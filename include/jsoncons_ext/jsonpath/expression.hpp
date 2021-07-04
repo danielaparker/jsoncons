@@ -2138,17 +2138,25 @@ namespace detail {
     template <class Json, class JsonReference>
     class dynamic_resources
     {
+        using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<typename Json::char_type>;
         using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<path_node_type>> temp_path_node_values_;
         std::unordered_map<std::size_t,std::pair<std::vector<path_stem_value_pair_type>,node_kind>> cache_;
+        std::unordered_map<std::size_t,pointer> cache2_;
         using node_accumulator_type = node_accumulator<Json,JsonReference>;
     public:
 
         bool is_cached(std::size_t id) const
         {
             return cache_.find(id) != cache_.end();
+        }
+
+        bool is_cached2(std::size_t id) const
+        {
+            return cache2_.find(id) != cache2_.end();
         }
 
         void add_to_cache(std::size_t id, const std::vector<path_stem_value_pair_type>& val, node_kind ndtype) 
@@ -2159,6 +2167,11 @@ namespace detail {
         void add_to_cache(std::size_t id, std::vector<path_stem_value_pair_type>&& val, node_kind ndtype) 
         {
             cache_.emplace(id,std::make_pair(std::forward<std::vector<path_stem_value_pair_type>>(val),ndtype));
+        }
+
+        void add_to_cache2(std::size_t id, reference val) 
+        {
+            cache2_.emplace(id, std::addressof(val));
         }
 
         void retrieve_from_cache(std::size_t id, node_accumulator_type& accumulator, node_kind& ndtype) 
@@ -2174,8 +2187,19 @@ namespace detail {
             }
         }
 
+        reference retrieve_from_cache2(std::size_t id) 
+        {
+            return *cache2_[id];
+        }
+
+        reference null_value()
+        {
+            static Json j{ null_type{} };
+            return j;
+        }
+
         template <typename... Args>
-        Json* new_json(Args&& ... args)
+        Json* create_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -2196,7 +2220,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        const path_node_type* new_path_node(Args&& ... args)
+        const path_node_type* create_path_node(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<path_node_type>(std::forward<Args>(args)...);
             path_node_type* ptr = temp.get();
@@ -2259,11 +2283,18 @@ namespace detail {
 
         virtual void select(dynamic_resources<Json,JsonReference>& resources,
                             reference root,
-                            const path_node_type& pathTail, 
+                            const path_node_type& pathStem, 
                             reference val, 
                             node_accumulator_type& accumulator,
                             node_kind& ndtype,
                             result_options options) const = 0;
+
+        virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                                   reference root,
+                                   const path_node_type& path_tail, 
+                                   reference current, 
+                                   result_options options,
+                                   std::error_code& ec) const = 0;
 
         virtual void append_selector(jsonpath_selector*) 
         {
@@ -2475,7 +2506,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        Json* new_json(Args&& ... args)
+        Json* create_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -2499,7 +2530,7 @@ namespace detail {
 
         virtual ~expression_base() noexcept = default;
 
-        virtual value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
+        virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                                            reference root,
                                            //const path_node_type& path, 
                                            reference val, 
@@ -2645,7 +2676,7 @@ namespace detail {
 
         Json& get_value(reference_arg_t, dynamic_resources<Json,JsonReference>& resources) const
         {
-            return *resources.new_json(value_);
+            return *resources.create_json(value_);
         }
 
         token& operator=(token&& other)
@@ -3092,7 +3123,7 @@ namespace detail {
 
         expression& operator=(expression&& expr) = default;
 
-        value_type evaluate_single(dynamic_resources<Json,reference>& resources, 
+        value_type evaluate(dynamic_resources<Json,reference>& resources, 
                                    reference root,
                                    reference current,
                                    result_options options,
@@ -3203,7 +3234,7 @@ namespace detail {
 
                             auto item = std::move(stack.back());
                             stack.pop_back();
-                            value_type val = tok.expression_->evaluate_single(resources, root, item.value(), options, ec);
+                            value_type val = tok.expression_->evaluate(resources, root, item.value(), options, ec);
                             //std::cout << "ref2: " << ref << "\n";
                             stack.emplace_back(std::move(val));
                             break;

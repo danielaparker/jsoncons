@@ -122,7 +122,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.new_path_node(&path_stem, index);
+                return *resources.create_path_node(&path_stem, index);
             }
             else
             {
@@ -138,7 +138,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.new_path_node(&path_stem, identifier);
+                return *resources.create_path_node(&path_stem, identifier);
             }
             else
             {
@@ -185,7 +185,7 @@ namespace detail {
             }
         }
 
-        void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
+        void tail_select(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
                            const path_node_type& path_stem, 
                            reference current,
@@ -200,6 +200,23 @@ namespace detail {
             else
             {
                 tail_->select(resources, root, path_stem, current, accumulator, ndtype, options);
+            }
+        }
+
+        reference evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
+                                reference root,
+                                const path_node_type& path_stem, 
+                                reference current, 
+                                result_options options,
+                                std::error_code& ec) const
+        {
+            if (!tail_)
+            {
+                return current;
+            }
+            else
+            {
+                return tail_->evaluate(resources, root, path_stem, current, options, ec);
             }
         }
 
@@ -263,7 +280,7 @@ namespace detail {
                 auto it = current.find(identifier_);
                 if (it != current.object_range().end())
                 {
-                    this->evaluate_tail(resources, root, 
+                    this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, identifier_, options),
                                         it->value(), accumulator, ndtype, options);
                 }
@@ -277,15 +294,15 @@ namespace detail {
                     std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
                     if (index < current.size())
                     {
-                        this->evaluate_tail(resources, root, 
+                        this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, index, options),
                                             current[index], accumulator, ndtype, options);
                     }
                 }
                 else if (identifier_ == length_name && current.size() > 0)
                 {
-                    pointer ptr = resources.new_json(current.size());
-                    this->evaluate_tail(resources, root, 
+                    pointer ptr = resources.create_json(current.size());
+                    this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, identifier_, options), 
                                         *ptr, 
                                         accumulator, ndtype, options);
@@ -295,12 +312,81 @@ namespace detail {
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.new_json(count);
-                this->evaluate_tail(resources, root, 
+                pointer ptr = resources.create_json(count);
+                this->tail_select(resources, root, 
                                     path_generator_type::generate(resources, path_stem, identifier_, options), 
                                     *ptr, accumulator, ndtype, options);
             }
             //std::cout << "end identifier_selector\n";
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
+
+            if (current.is_object())
+            {
+                auto it = current.find(identifier_);
+                if (it != current.object_range().end())
+                {
+                    return this->evaluate_tail(resources, root, 
+                                               path_generator_type::generate(resources, path_stem, identifier_, options),
+                                              it->value(), options, ec);
+                }
+                else
+                {
+                    return resources.null_value();
+                }
+            }
+            else if (current.is_array())
+            {
+                int64_t n{0};
+                auto r = jsoncons::detail::to_integer_decimal(identifier_.data(), identifier_.size(), n);
+                if (r)
+                {
+                    std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
+                    if (index < current.size())
+                    {
+                        return this->evaluate_tail(resources, root, 
+                                                   path_generator_type::generate(resources, path_stem, index, options),
+                                                   current[index], options, ec);
+                    }
+                    else
+                    {
+                        return resources.null_value();
+                    }
+                }
+                else if (identifier_ == length_name && current.size() > 0)
+                {
+                    pointer ptr = resources.create_json(current.size());
+                    return this->evaluate_tail(resources, root, 
+                                               path_generator_type::generate(resources, path_stem, identifier_, options), 
+                                               *ptr, 
+                                               options, ec);
+                }
+                else
+                {
+                    return resources.null_value();
+                }
+            }
+            else if (current.is_string() && identifier_ == length_name)
+            {
+                string_view_type sv = current.as_string_view();
+                std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
+                pointer ptr = resources.create_json(count);
+                return this->evaluate_tail(resources, root, 
+                                           path_generator_type::generate(resources, path_stem, identifier_, options), 
+                                           *ptr, options, ec);
+            }
+            else
+            {
+                return resources.null_value();
+            }
         }
 
         std::string to_string(int level = 0) const override
@@ -356,9 +442,32 @@ namespace detail {
             {
                 path_stem_value_accumulator<Json,JsonReference> accum;
 
-                this->evaluate_tail(resources, root, path_stem, root, accum, ndtype, options);
+                this->tail_select(resources, root, path_stem, root, accum, ndtype, options);
                 resources.add_to_cache(id_, std::move(accum.nodes), ndtype);
                 resources.retrieve_from_cache(id_, accumulator, ndtype);
+            }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            if (resources.is_cached2(id_))
+            {
+                return resources.retrieve_from_cache2(id_);
+            }
+            else
+            {
+                auto& ref = this->evaluate_tail(resources, root, path_stem, root, options, ec);
+                if (!ec)
+                {
+                    resources.add_to_cache2(id_, ref);
+                }
+
+                return ref;
             }
         }
 
@@ -405,8 +514,20 @@ namespace detail {
         {
             //std::cout << "current_node_selector: " << current << "\n";
             ndtype = node_kind::single;
-            this->evaluate_tail(resources,  
+            this->tail_select(resources,  
                                 root, path_stem, current, accumulator, ndtype, options);
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            //std::cout << "current_node_selector: " << current << "\n";
+            return this->evaluate_tail(resources,  
+                                root, path_stem, current, options, ec);
         }
 
         std::string to_string(int level = 0) const override
@@ -468,8 +589,42 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    this->evaluate_tail(resources, root, path.stem(), *ptr, accumulator, ndtype, options);        
+                    this->tail_select(resources, root, path.stem(), *ptr, accumulator, ndtype, options);        
                 }
+            }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            const path_node_type* ancestor = std::addressof(path_stem);
+            int index = 0;
+            while (ancestor != nullptr && index < ancestor_depth_)
+            {
+                ancestor = ancestor->parent();
+                ++index;
+            }
+
+            if (ancestor != nullptr)
+            {
+                normalized_path_type path(*ancestor);
+                pointer ptr = jsoncons::jsonpath::select(root,path);
+                if (ptr != nullptr)
+                {
+                    return this->evaluate_tail(resources, root, path.stem(), *ptr, options, ec);        
+                }
+                else
+                {
+                    return resources.null_value();
+                }
+            }
+            else
+            {
+                return resources.null_value();
             }
         }
 
@@ -523,7 +678,7 @@ namespace detail {
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t i = static_cast<std::size_t>(index_);
-                    this->evaluate_tail(resources, root, 
+                    this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, i, options), 
                                         current.at(i), accumulator, ndtype, options);
                 }
@@ -533,11 +688,50 @@ namespace detail {
                     if (index >= 0 && index < slen)
                     {
                         std::size_t i = static_cast<std::size_t>(index);
-                        this->evaluate_tail(resources, root, 
+                        this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, index, options), 
                                             current.at(i), accumulator, ndtype, options);
                     }
                 }
+            }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            if (current.is_array())
+            {
+                int64_t slen = static_cast<int64_t>(current.size());
+                if (index_ >= 0 && index_ < slen)
+                {
+                    std::size_t i = static_cast<std::size_t>(index_);
+                    return this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path_stem, i, options), 
+                                        current.at(i), options, ec);
+                }
+                else 
+                {
+                    int64_t index = slen + index_;
+                    if (index >= 0 && index < slen)
+                    {
+                        std::size_t i = static_cast<std::size_t>(index);
+                        return this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, index, options), 
+                                            current.at(i), options, ec);
+                    }
+                    else
+                    {
+                        return resources.null_value();
+                    }
+                }
+            }
+            else
+            {
+                return resources.null_value();
             }
         }
     };
@@ -577,7 +771,7 @@ namespace detail {
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    this->evaluate_tail(resources, root, 
+                    this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, i, options), current[i], 
                                         accumulator, tmptype, options);
                 }
@@ -586,11 +780,41 @@ namespace detail {
             {
                 for (auto& member : current.object_range())
                 {
-                    this->evaluate_tail(resources, root, 
+                    this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, member.key(), options), 
                                         member.value(), accumulator, tmptype, options);
                 }
             }
+            //std::cout << "end wildcard_selector\n";
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            auto jptr = resources.create_json(json_array_arg);
+            if (current.is_array())
+            {
+                for (std::size_t i = 0; i < current.size(); ++i)
+                {
+                    jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path_stem, i, options), current[i], 
+                                        options, ec));
+                }
+            }
+            else if (current.is_object())
+            {
+                for (auto& member : current.object_range())
+                {
+                    jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path_stem, member.key(), options), 
+                                        member.value(), options, ec));
+                }
+            }
+            return *jptr;
             //std::cout << "end wildcard_selector\n";
         }
 
@@ -639,7 +863,7 @@ namespace detail {
             //std::cout << "wildcard_selector: " << current << "\n";
             if (current.is_array())
             {
-                this->evaluate_tail(resources, root, path_stem, current, accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, current, accumulator, ndtype, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     select(resources, root, 
@@ -648,7 +872,7 @@ namespace detail {
             }
             else if (current.is_object())
             {
-                this->evaluate_tail(resources, root, path_stem, current, accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, current, accumulator, ndtype, options);
                 for (auto& item : current.object_range())
                 {
                     select(resources, root, 
@@ -656,6 +880,38 @@ namespace detail {
                 }
             }
             //std::cout << "end wildcard_selector\n";
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            //std::cout << "wildcard_selector: " << current << "\n";
+            auto jptr = resources.create_json(json_array_arg);
+            if (current.is_array())
+            {
+                jptr->emplace_back(this->evaluate_tail(resources, root, path_stem, current, options, ec));
+                for (std::size_t i = 0; i < current.size(); ++i)
+                {
+                    jptr->emplace_back(evaluate(resources, root, 
+                             path_generator_type::generate(resources, path_stem, i, options), current[i], 
+                             options, ec));
+                }
+            }
+            else if (current.is_object())
+            {
+                jptr->emplace_back(this->evaluate_tail(resources, root, path_stem, current, options, ec));
+                for (auto& item : current.object_range())
+                {
+                    jptr->emplace_back(evaluate(resources, root, 
+                           path_generator_type::generate(resources, path_stem, item.key(), options), item.value(), 
+                             options, ec));
+                }
+            }
+            return *jptr;
         }
 
         std::string to_string(int level = 0) const override
@@ -730,6 +986,22 @@ namespace detail {
             }
         }
 
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            auto jptr = resources.create_json(json_array_arg);
+
+            for (auto& selector : selectors_)
+            {
+                jptr->emplace_back(selector->evaluate(resources, root, path_stem, current, options, ec));
+            }
+            return *jptr;
+        }
+
         std::string to_string(int level = 0) const override
         {
             std::string s;
@@ -783,11 +1055,11 @@ namespace detail {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     std::error_code ec;
-                    value_type r = expr_.evaluate_single(resources, root, current[i], options, ec);
+                    value_type r = expr_.evaluate(resources, root, current[i], options, ec);
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, 
+                        this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, i, options), 
                                             current[i], accumulator, ndtype, options);
                     }
@@ -798,16 +1070,56 @@ namespace detail {
                 for (auto& member : current.object_range())
                 {
                     std::error_code ec;
-                    value_type r = expr_.evaluate_single(resources, root, member.value(), options, ec);
+                    value_type r = expr_.evaluate(resources, root, member.value(), options, ec);
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, 
+                        this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, member.key(), options), 
                                             member.value(), accumulator, ndtype, options);
                     }
                 }
             }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            auto jptr = resources.create_json(json_array_arg);
+
+            if (current.is_array())
+            {
+                for (std::size_t i = 0; i < current.size(); ++i)
+                {
+                    value_type r = expr_.evaluate(resources, root, current[i], options, ec);
+                    bool t = ec ? false : detail::is_true(r);
+                    if (t)
+                    {
+                        jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, i, options), 
+                                            current[i], options, ec));
+                    }
+                }
+            }
+            else if (current.is_object())
+            {
+                for (auto& member : current.object_range())
+                {
+                    value_type r = expr_.evaluate(resources, root, member.value(), options, ec);
+                    bool t = ec ? false : detail::is_true(r);
+                    if (t)
+                    {
+                        jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, member.key(), options), 
+                                            member.value(), options, ec));
+                    }
+                }
+            }
+            return *jptr;
         }
 
         std::string to_string(int level = 0) const override
@@ -857,19 +1169,52 @@ namespace detail {
             //std::cout << "index_expression_selector current: " << current << "\n";
 
             std::error_code ec;
-            value_type j = expr_.evaluate_single(resources, root, current, options, ec);
+            value_type j = expr_.evaluate(resources, root, current, options, ec);
 
             if (!ec)
             {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->evaluate_tail(resources, root, path_stem, current.at(start), accumulator, ndtype, options);
+                    this->tail_select(resources, root, path_stem, current.at(start), accumulator, ndtype, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->evaluate_tail(resources, root, path_stem, current.at(j.as_string_view()), accumulator, ndtype, options);
+                    this->tail_select(resources, root, path_stem, current.at(j.as_string_view()), accumulator, ndtype, options);
                 }
+            }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            //std::cout << "index_expression_selector current: " << current << "\n";
+
+            value_type j = expr_.evaluate(resources, root, current, options, ec);
+
+            if (!ec)
+            {
+                if (j.template is<std::size_t>() && current.is_array())
+                {
+                    std::size_t start = j.template as<std::size_t>();
+                    return this->evaluate_tail(resources, root, path_stem, current.at(start), options, ec);
+                }
+                else if (j.is_string() && current.is_object())
+                {
+                    return this->evaluate_tail(resources, root, path_stem, current.at(j.as_string_view()), options, ec);
+                }
+                else
+                {
+                    return resources.null_value();
+                }
+            }
+            else
+            {
+                return resources.null_value();
             }
         }
 
@@ -938,7 +1283,7 @@ namespace detail {
                     for (int64_t i = start; i < end; i += step)
                     {
                         std::size_t j = static_cast<std::size_t>(i);
-                        this->evaluate_tail(resources, root, 
+                        this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, j, options), 
                                             current[j], accumulator, ndtype, options);
                     }
@@ -958,12 +1303,69 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         if (j < current.size())
                         {
-                            this->evaluate_tail(resources, root, 
+                            this->tail_select(resources, root, 
                                                 path_generator_type::generate(resources, path_stem,j,options), current[j], accumulator, ndtype, options);
                         }
                     }
                 }
             }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            auto jptr = resources.create_json(json_array_arg);
+            if (current.is_array())
+            {
+                auto start = slice_.get_start(current.size());
+                auto end = slice_.get_stop(current.size());
+                auto step = slice_.step();
+
+                if (step > 0)
+                {
+                    if (start < 0)
+                    {
+                        start = 0;
+                    }
+                    if (end > static_cast<int64_t>(current.size()))
+                    {
+                        end = current.size();
+                    }
+                    for (int64_t i = start; i < end; i += step)
+                    {
+                        std::size_t j = static_cast<std::size_t>(i);
+                        jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, j, options), 
+                                            current[j], options, ec));
+                    }
+                }
+                else if (step < 0)
+                {
+                    if (start >= static_cast<int64_t>(current.size()))
+                    {
+                        start = static_cast<int64_t>(current.size()) - 1;
+                    }
+                    if (end < -1)
+                    {
+                        end = -1;
+                    }
+                    for (int64_t i = start; i > end; i += step)
+                    {
+                        std::size_t j = static_cast<std::size_t>(i);
+                        if (j < current.size())
+                        {
+                            jptr->emplace_back(this->evaluate_tail(resources, root, 
+                                                path_generator_type::generate(resources, path_stem,j,options), 
+                                                current[j], options, ec));
+                        }
+                    }
+                }
+            }
+            return *jptr;
         }
     };
 
@@ -998,10 +1400,29 @@ namespace detail {
         {
             ndtype = node_kind::single;
             std::error_code ec;
-            value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
+            value_type ref = expr_.evaluate(resources, root, current, options, ec);
             if (!ec)
             {
-                this->evaluate_tail(resources, root, path_stem, *resources.new_json(std::move(ref)), accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, *resources.create_json(std::move(ref)), accumulator, ndtype, options);
+            }
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           reference root,
+                           const path_node_type& path_stem, 
+                           reference current, 
+                           result_options options,
+                           std::error_code& ec) const override
+        {
+            value_type ref = expr_.evaluate(resources, root, current, options, ec);
+            if (!ec)
+            {
+                return this->evaluate_tail(resources, root, path_stem, *resources.create_json(std::move(ref)), 
+                                    options, ec);
+            }
+            else
+            {
+                return resources.null_value();
             }
         }
 
