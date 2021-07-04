@@ -213,7 +213,6 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current,
                            node_accumulator_type& accumulator,
-                           node_kind& ndtype,
                            result_options options) const
         {
             if (!tail_)
@@ -222,7 +221,7 @@ namespace detail {
             }
             else
             {
-                tail_->select(resources, root, path_stem, current, accumulator, ndtype, options);
+                tail_->select(resources, root, path_stem, current, accumulator, options);
             }
         }
 
@@ -288,7 +287,6 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
             //std::string buf;
@@ -297,7 +295,6 @@ namespace detail {
 
             static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
 
-            ndtype = node_kind::single;
             if (current.is_object())
             {
                 auto it = current.find(identifier_);
@@ -305,7 +302,7 @@ namespace detail {
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, identifier_, options),
-                                        it->value(), accumulator, ndtype, options);
+                                        it->value(), accumulator, options);
                 }
             }
             else if (current.is_array())
@@ -319,7 +316,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, index, options),
-                                            current[index], accumulator, ndtype, options);
+                                            current[index], accumulator, options);
                     }
                 }
                 else if (identifier_ == length_name && current.size() > 0)
@@ -328,7 +325,7 @@ namespace detail {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, identifier_, options), 
                                         *ptr, 
-                                        accumulator, ndtype, options);
+                                        accumulator, options);
                 }
             }
             else if (current.is_string() && identifier_ == length_name)
@@ -338,7 +335,7 @@ namespace detail {
                 pointer ptr = resources.create_json(count);
                 this->tail_select(resources, root, 
                                     path_generator_type::generate(resources, path_stem, identifier_, options), 
-                                    *ptr, accumulator, ndtype, options);
+                                    *ptr, accumulator, options);
             }
             //std::cout << "end identifier_selector\n";
         }
@@ -454,21 +451,9 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            if (resources.is_cached(id_))
-            {
-                resources.retrieve_from_cache(id_, accumulator, ndtype);
-            }
-            else
-            {
-                path_stem_value_accumulator<Json,JsonReference> accum;
-
-                this->tail_select(resources, root, path_stem, root, accum, ndtype, options);
-                resources.add_to_cache(id_, std::move(accum.nodes), ndtype);
-                resources.retrieve_from_cache(id_, accumulator, ndtype);
-            }
+                this->tail_select(resources, root, path_stem, root, accumulator, options);
         }
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -478,16 +463,16 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
-            if (resources.is_cached2(id_))
+            if (resources.is_cached(id_))
             {
-                return resources.retrieve_from_cache2(id_);
+                return resources.retrieve_from_cache(id_);
             }
             else
             {
                 auto& ref = this->evaluate_tail(resources, root, path_stem, root, options, ec);
                 if (!ec)
                 {
-                    resources.add_to_cache2(id_, ref);
+                    resources.add_to_cache(id_, ref);
                 }
 
                 return ref;
@@ -532,13 +517,10 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "current_node_selector: " << current << "\n";
-            ndtype = node_kind::single;
             this->tail_select(resources,  
-                                root, path_stem, current, accumulator, ndtype, options);
+                                root, path_stem, current, accumulator, options);
         }
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -595,7 +577,6 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
             const path_node_type* ancestor = std::addressof(path_stem);
@@ -612,7 +593,7 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    this->tail_select(resources, root, path.stem(), *ptr, accumulator, ndtype, options);        
+                    this->tail_select(resources, root, path.stem(), *ptr, accumulator, options);        
                 }
             }
         }
@@ -691,10 +672,8 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            ndtype = node_kind::single;
             if (current.is_array())
             {
                 int64_t slen = static_cast<int64_t>(current.size());
@@ -703,7 +682,7 @@ namespace detail {
                     std::size_t i = static_cast<std::size_t>(index_);
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, i, options), 
-                                        current.at(i), accumulator, ndtype, options);
+                                        current.at(i), accumulator, options);
                 }
                 else 
                 {
@@ -713,7 +692,7 @@ namespace detail {
                         std::size_t i = static_cast<std::size_t>(index);
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, index, options), 
-                                            current.at(i), accumulator, ndtype, options);
+                                            current.at(i), accumulator, options);
                     }
                 }
             }
@@ -783,20 +762,15 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "wildcard_selector: " << current << "\n";
-            ndtype = node_kind::multi; // always multi
-
-            node_kind tmptype;
             if (current.is_array())
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, i, options), current[i], 
-                                        accumulator, tmptype, options);
+                                        accumulator, options);
                 }
             }
             else if (current.is_object())
@@ -805,7 +779,7 @@ namespace detail {
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, path_stem, member.key(), options), 
-                                        member.value(), accumulator, tmptype, options);
+                                        member.value(), accumulator, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -816,34 +790,12 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current, 
                            result_options options,
-                           std::error_code& ec) const override
+                           std::error_code&) const override
         {
-            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
             json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,path_stem,current,accum,ndtype,options);
+            select(resources, root, path_stem, current, accum, options);
             return *jptr;
-            /*auto jptr = resources.create_json(json_array_arg);
-            if (current.is_array())
-            {
-                for (std::size_t i = 0; i < current.size(); ++i)
-                {
-                    jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path_stem, i, options), current[i], 
-                                        options, ec));
-                }
-            }
-            else if (current.is_object())
-            {
-                for (auto& member : current.object_range())
-                {
-                    jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path_stem, member.key(), options), 
-                                        member.value(), options, ec));
-                }
-            }
-            return *jptr;*/
-            //std::cout << "end wildcard_selector\n";
         }
 
         std::string to_string(int level = 0) const override
@@ -885,26 +837,24 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "wildcard_selector: " << current << "\n";
             if (current.is_array())
             {
-                this->tail_select(resources, root, path_stem, current, accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, current, accumulator, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path_stem, i, options), current[i], accumulator, ndtype, options);
+                           path_generator_type::generate(resources, path_stem, i, options), current[i], accumulator, options);
                 }
             }
             else if (current.is_object())
             {
-                this->tail_select(resources, root, path_stem, current, accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, current, accumulator, options);
                 for (auto& item : current.object_range())
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path_stem, item.key(), options), item.value(), accumulator, ndtype, options);
+                           path_generator_type::generate(resources, path_stem, item.key(), options), item.value(), accumulator, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -915,36 +865,12 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current, 
                            result_options options,
-                           std::error_code& ec) const override
+                           std::error_code&) const override
         {
-            //std::cout << "wildcard_selector: " << current << "\n";
-            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
             json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,path_stem,current,accum,ndtype,options);
+            select(resources, root, path_stem, current, accum, options);
             return *jptr;
-            /* auto jptr = resources.create_json(json_array_arg);
-            if (current.is_array())
-            {
-                jptr->emplace_back(this->evaluate_tail(resources, root, path_stem, current, options, ec));
-                for (std::size_t i = 0; i < current.size(); ++i)
-                {
-                    jptr->emplace_back(evaluate(resources, root, 
-                             path_generator_type::generate(resources, path_stem, i, options), current[i], 
-                             options, ec));
-                }
-            }
-            else if (current.is_object())
-            {
-                jptr->emplace_back(this->evaluate_tail(resources, root, path_stem, current, options, ec));
-                for (auto& item : current.object_range())
-                {
-                    jptr->emplace_back(evaluate(resources, root, 
-                           path_generator_type::generate(resources, path_stem, item.key(), options), item.value(), 
-                             options, ec));
-                }
-            }
-            return *jptr;*/
         }
 
         std::string to_string(int level = 0) const override
@@ -1007,15 +933,11 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "union_selector select current: " << current << "\n";
-            ndtype = node_kind::multi;
-
             for (auto& selector : selectors_)
             {
-                selector->select(resources, root, path_stem, current, accumulator, ndtype, options);
+                selector->select(resources, root, path_stem, current, accumulator, options);
             }
         }
 
@@ -1024,20 +946,12 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current, 
                            result_options options,
-                           std::error_code& ec) const override
+                           std::error_code&) const override
         {
-            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
             json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,path_stem,current,accum,ndtype,options);
+            select(resources,root,path_stem,current,accum,options);
             return *jptr;
-            /*auto jptr = resources.create_json(json_array_arg);
-
-            for (auto& selector : selectors_)
-            {
-                jptr->emplace_back(selector->evaluate(resources, root, path_stem, current, options, ec));
-            }
-            return *jptr;*/
         }
 
         std::string to_string(int level = 0) const override
@@ -1085,7 +999,6 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
             if (current.is_array())
@@ -1099,7 +1012,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, i, options), 
-                                            current[i], accumulator, ndtype, options);
+                                            current[i], accumulator, options);
                     }
                 }
             }
@@ -1114,7 +1027,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, member.key(), options), 
-                                            member.value(), accumulator, ndtype, options);
+                                            member.value(), accumulator, options);
                     }
                 }
             }
@@ -1127,43 +1040,10 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            node_kind ndtype;
-
             auto jptr = resources.create_json(json_array_arg);
             json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,path_stem,current,accum,ndtype,options);
+            select(resources, root, path_stem, current, accum, options);
             return *jptr;
-/*
-            if (current.is_array())
-            {
-                for (std::size_t i = 0; i < current.size(); ++i)
-                {
-                    value_type r = expr_.evaluate(resources, root, current[i], options, ec);
-                    bool t = ec ? false : detail::is_true(r);
-                    if (t)
-                    {
-                        jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path_stem, i, options), 
-                                            current[i], options, ec));
-                    }
-                }
-            }
-            else if (current.is_object())
-            {
-                for (auto& member : current.object_range())
-                {
-                    value_type r = expr_.evaluate(resources, root, member.value(), options, ec);
-                    bool t = ec ? false : detail::is_true(r);
-                    if (t)
-                    {
-                        jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path_stem, member.key(), options), 
-                                            member.value(), options, ec));
-                    }
-                }
-            }
-            return *jptr;
-*/
         }
 
         std::string to_string(int level = 0) const override
@@ -1207,11 +1087,8 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "index_expression_selector current: " << current << "\n";
-
             std::error_code ec;
             value_type j = expr_.evaluate(resources, root, current, options, ec);
 
@@ -1220,11 +1097,11 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->tail_select(resources, root, path_stem, current.at(start), accumulator, ndtype, options);
+                    this->tail_select(resources, root, path_stem, current.at(start), accumulator, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->tail_select(resources, root, path_stem, current.at(j.as_string_view()), accumulator, ndtype, options);
+                    this->tail_select(resources, root, path_stem, current.at(j.as_string_view()), accumulator, options);
                 }
             }
         }
@@ -1303,11 +1180,8 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            ndtype = node_kind::multi;
-
             if (current.is_array())
             {
                 auto start = slice_.get_start(current.size());
@@ -1329,7 +1203,7 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, path_stem, j, options), 
-                                            current[j], accumulator, ndtype, options);
+                                            current[j], accumulator, options);
                     }
                 }
                 else if (step < 0)
@@ -1348,7 +1222,7 @@ namespace detail {
                         if (j < current.size())
                         {
                             this->tail_select(resources, root, 
-                                                path_generator_type::generate(resources, path_stem,j,options), current[j], accumulator, ndtype, options);
+                                                path_generator_type::generate(resources, path_stem,j,options), current[j], accumulator, options);
                         }
                     }
                 }
@@ -1360,61 +1234,12 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current, 
                            result_options options,
-                           std::error_code& ec) const override
+                           std::error_code&) const override
         {
-            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
             json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,path_stem,current,accum,ndtype,options);
+            select(resources, root, path_stem, current, accum, options);
             return *jptr;
-            /*auto jptr = resources.create_json(json_array_arg);
-            if (current.is_array())
-            {
-                auto start = slice_.get_start(current.size());
-                auto end = slice_.get_stop(current.size());
-                auto step = slice_.step();
-
-                if (step > 0)
-                {
-                    if (start < 0)
-                    {
-                        start = 0;
-                    }
-                    if (end > static_cast<int64_t>(current.size()))
-                    {
-                        end = current.size();
-                    }
-                    for (int64_t i = start; i < end; i += step)
-                    {
-                        std::size_t j = static_cast<std::size_t>(i);
-                        jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path_stem, j, options), 
-                                            current[j], options, ec));
-                    }
-                }
-                else if (step < 0)
-                {
-                    if (start >= static_cast<int64_t>(current.size()))
-                    {
-                        start = static_cast<int64_t>(current.size()) - 1;
-                    }
-                    if (end < -1)
-                    {
-                        end = -1;
-                    }
-                    for (int64_t i = start; i > end; i += step)
-                    {
-                        std::size_t j = static_cast<std::size_t>(i);
-                        if (j < current.size())
-                        {
-                            jptr->emplace_back(this->evaluate_tail(resources, root, 
-                                                path_generator_type::generate(resources, path_stem,j,options), 
-                                                current[j], options, ec));
-                        }
-                    }
-                }
-            }
-            return *jptr;*/
         }
     };
 
@@ -1444,15 +1269,13 @@ namespace detail {
                     const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
-                    node_kind& ndtype,
                     result_options options) const override
         {
-            ndtype = node_kind::single;
             std::error_code ec;
             value_type ref = expr_.evaluate(resources, root, current, options, ec);
             if (!ec)
             {
-                this->tail_select(resources, root, path_stem, *resources.create_json(std::move(ref)), accumulator, ndtype, options);
+                this->tail_select(resources, root, path_stem, *resources.create_json(std::move(ref)), accumulator, options);
             }
         }
 

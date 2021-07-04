@@ -357,8 +357,6 @@ namespace jsonpath {
 
 namespace detail {
 
-    enum class node_kind{unknown, single, multi};
-
     template <class Json,class JsonReference>
     class dynamic_resources;
 
@@ -2144,52 +2142,19 @@ namespace detail {
         using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<path_node_type>> temp_path_node_values_;
-        std::unordered_map<std::size_t,std::pair<std::vector<path_stem_value_pair_type>,node_kind>> cache_;
-        std::unordered_map<std::size_t,pointer> cache2_;
-        using node_accumulator_type = node_accumulator<Json,JsonReference>;
+        std::unordered_map<std::size_t,pointer> cache_;
     public:
-
         bool is_cached(std::size_t id) const
         {
             return cache_.find(id) != cache_.end();
         }
-
-        bool is_cached2(std::size_t id) const
+        void add_to_cache(std::size_t id, reference val) 
         {
-            return cache2_.find(id) != cache2_.end();
+            cache_.emplace(id, std::addressof(val));
         }
-
-        void add_to_cache(std::size_t id, const std::vector<path_stem_value_pair_type>& val, node_kind ndtype) 
+        reference retrieve_from_cache(std::size_t id) 
         {
-            cache_.emplace(id,std::make_pair(val,ndtype));
-        }
-
-        void add_to_cache(std::size_t id, std::vector<path_stem_value_pair_type>&& val, node_kind ndtype) 
-        {
-            cache_.emplace(id,std::make_pair(std::forward<std::vector<path_stem_value_pair_type>>(val),ndtype));
-        }
-
-        void add_to_cache2(std::size_t id, reference val) 
-        {
-            cache2_.emplace(id, std::addressof(val));
-        }
-
-        void retrieve_from_cache(std::size_t id, node_accumulator_type& accumulator, node_kind& ndtype) 
-        {
-            auto it = cache_.find(id);
-            if (it != cache_.end())
-            {
-                for (auto& item : it->second.first)
-                {
-                    accumulator.accumulate(item.stem(), item.value());
-                }
-                ndtype = it->second.second;
-            }
-        }
-
-        reference retrieve_from_cache2(std::size_t id) 
-        {
-            return *cache2_[id];
+            return *cache_[id];
         }
 
         reference null_value()
@@ -2286,7 +2251,6 @@ namespace detail {
                             const path_node_type& pathStem, 
                             reference val, 
                             node_accumulator_type& accumulator,
-                            node_kind& ndtype,
                             result_options options) const = 0;
 
         virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -3003,14 +2967,13 @@ namespace detail {
             std::error_code ec;
 
             options |= required_options_;
-            node_kind ndtype = node_kind();
 
             const result_options require_more = result_options::nodups | result_options::sort;
 
             if ((options & require_more) != result_options())
             {
                 path_value_accumulator<Json,JsonReference> accumulator;
-                selector_->select(resources, root, path, current, accumulator, ndtype, options);
+                selector_->select(resources, root, path, current, accumulator, options);
 
                 if (accumulator.nodes.size() > 1 && (options & result_options::sort) == result_options::sort)
                 {
@@ -3063,7 +3026,7 @@ namespace detail {
             else
             {
                 callback_accumulator<Callback,Json,JsonReference> accumulator(callback);
-                selector_->select(resources, root, path, current, accumulator, ndtype, options);
+                selector_->select(resources, root, path, current, accumulator, options);
             }
         }
 
@@ -3272,58 +3235,6 @@ namespace detail {
 
                             stack.pop_back();
                             stack.emplace_back(stack_item_type(std::addressof(val)));
-                            /*node_kind ndtype = node_kind();
-                            path_value_accumulator<Json,JsonReference> accumulator;
-                            tok.selector_->select(resources, root, resources.current_path_node(), item.value(), accumulator, ndtype, options);
-                            
-                            if ((options & result_options::sort) == result_options::sort)
-                            {
-                                std::sort(accumulator.nodes.begin(), accumulator.nodes.end(), path_value_pair_less_type());
-                            }
-
-                            if ((options & result_options::nodups) == result_options::nodups)
-                            {
-                                if ((options & result_options::sort) == result_options::sort)
-                                {
-                                    auto last = std::unique(accumulator.nodes.begin(),accumulator.nodes.end(),path_value_pair_equal_type());
-                                    accumulator.nodes.erase(last,accumulator.nodes.end());
-                                    stack.emplace_back(nodes_to_stack_item(accumulator.nodes, ndtype));
-                                }
-                                else
-                                {
-                                    std::vector<path_value_pair_type> index(accumulator.nodes);
-                                    std::sort(index.begin(), index.end(), path_value_pair_less_type());
-                                    auto last = std::unique(index.begin(),index.end(),path_value_pair_equal_type());
-                                    index.erase(last,index.end());
-
-                                    std::vector<path_value_pair_type> temp2;
-                                    temp2.reserve(index.size());
-                                    for (auto&& node : accumulator.nodes)
-                                    {
-                                        //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                        auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
-
-                                        if (it != index.end() && it->path() == node.path()) 
-                                        {
-                                            temp2.emplace_back(std::move(node));
-                                            index.erase(it);
-                                        }
-                                    }
-                                    stack.emplace_back(nodes_to_stack_item(temp2, ndtype));
-                                }
-                            }
-                            else
-                            {
-                                //std::cout << "selector output " << accumulator.nodes.size() << "\n";
-                                //for (auto& item : accumulator.nodes)
-                                //{
-                                //    std::cout << *item.ptr << "\n";
-                                //}
-                                //std::cout << "\n";
-                                stack.emplace_back(nodes_to_stack_item(accumulator.nodes, ndtype));
-                            }*/
-
-                            
                             break;
                         }
                         default:
@@ -3357,27 +3268,6 @@ namespace detail {
 
         }
     private:
-        static stack_item_type nodes_to_stack_item(std::vector<path_value_pair_type>& nodes, node_kind tag)
-        {
-            if (nodes.empty())
-            {
-                return stack_item_type(Json(null_type()));
-            }
-            else if (nodes.size() == 1 && (tag == node_kind::single || tag == node_kind()))
-            {
-                return stack_item_type(nodes.back().value_ptr_);
-            }
-            else
-            {
-                Json j(json_array_arg);
-                j.reserve(nodes.size());
-                for (auto& item : nodes)
-                {
-                    j.emplace_back(item.value());
-                }
-                return stack_item_type(std::move(j));
-            }
-        }
     };
 
 } // namespace detail
