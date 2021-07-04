@@ -54,6 +54,7 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
     $..['firstName',@.address.city]
 
 - Fiter expressions, e.g. `$..book[?(@.price<10)]`, may omit the enclosing parentheses, like so `$..book[?@.price<10]`. 
+- A parent operator `^` allows you to access the parent node (since 0.166.0) 
 - Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
 ### Paths
@@ -63,15 +64,15 @@ JSONPath uses paths to select values. Paths can use the dot-notation or the brac
 
 Select the first (indexed 0) book in [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3) using the dot notation:
 
-    $.store.book.0
+    $.store.book[0]
 
 or
 
-    $.'store'.'book'.0
+    $.'store'.'book'[0]
 
 or
 
-    $."store"."book".0
+    $."store"."book"[0]
 
 The leading `$` represents the root JSON value. 
 Unquoted names in the dot notation are restricted to digits 0-9, letters A-Z and a-z, 
@@ -273,6 +274,12 @@ Precedence|Operator|Associativity
 8 |<code>&#124;&#124;</code> |Left 
 
 The precedence rules may be overriden with explicit parentheses, e.g. (a || b) && c.
+
+#### Properties
+
+Property|Description|Example
+--------|-----------|-------
+length  | Gets the number of elements in an array, or the number of codepoints in a string | `$[?(@.length == 2)]`
 
 ### Unions
 
