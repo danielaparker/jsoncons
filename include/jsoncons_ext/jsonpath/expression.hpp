@@ -3267,8 +3267,12 @@ namespace detail {
                             //std::cout << "\n";
                             //}
                             //std::cout << "selector item: " << *ptr << "\n";
+
+                            reference val = tok.selector_->evaluate(resources, root, resources.current_path_node(), item.value(), options, ec);
+
                             stack.pop_back();
-                            node_kind ndtype = node_kind();
+                            stack.emplace_back(stack_item_type(std::addressof(val)));
+                            /*node_kind ndtype = node_kind();
                             path_value_accumulator<Json,JsonReference> accumulator;
                             tok.selector_->select(resources, root, resources.current_path_node(), item.value(), accumulator, ndtype, options);
                             
@@ -3317,7 +3321,7 @@ namespace detail {
                                 //}
                                 //std::cout << "\n";
                                 stack.emplace_back(nodes_to_stack_item(accumulator.nodes, ndtype));
-                            }
+                            }*/
 
                             
                             break;

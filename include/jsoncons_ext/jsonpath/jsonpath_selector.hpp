@@ -108,6 +108,29 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class json_array_accumulator : public node_accumulator<Json,JsonReference>
+    {
+    public:
+        using reference = JsonReference;
+        using char_type = typename Json::char_type;
+        using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
+
+        Json* val;
+
+        json_array_accumulator(Json* ptr)
+            : val(ptr)
+        {
+        }
+
+        void accumulate(const path_node_type&, reference value) override
+        {
+            val->emplace_back(value);
+        }
+    };
+
+    template <class Json,class JsonReference>
     struct path_generator
     {
         using char_type = typename Json::char_type;
@@ -795,7 +818,12 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
+            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
+            json_array_accumulator<Json,JsonReference> accum(jptr);
+            select(resources,root,path_stem,current,accum,ndtype,options);
+            return *jptr;
+            /*auto jptr = resources.create_json(json_array_arg);
             if (current.is_array())
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
@@ -814,7 +842,7 @@ namespace detail {
                                         member.value(), options, ec));
                 }
             }
-            return *jptr;
+            return *jptr;*/
             //std::cout << "end wildcard_selector\n";
         }
 
@@ -890,7 +918,12 @@ namespace detail {
                            std::error_code& ec) const override
         {
             //std::cout << "wildcard_selector: " << current << "\n";
+            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
+            json_array_accumulator<Json,JsonReference> accum(jptr);
+            select(resources,root,path_stem,current,accum,ndtype,options);
+            return *jptr;
+            /* auto jptr = resources.create_json(json_array_arg);
             if (current.is_array())
             {
                 jptr->emplace_back(this->evaluate_tail(resources, root, path_stem, current, options, ec));
@@ -911,7 +944,7 @@ namespace detail {
                              options, ec));
                 }
             }
-            return *jptr;
+            return *jptr;*/
         }
 
         std::string to_string(int level = 0) const override
@@ -993,13 +1026,18 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
+            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
+            json_array_accumulator<Json,JsonReference> accum(jptr);
+            select(resources,root,path_stem,current,accum,ndtype,options);
+            return *jptr;
+            /*auto jptr = resources.create_json(json_array_arg);
 
             for (auto& selector : selectors_)
             {
                 jptr->emplace_back(selector->evaluate(resources, root, path_stem, current, options, ec));
             }
-            return *jptr;
+            return *jptr;*/
         }
 
         std::string to_string(int level = 0) const override
@@ -1087,10 +1125,15 @@ namespace detail {
                            const path_node_type& path_stem, 
                            reference current, 
                            result_options options,
-                           std::error_code& ec) const override
+                           std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            node_kind ndtype;
 
+            auto jptr = resources.create_json(json_array_arg);
+            json_array_accumulator<Json,JsonReference> accum(jptr);
+            select(resources,root,path_stem,current,accum,ndtype,options);
+            return *jptr;
+/*
             if (current.is_array())
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
@@ -1120,6 +1163,7 @@ namespace detail {
                 }
             }
             return *jptr;
+*/
         }
 
         std::string to_string(int level = 0) const override
@@ -1318,7 +1362,12 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
+            node_kind ndtype;
             auto jptr = resources.create_json(json_array_arg);
+            json_array_accumulator<Json,JsonReference> accum(jptr);
+            select(resources,root,path_stem,current,accum,ndtype,options);
+            return *jptr;
+            /*auto jptr = resources.create_json(json_array_arg);
             if (current.is_array())
             {
                 auto start = slice_.get_start(current.size());
@@ -1365,7 +1414,7 @@ namespace detail {
                     }
                 }
             }
-            return *jptr;
+            return *jptr;*/
         }
     };
 
