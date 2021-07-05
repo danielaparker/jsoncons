@@ -1,15 +1,22 @@
 0.166.0
 -------
 
-Bugs fixed:
+jsonpath bugs fixed:
  
 - Fixed issue with normalized paths produced by JSONPath expressions with filters
  
 jsonpath enhancements:
  
-- Added support for parent selector, `^', following jsonpath-plus. 
+- Added support for a parent selector, using the `^' symbol, 
+following [jsonpath-plus](https://www.npmjs.com/package/jsonpath-plus). 
 
 - Implemented a number of performance optimizations.
+
+jsonschema enhancements:
+
+- Improved error messages reported when compiling a schema document
+
+- Added a check that the "$schema" keyword, if present, is Draft 7.
 
 0.165.0
 -------
