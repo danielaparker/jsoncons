@@ -283,7 +283,7 @@ that allows you to select book objects based on criteria applied to descendent v
 
 Query                           |Output paths
 --------------------------------|------------
-$[*]reviews[?(@.rating == 5)]   | "$[1]['reviews'][1]"
+$[*]reviews[?(@.rating == 5)]   | "$[1]['reviews'][0]"
 &nbsp;                          | "$[2]['reviews'][1]"
 $[*]reviews[?(@.rating == 5)]^  | "$[1]['reviews']"
 &nbsp;                          | "$[2]['reviews']"
