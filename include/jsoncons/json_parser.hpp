@@ -592,6 +592,7 @@ public:
                     state_ = json_parse_state::done;
                     more_ = false;
                     break;
+                case json_parse_state::start:
                 case json_parse_state::done:
                     more_ = false;
                     break;

@@ -720,6 +720,37 @@ namespace {
         std::cout << "(2) " << result2 << "\n\n";
     }
 
+    void parent_operator_example() 
+    {
+        std::string doc = R"(
+[
+    {
+      "author" : "Haruki Murakami",
+      "title": "A Wild Sheep Chase",
+      "reviews": [{"rating": 4, "reviewer": "Nan"}]
+    },
+    {
+      "author" : "Sergei Lukyanenko",
+      "title": "The Night Watch",
+      "reviews": [{"rating": 5, "reviewer": "Alan"},
+                  {"rating": 3,"reviewer": "Anne"}]
+    },
+    {
+      "author" : "Graham Greene",
+      "title": "The Comedians",
+      "reviews": [{"rating": 4, "reviewer": "Lisa"},
+                  {"rating": 3, "reviewer": "Robert"}]
+    }
+]
+        )";
+
+        json store = json::parse(doc);
+
+        std::string path = "$[*].reviews[?(@.rating == 5)]^^";
+        auto result = jsonpath::json_query(store, path);
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
     template <class Json>
     class my_custom_functions : public jsonpath::custom_functions<Json>
     {
@@ -776,7 +807,7 @@ void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
 
-    jsonpath_complex_examples();
+  /*  jsonpath_complex_examples();
     jsonpath_union();
     flatten_and_unflatten();
     more_json_query_examples();
@@ -805,6 +836,7 @@ void jsonpath_examples()
     function_ceil_example();
 
     union_example();
+*/    parent_operator_example();
     std::cout << "\n";
 }
 

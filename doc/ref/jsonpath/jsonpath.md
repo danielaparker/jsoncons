@@ -109,6 +109,7 @@ JSONPath|       Description
 `[]`    |Subscript operator. 
 `[,]`   |Union.
 `[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
+`^`     | Parent operator (since 0.166.0)
 `?<expr>`   |Filter by expression.
 
 ### Duplicates and ordering
@@ -206,6 +207,75 @@ $[1::-1]   | First two items, reversed
 $[:-3:-1]  | Last two items, reversed
 $[-3::-1]  | All items except the last two, reversed
 
+### Unions
+
+In jsoncons, a JSONPath union element can be
+
+- an index or slice expression
+- a single quoted name
+- a double quoted name
+- a filter
+- a wildcard, i.e. `*`
+- a path relative to the root of the JSON document (begins with `$`)
+- a path relative to the current value being processed (begins with `@`)
+
+To illustrate, the path expression below selects the first and second titles, 
+the last, and the third from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
+
+```
+"$.store.book[0:2,-1,?(@.author=='Herman Melville')].title"
+```
+
+### Parent operator (since 0.166.0)
+
+Consider the JSON document 
+
+```
+[
+    {
+      "author" : "Haruki Murakami",
+      "title": "A Wild Sheep Chase",
+      "reviews": [{"rating": 4, "reviewer": "Nan"}]
+    },
+    {
+      "author" : "Sergei Lukyanenko",
+      "title": "The Night Watch",
+      "reviews": [{"rating": 5, "reviewer": "Alan"},
+                  {"rating": 3,"reviewer": "Anne"}]
+    },
+    {
+      "author" : "Graham Greene",
+      "title": "The Comedians",
+      "reviews": [{"rating": 4, "reviewer": "Lisa"},
+                  {"rating": 3, "reviewer": "Robert"}]
+    }
+]
+```
+with selector
+```
+$[*].reviews[?(@.rating == 5)]^^
+```
+
+This selects the book objects that have ratings of 5:
+```
+[
+    {
+        "author": "Sergei Lukyanenko",
+        "reviews": [
+            {
+                "rating": 5,
+                "reviewer": "Alan"
+            },
+            {
+                "rating": 3,
+                "reviewer": "Anne"
+            }
+        ],
+        "title": "The Night Watch"
+    }
+]
+```
+
 ### Filter expressions
 
 JSONPath uses filter expressions `[?<expr>]` to restrict the set of nodes
@@ -280,25 +350,6 @@ The precedence rules may be overriden with explicit parentheses, e.g. (a || b) &
 Property|Description|Example
 --------|-----------|-------
 length  | Gets the number of elements in an array, or the number of codepoints in a string | `$[?(@.length == 2)]`
-
-### Unions
-
-In jsoncons, a JSONPath union element can be
-
-- an index or slice expression
-- a single quoted name
-- a double quoted name
-- a filter
-- a wildcard, i.e. `*`
-- a path relative to the root of the JSON document (begins with `$`)
-- a path relative to the current value being processed (begins with `@`)
-
-To illustrate, the path expression below selects the first and second titles, 
-the last, and the third from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
-
-```
-"$.store.book[0:2,-1,?(@.author=='Herman Melville')].title"
-```
 
 ### Function expressions
 

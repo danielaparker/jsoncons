@@ -461,11 +461,11 @@ int main()
 
         jsonpointer_examples();
 
-        jsonpath_examples();
-
         bson_examples();
 
         json_reader_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {
