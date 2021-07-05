@@ -3,7 +3,11 @@
 
 Bugs fixed:
  
-- Fixed issue with normalized paths produced by JSONPath expressions with filters 
+- Fixed issue with normalized paths produced by JSONPath expressions with filters
+ 
+jsonpath enhancements:
+ 
+- Added support for parent selector, `^', following jsonpath-plus. 
 
 0.165.0
 -------

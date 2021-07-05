@@ -164,7 +164,7 @@ add_executable(unit_tests
                src/staj_iterator_tests.cpp
                src/stateful_allocator_tests.cpp
                src/string_to_double_tests.cpp
-               src/unicode_tests.cpp
+               src/unicode_conv_tests.cpp
                src/wjson_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
