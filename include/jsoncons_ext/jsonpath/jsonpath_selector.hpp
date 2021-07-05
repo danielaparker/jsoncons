@@ -122,7 +122,7 @@ namespace detail {
         {
         }
 
-        void accumulate(const path_node_type&, reference value) override
+        void add_node(const path_node_type&, reference value) override
         {
             val->emplace_back(value);
         }
@@ -215,7 +215,7 @@ namespace detail {
         {
             if (!tail_)
             {
-                accumulator.accumulate(path_stem, current);
+                accumulator.add_node(path_stem, current);
             }
             else
             {

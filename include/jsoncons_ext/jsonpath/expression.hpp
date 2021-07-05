@@ -2092,7 +2092,7 @@ namespace detail {
 
         virtual ~node_accumulator() noexcept = default;
 
-        virtual void accumulate(const path_node_type& path_tail, 
+        virtual void add_node(const path_node_type& path_tail, 
                                 reference value) = 0;
     };
 
@@ -2108,7 +2108,7 @@ namespace detail {
 
         std::vector<path_value_pair_type> nodes;
 
-        void accumulate(const path_node_type& path_tail, 
+        void add_node(const path_node_type& path_tail, 
                         reference value) override
         {
             nodes.emplace_back(normalized_path_type(path_tail), std::addressof(value));
@@ -2126,7 +2126,7 @@ namespace detail {
 
         std::vector<path_stem_value_pair_type> nodes;
 
-        void accumulate(const path_node_type& path_tail, 
+        void add_node(const path_node_type& path_tail, 
                         reference value) override
         {
             nodes.emplace_back(path_tail, value);
@@ -2878,7 +2878,7 @@ namespace detail {
         {
         }
 
-        void accumulate(const path_node_type& path_tail, 
+        void add_node(const path_node_type& path_tail, 
                         reference value) override
         {
             callback_(normalized_path_type(path_tail), value);
