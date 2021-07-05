@@ -9,6 +9,8 @@ jsonpath enhancements:
  
 - Added support for parent selector, `^', following jsonpath-plus. 
 
+- Implemented a number of performance optimizations.
+
 0.165.0
 -------
 
