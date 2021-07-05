@@ -739,7 +739,7 @@ namespace {
       "author" : "Graham Greene",
       "title": "The Comedians",
       "reviews": [{"rating": 4, "reviewer": "Lisa"},
-                  {"rating": 3, "reviewer": "Robert"}]
+                  {"rating": 5, "reviewer": "Robert"}]
     }
 ]
         )";

@@ -274,7 +274,7 @@ Consider the JSON document
       "author" : "Graham Greene",
       "title": "The Comedians",
       "reviews": [{"rating": 4, "reviewer": "Lisa"},
-                  {"rating": 3, "reviewer": "Robert"}]
+                  {"rating": 5, "reviewer": "Robert"}]
     }
 ]
 ```
@@ -312,6 +312,20 @@ selects all the book objects that have ratings of 5:
             }
         ],
         "title": "The Night Watch"
+    },
+    {
+        "author": "Graham Greene",
+        "reviews": [
+            {
+                "rating": 4,
+                "reviewer": "Lisa"
+            },
+            {
+                "rating": 5,
+                "reviewer": "Robert"
+            }
+        ],
+        "title": "The Comedians"
     }
 ]
 ```
