@@ -100,17 +100,18 @@ Union of the fourth book and all books with price > 10:
     $.store[@.book[3],@.book[?(@.price > 10)]]
 
 Selector|       Description
---------|--------------------------------
-`$`|    Represents the root JSON value
-`@`|    Represents the value currently being processed. 
-`.` or `[]`|    Child operator
-`..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
-`*` |   Wildcard. All objects/elements regardless their names.
-`[]`    |Subscript operator. 
-`[,]`   |Union.
-`[start:end:step]`      |Array slice selector borrowed from ECMASCRIPT 4.
-`^`     | Parent selector (since 0.166.0)
-`?<expr>`   |Filter by expression.
+--------------|--------------------------------
+`$`                                     |Represents the root JSON value
+`@`                                     |Represents the value currently being processed
+`.<name>` or `.'<name>'` or `."<name>"` |The '.' character followed by a JSON object member name, unquoted or quoted   
+`['<name>']` or `["<name>"]`            |Subscript operator with quoted JSON object member name 
+`[<index>]`                             |Index expression used to access elements in a JSON array. A negative index value indicates that indexing is relative to the end of the array.  I
+`*`                                     |Wildcard. All objects/elements regardless their names.
+`[<selector>,<selector>,...]`           |Union
+`[<start>:<end>:<step>]`                |Array slice operator 
+`^`                                     |Parent operator (since 0.166.0) borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus)
+`..`                                    |Recursive descent
+`?<expr>`                               |Filter by expression
 
 ### Duplicates and ordering
 
