@@ -99,7 +99,7 @@ Union of the fourth book and all books with price > 10:
 
     $.store[@.book[3],@.book[?(@.price > 10)]]
 
-JSONPath|       Description
+Selector|       Description
 --------|--------------------------------
 `$`|    Represents the root JSON value
 `@`|    Represents the value currently being processed. 
@@ -108,8 +108,8 @@ JSONPath|       Description
 `*` |   Wildcard. All objects/elements regardless their names.
 `[]`    |Subscript operator. 
 `[,]`   |Union.
-`[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
-`^`     | Parent operator (since 0.166.0)
+`[start:end:step]`      |Array slice selector borrowed from ECMASCRIPT 4.
+`^`     | Parent selector (since 0.166.0)
 `?<expr>`   |Filter by expression.
 
 ### Duplicates and ordering
@@ -226,7 +226,7 @@ the last, and the third from [Stefan Goessner's store](https://goessner.net/arti
 "$.store.book[0:2,-1,?(@.author=='Herman Melville')].title"
 ```
 
-### Parent operator (since 0.166.0)
+### Parent selector (since 0.166.0)
 
 Consider the JSON document 
 
