@@ -108,7 +108,7 @@ Selector|       Description
 `[<index>]`                             |Index expression used to access elements in a JSON array. A negative index value indicates that indexing is relative to the end of the array.
 `*`                                     |Wildcard. All objects/elements regardless their names.
 `[<selector>,<selector>,...]`           |Union
-`[<start>:<end>:<step>]`                |Array slice operator 
+`[start:stop:step]`                     |Array slice notation, following [Python](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html)
 `^`                                     |Parent operator (since 0.166.0) borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus)
 `..`                                    |Recursive descent
 `?<expr>`                               |Filter by expression
