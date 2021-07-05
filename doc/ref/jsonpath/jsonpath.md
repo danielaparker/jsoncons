@@ -57,10 +57,42 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 - A parent operator `^` allows you to access the parent node (since 0.166.0) 
 - Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
+[Paths](#S1)  
+
+[Duplicates and ordering](#S2)  
+
+[Slices](#S3)  
+
+[Unions](#S4)  
+
+[Parent operator](#S5)  
+
+[Filter expressions](#S6)  
+
+[Functions](#S7)  
+
+<div id="S1"/> 
+
 ### Paths
 
-It is a feature of JSONPath that it selects values in the original JSON document, and does not create JSON elements that are not in the original. 
-JSONPath uses paths to select values. Paths can use the dot-notation or the bracket-notation.
+JSONPath uses paths to select values. It is a feature of JSONPath that it selects values in the original JSON document, 
+and does not create JSON elements that are not in the original. 
+
+Selector      |       Description
+--------------|--------------------------------
+`$`                                     |Represents the root JSON value
+`@`                                     |Represents the value currently being processed
+`.<name>` or `.'<name>'` or `."<name>"` |The '.' character followed by a JSON object member name, unquoted or quoted   
+`['<name>']` or `["<name>"]`            |Subscript operator with quoted JSON object member name 
+`[<index>]`                             |Index expression used to access elements in a JSON array. A negative index value indicates that indexing is relative to the end of the array.
+`*` or ['*']                            |Wildcard. All objects/elements regardless their names.
+`[,,...]`                               |Union operator for alternative object names or array indices or JSONPath expressions 
+`[start:stop:step]`                     |Array slice notation, following [Python](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html)
+`^`                                     |Parent operator (since 0.166.0) borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus)
+`..`                                    |Recursive descent
+`?<expr>`                               |Filter by expression
+
+Paths can use the dot-notation or the bracket-notation.
 
 Select the first (indexed 0) book in [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3) using the dot notation:
 
@@ -99,19 +131,7 @@ Union of the fourth book and all books with price > 10:
 
     $.store[@.book[3],@.book[?(@.price > 10)]]
 
-Selector|       Description
---------------|--------------------------------
-`$`                                     |Represents the root JSON value
-`@`                                     |Represents the value currently being processed
-`.<name>` or `.'<name>'` or `."<name>"` |The '.' character followed by a JSON object member name, unquoted or quoted   
-`['<name>']` or `["<name>"]`            |Subscript operator with quoted JSON object member name 
-`[<index>]`                             |Index expression used to access elements in a JSON array. A negative index value indicates that indexing is relative to the end of the array.
-`*`                                     |Wildcard. All objects/elements regardless their names.
-`[<selector>,<selector>,...]`           |Union
-`[start:stop:step]`                     |Array slice notation, following [Python](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html)
-`^`                                     |Parent operator (since 0.166.0) borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus)
-`..`                                    |Recursive descent
-`?<expr>`                               |Filter by expression
+<div id="S2"/> 
 
 ### Duplicates and ordering
 
@@ -169,6 +189,8 @@ By default, the ordering of results is unspecified, although the user may
 expect array ordering at least to be preserved.  In 0.161.0, jsoncons
 provides an option for sorting results by paths.
 
+<div id="S3"/> 
+
 ### Slices
 
 jsoncons jsonpath slices have the same semantics as Python slices
@@ -208,6 +230,8 @@ $[1::-1]   | First two items, reversed
 $[:-3:-1]  | Last two items, reversed
 $[-3::-1]  | All items except the last two, reversed
 
+<div id="S4"/> 
+
 ### Unions
 
 In jsoncons, a JSONPath union element can be
@@ -227,7 +251,9 @@ the last, and the third from [Stefan Goessner's store](https://goessner.net/arti
 "$.store.book[0:2,-1,?(@.author=='Herman Melville')].title"
 ```
 
-### Parent selector (since 0.166.0)
+<div id="S5"/> 
+
+### Parent operator (since 0.166.0)
 
 Consider the JSON document 
 
@@ -276,6 +302,8 @@ This selects the book objects that have ratings of 5:
     }
 ]
 ```
+
+<div id="S6"/> 
 
 ### Filter expressions
 
@@ -352,7 +380,10 @@ Property|Description|Example
 --------|-----------|-------
 length  | Gets the number of elements in an array, or the number of codepoints in a string | `$[?(@.length == 2)]`
 
-### Function expressions
+
+<div id="S7"/> 
+
+### Functions
 
 Support for function expressions is a jsoncons extension.
 
