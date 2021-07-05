@@ -86,10 +86,10 @@ Selector      |       Description
 `['<name>']` or `["<name>"]`            |Subscript operator with quoted JSON object member name 
 `[<index>]`                             |Index expression used to access elements in a JSON array. A negative index value indicates that indexing is relative to the end of the array.
 `*` or ['*']                            |Wildcard. All objects/elements regardless their names.
-`[,,...]`                               |Union operator for alternative object names or array indices or JSONPath expressions 
 `[start:stop:step]`                     |Array slice notation, following [Python](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html)
 `^`                                     |Parent operator (since 0.166.0) borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus)
 `..`                                    |Recursive descent
+`[,]`                                   |Union operator for alternative object names or array indices or JSONPath expressions 
 `?<expr>`                               |Filter by expression
 
 Paths can use the dot-notation or the bracket-notation.
@@ -278,12 +278,24 @@ Consider the JSON document
     }
 ]
 ```
-with selector
+jsoncons supports the parent operator, `^`, borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus).
+
+Query                           |Output paths
+--------------------------------|------------
+$[*]reviews[?(@.rating == 5)]   | "$[1]['reviews'][1]"
+&nbsp;                          | "$[2]['reviews'][1]"
+$[*]reviews[?(@.rating == 5)]^  | "$[1]['reviews']"
+&nbsp;                          | "$[2]['reviews']"
+$[*]reviews[?(@.rating == 5)]^^ | "$[1]"
+&nbsp;                          | "$[2]"
+--------------------------------------------
+
+The JSONPath expression
 ```
 $[*].reviews[?(@.rating == 5)]^^
 ```
 
-This selects the book objects that have ratings of 5:
+selects all the book objects that have ratings of 5:
 ```
 [
     {
