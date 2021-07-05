@@ -54,7 +54,7 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
     $..['firstName',@.address.city]
 
 - Fiter expressions, e.g. `$..book[?(@.price<10)]`, may omit the enclosing parentheses, like so `$..book[?@.price<10]`. 
-- A parent operator `^` allows you to access the parent node (since 0.166.0) 
+- A parent operator `^` provides access to the parent node (since 0.166.0) 
 - Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
 [Paths](#S1)  
@@ -278,7 +278,8 @@ Consider the JSON document
     }
 ]
 ```
-jsoncons supports the parent operator, `^`, borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus).
+jsoncons supports the parent operator, `^`, borrowed from [JSONPath Plus](https://www.npmjs.com/package/jsonpath-plus),
+that allows you to select book objects based on criteria applied to descendent values.
 
 Query                           |Output paths
 --------------------------------|------------
