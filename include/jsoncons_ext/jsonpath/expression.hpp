@@ -3190,25 +3190,13 @@ namespace detail {
                         }
                         case jsonpath_token_kind::expression:
                         {
-                            if (stack.empty())
-                            {
-                                stack.emplace_back(std::addressof(current));
-                            }
-
-                            auto item = std::move(stack.back());
-                            stack.pop_back();
-                            value_type val = tok.expression_->evaluate(resources, root, item.value(), options, ec);
-                            //std::cout << "ref2: " << ref << "\n";
+                            value_type val = tok.expression_->evaluate(resources, root, current, options, ec);
                             stack.emplace_back(std::move(val));
                             break;
                         }
                         case jsonpath_token_kind::selector:
                         {
-                            if (stack.empty())
-                            {
-                                stack.emplace_back(std::addressof(current));
-                            }
-
+                            JSONCONS_ASSERT(!stack.empty());
                             auto item = std::move(stack.back());
                             //for (auto& item : stack)
                             //{
