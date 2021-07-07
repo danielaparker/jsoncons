@@ -641,5 +641,23 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         std::cout << ec.message() << "\n";
     }
+
+    // Fuzz target: fuzz_parse
+    // Issue: Abrt in __cxxabiv1::failed_throw
+    // Diagnosis:  
+    // Resolution: 
+    SECTION("issue 35879")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_parse-5981995560730624.fuzz";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        json_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        json::parse(is, options);
+    }
 }
 
