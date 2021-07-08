@@ -17,6 +17,7 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
+#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -641,7 +642,7 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         std::cout << ec.message() << "\n";
     }
-
+#endif
     // Fuzz target: fuzz_parse
     // Issue: Abrt in __cxxabiv1::failed_throw
     // Diagnosis:  
@@ -653,11 +654,11 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        json_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        json::parse(is, options);
+        try
+        {
+            json::parse(is);
+        }
+        catch(const jsoncons::ser_error&) {}
     }
 }
 

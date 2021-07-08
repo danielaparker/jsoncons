@@ -2706,7 +2706,7 @@ namespace jsoncons {
             parser.check_done();
             if (!decoder.is_valid())
             {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json string"));
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json string"));
             }
             return decoder.get_result();
         }
@@ -2745,7 +2745,7 @@ namespace jsoncons {
             reader.check_done();
             if (!visitor.is_valid())
             {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
             }
             return visitor.get_result();
         }
@@ -2768,7 +2768,7 @@ namespace jsoncons {
             reader.check_done();
             if (!visitor.is_valid())
             {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
             }
             return visitor.get_result();
         }
