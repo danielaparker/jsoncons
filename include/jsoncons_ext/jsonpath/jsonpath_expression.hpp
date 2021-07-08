@@ -27,6 +27,7 @@ namespace detail {
     enum class path_state 
     {
         start,
+        root_or_current_node,
         expect_function_expr,
         path_lhs,
         path_rhs,
@@ -217,6 +218,33 @@ namespace detail {
                         }
                         break;
                     }
+                    case path_state::root_or_current_node: 
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '$':
+                                push_token(resources, token_type(root_node_arg), ec);
+                                push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '@':
+                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
+                                push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::syntax_error;
+                                return path_expression_type();
+                        }
+                        break;
                     case path_state::recursive_descent_or_expression_lhs:
                         switch (*p_)
                         {
@@ -266,10 +294,9 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '$':
-                                state_stack_.back() = path_state::path_lhs;
-                                break;
                             case '@':
-                                state_stack_.back() = path_state::path_lhs;
+                                state_stack_.back() = path_state::path_rhs;
+                                state_stack_.push_back(path_state::root_or_current_node);
                                 break;
                             case '(':
                             {
@@ -506,22 +533,6 @@ namespace detail {
                                 break;
                             case '[':
                                 state_stack_.emplace_back(path_state::bracket_specifier_or_union);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '$':
-                                push_token(resources, token_type(root_node_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type();}
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '@':
-                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
-                                push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
-                                state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
