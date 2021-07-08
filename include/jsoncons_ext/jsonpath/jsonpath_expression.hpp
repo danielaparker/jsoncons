@@ -536,22 +536,6 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '$':
-                                push_token(resources, token_type(root_node_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type();}
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '@':
-                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
-                                push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
                             case '.':
                                 ec = jsonpath_errc::expected_key;
                                 return path_expression_type();
