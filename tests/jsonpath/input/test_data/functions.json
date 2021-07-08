@@ -89,6 +89,34 @@
        }
      ]
   },
+  {
+     "given": {
+             "books":
+             [
+                 {
+                     "title" : "A Wild Sheep Chase",
+                     "author" : "Haruki Murakami",
+                     "price" : 22.72
+                 },
+                 {
+                     "title" : "The Comedians",
+                     "author" : "Graham Greene",
+                     "price" : 21.99
+                 },
+                 {
+                     "title" : "The Night Watch",
+                     "author" : "Phillips, David Atlee"
+                 }
+             ]
+           },
+     "cases": [
+       {
+         "comment" : "All titles that don't have a price",
+         "expression": "$.books[?(!contains(keys(@),'price'))].title",
+         "result": ["The Night Watch"]
+       }
+     ]
+  },
    {
      "source": "JMESPath test suite",
      "given":
