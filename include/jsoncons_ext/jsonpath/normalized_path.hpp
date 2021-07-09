@@ -22,7 +22,7 @@ namespace jsonpath {
     template <class CharT>
     class normalized_path; 
 
-    enum class path_node_kind { root, index, name };
+    enum class path_component_kind { root, index, name };
 
     template <class CharT>
     class path_component 
@@ -34,29 +34,29 @@ namespace jsonpath {
     private:
 
         const path_component* parent_;
-        path_node_kind node_kind_;
+        path_component_kind node_kind_;
         string_type name_;
         std::size_t index_;
     public:
         path_component(char_type c)
-            : parent_(nullptr), node_kind_(path_node_kind::root), index_(0)
+            : parent_(nullptr), node_kind_(path_component_kind::root), index_(0)
         {
             name_.push_back(c);
         }
 
         path_component(const path_component* parent, const string_type& name)
-            : parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
+            : parent_(parent), node_kind_(path_component_kind::name), name_(name), index_(0)
         {
         }
 
         path_component(const path_component* parent, std::size_t index)
-            : parent_(parent), node_kind_(path_node_kind::index), index_(index)
+            : parent_(parent), node_kind_(path_component_kind::index), index_(index)
         {
         }
 
         const path_component* parent() const { return parent_;}
 
-        path_node_kind node_kind() const
+        path_component_kind node_kind() const
         {
             return node_kind_;
         }
@@ -83,7 +83,7 @@ namespace jsonpath {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
+            std::size_t h = node_kind_ == path_component_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
@@ -99,13 +99,13 @@ namespace jsonpath {
             {
                 switch (node_kind_)
                 {
-                    case path_node_kind::root:
+                    case path_component_kind::root:
                         diff = name_.compare(other.name_);
                         break;
-                    case path_node_kind::index:
+                    case path_component_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
-                    case path_node_kind::name:
+                    case path_component_kind::name:
                         diff = name_.compare(other.name_);
                         break;
                 }
@@ -322,10 +322,10 @@ namespace jsonpath {
             {
                 switch (node->node_kind())
                 {
-                    case path_node_kind::root:
+                    case path_component_kind::root:
                         buffer.append(node->name());
                         break;
-                    case path_node_kind::name:
+                    case path_component_kind::name:
                         buffer.push_back('[');
                         buffer.push_back('\'');
                         for (auto c : node->name())
@@ -343,7 +343,7 @@ namespace jsonpath {
                         buffer.push_back('\'');
                         buffer.push_back(']');
                         break;
-                    case path_node_kind::index:
+                    case path_component_kind::index:
                         buffer.push_back('[');
                         jsoncons::detail::from_integer(node->index(), buffer);
                         buffer.push_back(']');
@@ -414,7 +414,7 @@ namespace jsonpath {
         Json* current = std::addressof(root);
         for (const auto& path_component : path)
         {
-            if (path_component.node_kind() == path_node_kind::index)
+            if (path_component.node_kind() == path_component_kind::index)
             {
                 if (current->type() != json_type::array_value || path_component.index() >= current->size())
                 {
@@ -422,7 +422,7 @@ namespace jsonpath {
                 }
                 current = std::addressof(current->at(path_component.index()));
             }
-            else if (path_component.node_kind() == path_node_kind::name)
+            else if (path_component.node_kind() == path_component_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
