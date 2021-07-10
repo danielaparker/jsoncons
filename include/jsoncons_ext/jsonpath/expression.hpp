@@ -1998,9 +1998,9 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
-        using path_pointer = const path_node_type*;
+        using path_pointer = const path_component_type*;
 
         normalized_path_type path_;
         value_pointer value_ptr_;
@@ -2052,28 +2052,28 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    struct path_stem_value_pair
+    struct path_component_value_pair
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using value_type = Json;
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
-        using path_pointer = const path_node_type*;
+        using path_pointer = const path_component_type*;
     private:
-        const path_node_type* stem_ptr_;
+        const path_component_type* last_ptr_;
         value_pointer value_ptr_;
     public:
-        path_stem_value_pair(const path_node_type& stem, reference value) noexcept
-            : stem_ptr_(std::addressof(stem)), value_ptr_(std::addressof(value))
+        path_component_value_pair(const path_component_type& last, reference value) noexcept
+            : last_ptr_(std::addressof(last)), value_ptr_(std::addressof(value))
         {
         }
 
-        const path_node_type& stem() const
+        const path_component_type& last() const
         {
-            return *stem_ptr_;
+            return *last_ptr_;
         }
 
         reference value() const
@@ -2088,11 +2088,11 @@ namespace detail {
     public:
         using char_type = typename Json::char_type;
         using reference = JsonReference;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
 
         virtual ~node_accumulator() noexcept = default;
 
-        virtual void add_node(const path_node_type& path_tail, 
+        virtual void add_node(const path_component_type& path_tail, 
                                 reference value) = 0;
     };
 
@@ -2102,13 +2102,13 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
 
         std::vector<path_value_pair_type> nodes;
 
-        void add_node(const path_node_type& path_tail, 
+        void add_node(const path_component_type& path_tail, 
                         reference value) override
         {
             nodes.emplace_back(normalized_path_type(path_tail), std::addressof(value));
@@ -2121,12 +2121,12 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using path_node_type = path_node<char_type>;
-        using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
+        using path_component_type = path_component<char_type>;
+        using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
 
         std::vector<path_stem_value_pair_type> nodes;
 
-        void add_node(const path_node_type& path_tail, 
+        void add_node(const path_component_type& path_tail, 
                         reference value) override
         {
             nodes.emplace_back(path_tail, value);
@@ -2138,10 +2138,10 @@ namespace detail {
     {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using path_node_type = path_node<typename Json::char_type>;
-        using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
+        using path_component_type = path_component<typename Json::char_type>;
+        using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::vector<std::unique_ptr<path_node_type>> temp_path_node_values_;
+        std::vector<std::unique_ptr<path_component_type>> temp_path_node_values_;
         std::unordered_map<std::size_t,pointer> cache_;
     public:
         bool is_cached(std::size_t id) const
@@ -2172,23 +2172,23 @@ namespace detail {
             return ptr;
         }
 
-        const path_node_type& root_path_node() const
+        const path_component_type& root_path_node() const
         {
-            static path_node_type root('$');
+            static path_component_type root('$');
             return root;
         }
 
-        const path_node_type& current_path_node() const
+        const path_component_type& current_path_node() const
         {
-            static path_node_type root('@');
+            static path_component_type root('@');
             return root;
         }
 
         template <typename... Args>
-        const path_node_type* create_path_node(Args&& ... args)
+        const path_component_type* create_path_node(Args&& ... args)
         {
-            auto temp = jsoncons::make_unique<path_node_type>(std::forward<Args>(args)...);
-            path_node_type* ptr = temp.get();
+            auto temp = jsoncons::make_unique<path_component_type>(std::forward<Args>(args)...);
+            path_component_type* ptr = temp.get();
             temp_path_node_values_.emplace_back(std::move(temp));
             return ptr;
         }
@@ -2217,7 +2217,7 @@ namespace detail {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
         using node_accumulator_type = node_accumulator<Json,JsonReference>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
@@ -2248,14 +2248,14 @@ namespace detail {
 
         virtual void select(dynamic_resources<Json,JsonReference>& resources,
                             reference root,
-                            const path_node_type& pathStem, 
+                            const path_component_type& path_tail, 
                             reference val, 
                             node_accumulator_type& accumulator,
                             result_options options) const = 0;
 
         virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                                    reference root,
-                                   const path_node_type& path_tail, 
+                                   const path_component_type& path_tail, 
                                    reference current, 
                                    result_options options,
                                    std::error_code& ec) const = 0;
@@ -2490,13 +2490,13 @@ namespace detail {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
 
         virtual ~expression_base() noexcept = default;
 
         virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                                            reference root,
-                                           //const path_node_type& path, 
+                                           //const path_component_type& path, 
                                            reference val, 
                                            result_options options,
                                            std::error_code& ec) const = 0;
@@ -2870,7 +2870,7 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
 
         callback_accumulator(Callback& callback)
@@ -2878,7 +2878,7 @@ namespace detail {
         {
         }
 
-        void add_node(const path_node_type& path_tail, 
+        void add_node(const path_component_type& path_tail, 
                         reference value) override
         {
             callback_(normalized_path_type(path_tail), value);
@@ -2901,7 +2901,7 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using normalized_path_type = normalized_path<char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
@@ -2929,7 +2929,7 @@ namespace detail {
 
         Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
                       reference root,
-                      const path_node_type& path, 
+                      const path_component_type& path, 
                       reference instance,
                       result_options options) const
         {
@@ -2959,7 +2959,7 @@ namespace detail {
         typename std::enable_if<type_traits::is_binary_function_object<Callback,const normalized_path_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  reference root,
-                 const path_node_type& path, 
+                 const path_component_type& path, 
                  reference current, 
                  Callback callback,
                  result_options options) const
@@ -3064,7 +3064,7 @@ namespace detail {
         using token_type = token<Json,reference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
-        using path_node_type = path_node<char_type>;
+        using path_component_type = path_component<char_type>;
         using stack_item_type = value_or_pointer<Json,JsonReference>;
     private:
         std::vector<token_type> token_list_;

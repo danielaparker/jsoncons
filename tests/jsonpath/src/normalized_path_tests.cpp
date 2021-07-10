@@ -8,47 +8,47 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_node = jsoncons::jsonpath::path_node<char>;
+using path_component = jsoncons::jsonpath::path_component<char>;
 using normalized_path = jsoncons::jsonpath::normalized_path<char>;
 
 TEST_CASE("test normalized_path equals")
 {
-    path_node node1('$');
-    path_node node2(&node1,"foo");
-    path_node node3(&node2,"bar");
-    path_node node4(&node3,0);
+    path_component component1('$');
+    path_component component2(&component1,"foo");
+    path_component component3(&component2,"bar");
+    path_component component4(&component3,0);
 
-    path_node node11('$');
-    path_node node12(&node11,"foo");
-    path_node node13(&node12,"bar");
-    path_node node14(&node13,0);
+    path_component component11('$');
+    path_component component12(&component11,"foo");
+    path_component component13(&component12,"bar");
+    path_component component14(&component13,0);
 
-    normalized_path path1(node4);
-    normalized_path path2(node14);
+    normalized_path path1(component4);
+    normalized_path path2(component14);
 
     CHECK(path1 == path2);
 }
 
 TEST_CASE("test normalized_path to_string")
 {
-    path_node node1('$');
-    path_node node2(&node1,"foo");
-    path_node node3(&node2,"bar");
-    path_node node4(&node3,0);
+    path_component component1('$');
+    path_component component2(&component1,"foo");
+    path_component component3(&component2,"bar");
+    path_component component4(&component3,0);
 
-    normalized_path path1(node4);
+    normalized_path path1(component4);
 
     CHECK(path1.to_string() == std::string("$['foo']['bar'][0]"));
 }
 
 TEST_CASE("test normalized_path with solidus to_string")
 {
-    path_node node1('$');
-    path_node node2(&node1,"foo's");
-    path_node node3(&node2,"bar");
-    path_node node4(&node3,0);
+    path_component component1('$');
+    path_component component2(&component1,"foo's");
+    path_component component3(&component2,"bar");
+    path_component component4(&component3,0);
 
-    normalized_path path1(node4);
+    normalized_path path1(component4);
 
     CHECK(path1.to_string() == std::string(R"($['foo\'s']['bar'][0])"));
 }
