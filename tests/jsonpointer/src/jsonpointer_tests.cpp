@@ -163,7 +163,7 @@ TEST_CASE("test_add_array_element")
     check_insert_or_assign(example,"/foo/1", json("qux"), expected);
 }
 
-TEST_CASE("test_add_array_value")
+TEST_CASE("test add element to array end")
 {
     json example = json::parse(R"(
      { "foo": ["bar"] }
