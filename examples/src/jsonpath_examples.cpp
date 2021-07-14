@@ -770,7 +770,7 @@ namespace {
                        ec = jsonpath::jsonpath_errc::invalid_type; 
                        return Json::null();
                    }
-                   return Json(arg0.as<double>() / arg1.as<double>());
+                   return Json(arg0.template as<double>() / arg1.template as<double>());
                  }
             );
         }

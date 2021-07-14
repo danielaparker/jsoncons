@@ -32,147 +32,6 @@ namespace jsoncons { namespace jsonpointer {
 
     } // namespace detail
 
-    // json_pointer_iterator
-    template <class InputIt>
-    class json_pointer_iterator
-    {
-        using char_type = typename std::iterator_traits<InputIt>::value_type;
-        using string_type = std::basic_string<char_type>;
-        using base_iterator = InputIt;
-
-        base_iterator path_ptr_;
-        base_iterator end_input_;
-        base_iterator p_;
-        base_iterator q_;
-        jsonpointer::detail::pointer_state state_;
-        std::size_t column_;
-        std::basic_string<char_type> buffer_;
-    public:
-        using value_type = string_type;
-        using difference_type = std::ptrdiff_t;
-        using pointer = value_type*;
-        using reference = const value_type&;
-        using iterator_category = std::input_iterator_tag;
-
-        json_pointer_iterator(base_iterator first, base_iterator last)
-            : json_pointer_iterator(first, last, first)
-        {
-            std::error_code ec;
-            increment(ec);
-        }
-
-        json_pointer_iterator(base_iterator first, base_iterator last, base_iterator current)
-            : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(jsonpointer::detail::pointer_state::start),
-              column_(0)
-        {
-        }
-
-        json_pointer_iterator(const json_pointer_iterator&) = default;
-
-        json_pointer_iterator(json_pointer_iterator&&) = default;
-
-        json_pointer_iterator& operator=(const json_pointer_iterator&) = default;
-
-        json_pointer_iterator& operator=(json_pointer_iterator&&) = default;
-
-        json_pointer_iterator& operator++()
-        {
-            std::error_code ec;
-            increment(ec);
-            if (ec)
-            {
-                JSONCONS_THROW(jsonpointer_error(ec));
-            }
-            return *this;
-        }
-
-        json_pointer_iterator& increment(std::error_code& ec)
-        {
-            q_ = p_;
-            if (p_ != end_input_)
-            {
-                buffer_.clear();
-                bool done = false;
-                while (p_ != end_input_ && !done)
-                {
-                    switch (state_)
-                    {
-                        case jsonpointer::detail::pointer_state::start: 
-                            switch (*p_)
-                            {
-                                case '/':
-                                    state_ = jsonpointer::detail::pointer_state::delim;
-                                    break;
-                                default:
-                                    ec = jsonpointer_errc::expected_slash;
-                                    done = true;
-                                    break;
-                            };
-                            break;
-                        case jsonpointer::detail::pointer_state::delim: 
-                            switch (*p_)
-                            {
-                                case '/':
-                                    done = true;
-                                    break;
-                                case '~':
-                                    state_ = jsonpointer::detail::pointer_state::escaped;
-                                    break;
-                                default:
-                                    buffer_.push_back(*p_);
-                                    break;
-                            };
-                            break;
-                        case jsonpointer::detail::pointer_state::escaped: 
-                            switch (*p_)
-                            {
-                                case '0':
-                                    buffer_.push_back('~');
-                                    state_ = jsonpointer::detail::pointer_state::delim;
-                                    break;
-                                case '1':
-                                    buffer_.push_back('/');
-                                    state_ = jsonpointer::detail::pointer_state::delim;
-                                    break;
-                                default:
-                                    ec = jsonpointer_errc::expected_0_or_1;
-                                    done = true;
-                                    break;
-                            };
-                            break;
-                        default:
-                            JSONCONS_UNREACHABLE();
-                            break;
-                    }
-                    ++p_;
-                    ++column_;
-                }
-            }
-            return *this;
-        }
-
-        json_pointer_iterator operator++(int) // postfix increment
-        {
-            json_pointer_iterator temp(*this);
-            ++(*this);
-            return temp;
-        }
-
-        reference operator*() const
-        {
-            return buffer_;
-        }
-
-        friend bool operator==(const json_pointer_iterator& it1, const json_pointer_iterator& it2)
-        {
-            return it1.q_ == it2.q_;
-        }
-        friend bool operator!=(const json_pointer_iterator& it1, const json_pointer_iterator& it2)
-        {
-            return !(it1 == it2);
-        }
-    };
-
     template <class CharT>
     std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
     {
@@ -203,35 +62,114 @@ namespace jsoncons { namespace jsonpointer {
     class basic_json_pointer
     {
     public:
-        std::basic_string<CharT> path_;
-    public:
         // Member types
         using char_type = CharT;
         using string_type = std::basic_string<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type>;
-        using const_iterator = json_pointer_iterator<typename string_type::const_iterator>;
+        using const_iterator = typename std::vector<string_type>::const_iterator;
         using iterator = const_iterator;
-
+    private:
+        std::vector<string_type> tokens_;
+    public:
         // Constructors
         basic_json_pointer()
         {
         }
+
+        basic_json_pointer(const std::vector<string_type>& tokens)
+            : tokens_(tokens)
+        {
+        }
+
+        basic_json_pointer(std::vector<string_type>&& tokens)
+            : tokens_(std::move(tokens))
+        {
+        }
+
         explicit basic_json_pointer(const string_type& s)
-            : path_(s)
         {
-        }
-        explicit basic_json_pointer(string_type&& s)
-            : path_(std::move(s))
-        {
-        }
-        explicit basic_json_pointer(const CharT* s)
-            : path_(s)
-        {
+            std::error_code ec;
+            auto jp = parse(s, ec);
+            if (ec)
+            {
+                throw jsonpointer_error(ec);
+            }
+            tokens_ = std::move(jp.tokens_);
         }
 
         basic_json_pointer(const basic_json_pointer&) = default;
 
         basic_json_pointer(basic_json_pointer&&) = default;
+
+        static basic_json_pointer parse(const string_view_type& s, std::error_code& ec)
+        {
+            std::vector<string_type> tokens;
+
+            auto state = jsonpointer::detail::pointer_state::start;
+            string_type buffer;
+            const char_type* p = s.data();
+            const char_type* pend = s.data() + s.size();
+
+            while (p < pend)
+            {
+                bool done = false;
+                while (p < pend && !done)
+                {
+                    switch (state)
+                    {
+                        case jsonpointer::detail::pointer_state::start: 
+                            switch (*p)
+                            {
+                                case '/':
+                                    state = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                default:
+                                    ec = jsonpointer_errc::expected_slash;
+                                    return basic_json_pointer();
+                            };
+                            break;
+                        case jsonpointer::detail::pointer_state::delim: 
+                            switch (*p)
+                            {
+                                case '/':
+                                    done = true;
+                                    break;
+                                case '~':
+                                    state = jsonpointer::detail::pointer_state::escaped;
+                                    break;
+                                default:
+                                    buffer.push_back(*p);
+                                    break;
+                            };
+                            break;
+                        case jsonpointer::detail::pointer_state::escaped: 
+                            switch (*p)
+                            {
+                                case '0':
+                                    buffer.push_back('~');
+                                    state = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                case '1':
+                                    buffer.push_back('/');
+                                    state = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                default:
+                                    ec = jsonpointer_errc::expected_0_or_1;
+                                    return basic_json_pointer();
+                            };
+                            break;
+                    }
+                    ++p;
+                }
+                tokens.push_back(buffer);
+                buffer.clear();
+            }
+            if (!buffer.empty())
+            {
+                tokens.push_back(buffer);
+            }
+            return basic_json_pointer(tokens);
+        }
 
         // operator=
         basic_json_pointer& operator=(const basic_json_pointer&) = default;
@@ -242,14 +180,12 @@ namespace jsoncons { namespace jsonpointer {
 
         void clear()
         {
-            path_.clear();
+            tokens_.clear();
         }
 
         basic_json_pointer& operator/=(const string_type& s) 
         {
-            path_.push_back('/');
-            path_.append(escape_string(s));
-
+            tokens_.push_back(s);
             return *this;
         }
 
@@ -259,42 +195,61 @@ namespace jsoncons { namespace jsonpointer {
         {
             string_type s;
             jsoncons::detail::from_integer(val, s);
-            path_.push_back('/');
-            path_.append(s);
+            tokens_.push_back(s);
 
             return *this;
         }
 
         basic_json_pointer& operator+=(const basic_json_pointer& p)
         {
-            path_.append(p.path_);
+            for (const auto& s : p.tokens_)
+            {
+                tokens_.push_back(s);
+            }
             return *this;
         }
 
         // Accessors
         bool empty() const
         {
-          return path_.empty();
+          return tokens_.empty();
         }
 
-        const string_type& string() const
+        string_type string() const
         {
-            return path_;
-        }
-
-        operator string_view_type() const
-        {
-            return path_;
+            string_type buffer;
+            for (const auto& token : tokens_)
+            {
+                buffer.push_back('/');
+                for (auto c : token)
+                {
+                    switch (c)
+                    {
+                        case '~':
+                            buffer.push_back('~');
+                            buffer.push_back('0');
+                            break;
+                        case '/':
+                            buffer.push_back('~');
+                            buffer.push_back('1');
+                            break;
+                        default:
+                            buffer.push_back(c);
+                            break;
+                    }
+                }
+            }
+            return buffer;
         }
 
         // Iterators
         iterator begin() const
         {
-            return iterator(path_.begin(),path_.end());
+            return tokens_.cbegin();
         }
         iterator end() const
         {
-            return iterator(path_.begin(), path_.end(), path_.end());
+            return tokens_.cend();
         }
 
         // Non-member functions
@@ -314,18 +269,18 @@ namespace jsoncons { namespace jsonpointer {
 
         friend bool operator==( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
-            return lhs.path_ == rhs.path_;
+            return lhs.tokens_ == rhs.okens_;
         }
 
         friend bool operator!=( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
-            return lhs.path_ != rhs.path_;
+            return lhs.tokens_ != rhs.tokens_;
         }
 
         friend std::basic_ostream<CharT>&
         operator<<( std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& p )
         {
-            os << p.path_;
+            os << p.string();
             return os;
         }
     };
@@ -453,7 +408,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& location, 
+              const basic_json_pointer<typename Json::char_type>& location, 
               bool create_if_missing,
               std::error_code& ec)
     {
@@ -463,22 +418,36 @@ namespace jsoncons { namespace jsonpointer {
         }
 
         Json* current = std::addressof(root);
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, create_if_missing, ec);
             if (ec)
                 return *current;
-            it.increment(ec);
-            if (ec)
-                return *current;
+            ++it;
         }
         return *current;
     }
 
     template<class Json>
-    const Json& get(const Json& root, const typename Json::string_view_type& location, std::error_code& ec)
+    Json& get(Json& root, 
+              const std::basic_string<typename Json::char_type>& location, 
+              bool create_if_missing,
+              std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return root;
+        }
+        return get(root, jsonptr, create_if_missing, ec);
+    }
+
+    template<class Json>
+    const Json& get(const Json& root, 
+                    const basic_json_pointer<typename Json::char_type>& location, 
+                    std::error_code& ec)
     {
         if (location.empty())
         {
@@ -486,23 +455,34 @@ namespace jsoncons { namespace jsonpointer {
         }
 
         const Json* current = std::addressof(root);
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
             if (ec)
                 return *current;
-            it.increment(ec);
-            if (ec)
-                return *current;
+            ++it;
         }
         return *current;
     }
 
     template<class Json>
+    const Json& get(const Json& root, 
+                    const std::basic_string<typename Json::char_type>& location, 
+                    std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return root;
+        }
+        return get(root, jsonptr, ec);
+    }
+
+    template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& location, 
+              const basic_json_pointer<typename Json::char_type>& location, 
               std::error_code& ec)
     {
         return get(root, location, false, ec);
@@ -510,7 +490,15 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& location,
+              const std::basic_string<typename Json::char_type>& location, 
+              std::error_code& ec)
+    {
+        return get(root, location, false, ec);
+    }
+
+    template<class Json>
+    Json& get(Json& root, 
+              const basic_json_pointer<typename Json::char_type>& location,
               bool create_if_missing = false)
     {
         std::error_code ec;
@@ -523,7 +511,33 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json>
-    const Json& get(const Json& root, const typename Json::string_view_type& location)
+    Json& get(Json& root, 
+              const std::basic_string<typename Json::char_type>& location,
+              bool create_if_missing = false)
+    {
+        std::error_code ec;
+        Json& result = get(root, location, create_if_missing, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+        return result;
+    }
+
+    template<class Json>
+    const Json& get(const Json& root, const basic_json_pointer<typename Json::char_type>& location)
+    {
+        std::error_code ec;
+        const Json& j = get(root, location, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+        return j;
+    }
+
+    template<class Json>
+    const Json& get(const Json& root, const std::basic_string<typename Json::char_type>& location)
     {
         std::error_code ec;
         const Json& j = get(root, location, ec);
@@ -537,18 +551,24 @@ namespace jsoncons { namespace jsonpointer {
     // contains
 
     template<class Json>
-    bool contains(const Json& root, const typename Json::string_view_type& location)
+    bool contains(const Json& root, const basic_json_pointer<typename Json::char_type>& location)
     {
         std::error_code ec;
         get(root, location, ec);
         return !ec ? true : false;
     }
 
-    // add
+    template<class Json>
+    bool contains(const Json& root, const std::basic_string<typename Json::char_type>& location)
+    {
+        std::error_code ec;
+        get(root, location, ec);
+        return !ec ? true : false;
+    }
 
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& location, 
+             const basic_json_pointer<typename Json::char_type>& location, 
              T&& value, 
              bool create_if_missing,
              std::error_code& ec)
@@ -556,14 +576,12 @@ namespace jsoncons { namespace jsonpointer {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
         while (it != end)
         {
             buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return;
+            ++it;
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
@@ -616,9 +634,25 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
+    // add
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& location, 
+             const std::basic_string<typename Json::char_type>& location, 
+             T&& value, 
+             bool create_if_missing,
+             std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return;
+        }
+        add(root, jsonptr, std::forward<T>(value), create_if_missing, ec);
+    }
+
+    template<class Json,class T>
+    void add(Json& root, 
+             const basic_json_pointer<typename Json::char_type>& location, 
              T&& value, 
              std::error_code& ec)
     {
@@ -627,7 +661,30 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& location, 
+             const std::basic_string<typename Json::char_type>& location, 
+             T&& value, 
+             std::error_code& ec)
+    {
+        add(root, location, std::forward<T>(value), false, ec);
+    }
+
+    template<class Json,class T>
+    void add(Json& root, 
+             const basic_json_pointer<typename Json::char_type>& location, 
+             T&& value,
+             bool create_if_missing = false)
+    {
+        std::error_code ec;
+        add(root, location, std::forward<T>(value), create_if_missing, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+    }
+
+    template<class Json,class T>
+    void add(Json& root, 
+             const std::basic_string<typename Json::char_type>& location, 
              T&& value,
              bool create_if_missing = false)
     {
@@ -643,23 +700,21 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_if_absent(Json& root, 
-                const typename Json::string_view_type& location, 
-                T&& value, 
-                bool create_if_missing,
-                std::error_code& ec)
+                       const basic_json_pointer<typename Json::char_type>& location, 
+                       T&& value, 
+                       bool create_if_missing,
+                       std::error_code& ec)
     {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
 
         while (it != end)
         {
             buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return;
+            ++it;
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
@@ -722,7 +777,22 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_if_absent(Json& root, 
-                const typename Json::string_view_type& location, 
+                       const std::basic_string<typename Json::char_type>& location, 
+                       T&& value, 
+                       bool create_if_missing,
+                       std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return;
+        }
+        add_if_absent(root, jsonptr, std::forward<T>(value), create_if_missing, ec);
+    }
+
+    template<class Json, class T>
+    void add_if_absent(Json& root, 
+                const std::basic_string<typename Json::char_type>& location, 
                 T&& value, 
                 std::error_code& ec)
     {
@@ -731,7 +801,30 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_if_absent(Json& root, 
-                const typename Json::string_view_type& location, 
+                const std::basic_string<typename Json::char_type>& location, 
+                T&& value,
+                bool create_if_missing = false)
+    {
+        std::error_code ec;
+        add_if_absent(root, location, std::forward<T>(value), create_if_missing, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+    }
+
+    template<class Json, class T>
+    void add_if_absent(Json& root, 
+                const basic_json_pointer<typename Json::char_type>& location, 
+                T&& value, 
+                std::error_code& ec)
+    {
+        add_if_absent(root, location, std::forward<T>(value), false, ec);
+    }
+
+    template<class Json, class T>
+    void add_if_absent(Json& root, 
+                const basic_json_pointer<typename Json::char_type>& location, 
                 T&& value,
                 bool create_if_missing = false)
     {
@@ -746,20 +839,18 @@ namespace jsoncons { namespace jsonpointer {
     // remove
 
     template<class Json>
-    void remove(Json& root, const typename Json::string_view_type& location, std::error_code& ec)
+    void remove(Json& root, const basic_json_pointer<typename Json::char_type>& location, std::error_code& ec)
     {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
 
         while (it != end)
         {
             buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return;
+            ++it;
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
@@ -811,7 +902,29 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json>
-    void remove(Json& root, const typename Json::string_view_type& location)
+    void remove(Json& root, const std::basic_string<typename Json::char_type>& location, std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return;
+        }
+        remove(root, jsonptr, ec);
+    }
+
+    template<class Json>
+    void remove(Json& root, const std::basic_string<typename Json::char_type>& location)
+    {
+        std::error_code ec;
+        remove(root, location, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+    }
+
+    template<class Json>
+    void remove(Json& root, const basic_json_pointer<typename Json::char_type>& location)
     {
         std::error_code ec;
         remove(root, location, ec);
@@ -825,7 +938,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& location, 
+                 const basic_json_pointer<typename Json::char_type>& location, 
                  T&& value, 
                  bool create_if_missing,
                  std::error_code& ec)
@@ -833,15 +946,13 @@ namespace jsoncons { namespace jsonpointer {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        auto it = location.begin();
+        auto end = location.end();
 
         while (it != end)
         {
             buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return;
+            ++it;
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
@@ -902,7 +1013,22 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& location, 
+                 const std::basic_string<typename Json::char_type>& location, 
+                 T&& value, 
+                 bool create_if_missing,
+                 std::error_code& ec)
+    {
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        if (ec)
+        {
+            return;
+        }
+        replace(root, jsonptr, std::forward<T>(value), create_if_missing, ec);
+    }
+
+    template<class Json, class T>
+    void replace(Json& root, 
+                 const std::basic_string<typename Json::char_type>& location, 
                  T&& value, 
                  std::error_code& ec)
     {
@@ -911,7 +1037,30 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& location, 
+                 const std::basic_string<typename Json::char_type>& location, 
+                 T&& value, 
+                 bool create_if_missing = false)
+    {
+        std::error_code ec;
+        replace(root, location, std::forward<T>(value), create_if_missing, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jsonpointer_error(ec));
+        }
+    }
+
+    template<class Json, class T>
+    void replace(Json& root, 
+                 const basic_json_pointer<typename Json::char_type>& location, 
+                 T&& value, 
+                 std::error_code& ec)
+    {
+        replace(root, location, std::forward<T>(value), false, ec);
+    }
+
+    template<class Json, class T>
+    void replace(Json& root, 
+                 const basic_json_pointer<typename Json::char_type>& location, 
                  T&& value, 
                  bool create_if_missing = false)
     {
@@ -1221,20 +1370,20 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& location, const Json& value)
+    void insert_or_assign(Json& root, const std::basic_string<typename Json::char_type>& location, const Json& value)
     {
         add(root, location, value);
     }
 
     template<class Json>
     JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&, std::error_code&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& location, const Json& value, std::error_code& ec)
+    void insert_or_assign(Json& root, const std::basic_string<typename Json::char_type>& location, const Json& value, std::error_code& ec)
     {
         add(root, location, value, ec);
     }
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& location, 
+                const std::basic_string<typename Json::char_type>& location, 
                 T&& value, 
                 bool create_if_missing,
                 std::error_code& ec)
@@ -1244,7 +1393,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& location, 
+                const std::basic_string<typename Json::char_type>& location, 
                 T&& value, 
                 std::error_code& ec)
     {
@@ -1253,7 +1402,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& location, 
+                const std::basic_string<typename Json::char_type>& location, 
                 T&& value,
                 bool create_if_missing = false)
     {
