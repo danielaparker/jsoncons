@@ -217,7 +217,15 @@ namespace jsoncons { namespace jsonpointer {
           return tokens_.empty();
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+        JSONCONS_DEPRECATED_MSG("Instead, use to_string()")
         string_type string() const
+        {
+            return to_string();
+        }
+#endif
+        string_type to_string() const
         {
             string_type buffer;
             for (const auto& token : tokens_)
@@ -291,7 +299,7 @@ namespace jsoncons { namespace jsonpointer {
         friend std::basic_ostream<CharT>&
         operator<<( std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& p )
         {
-            os << p.string();
+            os << p.to_string();
             return os;
         }
     };

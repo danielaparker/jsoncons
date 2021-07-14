@@ -113,11 +113,11 @@ namespace jsonschema {
                                   uri_.port(),
                                   uri_.path(),
                                   uri_.query(),
-                                  pointer.string());
+                                  pointer.to_string());
 
             uri_wrapper wrapper;
             wrapper.uri_ = new_uri;
-            wrapper.identifier_ = pointer.string();
+            wrapper.identifier_ = pointer.to_string();
 
             return wrapper;
         }
@@ -136,11 +136,11 @@ namespace jsonschema {
                                   uri_.port(),
                                   uri_.path(),
                                   uri_.query(),
-                                  pointer.string());
+                                  pointer.to_string());
 
             uri_wrapper wrapper;
             wrapper.uri_ = new_uri;
-            wrapper.identifier_ = pointer.string();
+            wrapper.identifier_ = pointer.to_string();
 
             return wrapper;
         }
