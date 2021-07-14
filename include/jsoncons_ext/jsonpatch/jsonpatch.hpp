@@ -85,7 +85,6 @@ namespace detail {
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
-        using string_view_type = typename Json::string_view_type;
 
         auto rit = location.rbegin();
         if (rit == location.rend())
@@ -127,7 +126,6 @@ namespace detail {
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
-        using string_view_type = typename Json::string_view_type;
         using json_pointer_type = jsonpointer::basic_json_pointer<char_type>;
 
         struct entry
@@ -302,7 +300,6 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
 {
     using char_type = typename Json::char_type;
     using string_type = std::basic_string<char_type>;
-    using string_view_type = typename Json::string_view_type;
     using json_pointer_type = jsonpointer::basic_json_pointer<char_type>;
 
    jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);
@@ -321,7 +318,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
             unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
             return;
         }
-        string_type op = it_op->value().as<string_type>();
+        string_type op = it_op->value().template as<string_type>();
 
         auto it_path = operation.find(detail::jsonpatch_names<char_type>::path_name());
         if (it_path == operation.object_range().end())
@@ -330,7 +327,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
             unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
             return;
         }
-        string_type path = it_path->value().as<string_type>();
+        string_type path = it_path->value().template as<string_type>();
         auto location = json_pointer_type::parse(path, local_ec);
         if (local_ec)
         {
