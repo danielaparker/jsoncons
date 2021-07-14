@@ -68,6 +68,8 @@ namespace jsoncons { namespace jsonpointer {
         using string_view_type = jsoncons::basic_string_view<char_type>;
         using const_iterator = typename std::vector<string_type>::const_iterator;
         using iterator = const_iterator;
+        using const_reverse_iterator = typename std::vector<string_type>::const_reverse_iterator;
+        using reverse_iterator = const_reverse_iterator;
     private:
         std::vector<string_type> tokens_;
     public:
@@ -245,11 +247,20 @@ namespace jsoncons { namespace jsonpointer {
         // Iterators
         iterator begin() const
         {
-            return tokens_.cbegin();
+            return tokens_.begin();
         }
         iterator end() const
         {
-            return tokens_.cend();
+            return tokens_.end();
+        }
+
+        reverse_iterator rbegin() const
+        {
+            return tokens_.rbegin();
+        }
+        reverse_iterator rend() const
+        {
+            return tokens_.rend();
         }
 
         // Non-member functions
