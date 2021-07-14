@@ -59,6 +59,7 @@ void jsonpatch_tests(const std::string& fpath)
                 json target = test_group.at("given");
                 std::error_code ec;
                 jsonpatch::apply_patch(target, patch, ec);
+                CHECK(ec);
                 const json& expected = test_group.at("given");
                 if (target != expected)
                 {
@@ -81,8 +82,8 @@ TEST_CASE("jsonpatch tests")
 {
     SECTION("compliance")
     {
-        jsonpatch_tests("./jsonpatch/input/compliance/rfc6902-examples.json");
-        jsonpatch_tests("./jsonpatch/input/compliance/fail.json");
+        //jsonpatch_tests("./jsonpatch/input/compliance/rfc6902-examples.json");
+        jsonpatch_tests("./jsonpatch/input/compliance/test.json");
     }
 }
 

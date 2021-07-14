@@ -1,35 +1,4 @@
 [
-   {
-        "given": { "foo": "bar"},
-        "cases": [
-             {
-                "comment" : "add -> add -> add -> fail",
-                "patch": [
-                     { "op": "add", "path": "/baz", "value": "qux" },
-                     { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
-                     { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
-                 ],
-                "error" : "fail"
-             }
-         ]
-    },
-    {
-        "given": {
-               "baz": "boo",
-               "foo": [ "bar", "qux", "baz" ]
-           },
-        "cases": [
-             {
-                "comment" : "add -> remove -> remove -> fail",
-                "patch": [
-                     { "op": "add", "path": "/baz", "value": "qux" },
-                     { "op": "remove", "path": "/foo/2" },
-                     { "op": "remove", "path": "/foo/2" } // nonexistent target
-                 ],
-                "error" : "fail"
-             }
-         ]
-    },
     {
         "given": {
                "baz": ["boo"],
