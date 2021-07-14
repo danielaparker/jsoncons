@@ -73,64 +73,50 @@ namespace detail {
             static std::basic_string<CharT> name{'v','a','l','u','e'};
             return name;
         }
+        static std::basic_string<CharT> dash_name()
+        {
+            static std::basic_string<CharT> name{'-'};
+            return name;
+        }
     };
 
     template<class Json>
     std::basic_string<typename Json::char_type> normalized_path(const Json& root, jsonpointer::basic_json_pointer<typename Json::char_type>& location)
     {
-        using string_type = std::basic_string<typename Json::char_type>;
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
         using string_view_type = typename Json::string_view_type;
 
-        std::error_code ec;
-
-        const Json* current = std::addressof(root);
-        if (location.empty())
-        {
-            return string_type();
-        }
-
-        string_type buffer;
-        auto it = location.begin();
-        auto end = location.end();
-        while (it != end)
-        {
-            buffer = *it;
-            ++it;
-            if (it != end)
-            {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
-                if (ec)
-                    return location.string();
-            }
-        }
-
-        if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
-        {
-            string_type str = location.string();
-            string_type p = string_type(str.substr(0));
-            std::string s = std::to_string(current->size());
-            for (auto c : s)
-            {
-                p.push_back(c);
-            }
-            return p;
-        }
-        else
+        auto rit = location.rbegin();
+        if (rit == location.rend())
         {
             return location.string();
         }
-    }
 
-    template<class Json>
-    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const std::basic_string<typename Json::char_type>& location)
-    {
-        std::error_code ec;
-        auto jsonptr = jsonpointer::basic_json_pointer<typename Json::char_type>::parse(location, ec);
-        if (ec)
+        if (*rit != jsonpatch_names<char_type>::dash_name())
         {
-            return location;
+            return location.string();
         }
-        return normalized_path(root, jsonptr);
+
+        std::vector<string_type> tokens;
+        for (auto it = tokens.begin(); it != tokens.rend().base(); ++it)
+        {
+            tokens.push_back(*it);
+        }
+        jsonpointer::basic_json_pointer<char_type> pointer(tokens);
+
+        std::error_code ec;
+
+        Json val = jsonpointer::get(root, pointer, ec);
+        if (ec || !val.is_array())
+        {
+            return location.string();
+        }
+        string_type last_token;
+        jsoncons::detail::from_integer(val.size(), last_token);
+        tokens.emplace_back(std::move(last_token));
+
+        return jsonpointer::basic_json_pointer<char_type>(tokens).string();
     }
 
     enum class op_type {add,remove,replace};
