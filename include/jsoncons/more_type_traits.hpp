@@ -289,13 +289,28 @@ namespace type_traits {
            typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
     >::type> : std::true_type {};
 
-    // is_cstring
+    // From boost
+    namespace ut_detail {
+
     template<typename T>
-    struct is_cstring : std::false_type
-    {};
+    struct is_cstring_impl : public std::false_type {};
+
     template<typename T>
-    struct is_cstring<const T*> : is_character<T>
-    {};
+    struct is_cstring_impl<T const*> : public is_cstring_impl<T*> {};
+
+    template<typename T>
+    struct is_cstring_impl<T const* const> : public is_cstring_impl<T*> {};
+
+    template<>
+    struct is_cstring_impl<char*> : public std::true_type {};
+
+    template<>
+    struct is_cstring_impl<wchar_t*> : public std::true_type {};
+
+    } // namespace ut_detail
+
+    template<typename T>
+    struct is_cstring : public ut_detail::is_cstring_impl<typename std::decay<T>::type> {};
 
     // is_bool
 
@@ -745,6 +760,14 @@ namespace impl {
     template<class FunctionObject, class T, class Arg1, class Arg2>
     using
     is_binary_function_object_exact = is_detected_exact<T,binary_function_object_t, FunctionObject, Arg1, Arg2>;
+
+    template <class Source, class Enable=void>
+    struct is_convertible_to_string_view : std::false_type {};
+
+    template <class Source>
+    struct is_convertible_to_string_view<Source,typename std::enable_if<is_string_or_string_view<Source>::value ||
+                                                               is_cstring<Source>::value
+        >::type> : std::true_type {};
 
 } // type_traits
 } // jsoncons
