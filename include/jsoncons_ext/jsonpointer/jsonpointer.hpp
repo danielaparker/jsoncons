@@ -88,7 +88,7 @@ namespace jsoncons { namespace jsonpointer {
         {
         }
 
-        explicit basic_json_pointer(const string_type& s)
+        explicit basic_json_pointer(const string_view_type& s)
         {
             std::error_code ec;
             auto jp = parse(s, ec);
@@ -97,6 +97,15 @@ namespace jsoncons { namespace jsonpointer {
                 throw jsonpointer_error(ec);
             }
             tokens_ = std::move(jp.tokens_);
+        }
+
+        explicit basic_json_pointer(const string_view_type& s, std::error_code& ec)
+        {
+            auto jp = parse(s, ec);
+            if (!ec)
+            {
+                tokens_ = std::move(jp.tokens_);
+            }
         }
 
         basic_json_pointer(const basic_json_pointer&) = default;
@@ -452,11 +461,11 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,Json&>::type
     get(Json& root, 
-        const StringSource& location, 
+        const StringSource& location_str, 
         bool create_if_missing,
         std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return root;
@@ -490,10 +499,10 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,const Json&>::type
     get(const Json& root, 
-        const StringSource& location, 
+        const StringSource& location_str, 
         std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return root;
@@ -512,10 +521,10 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,Json&>::type
     get(Json& root, 
-        const StringSource& location, 
+        const StringSource& location_str, 
         std::error_code& ec)
     {
-        return get(root, location, false, ec);
+        return get(root, location_str, false, ec);
     }
 
     template<class Json>
@@ -535,11 +544,11 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,Json&>::type
     get(Json& root, 
-              const StringSource& location,
+              const StringSource& location_str,
               bool create_if_missing = false)
     {
         std::error_code ec;
-        Json& result = get(root, location, create_if_missing, ec);
+        Json& result = get(root, location_str, create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -561,10 +570,10 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,const Json&>::type
-    get(const Json& root, const StringSource& location)
+    get(const Json& root, const StringSource& location_str)
     {
         std::error_code ec;
-        const Json& j = get(root, location, ec);
+        const Json& j = get(root, location_str, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -584,10 +593,10 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,bool>::type
-    contains(const Json& root, const StringSource& location)
+    contains(const Json& root, const StringSource& location_str)
     {
         std::error_code ec;
-        get(root, location, ec);
+        get(root, location_str, ec);
         return !ec ? true : false;
     }
 
@@ -663,12 +672,12 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     add(Json& root, 
-             const StringSource& location, 
+             const StringSource& location_str, 
              T&& value, 
              bool create_if_missing,
              std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return;
@@ -688,11 +697,11 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     add(Json& root, 
-             const StringSource& location, 
+             const StringSource& location_str, 
              T&& value, 
              std::error_code& ec)
     {
-        add(root, location, std::forward<T>(value), false, ec);
+        add(root, location_str, std::forward<T>(value), false, ec);
     }
 
     template<class Json,class T>
@@ -712,12 +721,12 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     add(Json& root, 
-             const StringSource& location, 
+             const StringSource& location_str, 
              T&& value,
              bool create_if_missing = false)
     {
         std::error_code ec;
-        add(root, location, std::forward<T>(value), create_if_missing, ec);
+        add(root, location_str, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -806,12 +815,12 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     add_if_absent(Json& root, 
-                       const StringSource& location, 
+                       const StringSource& location_str, 
                        T&& value, 
                        bool create_if_missing,
                        std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return;
@@ -832,12 +841,12 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     add_if_absent(Json& root, 
-                const StringSource& location, 
+                const StringSource& location_str, 
                 T&& value,
                 bool create_if_missing = false)
     {
         std::error_code ec;
-        add_if_absent(root, location, std::forward<T>(value), create_if_missing, ec);
+        add_if_absent(root, location_str, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -846,9 +855,9 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_if_absent(Json& root, 
-                const basic_json_pointer<typename Json::char_type>& location, 
-                T&& value, 
-                std::error_code& ec)
+                       const basic_json_pointer<typename Json::char_type>& location, 
+                       T&& value, 
+                       std::error_code& ec)
     {
         add_if_absent(root, location, std::forward<T>(value), false, ec);
     }
@@ -934,9 +943,9 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
-    remove(Json& root, const StringSource& location, std::error_code& ec)
+    remove(Json& root, const StringSource& location_str, std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return;
@@ -946,10 +955,10 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class StringSource>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
-    remove(Json& root, const StringSource& location)
+    remove(Json& root, const StringSource& location_str)
     {
         std::error_code ec;
-        remove(root, location, ec);
+        remove(root, location_str, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -1047,12 +1056,12 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     replace(Json& root, 
-                 const StringSource& location, 
+                 const StringSource& location_str, 
                  T&& value, 
                  bool create_if_missing,
                  std::error_code& ec)
     {
-        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location, ec);
+        auto jsonptr = basic_json_pointer<typename Json::char_type>::parse(location_str, ec);
         if (ec)
         {
             return;
@@ -1063,22 +1072,22 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     replace(Json& root, 
-                 const StringSource& location, 
+                 const StringSource& location_str, 
                  T&& value, 
                  std::error_code& ec)
     {
-        replace(root, location, std::forward<T>(value), false, ec);
+        replace(root, location_str, std::forward<T>(value), false, ec);
     }
 
     template<class Json, class StringSource, class T>
     typename std::enable_if<std::is_convertible<StringSource,jsoncons::basic_string_view<typename Json::char_type>>::value,void>::type
     replace(Json& root, 
-                 const StringSource& location, 
+                 const StringSource& location_str, 
                  T&& value, 
                  bool create_if_missing = false)
     {
         std::error_code ec;
-        replace(root, location, std::forward<T>(value), create_if_missing, ec);
+        replace(root, location_str, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));

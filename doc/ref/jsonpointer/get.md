@@ -6,23 +6,54 @@ Selects a value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& location,
+Json& get(Json& root, 
+          const basic_json_pointer<Json::char_type>& location,
           bool create_if_missing = false);                               (1)
 
 template<class Json>
-const Json& get(const Json& root, const Json::string_view_type& location);   (2)
+const Json& get(const Json& root, 
+                const basic_json_pointer<Json::char_type>& location);    (2)
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& location, 
+Json& get(Json& root, 
+          const basic_json_pointer<Json::char_type>& location, 
           std::error_code& ec);                                          (3)
 
 template<class Json>
-const Json& get(const Json& root, const Json::string_view_type& location, 
+const Json& get(const Json& root, 
+                const basic_json_pointer<Json::char_type>& location, 
                 std::error_code& ec);                                    (4)
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& location, 
-          bool create_if_missing, std::error_code& ec);                  (5)
+Json& get(Json& root, 
+          const basic_json_pointer<Json::char_type>& location, 
+          bool create_if_missing, 
+          std::error_code& ec);                                          (5)
+
+template<class Json, class StringSource>
+Json& get(Json& root, 
+          const StringSource& location_str,
+          bool create_if_missing = false);                               (6)
+
+template<class Json, class StringSource>
+const Json& get(const Json& root, 
+                const StringSource& location_str);                       (7)
+
+template<class Json, class StringSource>
+Json& get(Json& root, 
+          const StringSource& location_str, 
+          std::error_code& ec);                                          (8)
+
+template<class Json, class StringSource>
+const Json& get(const Json& root, 
+                const StringSource& location_str, 
+                std::error_code& ec);                                    (9)
+
+template<class Json, class StringSource>
+Json& get(Json& root, 
+          const StringSource& location_str, 
+          bool create_if_missing, 
+          std::error_code& ec);                                          (10)
 ```
 
 #### Parameters
@@ -33,7 +64,11 @@ Json& get(Json& root, const Json::string_view_type& location,
   </tr>
   <tr>
     <td>location</td>
-    <td>JSON Pointer</td> 
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
     <td><code>create_if_missing</code> (since 0.162.0)</td>

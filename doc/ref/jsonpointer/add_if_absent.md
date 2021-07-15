@@ -7,16 +7,42 @@ if a value does not already exist at that location.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void add_if_absent(Json& target, const Json::string_view_type& location, 
-                    T&& value, bool create_if_missing = false);              (1) 
+void add_if_absent(Json& target, 
+                    const basic_json_pointer<Json::char_type>& location, 
+                    T&& value, 
+                    bool create_if_missing = false);                     (1) 
 
 template<class Json, class T>
-void add_if_absent(Json& target, const Json::string_view_type& location, 
-                    T&& value, std::error_code& ec);                         (2) 
+void add_if_absent(Json& target, 
+                   const basic_json_pointer<Json::char_type>& location, 
+                   T&& value, 
+                   std::error_code& ec);                                 (2) 
 
 template<class Json, class T>
-void add_if_absent(Json& target, const Json::string_view_type& location, 
-                    T&& value, bool create_if_missing, std::error_code& ec); (3) 
+void add_if_absent(Json& target, 
+                   const basic_json_pointer<Json::char_type>& location, 
+                   T&& value, 
+                   bool create_if_missing, 
+                   std::error_code& ec);                                 (3) 
+
+template<class Json, class StringSource, class T>
+void add_if_absent(Json& target, 
+                    const StringSource& location_str, 
+                    T&& value, 
+                    bool create_if_missing = false);                     (4) 
+
+template<class Json, class StringSource, class T>
+void add_if_absent(Json& target, 
+                   const StringSource& location_str, 
+                   T&& value, 
+                   std::error_code& ec);                                 (5) 
+
+template<class Json, class StringSource, class T>
+void add_if_absent(Json& target, 
+                   const StringSource& location_str, 
+                   T&& value, 
+                   bool create_if_missing, 
+                   std::error_code& ec);                                 (6) 
 ```
 
 Inserts a value into the target at the specified location, if the location doesn't specify an object member that already has the same key.
@@ -33,7 +59,11 @@ Inserts a value into the target at the specified location, if the location doesn
   </tr>
   <tr>
     <td>location</td>
-    <td>JSON Pointer</td> 
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
     <td>value</td>

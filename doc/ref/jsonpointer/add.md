@@ -7,16 +7,42 @@ If a value already exists at the target location, that value is replaced.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& location, 
-         T&& value, bool create_if_missing = false);              (1)
+void add(Json& target, 
+         const basic_json_pointer<Json::char_type>& location, 
+         T&& value, 
+         bool create_if_missing = false);                      (1) (since 0.167.0)
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& location, 
-         T&& value, std::error_code& ec);                         (2)
+void add(Json& target, 
+         const basic_json_pointer<Json::char_type>& location, 
+         T&& value, 
+         std::error_code& ec);                                 (2) (since 0.167.0)
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& location, 
-         T&& value, bool create_if_missing, std::error_code& ec); (3) (since 0.162.0)
+void add(Json& target, 
+         const basic_json_pointer<Json::char_type>& location, 
+         T&& value, 
+         bool create_if_missing, 
+         std::error_code& ec);                                 (3) (since 0.167.0)
+
+template<class Json, class StringSource, class T>
+void add(Json& target, 
+         const StringSource& location_str, 
+         T&& value, 
+         bool create_if_missing = false);                      (4)
+
+template<class Json, class StringSource, class T>
+void add(Json& target, 
+         const StringSource& location_str, 
+         T&& value, 
+         std::error_code& ec);                                 (5)
+
+template<class Json, class StringSource, class T>
+void add(Json& target, 
+         const StringSource& location_str, 
+         T&& value, 
+         bool create_if_missing, 
+         std::error_code& ec);                                 (6) (since 0.162.0)
 ```
 
 Inserts a value into the target at the specified location, or if the location specifies an object member that already has the same key, assigns the new value to that member
@@ -35,7 +61,11 @@ Inserts a value into the target at the specified location, or if the location sp
   </tr>
   <tr>
     <td>location</td>
-    <td>JSON Pointer</td> 
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
     <td>value</td>
@@ -63,7 +93,7 @@ None
  
 ### Examples
 
-#### Insert or assign an object member at a location that already exists
+#### Insert or assign an object member at a location_str that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -95,7 +125,7 @@ Output:
 {"baz":"qux","foo":"bar"}
 ```
 
-#### Add a value to a location after creating objects when missing object keys
+#### Add a value to a location_str after creating objects when missing object keys
 
 ```c++
 #include <iostream>
@@ -109,14 +139,14 @@ int main()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
-    jsonpointer::json_pointer location;
+    jsonpointer::json_pointer location_str;
     for (const auto& key : keys)
     {
-        location /= key;
+        location_str /= key;
     }
 
     json doc;
-    jsonpointer::add(doc, location, "str", true);
+    jsonpointer::add(doc, location_str, "str", true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }

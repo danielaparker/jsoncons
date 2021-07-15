@@ -6,11 +6,22 @@ Removes a `json` element.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-void remove(Json& target, const Json::string_view_type& location); (1)
+void remove(Json& target, 
+            const basic_json_pointer<Json::char_type>& location); (1)
 
 template<class Json>
-void remove(Json& target, const Json::string_view_type& location, 
-            std::error_code& ec);                              (2)
+void remove(Json& target, 
+            const basic_json_pointer<Json::char_type>& location, 
+            std::error_code& ec);                                 (2)
+
+template<class Json, class StringSource>
+void remove(Json& target, 
+            const StringSource& location_str);                    (3)
+
+template<class Json, class StringSource>
+void remove(Json& target, 
+            const StringSource& location_str, 
+            std::error_code& ec);                                 (4)
 ```
 
 Removes the value at the location specifed by `location`.
@@ -23,7 +34,11 @@ Removes the value at the location specifed by `location`.
   </tr>
   <tr>
     <td>location</td>
-    <td>JSON Pointer</td> 
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
     <td><code>ec</code></td>

@@ -4,8 +4,26 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-bool contains(const Json& doc, const Json::string_view_type& location);
+bool contains(const Json& root, const basic_json_pointer<Json::char_type>& location);
+
+template<class Json, class StringSource>
+bool contains(const Json& root, const StringSource& location_str);
 ```
+#### Parameters
+<table>
+  <tr>
+    <td>root</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>location</td>
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
+  </tr>
+</table>
 
 #### Return value
 

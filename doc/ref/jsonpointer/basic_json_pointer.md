@@ -24,18 +24,16 @@ Type        |Definition
 char_type   | `CharT`
 string_type | `std::basic_string<char_type>`
 string_view_type | `jsoncons::basic_string_view<char_type>`
-const_iterator | A constant [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) with a `value_type` of `std::basic_string<char_type>`
+const_iterator | A constant [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) with a `value_type` of `std::basic_string<char_type>`
 iterator    | An alias to `const_iterator`
 
 #### Constructors
 
     basic_json_pointer();
 
-    explicit basic_json_pointer(const string_type& pointer);
+    explicit basic_json_pointer(const string_view_type& str);
 
-    explicit basic_json_pointer(string_type&& pointer);
-
-    explicit basic_json_pointer(const CharT* s);
+    explicit basic_json_pointer(const string_view_type& str, std::error_code& ec);
 
     basic_json_pointer(const basic_json_pointer&);
 
@@ -50,11 +48,11 @@ iterator    | An alias to `const_iterator`
 #### Modifiers
 
     basic_json_pointer& operator/=(const string_type& s)
-First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
+Appends the token s.
 
     template <class IntegerType>
     basic_json_pointer& operator/=(IntegerType index) 
-First, appends the JSON Pointer separator `/`. Then appends the token `index`.
+Appends the token `index`.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
 
     basic_json_pointer& operator+=(const basic_json_pointer& ptr)
@@ -71,9 +69,8 @@ Iterator access to the tokens in the pointer.
     bool empty() const
 Checks if the pointer is empty
 
-    const string_view_type& string_view() const
-    operator string_view_type() const;
-Access the JSON Pointer pointer as a string view.
+   string_type to_string() const
+Gets a string representation of the JSON Pointer, escaping any `/` or `~` characters..
 
 #### Non-member functions
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);

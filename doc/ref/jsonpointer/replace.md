@@ -6,16 +6,42 @@ Replace a `json` element or member.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& location, 
-             T&& value, bool create_if_missing = false);              (1)
+void replace(Json& target, 
+             const basic_json_pointer<Json::char_type>& location, 
+             T&& value, 
+             bool create_if_missing = false);                      (1)
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& location, 
-             T&& value, std::error_code& ec);                         (2)
+void replace(Json& target, 
+             const basic_json_pointer<Json::char_type>& location, 
+             T&& value, 
+             std::error_code& ec);                                 (2)
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& location, 
-             T&& value, bool create_if_missing, std::error_code& ec); (3)
+void replace(Json& target, 
+             const basic_json_pointer<Json::char_type>& location, 
+             T&& value, 
+             bool create_if_missing, 
+             std::error_code& ec);                                 (3)
+
+template<class Json, class StringSource, class T>
+void replace(Json& target, 
+             const StringSource& location_str, 
+             T&& value, 
+             bool create_if_missing = false);                      (4)
+
+template<class Json, class StringSource, class T>
+void replace(Json& target, 
+             const StringSource& location_str, 
+             T&& value, 
+             std::error_code& ec);                                 (5)
+
+template<class Json, class StringSource, class T>
+void replace(Json& target, 
+             const StringSource& location_str, 
+             T&& value, 
+             bool create_if_missing, 
+             std::error_code& ec);                                 (6)
 ```
 
 Replaces the value at the location specified by `location` with a new value. 
@@ -28,7 +54,11 @@ Replaces the value at the location specified by `location` with a new value.
   </tr>
   <tr>
     <td>location</td>
-    <td>JSON Pointer</td> 
+    <td>A <a href="basic_json_pointer.md">basic_json_pointer</a></td> 
+  </tr>
+  <tr>
+    <td>location_str</td>
+    <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
     <td>value</td>
