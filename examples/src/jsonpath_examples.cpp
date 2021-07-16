@@ -807,7 +807,7 @@ void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
 
-  /*  jsonpath_complex_examples();
+    jsonpath_complex_examples();
     jsonpath_union();
     flatten_and_unflatten();
     more_json_query_examples();
@@ -836,7 +836,7 @@ void jsonpath_examples()
     function_ceil_example();
 
     union_example();
-*/    parent_operator_example();
+    parent_operator_example();
     std::cout << "\n";
 }
 
