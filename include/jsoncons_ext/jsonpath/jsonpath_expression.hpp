@@ -63,7 +63,6 @@ namespace detail {
         wildcard_or_union,
         union_element,
         index_or_slice_or_union,
-        index,
         integer,
         digit,
         slice_expression_stop,
@@ -1476,43 +1475,6 @@ namespace detail {
                                 state_stack_.emplace_back(path_state::integer);
                                 ++p_;
                                 ++column_;
-                                break;
-                            }
-                            default:
-                                ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
-                        }
-                        break;
-                    case path_state::index:
-                        switch(*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character();
-                                break;
-                            case ']':
-                            case '.':
-                            case ',':
-                            {
-                                if (buffer.empty())
-                                {
-                                    ec = jsonpath_errc::invalid_number;
-                                    return path_expression_type();
-                                }
-                                else
-                                {
-                                    int64_t n{0};
-                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
-                                    if (!r)
-                                    {
-                                        ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type();
-                                    }
-                                    push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                    if (ec) {return path_expression_type();}
-
-                                    buffer.clear();
-                                }
-                                state_stack_.pop_back(); // index
                                 break;
                             }
                             default:

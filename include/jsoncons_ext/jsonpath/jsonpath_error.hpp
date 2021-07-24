@@ -19,7 +19,6 @@ namespace jsoncons { namespace jsonpath {
         expected_current_node,
         expected_rparen,
         expected_rbracket,
-        expected_key,
         expected_separator,
         expected_forward_slash,
         expected_slice_start,
@@ -74,8 +73,6 @@ namespace jsoncons { namespace jsonpath {
                     return "Expected ]";
                 case jsonpath_errc::expected_rparen:
                     return "Expected )";
-                case jsonpath_errc::expected_key:
-                    return "Expected a name or index following the dot";
                 case jsonpath_errc::expected_slice_start:
                     return "Expected slice start";
                 case jsonpath_errc::expected_slice_end:
