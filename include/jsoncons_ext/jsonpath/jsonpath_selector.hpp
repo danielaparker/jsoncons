@@ -113,7 +113,7 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using path_component_type = path_component<char_type>;
+        using path_component_type = path_node<char_type>;
 
         Json* val;
 
@@ -132,7 +132,7 @@ namespace detail {
     struct path_generator
     {
         using char_type = typename Json::char_type;
-        using path_component_type = path_component<char_type>;
+        using path_component_type = path_node<char_type>;
         using string_type = std::basic_string<char_type>;
 
         static const path_component_type& generate(dynamic_resources<Json,JsonReference>& resources,

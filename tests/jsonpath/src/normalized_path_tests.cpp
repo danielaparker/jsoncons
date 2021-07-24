@@ -8,20 +8,20 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_component = jsoncons::jsonpath::path_component<char>;
+using path_node = jsoncons::jsonpath::path_node<char>;
 using normalized_path = jsoncons::jsonpath::normalized_path<char>;
 
 TEST_CASE("test normalized_path equals")
 {
-    path_component component1('$');
-    path_component component2(&component1,"foo");
-    path_component component3(&component2,"bar");
-    path_component component4(&component3,0);
+    path_node component1('$');
+    path_node component2(&component1,"foo");
+    path_node component3(&component2,"bar");
+    path_node component4(&component3,0);
 
-    path_component component11('$');
-    path_component component12(&component11,"foo");
-    path_component component13(&component12,"bar");
-    path_component component14(&component13,0);
+    path_node component11('$');
+    path_node component12(&component11,"foo");
+    path_node component13(&component12,"bar");
+    path_node component14(&component13,0);
 
     normalized_path path1(component4);
     normalized_path path2(component14);
@@ -31,10 +31,10 @@ TEST_CASE("test normalized_path equals")
 
 TEST_CASE("test normalized_path to_string")
 {
-    path_component component1('$');
-    path_component component2(&component1,"foo");
-    path_component component3(&component2,"bar");
-    path_component component4(&component3,0);
+    path_node component1('$');
+    path_node component2(&component1,"foo");
+    path_node component3(&component2,"bar");
+    path_node component4(&component3,0);
 
     normalized_path path1(component4);
 
@@ -43,10 +43,10 @@ TEST_CASE("test normalized_path to_string")
 
 TEST_CASE("test normalized_path with solidus to_string")
 {
-    path_component component1('$');
-    path_component component2(&component1,"foo's");
-    path_component component3(&component2,"bar");
-    path_component component4(&component3,0);
+    path_node component1('$');
+    path_node component2(&component1,"foo's");
+    path_node component3(&component2,"bar");
+    path_node component4(&component3,0);
 
     normalized_path path1(component4);
 
