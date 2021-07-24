@@ -50,7 +50,8 @@ namespace jsoncons { namespace jsonpath {
         expected_or,
         expected_and,
         expected_comma_or_rparen,
-        expected_comma_or_rbracket
+        expected_comma_or_rbracket,
+        expected_relative_path
     };
 
     class jsonpath_error_category_impl
@@ -135,6 +136,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Expected comma or right parenthesis";
                 case jsonpath_errc::expected_comma_or_rbracket:
                     return "Expected comma or right bracket";
+                case jsonpath_errc::expected_relative_path:
+                    return "Expected unquoted string, or single or double quoted string, or index or '*'";
                 default:
                     return "Unknown jsonpath parser error";
             }

@@ -29,8 +29,8 @@ namespace detail {
         start,
         root_or_current_node,
         expect_function_expr,
-        path_lhs,
-        path_rhs,
+        relative_path,
+        relative_location,
         parent_operator,
         ancestor_depth,
         filter_expression,
@@ -203,14 +203,14 @@ namespace detail {
                             {
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.emplace_back(path_state::path_rhs);
+                                state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
                                 ++column_;
                                 break;
                             }
                             default:
                             {
-                                state_stack_.emplace_back(path_state::path_rhs);
+                                state_stack_.emplace_back(path_state::relative_location);
                                 state_stack_.emplace_back(path_state::expect_function_expr);
                                 state_stack_.emplace_back(path_state::unquoted_string);
                                 break;
@@ -256,7 +256,7 @@ namespace detail {
                                 state_stack_.back() = path_state::name_or_lbracket;
                                 break;
                             default:
-                                state_stack_.back() = path_state::path_lhs;
+                                state_stack_.back() = path_state::relative_path;
                                 break;
                         }
                         break;
@@ -273,7 +273,7 @@ namespace detail {
                                 break;
                             default:
                                 buffer.clear();
-                                state_stack_.back() = path_state::path_lhs;
+                                state_stack_.back() = path_state::relative_path;
                                 break;
                         }
                         break;
@@ -295,7 +295,7 @@ namespace detail {
                                 break;
                             case '$':
                             case '@':
-                                state_stack_.back() = path_state::path_rhs;
+                                state_stack_.back() = path_state::relative_location;
                                 state_stack_.push_back(path_state::root_or_current_node);
                                 break;
                             case '(':
@@ -506,7 +506,7 @@ namespace detail {
                                 break;
                         };
                         break;
-                    case path_state::path_lhs: 
+                    case path_state::relative_path: 
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -532,12 +532,8 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '[':
-                                state_stack_.emplace_back(path_state::bracket_specifier_or_union);
-                                ++p_;
-                                ++column_;
-                                break;
                             case '.':
-                                ec = jsonpath_errc::expected_key;
+                                ec = jsonpath_errc::expected_relative_path;
                                 return path_expression_type();
                             default:
                                 buffer.clear();
@@ -739,7 +735,7 @@ namespace detail {
                                 break;
                         };
                         break;                    
-                    case path_state::path_rhs: 
+                    case path_state::relative_location: 
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1275,7 +1271,7 @@ namespace detail {
                                 push_token(resources, root_node_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::path_rhs);                                
+                                state_stack_.emplace_back(path_state::relative_location);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1285,7 +1281,7 @@ namespace detail {
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::path_rhs);
+                                state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1334,7 +1330,7 @@ namespace detail {
                             case '*':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::path_rhs;
+                                state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1342,7 +1338,7 @@ namespace detail {
                                 push_token(resources, token_type(root_node_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::path_rhs;
+                                state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1350,7 +1346,7 @@ namespace detail {
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::path_rhs;
+                                state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1621,7 +1617,7 @@ namespace detail {
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::path_lhs);                                
+                                state_stack_.emplace_back(path_state::relative_path);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1630,7 +1626,7 @@ namespace detail {
                                 push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::path_lhs);                                
+                                state_stack_.emplace_back(path_state::relative_path);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1641,7 +1637,7 @@ namespace detail {
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::path_lhs);                                
+                                state_stack_.emplace_back(path_state::relative_path);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1659,7 +1655,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::path_lhs);
+                                state_stack_.emplace_back(path_state::relative_path);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2070,9 +2066,9 @@ namespace detail {
                 switch (state_stack_.back())
                 {
                     case path_state::name_or_lbracket: 
-                        state_stack_.back() = path_state::path_lhs;
+                        state_stack_.back() = path_state::relative_path;
                         break;
-                    case path_state::path_lhs: 
+                    case path_state::relative_path: 
                         state_stack_.back() = path_state::identifier_or_function_expr;
                         state_stack_.emplace_back(path_state::unquoted_string);
                         break;
@@ -2087,7 +2083,7 @@ namespace detail {
                     case path_state::unquoted_string: 
                         state_stack_.pop_back(); // unquoted_string
                         break;                    
-                    case path_state::path_rhs: 
+                    case path_state::relative_location: 
                         state_stack_.pop_back();
                         break;
                     case path_state::identifier:
