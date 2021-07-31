@@ -328,7 +328,15 @@ namespace detail {
                                 if (ec) {return path_expression_type();}
                                 break;
                             }
-                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                            case '-':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(resources, token_type(resources.get_unary_minus()), ec);
+                                if (ec) {return path_expression_type();}
+                                break;
+                            }
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             {
                                 state_stack_.back() = path_state::json_value;
                                 state_stack_.emplace_back(path_state::number);
