@@ -22,10 +22,10 @@ namespace jsonpath {
     template <class CharT>
     class normalized_path; 
 
-    enum class path_node_kind { root, index, name };
+    enum class normalized_path_node_kind { root, index, name };
 
     template <class CharT>
-    class path_node 
+    class normalized_path_node 
     {
         friend class normalized_path<CharT>;
     public:
@@ -33,30 +33,30 @@ namespace jsonpath {
         using string_type = std::basic_string<CharT>;
     private:
 
-        const path_node* parent_;
-        path_node_kind node_kind_;
+        const normalized_path_node* parent_;
+        normalized_path_node_kind node_kind_;
         string_type name_;
         std::size_t index_;
     public:
-        path_node(char_type c)
-            : parent_(nullptr), node_kind_(path_node_kind::root), index_(0)
+        normalized_path_node(char_type c)
+            : parent_(nullptr), node_kind_(normalized_path_node_kind::root), index_(0)
         {
             name_.push_back(c);
         }
 
-        path_node(const path_node* parent, const string_type& name)
-            : parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
+        normalized_path_node(const normalized_path_node* parent, const string_type& name)
+            : parent_(parent), node_kind_(normalized_path_node_kind::name), name_(name), index_(0)
         {
         }
 
-        path_node(const path_node* parent, std::size_t index)
-            : parent_(parent), node_kind_(path_node_kind::index), index_(index)
+        normalized_path_node(const normalized_path_node* parent, std::size_t index)
+            : parent_(parent), node_kind_(normalized_path_node_kind::index), index_(index)
         {
         }
 
-        const path_node* parent() const { return parent_;}
+        const normalized_path_node* parent() const { return parent_;}
 
-        path_node_kind node_kind() const
+        normalized_path_node_kind node_kind() const
         {
             return node_kind_;
         }
@@ -71,7 +71,7 @@ namespace jsonpath {
             return index_;
         }
 
-        void swap(path_node& node)
+        void swap(normalized_path_node& node)
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
@@ -83,12 +83,12 @@ namespace jsonpath {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
+            std::size_t h = node_kind_ == normalized_path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
 
-        int compare_node(const path_node& other) const
+        int compare_node(const normalized_path_node& other) const
         {
             int diff = 0;
             if (node_kind_ != other.node_kind_)
@@ -99,13 +99,13 @@ namespace jsonpath {
             {
                 switch (node_kind_)
                 {
-                    case path_node_kind::root:
+                    case normalized_path_node_kind::root:
                         diff = name_.compare(other.name_);
                         break;
-                    case path_node_kind::index:
+                    case normalized_path_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
-                    case path_node_kind::name:
+                    case normalized_path_node_kind::name:
                         diff = name_.compare(other.name_);
                         break;
                 }
@@ -269,16 +269,16 @@ namespace jsonpath {
     public:
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
-        using path_component_type = path_node<CharT>;
+        using normalized_path_node_type = normalized_path_node<CharT>;
     private:
-        std::vector<const path_component_type*> nodes_;
+        std::vector<const normalized_path_node_type*> nodes_;
     public:
-        using iterator = typename detail::normalized_path_iterator<typename std::vector<const path_component_type*>::iterator>;
-        using const_iterator = typename detail::normalized_path_iterator<typename std::vector<const path_component_type*>::const_iterator>;
+        using iterator = typename detail::normalized_path_iterator<typename std::vector<const normalized_path_node_type*>::iterator>;
+        using const_iterator = typename detail::normalized_path_iterator<typename std::vector<const normalized_path_node_type*>::const_iterator>;
 
-        normalized_path(const path_component_type& node)
+        normalized_path(const normalized_path_node_type& node)
         {
-            const path_component_type* p = std::addressof(node);
+            const normalized_path_node_type* p = std::addressof(node);
             do
             {
                 nodes_.push_back(p);
@@ -309,7 +309,7 @@ namespace jsonpath {
             return const_iterator(nodes_.end());
         }
 
-        const path_component_type& last() const
+        const normalized_path_node_type& last() const
         {
             return *nodes_.back();
         }
@@ -322,10 +322,10 @@ namespace jsonpath {
             {
                 switch (node->node_kind())
                 {
-                    case path_node_kind::root:
+                    case normalized_path_node_kind::root:
                         buffer.append(node->name());
                         break;
-                    case path_node_kind::name:
+                    case normalized_path_node_kind::name:
                         buffer.push_back('[');
                         buffer.push_back('\'');
                         for (auto c : node->name())
@@ -343,7 +343,7 @@ namespace jsonpath {
                         buffer.push_back('\'');
                         buffer.push_back(']');
                         break;
-                    case path_node_kind::index:
+                    case normalized_path_node_kind::index:
                         buffer.push_back('[');
                         jsoncons::detail::from_integer(node->index(), buffer);
                         buffer.push_back(']');
@@ -412,23 +412,23 @@ namespace jsonpath {
     Json* select(Json& root, const normalized_path<typename Json::char_type>& path)
     {
         Json* current = std::addressof(root);
-        for (const auto& path_node : path)
+        for (const auto& normalized_path_node : path)
         {
-            if (path_node.node_kind() == path_node_kind::index)
+            if (normalized_path_node.node_kind() == normalized_path_node_kind::index)
             {
-                if (current->type() != json_type::array_value || path_node.index() >= current->size())
+                if (current->type() != json_type::array_value || normalized_path_node.index() >= current->size())
                 {
                     return nullptr; 
                 }
-                current = std::addressof(current->at(path_node.index()));
+                current = std::addressof(current->at(normalized_path_node.index()));
             }
-            else if (path_node.node_kind() == path_node_kind::name)
+            else if (normalized_path_node.node_kind() == normalized_path_node_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
                     return nullptr;
                 }
-                auto it = current->find(path_node.name());
+                auto it = current->find(normalized_path_node.name());
                 if (it == current->object_range().end())
                 {
                     return nullptr;

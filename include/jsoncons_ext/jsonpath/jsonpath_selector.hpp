@@ -113,7 +113,7 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using path_component_type = path_node<char_type>;
+        using normalized_path_node_type = normalized_path_node<char_type>;
 
         Json* val;
 
@@ -122,7 +122,7 @@ namespace detail {
         {
         }
 
-        void add_node(const path_component_type&, reference value) override
+        void add_node(const normalized_path_node_type&, reference value) override
         {
             val->emplace_back(value);
         }
@@ -132,11 +132,11 @@ namespace detail {
     struct path_generator
     {
         using char_type = typename Json::char_type;
-        using path_component_type = path_node<char_type>;
+        using normalized_path_node_type = normalized_path_node<char_type>;
         using string_type = std::basic_string<char_type>;
 
-        static const path_component_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const path_component_type& last, 
+        static const normalized_path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+                                              const normalized_path_node_type& last, 
                                               std::size_t index, 
                                               result_options options) 
         {
@@ -151,8 +151,8 @@ namespace detail {
             }
         }
 
-        static const path_component_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const path_component_type& last, 
+        static const normalized_path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+                                              const normalized_path_node_type& last, 
                                               const string_type& identifier, 
                                               result_options options) 
         {
@@ -179,7 +179,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
         using selector_type = typename supertype::selector_type;
@@ -208,7 +208,7 @@ namespace detail {
 
         void tail_select(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current,
                            node_accumulator_type& accumulator,
                            result_options options) const
@@ -225,7 +225,7 @@ namespace detail {
 
         reference evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
                                 reference root,
-                                const path_component_type& last, 
+                                const normalized_path_node_type& last, 
                                 reference current, 
                                 result_options options,
                                 std::error_code& ec) const
@@ -266,7 +266,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         using string_view_type = basic_string_view<char_type>;
@@ -282,7 +282,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -340,7 +340,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
@@ -436,7 +436,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
         root_selector(std::size_t id)
@@ -446,7 +446,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -456,7 +456,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference, 
                            result_options options,
                            std::error_code& ec) const override
@@ -502,7 +502,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -512,7 +512,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -523,7 +523,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
@@ -560,7 +560,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
@@ -572,12 +572,12 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference,
                     node_accumulator_type& accumulator,
                     result_options options) const override
         {
-            const path_component_type* ancestor = std::addressof(last);
+            const normalized_path_node_type* ancestor = std::addressof(last);
             int index = 0;
             while (ancestor != nullptr && index < ancestor_depth_)
             {
@@ -598,12 +598,12 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference, 
                            result_options options,
                            std::error_code& ec) const override
         {
-            const path_component_type* ancestor = std::addressof(last);
+            const normalized_path_node_type* ancestor = std::addressof(last);
             int index = 0;
             while (ancestor != nullptr && index < ancestor_depth_)
             {
@@ -656,7 +656,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -667,7 +667,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -698,7 +698,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
@@ -746,7 +746,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -757,7 +757,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -785,7 +785,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
@@ -821,7 +821,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -832,7 +832,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -860,7 +860,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
@@ -895,7 +895,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -928,7 +928,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -941,7 +941,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
@@ -983,7 +983,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -994,7 +994,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -1033,7 +1033,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
@@ -1071,7 +1071,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -1082,7 +1082,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -1106,7 +1106,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
@@ -1165,7 +1165,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
         slice_selector(const slice& slic)
@@ -1175,7 +1175,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current,
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -1229,7 +1229,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
@@ -1253,7 +1253,7 @@ namespace detail {
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_component_type = typename supertype::path_component_type;
+        using normalized_path_node_type = typename supertype::normalized_path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
@@ -1264,7 +1264,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_component_type& last, 
+                    const normalized_path_node_type& last, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     result_options options) const override
@@ -1279,7 +1279,7 @@ namespace detail {
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_component_type& last, 
+                           const normalized_path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
