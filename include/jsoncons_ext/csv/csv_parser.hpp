@@ -639,12 +639,6 @@ public:
         return !more_;
     }
 
-    bool finished() const
-    {
-        return !more_;
-        //return !more_ && (state_ != csv_parse_state::no_more_records || state_ != csv_parse_state::accept);
-    }
-
     bool source_exhausted() const
     {
         return input_ptr_ == input_end_;

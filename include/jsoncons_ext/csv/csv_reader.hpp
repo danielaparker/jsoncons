@@ -152,7 +152,7 @@ namespace jsoncons { namespace csv {
                 ec = csv_errc::source_error;
                 return;
             }   
-            while (!parser_.finished())
+            while (!parser_.stopped())
             {
                 if (parser_.source_exhausted())
                 {
@@ -316,7 +316,7 @@ namespace jsoncons { namespace csv {
                 ec = csv_errc::source_error;
                 return;
             }   
-            while (!parser_.finished())
+            while (!parser_.stopped())
             {
                 if (parser_.source_exhausted())
                 {
