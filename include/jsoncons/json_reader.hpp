@@ -298,7 +298,7 @@ namespace jsoncons {
                 return;
             }        
             parser_.reset();
-            while (!parser_.finished())
+            while (!parser_.stopped())
             {
                 if (parser_.source_exhausted())
                 {
@@ -309,8 +309,14 @@ namespace jsoncons {
                         parser_.update(s.data(),s.size());
                     }
                 }
+                bool eof = parser_.source_exhausted();
                 parser_.parse_some(visitor_, ec);
                 if (ec) return;
+                if (eof && !parser_.accept())
+                {
+                    ec = json_errc::unexpected_eof;
+                    return;
+                }
             }
             
             while (!source_.eof())
@@ -581,7 +587,7 @@ namespace jsoncons {
                 return;
             }        
             parser_.reset();
-            while (!parser_.finished())
+            while (!parser_.stopped())
             {
                 if (parser_.source_exhausted())
                 {
@@ -592,8 +598,14 @@ namespace jsoncons {
                         parser_.update(s.data(),s.size());
                     }
                 }
+                bool eof = parser_.source_exhausted();
                 parser_.parse_some(visitor_, ec);
                 if (ec) return;
+                if (eof && !parser_.accept())
+                {
+                    ec = json_errc::unexpected_eof;
+                    return;
+                }
             }
             
             while (!source_.eof())
