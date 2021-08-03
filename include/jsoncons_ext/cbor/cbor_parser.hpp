@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
+enum class parse_mode {root,accept,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
 struct mapped_string
 {
@@ -305,11 +305,11 @@ public:
                 }
                 case parse_mode::root:
                 {
-                    state_stack_.back().mode = parse_mode::before_done;
+                    state_stack_.back().mode = parse_mode::accept;
                     read_item(visitor, ec);
                     break;
                 }
-                case parse_mode::before_done:
+                case parse_mode::accept:
                 {
                     JSONCONS_ASSERT(state_stack_.size() == 1);
                     state_stack_.clear();

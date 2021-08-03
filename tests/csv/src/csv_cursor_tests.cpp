@@ -16,6 +16,21 @@
 
 using namespace jsoncons;
 
+TEST_CASE("csv_cursor eof test")
+{
+    const std::string data = "";
+
+    SECTION("csv::mapping_kind::n_rows eof test")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_kind::n_rows);
+        std::error_code ec;
+        csv::csv_cursor cursor(data, options, ec);
+        CHECK(ec == csv::csv_errc::source_error);
+    }
+}
+
 TEST_CASE("csv_cursor n_rows test")
 {
     const std::string data = R"(index_id,observation_date,rate

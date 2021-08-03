@@ -15,6 +15,18 @@
 
 using namespace jsoncons;
 
+TEST_CASE("json_cursor eof test")
+{
+    const std::string data = "";
+
+    SECTION("eof test")
+    {
+        std::error_code ec;
+        json_cursor cursor(data, ec);
+        CHECK(ec == json_errc::unexpected_eof);
+    }
+}
+
 TEST_CASE("json_cursor string_value test")
 {
     std::string s = R"("Tom")";
@@ -93,12 +105,15 @@ TEST_CASE("json_cursor int64_value test")
     std::string s = "-100";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    std::error_code ec;
+    json_cursor cursor(is, ec);
+    REQUIRE_FALSE(ec);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::int64_value);
     CHECK(cursor.current().get<int>() == -100);
-    cursor.next();
+    cursor.next(ec);
+    REQUIRE_FALSE(ec);
     CHECK(cursor.done());
 }
 

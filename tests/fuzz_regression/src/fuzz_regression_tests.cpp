@@ -17,7 +17,6 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
-#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -642,7 +641,6 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         std::cout << ec.message() << "\n";
     }
-#endif
     // Fuzz target: fuzz_parse
     // Issue: Abrt in __cxxabiv1::failed_throw
     // Diagnosis:  
@@ -659,6 +657,29 @@ TEST_CASE("oss-fuzz issues")
             json::parse(is);
         }
         catch(const jsoncons::ser_error&) {}
+    }
+
+    // Fuzz target: jsoncons:fuzz_json_cursor
+    // Issue: Timeout (exceeds 60 secs)
+    SECTION("issue 36013")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_cursor-6585089218707456";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::error_code ec;
+        json_cursor reader(is, ec);
+        while (reader.done() == 0 && !ec)
+        {
+            const auto& event = reader.current();
+            std::string s2 = event.get<std::string>(ec); 
+            if (!ec)
+            {
+                reader.next(ec);
+            }
+        }
+        CHECK(ec == json_errc::unexpected_eof); 
     }
 }
 

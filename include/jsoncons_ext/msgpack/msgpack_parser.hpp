@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace msgpack {
 
-enum class parse_mode {root,before_done,array,map_key,map_value};
+enum class parse_mode {root,accept,array,map_key,map_value};
 
 struct parse_state 
 {
@@ -165,7 +165,7 @@ public:
                 }
                 case parse_mode::root:
                 {
-                    state_stack_.back().mode = parse_mode::before_done;
+                    state_stack_.back().mode = parse_mode::accept;
                     read_item(visitor, ec);
                     if (ec)
                     {
@@ -173,7 +173,7 @@ public:
                     }
                     break;
                 }
-                case parse_mode::before_done:
+                case parse_mode::accept:
                 {
                     JSONCONS_ASSERT(state_stack_.size() == 1);
                     state_stack_.clear();

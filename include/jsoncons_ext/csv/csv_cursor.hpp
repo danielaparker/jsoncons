@@ -267,21 +267,7 @@ private:
 
     void read_next(std::error_code& ec)
     {
-        parser_.restart();
-        while (!parser_.finished())
-        {
-            if (parser_.source_exhausted())
-            {
-                auto s = source_.read_buffer(ec);
-                if (ec) return;
-                if (s.size() > 0)
-                {
-                    parser_.update(s.data(),s.size());
-                }
-            }
-            parser_.parse_some(cursor_visitor_, ec);
-            if (ec) return;
-        }
+        read_next(cursor_visitor_, ec);
     }
 
     void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)

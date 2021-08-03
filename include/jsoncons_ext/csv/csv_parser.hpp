@@ -55,7 +55,7 @@ enum class csv_parse_state
     exp1,
     exp2,
     exp3,
-    before_done,
+    accept,
     before_unquoted_field,
     before_unquoted_field_tail, 
     before_unquoted_field_tail1,
@@ -629,6 +629,11 @@ public:
         return state_ == csv_parse_state::done;
     }
 
+    bool accept() const
+    {
+        return state_ == csv_parse_state::accept || state_ == csv_parse_state::done;
+    }
+
     bool stopped() const
     {
         return !more_;
@@ -637,7 +642,7 @@ public:
     bool finished() const
     {
         return !more_;
-        //return !more_ && (state_ != csv_parse_state::no_more_records || state_ != csv_parse_state::before_done);
+        //return !more_ && (state_ != csv_parse_state::no_more_records || state_ != csv_parse_state::accept);
     }
 
     bool source_exhausted() const
@@ -773,15 +778,15 @@ public:
                         }
                         else
                         {
-                            state_ = csv_parse_state::before_done;
+                            state_ = csv_parse_state::accept;
                         }
                     }
                     else
                     {
-                        state_ = csv_parse_state::before_done;
+                        state_ = csv_parse_state::accept;
                     }
                     break;
-                case csv_parse_state::before_done:
+                case csv_parse_state::accept:
                     if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
                     {
                         err_handler_(csv_errc::unexpected_eof, *this);

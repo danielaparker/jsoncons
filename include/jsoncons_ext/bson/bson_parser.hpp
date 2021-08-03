@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace bson {
 
-enum class parse_mode {root,before_done,document,array,value};
+enum class parse_mode {root,accept,document,array,value};
 
 struct parse_state 
 {
@@ -132,7 +132,7 @@ public:
             switch (state_stack_.back().mode)
             {
                 case parse_mode::root:
-                    state_stack_.back().mode = parse_mode::before_done;
+                    state_stack_.back().mode = parse_mode::accept;
                     begin_document(visitor, ec);
                     break;
                 case parse_mode::document:
@@ -184,7 +184,7 @@ public:
                     state_stack_.back().mode = parse_mode::document;
                     read_value(visitor,state_stack_.back().type,ec);
                     break;
-                case parse_mode::before_done:
+                case parse_mode::accept:
                 {
                     JSONCONS_ASSERT(state_stack_.size() == 1);
                     state_stack_.clear();

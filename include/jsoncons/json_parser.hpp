@@ -37,7 +37,7 @@ enum class json_parse_state : uint8_t
 {
     root,
     start, 
-    before_done, 
+    accept, 
     slash,  
     slash_slash, 
     slash_star, 
@@ -244,14 +244,24 @@ public:
         return done_;
     }
 
+    bool accept() const
+    {
+        return state_ == json_parse_state::accept || done_;
+    }
+
     bool stopped() const
     {
         return !more_;
     }
 
+    json_parse_state state() const
+    {
+        return state_;
+    }
+
     bool finished() const
     {
-        return !more_ && state_ != json_parse_state::before_done;
+        return !more_ && state_ != json_parse_state::accept;
     }
 
     const char_type* first() const
@@ -390,7 +400,7 @@ public:
 
         if (parent() == json_parse_state::root)
         {
-            state_ = json_parse_state::before_done;
+            state_ = json_parse_state::accept;
         }
         else
         {
@@ -446,7 +456,7 @@ public:
         }
         if (parent() == json_parse_state::root)
         {
-            state_ = json_parse_state::before_done;
+            state_ = json_parse_state::accept;
         }
         else
         {
@@ -507,11 +517,6 @@ public:
         }
     }
 
-    json_parse_state state() const
-    {
-        return state_;
-    }
-
     void update(const string_view_type sv)
     {
         update(sv.data(),sv.length());
@@ -559,7 +564,7 @@ public:
 
     void parse_some_(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (state_ == json_parse_state::before_done)
+        if (state_ == json_parse_state::accept)
         {
             visitor.flush();
             done_ = true;
@@ -586,7 +591,7 @@ public:
                     end_fraction_value(visitor, ec);
                     if (ec) return;
                     break;
-                case json_parse_state::before_done:
+                case json_parse_state::accept:
                     visitor.flush();
                     done_ = true;
                     state_ = json_parse_state::done;
@@ -611,7 +616,7 @@ public:
         {
             switch (state_)
             {
-                case json_parse_state::before_done:
+                case json_parse_state::accept:
                     visitor.flush();
                     done_ = true;
                     state_ = json_parse_state::done;
@@ -1354,7 +1359,7 @@ public:
                             more_ = visitor.bool_value(true,  semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
-                                state_ = json_parse_state::before_done;
+                                state_ = json_parse_state::accept;
                             }
                             else
                             {
@@ -1422,7 +1427,7 @@ public:
                             more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
-                                state_ = json_parse_state::before_done;
+                                state_ = json_parse_state::accept;
                             }
                             else
                             {
@@ -1475,7 +1480,7 @@ public:
                         more_ = visitor.null_value(semantic_tag::none, *this, ec);
                         if (parent() == json_parse_state::root)
                         {
-                            state_ = json_parse_state::before_done;
+                            state_ = json_parse_state::accept;
                         }
                         else
                         {
@@ -1604,7 +1609,7 @@ public:
                 position_ += 4;
                 if (parent() == json_parse_state::root)
                 {
-                    state_ = json_parse_state::before_done;
+                    state_ = json_parse_state::accept;
                 }
                 else
                 {
@@ -1639,7 +1644,7 @@ public:
                 position_ += 4;
                 if (parent() == json_parse_state::root)
                 {
-                    state_ = json_parse_state::before_done;
+                    state_ = json_parse_state::accept;
                 }
                 else
                 {
@@ -1674,7 +1679,7 @@ public:
                 position_ += 5;
                 if (parent() == json_parse_state::root)
                 {
-                    state_ = json_parse_state::before_done;
+                    state_ = json_parse_state::accept;
                 }
                 else
                 {
@@ -2740,7 +2745,7 @@ private:
             {
                 more_ = visitor.string_value(sv, semantic_tag::none, *this, ec);
             }
-            state_ = json_parse_state::before_done;
+            state_ = json_parse_state::accept;
             break;
         }
         default:
@@ -2786,7 +2791,7 @@ private:
             state_ = json_parse_state::expect_comma_or_end;
             break;
         case json_parse_state::root:
-            state_ = json_parse_state::before_done;
+            state_ = json_parse_state::accept;
             break;
         default:
             more_ = err_handler_(json_errc::syntax_error, *this);
