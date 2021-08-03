@@ -35,7 +35,7 @@ namespace {
 
         csv::csv_options csv_options;
         csv_options.column_names("Pos,Driver,Entrant,Time,Gap");
-        csv_options.mapping(csv::mapping_kind::n_rows);
+        csv_options.mapping(csv::csv_mapping_kind::n_rows);
         std::string csv_data;
         csv_options.header_lines(1);
         csv::encode_csv(results, csv_data, csv_options);

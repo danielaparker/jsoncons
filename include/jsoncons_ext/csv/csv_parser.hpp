@@ -666,9 +666,9 @@ public:
 
     void parse_some(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        switch (options_.mapping())
+        switch (options_.mapping_kind())
         {
-            case mapping_kind::m_columns:
+            case csv_mapping_kind::m_columns:
                 visitor_ = &m_columns_filter_;
                 break;
             default:
@@ -764,7 +764,7 @@ public:
                             break;
                     }
                     more_ = visitor_->end_array(*this, ec);
-                    if (options_.mapping() == mapping_kind::m_columns)
+                    if (options_.mapping_kind() == csv_mapping_kind::m_columns)
                     {
                         if (!m_columns_filter_.done())
                         {
@@ -820,11 +820,11 @@ public:
                     }
                     break;
                 case csv_parse_state::start:
-                    if (options_.mapping() != mapping_kind::m_columns)
+                    if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                     {
                         more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                     }
-                    if (options_.assume_header() && options_.mapping() == mapping_kind::n_rows && options_.column_names().size() > 0)
+                    if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
@@ -1313,14 +1313,14 @@ private:
                 if (line_ == header_line_)
                 {
                     column_names_.push_back(buffer_);
-                    if (options_.assume_header() && options_.mapping() == mapping_kind::n_rows)
+                    if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
                         more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
                     }
                 }
                 break;
             case csv_mode::data:
-                if (options_.mapping() == mapping_kind::n_objects)
+                if (options_.mapping_kind() == csv_mapping_kind::n_objects)
                 {
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
@@ -1346,22 +1346,22 @@ private:
             case csv_mode::header:
                 if (options_.assume_header() && line_ == header_line_)
                 {
-                    if (options_.mapping() == mapping_kind::n_rows)
+                    if (options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
                         more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                     }
                 }
                 break;
             case csv_mode::data:
-                switch (options_.mapping())
+                switch (options_.mapping_kind())
                 {
-                    case mapping_kind::n_rows:
+                    case csv_mapping_kind::n_rows:
                         more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                         break;
-                    case mapping_kind::n_objects:
+                    case csv_mapping_kind::n_objects:
                         more_ = visitor_->begin_object(semantic_tag::none, *this, ec);
                         break;
-                    case mapping_kind::m_columns:
+                    case csv_mapping_kind::m_columns:
                         break;
                     default:
                         break;
@@ -1390,15 +1390,15 @@ private:
                 {
                     stack_.back() = csv_mode::data;
                 }
-                switch (options_.mapping())
+                switch (options_.mapping_kind())
                 {
-                    case mapping_kind::n_rows:
+                    case csv_mapping_kind::n_rows:
                         if (options_.assume_header())
                         {
                             more_ = visitor_->end_array(*this, ec);
                         }
                         break;
-                    case mapping_kind::m_columns:
+                    case csv_mapping_kind::m_columns:
                         m_columns_filter_.initialize(column_names_);
                         break;
                     default:
@@ -1408,15 +1408,15 @@ private:
             case csv_mode::data:
             case csv_mode::subfields:
             {
-                switch (options_.mapping())
+                switch (options_.mapping_kind())
                 {
-                    case mapping_kind::n_rows:
+                    case csv_mapping_kind::n_rows:
                         more_ = visitor_->end_array(*this, ec);
                         break;
-                    case mapping_kind::n_objects:
+                    case csv_mapping_kind::n_objects:
                         more_ = visitor_->end_object(*this, ec);
                         break;
-                    case mapping_kind::m_columns:
+                    case csv_mapping_kind::m_columns:
                         more_ = visitor_->end_array(*this, ec);
                         break;
                 }
@@ -1477,9 +1477,9 @@ private:
         {
             case csv_mode::data:
             case csv_mode::subfields:
-                switch (options_.mapping())
+                switch (options_.mapping_kind())
                 {
-                case mapping_kind::n_rows:
+                case csv_mapping_kind::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
                         more_ = visitor_->null_value(semantic_tag::none, *this, ec);
@@ -1489,7 +1489,7 @@ private:
                         end_value(options_.infer_types(), ec);
                     }
                     break;
-                case mapping_kind::n_objects:
+                case csv_mapping_kind::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
@@ -1516,7 +1516,7 @@ private:
                         }
                     }
                     break;
-                case mapping_kind::m_columns:
+                case csv_mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(options_.infer_types(), ec);
@@ -1543,12 +1543,12 @@ private:
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }
-                switch (options_.mapping())
+                switch (options_.mapping_kind())
                 {
-                case mapping_kind::n_rows:
+                case csv_mapping_kind::n_rows:
                     end_value(false, ec);
                     break;
-                case mapping_kind::n_objects:
+                case csv_mapping_kind::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
@@ -1575,7 +1575,7 @@ private:
                         }
                     }
                     break;
-                case mapping_kind::m_columns:
+                case csv_mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(false, ec);

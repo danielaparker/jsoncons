@@ -9,7 +9,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
         json_decoder<ojson> decoder;
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::mapping_kind::n_rows);
+        options.mapping(csv::csv_mapping_kind::n_rows);
         try {
                 csv::csv_string_reader reader1(input, decoder, options);
                 reader1.read();

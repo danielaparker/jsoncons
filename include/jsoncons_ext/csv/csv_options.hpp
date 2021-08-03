@@ -35,7 +35,7 @@ enum class quote_style_kind : uint8_t
     minimal,all,nonnumeric,none
 };
 
-enum class mapping_kind : uint8_t 
+enum class csv_mapping_kind : uint8_t 
 {
     n_rows = 1, 
     n_objects, 
@@ -43,9 +43,10 @@ enum class mapping_kind : uint8_t
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+using mapping_kind = csv_mapping_kind;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
-JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind") typedef mapping_kind mapping_type;
+JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_kind") typedef csv_mapping_kind mapping_type;
 #endif
 
 enum class column_state {sequence,label};
@@ -479,7 +480,7 @@ private:
     bool infer_types_:1;
     bool lossless_number_:1;
     char_type comment_starter_;
-    mapping_kind mapping_;
+    csv_mapping_kind mapping_;
     std::size_t header_lines_;
     std::size_t max_lines_;
     string_type column_types_;
@@ -594,10 +595,17 @@ public:
         return comment_starter_;
     }
 
-    mapping_kind mapping() const 
+    csv_mapping_kind mapping_kind() const 
     {
-        return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names().size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
+        return mapping_ != csv_mapping_kind() ? mapping_ : (assume_header() || this->column_names().size() > 0 ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    csv_mapping_kind mapping() const 
+    {
+        return mapping_kind();
+    }
+#endif
 
     std::size_t max_lines() const 
     {
@@ -875,7 +883,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& mapping(mapping_kind value)
+    basic_csv_options& mapping(csv_mapping_kind value)
     {
         this->mapping_ = value;
         return *this;

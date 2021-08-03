@@ -112,7 +112,7 @@ void encode_m_columns()
 
     csv::csv_options ooptions;
     ooptions.assume_header(true)
-            .mapping(csv::mapping_kind::m_columns);
+            .mapping(csv::csv_mapping_kind::m_columns);
     ojson other = csv::decode_csv<ojson>(output, ooptions);
     assert(other == j);
 }
@@ -129,18 +129,18 @@ void csv_source_to_json_value()
     options.assume_header(true)
            .column_types("string,float,float,float,float");
 
-    // mapping_kind::n_objects
-    options.mapping(csv::mapping_kind::n_objects);
+    // csv_mapping_kind::n_objects
+    options.mapping(csv::csv_mapping_kind::n_objects);
     ojson j1 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    // mapping_kind::n_rows
-    options.mapping(csv::mapping_kind::n_rows);
+    // csv_mapping_kind::n_rows
+    options.mapping(csv::csv_mapping_kind::n_rows);
     ojson j2 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    // mapping_kind::m_columns
-    options.mapping(csv::mapping_kind::m_columns);
+    // csv_mapping_kind::m_columns
+    options.mapping(csv::csv_mapping_kind::m_columns);
     ojson j3 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
@@ -155,7 +155,7 @@ void csv_source_to_cpp_object()
 
     csv::csv_options ioptions;
     ioptions.header_lines(1)
-            .mapping(csv::mapping_kind::n_rows);
+            .mapping(csv::csv_mapping_kind::n_rows);
 
     using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
@@ -439,18 +439,18 @@ void csv_parser_type_inference()
 {
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_kind::n_objects);
+           .mapping(csv::csv_mapping_kind::n_objects);
 
     std::ifstream is1("input/sales.csv");
     ojson j1 = csv::decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    options.mapping(csv::mapping_kind::n_rows);
+    options.mapping(csv::csv_mapping_kind::n_rows);
     std::ifstream is2("input/sales.csv");
     ojson j2 = csv::decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    options.mapping(csv::mapping_kind::m_columns);
+    options.mapping(csv::csv_mapping_kind::m_columns);
     std::ifstream is3("input/sales.csv");
     ojson j3 = csv::decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
@@ -480,7 +480,7 @@ NY,LON,TOR;LON
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
     csv::csv_options options2;
-    options2.mapping(csv::mapping_kind::n_rows)
+    options2.mapping(csv::csv_mapping_kind::n_rows)
            .subfield_delimiter(';');
 
     json j2 = csv::decode_csv<json>(s,options2);
@@ -488,7 +488,7 @@ NY,LON,TOR;LON
 
     csv::csv_options options3;
     options3.assume_header(true)
-           .mapping(csv::mapping_kind::m_columns)
+           .mapping(csv::csv_mapping_kind::m_columns)
            .subfield_delimiter(';');
 
     json j3 = csv::decode_csv<json>(s,options3);

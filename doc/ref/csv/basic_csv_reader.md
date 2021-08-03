@@ -266,21 +266,21 @@ csv_options options;
 options.assume_header(true)
        .column_types("string,float,float,float,float");
 
-options.mapping(mapping_kind::n_rows);
+options.mapping(csv_mapping_kind::n_rows);
 std::istringstream is1("bond_yields.csv");
 csv_stream_reader reader1(is1,decoder,options);
 reader1.read();
 ojson val1 = decoder.get_result();
 std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
-options.mapping(mapping_kind::n_objects);
+options.mapping(csv_mapping_kind::n_objects);
 std::istringstream is2("bond_yields.csv");
 csv_stream_reader reader2(is2,decoder,options);
 reader2.read();
 ojson val2 = decoder.get_result();
 std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
-options.mapping(mapping_kind::m_columns);
+options.mapping(csv_mapping_kind::m_columns);
 std::istringstream is3("bond_yields.csv");
 csv_stream_reader reader3(is3, decoder, options);
 reader3.read();

@@ -44,7 +44,7 @@ unquoted_empty_value_is_null|Replace empty field with json null value. Default i
 infer_types|Infer null, true, false, integers and floating point values in the CSV source. Default is `true`.|
 lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Default is `false`.|
 comment_starter|Character to comment out a line, must be at column 1. Default is no comments.|
-mapping|Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_objects`, otherwise `mapping_kind::n_rows`.|
+csv_mapping_kind|Indicates what [mapping kind](csv_mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `csv_mapping_kind::n_objects`, otherwise `csv_mapping_kind::n_rows`.|
 max_lines|Maximum number of lines to read. Default is unlimited.|
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
@@ -172,8 +172,8 @@ Character to comment out a line, must be at column 1. Default is no comments.
     basic_csv_options& quote_style(quote_style_kind value);
 Indicates what [quote_style](quote_style_kind.md) to use when quoting fields. Default is minimal.
 
-    basic_csv_options& mapping(mapping_kind value);
-Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_rows`, otherwise `mapping_kind::n_columns`.
+    basic_csv_options& mapping(csv_mapping_kind value);
+Indicates what [mapping kind](csv_mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `csv_mapping_kind::n_rows`, otherwise `csv_mapping_kind::n_columns`.
 
     basic_csv_options& max_lines(std::size_t value);
 Maximum number of lines to read. Default is unlimited.

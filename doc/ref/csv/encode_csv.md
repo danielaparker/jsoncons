@@ -132,7 +132,7 @@ int main()
 
     csv::csv_options ooptions;
     ooptions.assume_header(true)
-            .mapping(csv::mapping_kind::n_rows);
+            .mapping(csv::csv_mapping_kind::n_rows);
     json other = csv::decode_csv<json>(output, ooptions);
     assert(other == j);
 }
@@ -179,7 +179,7 @@ int main()
 
     csv::csv_options ooptions;
     ooptions.assume_header(true)
-            .mapping(csv::mapping_kind::m_columns);
+            .mapping(csv::csv_mapping_kind::m_columns);
     ojson other = csv::decode_csv<ojson>(output, ooptions);
     assert(other == j);
 }

@@ -70,7 +70,7 @@ TEST_CASE("encode decode csv source")
     using cpp_type = std::vector<std::tuple<std::string,int>>;
     std::string input = "\"a\",1\n\"b\",2";
     csv::csv_options options;
-    options.mapping(csv::mapping_kind::n_rows)
+    options.mapping(csv::csv_mapping_kind::n_rows)
            .assume_header(false);
 
     SECTION("from string")

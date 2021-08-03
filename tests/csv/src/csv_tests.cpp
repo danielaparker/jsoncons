@@ -36,7 +36,7 @@ TEST_CASE("csv subfield delimiter tests")
        options.assume_header(true)
               .subfield_delimiter(';')
               .quote_style(csv::quote_style_kind::nonnumeric)
-              .mapping(csv::mapping_kind::n_objects);
+              .mapping(csv::csv_mapping_kind::n_objects);
 
        std::string output;
        csv::encode_csv(j, output, options);
@@ -84,7 +84,7 @@ TEST_CASE("csv subfield delimiter tests")
        csv::csv_options options;
        options.subfield_delimiter(';')
               .quote_style(csv::quote_style_kind::nonnumeric)
-              .mapping(csv::mapping_kind::m_columns)
+              .mapping(csv::csv_mapping_kind::m_columns)
               .assume_header(true)
               .ignore_empty_values(true);
 
@@ -131,7 +131,7 @@ TEST_CASE("n_objects_test")
     json_decoder<ojson> decoder;
     csv::csv_options options;
 
-    options.mapping(csv::mapping_kind::n_rows);
+    options.mapping(csv::csv_mapping_kind::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
@@ -139,7 +139,7 @@ TEST_CASE("n_objects_test")
     CHECK(val1.size() == 4);
 
     options.assume_header(true);
-    options.mapping(csv::mapping_kind::n_objects);
+    options.mapping(csv::csv_mapping_kind::n_objects);
     csv::csv_reader reader2(bond_yields,decoder,options);
     reader2.read();
     ojson val2 = decoder.get_result();
@@ -159,7 +159,7 @@ TEST_CASE("m_columns_test")
     json_decoder<ojson> decoder;
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_kind::m_columns);
+           .mapping(csv::csv_mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
     csv::csv_stream_reader reader(is, decoder, options);
@@ -189,7 +189,7 @@ TEST_CASE("csv ignore_empty_value")
         csv::csv_options options;
         options.assume_header(true)
                .ignore_empty_values(true)
-               .mapping(csv::mapping_kind::m_columns);
+               .mapping(csv::csv_mapping_kind::m_columns);
 
         std::istringstream is(bond_yields);
         csv::csv_stream_reader reader(is, decoder, options);
@@ -210,7 +210,7 @@ TEST_CASE("csv ignore_empty_value")
         csv::csv_options options;
         options.assume_header(false)
                .ignore_empty_values(true)
-               .mapping(csv::mapping_kind::n_rows);
+               .mapping(csv::csv_mapping_kind::n_rows);
 
         std::istringstream is(bond_yields);
         csv::csv_stream_reader reader(is, decoder, options);
@@ -1280,7 +1280,7 @@ TEST_CASE("Test decode_csv, terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_kind::m_columns);
+               .mapping(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1321,7 +1321,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_kind::m_columns);
+               .mapping(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1373,7 +1373,7 @@ TEST_CASE("test_type_inference")
         )");
 
         csv::csv_options options;
-        options.mapping(csv::mapping_kind::n_rows);
+        options.mapping(csv::csv_mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
         REQUIRE(j == expected); //-V521
@@ -1420,7 +1420,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_kind::n_objects);
+               .mapping(csv::csv_mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected); //-V521
@@ -1441,7 +1441,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_kind::m_columns);
+               .mapping(csv::csv_mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected); //-V521
@@ -1458,7 +1458,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_kind::n_objects)
+           .mapping(csv::csv_mapping_kind::n_objects)
            .trim(true)
            .lossless_number(true);
 
@@ -1513,7 +1513,7 @@ TEST_CASE("csv_reader constructors")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_kind::n_objects);
+               .mapping(csv::csv_mapping_kind::n_objects);
 
         json_decoder<my_json,csv_test::FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
@@ -1537,7 +1537,7 @@ TEST_CASE("infinite loop")
         json_decoder<ojson> decoder;
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::mapping_kind::n_rows);
+        options.mapping(csv::csv_mapping_kind::n_rows);
         csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
@@ -1551,7 +1551,7 @@ TEST_CASE("infinite loop")
         json_decoder<ojson> decoder;
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::mapping_kind::n_rows);
+        options.mapping(csv::csv_mapping_kind::n_rows);
         csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
