@@ -1,3 +1,21 @@
+master
+-------
+
+Bugs fixed:
+
+- Fixed issue with a json_cursor hanging if opened with an empty file 
+or string, detected by google/OSS-fuzz.
+
+- Fixed issue with the unary minus in a JSONPath filter expression,
+where an expression such as `$[?-@.key > -42]` would fail to parse.
+
+Changes:
+
+- In the csv extension, the enum name `mapping_kind` has been 
+renamed to `csv_mapping_kind`, and the `csv_options.mapping` function
+has been renamed to `csv_options.mapping_kind`. The old names have
+been deprecated but are still usable.
+
 0.166.0
 -------
 
