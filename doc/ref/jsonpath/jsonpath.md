@@ -36,8 +36,8 @@ It provides functions for search and "search and replace" using JSONPath express
 
 [JSONPath](http://goessner.net/articles/JsonPath/) is a loosely standardized syntax for querying JSON. 
 There are many implementations and they differ in significant ways, see Christoph Burgmer's 
-[JSONPath comparison](https://cburgmer.github.io/json-path-comparison/). The jsoncons
-take on JSONPath is described [here](https://danielaparker.github.io/JsonCons.Net/articles/JsonPath/JsonConsJsonPath.html).
+[JSONPath comparison](https://cburgmer.github.io/json-path-comparison/). For details about the jsoncons
+implementation, see the document [JsonCons JSONPath](https://danielaparker.github.io/JsonCons.Net/articles/JsonPath/JsonConsJsonPath.html).
 
 In addition, the C++ implementation supports the following features:
 
