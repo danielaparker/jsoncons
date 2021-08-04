@@ -32,8 +32,8 @@ namespace jsoncons {
     public:
         using allocator_type = typename Json::allocator_type;
         using value_type = Json;
-    private:
         using implementation_policy = typename Json::implementation_policy;
+    private:
         using value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;                   
         using value_container_type = typename implementation_policy::template sequence_container_type<value_type,value_allocator_type>;
         value_container_type elements_;
@@ -537,8 +537,8 @@ namespace jsoncons {
         using key_value_type = key_value<KeyT,Json>;
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
-    private:
         using implementation_policy = typename Json::implementation_policy;
+    private:
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
 
@@ -1235,8 +1235,8 @@ namespace jsoncons {
         //using mapped_type = Json;
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
-    private:
         using implementation_policy = typename Json::implementation_policy;
+    private:
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
