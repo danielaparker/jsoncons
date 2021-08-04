@@ -16,6 +16,10 @@ renamed to `csv_mapping_kind`, and the `csv_options.mapping` function
 has been renamed to `csv_options.mapping_kind`. The old names have
 been deprecated but are still usable.
 
+Enhancements:
+
+- Added support for JSON Merge Patch.
+
 0.166.0
 -------
 
