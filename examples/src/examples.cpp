@@ -29,6 +29,7 @@ void json_reader_examples();
 void json_traits_macros_examples();
 void json_traits_name_macro_examples();
 void jsonpatch_examples();
+void json_merge_patch_examples();
 void jsonpath_examples();
 void jsonpointer_examples();
 void msgpack_examples();
@@ -463,9 +464,11 @@ int main()
 
         bson_examples();
 
-        json_reader_examples();
-
         jsonpath_examples();
+
+        json_merge_patch_examples();
+
+        json_reader_examples();
     }
     catch (const std::exception& e)
     {

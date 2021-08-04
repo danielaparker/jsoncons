@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPOINTER_JSONPATCH_HPP
-#define JSONCONS_JSONPOINTER_JSONPATCH_HPP
+#ifndef JSONCONS_JSONPATCH_JSONPATCH_HPP
+#define JSONCONS_JSONPATCH_JSONPATCH_HPP
 
 #include <string>
 #include <vector> 
