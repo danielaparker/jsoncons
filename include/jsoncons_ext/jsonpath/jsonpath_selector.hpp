@@ -689,7 +689,7 @@ namespace detail {
                     {
                         std::size_t i = static_cast<std::size_t>(index);
                         this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, index, options), 
+                                            path_generator_type::generate(resources, last, i, options), 
                                             current.at(i), accumulator, options);
                     }
                 }
@@ -720,7 +720,7 @@ namespace detail {
                     {
                         std::size_t i = static_cast<std::size_t>(index);
                         return this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, last, index, options), 
+                                            path_generator_type::generate(resources, last, i, options), 
                                             current.at(i), options, ec);
                     }
                     else
