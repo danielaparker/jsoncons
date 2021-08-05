@@ -1,0 +1,98 @@
+version: '{build}'
+
+environment:
+  vsversion: none
+  arch: default
+  matrix:
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS: "/std:c++11"
+
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS:  "/std:c++11"
+
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS: "/permissive- /std:c++latest /utf-8"
+
+    - platform: vs
+      vsversion: 2015
+      arch: x64
+      FLAGS:  "/std:c++11"
+
+    - platform: vs
+      vsversion: 2017
+      arch: x64
+      FLAGS:  "/std:c++14"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+
+    - platform: vs
+      vsversion: 2017
+      arch: x86
+      FLAGS:  "/std:c++14"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+
+    - platform: vs
+      vsversion: 2017
+      arch: x64
+      FLAGS: "/permissive- /std:c++latest /utf-8"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      vsversion: 2019
+      configuration: Release
+      platform: x64
+      CXX_FLAGS: "/std:c++latest"
+      LINKER_FLAGS: ""
+      GENERATOR: Visual Studio 16 2019
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - if "%platform%"=="x86" set GENERATOR_PLATFORM=Win32
+
+before_build:
+  # Remove the following from the path, as it will interfere with
+  # the MinGW builds
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - if %platform%==msvc call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
+  - if %platform%==msvc cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%P%
+  - if %platform%==vs (
+      set "makecommand=Visual Studio"
+    )
+  - set "vcx=false"
+  - set "vcs=false"
+  - if %platform%==vs (
+      set "vcx=true"
+    )
+  - if %vsversion%==2015 (
+      set "makecommand=%makecommand% 14 %vsversion%"
+    )
+  - if %vsversion%==2017 (
+      set "makecommand=%makecommand% 15 %vsversion%"
+    )
+  - if %vsversion%==2019 (
+      set "makecommand=%GENERATOR%"
+    )
+  - if %arch%==x64 (
+      set "makecommand=%makecommand% Win64"
+    )
+
+  - cmake -G "%makecommand%" -D BUILD_TESTS=1 .
+
+build_script:
+  - cmake --build . --target unit_tests --config Release
+  - cd tests
+
+test_script:
+  - set "testplatform=%platform%"
+  # Can not run ARM builds on x86/x64 build images
+  - if %arch%==ARM (
+      set "testplatform=none"
+    )
+  - if %testplatform%==vs .\Release\unit_tests
