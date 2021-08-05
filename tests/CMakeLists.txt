@@ -59,15 +59,11 @@ endif()
 target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
-               cbor/src/cbor_bitset_traits_tests.cpp
-               cbor/src/cbor_cursor_tests.cpp
-               cbor/src/cbor_encoder_tests.cpp
-               cbor/src/cbor_json_visitor2_tests.cpp
-               cbor/src/cbor_reader_tests.cpp
-               cbor/src/cbor_tests.cpp
-               cbor/src/cbor_typed_array_tests.cpp
-               cbor/src/decode_cbor_tests.cpp
-               cbor/src/encode_cbor_tests.cpp
+               csv/src/csv_cursor_tests.cpp
+               csv/src/csv_subfield_tests.cpp
+               csv/src/csv_tests.cpp
+               csv/src/encode_decode_csv_tests.cpp
+               fuzz_regression/src/fuzz_regression_tests.cpp
                src/main.cpp
 )
 
