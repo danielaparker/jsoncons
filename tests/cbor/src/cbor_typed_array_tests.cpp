@@ -74,10 +74,9 @@ TEST_CASE("cbor multi dim row major cursor tests")
         }
     }
 }
-#endif
+
 TEST_CASE("cbor typed array cursor tests")
 {
-#if 0
     SECTION("Tag 86, float64, little endian")
     {
         std::cout << "CBOR cursor typed array Tag 86, float64, little endian" << std::endl;
