@@ -134,7 +134,6 @@ add_executable(unit_tests
                src/json_validation_tests.cpp
                src/jsoncons_tests.cpp
                src/JSONTestSuite_tests.cpp
-               src/main.cpp
                src/ojson_tests.cpp
                src/order_preserving_json_object_tests.cpp
                src/parse_string_tests.cpp
