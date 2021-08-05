@@ -67,6 +67,7 @@ add_executable(unit_tests
                cbor/src/cbor_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
+               src/main.cpp
 )
 
 if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
