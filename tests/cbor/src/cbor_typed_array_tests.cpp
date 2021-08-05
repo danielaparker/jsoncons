@@ -55,7 +55,7 @@ private:
         return false;
     }
 };
-#if 0
+
 TEST_CASE("cbor multi dim row major cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -800,7 +800,7 @@ TEST_CASE("cbor typed array tests")
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
-#endif
+
     SECTION("Tag 87, float128, little endian")
     {
         std::cout << "CBOR typed array Tag 87, float128, little endian" << std::endl;
