@@ -17,13 +17,30 @@ using namespace jsoncons;
 
 TEST_CASE("json_cursor eof test")
 {
-    const std::string data = "";
-
-    SECTION("eof test")
+    SECTION("string source eof test")
     {
+        std::string data = "";
+
+        std::error_code ec;
+        json_string_cursor cursor(data, ec);
+        CHECK(cursor.eof());
+    }
+    SECTION("stream source eof test")
+    {
+        std::string data = "";
+        std::istringstream is(data);
+
+        std::error_code ec;
+        json_stream_cursor cursor(is, ec);
+        CHECK(cursor.eof());
+    }
+    SECTION("null stream source eof test")
+    {   
+        std::string data = "";
+
         std::error_code ec;
         json_cursor cursor(data, ec);
-        CHECK(ec == json_errc::unexpected_eof);
+        CHECK(cursor.eof());
     }
 }
 

@@ -312,10 +312,17 @@ namespace jsoncons {
                 bool eof = parser_.source_exhausted();
                 parser_.parse_some(visitor_, ec);
                 if (ec) return;
-                if (eof && !parser_.accept())
+                if (eof)
                 {
-                    ec = json_errc::unexpected_eof;
-                    return;
+                    if (parser_.enter())
+                    {
+                        break;
+                    }
+                    else if (!parser_.accept())
+                    {
+                        ec = json_errc::unexpected_eof;
+                        return;
+                    }
                 }
             }
             
@@ -601,10 +608,17 @@ namespace jsoncons {
                 bool eof = parser_.source_exhausted();
                 parser_.parse_some(visitor_, ec);
                 if (ec) return;
-                if (eof && !parser_.accept())
+                if (eof)
                 {
-                    ec = json_errc::unexpected_eof;
-                    return;
+                    if (parser_.enter())
+                    {
+                        break;
+                    }
+                    else if (!parser_.accept())
+                    {
+                        ec = json_errc::unexpected_eof;
+                        return;
+                    }
                 }
             }
             

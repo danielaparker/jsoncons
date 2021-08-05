@@ -314,22 +314,29 @@ private:
                     if (ec) return;
                 }
             }
-            bool eof = parser_.source_exhausted();
+            bool eof = parser_.source_exhausted() && source_.eof();
             parser_.parse_some(visitor, ec);
             if (ec) return;
-            if (eof && !parser_.accept())
+            if (eof)
             {
-                ec = json_errc::unexpected_eof;
-                return;
+                if (parser_.enter())
+                {
+                    break;
+                }
+                else if (!parser_.accept())
+                {
+                    ec = json_errc::unexpected_eof;
+                    return;
+                }
             }
         }
     }
 };
 
-using json_stream_cursor = basic_json_cursor<jsoncons::stream_source<char>>;
-using json_string_cursor = basic_json_cursor<jsoncons::string_source<char>>;
-using wjson_stream_cursor = basic_json_cursor<jsoncons::stream_source<wchar_t>>;
-using wjson_string_cursor = basic_json_cursor<jsoncons::string_source<wchar_t>>;
+using json_stream_cursor = basic_json_cursor<char,jsoncons::stream_source<char>>;
+using json_string_cursor = basic_json_cursor<char,jsoncons::string_source<char>>;
+using wjson_stream_cursor = basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
+using wjson_string_cursor = basic_json_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
 
 using json_cursor = basic_json_cursor<char>;
 using wjson_cursor = basic_json_cursor<wchar_t>;

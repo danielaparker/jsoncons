@@ -290,10 +290,10 @@ private:
     }
 };
 
-using csv_stream_cursor = basic_csv_cursor<jsoncons::stream_source<char>>;
-using csv_string_cursor = basic_csv_cursor<jsoncons::string_source<char>>;
-using wcsv_stream_cursor = basic_csv_cursor<jsoncons::stream_source<wchar_t>>;
-using wcsv_string_cursor = basic_csv_cursor<jsoncons::string_source<wchar_t>>;
+using csv_stream_cursor = basic_csv_cursor<char,jsoncons::stream_source<char>>;
+using csv_string_cursor = basic_csv_cursor<char,jsoncons::string_source<char>>;
+using wcsv_stream_cursor = basic_csv_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
+using wcsv_string_cursor = basic_csv_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
 
 using csv_cursor = basic_csv_cursor<char>;
 using wcsv_cursor = basic_csv_cursor<wchar_t>;

@@ -91,7 +91,7 @@ namespace jsoncons {
     public:
         stream_source()
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(0), buffer_data_(buffer_.data()), buffer_length_(0)
+              buffer_(1), buffer_data_(buffer_.data()), buffer_length_(0)
         {
         }
 

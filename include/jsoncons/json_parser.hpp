@@ -244,6 +244,11 @@ public:
         return done_;
     }
 
+    bool enter() const
+    {
+        return state_ == json_parse_state::start;
+    }
+
     bool accept() const
     {
         return state_ == json_parse_state::accept || done_;

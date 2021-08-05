@@ -265,4 +265,34 @@ TEST_CASE("json_reader read from string test")
     CHECK(j[0][0][1]["author"].as<std::string>() == std::string("Brent Weeks"));
 }
 
+TEST_CASE("json_reader json lines")
+{
+    SECTION("json lines")
+    {
+        std::string data = R"(
+    ["Name", "Session", "Score", "Completed"]
+    ["Gilbert", "2013", 24, true]
+    ["Alexa", "2013", 29, true]
+    ["May", "2012B", 14, false]
+    ["Deloise", "2012A", 19, true] 
+        )";
 
+        std::stringstream is(data);
+        json_decoder<json> decoder;
+        json_stream_reader reader(is, decoder);
+
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(!reader.eof());
+        reader.read_next();
+        CHECK(reader.eof());
+    }
+}
