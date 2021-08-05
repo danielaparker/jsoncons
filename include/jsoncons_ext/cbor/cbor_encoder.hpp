@@ -1277,7 +1277,7 @@ private:
                                   uint16_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
-            memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
+            std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1307,7 +1307,7 @@ private:
                                   uint32_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1337,7 +1337,7 @@ private:
                                   uint64_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1365,7 +1365,7 @@ private:
         {
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1395,7 +1395,7 @@ private:
                                   int16_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int16_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1425,7 +1425,7 @@ private:
                                   int32_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int32_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1455,7 +1455,7 @@ private:
                                   int64_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int64_t));
-            memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1485,7 +1485,7 @@ private:
                                   half_arg, 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
-            memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
+            std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1515,7 +1515,7 @@ private:
                                   float(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(float));
-            memcpy(v.data(), data.data(), data.size()*sizeof(float));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(float));
             write_byte_string_value(byte_string_view(v));
             return true;
         }
@@ -1545,7 +1545,7 @@ private:
                                   double(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));
-            memcpy(v.data(), data.data(), data.size()*sizeof(double));
+            std::memcpy(v.data(), data.data(), data.size()*sizeof(double));
             write_byte_string_value(byte_string_view(v));
             return true;
         }

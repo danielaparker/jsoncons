@@ -52,7 +52,7 @@ namespace jsoncons { namespace bson {
         }
         oid_t(uint8_t data[12])
         {
-            memcpy(bytes_.data(),data,12);
+            std::memcpy(bytes_.data(),data,12);
         }
 
         oid_t(const string_view& str)

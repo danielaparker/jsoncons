@@ -222,7 +222,7 @@ namespace jsoncons {
             if (buffer_length_ > 0)
             {
                 len = (std::min)(buffer_length_, length);
-                memcpy(p, buffer_data_, len);
+                std::memcpy(p, buffer_data_, len*sizeof(value_type));
                 buffer_data_ += len;
                 buffer_length_ -= len;
                 position_ += len;
@@ -237,7 +237,7 @@ namespace jsoncons {
                 if (buffer_length_ > 0)
                 {
                     std::size_t len2 = (std::min)(buffer_length_, length-len);
-                    memcpy(p+len, buffer_data_, len2);
+                    std::memcpy(p+len, buffer_data_, len2*sizeof(value_type));
                     buffer_data_ += len2;
                     buffer_length_ -= len2;
                     position_ += len2;
@@ -476,8 +476,12 @@ namespace jsoncons {
         read(value_type* data, std::size_t length)
         {
             std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-            std::copy(current_, current_+count, data);
 
+#if defined(_MSC_VER) 
+        std::copy(current_, current_ + count, stdext::make_checked_array_iterator(data, count));
+#else 
+        std::copy(current_, current_ + count, data);
+#endif
             current_ += count;
             position_ += count;
 
@@ -593,7 +597,7 @@ namespace jsoncons {
             {
                 len = length;
             }
-            std::memcpy(p, current_, len);
+            std::memcpy(p, current_, len*sizeof(value_type));
             current_  += len;
             return len;
         }
@@ -677,8 +681,11 @@ namespace jsoncons {
         read(value_type* data, std::size_t length)
         {
             std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-            std::copy(current_, current_+count, data);
-
+#if defined(_MSC_VER)
+        std::copy(current_, current_ + count, stdext::make_checked_array_iterator(data, count));
+#else 
+        std::copy(current_, current_ + count, data);
+#endif
             current_ += count;
             position_ += count;
 

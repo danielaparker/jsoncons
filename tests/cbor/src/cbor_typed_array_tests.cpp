@@ -60,6 +60,8 @@ TEST_CASE("cbor multi dim row major cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
     {
+        std::cout << "CBOR multi dim typed array Tag 86, float64, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8,0x28,0x82,0x82,0x02,0x03,0x86,0x02,0x04,0x08,0x04,0x10,0x19,0x01,0x00
         };
@@ -77,6 +79,8 @@ TEST_CASE("cbor typed array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
     {
+        std::cout << "CBOR cursor typed array Tag 86, float64, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x56, // Tag 86, float64, little endian, Typed Array
@@ -102,6 +106,8 @@ TEST_CASE("cbor typed array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
     {
+        std::cout << "CBOR typed array Tag 64 (uint8 Typed Array)" << std::endl;
+
         //std::cout << (int)detail::endian::native << "\n";
 
         const std::vector<uint8_t> input = {
@@ -235,6 +241,8 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tags 69 (uint16, little endian)")
     {
+        std::cout << "CBOR typed array Tags 69 (uint16, little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x45, // Tag 69, uint16, little endian, Typed Array
@@ -278,6 +286,8 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tags 70 (uint32, little endian)")
     {
+        std::cout << "CBOR typed array Tags 70 (uint32, little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x46, // Tag 70, uint32, little endian, Typed Array
@@ -316,6 +326,8 @@ TEST_CASE("cbor typed array tests")
     }
     SECTION("Tag 71 (uint64,little endian)")
     {
+        std::cout << "CBOR typed array Tag 71 (uint64,little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x47, // Tag 71, uint64, little endian, Typed Array
@@ -489,6 +501,8 @@ TEST_CASE("cbor typed array tests")
     }
     SECTION("Tag 77 (int16, little endian)")
     {
+        std::cout << "CBOR typed array Tag 77 (int16, little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x4d, // Tag 77, sint16, little endian, Typed Array
@@ -533,6 +547,8 @@ TEST_CASE("cbor typed array tests")
     }
     SECTION("Tags 78 (int32, little endian)")
     {
+        std::cout << "CBOR typed array Tags 78 (int32, little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x4e, // Tag 78, sint32, little endian, Typed Array
@@ -572,6 +588,8 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tag 79 (int64,little endian)")
     {
+        std::cout << "CBOR typed array Tag 79 (int64,little endian)" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x4f, // Tag 79, sint64, little endian, Typed Array
@@ -680,7 +698,7 @@ TEST_CASE("cbor typed array tests")
     {
         const std::vector<uint8_t> input = {
             0xd8, // Tag
-                0x53, // Tag 83, float128, little endian, Typed Array
+                0x53, // Tag 83, float128, big endian, Typed Array
             0x58,0x40, // Byte string value of length 64
                 0xff,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
                 0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
@@ -698,6 +716,8 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tag 84, float16, little endian")
     {
+        std::cout << "CBOR typed array Tag 84, float16, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x54, // Tag 84, float16, little endian, Typed Array
@@ -719,6 +739,8 @@ TEST_CASE("cbor typed array tests")
     }
     SECTION("Tag 85, float32, little endian")
     {
+        std::cout << "CBOR typed array Tag 85, float32, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x55, // Tag 85, float64, little endian, Typed Array
@@ -748,6 +770,8 @@ TEST_CASE("cbor typed array tests")
     }
     SECTION("Tag 86, float64, little endian")
     {
+        std::cout << "CBOR typed array Tag 86, float64, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x56, // Tag 86, float64, little endian, Typed Array
@@ -778,6 +802,8 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tag 87, float128, little endian")
     {
+        std::cout << "CBOR typed array Tag 87, float128, little endian" << std::endl;
+
         const std::vector<uint8_t> input = {
             0xd8, // Tag
                 0x57, // Tag 87, float128, little endian, Typed Array

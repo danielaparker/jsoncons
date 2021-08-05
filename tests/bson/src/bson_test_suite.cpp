@@ -22,8 +22,8 @@ namespace
         is.seekg (0, is.end);
         std::streamoff length = is.tellg();
         is.seekg (0, is.beg);
-        bytes.resize(length);
-        is.read(bytes.data(), length);
+        bytes.resize(static_cast<std::size_t>(length));
+        is.read(bytes.data(), static_cast<std::size_t>(length));
         is.close();
         return bytes;
     }

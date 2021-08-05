@@ -373,7 +373,7 @@ namespace jsoncons { namespace bson {
            if (combination == combination_infinity) { /* Infinity */
                if (last-str_out >= static_cast<ptrdiff_t >(bson_decimal128_inf.size())) 
                {
-                   memcpy(str_out, bson_decimal128_inf.data(), bson_decimal128_inf.size());
+                   std::memcpy(str_out, bson_decimal128_inf.data(), bson_decimal128_inf.size());
                    str_out += bson_decimal128_inf.size();
                }
                *str_out = 0;
@@ -384,7 +384,7 @@ namespace jsoncons { namespace bson {
                str_out = first;
                if (last-str_out >= static_cast<ptrdiff_t >(bson_decimal128_nan.size())) 
                {
-                   memcpy(str_out, bson_decimal128_nan.data(), bson_decimal128_nan.size());
+                   std::memcpy(str_out, bson_decimal128_nan.data(), bson_decimal128_nan.size());
                    str_out += bson_decimal128_nan.size();
                }
                *str_out = 0;
@@ -488,7 +488,7 @@ namespace jsoncons { namespace bson {
            jsoncons::detail::from_integer(scientific_exponent, s);
            if (str_out + s.size() < last) 
            {
-               memcpy(str_out, s.data(), s.size());
+               std::memcpy(str_out, s.data(), s.size());
            }
            else
            {

@@ -181,10 +181,10 @@ namespace binary {
     byte_swap(T val)
     {
         uint32_t x;
-        memcpy(&x,&val,sizeof(uint32_t));
+        std::memcpy(&x,&val,sizeof(uint32_t));
         uint32_t y = byte_swap(x);
         T val2;
-        memcpy(&val2,&y,sizeof(uint32_t));
+        std::memcpy(&val2,&y,sizeof(uint32_t));
         return val2;
     }
 
@@ -193,10 +193,10 @@ namespace binary {
     byte_swap(T val)
     {
         uint64_t x;
-        memcpy(&x,&val,sizeof(uint64_t));
+        std::memcpy(&x,&val,sizeof(uint64_t));
         uint64_t y = byte_swap(x);
         T val2;
-        memcpy(&val2,&y,sizeof(uint64_t));
+        std::memcpy(&val2,&y,sizeof(uint64_t));
         return val2;
     }
 
@@ -206,7 +206,7 @@ namespace binary {
     {
         uint128_holder x;
         uint8_t buf[2*sizeof(uint64_t)];
-        memcpy(buf,&val,2*sizeof(uint64_t));
+        std::memcpy(buf,&val,2*sizeof(uint64_t));
         std::memcpy(&x.lo,buf,sizeof(uint64_t));
         std::memcpy(&x.hi,buf+sizeof(uint64_t),sizeof(uint64_t));
 
@@ -215,7 +215,7 @@ namespace binary {
         y.hi = byte_swap(x.lo);
 
         T val2;
-        memcpy(&val2,&y,2*sizeof(uint64_t));
+        std::memcpy(&val2,&y,2*sizeof(uint64_t));
 
         return val2;
     }
