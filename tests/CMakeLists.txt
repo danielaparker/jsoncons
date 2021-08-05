@@ -59,8 +59,30 @@ endif()
 target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
+               bson/src/bson_cursor_tests.cpp
+               bson/src/bson_encoder_tests.cpp
+               bson/src/bson_reader_tests.cpp
+               bson/src/bson_decimal128_tests.cpp
+               bson/src/bson_oid_tests.cpp
+               bson/src/bson_test_suite.cpp
+               bson/src/encode_decode_bson_tests.cpp
+               cbor/src/cbor_bitset_traits_tests.cpp
+               cbor/src/cbor_cursor_tests.cpp
+               cbor/src/cbor_encoder_tests.cpp
+               cbor/src/cbor_json_visitor2_tests.cpp
+               cbor/src/cbor_reader_tests.cpp
+               cbor/src/cbor_tests.cpp
+               cbor/src/cbor_typed_array_tests.cpp
+               cbor/src/decode_cbor_tests.cpp
+               cbor/src/encode_cbor_tests.cpp
+               csv/src/csv_cursor_tests.cpp
+               csv/src/csv_subfield_tests.cpp
+               csv/src/csv_tests.cpp
+               csv/src/encode_decode_csv_tests.cpp
+               fuzz_regression/src/fuzz_regression_tests.cpp
                jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_tests.cpp
+               json_merge_patch/src/json_merge_patch_test_suite.cpp
                jsonpatch/src/jsonpatch_test_suite.cpp
                jsonpatch/src/jsonpatch_tests.cpp
                jsonpath/src/jsonpath_flatten_tests.cpp

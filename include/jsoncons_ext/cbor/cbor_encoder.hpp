@@ -1715,14 +1715,12 @@ private:
                                double,
                                semantic_tag)
     {
-        std::cout << "write_typed_array_tag big\n";
         write_tag(0x52); // big endian
     }
     void write_typed_array_tag(std::false_type,
                                double,
                                semantic_tag)
     {
-        std::cout << "write_typed_array_tag little\n";
         write_tag(0x56);  // little endian
     }
 
