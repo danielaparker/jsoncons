@@ -118,7 +118,7 @@ namespace {
             }
         )";
 
-        json_cursor cursor(data);
+        json_string_cursor cursor(data);
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
@@ -200,7 +200,7 @@ namespace {
             return false;
         };
 
-        json_cursor cursor(data);
+        json_string_cursor cursor(data);
 
         auto filtered_c = cursor | filter;
         for (; !filtered_c.done(); filtered_c.next())

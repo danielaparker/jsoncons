@@ -43,7 +43,7 @@ TEST_CASE("jtaj_array_view tests")
 
     SECTION("test 1")
     {
-        json_cursor cursor(s);
+        json_string_cursor cursor(s);
 
         auto view = staj_array<json>(cursor);
 
@@ -65,7 +65,7 @@ TEST_CASE("jtaj_array_view tests")
 
     SECTION("filter test")
     {
-        json_cursor cursor(s);
+        json_string_cursor cursor(s);
 
         bool author_next = false;
         auto filtered_c = cursor |
@@ -115,7 +115,7 @@ TEST_CASE("object_iterator test")
     SECTION("test 1")
     {
         std::istringstream is(s);
-        json_cursor cursor(is);
+        json_stream_cursor cursor(is);
         auto view = staj_object<std::string,json>(cursor);
 
         auto it = view.begin();

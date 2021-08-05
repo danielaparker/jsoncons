@@ -590,7 +590,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(is); //-V521
 
         std::error_code ec;
-        json_cursor reader(is, ec);
+        json_stream_cursor reader(is, ec);
         while (reader.done() == 0 && !ec)
         {
             const auto& event = reader.current();
@@ -669,7 +669,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(is); //-V521
 
         std::error_code ec;
-        json_cursor reader(is, ec);
+        json_stream_cursor reader(is, ec);
         while (reader.done() == 0 && !ec)
         {
             const auto& event = reader.current();

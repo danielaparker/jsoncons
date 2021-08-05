@@ -555,7 +555,7 @@ void as_a_stream_of_json_events()
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_cursor cursor(data, options);
+    csv::csv_string_cursor cursor(data, options);
 
     for (; !cursor.done(); cursor.next())
     {
@@ -609,7 +609,7 @@ void grouped_into_basic_json_records()
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_cursor cursor(data, options);
+    csv::csv_string_cursor cursor(data, options);
 
     auto view = staj_array<ojson>(cursor);
     auto it = view.begin();
@@ -630,7 +630,7 @@ void grouped_into_strongly_typed_records()
 
     csv::csv_options options;
     options.assume_header(true);
-    csv::csv_cursor cursor(data, options);
+    csv::csv_string_cursor cursor(data, options);
 
     auto view = staj_array<record_type>(cursor);
 

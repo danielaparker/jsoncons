@@ -179,7 +179,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_AMN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_AMN>(cursor);
 
@@ -198,7 +198,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_NMN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_NMN>(cursor);
 
@@ -217,7 +217,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_ACGN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_ACGN>(cursor);
 
@@ -236,7 +236,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_NCGN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_NCGN>(cursor);
 
@@ -255,7 +255,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_AGSN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_AGSN>(cursor);
 
@@ -274,7 +274,7 @@ TEST_CASE("json validator tests")
 
     SECTION("employee_NGSN test")
     {
-        jsoncons::json_cursor cursor(input);
+        jsoncons::json_string_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_NGSN>(cursor);
 

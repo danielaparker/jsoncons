@@ -89,7 +89,7 @@ const std::string example = R"(
 
 int main()
 {
-    json_cursor cursor(example);
+    json_string_cursor cursor(example);
 
     auto view = staj_object<std::string,json>(cursor);
 

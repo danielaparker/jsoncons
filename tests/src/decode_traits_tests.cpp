@@ -22,7 +22,7 @@ TEST_CASE("decode_traits primitive")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<uint64_t,char>::decode(cursor,decoder,ec);
 
         CHECK(val == 1000);
@@ -36,7 +36,7 @@ TEST_CASE("decode_traits primitive")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         REQUIRE(val.size() == 3);
@@ -59,7 +59,7 @@ TEST_CASE("decode_traits std::string")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<std::string,char>::decode(cursor,decoder,ec);
 
         CHECK((val == "Hello World"));
@@ -76,7 +76,7 @@ TEST_CASE("decode_traits std::pair")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK((val == test_type("first","second")));
@@ -89,7 +89,7 @@ TEST_CASE("decode_traits std::pair")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
         REQUIRE_FALSE(ec);
 
@@ -105,7 +105,7 @@ TEST_CASE("decode_traits std::pair")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         REQUIRE_FALSE(ec);
@@ -126,7 +126,7 @@ TEST_CASE("decode_traits std::pair")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK(ec == conv_errc::not_pair);
@@ -143,7 +143,7 @@ TEST_CASE("decode_traits deserialization errors")
         json_decoder<json> decoder;
         std::error_code ec;
 
-        json_cursor cursor(input);
+        json_string_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK(ec == json_errc::expected_comma_or_rbrace);

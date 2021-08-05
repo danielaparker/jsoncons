@@ -39,7 +39,7 @@ TEST_CASE("json_cursor eof test")
         std::string data = "";
 
         std::error_code ec;
-        json_cursor cursor(data, ec);
+        json_string_cursor cursor(data, ec);
         CHECK(cursor.eof());
     }
 }
@@ -49,7 +49,7 @@ TEST_CASE("json_cursor string_value test")
     std::string s = R"("Tom")";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
     REQUIRE_FALSE(cursor.done());
 
     SECTION("test 1")
@@ -67,7 +67,7 @@ TEST_CASE("json_cursor string_value as<int> test")
     std::string s = R"("-100")";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -81,7 +81,7 @@ TEST_CASE("json_cursor string_value as<unsigned> test")
     std::string s = R"("100")";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -96,7 +96,7 @@ TEST_CASE("json_cursor null_value test")
     std::string s = "null";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::null_value);
@@ -109,7 +109,7 @@ TEST_CASE("json_cursor bool_value test")
     std::string s = "false";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::bool_value);
@@ -123,7 +123,7 @@ TEST_CASE("json_cursor int64_value test")
     std::istringstream is(s);
 
     std::error_code ec;
-    json_cursor cursor(is, ec);
+    json_stream_cursor cursor(is, ec);
     REQUIRE_FALSE(ec);
 
     REQUIRE_FALSE(cursor.done());
@@ -139,7 +139,7 @@ TEST_CASE("json_cursor uint64_value test")
     std::string s = "100";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
@@ -154,7 +154,7 @@ TEST_CASE("json_cursor string_value as bignum test")
     std::string s = "-18446744073709551617";
     std::istringstream is("\""+s+"\"");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -168,7 +168,7 @@ TEST_CASE("json_cursor bigint value as bignum")
     std::string s = "-18446744073709551617";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -182,7 +182,7 @@ TEST_CASE("json_cursor double_value test")
     std::string s = "100.0";
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::double_value);
@@ -216,7 +216,7 @@ TEST_CASE("json_cursor array_value test")
 
     std::istringstream is(s);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -328,7 +328,7 @@ TEST_CASE("json_cursor object_value test")
         }
     )";
 
-    json_cursor cursor(s);
+    json_string_cursor cursor(s);
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::begin_object);
@@ -411,7 +411,7 @@ TEST_CASE("json_cursor with filter tests")
     ]
     )";
 
-    json_cursor cursor(s);
+    json_string_cursor cursor(s);
 
     auto filtered_c = cursor | remove_mark_filter();
 
@@ -538,7 +538,7 @@ TEST_CASE("staj event as object")
 
     SECTION("test 1")
     {
-        json_cursor cursor(buffer);
+        json_string_cursor cursor(buffer);
         REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -582,7 +582,7 @@ TEST_CASE("staj event as object")
     {
         json document = json::parse(buffer);
 
-        json_cursor cursor(buffer);
+        json_string_cursor cursor(buffer);
         REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();

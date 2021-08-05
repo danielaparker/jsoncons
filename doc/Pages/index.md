@@ -281,7 +281,7 @@ See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Example
 ```c++
 int main()
 {
-    json_cursor cursor(data);
+    json_string_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
         const auto& event = cursor.current();

@@ -91,7 +91,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<json>(cursor);
 
@@ -136,7 +136,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<ns::employee>(cursor);
 

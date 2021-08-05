@@ -26,7 +26,7 @@ TEST_CASE("csv_cursor eof test")
         options.assume_header(true)
                .mapping(csv::csv_mapping_kind::n_rows);
         std::error_code ec;
-        csv::csv_cursor cursor(data, options, ec);
+        csv::csv_string_cursor cursor(data, options, ec);
         CHECK(ec == csv::csv_errc::source_error);
     }
 }
@@ -44,7 +44,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         csv::csv_options options;
         options.assume_header(true)
                .mapping(csv::csv_mapping_kind::n_rows);
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -109,7 +109,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         csv::csv_options options;
         options.assume_header(true)
                .mapping(csv::csv_mapping_kind::m_columns);
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
@@ -174,7 +174,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         csv::csv_options options;
         options.assume_header(true)
                .mapping(csv::csv_mapping_kind::n_rows);
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
         /* for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
@@ -290,7 +290,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         csv::csv_options options;
         options.assume_header(true)
                .mapping(csv::csv_mapping_kind::n_objects);
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 /*
         for (; !cursor.done(); cursor.next())
         {
@@ -422,7 +422,7 @@ NY,LON,TOR;LON
         options.assume_header(true)
                .subfield_delimiter(';');
 
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         /* 
         for (; !cursor.done(); cursor.next())
@@ -612,7 +612,7 @@ TEST_CASE("csv_cursor n_rows, no header test")
         options.mapping(csv::csv_mapping_kind::n_rows)
                .assume_header(false);
 
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -639,7 +639,7 @@ TEST_CASE("csv_cursor n_objects, header test")
         csv::csv_options options;
         options.assume_header(true);
 
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -672,7 +672,7 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         options.assume_header(true)
                .subfield_delimiter(';')
                .mapping(csv::csv_mapping_kind::n_rows);
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -707,7 +707,7 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         csv::csv_options options;
         options.assume_header(true)
                .subfield_delimiter(';');
-        csv::csv_cursor cursor(data, options);
+        csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -789,7 +789,7 @@ TEST_CASE("csv_cursor with filter tests")
 
     csv::csv_options options;
     options.assume_header(true);
-    csv::csv_cursor cursor(data, options);
+    csv::csv_string_cursor cursor(data, options);
     auto filtered_c = cursor | remove_mark_csv_filter();
 
     REQUIRE_FALSE(filtered_c.done());

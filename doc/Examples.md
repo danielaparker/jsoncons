@@ -646,7 +646,7 @@ int main()
 {
     std::ifstream is("./output/book_catalog.json");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     for (; !cursor.done(); cursor.next())
     {
@@ -752,7 +752,7 @@ int main()
 
     std::ifstream is("./output/book_catalog.json");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
     auto filtered_c = cursor | filter;
 
     for (; !filtered_c.done(); filtered_c.next())
@@ -794,7 +794,7 @@ int main()
 {
     std::ifstream is("./output/book_catalog.json");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     json_decoder<json> decoder;
     for (; !cursor.done(); cursor.next())
@@ -861,7 +861,7 @@ int main()
 {
     std::ifstream is("./output/book_catalog.json");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<json>(cursor);
     for (const auto& j : view)
@@ -911,7 +911,7 @@ int main()
 {
     std::ifstream is("./output/book_catalog.json");
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<ns::book>(cursor);
     for (const auto& book : view)

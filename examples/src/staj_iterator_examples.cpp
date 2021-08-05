@@ -44,7 +44,7 @@ void staj_array_iterator_example()
 {
     std::istringstream is(array_example);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<json>(cursor);
 
@@ -59,7 +59,7 @@ void staj_array_iterator_example2()
 {
     std::istringstream is(array_example);
 
-    json_cursor cursor(is);
+    json_stream_cursor cursor(is);
 
     auto view = staj_array<ns::employee>(cursor);
 
@@ -72,7 +72,7 @@ void staj_array_iterator_example2()
 
 void staj_object_iterator_example()
 {
-    json_cursor cursor(object_example);
+    json_string_cursor cursor(object_example);
 
     auto view = staj_object<std::string,json>(cursor);
 
