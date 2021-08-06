@@ -4,7 +4,7 @@
 Bugs fixed:
 
 - Fixed issue with a json_cursor hanging if opened with an empty file 
-or string, detected by google/OSS-fuzz.
+or string, detected by google/OSS-fuzz. 
 
 - Fixed issue with the unary minus in a JSONPath filter expression,
 where an expression such as `$[?-@.key > -42]` would fail to parse.
