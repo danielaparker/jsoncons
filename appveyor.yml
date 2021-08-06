@@ -1,5 +1,7 @@
 version: '{build}'
 
+# Appveyor builds now take too long to compile, exceed resource limits
+
 environment:
   matrix:
 #    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
@@ -49,22 +51,22 @@ environment:
 #      LINKER_FLAGS: "/STACK:4000000"
 #      CMAKE_OPTIONS: ""
 #      GENERATOR: Visual Studio 15 2017
-
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      configuration: Release
-      arch: x86
-      CXX_FLAGS: ""
-      LINKER_FLAGS: ""
-      CMAKE_OPTIONS: "-DJSON_ImplicitConversions=OFF"
-      GENERATOR: Visual Studio 16 2019
-
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      vsversion: 2019
-      configuration: Release
-      platform: x64
-      CXX_FLAGS: "/std:c++latest"
-      LINKER_FLAGS: ""
-      GENERATOR: Visual Studio 16 2019
+#
+#    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#      configuration: Release
+#      arch: x86
+#      CXX_FLAGS: ""
+#      LINKER_FLAGS: ""
+#      CMAKE_OPTIONS: "-DJSON_ImplicitConversions=OFF"
+#      GENERATOR: Visual Studio 16 2019
+#
+#    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#      vsversion: 2019
+#      configuration: Release
+#      platform: x64
+#      CXX_FLAGS: "/std:c++latest"
+#      LINKER_FLAGS: ""
+#      GENERATOR: Visual Studio 16 2019
 
 init:
   - cmake --version
