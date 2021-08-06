@@ -23,6 +23,8 @@ Enhancements:
 
 - Added support for JSON Merge Patch.
 
+- Added support in JSONPath expressions for '%' (modulus) operator
+
 0.166.0
 -------
 

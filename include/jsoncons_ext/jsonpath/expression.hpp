@@ -947,6 +947,50 @@ namespace detail {
         }
     };
 
+    template <class Json,class JsonReference>
+    class modulus_operator final : public binary_operator<Json,JsonReference>
+    {
+    public:
+        modulus_operator()
+            : binary_operator<Json,JsonReference>(3)
+        {
+        }
+
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        {
+            //std::cout << "operator/ lhs: " << lhs << ", rhs: " << rhs << "\n";
+
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return Json::null();
+            }
+            else if (lhs.is_int64() && rhs.is_int64())
+            {
+                return Json(((lhs.template as<int64_t>() % rhs.template as<int64_t>())));
+            }
+            else if (lhs.is_uint64() && rhs.is_uint64())
+            {
+                return Json((lhs.template as<uint64_t>() % rhs.template as<uint64_t>()));
+            }
+            else
+            {
+                return Json((lhs.as_double() % rhs.as_double()));
+            }
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("modulus operator");
+            return s;
+        }
+    };
+
     // function_base
     template <class Json>
     class function_base
@@ -2458,6 +2502,12 @@ namespace detail {
         const binary_operator<Json,JsonReference>* get_div_operator() const
         {
             static div_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_modulus_operator() const
+        {
+            static modulus_operator<Json,JsonReference> oper;
             return &oper;
         }
 

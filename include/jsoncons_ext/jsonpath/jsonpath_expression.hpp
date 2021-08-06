@@ -882,6 +882,13 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '%':
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
+                                push_token(resources, token_type(resources.get_modulus_operator()), ec);
+                                if (ec) {return path_expression_type();}
+                                ++p_;
+                                ++column_;
+                                break;
                             case ']':
                             case ',':
                                 state_stack_.pop_back();
