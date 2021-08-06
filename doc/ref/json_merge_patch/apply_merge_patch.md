@@ -7,7 +7,7 @@ template <class Json>
 void apply_merge_patch(Json& target, const Json& patch); 
 ```
 
-Applies a patch to a `json` document.
+Applies a merge patch to a `json` document.
 
 #### Return value
 
@@ -19,7 +19,9 @@ None expected.
 
 ### Examples
 
-#### Apply a JSON Patch with two add operations
+#### Apply a JSON Merge Patch 
+
+This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#section-3).
 
 ```c++
 #include <jsoncons/json.hpp>

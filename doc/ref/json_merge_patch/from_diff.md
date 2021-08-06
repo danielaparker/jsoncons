@@ -7,15 +7,17 @@ template <class Json>
 Json from_diff(const Json& source, const Json& target)
 ```
 
-Create a JSON Patch from a diff of two json documents.
+Create a JSON Merge Patch from a diff of two json documents.
 
 #### Return value
 
-Returns a JSON Patch.  
+Returns a JSON Merge Patch.  
 
 ### Examples
 
-#### Create a JSON Patch
+#### Create a JSON Merge Patch
+
+This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#section-3).
 
 ```c++
 #include <jsoncons/json.hpp>

@@ -9,6 +9,9 @@ or string, detected by google/OSS-fuzz.
 - Fixed issue with the unary minus in a JSONPath filter expression,
 where an expression such as `$[?-@.key > -42]` would fail to parse.
 
+- Fixed issue with private typedef and Intel C++ Compiler
+via [PR \#327](https://github.com/danielaparker/jsoncons/pull/327)
+
 Changes:
 
 - In the csv extension, the enum name `mapping_kind` has been 
