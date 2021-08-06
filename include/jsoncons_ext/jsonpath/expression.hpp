@@ -974,7 +974,7 @@ namespace detail {
             }
             else
             {
-                return Json((lhs.as_double() % rhs.as_double()));
+                return Json(fmod(lhs.as_double(), rhs.as_double()));
             }
         }
 

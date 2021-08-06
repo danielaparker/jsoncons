@@ -1282,6 +1282,16 @@
         ]
     },
     {
+        "given" : [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key*2": 100}],
+        "cases" : [
+            {
+                "comment" : "Filter expression with modulus",
+                "expression" : "$[?(@.key%40==20)]",
+                "result" : [{"key": 60}]
+            }
+        ]
+    },
+    {
         "given" : [[1,2],[3,4],[5,6]],
         "cases" : [
             {
