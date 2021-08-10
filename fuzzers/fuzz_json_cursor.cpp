@@ -10,7 +10,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 
         std::error_code ec;
         json_stream_cursor reader(is, ec);
-        while (reader.done() == 0 && !ec)
+        while (!reader.done() && !ec)
         {
                 const auto& event = reader.current();
                 std::string s2 = event.get<std::string>(ec);

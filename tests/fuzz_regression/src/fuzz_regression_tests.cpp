@@ -591,7 +591,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         json_stream_cursor reader(is, ec);
-        while (reader.done() == 0 && !ec)
+        while (!reader.done() && !ec)
         {
             const auto& event = reader.current();
             std::string s2 = event.get<std::string>(ec); 
@@ -670,7 +670,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         json_stream_cursor reader(is, ec);
-        while (reader.done() == 0 && !ec)
+        while (!reader.done() && !ec)
         {
             const auto& event = reader.current();
             std::string s2 = event.get<std::string>(ec); 
@@ -680,6 +680,28 @@ TEST_CASE("oss-fuzz issues")
             }
         }
         CHECK(ec == json_errc::unexpected_eof); 
+    }
+
+    // Fuzz target: jsoncons:fuzz_json_cursor
+    // Issue: Timeout (exceeds 60 secs)
+    SECTION("issue  36926")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_cursor-5656793396150272";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::error_code ec;
+        json_stream_cursor reader(is, ec);
+        while (!reader.done() && !ec)
+        {
+            const auto& event = reader.current();
+            std::string s2 = event.get<std::string>(ec); 
+            if (!ec)
+            {
+                reader.next(ec);
+            }
+        }
     }
 }
 

@@ -40,6 +40,7 @@ private:
     json_source_adaptor<Source> source_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
+    bool done_;
 
     // Noncopyable and nonmoveable
     basic_json_cursor(const basic_json_cursor&) = delete;
@@ -57,7 +58,8 @@ public:
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         cursor_visitor_(accept_all),
+         done_(false)
     {
         if (!done())
         {
@@ -73,7 +75,8 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all)
+         cursor_visitor_(accept_all),
+         done_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
 
@@ -137,7 +140,8 @@ public:
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all)
+         cursor_visitor_(accept_all),
+         done_(false)
     {
         if (!done())
         {
@@ -154,7 +158,8 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all)
+         cursor_visitor_(accept_all),
+         done_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
@@ -173,7 +178,7 @@ public:
 
     bool done() const override
     {
-        return parser_.done();
+        return parser_.done() || done_;
     }
 
     const basic_staj_event<CharT>& current() const override
@@ -321,6 +326,7 @@ private:
             {
                 if (parser_.enter())
                 {
+                    done_ = true;
                     break;
                 }
                 else if (!parser_.accept())
