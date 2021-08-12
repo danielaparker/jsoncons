@@ -224,6 +224,25 @@ namespace jsonpath {
             }
         }
 
+        value_or_pointer& operator=(value_or_pointer&& other) noexcept
+        {
+            if (is_value_)
+            {
+                val_.~value_type();
+            }
+            is_value_ = other.is_value_;
+
+            if (is_value_)
+            {
+                new(&val_)value_type(std::move(other.val_));
+            }
+            else
+            {
+                ptr_ = other.ptr_;
+            }
+            return *this;
+        }
+
         reference value() 
         {
             return is_value_ ? val_ : *ptr_;
@@ -259,11 +278,7 @@ namespace jsonpath {
             }
         }
 
-        parameter(const parameter& other) noexcept = default;
-
         parameter(parameter&& other) noexcept = default;
-
-        parameter& operator=(const parameter& other) noexcept = default;
 
         parameter& operator=(parameter&& other) noexcept = default;
 
