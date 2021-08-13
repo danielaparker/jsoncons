@@ -1,3 +1,10 @@
+0.167.1
+-------
+
+Bugs fixed:
+
+- Fixed compilation error with clang version 8.0.1, [issue \#328](https://github.com/danielaparker/jsoncons/issues/328).
+
 0.167.0
 -------
 
