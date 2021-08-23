@@ -558,8 +558,10 @@ namespace jmespath {
             bool is_right_associative_;
             bool is_projection_;
         public:
-            expression_base(std::size_t precedence_level, bool is_right_associative, bool is_projection)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative), is_projection_(is_projection)
+            expression_base(operator_kind oper, bool is_projection)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper)), 
+                  is_projection_(is_projection)
             {
             }
 
@@ -2600,7 +2602,7 @@ namespace jmespath {
         {
         public:
             basic_expression()
-                : expression_base(1, false, false)
+                : expression_base(operator_kind::default_op, false)
             {
             }
 
@@ -2721,8 +2723,7 @@ namespace jmespath {
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
             projection_base(operator_kind oper)
-                : expression_base(operator_table::precedence_level(oper), 
-                                  operator_table::is_right_associative(oper), true)
+                : expression_base(oper, true)
             {
             }
 
