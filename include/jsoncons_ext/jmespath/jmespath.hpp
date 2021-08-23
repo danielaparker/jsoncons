@@ -41,7 +41,7 @@ namespace jmespath {
 
     struct operator_table final
     {
-        static int PrecedenceLevel(operator_kind oper)
+        static int precedence_level(operator_kind oper)
         {
             switch (oper)
             {
@@ -68,7 +68,7 @@ namespace jmespath {
             }
         }
 
-        static bool IsRightAssociative(operator_kind oper)
+        static bool is_right_associative(operator_kind oper)
         {
             switch (oper)
             {
@@ -483,8 +483,9 @@ namespace jmespath {
         protected:
             ~unary_operator() = default; // virtual destructor not needed
         public:
-            unary_operator(std::size_t precedence_level, bool is_right_associative)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            unary_operator(operator_kind oper)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper))
             {
             }
 
@@ -504,7 +505,7 @@ namespace jmespath {
         {
         public:
             not_expression()
-                : unary_operator(1, true)
+                : unary_operator(operator_kind::not_op)
             {}
 
             reference evaluate(reference val, dynamic_resources& resources, std::error_code&) const override
