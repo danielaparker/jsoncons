@@ -23,6 +23,76 @@
 namespace jsoncons { 
 namespace jmespath {
 
+    enum class operator_kind
+    {
+        default_op, // Identifier, CurrentNode, Index, MultiSelectList, MultiSelectHash, FunctionExpression
+        projection_op,
+        flatten_projection_op, // FlattenProjection
+        or_op,
+        and_op,
+        eq_op,
+        ne_op,
+        lt_op,
+        lte_op,
+        gt_op,
+        gte_op,
+        not_op
+    };
+
+    struct operator_table final
+    {
+        static int PrecedenceLevel(operator_kind oper)
+        {
+            switch (oper)
+            {
+                case operator_kind::projection_op:
+                    return 11;
+                case operator_kind::flatten_projection_op:
+                    return 11;
+                case operator_kind::or_op:
+                    return 9;
+                case operator_kind::and_op:
+                    return 8;
+                case operator_kind::eq_op:
+                case operator_kind::ne_op:
+                    return 6;
+                case operator_kind::lt_op:
+                case operator_kind::lte_op:
+                case operator_kind::gt_op:
+                case operator_kind::gte_op:
+                    return 5;
+                case operator_kind::not_op:
+                    return 1;
+                default:
+                    return 1;
+            }
+        }
+
+        static bool IsRightAssociative(operator_kind oper)
+        {
+            switch (oper)
+            {
+                case operator_kind::not_op:
+                    return true;
+                case operator_kind::projection_op:
+                    return true;
+                case operator_kind::flatten_projection_op:
+                    return false;
+                case operator_kind::or_op:
+                case operator_kind::and_op:
+                case operator_kind::eq_op:
+                case operator_kind::ne_op:
+                case operator_kind::lt_op:
+                case operator_kind::lte_op:
+                case operator_kind::gt_op:
+                case operator_kind::gte_op:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    };
+
     enum class token_kind 
     {
         current_node,
