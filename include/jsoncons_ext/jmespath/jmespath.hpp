@@ -2720,9 +2720,9 @@ namespace jmespath {
         protected:
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
-            projection_base(std::size_t precedence_level, 
-                            bool is_right_associative = true)
-                : expression_base(precedence_level, is_right_associative, true)
+            projection_base(operator_kind oper)
+                : expression_base(operator_table::precedence_level(oper), 
+                                  operator_table::is_right_associative(oper), true)
             {
             }
 
@@ -2755,7 +2755,7 @@ namespace jmespath {
         {
         public:
             object_projection()
-                : projection_base(11, true)
+                : projection_base(operator_kind::projection_op)
             {
             }
 
@@ -2803,7 +2803,7 @@ namespace jmespath {
         {
         public:
             list_projection()
-                : projection_base(11, true)
+                : projection_base(operator_kind::projection_op)
             {
             }
 
@@ -2852,7 +2852,7 @@ namespace jmespath {
             slice slice_;
         public:
             slice_projection(const slice& s)
-                : projection_base(11, true), slice_(s)
+                : projection_base(operator_kind::projection_op), slice_(s)
             {
             }
 
@@ -2939,7 +2939,7 @@ namespace jmespath {
             std::vector<token> token_list_;
         public:
             filter_expression(std::vector<token>&& token_list)
-                : projection_base(11, true), token_list_(std::move(token_list))
+                : projection_base(operator_kind::projection_op), token_list_(std::move(token_list))
             {
             }
 
@@ -2988,7 +2988,7 @@ namespace jmespath {
         {
         public:
             flatten_projection()
-                : projection_base(11, false)
+                : projection_base(operator_kind::flatten_projection_op)
             {
             }
 
