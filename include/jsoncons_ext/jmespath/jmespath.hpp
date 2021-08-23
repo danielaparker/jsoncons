@@ -290,7 +290,6 @@ namespace jmespath {
         expect_rbracket,
         expect_rparen,
         expect_dot,
-        expect_filter_rbracket,
         expect_rbrace,
         expect_colon,
         expect_multi_select_list,
@@ -2524,11 +2523,11 @@ namespace jmespath {
             }
         };
 
-        // jsonpath_selector
-        class jsonpath_selector :  public expression_base
+        // basic_expression
+        class basic_expression :  public expression_base
         {
         public:
-            jsonpath_selector()
+            basic_expression()
                 : expression_base(1, false, false)
             {
             }
@@ -2538,7 +2537,7 @@ namespace jmespath {
             }
         };
 
-        class identifier_selector final : public jsonpath_selector
+        class identifier_selector final : public basic_expression
         {
         private:
             string_type identifier_;
@@ -2574,7 +2573,7 @@ namespace jmespath {
             }
         };
 
-        class current_node final : public jsonpath_selector
+        class current_node final : public basic_expression
         {
         public:
             current_node()
@@ -2598,7 +2597,7 @@ namespace jmespath {
             }
         };
 
-        class index_selector final : public jsonpath_selector
+        class index_selector final : public basic_expression
         {
             int64_t index_;
         public:
@@ -2649,7 +2648,8 @@ namespace jmespath {
         protected:
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
-            projection_base(std::size_t precedence_level, bool is_right_associative = true)
+            projection_base(std::size_t precedence_level, 
+                            bool is_right_associative = true)
                 : expression_base(precedence_level, is_right_associative, true)
             {
             }
@@ -2977,7 +2977,7 @@ namespace jmespath {
             }
         };
 
-        class multi_select_list final : public jsonpath_selector
+        class multi_select_list final : public basic_expression
         {
             std::vector<std::vector<token>> token_lists_;
         public:
@@ -3035,7 +3035,7 @@ namespace jmespath {
             }
         };
 
-        class multi_select_hash final : public jsonpath_selector
+        class multi_select_hash final : public basic_expression
         {
         public:
             std::vector<key_tokens> key_toks_;
@@ -3073,7 +3073,7 @@ namespace jmespath {
             }
         };
 
-        class function_expression final : public jsonpath_selector
+        class function_expression final : public basic_expression
         {
         public:
             std::vector<token> toks_;
@@ -4509,27 +4509,6 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::expect_filter_rbracket:
-                    {
-                        switch(*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
-                                break;
-                            case ']':
-                            {
-                                state_stack_.pop_back();
-
-                                ++p_;
-                                ++column_;
-                                break;
-                            }
-                            default:
-                                ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
-                        }
-                        break;
-                    }
                     case path_state::multi_select_list:
                     {
                         switch(*p_)
@@ -4826,7 +4805,7 @@ namespace jmespath {
                             toks.emplace_back(current_node_arg);
                         }
                         std::reverse(toks.begin(), toks.end());
-                        vals.insert(vals.begin(), std::move(toks));
+                        vals.emplace_back(std::move(toks));
                     }
                     if (it == output_stack_.rend())
                     {
@@ -4835,7 +4814,7 @@ namespace jmespath {
                     }
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
-
+                    std::reverse(vals.begin(), vals.end());
                     if (!output_stack_.empty() && output_stack_.back().is_projection() && 
                         (tok.precedence_level() < output_stack_.back().precedence_level() ||
                         (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
@@ -4860,7 +4839,7 @@ namespace jmespath {
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                        } while (it->type() != token_kind::key);
+                        } while (it != output_stack_.rend() && it->type() != token_kind::key);
                         JSONCONS_ASSERT(it->is_key());
                         auto key = std::move(it->key_);
                         ++it;
