@@ -521,8 +521,9 @@ namespace jmespath {
         protected:
             ~binary_operator() = default; // virtual destructor not needed
         public:
-            binary_operator(std::size_t precedence_level, bool is_right_associative = false)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            binary_operator(operator_kind oper)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper))
             {
             }
 
@@ -2364,7 +2365,7 @@ namespace jmespath {
         {
         public:
             or_operator()
-                : binary_operator(9)
+                : binary_operator(operator_kind::or_op)
             {
             }
 
@@ -2400,7 +2401,7 @@ namespace jmespath {
         {
         public:
             and_operator()
-                : binary_operator(8)
+                : binary_operator(operator_kind::and_op)
             {
             }
 
@@ -2432,7 +2433,7 @@ namespace jmespath {
         {
         public:
             eq_operator()
-                : binary_operator(6)
+                : binary_operator(operator_kind::eq_op)
             {
             }
 
@@ -2457,7 +2458,7 @@ namespace jmespath {
         {
         public:
             ne_operator()
-                : binary_operator(6)
+                : binary_operator(operator_kind::ne_op)
             {
             }
 
@@ -2482,7 +2483,7 @@ namespace jmespath {
         {
         public:
             lt_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::lt_op)
             {
             }
 
@@ -2511,7 +2512,7 @@ namespace jmespath {
         {
         public:
             lte_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::lte_op)
             {
             }
 
@@ -2540,7 +2541,7 @@ namespace jmespath {
         {
         public:
             gt_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::gt_op)
             {
             }
 
@@ -2569,7 +2570,7 @@ namespace jmespath {
         {
         public:
             gte_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::gte_op)
             {
             }
 
