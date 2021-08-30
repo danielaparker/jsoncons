@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/subschema.hpp>
-#include <jsoncons_ext/jsonschema/format_checkers.hpp>
+#include <jsoncons_ext/jsonschema/format_validator.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -24,6 +24,58 @@
 
 namespace jsoncons {
 namespace jsonschema {
+
+    template <class Json>
+    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
+
+    template <class Json>
+    class reference_schema : public keyword_validator<Json>
+    {
+        using validator_pointer = typename keyword_validator<Json>::validator_pointer;
+
+        validator_pointer referred_schema_;
+
+    public:
+        reference_schema(const std::string& id)
+            : keyword_validator<Json>(id), referred_schema_(nullptr) {}
+
+        void set_referred_schema(validator_pointer target) { referred_schema_ = target; }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
+                         error_reporter& reporter, 
+                         Json& patch) const override
+        {
+            if (!referred_schema_)
+            {
+                reporter.error(validation_output("", 
+                                                 this->absolute_keyword_location(), 
+                                                 instance_location.string(), 
+                                                 "Unresolved schema reference " + this->absolute_keyword_location()));
+                return;
+            }
+
+            referred_schema_->validate(instance, instance_location, reporter, patch);
+        }
+
+        jsoncons::optional<Json> get_default_value(const schema_location& instance_location, 
+                                                   const Json& instance, 
+                                                   error_reporter& reporter) const override
+        {
+            if (!referred_schema_)
+            {
+                reporter.error(validation_output("", 
+                                                 this->absolute_keyword_location(), 
+                                                 instance_location.string(), 
+                                                 "Unresolved schema reference " + this->absolute_keyword_location()));
+                return jsoncons::optional<Json>();
+            }
+
+            return referred_schema_->get_default_value(instance_location, instance, reporter);
+        }
+    };
 
     template <class Json>
     class schema_builder

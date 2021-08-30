@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <jsoncons_ext/jsonschema/format_checkers.hpp>
+#include <jsoncons_ext/jsonschema/format_validator.hpp>
 
 namespace jsonschema = jsoncons::jsonschema;
  
