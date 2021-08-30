@@ -1009,6 +1009,42 @@ namespace jmespath {
             }
         };
 
+        class keys_function final : public function_base
+        {
+        public:
+            keys_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<parameter>& args, dynamic_resources& resources, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(args.size() == *this->arity());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return resources.null_value();
+                }
+
+                reference arg0 = args[0].value();
+                if (!arg0.is_object())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return resources.null_value();
+                }
+
+                auto result = resources.create_json(json_array_arg);
+                result->reserve(args.size());
+
+                for (auto& item : arg0.object_range())
+                {
+                    result->emplace_back(item.key());
+                }
+                return *result;
+            }
+        };
+
         class length_function : public function_base
         {
         public:
@@ -1522,12 +1558,14 @@ namespace jmespath {
                     if (!(is_number || is_string))
                     {
                         ec = jmespath_errc::invalid_type;
+                        return resources.null_value();
                     }
 
                     reference key2 = expr.evaluate(rhs, resources, ec2);
                     if (!(key2.is_number() == is_number && key2.is_string() == is_string))
                     {
                         ec = jmespath_errc::invalid_type;
+                        return resources.null_value();
                     }
                     
                     return key1 < key2;
@@ -1538,42 +1576,6 @@ namespace jmespath {
             std::string to_string(std::size_t = 0) const override
             {
                 return std::string("sort_by_function\n");
-            }
-        };
-
-        class keys_function final : public function_base
-        {
-        public:
-            keys_function()
-                : function_base(1)
-            {
-            }
-
-            reference evaluate(std::vector<parameter>& args, dynamic_resources& resources, std::error_code& ec) const override
-            {
-                JSONCONS_ASSERT(args.size() == *this->arity());
-
-                if (!args[0].is_value())
-                {
-                    ec = jmespath_errc::invalid_type;
-                    return resources.null_value();
-                }
-
-                reference arg0 = args[0].value();
-                if (!arg0.is_object())
-                {
-                    ec = jmespath_errc::invalid_type;
-                    return resources.null_value();
-                }
-
-                auto result = resources.create_json(json_array_arg);
-                result->reserve(args.size());
-
-                for (auto& item : arg0.object_range())
-                {
-                    result->emplace_back(item.key());
-                }
-                return *result;
             }
         };
 
@@ -2746,8 +2748,10 @@ namespace jmespath {
                 pointer ptr = std::addressof(val);
                 for (auto& expression : expressions_)
                 {
+                    //std::string s = ptr->to_string();
                     ptr = std::addressof(expression->evaluate(*ptr, resources, ec));
                 }
+                //std::string s2 = ptr->to_string();
                 return *ptr;
             }
         };
@@ -2995,6 +2999,7 @@ namespace jmespath {
 
             reference evaluate(reference val, dynamic_resources& resources, std::error_code& ec) const override
             {
+                //std::string s = val.to_string();
                 if (!val.is_array())
                 {
                     return resources.null_value();
