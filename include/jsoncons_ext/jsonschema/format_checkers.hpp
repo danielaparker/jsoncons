@@ -844,8 +844,10 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("date", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a RFC 3339 date string"));
         }
     }
 
@@ -857,8 +859,10 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("time", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a RFC 3339 time string"));
         }
     }
 
@@ -870,8 +874,10 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("date-time",  
+                                             absolute_keyword_location,
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a RFC 3339 date-time string"));
         }
     }
 
@@ -883,8 +889,10 @@ namespace jsonschema {
     {
         if (!validate_email_rfc5322(value))        
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("email", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
         }
     } 
 
@@ -896,8 +904,10 @@ namespace jsonschema {
     {
         if (!validate_hostname_rfc1034(value))
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", 
-                                             absolute_keyword_location));
+            reporter.error(validation_output("hostname", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
         }
     } 
 
@@ -909,8 +919,10 @@ namespace jsonschema {
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("ipv4", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
         }
     } 
 
@@ -922,8 +934,10 @@ namespace jsonschema {
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("ipv6", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
         }
     } 
 
@@ -940,8 +954,10 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            reporter.error(validation_output(instance_location.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", 
-                                            absolute_keyword_location));
+            reporter.error(validation_output("pattern", 
+                                             absolute_keyword_location, 
+                                             instance_location.string(), 
+                                             "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
         }
 #endif
     } 

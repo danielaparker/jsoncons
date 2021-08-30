@@ -52,7 +52,10 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_output(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_output("", 
+                                                 this->absolute_keyword_location(), 
+                                                 instance_location.string(), 
+                                                 "Unresolved schema reference " + this->absolute_keyword_location()));
                 return;
             }
 
@@ -65,7 +68,10 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_output(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_output("", 
+                                                 this->absolute_keyword_location(), 
+                                                 instance_location.string(), 
+                                                 "Unresolved schema reference " + this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
 
@@ -243,7 +249,7 @@ namespace jsonschema {
                                         const std::vector<schema_location>& uris, 
                                         std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<number_keyword<Json>>(schema, uris, keywords);
+            auto sch_orig = jsoncons::make_unique<number_validator<Json>>(schema, uris, keywords);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
