@@ -74,12 +74,15 @@ namespace jsonschema {
             return absolute_keyword_location_;
         }
 
-        void validate(const schema_location& instance_location, 
-                      const Json& instance, 
+        void validate(const Json& instance, 
+                      const schema_location& instance_location, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
-            do_validate(instance_location,instance,reporter,patch);
+            do_validate(instance, 
+                        instance_location,
+                        reporter,
+                        patch);
         }
 
         virtual jsoncons::optional<Json> get_default_value(const schema_location&, const Json&, error_reporter&) const
@@ -88,8 +91,8 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_validate(const schema_location& instance_location, 
-                                 const Json& instance, 
+        virtual void do_validate(const Json& instance, 
+                                 const schema_location& instance_location, 
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;
     };

@@ -236,8 +236,8 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const override
         {
@@ -399,13 +399,13 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
             collecting_error_reporter local_reporter;
-            rule_->validate(instance_location, instance, local_reporter, patch);
+            rule_->validate(instance, instance_location, local_reporter, patch);
 
             if (local_reporter.errors.empty())
             {
@@ -520,8 +520,8 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -531,7 +531,7 @@ namespace jsonschema {
             for (auto& s : subschemas_) 
             {
                 std::size_t mark = local_reporter.errors.size();
-                s->validate(instance_location, instance, local_reporter, patch);
+                s->validate(instance, instance_location, local_reporter, patch);
                 if (mark == local_reporter.errors.size())
                     count++;
 
@@ -728,8 +728,8 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -760,8 +760,8 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -794,7 +794,10 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, const Json& instance, error_reporter& reporter, Json&) const override
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
+                         error_reporter& reporter, 
+                         Json&) const override
         {
             if (!instance.is_null())
             {
@@ -817,7 +820,10 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location&, const Json&, error_reporter&, Json&) const override
+        void do_validate(const Json&, 
+                         const schema_location&, 
+                         error_reporter&, 
+                         Json&) const override
         {
         }
 
@@ -834,7 +840,10 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location&, const Json&, error_reporter&, Json&) const override
+        void do_validate(const Json&, 
+                         const schema_location&, 
+                         error_reporter&, 
+                         Json&) const override
         {
         }
     };
@@ -850,7 +859,10 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, const Json&, error_reporter& reporter, Json&) const override
+        void do_validate(const Json&, 
+                         const schema_location& instance_location, 
+                         error_reporter& reporter, 
+                         Json&) const override
         {
             reporter.error(validation_output("false", 
                                              this->absolute_keyword_location(), 
@@ -879,7 +891,10 @@ namespace jsonschema {
         required_keyword_validator& operator=(required_keyword_validator&&) = default;
     private:
 
-        void do_validate(const schema_location& instance_location, const Json& instance, error_reporter& reporter, Json&) const override final
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
+                         error_reporter& reporter, 
+                         Json&) const override final
         {
             for (const auto& key : items_)
             {
@@ -1011,8 +1026,8 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1045,12 +1060,12 @@ namespace jsonschema {
             }
 
             if (required_)
-                required_->validate(instance_location, instance, reporter, patch);
+                required_->validate(instance, instance_location, reporter, patch);
 
             for (const auto& property : instance.object_range()) 
             {
                 if (property_names_)
-                    property_names_->validate(instance_location, property.key(), reporter, patch);
+                    property_names_->validate(property.key(), instance_location, reporter, patch);
 
                 bool a_prop_or_pattern_matched = false;
                 auto properties_it = properties_.find(property.key());
@@ -1059,7 +1074,7 @@ namespace jsonschema {
                 if (properties_it != properties_.end()) 
                 {
                     a_prop_or_pattern_matched = true;
-                    properties_it->second->validate(instance_location.append(property.key()), property.value(), reporter, patch);
+                    properties_it->second->validate(property.value(), instance_location.append(property.key()), reporter, patch);
                 }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1069,7 +1084,7 @@ namespace jsonschema {
                     if (std::regex_search(property.key(), schema_pp.first)) 
                     {
                         a_prop_or_pattern_matched = true;
-                        schema_pp.second->validate(instance_location.append(property.key()), property.value(), reporter, patch);
+                        schema_pp.second->validate(property.value(), instance_location.append(property.key()), reporter, patch);
                     }
     #endif
 
@@ -1077,7 +1092,7 @@ namespace jsonschema {
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
                     collecting_error_reporter local_reporter;
-                    additional_properties_->validate(instance_location.append(property.key()), property.value(), local_reporter, patch);
+                    additional_properties_->validate(property.value(), instance_location.append(property.key()), local_reporter, patch);
                     if (!local_reporter.errors.empty())
                     {
                         reporter.error(validation_output("additionalProperties", 
@@ -1112,7 +1127,7 @@ namespace jsonschema {
             {
                 auto prop = instance.find(dep.first);
                 if (prop != instance.object_range().end()) // if dependency-property is present in instance
-                    dep.second->validate(instance_location.append(dep.first), instance, reporter, patch); // validate
+                    dep.second->validate(instance, instance_location.append(dep.first), reporter, patch); // validate
             }
         }
     };
@@ -1204,8 +1219,8 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1263,7 +1278,7 @@ namespace jsonschema {
             {
                 for (const auto& i : instance.array_range()) 
                 {
-                    items_schema_->validate(instance_location.append(index), i, reporter, patch);
+                    items_schema_->validate(i, instance_location.append(index), reporter, patch);
                     index++;
                 }
             }
@@ -1284,7 +1299,7 @@ namespace jsonschema {
                     if (!item_validator)
                         break;
 
-                    item_validator->validate(instance_location.append(index), i, reporter, patch);
+                    item_validator->validate(i, instance_location.append(index), reporter, patch);
                 }
             }
 
@@ -1295,7 +1310,7 @@ namespace jsonschema {
                 for (const auto& item : instance.array_range()) 
                 {
                     std::size_t mark = local_reporter.errors.size();
-                    contains_->validate(instance_location, item, local_reporter, patch);
+                    contains_->validate(item, instance_location, local_reporter, patch);
                     if (mark == local_reporter.errors.size()) 
                     {
                         contained = true;
@@ -1368,8 +1383,8 @@ namespace jsonschema {
             }
         }
     private:
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -1377,16 +1392,16 @@ namespace jsonschema {
             {
                 collecting_error_reporter local_reporter;
 
-                if_->validate(instance_location, instance, local_reporter, patch);
+                if_->validate(instance, instance_location, local_reporter, patch);
                 if (local_reporter.errors.empty()) 
                 {
                     if (then_)
-                        then_->validate(instance_location, instance, reporter, patch);
+                        then_->validate(instance, instance_location, reporter, patch);
                 } 
                 else 
                 {
                     if (else_)
-                        else_->validate(instance_location, instance, reporter, patch);
+                        else_->validate(instance, instance_location, reporter, patch);
                 }
             }
         }
@@ -1408,8 +1423,8 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
@@ -1452,8 +1467,8 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
@@ -1581,15 +1596,15 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const schema_location& instance_location, 
-                         const Json& instance, 
+        void do_validate(const Json& instance, 
+                         const schema_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override final
         {
             auto type = type_mapping_[(uint8_t) instance.type()];
 
             if (type)
-                type->validate(instance_location, instance, reporter, patch);
+                type->validate(instance, instance_location, reporter, patch);
             else
             {
                 std::ostringstream ss;
@@ -1620,7 +1635,7 @@ namespace jsonschema {
 
             if (enum_)
             { 
-                enum_->validate(instance_location, instance, reporter, patch);
+                enum_->validate(instance, instance_location, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1629,7 +1644,7 @@ namespace jsonschema {
 
             if (const_)
             { 
-                const_->validate(instance_location, instance, reporter, patch);
+                const_->validate(instance, instance_location, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1638,7 +1653,7 @@ namespace jsonschema {
 
             for (const auto& l : combined_)
             {
-                l->validate(instance_location, instance, reporter, patch);
+                l->validate(instance, instance_location, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1648,7 +1663,7 @@ namespace jsonschema {
 
             if (conditional_)
             { 
-                conditional_->validate(instance_location, instance, reporter, patch);
+                conditional_->validate(instance, instance_location, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;

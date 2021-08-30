@@ -85,7 +85,7 @@ namespace jsonschema {
             schema_location instance_location("#");
             Json patch(json_array_arg);
 
-            root_->validate(instance_location, instance, reporter, patch);
+            root_->validate(instance, instance_location, reporter, patch);
             return patch;
         }
 
@@ -96,7 +96,7 @@ namespace jsonschema {
             schema_location instance_location("#");
             Json patch(json_array_arg);
 
-            root_->validate(instance_location, instance, reporter, patch);
+            root_->validate(instance, instance_location, reporter, patch);
             return reporter.error_count() == 0;
         }
 
@@ -109,7 +109,7 @@ namespace jsonschema {
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
-            root_->validate(instance_location, instance, adaptor, patch);
+            root_->validate(instance, instance_location, adaptor, patch);
             return patch;
         }
     };
