@@ -78,6 +78,42 @@ namespace jsonschema {
     };
 
     template <class Json>
+    class schema_loader;
+
+    template <class Json>
+    class json_schema
+    {
+        using validator_pointer = typename keyword_validator<Json>::validator_pointer;
+
+        friend class schema_loader<Json>;
+
+        std::vector<std::unique_ptr<keyword_validator<Json>>> subschemas_;
+        validator_pointer root_;
+    public:
+        json_schema(std::vector<std::unique_ptr<keyword_validator<Json>>>&& subschemas,
+                    validator_pointer root)
+            : subschemas_(std::move(subschemas)), root_(root)
+        {
+            if (root_ == nullptr)
+                JSONCONS_THROW(schema_error("There is no root schema to validate an instance against"));
+        }
+
+        json_schema(const json_schema&) = delete;
+        json_schema(json_schema&&) = default;
+        json_schema& operator=(const json_schema&) = delete;
+        json_schema& operator=(json_schema&&) = default;
+
+        void validate(const Json& instance, 
+                      const schema_location& instance_location, 
+                      error_reporter& reporter, 
+                      Json& patch) const 
+        {
+            JSONCONS_ASSERT(root_ != nullptr);
+            root_->validate(instance, instance_location, reporter, patch);
+        }
+    };
+
+    template <class Json>
     class schema_builder
     {
     public:
