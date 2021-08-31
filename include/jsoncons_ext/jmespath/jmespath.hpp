@@ -23,6 +23,76 @@
 namespace jsoncons { 
 namespace jmespath {
 
+    enum class operator_kind
+    {
+        default_op, // Identifier, CurrentNode, Index, MultiSelectList, MultiSelectHash, FunctionExpression
+        projection_op,
+        flatten_projection_op, // FlattenProjection
+        or_op,
+        and_op,
+        eq_op,
+        ne_op,
+        lt_op,
+        lte_op,
+        gt_op,
+        gte_op,
+        not_op
+    };
+
+    struct operator_table final
+    {
+        static int precedence_level(operator_kind oper)
+        {
+            switch (oper)
+            {
+                case operator_kind::projection_op:
+                    return 11;
+                case operator_kind::flatten_projection_op:
+                    return 11;
+                case operator_kind::or_op:
+                    return 9;
+                case operator_kind::and_op:
+                    return 8;
+                case operator_kind::eq_op:
+                case operator_kind::ne_op:
+                    return 6;
+                case operator_kind::lt_op:
+                case operator_kind::lte_op:
+                case operator_kind::gt_op:
+                case operator_kind::gte_op:
+                    return 5;
+                case operator_kind::not_op:
+                    return 1;
+                default:
+                    return 1;
+            }
+        }
+
+        static bool is_right_associative(operator_kind oper)
+        {
+            switch (oper)
+            {
+                case operator_kind::not_op:
+                    return true;
+                case operator_kind::projection_op:
+                    return true;
+                case operator_kind::flatten_projection_op:
+                    return false;
+                case operator_kind::or_op:
+                case operator_kind::and_op:
+                case operator_kind::eq_op:
+                case operator_kind::ne_op:
+                case operator_kind::lt_op:
+                case operator_kind::lte_op:
+                case operator_kind::gt_op:
+                case operator_kind::gte_op:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    };
+
     enum class token_kind 
     {
         current_node,
@@ -413,8 +483,9 @@ namespace jmespath {
         protected:
             ~unary_operator() = default; // virtual destructor not needed
         public:
-            unary_operator(std::size_t precedence_level, bool is_right_associative)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            unary_operator(operator_kind oper)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper))
             {
             }
 
@@ -434,7 +505,7 @@ namespace jmespath {
         {
         public:
             not_expression()
-                : unary_operator(1, true)
+                : unary_operator(operator_kind::not_op)
             {}
 
             reference evaluate(reference val, dynamic_resources& resources, std::error_code&) const override
@@ -450,8 +521,9 @@ namespace jmespath {
         protected:
             ~binary_operator() = default; // virtual destructor not needed
         public:
-            binary_operator(std::size_t precedence_level, bool is_right_associative = false)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            binary_operator(operator_kind oper)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper))
             {
             }
 
@@ -486,8 +558,10 @@ namespace jmespath {
             bool is_right_associative_;
             bool is_projection_;
         public:
-            expression_base(std::size_t precedence_level, bool is_right_associative, bool is_projection)
-                : precedence_level_(precedence_level), is_right_associative_(is_right_associative), is_projection_(is_projection)
+            expression_base(operator_kind oper, bool is_projection)
+                : precedence_level_(operator_table::precedence_level(oper)), 
+                  is_right_associative_(operator_table::is_right_associative(oper)), 
+                  is_projection_(is_projection)
             {
             }
 
@@ -2293,7 +2367,7 @@ namespace jmespath {
         {
         public:
             or_operator()
-                : binary_operator(9)
+                : binary_operator(operator_kind::or_op)
             {
             }
 
@@ -2329,7 +2403,7 @@ namespace jmespath {
         {
         public:
             and_operator()
-                : binary_operator(8)
+                : binary_operator(operator_kind::and_op)
             {
             }
 
@@ -2361,7 +2435,7 @@ namespace jmespath {
         {
         public:
             eq_operator()
-                : binary_operator(6)
+                : binary_operator(operator_kind::eq_op)
             {
             }
 
@@ -2386,7 +2460,7 @@ namespace jmespath {
         {
         public:
             ne_operator()
-                : binary_operator(6)
+                : binary_operator(operator_kind::ne_op)
             {
             }
 
@@ -2411,7 +2485,7 @@ namespace jmespath {
         {
         public:
             lt_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::lt_op)
             {
             }
 
@@ -2440,7 +2514,7 @@ namespace jmespath {
         {
         public:
             lte_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::lte_op)
             {
             }
 
@@ -2469,7 +2543,7 @@ namespace jmespath {
         {
         public:
             gt_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::gt_op)
             {
             }
 
@@ -2498,7 +2572,7 @@ namespace jmespath {
         {
         public:
             gte_operator()
-                : binary_operator(5)
+                : binary_operator(operator_kind::gte_op)
             {
             }
 
@@ -2528,7 +2602,7 @@ namespace jmespath {
         {
         public:
             basic_expression()
-                : expression_base(1, false, false)
+                : expression_base(operator_kind::default_op, false)
             {
             }
 
@@ -2648,9 +2722,8 @@ namespace jmespath {
         protected:
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
-            projection_base(std::size_t precedence_level, 
-                            bool is_right_associative = true)
-                : expression_base(precedence_level, is_right_associative, true)
+            projection_base(operator_kind oper)
+                : expression_base(oper, true)
             {
             }
 
@@ -2683,7 +2756,7 @@ namespace jmespath {
         {
         public:
             object_projection()
-                : projection_base(11, true)
+                : projection_base(operator_kind::projection_op)
             {
             }
 
@@ -2731,7 +2804,7 @@ namespace jmespath {
         {
         public:
             list_projection()
-                : projection_base(11, true)
+                : projection_base(operator_kind::projection_op)
             {
             }
 
@@ -2780,7 +2853,7 @@ namespace jmespath {
             slice slice_;
         public:
             slice_projection(const slice& s)
-                : projection_base(11, true), slice_(s)
+                : projection_base(operator_kind::projection_op), slice_(s)
             {
             }
 
@@ -2867,7 +2940,7 @@ namespace jmespath {
             std::vector<token> token_list_;
         public:
             filter_expression(std::vector<token>&& token_list)
-                : projection_base(11, true), token_list_(std::move(token_list))
+                : projection_base(operator_kind::projection_op), token_list_(std::move(token_list))
             {
             }
 
@@ -2916,7 +2989,7 @@ namespace jmespath {
         {
         public:
             flatten_projection()
-                : projection_base(11, false)
+                : projection_base(operator_kind::flatten_projection_op)
             {
             }
 

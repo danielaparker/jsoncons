@@ -1,14 +1,13 @@
 [
-  {
+{
     "given": {"reservations": [
-      {"instances": [
-        {"foo": 1, "bar": 2}, {"foo": 1, "bar": 3},
-        {"foo": 1, "bar": 2}, {"foo": 2, "bar": 1}]}]},
+        {"instances": [{"foo": 1}, {"foo": 2}]}
+    ]},
     "cases": [
-      {
-        "expression": "reservations[].instances[?bar==`1`][]",
-        "result": [{"foo": 2, "bar": 1}]
-      }
+        {
+           "expression": "reservations[].instances[].foo",
+           "result": [1, 2]
+        }
     ]
-  }
+}
 ]
