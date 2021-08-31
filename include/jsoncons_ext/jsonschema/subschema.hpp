@@ -55,7 +55,7 @@ namespace jsonschema {
     {
         std::string absolute_keyword_location_;
     public:
-        using validator_pointer = keyword_validator<Json>*;
+        using self_pointer = keyword_validator<Json>*;
 
         keyword_validator(const std::string& absolute_keyword_location)
             : absolute_keyword_location_(absolute_keyword_location)
