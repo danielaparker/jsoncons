@@ -92,7 +92,7 @@ add_executable(unit_tests
                jsonpath/src/jsonpath_test_suite.cpp
                jsonpointer/src/jsonpointer_flatten_tests.cpp
                jsonpointer/src/jsonpointer_tests.cpp
-               jsonschema/src/format_checker_tests.cpp
+               jsonschema/src/format_validator_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_output_format_tests.cpp
                jsonschema/src/jsonschema_tests.cpp
