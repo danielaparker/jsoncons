@@ -34,50 +34,50 @@ namespace jsonschema {
         virtual ~abstract_keyword_validator_factory() = default;
 
         virtual validator_pointer make_keyword_validator(const Json& schema,
-                                                         const std::vector<schema_location>& uris,
+                                                         const std::vector<json_location>& uris,
                                                          const std::vector<std::string>& keys) = 0;
-        virtual validator_pointer make_required_validator(const std::vector<schema_location>& uris,
+        virtual validator_pointer make_required_validator(const std::vector<json_location>& uris,
                                                           const std::vector<std::string>& items) = 0;
 
-        virtual validator_pointer make_null_validator(const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_null_validator(const std::vector<json_location>& uris) = 0;
 
-        virtual validator_pointer make_true_validator(const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_true_validator(const std::vector<json_location>& uris) = 0;
 
-        virtual validator_pointer make_false_validator(const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_false_validator(const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_object_validator(const Json& sch, 
-                                                        const std::vector<schema_location>& uris) = 0;
+                                                        const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_array_validator(const Json& sch,
-                                                       const std::vector<schema_location>& uris) = 0;
+                                                       const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_string_validator(const Json& sch,
-                                                        const std::vector<schema_location>& uris) = 0;
+                                                        const std::vector<json_location>& uris) = 0;
 
-        virtual validator_pointer make_boolean_validator(const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_boolean_validator(const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_integer_validator(const Json& sch, 
-                                                         const std::vector<schema_location>& uris, 
+                                                         const std::vector<json_location>& uris, 
                                                          std::set<std::string>& keywords) = 0;
 
         virtual validator_pointer make_number_validator(const Json& sch, 
-                                                        const std::vector<schema_location>& uris, 
+                                                        const std::vector<json_location>& uris, 
                                                         std::set<std::string>& keywords) = 0;
 
         virtual validator_pointer make_not_validator(const Json& schema,
-                                                     const std::vector<schema_location>& uris) = 0;
+                                                     const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_all_of_validator(const Json& schema,
-                                                        const std::vector<schema_location>& uris) = 0;
+                                                        const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_any_of_validator(const Json& schema,
-                                                        const std::vector<schema_location>& uris) = 0;
+                                                        const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_one_of_validator(const Json& schema,
-                                                        const std::vector<schema_location>& uris) = 0;
+                                                        const std::vector<json_location>& uris) = 0;
 
         virtual validator_pointer make_type_validator(const Json& schema,
-                                                      const std::vector<schema_location>& uris) = 0;
+                                                      const std::vector<json_location>& uris) = 0;
     };
 
     struct collecting_error_reporter : public error_reporter
@@ -91,21 +91,10 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
-    void update_patch(Json& patch, const schema_location& instance_location, Json&& default_value)
-    {
-        Json j;
-        j.try_emplace("op", "add"); 
-        j.try_emplace("path", instance_location.pointer()); 
-        j.try_emplace("value", std::forward<Json>(default_value)); 
-
-        patch.push_back(std::move(j));
-    }
-
     // string keyword_validator
 
     inline
-    std::string make_absolute_keyword_location(const std::vector<schema_location>& uris,
+    std::string make_absolute_keyword_location(const std::vector<json_location>& uris,
                                                const std::string& keyword)
     {
         for (auto it = uris.rbegin(); it != uris.rend(); ++it)
@@ -141,7 +130,7 @@ namespace jsonschema {
         std::string content_media_type_location_;
 
     public:
-        string_validator(const Json& sch, const std::vector<schema_location>& uris)
+        string_validator(const Json& sch, const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_length_(), min_length_(), 
     #if defined(JSONCONS_HAS_STD_REGEX)
               pattern_(),
@@ -235,7 +224,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const override
         {
@@ -389,7 +378,7 @@ namespace jsonschema {
     public:
         not_validator(abstract_keyword_validator_factory<Json>* builder,
                  const Json& sch,
-                 const std::vector<schema_location>& uris)
+                 const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
             rule_ = builder->make_keyword_validator(sch, uris, {"not"});
@@ -398,7 +387,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -414,7 +403,7 @@ namespace jsonschema {
             }
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location& instance_location, 
+        jsoncons::optional<Json> get_default_value(const json_location& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -432,7 +421,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location& instance_location, 
+                                const json_location& instance_location, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter& local_reporter, 
                                 std::size_t)
@@ -457,7 +446,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location&, 
+                                const json_location&, 
                                 error_reporter&, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -476,7 +465,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location& instance_location, 
+                                const json_location& instance_location, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -504,7 +493,7 @@ namespace jsonschema {
     public:
         combining_validator(abstract_keyword_validator_factory<Json>* builder,
                        const Json& sch,
-                       const std::vector<schema_location>& uris)
+                       const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
             size_t c = 0;
@@ -519,7 +508,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -576,7 +565,7 @@ namespace jsonschema {
 
     public:
         numeric_validator_base(const Json& sch, 
-                    const std::vector<schema_location>& uris, 
+                    const std::vector<json_location>& uris, 
                     std::set<std::string>& keywords)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               maximum_(), minimum_(),exclusive_maximum_(), exclusive_minimum_(), multiple_of_()
@@ -625,7 +614,7 @@ namespace jsonschema {
     protected:
 
         void apply_kewords(T value,
-                           const schema_location& instance_location, 
+                           const json_location& instance_location, 
                            const Json& instance, 
                            error_reporter& reporter) const 
         {
@@ -714,18 +703,18 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class integer_keyword : public numeric_validator_base<Json,int64_t>
+    class integer_validator : public numeric_validator_base<Json,int64_t>
     {
     public:
-        integer_keyword(const Json& sch, 
-                          const std::vector<schema_location>& uris, 
+        integer_validator(const Json& sch, 
+                          const std::vector<json_location>& uris, 
                           std::set<std::string>& keywords)
             : numeric_validator_base<Json, int64_t>(sch, uris, keywords)
         {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -750,14 +739,14 @@ namespace jsonschema {
     {
     public:
         number_validator(const Json& sch,
-                          const std::vector<schema_location>& uris, 
+                          const std::vector<json_location>& uris, 
                           std::set<std::string>& keywords)
             : numeric_validator_base<Json, double>(sch, uris, keywords)
         {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -783,13 +772,13 @@ namespace jsonschema {
     class null_validator : public keyword_validator<Json>
     {
     public:
-        null_validator(const std::vector<schema_location>& uris)
+        null_validator(const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override
         {
@@ -807,13 +796,13 @@ namespace jsonschema {
     class boolean_validator : public keyword_validator<Json>
     {
     public:
-        boolean_validator(const std::vector<schema_location>& uris)
+        boolean_validator(const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location&, 
+                         const json_location&, 
                          error_reporter&, 
                          Json&) const override
         {
@@ -825,13 +814,13 @@ namespace jsonschema {
     class true_validator : public keyword_validator<Json>
     {
     public:
-        true_validator(const std::vector<schema_location>& uris)
+        true_validator(const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location&, 
+                         const json_location&, 
                          error_reporter&, 
                          Json&) const override
         {
@@ -842,13 +831,13 @@ namespace jsonschema {
     class false_validator : public keyword_validator<Json>
     {
     public:
-        false_validator(const std::vector<schema_location>& uris)
+        false_validator(const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override
         {
@@ -867,7 +856,7 @@ namespace jsonschema {
         std::vector<std::string> items_;
 
     public:
-        required_validator(const std::vector<schema_location>& uris,
+        required_validator(const std::vector<json_location>& uris,
                          const std::vector<std::string>& items)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
         required_validator(const std::string& absolute_keyword_location, const std::vector<std::string>& items)
@@ -880,7 +869,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override final
         {
@@ -925,7 +914,7 @@ namespace jsonschema {
     public:
         object_validator(abstract_keyword_validator_factory<Json>* builder,
                     const Json& sch,
-                    const std::vector<schema_location>& uris)
+                    const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               max_properties_(), min_properties_(), 
               additional_properties_(nullptr),
@@ -990,7 +979,7 @@ namespace jsonschema {
                     {
                         case json_type::array_value:
                         {
-                            auto location = make_absolute_keyword_location(uris, "required");
+                            auto location = make_absolute_keyword_location(uris, "dependencies");
                             dependencies_.emplace(dep.key(),
                                                   builder->make_required_validator({location},
                                                                                  dep.value().template as<std::vector<std::string>>()));
@@ -1015,7 +1004,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1118,6 +1107,15 @@ namespace jsonschema {
                     dep.second->validate(instance, instance_location.append(dep.first), reporter, patch); // validate
             }
         }
+
+        void update_patch(Json& patch, const json_location& instance_location, Json&& default_value) const
+        {
+            Json j;
+            j.try_emplace("op", "add"); 
+            j.try_emplace("path", instance_location.pointer()); 
+            j.try_emplace("value", std::forward<Json>(default_value)); 
+            patch.push_back(std::move(j));
+        }
     };
 
     // array_validator
@@ -1140,7 +1138,7 @@ namespace jsonschema {
     public:
         array_validator(abstract_keyword_validator_factory<Json>* builder, 
                    const Json& sch, 
-                   const std::vector<schema_location>& uris)
+                   const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
         {
@@ -1208,7 +1206,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1337,7 +1335,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class conditional_keyword : public keyword_validator<Json>
+    class conditional_validator : public keyword_validator<Json>
     {
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
@@ -1346,10 +1344,10 @@ namespace jsonschema {
         validator_pointer else_;
 
     public:
-        conditional_keyword(abstract_keyword_validator_factory<Json>* builder,
+        conditional_validator(abstract_keyword_validator_factory<Json>* builder,
                          const Json& sch_if,
                          const Json& sch,
-                         const std::vector<schema_location>& uris)
+                         const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), if_(nullptr), then_(nullptr), else_(nullptr)
         {
             auto then_it = sch.find("then");
@@ -1372,7 +1370,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -1395,22 +1393,22 @@ namespace jsonschema {
         }
     };
 
-    // enum_keyword
+    // enum_validator
 
     template <class Json>
-    class enum_keyword : public keyword_validator<Json>
+    class enum_validator : public keyword_validator<Json>
     {
         Json enum_;
 
     public:
-        enum_keyword(const Json& sch,
-                  const std::vector<schema_location>& uris)
+        enum_validator(const Json& sch,
+                  const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), enum_(sch)
         {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
@@ -1446,13 +1444,13 @@ namespace jsonschema {
         Json const_;
 
     public:
-        const_keyword(const Json& sch, const std::vector<schema_location>& uris)
+        const_keyword(const Json& sch, const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), const_(sch)
         {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
@@ -1471,10 +1469,10 @@ namespace jsonschema {
 
         Json default_value_;
         std::vector<validator_pointer> type_mapping_;
-        jsoncons::optional<enum_keyword<Json>> enum_;
+        jsoncons::optional<enum_validator<Json>> enum_;
         jsoncons::optional<const_keyword<Json>> const_;
         std::vector<validator_pointer> combined_;
-        jsoncons::optional<conditional_keyword<Json>> conditional_;
+        jsoncons::optional<conditional_validator<Json>> conditional_;
         std::vector<std::string> expected_types_;
 
     public:
@@ -1485,7 +1483,7 @@ namespace jsonschema {
 
         type_keyword(abstract_keyword_validator_factory<Json>* builder,
                      const Json& sch,
-                     const std::vector<schema_location>& uris)
+                     const std::vector<json_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), default_value_(jsoncons::null_type()), 
               type_mapping_((uint8_t)(json_type::object_value)+1), 
               enum_(), const_()
@@ -1539,7 +1537,7 @@ namespace jsonschema {
             it = sch.find("enum");
             if (it != sch.object_range().end()) 
             {
-                enum_ = enum_keyword<Json >(it->value(), uris);
+                enum_ = enum_validator<Json >(it->value(), uris);
             }
 
             it = sch.find("const");
@@ -1575,13 +1573,13 @@ namespace jsonschema {
             it = sch.find("if");
             if (it != sch.object_range().end()) 
             {
-                conditional_ = conditional_keyword<Json>(builder, it->value(), sch, uris);
+                conditional_ = conditional_validator<Json>(builder, it->value(), sch, uris);
             }
         }
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override final
         {
@@ -1655,7 +1653,7 @@ namespace jsonschema {
             }
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location&, 
+        jsoncons::optional<Json> get_default_value(const json_location&, 
                                                    const Json&,
                                                    error_reporter&) const override
         {
@@ -1665,7 +1663,7 @@ namespace jsonschema {
         void initialize_type_mapping(abstract_keyword_validator_factory<Json>* builder,
                                      const std::string& type,
                                      const Json& sch,
-                                     const std::vector<schema_location>& uris,
+                                     const std::vector<json_location>& uris,
                                      std::set<std::string>& keywords)
         {
             if (type.empty() || type == "null")

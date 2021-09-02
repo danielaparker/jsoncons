@@ -832,13 +832,13 @@ namespace jsonschema {
 
     // format checkers
     using format_checker = std::function<void(const std::string& absolute_keyword_location,
-                                              const schema_location& instance_location, 
+                                              const json_location& instance_location, 
                                               const std::string&, 
                                               error_reporter& reporter)>;
 
     inline
     void rfc3339_date_check(const std::string& absolute_keyword_location,
-                            const schema_location& instance_location, 
+                            const json_location& instance_location, 
                             const std::string& value,
                             error_reporter& reporter)
     {
@@ -853,7 +853,7 @@ namespace jsonschema {
 
     inline
     void rfc3339_time_check(const std::string& absolute_keyword_location,
-                            const schema_location& instance_location, 
+                            const json_location& instance_location, 
                             const std::string &value,
                             error_reporter& reporter)
     {
@@ -868,7 +868,7 @@ namespace jsonschema {
 
     inline
     void rfc3339_date_time_check(const std::string& absolute_keyword_location,
-                                 const schema_location& instance_location, 
+                                 const json_location& instance_location, 
                                  const std::string &value,
                                  error_reporter& reporter)
     {
@@ -883,7 +883,7 @@ namespace jsonschema {
 
     inline
     void email_check(const std::string& absolute_keyword_location,
-                     const schema_location& instance_location, 
+                     const json_location& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
     {
@@ -898,7 +898,7 @@ namespace jsonschema {
 
     inline
     void hostname_check(const std::string& absolute_keyword_location,
-                        const schema_location& instance_location, 
+                        const json_location& instance_location, 
                         const std::string& value,
                         error_reporter& reporter) 
     {
@@ -913,7 +913,7 @@ namespace jsonschema {
 
     inline
     void ipv4_check(const std::string& absolute_keyword_location,
-                    const schema_location& instance_location, 
+                    const json_location& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
     {
@@ -928,7 +928,7 @@ namespace jsonschema {
 
     inline
     void ipv6_check(const std::string& absolute_keyword_location,
-                    const schema_location& instance_location, 
+                    const json_location& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
     {
@@ -943,7 +943,7 @@ namespace jsonschema {
 
     inline
     void regex_check(const std::string& absolute_keyword_location,
-                     const schema_location& instance_location, 
+                     const json_location& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
     {

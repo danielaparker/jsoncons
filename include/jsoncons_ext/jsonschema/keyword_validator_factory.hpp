@@ -46,7 +46,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const json_location& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -62,7 +62,7 @@ namespace jsonschema {
             referred_schema_->validate(instance, instance_location, reporter, patch);
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location& instance_location, 
+        jsoncons::optional<Json> get_default_value(const json_location& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -106,7 +106,7 @@ namespace jsonschema {
         json_schema& operator=(json_schema&&) = default;
 
         void validate(const Json& instance, 
-                      const schema_location& instance_location, 
+                      const json_location& instance_location, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
@@ -167,7 +167,7 @@ namespace jsonschema {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), root_);
         }
 
-        validator_pointer make_required_validator(const std::vector<schema_location>& uris,
+        validator_pointer make_required_validator(const std::vector<json_location>& uris,
                                                   const std::vector<std::string>& r) override
         {
             auto sch_orig = jsoncons::make_unique<required_validator<Json>>(uris, r);
@@ -176,7 +176,7 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_null_validator(const std::vector<schema_location>& uris) override
+        validator_pointer make_null_validator(const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<null_validator<Json>>(uris);
             auto sch = sch_orig.get();
@@ -184,7 +184,7 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_true_validator(const std::vector<schema_location>& uris) override
+        validator_pointer make_true_validator(const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<true_validator<Json>>(uris);
             auto sch = sch_orig.get();
@@ -192,7 +192,7 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_false_validator(const std::vector<schema_location>& uris) override
+        validator_pointer make_false_validator(const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<false_validator<Json>>(uris);
             auto sch = sch_orig.get();
@@ -201,7 +201,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_object_validator(const Json& schema,
-                                                const std::vector<schema_location>& uris) override
+                                                const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<object_validator<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -210,7 +210,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_array_validator(const Json& schema,
-                                               const std::vector<schema_location>& uris) override
+                                               const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<array_validator<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -219,7 +219,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_string_validator(const Json& schema,
-                                                const std::vector<schema_location>& uris) override
+                                                const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<string_validator<Json>>(schema, uris);
             auto sch = sch_orig.get();
@@ -227,7 +227,7 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_boolean_validator(const std::vector<schema_location>& uris) override
+        validator_pointer make_boolean_validator(const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<boolean_validator<Json>>(uris);
             auto sch = sch_orig.get();
@@ -236,17 +236,17 @@ namespace jsonschema {
         }
 
         validator_pointer make_integer_validator(const Json& schema, 
-                                                 const std::vector<schema_location>& uris, 
+                                                 const std::vector<json_location>& uris, 
                                                  std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<integer_keyword<Json>>(schema, uris, keywords);
+            auto sch_orig = jsoncons::make_unique<integer_validator<Json>>(schema, uris, keywords);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
         validator_pointer make_number_validator(const Json& schema, 
-                                                const std::vector<schema_location>& uris, 
+                                                const std::vector<json_location>& uris, 
                                                 std::set<std::string>& keywords) override
         {
             auto sch_orig = jsoncons::make_unique<number_validator<Json>>(schema, uris, keywords);
@@ -256,7 +256,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_not_validator(const Json& schema,
-                                             const std::vector<schema_location>& uris) override
+                                             const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<not_validator<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -265,7 +265,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_all_of_validator(const Json& schema,
-                                                const std::vector<schema_location>& uris) override
+                                                const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -274,7 +274,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_any_of_validator(const Json& schema,
-                                                const std::vector<schema_location>& uris) override
+                                                const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -283,7 +283,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_one_of_validator(const Json& schema,
-                                                const std::vector<schema_location>& uris) override
+                                                const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -292,7 +292,7 @@ namespace jsonschema {
         }
 
         validator_pointer make_type_validator(const Json& schema,
-                                              const std::vector<schema_location>& uris) override
+                                              const std::vector<json_location>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<type_keyword<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
@@ -301,10 +301,10 @@ namespace jsonschema {
         }
 
         validator_pointer make_keyword_validator(const Json& schema,
-                                                 const std::vector<schema_location>& uris,
+                                                 const std::vector<json_location>& uris,
                                                  const std::vector<std::string>& keys) override
         {
-            std::vector<schema_location> new_uris = update_uris(schema, uris, keys);
+            std::vector<json_location> new_uris = update_uris(schema, uris, keys);
 
             validator_pointer sch = nullptr;
 
@@ -332,8 +332,8 @@ namespace jsonschema {
                     it = schema.find("$ref");
                     if (it != schema.object_range().end()) // this schema is a reference
                     { 
-                        schema_location relative(it->value().template as<std::string>()); 
-                        schema_location id = relative.resolve(new_uris.back());
+                        json_location relative(it->value().template as<std::string>()); 
+                        json_location id = relative.resolve(new_uris.back());
                         sch = get_or_create_reference(id);
                     } 
                     else 
@@ -427,7 +427,7 @@ namespace jsonschema {
 
     private:
 
-        void insert(const schema_location& uri, validator_pointer s)
+        void insert(const json_location& uri, validator_pointer s)
         {
             auto& file = get_or_create_file(std::string(uri.base()));
             auto schemas_it = file.schemas.lower_bound(std::string(uri.fragment()));
@@ -449,13 +449,13 @@ namespace jsonschema {
             }
         }
 
-        void insert_unknown_keyword(const schema_location& uri, 
+        void insert_unknown_keyword(const json_location& uri, 
                                     const std::string& key, 
                                     const Json& value)
         {
             auto &file = get_or_create_file(std::string(uri.base()));
             auto new_u = uri.append(key);
-            schema_location new_uri(new_u);
+            json_location new_uri(new_u);
 
             if (new_uri.has_json_pointer()) 
             {
@@ -476,7 +476,7 @@ namespace jsonschema {
             }
         }
 
-        validator_pointer get_or_create_reference(const schema_location& uri)
+        validator_pointer get_or_create_reference(const json_location& uri)
         {
             auto &file = get_or_create_file(std::string(uri.base()));
 
