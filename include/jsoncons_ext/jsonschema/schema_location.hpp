@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_JSON_LOCATION_HPP
-#define JSONCONS_JSONSCHEMA_JSON_LOCATION_HPP
+#ifndef JSONCONS_JSONSCHEMA_SCHEMA_LOCATION_HPP
+#define JSONCONS_JSONSCHEMA_SCHEMA_LOCATION_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,16 +16,16 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class json_location
+    class schema_location
     {
         jsoncons::uri uri_;
         std::string identifier_;
     public:
-        json_location()
+        schema_location()
         {
         }
 
-        json_location(const std::string& uri)
+        schema_location(const std::string& uri)
         {
             auto pos = uri.find('#');
             if (pos != std::string::npos)
@@ -81,15 +81,15 @@ namespace jsonschema {
             return identifier_;
         }
 
-        json_location resolve(const json_location& uri) const
+        schema_location resolve(const schema_location& uri) const
         {
-            json_location new_uri;
+            schema_location new_uri;
             new_uri.identifier_ = identifier_;
             new_uri.uri_ = uri_.resolve(uri.uri_);
             return new_uri;
         }
 
-        int compare(const json_location& other) const
+        int compare(const schema_location& other) const
         {
             int result = uri_.compare(other.uri_);
             if (result != 0) 
@@ -99,7 +99,7 @@ namespace jsonschema {
             return result; 
         }
 
-        json_location append(const std::string& field) const
+        schema_location append(const std::string& field) const
         {
             if (has_identifier())
                 return *this;
@@ -115,14 +115,14 @@ namespace jsonschema {
                                   uri_.query(),
                                   pointer.to_string());
 
-            json_location wrapper;
+            schema_location wrapper;
             wrapper.uri_ = new_uri;
             wrapper.identifier_ = pointer.to_string();
 
             return wrapper;
         }
 
-        json_location append(std::size_t index) const
+        schema_location append(std::size_t index) const
         {
             if (has_identifier())
                 return *this;
@@ -138,7 +138,7 @@ namespace jsonschema {
                                   uri_.query(),
                                   pointer.to_string());
 
-            json_location wrapper;
+            schema_location wrapper;
             wrapper.uri_ = new_uri;
             wrapper.identifier_ = pointer.to_string();
 
@@ -151,32 +151,32 @@ namespace jsonschema {
             return s;
         }
 
-        friend bool operator==(const json_location& lhs, const json_location& rhs)
+        friend bool operator==(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) == 0;
         }
 
-        friend bool operator!=(const json_location& lhs, const json_location& rhs)
+        friend bool operator!=(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) != 0;
         }
 
-        friend bool operator<(const json_location& lhs, const json_location& rhs)
+        friend bool operator<(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) < 0;
         }
 
-        friend bool operator<=(const json_location& lhs, const json_location& rhs)
+        friend bool operator<=(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) <= 0;
         }
 
-        friend bool operator>(const json_location& lhs, const json_location& rhs)
+        friend bool operator>(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) > 0;
         }
 
-        friend bool operator>=(const json_location& lhs, const json_location& rhs)
+        friend bool operator>=(const schema_location& lhs, const schema_location& rhs)
         {
             return lhs.compare(rhs) >= 0;
         }

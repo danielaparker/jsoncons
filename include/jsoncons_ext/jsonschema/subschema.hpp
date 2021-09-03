@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/json_location.hpp>
+#include <jsoncons_ext/jsonschema/schema_location.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -75,7 +75,7 @@ namespace jsonschema {
         }
 
         void validate(const Json& instance, 
-                      const json_location& instance_location, 
+                      const schema_location& instance_location, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
@@ -85,25 +85,25 @@ namespace jsonschema {
                         patch);
         }
 
-        virtual jsoncons::optional<Json> get_default_value(const json_location&, const Json&, error_reporter&) const
+        virtual jsoncons::optional<Json> get_default_value(const schema_location&, const Json&, error_reporter&) const
         {
             return jsoncons::optional<Json>();
         }
 
     private:
         virtual void do_validate(const Json& instance, 
-                                 const json_location& instance_location, 
+                                 const schema_location& instance_location, 
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;
     };
 
     template <class Json>
-    std::vector<json_location> update_uris(const Json& schema,
-                                         const std::vector<json_location>& uris,
+    std::vector<schema_location> update_uris(const Json& schema,
+                                         const std::vector<schema_location>& uris,
                                          const std::vector<std::string>& keys)
     {
         // Exclude uri's that are not plain name identifiers
-        std::vector<json_location> new_uris;
+        std::vector<schema_location> new_uris;
         for (const auto& uri : uris)
         {
             if (!uri.has_identifier())
@@ -116,7 +116,7 @@ namespace jsonschema {
             for (auto& uri : new_uris)
             {
                 auto new_u = uri.append(key);
-                uri = json_location(new_u);
+                uri = schema_location(new_u);
             }
         }
         if (schema.type() == json_type::object_value)
@@ -128,8 +128,8 @@ namespace jsonschema {
                 // Add it to the list if it is not already there
                 if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
                 {
-                    json_location relative(id); 
-                    json_location new_uri = relative.resolve(new_uris.back());
+                    schema_location relative(id); 
+                    schema_location new_uri = relative.resolve(new_uris.back());
                     new_uris.emplace_back(new_uri.string()); 
                 }
             }
