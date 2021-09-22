@@ -430,8 +430,8 @@ namespace jsonschema {
         void insert(const schema_location& uri, validator_pointer s)
         {
             auto& file = get_or_create_file(std::string(uri.base()));
-            auto schemas_it = file.schemas.lower_bound(std::string(uri.fragment()));
-            if (schemas_it != file.schemas.end() && !(file.schemas.key_comp()(std::string(uri.fragment()), schemas_it->first))) 
+            auto schemas_it = file.schemas.find(std::string(uri.fragment()));
+            if (schemas_it != file.schemas.end()) 
             {
                 JSONCONS_THROW(schema_error("schema with " + uri.string() + " already inserted"));
                 return;
@@ -503,8 +503,8 @@ namespace jsonschema {
             }
 
             // get or create a reference_schema
-            auto ref = file.unresolved.lower_bound(std::string(uri.fragment()));
-            if (ref != file.unresolved.end() && !(file.unresolved.key_comp()(std::string(uri.fragment()), ref->first))) 
+            auto ref = file.unresolved.find(std::string(uri.fragment()));
+            if (ref != file.unresolved.end()) 
             {
                 return ref->second; // unresolved, use existing reference
             } 
@@ -522,8 +522,8 @@ namespace jsonschema {
 
         subschema_registry& get_or_create_file(const std::string& loc)
         {
-            auto file = subschema_registries_.lower_bound(loc);
-            if (file != subschema_registries_.end() && !(subschema_registries_.key_comp()(loc, file->first)))
+            auto file = subschema_registries_.find(loc);
+            if (file != subschema_registries_.end())
                 return file->second;
             else
                 return subschema_registries_.insert(file, {loc, {}})->second;
