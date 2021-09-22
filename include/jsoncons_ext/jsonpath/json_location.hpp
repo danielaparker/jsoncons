@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_NORMALIZED_PATH_HPP
-#define JSONCONS_JSONPATH_NORMALIZED_PATH_HPP
+#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
 
 #include <string>
 #include <vector>
@@ -20,43 +20,43 @@ namespace jsoncons {
 namespace jsonpath {
 
     template <class CharT>
-    class normalized_path; 
+    class json_location; 
 
-    enum class normalized_path_node_kind { root, index, name };
+    enum class json_location_node_kind { root, index, name };
 
     template <class CharT>
-    class normalized_path_node 
+    class json_location_node 
     {
-        friend class normalized_path<CharT>;
+        friend class json_location<CharT>;
     public:
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
 
-        const normalized_path_node* parent_;
-        normalized_path_node_kind node_kind_;
+        const json_location_node* parent_;
+        json_location_node_kind node_kind_;
         string_type name_;
         std::size_t index_;
     public:
-        normalized_path_node(char_type c)
-            : parent_(nullptr), node_kind_(normalized_path_node_kind::root), index_(0)
+        json_location_node(char_type c)
+            : parent_(nullptr), node_kind_(json_location_node_kind::root), index_(0)
         {
             name_.push_back(c);
         }
 
-        normalized_path_node(const normalized_path_node* parent, const string_type& name)
-            : parent_(parent), node_kind_(normalized_path_node_kind::name), name_(name), index_(0)
+        json_location_node(const json_location_node* parent, const string_type& name)
+            : parent_(parent), node_kind_(json_location_node_kind::name), name_(name), index_(0)
         {
         }
 
-        normalized_path_node(const normalized_path_node* parent, std::size_t index)
-            : parent_(parent), node_kind_(normalized_path_node_kind::index), index_(index)
+        json_location_node(const json_location_node* parent, std::size_t index)
+            : parent_(parent), node_kind_(json_location_node_kind::index), index_(index)
         {
         }
 
-        const normalized_path_node* parent() const { return parent_;}
+        const json_location_node* parent() const { return parent_;}
 
-        normalized_path_node_kind node_kind() const
+        json_location_node_kind node_kind() const
         {
             return node_kind_;
         }
@@ -71,7 +71,7 @@ namespace jsonpath {
             return index_;
         }
 
-        void swap(normalized_path_node& node)
+        void swap(json_location_node& node)
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
@@ -83,12 +83,12 @@ namespace jsonpath {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == normalized_path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
+            std::size_t h = node_kind_ == json_location_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
 
-        int compare_node(const normalized_path_node& other) const
+        int compare_node(const json_location_node& other) const
         {
             int diff = 0;
             if (node_kind_ != other.node_kind_)
@@ -99,13 +99,13 @@ namespace jsonpath {
             {
                 switch (node_kind_)
                 {
-                    case normalized_path_node_kind::root:
+                    case json_location_node_kind::root:
                         diff = name_.compare(other.name_);
                         break;
-                    case normalized_path_node_kind::index:
+                    case json_location_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
-                    case normalized_path_node_kind::name:
+                    case json_location_node_kind::name:
                         diff = name_.compare(other.name_);
                         break;
                 }
@@ -117,7 +117,7 @@ namespace jsonpath {
     namespace detail {
 
         template <class Iterator>
-        class normalized_path_iterator
+        class json_location_iterator
         { 
             Iterator it_; 
 
@@ -129,22 +129,22 @@ namespace jsonpath {
             using pointer = const value_type*;
             using reference = const value_type&;
 
-            normalized_path_iterator() : it_()
+            json_location_iterator() : it_()
             { 
             }
 
-            explicit normalized_path_iterator(Iterator ptr) : it_(ptr)
+            explicit json_location_iterator(Iterator ptr) : it_(ptr)
             {
             }
 
-            normalized_path_iterator(const normalized_path_iterator&) = default;
-            normalized_path_iterator(normalized_path_iterator&&) = default;
-            normalized_path_iterator& operator=(const normalized_path_iterator&) = default;
-            normalized_path_iterator& operator=(normalized_path_iterator&&) = default;
+            json_location_iterator(const json_location_iterator&) = default;
+            json_location_iterator(json_location_iterator&&) = default;
+            json_location_iterator& operator=(const json_location_iterator&) = default;
+            json_location_iterator& operator=(json_location_iterator&&) = default;
 
             template <class Iter,
                       class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
-            normalized_path_iterator(const normalized_path_iterator<Iter>& other)
+            json_location_iterator(const json_location_iterator<Iter>& other)
                 : it_(other.it_)
             {
             }
@@ -164,56 +164,56 @@ namespace jsonpath {
                 return (*it_);
             }
 
-            normalized_path_iterator& operator++() 
+            json_location_iterator& operator++() 
             {
                 ++it_;
                 return *this;
             }
 
-            normalized_path_iterator operator++(int) 
+            json_location_iterator operator++(int) 
             {
-                normalized_path_iterator temp = *this;
+                json_location_iterator temp = *this;
                 ++*this;
                 return temp;
             }
 
-            normalized_path_iterator& operator--() 
+            json_location_iterator& operator--() 
             {
                 --it_;
                 return *this;
             }
 
-            normalized_path_iterator operator--(int) 
+            json_location_iterator operator--(int) 
             {
-                normalized_path_iterator temp = *this;
+                json_location_iterator temp = *this;
                 --*this;
                 return temp;
             }
 
-            normalized_path_iterator& operator+=(const difference_type offset) 
+            json_location_iterator& operator+=(const difference_type offset) 
             {
                 it_ += offset;
                 return *this;
             }
 
-            normalized_path_iterator operator+(const difference_type offset) const 
+            json_location_iterator operator+(const difference_type offset) const 
             {
-                normalized_path_iterator temp = *this;
+                json_location_iterator temp = *this;
                 return temp += offset;
             }
 
-            normalized_path_iterator& operator-=(const difference_type offset) 
+            json_location_iterator& operator-=(const difference_type offset) 
             {
                 return *this += -offset;
             }
 
-            normalized_path_iterator operator-(const difference_type offset) const 
+            json_location_iterator operator-(const difference_type offset) const 
             {
-                normalized_path_iterator temp = *this;
+                json_location_iterator temp = *this;
                 return temp -= offset;
             }
 
-            difference_type operator-(const normalized_path_iterator& rhs) const noexcept
+            difference_type operator-(const json_location_iterator& rhs) const noexcept
             {
                 return it_ - rhs.it_;
             }
@@ -223,39 +223,39 @@ namespace jsonpath {
                 return *(*(*this + offset));
             }
 
-            bool operator==(const normalized_path_iterator& rhs) const noexcept
+            bool operator==(const json_location_iterator& rhs) const noexcept
             {
                 return it_ == rhs.it_;
             }
 
-            bool operator!=(const normalized_path_iterator& rhs) const noexcept
+            bool operator!=(const json_location_iterator& rhs) const noexcept
             {
                 return !(*this == rhs);
             }
 
-            bool operator<(const normalized_path_iterator& rhs) const noexcept
+            bool operator<(const json_location_iterator& rhs) const noexcept
             {
                 return it_ < rhs.it_;
             }
 
-            bool operator>(const normalized_path_iterator& rhs) const noexcept
+            bool operator>(const json_location_iterator& rhs) const noexcept
             {
                 return rhs < *this;
             }
 
-            bool operator<=(const normalized_path_iterator& rhs) const noexcept
+            bool operator<=(const json_location_iterator& rhs) const noexcept
             {
                 return !(rhs < *this);
             }
 
-            bool operator>=(const normalized_path_iterator& rhs) const noexcept
+            bool operator>=(const json_location_iterator& rhs) const noexcept
             {
                 return !(*this < rhs);
             }
 
             inline 
-            friend normalized_path_iterator<Iterator> operator+(
-                difference_type offset, normalized_path_iterator<Iterator> next) 
+            friend json_location_iterator<Iterator> operator+(
+                difference_type offset, json_location_iterator<Iterator> next) 
             {
                 return next += offset;
             }
@@ -264,21 +264,21 @@ namespace jsonpath {
     } // namespace detail
 
     template <class CharT>
-    class normalized_path
+    class json_location
     {
     public:
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
-        using normalized_path_node_type = normalized_path_node<CharT>;
+        using json_location_node_type = json_location_node<CharT>;
     private:
-        std::vector<const normalized_path_node_type*> nodes_;
+        std::vector<const json_location_node_type*> nodes_;
     public:
-        using iterator = typename detail::normalized_path_iterator<typename std::vector<const normalized_path_node_type*>::iterator>;
-        using const_iterator = typename detail::normalized_path_iterator<typename std::vector<const normalized_path_node_type*>::const_iterator>;
+        using iterator = typename detail::json_location_iterator<typename std::vector<const json_location_node_type*>::iterator>;
+        using const_iterator = typename detail::json_location_iterator<typename std::vector<const json_location_node_type*>::const_iterator>;
 
-        normalized_path(const normalized_path_node_type& node)
+        json_location(const json_location_node_type& node)
         {
-            const normalized_path_node_type* p = std::addressof(node);
+            const json_location_node_type* p = std::addressof(node);
             do
             {
                 nodes_.push_back(p);
@@ -309,7 +309,7 @@ namespace jsonpath {
             return const_iterator(nodes_.end());
         }
 
-        const normalized_path_node_type& last() const
+        const json_location_node_type& last() const
         {
             return *nodes_.back();
         }
@@ -322,10 +322,10 @@ namespace jsonpath {
             {
                 switch (node->node_kind())
                 {
-                    case normalized_path_node_kind::root:
+                    case json_location_node_kind::root:
                         buffer.append(node->name());
                         break;
-                    case normalized_path_node_kind::name:
+                    case json_location_node_kind::name:
                         buffer.push_back('[');
                         buffer.push_back('\'');
                         for (auto c : node->name())
@@ -343,7 +343,7 @@ namespace jsonpath {
                         buffer.push_back('\'');
                         buffer.push_back(']');
                         break;
-                    case normalized_path_node_kind::index:
+                    case json_location_node_kind::index:
                         buffer.push_back('[');
                         jsoncons::detail::from_integer(node->index(), buffer);
                         buffer.push_back(']');
@@ -354,7 +354,7 @@ namespace jsonpath {
             return buffer;
         }
 
-        int compare(const normalized_path& other) const
+        int compare(const json_location& other) const
         {
             if (this == &other)
             {
@@ -392,43 +392,43 @@ namespace jsonpath {
             return hash;
         }
 
-        friend bool operator==(const normalized_path& lhs, const normalized_path& rhs) 
+        friend bool operator==(const json_location& lhs, const json_location& rhs) 
         {
             return lhs.compare(rhs) == 0;
         }
 
-        friend bool operator!=(const normalized_path& lhs, const normalized_path& rhs)
+        friend bool operator!=(const json_location& lhs, const json_location& rhs)
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator<(const normalized_path& lhs, const normalized_path& rhs) 
+        friend bool operator<(const json_location& lhs, const json_location& rhs) 
         {
             return lhs.compare(rhs) < 0;
         }
     };
 
     template <class Json>
-    Json* select(Json& root, const normalized_path<typename Json::char_type>& path)
+    Json* select(Json& root, const json_location<typename Json::char_type>& path)
     {
         Json* current = std::addressof(root);
-        for (const auto& normalized_path_node : path)
+        for (const auto& json_location_node : path)
         {
-            if (normalized_path_node.node_kind() == normalized_path_node_kind::index)
+            if (json_location_node.node_kind() == json_location_node_kind::index)
             {
-                if (current->type() != json_type::array_value || normalized_path_node.index() >= current->size())
+                if (current->type() != json_type::array_value || json_location_node.index() >= current->size())
                 {
                     return nullptr; 
                 }
-                current = std::addressof(current->at(normalized_path_node.index()));
+                current = std::addressof(current->at(json_location_node.index()));
             }
-            else if (normalized_path_node.node_kind() == normalized_path_node_kind::name)
+            else if (json_location_node.node_kind() == json_location_node_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
                     return nullptr;
                 }
-                auto it = current->find(normalized_path_node.name());
+                auto it = current->find(json_location_node.name());
                 if (it == current->object_range().end())
                 {
                     return nullptr;

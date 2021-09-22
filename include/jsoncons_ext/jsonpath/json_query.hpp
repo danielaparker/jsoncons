@@ -46,14 +46,14 @@ namespace jsonpath {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using normalized_path_type = typename evaluator_t::normalized_path_type;
+        using json_location_type = typename evaluator_t::json_location_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
         evaluator_t e;
         json_selector_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto callback = [&new_value](const normalized_path_type&, reference v)
+        auto callback = [&new_value](const json_location_type&, reference v)
         {
             v = std::forward<T>(new_value);
         };
@@ -69,14 +69,14 @@ namespace jsonpath {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using normalized_path_type = typename evaluator_t::normalized_path_type;
+        using json_location_type = typename evaluator_t::json_location_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources;
         evaluator_t e;
         json_selector_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto f = [callback](const normalized_path_type&, reference v)
+        auto f = [callback](const json_location_type&, reference v)
         {
             v = callback(v);
         };
@@ -94,7 +94,7 @@ namespace jsonpath {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using normalized_path_type = typename evaluator_t::normalized_path_type;
+        using json_location_type = typename evaluator_t::json_location_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
         evaluator_t e;
@@ -102,7 +102,7 @@ namespace jsonpath {
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
-        auto f = [&callback](const normalized_path_type& path, reference val)
+        auto f = [&callback](const json_location_type& path, reference val)
         {
             callback(path.to_string(), val);
         };

@@ -112,8 +112,8 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using normalized_path_type = normalized_path<char_type>;
-        using normalized_path_node_type = normalized_path_node<char_type>;
+        using json_location_type = json_location<char_type>;
+        using json_location_node_type = json_location_node<char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
     private:
@@ -2496,7 +2496,7 @@ namespace detail {
         using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_value_pair_type = typename evaluator_t::path_value_pair_type;
-        using normalized_path_type = typename evaluator_t::normalized_path_type;
+        using json_location_type = typename evaluator_t::json_location_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources_;
@@ -2521,7 +2521,7 @@ namespace detail {
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options())
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-            auto f = [&callback](const normalized_path_type& path, reference val)
+            auto f = [&callback](const json_location_type& path, reference val)
             {
                 callback(path.to_string(), val);
             };
@@ -2535,7 +2535,7 @@ namespace detail {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
                 Json result(json_array_arg);
-                auto callback = [&result](const normalized_path_type& p, reference)
+                auto callback = [&result](const json_location_type& p, reference)
                 {
                     result.emplace_back(p.to_string());
                 };
