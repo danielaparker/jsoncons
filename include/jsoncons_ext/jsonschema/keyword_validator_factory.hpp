@@ -457,7 +457,7 @@ namespace jsonschema {
             auto new_u = uri.append(key);
             schema_location new_uri(new_u);
 
-            if (new_uri.has_json_pointer()) 
+            if (new_uri.has_fragment() && !new_uri.has_identifier()) 
             {
                 auto fragment = std::string(new_uri.fragment());
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
@@ -489,7 +489,7 @@ namespace jsonschema {
             //
             // an unknown keyword can only be referenced by a JSONPointer,
             // not by a plain name identifier
-            if (uri.has_json_pointer()) 
+            if (uri.has_fragment() && !uri.has_identifier()) 
             {
                 std::string fragment = std::string(uri.fragment());
                 auto unprocessed_keywords_it = file.unprocessed_keywords.find(fragment);

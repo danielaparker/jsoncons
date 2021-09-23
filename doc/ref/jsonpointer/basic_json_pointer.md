@@ -29,15 +29,21 @@ iterator    | An alias to `const_iterator`
 
 #### Constructors
 
-    basic_json_pointer();
+    basic_json_pointer();                                      (1)
 
-    explicit basic_json_pointer(const string_view_type& str);
+    explicit basic_json_pointer(const string_view_type& str);  
 
-    explicit basic_json_pointer(const string_view_type& str, std::error_code& ec);
+    explicit basic_json_pointer(const string_view_type& str, 
+                                std::error_code& ec);          (2)
 
-    basic_json_pointer(const basic_json_pointer&);
+    basic_json_pointer(const basic_json_pointer&);             (3)
 
-    basic_json_pointer(basic_json_pointer&&) noexcept;
+    basic_json_pointer(basic_json_pointer&&) noexcept;         (4)
+
+(1) Constructs an empty `basic_json_pointer`.
+
+(2) Constructs a `basic_json_pointer` from a string representation or a 
+URI fragment identifier (starts with `#`).
 
 #### operator=
 
@@ -70,7 +76,11 @@ Iterator access to the tokens in the pointer.
 Checks if the pointer is empty
 
    string_type to_string() const
-Gets a string representation of the JSON Pointer, escaping any `/` or `~` characters..
+Returns a JSON Pointer represented as a string value, escaping any `/` or `~` characters.
+
+   string_type to_uri_fragment() const
+Returns a string representing the JSON Pointer as a URI fragment identifier, 
+escaping any `/` or `~` characters.
 
 #### Non-member functions
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);

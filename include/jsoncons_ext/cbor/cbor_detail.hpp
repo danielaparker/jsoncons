@@ -26,11 +26,17 @@
 
 namespace jsoncons { namespace cbor { namespace detail {
 
-const uint8_t cbor_array_tags_010_mask = 0b11100000;
-const uint8_t cbor_array_tags_f_mask = 0b00010000;
-const uint8_t cbor_array_tags_s_mask = 0b00001000;
-const uint8_t cbor_array_tags_e_mask = 0b00000100;
-const uint8_t cbor_array_tags_ll_mask = 0b00000011;
+//const uint8_t cbor_array_tags_010_mask = 0b11100000;
+//const uint8_t cbor_array_tags_f_mask = 0b00010000;
+//const uint8_t cbor_array_tags_s_mask = 0b00001000;
+//const uint8_t cbor_array_tags_e_mask = 0b00000100;
+//const uint8_t cbor_array_tags_ll_mask = 0b00000011;
+
+const uint8_t cbor_array_tags_010_mask = 0xE0;
+const uint8_t cbor_array_tags_f_mask = 0x10;
+const uint8_t cbor_array_tags_s_mask = 0x08;
+const uint8_t cbor_array_tags_e_mask = 0x04;
+const uint8_t cbor_array_tags_ll_mask = 0x03;
 
 const uint8_t cbor_array_tags_010_shift = 5;
 const uint8_t cbor_array_tags_f_shift = 4;

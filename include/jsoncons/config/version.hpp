@@ -10,8 +10,8 @@
 #include <iostream>
     
 #define JSONCONS_VERSION_MAJOR 0
-#define JSONCONS_VERSION_MINOR 167
-#define JSONCONS_VERSION_PATCH 1
+#define JSONCONS_VERSION_MINOR 168
+#define JSONCONS_VERSION_PATCH 0
 
 namespace jsoncons {
 

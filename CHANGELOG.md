@@ -1,3 +1,19 @@
+0.168.0
+-------
+
+Bugs fixed:
+
+- Fixed [issue \#335](https://github.com/danielaparker/jsoncons/issues/335).
+The 0b... notation used in a cbor header file has been replaced with 0x... notation.
+The 0b... notation used is only standard compliant with C++14 and later, although
+supported in some C++ 11 compilers. 
+
+Enhancements to jsonpointer extension:
+
+- Support construction of a `json_pointer` from a URI fragment representation of a JSON Pointer.
+ 
+- Support stringifying a `json_pointer` to a URI fragment representation with the `to_uri_fragment` function. 
+
 0.167.1
 -------
 

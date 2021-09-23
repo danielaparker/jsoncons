@@ -41,9 +41,9 @@ namespace jsonschema {
             return uri_;
         }
 
-        bool has_json_pointer() const
+        bool has_fragment() const
         {
-            return !identifier_.empty() && identifier_.front() == '/';
+            return !identifier_.empty();
         }
 
         bool has_identifier() const
@@ -64,11 +64,6 @@ namespace jsonschema {
         bool is_absolute() const
         {
             return uri_.is_absolute();
-        }
-
-        std::string pointer() const
-        {
-            return identifier_;
         }
 
         std::string identifier() const
