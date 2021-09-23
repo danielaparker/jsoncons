@@ -131,7 +131,8 @@ TEST_CASE("n_objects_test")
     json_decoder<ojson> decoder;
     csv::csv_options options;
 
-    options.mapping(csv::csv_mapping_kind::n_rows);
+    options.assume_header(true)
+            .mapping(csv::csv_mapping_kind::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
@@ -1558,3 +1559,23 @@ TEST_CASE("infinite loop")
         CHECK(ec == csv::csv_errc::unexpected_char_between_fields); //-V521
     }
 }
+
+TEST_CASE("csv_parser number detection")
+{
+    std::string data = R"(Number
+5001173100,
+5E10,
+5001173100E95978
+)";
+
+    jsoncons::csv::csv_options options;
+    options.assume_header(true)
+           .field_delimiter(',');
+
+    const auto csv = jsoncons::csv::decode_csv<jsoncons::json>(data, options);
+
+    CHECK(csv[0].at("Number").as<int64_t>() == 5001173100);
+    CHECK(csv[1].at("Number").as<double>() == 5E10);
+    CHECK(csv[2].at("Number").as<double>() == std::numeric_limits<double>::infinity()); // infinite
+}
+

@@ -1764,7 +1764,7 @@ private:
         fraction,
         exp1,
         exp,
-        done
+        not_a_number
     };
 
     /*
@@ -1780,7 +1780,7 @@ private:
         auto last = buffer_.end();
 
         std::string buffer;
-        for (auto p = buffer_.begin(); state != numeric_check_state::done && p != last; ++p)
+        for (auto p = buffer_.begin(); state != numeric_check_state::not_a_number && p != last; ++p)
         {
             switch (state)
             {
@@ -1795,7 +1795,7 @@ private:
                         }
                         else
                         {
-                            state = numeric_check_state::done;
+                            state = numeric_check_state::not_a_number;
                         }
                         break;
                     case 't':case 'T':
@@ -1805,7 +1805,7 @@ private:
                         }
                         else
                         {
-                            state = numeric_check_state::done;
+                            state = numeric_check_state::not_a_number;
                         }
                         break;
                     case 'f':case 'F':
@@ -1815,7 +1815,7 @@ private:
                         }
                         else
                         {
-                            state = numeric_check_state::done;
+                            state = numeric_check_state::not_a_number;
                         }
                         break;
                     case '-':
@@ -1834,7 +1834,7 @@ private:
                         state = numeric_check_state::integer;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1852,7 +1852,7 @@ private:
                         state = numeric_check_state::exp1;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1874,7 +1874,7 @@ private:
                         state = numeric_check_state::exp1;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1894,7 +1894,7 @@ private:
                         state = numeric_check_state::integer;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1910,7 +1910,7 @@ private:
                         state = numeric_check_state::fraction;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1929,7 +1929,7 @@ private:
                         state = numeric_check_state::exp1;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1940,17 +1940,15 @@ private:
                     {
                     case '-':
                         buffer.push_back(*p);
-                        state = numeric_check_state::exp;
                         break;
                     case '+':
-                        state = numeric_check_state::exp;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        state = numeric_check_state::exp;
                         buffer.push_back(*p);
-                        state = numeric_check_state::integer;
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
@@ -1963,7 +1961,7 @@ private:
                         buffer.push_back(*p);
                         break;
                     default:
-                        state = numeric_check_state::done;
+                        state = numeric_check_state::not_a_number;
                         break;
                     }
                     break;
