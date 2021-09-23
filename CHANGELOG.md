@@ -8,6 +8,9 @@ The 0b... notation used in a cbor header file has been replaced with 0x... notat
 The 0b... notation used is only standard compliant with C++14 and later, although
 supported in some C++ 11 compilers. 
 
+- Fixed issue with csv automatic number detection discovered while investigating
+[issue \#333](https://github.com/danielaparker/jsoncons/issues/333).
+
 Enhancements to jsonpointer extension:
 
 - Support construction of a `json_pointer` from a URI fragment representation of a JSON Pointer.
