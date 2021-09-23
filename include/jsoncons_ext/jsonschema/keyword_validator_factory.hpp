@@ -54,7 +54,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.to_string(), 
+                                                 instance_location.to_uri_fragment(), 
                                                  "Unresolved schema reference " + this->absolute_keyword_location()));
                 return;
             }
@@ -70,7 +70,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.to_string(), 
+                                                 instance_location.to_uri_fragment(), 
                                                  "Unresolved schema reference " + this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }

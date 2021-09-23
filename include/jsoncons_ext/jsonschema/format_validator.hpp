@@ -846,7 +846,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("date", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a RFC 3339 date string"));
         }
     }
@@ -861,7 +861,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("time", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a RFC 3339 time string"));
         }
     }
@@ -876,7 +876,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("date-time",  
                                              absolute_keyword_location,
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a RFC 3339 date-time string"));
         }
     }
@@ -891,7 +891,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("email", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
         }
     } 
@@ -906,7 +906,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("hostname", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
         }
     } 
@@ -921,7 +921,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("ipv4", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
         }
     } 
@@ -936,7 +936,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("ipv6", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
         }
     } 
@@ -956,7 +956,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("pattern", 
                                              absolute_keyword_location, 
-                                             instance_location.to_string(), 
+                                             instance_location.to_uri_fragment(), 
                                              "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
         }
 #endif
