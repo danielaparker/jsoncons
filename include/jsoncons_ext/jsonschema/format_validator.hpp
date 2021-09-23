@@ -832,13 +832,13 @@ namespace jsonschema {
 
     // format checkers
     using format_checker = std::function<void(const std::string& absolute_keyword_location,
-                                              const schema_location& instance_location, 
+                                              const jsonpointer::json_pointer& instance_location, 
                                               const std::string&, 
                                               error_reporter& reporter)>;
 
     inline
     void rfc3339_date_check(const std::string& absolute_keyword_location,
-                            const schema_location& instance_location, 
+                            const jsonpointer::json_pointer& instance_location, 
                             const std::string& value,
                             error_reporter& reporter)
     {
@@ -846,14 +846,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("date", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a RFC 3339 date string"));
         }
     }
 
     inline
     void rfc3339_time_check(const std::string& absolute_keyword_location,
-                            const schema_location& instance_location, 
+                            const jsonpointer::json_pointer& instance_location, 
                             const std::string &value,
                             error_reporter& reporter)
     {
@@ -861,14 +861,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("time", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a RFC 3339 time string"));
         }
     }
 
     inline
     void rfc3339_date_time_check(const std::string& absolute_keyword_location,
-                                 const schema_location& instance_location, 
+                                 const jsonpointer::json_pointer& instance_location, 
                                  const std::string &value,
                                  error_reporter& reporter)
     {
@@ -876,14 +876,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("date-time",  
                                              absolute_keyword_location,
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a RFC 3339 date-time string"));
         }
     }
 
     inline
     void email_check(const std::string& absolute_keyword_location,
-                     const schema_location& instance_location, 
+                     const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
     {
@@ -891,14 +891,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("email", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
         }
     } 
 
     inline
     void hostname_check(const std::string& absolute_keyword_location,
-                        const schema_location& instance_location, 
+                        const jsonpointer::json_pointer& instance_location, 
                         const std::string& value,
                         error_reporter& reporter) 
     {
@@ -906,14 +906,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("hostname", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
         }
     } 
 
     inline
     void ipv4_check(const std::string& absolute_keyword_location,
-                    const schema_location& instance_location, 
+                    const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
     {
@@ -921,14 +921,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("ipv4", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
         }
     } 
 
     inline
     void ipv6_check(const std::string& absolute_keyword_location,
-                    const schema_location& instance_location, 
+                    const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
     {
@@ -936,14 +936,14 @@ namespace jsonschema {
         {
             reporter.error(validation_output("ipv6", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
         }
     } 
 
     inline
     void regex_check(const std::string& absolute_keyword_location,
-                     const schema_location& instance_location, 
+                     const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
     {
@@ -956,7 +956,7 @@ namespace jsonschema {
         {
             reporter.error(validation_output("pattern", 
                                              absolute_keyword_location, 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
         }
 #endif

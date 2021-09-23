@@ -224,7 +224,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter,
                          Json&) const override
         {
@@ -239,7 +239,7 @@ namespace jsonschema {
                     {
                         reporter.error(validation_output("contentEncoding", 
                                                          content_encoding_location_, 
-                                                         instance_location.string(), 
+                                                         instance_location.to_string(), 
                                                          "Content is not a base64 string"));
                         if (reporter.fail_early())
                         {
@@ -251,7 +251,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("contentEncoding", 
                                                      content_encoding_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      "unable to check for contentEncoding '" + *content_encoding_ + "'"));
                     if (reporter.fail_early())
                     {
@@ -276,7 +276,7 @@ namespace jsonschema {
                     {
                         reporter.error(validation_output("contentMediaType", 
                                                          content_media_type_location_, 
-                                                         instance_location.string(), 
+                                                         instance_location.to_string(), 
                                                          std::string("Content is not JSON: ") + ec.message()));
                     }
                 }
@@ -285,7 +285,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("contentMediaType", 
                                                  content_media_type_location_, 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Expected string, but is byte string"));
                 if (reporter.fail_early())
                 {
@@ -305,7 +305,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("minLength", 
                                                      min_length_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      std::string("Expected minLength: ") + std::to_string(*min_length_)
                                               + ", actual: " + std::to_string(length)));
                     if (reporter.fail_early())
@@ -322,7 +322,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("maxLength", 
                                                      max_length_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      std::string("Expected maxLength: ") + std::to_string(*max_length_)
                         + ", actual: " + std::to_string(length)));
                     if (reporter.fail_early())
@@ -344,7 +344,7 @@ namespace jsonschema {
                     message.append("\"");
                     reporter.error(validation_output("pattern", 
                                                      pattern_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      std::move(message)));
                     if (reporter.fail_early())
                     {
@@ -387,7 +387,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -398,12 +398,12 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("not", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Instance must not be valid against schema"));
             }
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location& instance_location, 
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -421,7 +421,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location& instance_location, 
+                                const jsonpointer::json_pointer& instance_location, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter& local_reporter, 
                                 std::size_t)
@@ -429,7 +429,7 @@ namespace jsonschema {
             if (!local_reporter.errors.empty())
                 reporter.error(validation_output("allOf", 
                                                  "",
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "At least one keyword_validator failed to match, but all are required to match. ", 
                                                  local_reporter.errors));
             return !local_reporter.errors.empty();
@@ -446,7 +446,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location&, 
+                                const jsonpointer::json_pointer&, 
                                 error_reporter&, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -465,7 +465,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const schema_location& instance_location, 
+                                const jsonpointer::json_pointer& instance_location, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -476,7 +476,7 @@ namespace jsonschema {
                 message.append(" subschemas matched, but exactly one is required to match");
                 reporter.error(validation_output("oneOf", 
                                                  "", 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  std::move(message)));
             }
             return count > 1;
@@ -508,7 +508,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -530,7 +530,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("combined", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "No keyword_validator matched, but one of them is required to match", 
                                                  local_reporter.errors));
             }
@@ -614,7 +614,7 @@ namespace jsonschema {
     protected:
 
         void apply_kewords(T value,
-                           const schema_location& instance_location, 
+                           const jsonpointer::json_pointer& instance_location, 
                            const Json& instance, 
                            error_reporter& reporter) const 
         {
@@ -624,7 +624,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("multipleOf", 
                                                      absolute_multiple_of_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_)));
                     if (reporter.fail_early())
                     {
@@ -639,7 +639,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("maximum", 
                                                      absolute_maximum_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_)));
                     if (reporter.fail_early())
                     {
@@ -654,7 +654,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("minimum", 
                                                      absolute_minimum_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_)));
                     if (reporter.fail_early())
                     {
@@ -669,7 +669,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("exclusiveMaximum", 
                                                      absolute_exclusive_maximum_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_)));
                     if (reporter.fail_early())
                     {
@@ -684,7 +684,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("exclusiveMinimum", 
                                                      absolute_exclusive_minimum_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_)));
                     if (reporter.fail_early())
                     {
@@ -714,7 +714,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -722,7 +722,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("integer", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Instance is not an integer"));
                 if (reporter.fail_early())
                 {
@@ -746,7 +746,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json&) const 
         {
@@ -754,7 +754,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("number", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Instance is not a number"));
                 if (reporter.fail_early())
                 {
@@ -778,7 +778,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override
         {
@@ -786,7 +786,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("null", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Expected to be null"));
             }
         }
@@ -802,7 +802,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location&, 
+                         const jsonpointer::json_pointer&, 
                          error_reporter&, 
                          Json&) const override
         {
@@ -820,7 +820,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location&, 
+                         const jsonpointer::json_pointer&, 
                          error_reporter&, 
                          Json&) const override
         {
@@ -837,13 +837,13 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json&, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override
         {
             reporter.error(validation_output("false", 
                                              this->absolute_keyword_location(), 
-                                             instance_location.string(), 
+                                             instance_location.to_string(), 
                                              "False schema always fails"));
         }
     };
@@ -869,7 +869,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json&) const override final
         {
@@ -879,7 +879,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("required", 
                                                      this->absolute_keyword_location(), 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      "Required property \"" + key + "\" not found"));
                     if (reporter.fail_early())
                     {
@@ -1004,7 +1004,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1014,7 +1014,7 @@ namespace jsonschema {
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output("maxProperties", 
                                                  absolute_max_properties_location_, 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  std::move(message)));
                 if (reporter.fail_early())
                 {
@@ -1028,7 +1028,7 @@ namespace jsonschema {
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output("minProperties", 
                                                  absolute_min_properties_location_, 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  std::move(message)));
                 if (reporter.fail_early())
                 {
@@ -1051,7 +1051,9 @@ namespace jsonschema {
                 if (properties_it != properties_.end()) 
                 {
                     a_prop_or_pattern_matched = true;
-                    properties_it->second->validate(property.value(), instance_location.append(property.key()), reporter, patch);
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= property.key();
+                    properties_it->second->validate(property.value(), pointer, reporter, patch);
                 }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1061,7 +1063,9 @@ namespace jsonschema {
                     if (std::regex_search(property.key(), schema_pp.first)) 
                     {
                         a_prop_or_pattern_matched = true;
-                        schema_pp.second->validate(property.value(), instance_location.append(property.key()), reporter, patch);
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= property.key();
+                        schema_pp.second->validate(property.value(), pointer, reporter, patch);
                     }
     #endif
 
@@ -1069,12 +1073,15 @@ namespace jsonschema {
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
                     collecting_error_reporter local_reporter;
-                    additional_properties_->validate(property.value(), instance_location.append(property.key()), local_reporter, patch);
+
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= property.key();
+                    additional_properties_->validate(property.value(), pointer, local_reporter, patch);
                     if (!local_reporter.errors.empty())
                     {
                         reporter.error(validation_output("additionalProperties", 
                                                          additional_properties_->absolute_keyword_location(), 
-                                                         instance_location.string(), 
+                                                         instance_location.to_string(), 
                                                          "Additional property \"" + property.key() + "\" found but was invalid."));
                         if (reporter.fail_early())
                         {
@@ -1095,7 +1102,10 @@ namespace jsonschema {
                     if (default_value) 
                     { 
                         // If default value is available, update patch
-                        update_patch(patch, instance_location.append(prop.first), std::move(*default_value));
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= prop.first;
+
+                        update_patch(patch, pointer, std::move(*default_value));
                     }
                 }
             }
@@ -1103,16 +1113,21 @@ namespace jsonschema {
             for (const auto& dep : dependencies_) 
             {
                 auto prop = instance.find(dep.first);
-                if (prop != instance.object_range().end()) // if dependency-property is present in instance
-                    dep.second->validate(instance, instance_location.append(dep.first), reporter, patch); // validate
+                if (prop != instance.object_range().end()) 
+                {
+                    // if dependency-property is present in instance
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= dep.first;
+                    dep.second->validate(instance, pointer, reporter, patch); // validate
+                }
             }
         }
 
-        void update_patch(Json& patch, const schema_location& instance_location, Json&& default_value) const
+        void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
         {
             Json j;
             j.try_emplace("op", "add"); 
-            j.try_emplace("path", instance_location.pointer()); 
+            j.try_emplace("path", instance_location.to_string()); 
             j.try_emplace("value", std::forward<Json>(default_value)); 
             patch.push_back(std::move(j));
         }
@@ -1206,7 +1221,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -1218,7 +1233,7 @@ namespace jsonschema {
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output("maxItems", 
                                                      absolute_max_items_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      std::move(message)));
                     if (reporter.fail_early())
                     {
@@ -1235,7 +1250,7 @@ namespace jsonschema {
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output("minItems", 
                                                      absolute_min_items_location_, 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      std::move(message)));
                     if (reporter.fail_early())
                     {
@@ -1250,7 +1265,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("uniqueItems", 
                                                      this->absolute_keyword_location(), 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      "Array items are not unique"));
                     if (reporter.fail_early())
                     {
@@ -1264,7 +1279,9 @@ namespace jsonschema {
             {
                 for (const auto& i : instance.array_range()) 
                 {
-                    items_schema_->validate(i, instance_location.append(index), reporter, patch);
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= index;
+                    items_schema_->validate(i, pointer, reporter, patch);
                     index++;
                 }
             }
@@ -1285,7 +1302,9 @@ namespace jsonschema {
                     if (!item_validator)
                         break;
 
-                    item_validator->validate(i, instance_location.append(index), reporter, patch);
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= index;
+                    item_validator->validate(i, pointer, reporter, patch);
                 }
             }
 
@@ -1307,7 +1326,7 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output("contains", 
                                                      this->absolute_keyword_location(), 
-                                                     instance_location.string(), 
+                                                     instance_location.to_string(), 
                                                      "Expected at least one array item to match \"contains\" schema", 
                                                      local_reporter.errors));
                     if (reporter.fail_early())
@@ -1370,7 +1389,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const final
         {
@@ -1408,7 +1427,7 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
@@ -1426,7 +1445,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("enum", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  instance.template as<std::string>() + " is not a valid enum value"));
                 if (reporter.fail_early())
                 {
@@ -1450,14 +1469,14 @@ namespace jsonschema {
         }
     private:
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter,
                          Json&) const final
         {
             if (const_ != instance)
                 reporter.error(validation_output("const", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Instance is not const"));
         }
     };
@@ -1579,7 +1598,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override final
         {
@@ -1607,7 +1626,7 @@ namespace jsonschema {
 
                 reporter.error(validation_output("type", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  ss.str()));
                 if (reporter.fail_early())
                 {
@@ -1653,7 +1672,7 @@ namespace jsonschema {
             }
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location&, 
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
                                                    const Json&,
                                                    error_reporter&) const override
         {

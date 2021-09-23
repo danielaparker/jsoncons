@@ -82,7 +82,7 @@ namespace jsonschema {
         Json validate(const Json& instance) const
         {
             throwing_error_reporter reporter;
-            schema_location instance_location("#");
+            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             root_->validate(instance, instance_location, reporter, patch);
@@ -93,7 +93,7 @@ namespace jsonschema {
         bool is_valid(const Json& instance) const
         {
             fail_early_reporter reporter;
-            schema_location instance_location("#");
+            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             root_->validate(instance, instance_location, reporter, patch);
@@ -105,7 +105,7 @@ namespace jsonschema {
         typename std::enable_if<type_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
-            schema_location instance_location("#");
+            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);

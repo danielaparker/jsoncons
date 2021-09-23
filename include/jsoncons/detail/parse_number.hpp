@@ -102,7 +102,7 @@ struct to_integer_result
 };
 
 enum class integer_chars_format : uint8_t {decimal=1,hex};
-enum class integer_chars_state {initial,minus,integer,binary,octal,decimal,hex};
+enum class integer_chars_state {initial,minus,integer,binary,octal,decimal,base16};
 
 template <class CharT>
 bool is_base10(const CharT* s, std::size_t length)
@@ -283,6 +283,137 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
 
 template <class T, class CharT>
 typename std::enable_if<type_traits::integer_limits<T>::is_specialized && !type_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+to_integer_base16(const CharT* s, std::size_t length, T& n)
+{
+    n = 0;
+
+    integer_chars_state state = integer_chars_state::initial;
+
+    const CharT* end = s + length; 
+    while (s < end)
+    {
+        switch(state)
+        {
+            case integer_chars_state::initial:
+            {
+                switch(*s)
+                {
+                    case '0':
+                        if (++s == end)
+                        {
+                            return (++s == end) ? to_integer_result<T,CharT>(s) : to_integer_result<T, CharT>(s, to_integer_errc());
+                        }
+                        else
+                        {
+                            return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
+                        }
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be base16
+                    case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                        state = integer_chars_state::base16;
+                        break;
+                    default:
+                        return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
+                }
+                break;
+            }
+            case integer_chars_state::base16:
+            {
+                static constexpr T max_value = (type_traits::integer_limits<T>::max)();
+                static constexpr T max_value_div_16 = max_value / 16;
+                for (; s < end; ++s)
+                {
+                    CharT c = *s;
+                    T x = 0;
+                    switch(*s)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            x = c - '0';
+                            break;
+                        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                            x = c - ('a' - 10);
+                            break;
+                        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                            x = c - ('A' - 10);
+                            break;
+                        default:
+                            return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
+                    }
+                    if (n > max_value_div_16)
+                    {
+                        return to_integer_result<T,CharT>(s, to_integer_errc::overflow);
+                    }
+                    n = n * 16;
+                    if (n > max_value - x)
+                    {
+                        return to_integer_result<T,CharT>(s, to_integer_errc::overflow);
+                    }
+                    n += x;
+                }
+                break;
+            }
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+        }
+    }
+    return (state == integer_chars_state::initial) ? to_integer_result<T,CharT>(s, to_integer_errc::invalid_number) : to_integer_result<T,CharT>(s, to_integer_errc());
+}
+
+template <class T, class CharT>
+typename std::enable_if<type_traits::integer_limits<T>::is_specialized && type_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+to_integer_base16(const CharT* s, std::size_t length, T& n)
+{
+    n = 0;
+
+    if (length == 0)
+    {
+        return to_integer_result<T,CharT>(s, to_integer_errc::invalid_number);
+    }
+
+    bool is_negative = *s == '-' ? true : false;
+    if (is_negative)
+    {
+        ++s;
+        --length;
+    }
+
+    using U = typename type_traits::make_unsigned<T>::type;
+
+    U u;
+    auto ru = to_integer_base16(s, length, u);
+    if (ru.ec != to_integer_errc())
+    {
+        return to_integer_result<T,CharT>(ru.ptr, ru.ec);
+    }
+    if (is_negative)
+    {
+        if (u > static_cast<U>(-((type_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
+        {
+            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
+        }
+        else
+        {
+            n = static_cast<T>(U(0) - u);
+            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc());
+        }
+    }
+    else
+    {
+        if (u > static_cast<U>((type_traits::integer_limits<T>::max)()))
+        {
+            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
+        }
+        else
+        {
+            n = static_cast<T>(u);
+            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc());
+        }
+    }
+}
+
+template <class T, class CharT>
+typename std::enable_if<type_traits::integer_limits<T>::is_specialized && !type_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -322,7 +453,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
                     }
                     case 'x':case 'X':
                     {
-                        state = integer_chars_state::hex;
+                        state = integer_chars_state::base16;
                         ++s;
                         break;
                     }
@@ -420,7 +551,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
                 }
                 break;
             }
-            case integer_chars_state::hex:
+            case integer_chars_state::base16:
             {
                 static constexpr T max_value = (type_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_16 = max_value / 16;

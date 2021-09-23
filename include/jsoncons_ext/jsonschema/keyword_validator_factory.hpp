@@ -46,7 +46,7 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const schema_location& instance_location, 
+                         const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
@@ -54,7 +54,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Unresolved schema reference " + this->absolute_keyword_location()));
                 return;
             }
@@ -62,7 +62,7 @@ namespace jsonschema {
             referred_schema_->validate(instance, instance_location, reporter, patch);
         }
 
-        jsoncons::optional<Json> get_default_value(const schema_location& instance_location, 
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -70,7 +70,7 @@ namespace jsonschema {
             {
                 reporter.error(validation_output("", 
                                                  this->absolute_keyword_location(), 
-                                                 instance_location.string(), 
+                                                 instance_location.to_string(), 
                                                  "Unresolved schema reference " + this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
@@ -106,7 +106,7 @@ namespace jsonschema {
         json_schema& operator=(json_schema&&) = default;
 
         void validate(const Json& instance, 
-                      const schema_location& instance_location, 
+                      const jsonpointer::json_pointer& instance_location, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {

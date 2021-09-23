@@ -50,7 +50,8 @@ enum class jsonpointer_errc
     end_of_input,
     unexpected_end_of_input,
     argument_to_unflatten_invalid,
-    invalid_flattened_key
+    invalid_flattened_key,
+    invalid_uri_escaped_data
 };
 
 class jsonpointer_error_category_impl

@@ -75,7 +75,7 @@ namespace jsonschema {
         }
 
         void validate(const Json& instance, 
-                      const schema_location& instance_location, 
+                      const jsonpointer::json_pointer& instance_location, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
@@ -85,14 +85,14 @@ namespace jsonschema {
                         patch);
         }
 
-        virtual jsoncons::optional<Json> get_default_value(const schema_location&, const Json&, error_reporter&) const
+        virtual jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, const Json&, error_reporter&) const
         {
             return jsoncons::optional<Json>();
         }
 
     private:
         virtual void do_validate(const Json& instance, 
-                                 const schema_location& instance_location, 
+                                 const jsonpointer::json_pointer& instance_location, 
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;
     };
