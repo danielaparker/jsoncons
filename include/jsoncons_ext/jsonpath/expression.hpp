@@ -2141,21 +2141,21 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class node_accumulator
+    class node_receiver
     {
     public:
         using char_type = typename Json::char_type;
         using reference = JsonReference;
         using json_location_node_type = json_location_node<char_type>;
 
-        virtual ~node_accumulator() noexcept = default;
+        virtual ~node_receiver() noexcept = default;
 
-        virtual void add_node(const json_location_node_type& path_tail, 
-                                reference value) = 0;
+        virtual void add(const json_location_node_type& path_tail, 
+                         reference value) = 0;
     };
 
     template <class Json,class JsonReference>
-    class path_value_accumulator : public node_accumulator<Json,JsonReference>
+    class path_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
         using reference = JsonReference;
@@ -2166,15 +2166,15 @@ namespace detail {
 
         std::vector<path_value_pair_type> nodes;
 
-        void add_node(const json_location_node_type& path_tail, 
-                        reference value) override
+        void add(const json_location_node_type& path_tail, 
+                 reference value) override
         {
             nodes.emplace_back(json_location_type(path_tail), std::addressof(value));
         }
     };
 
     template <class Json,class JsonReference>
-    class path_stem_value_accumulator : public node_accumulator<Json,JsonReference>
+    class path_stem_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
         using reference = JsonReference;
@@ -2184,8 +2184,8 @@ namespace detail {
 
         std::vector<path_stem_value_pair_type> nodes;
 
-        void add_node(const json_location_node_type& path_tail, 
-                        reference value) override
+        void add(const json_location_node_type& path_tail, 
+                 reference value) override
         {
             nodes.emplace_back(path_tail, value);
         }
@@ -2277,7 +2277,7 @@ namespace detail {
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using json_location_node_type = json_location_node<char_type>;
         using json_location_type = json_location<char_type>;
-        using node_accumulator_type = node_accumulator<Json,JsonReference>;
+        using node_receiver_type = node_receiver<Json,JsonReference>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
         jsonpath_selector(bool is_path,
@@ -2308,7 +2308,7 @@ namespace detail {
                             reference root,
                             const json_location_node_type& path_tail, 
                             reference val, 
-                            node_accumulator_type& accumulator,
+                            node_receiver_type& receiver,
                             result_options options) const = 0;
 
         virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -2928,7 +2928,7 @@ namespace detail {
     };
 
     template <class Callback, class Json,class JsonReference>
-    class callback_accumulator : public node_accumulator<Json,JsonReference>
+    class callback_receiver : public node_receiver<Json,JsonReference>
     {
         Callback& callback_;
     public:
@@ -2937,13 +2937,13 @@ namespace detail {
         using json_location_node_type = json_location_node<char_type>;
         using json_location_type = json_location<char_type>;
 
-        callback_accumulator(Callback& callback)
+        callback_receiver(Callback& callback)
             : callback_(callback)
         {
         }
 
-        void add_node(const json_location_node_type& path_tail, 
-                        reference value) override
+        void add(const json_location_node_type& path_tail, 
+                 reference value) override
         {
             callback_(json_location_type(path_tail), value);
         }
@@ -3036,35 +3036,35 @@ namespace detail {
 
             if ((options & require_more) != result_options())
             {
-                path_value_accumulator<Json,JsonReference> accumulator;
-                selector_->select(resources, root, path, current, accumulator, options);
+                path_value_receiver<Json,JsonReference> receiver;
+                selector_->select(resources, root, path, current, receiver, options);
 
-                if (accumulator.nodes.size() > 1 && (options & result_options::sort) == result_options::sort)
+                if (receiver.nodes.size() > 1 && (options & result_options::sort) == result_options::sort)
                 {
-                    std::sort(accumulator.nodes.begin(), accumulator.nodes.end(), path_value_pair_less_type());
+                    std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_less_type());
                 }
 
-                if (accumulator.nodes.size() > 1 && (options & result_options::nodups) == result_options::nodups)
+                if (receiver.nodes.size() > 1 && (options & result_options::nodups) == result_options::nodups)
                 {
                     if ((options & result_options::sort) == result_options::sort)
                     {
-                        auto last = std::unique(accumulator.nodes.begin(),accumulator.nodes.end(),path_value_pair_equal_type());
-                        accumulator.nodes.erase(last,accumulator.nodes.end());
-                        for (auto& node : accumulator.nodes)
+                        auto last = std::unique(receiver.nodes.begin(),receiver.nodes.end(),path_value_pair_equal_type());
+                        receiver.nodes.erase(last,receiver.nodes.end());
+                        for (auto& node : receiver.nodes)
                         {
                             callback(node.path(), node.value());
                         }
                     }
                     else
                     {
-                        std::vector<path_value_pair_type> index(accumulator.nodes);
+                        std::vector<path_value_pair_type> index(receiver.nodes);
                         std::sort(index.begin(), index.end(), path_value_pair_less_type());
                         auto last = std::unique(index.begin(),index.end(),path_value_pair_equal_type());
                         index.erase(last,index.end());
 
                         std::vector<path_value_pair_type> temp2;
                         temp2.reserve(index.size());
-                        for (auto&& node : accumulator.nodes)
+                        for (auto&& node : receiver.nodes)
                         {
                             auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
                             if (it != index.end() && it->path() == node.path()) 
@@ -3081,7 +3081,7 @@ namespace detail {
                 }
                 else
                 {
-                    for (auto& node : accumulator.nodes)
+                    for (auto& node : receiver.nodes)
                     {
                         callback(node.path(), node.value());
                     }
@@ -3089,8 +3089,8 @@ namespace detail {
             }
             else
             {
-                callback_accumulator<Callback,Json,JsonReference> accumulator(callback);
-                selector_->select(resources, root, path, current, accumulator, options);
+                callback_receiver<Callback,Json,JsonReference> receiver(callback);
+                selector_->select(resources, root, path, current, receiver, options);
             }
         }
 

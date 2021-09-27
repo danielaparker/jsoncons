@@ -108,7 +108,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class json_array_accumulator : public node_accumulator<Json,JsonReference>
+    class json_array_receiver : public node_receiver<Json,JsonReference>
     {
     public:
         using reference = JsonReference;
@@ -117,12 +117,12 @@ namespace detail {
 
         Json* val;
 
-        json_array_accumulator(Json* ptr)
+        json_array_receiver(Json* ptr)
             : val(ptr)
         {
         }
 
-        void add_node(const json_location_node_type&, reference value) override
+        void add(const json_location_node_type&, reference value) override
         {
             val->emplace_back(value);
         }
@@ -136,9 +136,9 @@ namespace detail {
         using string_type = std::basic_string<char_type>;
 
         static const json_location_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const json_location_node_type& last, 
-                                              std::size_t index, 
-                                              result_options options) 
+                                                       const json_location_node_type& last, 
+                                                       std::size_t index, 
+                                                       result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
@@ -152,9 +152,9 @@ namespace detail {
         }
 
         static const json_location_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const json_location_node_type& last, 
-                                              const string_type& identifier, 
-                                              result_options options) 
+                                                       const json_location_node_type& last, 
+                                                       const string_type& identifier, 
+                                                       result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
@@ -181,7 +181,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using json_location_type = typename supertype::json_location_type;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
         using selector_type = typename supertype::selector_type;
 
         base_selector()
@@ -210,16 +210,16 @@ namespace detail {
                            reference root,
                            const json_location_node_type& last, 
                            reference current,
-                           node_accumulator_type& accumulator,
+                           node_receiver_type& receiver,
                            result_options options) const
         {
             if (!tail_)
             {
-                accumulator.add_node(last, current);
+                receiver.add(last, current);
             }
             else
             {
-                tail_->select(resources, root, last, current, accumulator, options);
+                tail_->select(resources, root, last, current, receiver, options);
             }
         }
 
@@ -270,7 +270,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         using string_view_type = basic_string_view<char_type>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
     private:
         string_type identifier_;
     public:
@@ -284,7 +284,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             //std::string buf;
@@ -300,7 +300,7 @@ namespace detail {
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, identifier_, options),
-                                        it->value(), accumulator, options);
+                                        it->value(), receiver, options);
                 }
             }
             else if (current.is_array())
@@ -314,7 +314,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, last, index, options),
-                                            current[index], accumulator, options);
+                                            current[index], receiver, options);
                     }
                 }
                 else if (identifier_ == length_name && current.size() > 0)
@@ -323,7 +323,7 @@ namespace detail {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, identifier_, options), 
                                         *ptr, 
-                                        accumulator, options);
+                                        receiver, options);
                 }
             }
             else if (current.is_string() && identifier_ == length_name)
@@ -333,7 +333,7 @@ namespace detail {
                 pointer ptr = resources.create_json(count);
                 this->tail_select(resources, root, 
                                     path_generator_type::generate(resources, last, identifier_, options), 
-                                    *ptr, accumulator, options);
+                                    *ptr, receiver, options);
             }
             //std::cout << "end identifier_selector\n";
         }
@@ -437,7 +437,7 @@ namespace detail {
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         root_selector(std::size_t id)
             : base_selector<Json,JsonReference>(), id_(id)
@@ -448,10 +448,10 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
-                this->tail_select(resources, root, last, root, accumulator, options);
+                this->tail_select(resources, root, last, root, receiver, options);
         }
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -504,7 +504,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         current_node_selector()
         {
@@ -514,11 +514,11 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             this->tail_select(resources,  
-                                root, last, current, accumulator, options);
+                                root, last, current, receiver, options);
         }
 
         reference evaluate(dynamic_resources<Json,JsonReference>& resources,
@@ -563,7 +563,7 @@ namespace detail {
         using json_location_node_type = typename supertype::json_location_node_type;
         using json_location_type = typename supertype::json_location_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         parent_node_selector(int ancestor_depth)
         {
@@ -574,7 +574,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             const json_location_node_type* ancestor = std::addressof(last);
@@ -591,7 +591,7 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    this->tail_select(resources, root, path.last(), *ptr, accumulator, options);        
+                    this->tail_select(resources, root, path.last(), *ptr, receiver, options);        
                 }
             }
         }
@@ -658,7 +658,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         index_selector(int64_t index)
             : base_selector<Json,JsonReference>(), index_(index)
@@ -669,7 +669,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             if (current.is_array())
@@ -680,7 +680,7 @@ namespace detail {
                     std::size_t i = static_cast<std::size_t>(index_);
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, i, options), 
-                                        current.at(i), accumulator, options);
+                                        current.at(i), receiver, options);
                 }
                 else 
                 {
@@ -690,7 +690,7 @@ namespace detail {
                         std::size_t i = static_cast<std::size_t>(index);
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, last, i, options), 
-                                            current.at(i), accumulator, options);
+                                            current.at(i), receiver, options);
                     }
                 }
             }
@@ -748,7 +748,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         wildcard_selector()
             : base_selector<Json,JsonReference>()
@@ -759,7 +759,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             if (current.is_array())
@@ -768,7 +768,7 @@ namespace detail {
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, i, options), current[i], 
-                                        accumulator, options);
+                                        receiver, options);
                 }
             }
             else if (current.is_object())
@@ -777,7 +777,7 @@ namespace detail {
                 {
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, member.key(), options), 
-                                        member.value(), accumulator, options);
+                                        member.value(), receiver, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -791,8 +791,8 @@ namespace detail {
                            std::error_code&) const override
         {
             auto jptr = resources.create_json(json_array_arg);
-            json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources, root, last, current, accum, options);
+            json_array_receiver<Json,JsonReference> receiver(jptr);
+            select(resources, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -823,7 +823,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         recursive_selector()
             : base_selector<Json,JsonReference>()
@@ -834,25 +834,25 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             if (current.is_array())
             {
-                this->tail_select(resources, root, last, current, accumulator, options);
+                this->tail_select(resources, root, last, current, receiver, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, last, i, options), current[i], accumulator, options);
+                           path_generator_type::generate(resources, last, i, options), current[i], receiver, options);
                 }
             }
             else if (current.is_object())
             {
-                this->tail_select(resources, root, last, current, accumulator, options);
+                this->tail_select(resources, root, last, current, receiver, options);
                 for (auto& item : current.object_range())
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, last, item.key(), options), item.value(), accumulator, options);
+                           path_generator_type::generate(resources, last, item.key(), options), item.value(), receiver, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -866,8 +866,8 @@ namespace detail {
                            std::error_code&) const override
         {
             auto jptr = resources.create_json(json_array_arg);
-            json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources, root, last, current, accum, options);
+            json_array_receiver<Json,JsonReference> receiver(jptr);
+            select(resources, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -899,7 +899,7 @@ namespace detail {
         using json_location_type = typename supertype::json_location_type;
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
         using selector_type = typename supertype::selector_type;
     private:
         std::vector<selector_type*> selectors_;
@@ -930,12 +930,12 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current, 
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             for (auto& selector : selectors_)
             {
-                selector->select(resources, root, last, current, accumulator, options);
+                selector->select(resources, root, last, current, receiver, options);
             }
         }
 
@@ -947,8 +947,8 @@ namespace detail {
                            std::error_code&) const override
         {
             auto jptr = resources.create_json(json_array_arg);
-            json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources,root,last,current,accum,options);
+            json_array_receiver<Json,JsonReference> receiver(jptr);
+            select(resources,root,last,current,receiver,options);
             return *jptr;
         }
 
@@ -985,7 +985,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         filter_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -996,7 +996,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current, 
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             if (current.is_array())
@@ -1010,7 +1010,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, last, i, options), 
-                                            current[i], accumulator, options);
+                                            current[i], receiver, options);
                     }
                 }
             }
@@ -1025,7 +1025,7 @@ namespace detail {
                     {
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, last, member.key(), options), 
-                                            member.value(), accumulator, options);
+                                            member.value(), receiver, options);
                     }
                 }
             }
@@ -1039,8 +1039,8 @@ namespace detail {
                            std::error_code&) const override
         {
             auto jptr = resources.create_json(json_array_arg);
-            json_array_accumulator<Json,JsonReference> accum(jptr);
-            select(resources, root, last, current, accum, options);
+            json_array_receiver<Json,JsonReference> receiver(jptr);
+            select(resources, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -1073,7 +1073,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         index_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -1084,7 +1084,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current, 
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             std::error_code ec;
@@ -1095,11 +1095,11 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->tail_select(resources, root, last, current.at(start), accumulator, options);
+                    this->tail_select(resources, root, last, current.at(start), receiver, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->tail_select(resources, root, last, current.at(j.as_string_view()), accumulator, options);
+                    this->tail_select(resources, root, last, current.at(j.as_string_view()), receiver, options);
                 }
             }
         }
@@ -1166,7 +1166,7 @@ namespace detail {
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         slice_selector(const slice& slic)
             : base_selector<Json,JsonReference>(), slice_(slic) 
@@ -1177,7 +1177,7 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current,
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             if (current.is_array())
@@ -1201,7 +1201,7 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         this->tail_select(resources, root, 
                                             path_generator_type::generate(resources, last, j, options), 
-                                            current[j], accumulator, options);
+                                            current[j], receiver, options);
                     }
                 }
                 else if (step < 0)
@@ -1220,7 +1220,7 @@ namespace detail {
                         if (j < current.size())
                         {
                             this->tail_select(resources, root, 
-                                                path_generator_type::generate(resources, last,j,options), current[j], accumulator, options);
+                                                path_generator_type::generate(resources, last,j,options), current[j], receiver, options);
                         }
                     }
                 }
@@ -1235,7 +1235,7 @@ namespace detail {
                            std::error_code&) const override
         {
             auto jptr = resources.create_json(json_array_arg);
-            json_array_accumulator<Json,JsonReference> accum(jptr);
+            json_array_receiver<Json,JsonReference> accum(jptr);
             select(resources, root, last, current, accum, options);
             return *jptr;
         }
@@ -1255,7 +1255,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
-        using node_accumulator_type = typename supertype::node_accumulator_type;
+        using node_receiver_type = typename supertype::node_receiver_type;
 
         function_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -1266,14 +1266,14 @@ namespace detail {
                     reference root,
                     const json_location_node_type& last, 
                     reference current, 
-                    node_accumulator_type& accumulator,
+                    node_receiver_type& receiver,
                     result_options options) const override
         {
             std::error_code ec;
             value_type ref = expr_.evaluate(resources, root, current, options, ec);
             if (!ec)
             {
-                this->tail_select(resources, root, last, *resources.create_json(std::move(ref)), accumulator, options);
+                this->tail_select(resources, root, last, *resources.create_json(std::move(ref)), receiver, options);
             }
         }
 
