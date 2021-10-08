@@ -294,7 +294,7 @@ namespace jsonschema {
         validator_pointer make_type_validator(const Json& schema,
                                               const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<type_keyword<Json>>(this, schema, uris);
+            auto sch_orig = jsoncons::make_unique<type_validator<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
