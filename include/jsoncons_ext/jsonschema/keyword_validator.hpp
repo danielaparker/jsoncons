@@ -1146,8 +1146,8 @@ namespace jsonschema {
         std::string absolute_min_items_location_;
         bool unique_items_ = false;
         validator_pointer items_schema_;
-        std::vector<validator_pointer> items_;
-        validator_pointer additional_items_;
+        std::vector<validator_pointer> item_validators_;
+        validator_pointer additional_items_validator_;
         validator_pointer contains_;
 
     public:
@@ -1155,7 +1155,7 @@ namespace jsonschema {
                    const Json& sch, 
                    const std::vector<schema_location>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
-              max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
+              max_items_(), min_items_(), items_schema_(nullptr), additional_items_validator_(nullptr), contains_(nullptr)
         {
             {
                 auto it = sch.find("maxItems");
@@ -1192,12 +1192,12 @@ namespace jsonschema {
                     {
                         size_t c = 0;
                         for (const auto& subsch : it->value().array_range())
-                            items_.push_back(builder->make_keyword_validator(subsch, uris, {"items", std::to_string(c++)}));
+                            item_validators_.push_back(builder->make_keyword_validator(subsch, uris, {"items", std::to_string(c++)}));
 
                         auto attr_add = sch.find("additionalItems");
                         if (attr_add != sch.object_range().end()) 
                         {
-                            additional_items_ = builder->make_keyword_validator(attr_add->value(), uris, {"additionalItems"});
+                            additional_items_validator_ = builder->make_keyword_validator(attr_add->value(), uris, {"additionalItems"});
                         }
 
                     } 
@@ -1287,24 +1287,25 @@ namespace jsonschema {
             }
             else 
             {
-                auto item = items_.cbegin();
-                for (const auto& i : instance.array_range()) 
+                auto validator_it = item_validators_.cbegin();
+                for (const auto& item : instance.array_range()) 
                 {
                     validator_pointer item_validator = nullptr;
-                    if (item == items_.cend())
-                        item_validator = additional_items_;
-                    else 
+                    if (validator_it != item_validators_.cend())
                     {
-                        item_validator = *item;
-                        ++item;
+                        item_validator = *validator_it;
+                        ++validator_it;
                     }
-
-                    if (!item_validator)
+                    else if (additional_items_validator_ != nullptr)
+                    {
+                        item_validator = additional_items_validator_;
+                    }
+                    else
                         break;
 
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    item_validator->validate(i, pointer, reporter, patch);
+                    item_validator->validate(item, pointer, reporter, patch);
                 }
             }
 
@@ -1685,36 +1686,52 @@ namespace jsonschema {
                                      const std::vector<schema_location>& uris,
                                      std::set<std::string>& keywords)
         {
-            if (type.empty() || type == "null")
+            if (type == "null")
             {
                 type_mapping_[(uint8_t)json_type::null_value] = builder->make_null_validator(uris);
             }
-            if (type.empty() || type == "object")
+            else if (type == "object")
             {
                 type_mapping_[(uint8_t)json_type::object_value] = builder->make_object_validator(sch, uris);
             }
-            if (type.empty() || type == "array")
+            else if (type == "array")
             {
                 type_mapping_[(uint8_t)json_type::array_value] = builder->make_array_validator(sch, uris);
             }
-            if (type.empty() || type == "string")
+            else if (type == "string")
             {
                 type_mapping_[(uint8_t)json_type::string_value] = builder->make_string_validator(sch, uris);
                 // For binary types
                 type_mapping_[(uint8_t) json_type::byte_string_value] = type_mapping_[(uint8_t) json_type::string_value];
             }
-            if (type.empty() || type == "boolean")
+            else if (type == "boolean")
             {
                 type_mapping_[(uint8_t)json_type::bool_value] = builder->make_boolean_validator(uris);
             }
-            if (type.empty() || type == "integer")
+            else if (type == "integer")
             {
                 type_mapping_[(uint8_t)json_type::int64_value] = builder->make_integer_validator(sch, uris, keywords);
                 type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::int64_value];
                 type_mapping_[(uint8_t)json_type::double_value] = type_mapping_[(uint8_t)json_type::int64_value];
             }
-            if (type.empty() || type == "number")
+            else if (type == "number")
             {
+                type_mapping_[(uint8_t)json_type::double_value] = builder->make_number_validator(sch, uris, keywords);
+                type_mapping_[(uint8_t)json_type::int64_value] = type_mapping_[(uint8_t)json_type::double_value];
+                type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::double_value];
+            }
+            else if (type.empty())
+            {
+                type_mapping_[(uint8_t)json_type::null_value] = builder->make_null_validator(uris);
+                type_mapping_[(uint8_t)json_type::object_value] = builder->make_object_validator(sch, uris);
+                type_mapping_[(uint8_t)json_type::array_value] = builder->make_array_validator(sch, uris);
+                type_mapping_[(uint8_t)json_type::string_value] = builder->make_string_validator(sch, uris);
+                // For binary types
+                type_mapping_[(uint8_t) json_type::byte_string_value] = type_mapping_[(uint8_t) json_type::string_value];
+                type_mapping_[(uint8_t)json_type::bool_value] = builder->make_boolean_validator(uris);
+                type_mapping_[(uint8_t)json_type::int64_value] = builder->make_integer_validator(sch, uris, keywords);
+                type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::int64_value];
+                type_mapping_[(uint8_t)json_type::double_value] = type_mapping_[(uint8_t)json_type::int64_value];
                 type_mapping_[(uint8_t)json_type::double_value] = builder->make_number_validator(sch, uris, keywords);
                 type_mapping_[(uint8_t)json_type::int64_value] = type_mapping_[(uint8_t)json_type::double_value];
                 type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::double_value];
