@@ -10,6 +10,7 @@
 #include <string> // std::string
 #include <sstream> // std::ostringstream
 #include <system_error> // std::error_code
+#include <exception>
 #include <jsoncons/unicode_traits.hpp> // unicode_traits::convert
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/more_type_traits.hpp>
@@ -18,7 +19,7 @@ namespace jsoncons {
 
     // json_exception
 
-    class json_exception
+    class json_exception : public std::exception
     {
     public:
         virtual ~json_exception() noexcept = default;
@@ -35,7 +36,7 @@ namespace jsoncons {
     template <class Base>
     class json_runtime_error<Base,
                              typename std::enable_if<std::is_convertible<Base*,std::exception*>::value &&
-                                                     type_traits::is_constructible_from_string<Base>::value>::type> 
+                                                     type_traits::is_constructible_from_string<Base>::value>::type>
         : public Base, public virtual json_exception
     {
     public:
