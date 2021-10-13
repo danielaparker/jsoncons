@@ -29,7 +29,7 @@
 #define JSONCONS_NO_MAP_TAKING_ALLOCATOR 1
 #endif
 
-#if defined(__clang__) 
+#if defined(__clang__)
 #  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
 #elif defined(__GNUC__) && ((__GNUC__ >= 7))
 #  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
@@ -97,7 +97,7 @@
 #else
 #define JSONCONS_NO_LOCALECONV
 #endif
-#endif 
+#endif
 
 #if defined(_MSC_VER)
 #define JSONCONS_HAS_MSC_STRTOD_L
@@ -132,7 +132,7 @@
 #     endif // __has_include(<string_view>)
 #   else
 #      define JSONCONS_HAS_STD_STRING_VIEW 1
-#   endif 
+#   endif
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_STRING_VIEW)
 
@@ -150,7 +150,7 @@
 #     endif // __has_include(<string_view>)
 #   else
 #      define JSONCONS_HAS_STD_OPTIONAL 1
-#   endif 
+#   endif
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
@@ -166,7 +166,7 @@
 #     endif // __has_include(<variant>)
 #   else
 #      define JSONCONS_HAS_STD_VARIANT 1
-#   endif 
+#   endif
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_VARIANT)
 
@@ -178,7 +178,7 @@
 #     endif // __has_include(<filesystem>)
 #   else
 #      define JSONCONS_HAS_FILESYSTEM 1
-#   endif 
+#   endif
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_FILESYSTEM)
 
@@ -193,7 +193,7 @@
 
 #if defined(__GNUC__) && !__EXCEPTIONS
 # define JSONCONS_NO_EXCEPTIONS 1
-#elif _MSC_VER 
+#elif _MSC_VER
 #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
 # define JSONCONS_NO_EXCEPTIONS 1
 #elif !defined(_CPPUNWIND)
@@ -216,12 +216,12 @@
 #endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
-   #if defined(__clang__) && defined(_cplusplus)
+   #if defined(__clang__) && defined(__cplusplus)
       #if defined(__APPLE__)
-         #if __clang_major__ >= 6  && _cplusplus >= 201103L // Xcode 6
+         #if __clang_major__ >= 6  && __cplusplus >= 201103L // Xcode 6
             #define JSONCONS_HAS_STD_MAKE_UNIQUE
          #endif
-      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && _cplusplus > 201103L
+      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && __cplusplus > 201103L
          #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #elif defined(__GNUC__)
@@ -229,15 +229,15 @@
          #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #elif defined(_MSC_VER)
-      #if _MSC_VER >= 1800 
+      #if _MSC_VER >= 1800
          #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #endif
 #endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
 
 #ifndef JSONCONS_HAS_CP14_CONSTEXPR
-    #if defined(_MSC_VER) 
-        #if _MSC_VER >= 1910 
+    #if defined(_MSC_VER)
+        #if _MSC_VER >= 1910
             #define JSONCONS_HAS_CP14_CONSTEXPR
         #endif
    #elif defined(__GNUC__)
@@ -270,7 +270,7 @@
 #endif
 
 #if defined(__GNUC__)
-#if defined(_GLIBCXX_USE_FLOAT128) 
+#if defined(_GLIBCXX_USE_FLOAT128)
 # define JSONCONS_HAS_FLOAT128
 #endif
 #endif
@@ -338,4 +338,3 @@ namespace jsoncons {
 #endif // _DEBUG
 
 #endif // JSONCONS_COMPILER_SUPPORT_HPP
-
