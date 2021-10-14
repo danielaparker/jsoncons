@@ -1095,11 +1095,15 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->tail_select(resources, root, last, current.at(start), receiver, options);
+                    this->tail_select(resources, root, 
+                                      path_generator_type::generate(resources, last, start, options),
+                                      current.at(start), receiver, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->tail_select(resources, root, last, current.at(j.as_string_view()), receiver, options);
+                    this->tail_select(resources, root, 
+                                      path_generator_type::generate(resources, last, j.as_string(), options),
+                                      current.at(j.as_string_view()), receiver, options);
                 }
             }
         }
