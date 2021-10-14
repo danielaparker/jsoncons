@@ -130,7 +130,7 @@ namespace jsonschema {
                 {
                     schema_location relative(id); 
                     schema_location new_uri = relative.resolve(new_uris.back());
-                    new_uris.emplace_back(new_uri.string()); 
+                    new_uris.emplace_back(new_uri); 
                 }
             }
         }
