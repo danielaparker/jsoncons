@@ -1,3 +1,11 @@
+0.168.1
+-------
+
+Bugs fixed:
+
+- Fixed jsonpath issue of normalized path component not being computed
+for expression, [issue \#338](https://github.com/danielaparker/jsoncons/issues/338).
+
 0.168.0
 -------
 
