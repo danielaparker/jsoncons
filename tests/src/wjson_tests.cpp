@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -51,3 +52,16 @@ TEST_CASE("wjson serialization tests")
     CHECK(testStr == L"{\"bar\":false,\"baz\":true,\"foo\":true}");
 }
 
+TEST_CASE("wjson test case")
+{
+    std::wstring data = LR"(
+    {"call":"script","cwd":"C:\\Users\\Robert\\Documents\\Visual Studio 2015\\Projects\\EscPosPrinter\\Release\\","file":"scripts\\pos-submitorder.js","filename":"pos-submitorder.js","lib":"function",
+"params":{"data":{"cash":0,"coupons":0,"creditcard":0,"debit":0,"discounts":0,"name":null,"neworder":true,"operator":"","orders":[{"active":"1","addtoitem":"0","bar":"1","cat":"Beer","cooking":"","id":"7","kitchen":"0","modifier":"0","name":"Budwiser","noqty":"1","oneof":"[]","operator":"robert","options":"[]","price":"5","print":"","qty":1,"server":"robert","sideprice":"0","subtotal":5,"type":"Bar","uid":"0242.7559"}],"outstanding":5.25,"payments":[],"server":"robert","status":"0","subtotal":5,"tableid":"quickserv","taxes":0.25,"tip":0,"total":5.25,"uid":"2822.7128","voiditems":[]},"posstation":{"printers":{"kitchen":[{"arguments":{"baud":"9600","bits":"8","nparity":"0","port":"3","stopbit":"0","xonxoff":"5"},"model":"epson","path":"localhost","type":"com"},{"arguments":{"baud":"","bits":"","nparity":"","port":"","stopbit":"","xonxoff":""},"model":"screen","path":"temp-pc","type":"screen"}],"receipt":[{"arguments":{"baud":"9600","bits":"8","nparity":"0","port":"3","stopbit":"0","xonxoff":"5"},"model":"epson","path":"Temp-PC","type":"com"},{"arguments":{"baud":"","bits":"","nparity":"","port":"","stopbit":"","xonxoff":""},"model":"screen","path":"localhost","type":"screen"}]}}},"plugin":"clib"}
+    )";
+
+    wjson j = wjson::parse(data);
+
+    std::wstring s = j[L"params"].to_string();
+
+    std::wcout << s << "\n";
+}
