@@ -95,8 +95,6 @@ namespace detail {
         expect_and
     };
 
-    JSONCONS_STRING_LITERAL(length_literal, 'l', 'e', 'n', 'g', 't', 'h')
-
     template<class Json,
              class JsonReference>
     class jsonpath_evaluator : public ser_context

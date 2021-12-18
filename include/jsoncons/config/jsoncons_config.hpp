@@ -242,15 +242,58 @@ namespace binary {
 } // binary
 } // jsoncons
 
+namespace jsoncons {
+
+    template<typename CharT>
+    const CharT* cstring_constant_of_type(const char* c, const wchar_t* w);
+
+    template<> inline
+    const char* cstring_constant_of_type<char>(const char* c, const wchar_t*)
+    {
+        return c;
+    }
+    template<> inline
+    const wchar_t* cstring_constant_of_type<wchar_t>(const char*, const wchar_t* w)
+    {
+        return w;
+    }
+
+    template<typename CharT>
+    std::basic_string<CharT> string_constant_of_type(const char* c, const wchar_t* w);
+
+    template<> inline
+    std::string string_constant_of_type<char>(const char* c, const wchar_t*)
+    {
+        return std::string(c);
+    }
+    template<> inline
+    std::wstring string_constant_of_type<wchar_t>(const char*, const wchar_t* w)
+    {
+        return std::wstring(w);
+    }
+
+    template<typename CharT>
+    jsoncons::basic_string_view<CharT> string_view_constant_of_type(const char* c, const wchar_t* w);
+
+    template<> inline
+    jsoncons::string_view string_view_constant_of_type<char>(const char* c, const wchar_t*)
+    {
+        return jsoncons::string_view(c);
+    }
+    template<> inline
+    jsoncons::wstring_view string_view_constant_of_type<wchar_t>(const char*, const wchar_t* w)
+    {
+        return jsoncons::wstring_view(w);
+    }
+
+} // jsoncons
+
 #define JSONCONS_EXPAND(X) X    
 #define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
 
-#define JSONCONS_STRING_LITERAL(name, ...) \
-   template <class CharT> \
-   jsoncons::basic_string_view<CharT> name() {\
-       static constexpr CharT s[] = { __VA_ARGS__};\
-       return jsoncons::basic_string_view<CharT>(s, sizeof(s) / sizeof(CharT));\
-   }
+#define JSONCONS_CSTRING_CONSTANT(CharT, Str) cstring_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
+#define JSONCONS_STRING_CONSTANT(CharT, Str) string_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
+#define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
 
 #define JSONCONS_CSTRING(CharT, name, ...) \
     static constexpr CharT name[] = { __VA_ARGS__,0};

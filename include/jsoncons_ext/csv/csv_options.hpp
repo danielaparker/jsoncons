@@ -18,13 +18,6 @@
 
 namespace jsoncons { namespace csv {
 
-namespace detail {
-    JSONCONS_STRING_LITERAL(string_literal,'s','t','r','i','n','g')
-    JSONCONS_STRING_LITERAL(integer_literal,'i','n','t','e','g','e','r')
-    JSONCONS_STRING_LITERAL(float_literal,'f','l','o','a','t')
-    JSONCONS_STRING_LITERAL(boolean_literal,'b','o','o','l','e','a','n')
-}
-
 enum class csv_column_type : uint8_t 
 {
     string_t,integer_t,float_t,boolean_t,repeat_t
@@ -131,10 +124,10 @@ void parse_column_types(const std::basic_string<CharT>& types,
     const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
-        {detail::string_literal<char_type>(),csv_column_type::string_t},
-        {detail::integer_literal<char_type>(),csv_column_type::integer_t},
-        {detail::float_literal<char_type>(),csv_column_type::float_t},
-        {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
+        {JSONCONS_STRING_VIEW_CONSTANT(CharT,"string"),csv_column_type::string_t},
+        {JSONCONS_STRING_VIEW_CONSTANT(CharT,"integer"),csv_column_type::integer_t},
+        {JSONCONS_STRING_VIEW_CONSTANT(CharT,"float"),csv_column_type::float_t},
+        {JSONCONS_STRING_VIEW_CONSTANT(CharT,"boolean"),csv_column_type::boolean_t}
     };
 
     column_state state = column_state::sequence;

@@ -227,8 +227,6 @@ namespace jmespath {
     };
     constexpr argument_arg_t argument_arg{};
 
-    JSONCONS_STRING_LITERAL(sort_by,'s','o','r','t','-','b','y')
-
     struct slice
     {
         jsoncons::optional<int64_t> start_;
