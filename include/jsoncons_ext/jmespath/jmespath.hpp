@@ -387,42 +387,42 @@ namespace jmespath {
     public:
         reference number_type_name() 
         {
-            static Json number_type_name(string_type({'n','u','m','b','e','r'}));
+            static Json number_type_name(JSONCONS_STRING_CONSTANT(char_type, "number"));
 
             return number_type_name;
         }
 
         reference boolean_type_name()
         {
-            static Json boolean_type_name(string_type({'b','o','o','l','e','a','n'}));
+            static Json boolean_type_name(JSONCONS_STRING_CONSTANT(char_type, "boolean"));
 
             return boolean_type_name;
         }
 
         reference string_type_name()
         {
-            static Json string_type_name(string_type({'s','t','r','i','n','g'}));
+            static Json string_type_name(JSONCONS_STRING_CONSTANT(char_type, "string"));
 
             return string_type_name;
         }
 
         reference object_type_name()
         {
-            static Json object_type_name(string_type({'o','b','j','e','c','t'}));
+            static Json object_type_name(JSONCONS_STRING_CONSTANT(char_type, "object"));
 
             return object_type_name;
         }
 
         reference array_type_name()
         {
-            static Json array_type_name(string_type({'a','r','r','a','y'}));
+            static Json array_type_name(JSONCONS_STRING_CONSTANT(char_type, "array"));
 
             return array_type_name;
         }
 
         reference null_type_name()
         {
-            static Json null_type_name(string_type({'n','u','l','l'}));
+            static Json null_type_name(JSONCONS_STRING_CONSTANT(char_type, "null"));
 
             return null_type_name;
         }
