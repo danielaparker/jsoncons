@@ -245,15 +245,15 @@ namespace binary {
 namespace jsoncons {
 
     template<typename CharT>
-    const CharT* cstring_constant_of_type(const char* c, const wchar_t* w);
+    constexpr const CharT* cstring_constant_of_type(const char* c, const wchar_t* w);
 
     template<> inline
-    const char* cstring_constant_of_type<char>(const char* c, const wchar_t*)
+    constexpr const char* cstring_constant_of_type<char>(const char* c, const wchar_t*)
     {
         return c;
     }
     template<> inline
-    const wchar_t* cstring_constant_of_type<wchar_t>(const char*, const wchar_t* w)
+    constexpr const wchar_t* cstring_constant_of_type<wchar_t>(const char*, const wchar_t* w)
     {
         return w;
     }
@@ -294,9 +294,6 @@ namespace jsoncons {
 #define JSONCONS_CSTRING_CONSTANT(CharT, Str) cstring_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
 #define JSONCONS_STRING_CONSTANT(CharT, Str) string_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
 #define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_QUOTE(L, Str))
-
-#define JSONCONS_CSTRING(CharT, name, ...) \
-    static constexpr CharT name[] = { __VA_ARGS__,0};
 
 #if defined(__clang__) 
 #define JSONCONS_HAS_STD_REGEX 1

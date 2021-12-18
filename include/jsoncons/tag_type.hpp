@@ -101,27 +101,27 @@ enum class semantic_tag : uint8_t
 template <class CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_tag tag)
 {
-    JSONCONS_CSTRING(CharT,na_name,'n','/','a')
-    JSONCONS_CSTRING(CharT,undefined_name,'u','n','d','e','f','i','n','e','d')
-    JSONCONS_CSTRING(CharT,datetime_name,'d','a','t','e','t','i','m','e')
-    JSONCONS_CSTRING(CharT,epoch_second_name,'e','p','o','c','h','-','s','e','c','o','n','d')
-    JSONCONS_CSTRING(CharT,epoch_milli_name,'e','p','o','c','h','-','m','i','l','l','i')
-    JSONCONS_CSTRING(CharT,epoch_nano_name,'e','p','o','c','h','-','n','a','n','o')
-    JSONCONS_CSTRING(CharT,bigint_name,'b','i','g','i','n','t')
-    JSONCONS_CSTRING(CharT,bigdec_name,'b','i','g','d','e','c')
-    JSONCONS_CSTRING(CharT,bigfloat_name,'b','i','g','f','l','o','a','t')
-    JSONCONS_CSTRING(CharT,base16_name,'b','a','s','e','l','6')
-    JSONCONS_CSTRING(CharT,base64_name,'b','a','s','e','6','4')
-    JSONCONS_CSTRING(CharT,base64url_name,'b','a','s','e','6','4','u','r','l')
-    JSONCONS_CSTRING(CharT,uri_name,'u','r','i')
-    JSONCONS_CSTRING(CharT,clamped_name,'c','l','a','m','p','e','d')
-    JSONCONS_CSTRING(CharT,multi_dim_row_major_name,'m','u','l','t','i','-','d','i','m','-','r','o','w','-','m','a','j','o','r')
-    JSONCONS_CSTRING(CharT,multi_dim_column_major_name,'m','u','l','t','i','-','d','i','m','-','c','o','l','u','m','n','-','m','a','j','o','r')
-    JSONCONS_CSTRING(CharT,ext_name,'e','x','t')
-    JSONCONS_CSTRING(CharT,id_name,'i','d')
-    JSONCONS_CSTRING(CharT, float128_name, 'f', 'l', 'o', 'a', 't', '1', '2', '8')
-    JSONCONS_CSTRING(CharT, regex_name, 'r', 'e', 'g', 'e', 'x')
-    JSONCONS_CSTRING(CharT, code_name, 'c', 'o', 'd', 'e')
+    static constexpr const CharT* na_name = JSONCONS_CSTRING_CONSTANT(CharT, "n/a");
+    static constexpr const CharT* undefined_name = JSONCONS_CSTRING_CONSTANT(CharT, "undefined");
+    static constexpr const CharT* datetime_name = JSONCONS_CSTRING_CONSTANT(CharT, "datetime");
+    static constexpr const CharT* epoch_second_name = JSONCONS_CSTRING_CONSTANT(CharT, "epoch-second");
+    static constexpr const CharT* epoch_milli_name = JSONCONS_CSTRING_CONSTANT(CharT, "epoch-milli");
+    static constexpr const CharT* epoch_nano_name = JSONCONS_CSTRING_CONSTANT(CharT, "epoch-nano");
+    static constexpr const CharT* bigint_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigint");
+    static constexpr const CharT* bigdec_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigdec");
+    static constexpr const CharT* bigfloat_name = JSONCONS_CSTRING_CONSTANT(CharT, "bigfloat");
+    static constexpr const CharT* base16_name = JSONCONS_CSTRING_CONSTANT(CharT, "base16");
+    static constexpr const CharT* base64_name = JSONCONS_CSTRING_CONSTANT(CharT, "base64");
+    static constexpr const CharT* base64url_name = JSONCONS_CSTRING_CONSTANT(CharT, "base64url");
+    static constexpr const CharT* uri_name = JSONCONS_CSTRING_CONSTANT(CharT, "uri");
+    static constexpr const CharT* clamped_name = JSONCONS_CSTRING_CONSTANT(CharT, "clamped");
+    static constexpr const CharT* multi_dim_row_major_name = JSONCONS_CSTRING_CONSTANT(CharT, "multi-dim-row-major");
+    static constexpr const CharT* multi_dim_column_major_name = JSONCONS_CSTRING_CONSTANT(CharT, "multi-dim-column-major");
+    static constexpr const CharT* ext_name = JSONCONS_CSTRING_CONSTANT(CharT, "ext");
+    static constexpr const CharT* id_name = JSONCONS_CSTRING_CONSTANT(CharT, "id");
+    static constexpr const CharT*  float128_name = JSONCONS_CSTRING_CONSTANT(CharT, "float128");
+    static constexpr const CharT*  regex_name = JSONCONS_CSTRING_CONSTANT(CharT, "regex");
+    static constexpr const CharT*  code_name = JSONCONS_CSTRING_CONSTANT(CharT, "code");
 
     switch (tag)
     {

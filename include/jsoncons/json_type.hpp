@@ -29,16 +29,16 @@ namespace jsoncons {
     template <class CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, json_type type)
     {
-        JSONCONS_CSTRING(CharT,null_value,'n','u','l','l')
-        JSONCONS_CSTRING(CharT,bool_value,'b','o','o','l')
-        JSONCONS_CSTRING(CharT,int64_value,'i','n','t','6','4')
-        JSONCONS_CSTRING(CharT,uint64_value,'u','i','n','t','6','4')
-        JSONCONS_CSTRING(CharT,half_value,'h','a','l','f')
-        JSONCONS_CSTRING(CharT,double_value,'d','o','u','b','l','e')
-        JSONCONS_CSTRING(CharT,string_value,'s','t','r','i','n','g')
-        JSONCONS_CSTRING(CharT,byte_string_value,'b','y','t','e',' ','s','t','r','i','n','g')
-        JSONCONS_CSTRING(CharT,array_value,'a','r','r','a','y')
-        JSONCONS_CSTRING(CharT,object_value,'o','b','j','e','c','t')
+        static constexpr const CharT* null_value = JSONCONS_CSTRING_CONSTANT(CharT, "null");
+        static constexpr const CharT* bool_value = JSONCONS_CSTRING_CONSTANT(CharT, "bool");
+        static constexpr const CharT* int64_value = JSONCONS_CSTRING_CONSTANT(CharT, "int64");
+        static constexpr const CharT* uint64_value = JSONCONS_CSTRING_CONSTANT(CharT, "uint64");
+        static constexpr const CharT* half_value = JSONCONS_CSTRING_CONSTANT(CharT, "half");
+        static constexpr const CharT* double_value = JSONCONS_CSTRING_CONSTANT(CharT, "double");
+        static constexpr const CharT* string_value = JSONCONS_CSTRING_CONSTANT(CharT, "string");
+        static constexpr const CharT* byte_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string");
+        static constexpr const CharT* array_value = JSONCONS_CSTRING_CONSTANT(CharT, "array");
+        static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
 
         switch (type)
         {
@@ -116,19 +116,19 @@ namespace jsoncons {
     template <class CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, storage_kind storage)
     {
-        JSONCONS_CSTRING(CharT,null_value,'n','u','l','l')
-        JSONCONS_CSTRING(CharT,bool_value,'b','o','o','l')
-        JSONCONS_CSTRING(CharT,int64_value,'i','n','t','6','4')
-        JSONCONS_CSTRING(CharT,uint64_value,'u','i','n','t','6','4')
-        JSONCONS_CSTRING(CharT,half_value,'h','a','l','f')
-        JSONCONS_CSTRING(CharT,double_value,'d','o','u','b','l','e')
-        JSONCONS_CSTRING(CharT,short_string_value,'s','h','o','r','t',' ','s','t','r','i','n','g')
-        JSONCONS_CSTRING(CharT,long_string_value,'l','o','n','g',' ','s','t','r','i','n','g')
-        JSONCONS_CSTRING(CharT,byte_string_value,'b','y','t','e',' ','s','t','r','i','n','g')
-        JSONCONS_CSTRING(CharT,array_value,'a','r','r','a','y')
-        JSONCONS_CSTRING(CharT,empty_object_value,'e','m','p','t','y',' ','o','b','j','e','c','t')
-        JSONCONS_CSTRING(CharT,object_value,'o','b','j','e','c','t')
-        JSONCONS_CSTRING(CharT,json_const_pointer,'j','s','o','n',' ','c','o','n','s','t',' ','p','o','i','n','t','e','r')
+        static constexpr const CharT* null_value = JSONCONS_CSTRING_CONSTANT(CharT, "null");
+        static constexpr const CharT* bool_value = JSONCONS_CSTRING_CONSTANT(CharT, "bool");
+        static constexpr const CharT* int64_value = JSONCONS_CSTRING_CONSTANT(CharT, "int64");
+        static constexpr const CharT* uint64_value = JSONCONS_CSTRING_CONSTANT(CharT, "uint64");
+        static constexpr const CharT* half_value = JSONCONS_CSTRING_CONSTANT(CharT, "half");
+        static constexpr const CharT* double_value = JSONCONS_CSTRING_CONSTANT(CharT, "double");
+        static constexpr const CharT* short_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "short string");
+        static constexpr const CharT* long_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "string");
+        static constexpr const CharT* byte_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "byte string");
+        static constexpr const CharT* array_value = JSONCONS_CSTRING_CONSTANT(CharT, "array");
+        static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty object");
+        static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
+        static constexpr const CharT* json_const_pointer = JSONCONS_CSTRING_CONSTANT(CharT, "json const pointer");
 
         switch (storage)
         {

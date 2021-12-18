@@ -50,19 +50,19 @@ enum class staj_event_type
 template <class CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
 {
-    JSONCONS_CSTRING(CharT,begin_array_name,'b','e','g','i','n','_','a','r','r','a','y')
-    JSONCONS_CSTRING(CharT,end_array_name,'e','n','d','_','a','r','r','a','y')
-    JSONCONS_CSTRING(CharT,begin_object_name,'b','e','g','i','n','_','o','b','j','e','c','t')
-    JSONCONS_CSTRING(CharT,end_object_name,'e','n','d','_','o','b','j','e','c','t')
-    JSONCONS_CSTRING(CharT,key_name,'k','e','y')
-    JSONCONS_CSTRING(CharT,string_value_name,'s','t','r','i','n','g','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,byte_string_value_name,'b','y','t','e','_','s','t','r','i','n','g','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,null_value_name,'n','u','l','l','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,bool_value_name,'b','o','o','l','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,uint64_value_name,'u','i','n','t','6','4','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,int64_value_name,'i','n','t','6','4','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,half_value_name,'h','a','l','f','_','v','a','l','u','e')
-    JSONCONS_CSTRING(CharT,double_value_name,'d','o','u','b','l','e','_','v','a','l','u','e')
+    static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
+    static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
+    static constexpr const CharT* begin_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_object");
+    static constexpr const CharT* end_object_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_object");
+    static constexpr const CharT* key_name = JSONCONS_CSTRING_CONSTANT(CharT, "key");
+    static constexpr const CharT* string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "string_value");
+    static constexpr const CharT* byte_string_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string_value");
+    static constexpr const CharT* null_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "null_value");
+    static constexpr const CharT* bool_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "bool_value");
+    static constexpr const CharT* uint64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "uint64_value");
+    static constexpr const CharT* int64_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "int64_value");
+    static constexpr const CharT* half_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "half_value");
+    static constexpr const CharT* double_value_name = JSONCONS_CSTRING_CONSTANT(CharT, "double_value");
 
     switch (tag)
     {
