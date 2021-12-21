@@ -122,13 +122,13 @@ namespace jsoncons {
         static constexpr const CharT* uint64_value = JSONCONS_CSTRING_CONSTANT(CharT, "uint64");
         static constexpr const CharT* half_value = JSONCONS_CSTRING_CONSTANT(CharT, "half");
         static constexpr const CharT* double_value = JSONCONS_CSTRING_CONSTANT(CharT, "double");
-        static constexpr const CharT* short_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "short string");
+        static constexpr const CharT* short_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "short_string");
         static constexpr const CharT* long_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "string");
-        static constexpr const CharT* byte_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "byte string");
+        static constexpr const CharT* byte_string_value = JSONCONS_CSTRING_CONSTANT(CharT, "byte_string");
         static constexpr const CharT* array_value = JSONCONS_CSTRING_CONSTANT(CharT, "array");
-        static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty object");
+        static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty_object");
         static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
-        static constexpr const CharT* json_const_pointer = JSONCONS_CSTRING_CONSTANT(CharT, "json const pointer");
+        static constexpr const CharT* json_const_pointer = JSONCONS_CSTRING_CONSTANT(CharT, "json_const_pointer");
 
         switch (storage)
         {

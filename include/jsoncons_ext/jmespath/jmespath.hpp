@@ -385,6 +385,29 @@ namespace jmespath {
         std::vector<std::unique_ptr<Json>> temp_storage_;
 
     public:
+        ~dynamic_resources()
+        {
+            for (auto& item : temp_storage_)
+            {
+                std::cout << item->storage() << " "  << *item << "\n";
+                switch (item->storage())
+                {
+                    case storage_kind::array_value:
+                        for (auto& elem : item->array_range())
+                        {
+                            std::cout << "    " << elem.storage() << " "  << elem << "\n";
+                        }
+                        break;
+                    case storage_kind::object_value:
+                        for (auto& elem : item->object_range())
+                        {
+                            std::cout << "    " << elem.value().storage() << " "  << elem.value() << "\n";
+                        }
+                        break;
+                }
+            }
+        }
+
         reference number_type_name() 
         {
             static Json number_type_name(JSONCONS_STRING_CONSTANT(char_type, "number"));
@@ -450,6 +473,7 @@ namespace jmespath {
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
+            std::cout << "create: " << *ptr << "\n";
             temp_storage_.emplace_back(std::move(temp));
             return ptr;
         }
@@ -3373,6 +3397,7 @@ namespace jmespath {
                     return Json::null();
                 }
                 dynamic_resources<Json,JsonReference> dynamic_storage;
+                std::cout << "begin evaluate\n";
                 return deep_copy(*evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
             }
 
