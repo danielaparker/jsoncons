@@ -38,19 +38,19 @@ public:
     using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
 
 private:
-    static const std::array<CharT, 4>& null_k()
+    static jsoncons::basic_string_view<CharT> null_constant()
     {
-        static constexpr std::array<CharT,4> k{'n','u','l','l'};
+        static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"null");
         return k;
     }
-    static const std::array<CharT, 4>& true_k()
+    static jsoncons::basic_string_view<CharT> true_constant()
     {
-        static constexpr std::array<CharT,4> k{'t','r','u','e'};
+        static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"true");
         return k;
     }
-    static const std::array<CharT, 5>& false_k()
+    static jsoncons::basic_string_view<CharT> false_constant()
     {
-        static constexpr std::array<CharT,5> k{'f','a','l','s','e'};
+        static jsoncons::basic_string_view<CharT> k = JSONCONS_STRING_VIEW_CONSTANT(CharT,"false");
         return k;
     }
 
@@ -759,7 +759,7 @@ private:
                 }
                 else
                 {
-                    sink.append(null_k().data(), null_k().size());
+                    sink.append(null_constant().data(), null_constant().size());
                 }
             }
             else if (val == std::numeric_limits<double>::infinity())
@@ -774,7 +774,7 @@ private:
                 }
                 else
                 {
-                    sink.append(null_k().data(), null_k().size());
+                    sink.append(null_constant().data(), null_constant().size());
                 }
             }
             else
@@ -789,7 +789,7 @@ private:
                 }
                 else
                 {
-                    sink.append(null_k().data(), null_k().size());
+                    sink.append(null_constant().data(), null_constant().size());
                 }
             }
         }
@@ -829,11 +829,11 @@ private:
 
         if (val)
         {
-            sink.append(true_k().data(), true_k().size());
+            sink.append(true_constant().data(), true_constant().size());
         }
         else
         {
-            sink.append(false_k().data(), false_k().size());
+            sink.append(false_constant().data(), false_constant().size());
         }
 
         end_value();
@@ -843,7 +843,7 @@ private:
     bool write_null_value(AnyWriter& sink) 
     {
         begin_value(sink);
-        sink.append(null_k().data(), null_k().size());
+        sink.append(null_constant().data(), null_constant().size());
         end_value();
         return true;
     }

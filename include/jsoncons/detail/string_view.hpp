@@ -54,9 +54,17 @@ namespace detail {
         constexpr basic_string_view(const basic_string_view& other) noexcept = default;
 
         template <class Tr, class Allocator>
-        basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept
+        JSONCONS_CPP14_CONSTEXPR  basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept
             : data_(s.data()), length_(s.length())
         {
+        }
+
+        JSONCONS_CPP14_CONSTEXPR basic_string_view& operator=( const basic_string_view& view ) noexcept
+        {
+            data_ = view.data();
+            length_ = view.length();
+
+            return *this;
         }
 
         template <class Allocator>
