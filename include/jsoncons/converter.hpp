@@ -223,35 +223,35 @@ namespace jsoncons {
         JSONCONS_CPP14_CONSTEXPR 
         Into from(bool val, semantic_tag, std::error_code&) const
         {
-            constexpr char_type true_literal[] = {'t','r','u','e'}; 
-            constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+            constexpr const char_type* true_constant = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
+            constexpr const char_type* false_constant = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
 
-            return val ? Into(true_literal,4) : Into(false_literal,5);
+            return val ? Into(true_constant,4) : Into(false_constant,5);
         }
 
         JSONCONS_CPP14_CONSTEXPR 
         Into from(bool val, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
-            constexpr char_type true_literal[] = {'t','r','u','e'}; 
-            constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+            constexpr const char_type* true_constant = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
+            constexpr const char_type* false_constant = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
 
-            return val ? Into(true_literal,4,alloc) : Into(false_literal,5,alloc);
+            return val ? Into(true_constant,4,alloc) : Into(false_constant,5,alloc);
         }
 
         JSONCONS_CPP14_CONSTEXPR 
         Into from(null_type, semantic_tag, std::error_code&) const
         {
-            constexpr char_type null_literal[] = {'n','u','l','l'}; 
+            constexpr const char_type* null_constant = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
 
-            return Into(null_literal,4);
+            return Into(null_constant,4);
         }
 
         JSONCONS_CPP14_CONSTEXPR 
         Into from(null_type, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
-            constexpr char_type null_literal[] = {'n','u','l','l'}; 
+            constexpr const char_type* null_constant = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
 
-            return Into(null_literal,4,alloc);
+            return Into(null_constant,4,alloc);
         }
     private:
 
