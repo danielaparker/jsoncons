@@ -106,7 +106,7 @@ namespace jsoncons {
         }
         ~json_array() noexcept
         {
-            destroy();
+            flatten_and_destroy();
         }
 
         reference back()
@@ -280,7 +280,7 @@ namespace jsoncons {
 
         json_array& operator=(const json_array<Json>&) = delete;
 
-        void destroy() noexcept
+        void flatten_and_destroy() noexcept
         {
             while (!elements_.empty())
             {
@@ -644,7 +644,7 @@ namespace jsoncons {
 
         ~json_object() noexcept
         {
-            destroy();
+            flatten_and_destroy();
         }
 
         bool empty() const
@@ -1206,7 +1206,7 @@ namespace jsoncons {
         }
     private:
 
-        void destroy() noexcept
+        void flatten_and_destroy() noexcept
         {
             if (!members_.empty())
             {
@@ -1220,10 +1220,7 @@ namespace jsoncons {
                         case storage_kind::object_value:
                             if (!kv.value().empty())
                             {
-                                Json tempitem;
-                                tempitem.swap(kv.value());
-                                temp.emplace_back(std::move(tempitem));
-                                //temp.emplace_back(std::move(kv.value()));
+                                temp.emplace_back(std::move(kv.value()));
                             }
                             break;
                         default:
@@ -1388,7 +1385,7 @@ namespace jsoncons {
 
         ~json_object() noexcept
         {
-            destroy();
+            flatten_and_destroy();
         }
 
         json_object& operator=(json_object&& val)
@@ -1926,7 +1923,7 @@ namespace jsoncons {
         }
     private:
 
-        void destroy() noexcept
+        void flatten_and_destroy() noexcept
         {
             if (!members_.empty())
             {
