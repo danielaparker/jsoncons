@@ -1223,6 +1223,7 @@ namespace jsoncons {
                                 Json tempitem;
                                 tempitem.swap(kv.value());
                                 temp.emplace_back(std::move(tempitem));
+                                //temp.emplace_back(std::move(kv.value()));
                             }
                             break;
                         default:
