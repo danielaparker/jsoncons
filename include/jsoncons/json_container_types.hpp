@@ -1212,11 +1212,21 @@ namespace jsoncons {
             {
                 json_array<Json> temp(get_allocator());
 
-                for (auto&& kv : members_)
+                for (auto& kv : members_)
                 {
-                    if (kv.value().size() > 0)
+                    switch (kv.value().storage())
                     {
-                        temp.emplace_back(std::move(kv.value()));
+                        case storage_kind::array_value:
+                        case storage_kind::object_value:
+                            if (!kv.value().empty())
+                            {
+                                Json tempitem;
+                                tempitem.swap(kv.value());
+                                temp.emplace_back(std::move(tempitem));
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
