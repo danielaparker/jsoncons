@@ -96,7 +96,7 @@ namespace jsoncons {
         return os;
     }
 
-    enum class storage_kind : uint8_t 
+    enum class json_storage_kind : uint8_t 
     {
         null_value = 0x00,
         bool_value = 0x01,
@@ -114,7 +114,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, storage_kind storage)
+    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, json_storage_kind storage)
     {
         static constexpr const CharT* null_value = JSONCONS_CSTRING_CONSTANT(CharT, "null");
         static constexpr const CharT* bool_value = JSONCONS_CSTRING_CONSTANT(CharT, "bool");
@@ -132,67 +132,67 @@ namespace jsoncons {
 
         switch (storage)
         {
-            case storage_kind::null_value:
+            case json_storage_kind::null_value:
             {
                 os << null_value;
                 break;
             }
-            case storage_kind::bool_value:
+            case json_storage_kind::bool_value:
             {
                 os << bool_value;
                 break;
             }
-            case storage_kind::int64_value:
+            case json_storage_kind::int64_value:
             {
                 os << int64_value;
                 break;
             }
-            case storage_kind::uint64_value:
+            case json_storage_kind::uint64_value:
             {
                 os << uint64_value;
                 break;
             }
-            case storage_kind::half_value:
+            case json_storage_kind::half_value:
             {
                 os << half_value;
                 break;
             }
-            case storage_kind::double_value:
+            case json_storage_kind::double_value:
             {
                 os << double_value;
                 break;
             }
-            case storage_kind::short_string_value:
+            case json_storage_kind::short_string_value:
             {
                 os << short_string_value;
                 break;
             }
-            case storage_kind::long_string_value:
+            case json_storage_kind::long_string_value:
             {
                 os << long_string_value;
                 break;
             }
-            case storage_kind::byte_string_value:
+            case json_storage_kind::byte_string_value:
             {
                 os << byte_string_value;
                 break;
             }
-            case storage_kind::array_value:
+            case json_storage_kind::array_value:
             {
                 os << array_value;
                 break;
             }
-            case storage_kind::empty_object_value:
+            case json_storage_kind::empty_object_value:
             {
                 os << empty_object_value;
                 break;
             }
-            case storage_kind::object_value:
+            case json_storage_kind::object_value:
             {
                 os << object_value;
                 break;
             }
-            case storage_kind::json_const_pointer:
+            case json_storage_kind::json_const_pointer:
             {
                 os << json_const_pointer;
                 break;

@@ -286,9 +286,9 @@ namespace jsoncons {
             {
                 value_type current = std::move(elements_.back());
                 elements_.pop_back();
-                switch (current.storage())
+                switch (current.storage_kind())
                 {
-                    case storage_kind::array_value:
+                    case json_storage_kind::array_value:
                     {
                         for (auto&& item : current.array_range())
                         {
@@ -300,7 +300,7 @@ namespace jsoncons {
                         current.clear();                           
                         break;
                     }
-                    case storage_kind::object_value:
+                    case json_storage_kind::object_value:
                     {
                         for (auto&& kv : current.object_range())
                         {
@@ -1214,10 +1214,10 @@ namespace jsoncons {
 
                 for (auto& kv : members_)
                 {
-                    switch (kv.value().storage())
+                    switch (kv.value().storage_kind())
                     {
-                        case storage_kind::array_value:
-                        case storage_kind::object_value:
+                        case json_storage_kind::array_value:
+                        case json_storage_kind::object_value:
                             if (!kv.value().empty())
                             {
                                 temp.emplace_back(std::move(kv.value()));

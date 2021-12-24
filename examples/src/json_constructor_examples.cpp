@@ -103,7 +103,7 @@ namespace {
 
         for (const auto& item : j_v.array_range())
         {
-            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
+            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage_kind() << "\n";
         }
 
         json j2 = deep_copy(j_v);
@@ -112,7 +112,7 @@ namespace {
 
         for (const auto& item : j2.array_range())
         {
-            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
+            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage_kind() << "\n";
         }
     }
 

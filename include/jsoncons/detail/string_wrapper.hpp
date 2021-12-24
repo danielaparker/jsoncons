@@ -98,7 +98,7 @@ namespace detail {
             str_t data;
             char_type c[1];
         };
-        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type storage_kind;
+        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
 
         string_pointer ptr_;
     public:
@@ -159,7 +159,7 @@ namespace detail {
     private:
         static size_t aligned_size(std::size_t n)
         {
-            return sizeof(storage_kind) + n;
+            return sizeof(json_storage_kind) + n;
         }
 
         static string_pointer create(const char_type* s, std::size_t length, const Allocator& alloc)
@@ -263,7 +263,7 @@ namespace detail {
             str_t data;
             char_type c[1];
         };
-        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type storage_kind;
+        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
 
         string_pointer ptr_;
     public:
@@ -329,7 +329,7 @@ namespace detail {
     private:
         static size_t aligned_size(std::size_t n)
         {
-            return sizeof(storage_kind) + n;
+            return sizeof(json_storage_kind) + n;
         }
 
         static string_pointer create(const char_type* s, std::size_t length, uint64_t tag, const Allocator& alloc)
