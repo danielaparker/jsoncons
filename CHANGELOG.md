@@ -1,3 +1,15 @@
+0.168.2
+-------
+
+Issues fixed:
+
+- Fixed [issue \#343](https://github.com/danielaparker/jsoncons/issues/343)
+concerning segfault using JMESPath with Apple clang version 12.0.0 and
+x86_64-apple-darwin19.6.0.
+
+- Fixed [issue \#344](https://github.com/danielaparker/jsoncons/issues/344)
+concerning compile error with gcc on archlinux with `-Werror=nonnull`.
+
 0.168.1
 -------
 
