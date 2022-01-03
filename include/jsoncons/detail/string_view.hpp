@@ -47,7 +47,8 @@ namespace detail {
             : data_(data), length_(length)
         {
         }
-        constexpr basic_string_view(const CharT* data)
+        
+        basic_string_view(const CharT* data)
             : data_(data), length_(Traits::length(data))
         {
         }

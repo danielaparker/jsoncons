@@ -273,15 +273,15 @@ namespace jsoncons {
     }
 
     template<typename CharT>
-    constexpr jsoncons::basic_string_view<CharT> string_view_constant_of_type(const char* c, const wchar_t* w);
+    jsoncons::basic_string_view<CharT> string_view_constant_of_type(const char* c, const wchar_t* w);
 
     template<> inline
-    constexpr jsoncons::string_view string_view_constant_of_type<char>(const char* c, const wchar_t*)
+    jsoncons::string_view string_view_constant_of_type<char>(const char* c, const wchar_t*)
     {
         return jsoncons::string_view(c);
     }
     template<> inline
-    constexpr jsoncons::wstring_view string_view_constant_of_type<wchar_t>(const char*, const wchar_t* w)
+    jsoncons::wstring_view string_view_constant_of_type<wchar_t>(const char*, const wchar_t* w)
     {
         return jsoncons::wstring_view(w);
     }
