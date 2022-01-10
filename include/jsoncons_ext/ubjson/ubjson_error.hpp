@@ -67,7 +67,7 @@ public:
             case ubjson_errc::key_expected:
                 return "Text string key in a map expected";
             case ubjson_errc::max_items_exceeded:
-                return "Number of items in UBJSON object or array exceeds limit in options";
+                return "Number of items in UBJSON object or array exceeds limit set in options";
             default:
                 return "Unknown UBJSON parser error";
         }

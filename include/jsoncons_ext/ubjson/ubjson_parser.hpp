@@ -514,9 +514,12 @@ private:
             default:
             {
                 ec = ubjson_errc::unknown_type;
-                more_ = false;
-                return;
+                break;
             }
+        }
+        if (ec)
+        {
+            more_ = false;
         }
     }
 

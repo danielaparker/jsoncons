@@ -290,23 +290,27 @@ private:
     {
         if (length <= (std::numeric_limits<uint8_t>::max)())
         {
-            sink_.push_back('U');
+            sink_.push_back(ubjson_type::uint8_type);
             binary::native_to_big(static_cast<uint8_t>(length), std::back_inserter(sink_));
         }
         else if (length <= (std::size_t)(std::numeric_limits<int16_t>::max)())
         {
-            sink_.push_back('I');
+            sink_.push_back(ubjson_type::int16_type);
             binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
         }
-        else if (length <= (uint32_t)(std::numeric_limits<int32_t>::max)())
+        else if (length <= (std::size_t)(std::numeric_limits<int32_t>::max)())
         {
-            sink_.push_back('l');
+            sink_.push_back(ubjson_type::int32_type);
             binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
         }
-        else if (length <= (uint64_t)(std::numeric_limits<int64_t>::max)())
+        else if (length <= (std::size_t)(std::numeric_limits<int64_t>::max)())
         {
-            sink_.push_back('L');
-            binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+            sink_.push_back(ubjson_type::int64_type);
+            binary::native_to_big(static_cast<uint64_t>(length),std::back_inserter(sink_));
+        }
+        else
+        {
+            JSONCONS_THROW(ser_error(ubjson_errc::too_many_items));
         }
     }
 

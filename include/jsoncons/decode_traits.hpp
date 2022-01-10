@@ -33,7 +33,11 @@ namespace jsoncons {
         {
             decoder.reset();
             cursor.read_to(decoder, ec);
-            if (!decoder.is_valid())
+            if (ec)
+            {
+                JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            }
+            else if (!decoder.is_valid())
             {
                 JSONCONS_THROW(ser_error(conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()));
             }

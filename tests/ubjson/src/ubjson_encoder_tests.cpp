@@ -16,6 +16,30 @@
 using namespace jsoncons;
 using namespace jsoncons::ubjson;
 
+namespace ns {
+    class hiking_reputon
+    {
+        std::vector<double> x_;
+    public:
+        hiking_reputon(std::vector<double> x)
+            : x_(x)
+        {
+        }
+        const std::vector<double>& x() const {return x_;}
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return lhs.x_ == rhs.x_;
+        }
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputon, x)
+
 TEST_CASE("serialize array to ubjson")
 {
     std::vector<uint8_t> v;
@@ -104,3 +128,22 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
         encoder.flush();
     }
 }
+
+TEST_CASE("serialize big array to ubjson")
+{
+    std::vector<double> x; x.resize(16777217);
+    for (int i = 0; i < x.size(); ++i) { x[i] = (double)i; }
+    ns::hiking_reputon val(x);
+
+    // Encode a ns::hiking_reputation value to UBJSON
+    std::vector<uint8_t> data;
+    jsoncons::ubjson::encode_ubjson(val, data);
+    std::cout << "start reading" << std::endl;
+
+    jsoncons::ubjson::ubjson_options options;
+    options.max_items((std::numeric_limits<int32_t>::max)());
+    ns::hiking_reputon val2 = jsoncons::ubjson::decode_ubjson<ns::hiking_reputon>(data, options);
+
+    CHECK(val2 == val);
+}
+
