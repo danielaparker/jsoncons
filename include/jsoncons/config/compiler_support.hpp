@@ -218,10 +218,10 @@
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
    #if defined(__clang__) && defined(__cplusplus)
       #if defined(__APPLE__)
-         #if __clang_major__ >= 6  && __cplusplus >= 201103L // Xcode 6
+         #if __clang_major__ >= 6  && __cplusplus >= 201402L // Xcode 6
             #define JSONCONS_HAS_STD_MAKE_UNIQUE
          #endif
-      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && __cplusplus > 201103L
+      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && __cplusplus >= 201402L
          #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #elif defined(__GNUC__)
