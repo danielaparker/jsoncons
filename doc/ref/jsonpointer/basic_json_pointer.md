@@ -82,6 +82,14 @@ Returns a JSON Pointer represented as a string value, escaping any `/` or `~` ch
 Returns a string representing the JSON Pointer as a URI fragment identifier, 
 escaping any `/` or `~` characters.
 
+
+#### Static member functions
+
+   static parse(const string_view_type& str);
+   static parse(const string_view_type& str, std::error_code& ec);
+Constructs a `basic_json_pointer` from a string representation or a 
+URI fragment identifier (starts with `#`).
+
 #### Non-member functions
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);
 Concatenates a JSON Pointer pointer and a string. Effectively returns basic_json_pointer<CharT>(lhs) /= s.
