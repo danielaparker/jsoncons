@@ -179,6 +179,7 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.push_back(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
+                if (ec) {return T{};}
                 cursor.next(ec);
             }
             return v;
@@ -419,7 +420,9 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.insert(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
+                if (ec) {return T{};}
                 cursor.next(ec);
+                if (ec) {return T{};}
             }
             return v;
         }
@@ -454,7 +457,9 @@ namespace jsoncons {
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
                 v[i] = decode_traits<value_type,CharT>::decode(cursor, decoder, ec);
+                if (ec) {return T{};}
                 cursor.next(ec);
+                if (ec) {return T{};}
             }
             return v;
         }
@@ -498,7 +503,9 @@ namespace jsoncons {
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(std::move(key),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
+                if (ec) {return val;}
                 cursor.next(ec);
+                if (ec) {return val;}
             }
             return val;
         }
@@ -547,7 +554,9 @@ namespace jsoncons {
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
+                if (ec) {return val;}
                 cursor.next(ec);
+                if (ec) {return val;}
             }
             return val;
         }
