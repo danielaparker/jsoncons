@@ -1,3 +1,14 @@
+0.168.3
+-------
+
+Issues fixed:
+
+- Preseve original error messages when decoding into C++ data structures
+(related to [issue \#345](https://github.com/danielaparker/jsoncons/issues/345))
+
+- Fixed [issue \#348](https://github.com/danielaparker/jsoncons/issues/348))
+concerning compilation issue on OSx with C++11 
+
 0.168.2
 -------
 
