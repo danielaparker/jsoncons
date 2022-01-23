@@ -457,9 +457,9 @@ namespace jsoncons {
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
                 v[i] = decode_traits<value_type,CharT>::decode(cursor, decoder, ec);
-                if (ec) {return T{};}
+                if (ec) {return v;}
                 cursor.next(ec);
-                if (ec) {return T{};}
+                if (ec) {return v;}
             }
             return v;
         }
