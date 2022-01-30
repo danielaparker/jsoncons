@@ -227,7 +227,7 @@ namespace jsoncons {
 
 
     // Sort keys
-    template <class KeyT,class Json,template<typename,typename> typename SequenceContainer = std::vector>
+    template <class KeyT,class Json,template<typename,typename> class SequenceContainer = std::vector>
     class sorted_json_object : public allocator_holder<typename Json::allocator_type>    
     {
     public:
@@ -932,7 +932,7 @@ namespace jsoncons {
     };
 
     // Preserve order
-    template <class KeyT,class Json,template<typename,typename> typename SequenceContainer = std::vector>
+    template <class KeyT,class Json,template<typename,typename> class SequenceContainer = std::vector>
     class order_preserving_json_object : public allocator_holder<typename Json::allocator_type>
     {
     public:
