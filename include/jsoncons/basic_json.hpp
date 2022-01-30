@@ -236,7 +236,7 @@ namespace jsoncons {
     struct sorted_policy 
     {
         template <class KeyT,class Json>
-        using object = json_object<KeyT,Json>;
+        using object = sorted_json_object<KeyT,Json>;
 
         using key_order = sort_key_order;
 
@@ -249,7 +249,7 @@ namespace jsoncons {
     struct preserve_order_policy : public sorted_policy
     {
         template <class KeyT,class Json>
-        using object = json_object<KeyT,Json>;
+        using object = order_preserving_json_object<KeyT,Json>;
 
         using key_order = preserve_key_order;
     };
@@ -362,8 +362,6 @@ namespace jsoncons {
         using array = json_array<basic_json>;
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
-
-        //using object = json_object<key_type,basic_json>;
 
         using object = typename ImplementationPolicy::template object<key_type,basic_json>;
 

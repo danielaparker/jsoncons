@@ -127,7 +127,7 @@ TEST_CASE("ojson sorted_unique_range_tag")
 
 TEST_CASE("order preserving insert")
 {
-    json_object<std::string, ojson> o;
+    typename ojson::object o;
 
     using item_type = std::pair<ojson::key_type,ojson>;
     std::vector<item_type> items;
@@ -179,7 +179,7 @@ TEST_CASE("order preserving insert")
 
 TEST_CASE("order preserving insert_or_assign")
 {
-    json_object<std::string, ojson> o;
+    typename ojson::object o;
 
     o.insert_or_assign("b", 1);
     o.insert_or_assign("a", 2);
@@ -315,7 +315,7 @@ TEST_CASE("order preserving insert_or_assign")
 
 TEST_CASE("order preserving erase")
 {
-    json_object<std::string, ojson> o;
+    typename ojson::object o;
 
     const std::string key1 = "key1";
     const std::string key2 = "key2";
@@ -333,7 +333,7 @@ TEST_CASE("order preserving erase")
     o.insert_or_assign(key3, value3);
     REQUIRE(o.size() == 4);
 
-    const json_object<std::string, ojson> original = o;
+    const typename ojson::object original = o;
 
     SECTION("erase 1,2,3,4, insert 2,1,4,3, compare")
     {
