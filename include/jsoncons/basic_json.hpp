@@ -235,19 +235,22 @@ namespace jsoncons {
 
     struct sorted_policy 
     {
+        template <class KeyT,class Json>
+        using object = json_object<KeyT,Json>;
+
         using key_order = sort_key_order;
 
         template <class T,class Allocator>
         using sequence_container_type = std::vector<T,Allocator>;
-
-        template <class CharT, class CharTraits, class Allocator>
-        using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
 
         using parse_error_handler_type = default_json_parsing;
     };
 
     struct preserve_order_policy : public sorted_policy
     {
+        template <class KeyT,class Json>
+        using object = json_object<KeyT,Json>;
+
         using key_order = preserve_key_order;
     };
 
@@ -360,7 +363,9 @@ namespace jsoncons {
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
 
-        using object = json_object<key_type,basic_json>;
+        //using object = json_object<key_type,basic_json>;
+
+        using object = typename ImplementationPolicy::template object<key_type,basic_json>;
 
         using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;              
         using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    

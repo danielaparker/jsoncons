@@ -43,6 +43,7 @@ namespace jsoncons {
         using allocator_type = typename ValueT::allocator_type;
         using string_view_type = typename value_type::string_view_type;
     private:
+
         key_type key_;
         value_type value_;
     public:
@@ -245,7 +246,13 @@ namespace jsoncons {
         using string_view_type = typename Json::string_view_type;
         using implementation_policy = typename Json::implementation_policy;
     private:
-        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
+        struct Comp
+        {
+            bool operator() (const key_value_type& kv, string_view_type k) const { return kv.key() < k; }
+            bool operator() (string_view_type k, const key_value_type& kv) const { return k < kv.key(); }
+        };
+
+        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
 
         key_value_container_type members_;
@@ -420,19 +427,16 @@ namespace jsoncons {
 
         iterator find(const string_view_type& name) noexcept
         {
-            auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-            auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
-            return result;
+            auto p = std::equal_range(members_.begin(),members_.end(), name, 
+                                       Comp());        
+            return p.first == p.second ? members_.end() : p.first;
         }
 
         const_iterator find(const string_view_type& name) const noexcept
         {
-            auto it = std::lower_bound(members_.begin(),members_.end(), 
-                                       name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});
-            auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
-            return result;
+            auto p = std::equal_range(members_.begin(),members_.end(), name, 
+                                       Comp());        
+            return p.first == p.second ? members_.end() : p.first;
         }
 
         void erase(const_iterator pos) 
@@ -458,9 +462,8 @@ namespace jsoncons {
 
         void erase(const string_view_type& name) 
         {
-            auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-            if (it != members_.end() && it->key() == name)
+            auto it = find(name);
+            if (it != members_.end())
             {
                 members_.erase(it);
             }
@@ -516,7 +519,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       Comp());        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -545,7 +548,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       Comp());        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -576,7 +579,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       Comp());        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -604,7 +607,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       Comp());        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -635,12 +638,12 @@ namespace jsoncons {
             if (hint != members_.end() && hint->key() <= name)
             {
                 it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
             else
             {
                 it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
 
             if (it == members_.end())
@@ -670,12 +673,12 @@ namespace jsoncons {
             if (hint != members_.end() && hint->key() <= name)
             {
                 it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
             else
             {
                 it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
 
             if (it == members_.end())
@@ -741,12 +744,12 @@ namespace jsoncons {
             if (hint != members_.end() && hint->key() <= name)
             {
                 it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
             else
             {
                 it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      Comp());        
             }
 
             if (it == members_.end())
@@ -785,7 +788,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
-                                            [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
+                                            Comp());   
                 if (pos == members_.end() )
                 {
                     members_.emplace_back(*it);
@@ -815,12 +818,12 @@ namespace jsoncons {
                 if (hint != members_.end() && hint->key() <= (*it).key())
                 {
                     pos = std::lower_bound(hint,members_.end(), (*it).key(), 
-                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                          Comp());        
                 }
                 else
                 {
                     pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
-                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                          Comp());        
                 }
                 if (pos == members_.end() )
                 {
@@ -851,7 +854,7 @@ namespace jsoncons {
             for (; it != end; ++it)
             {
                 auto pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
-                                            [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
+                                            Comp());   
                 if (pos == members_.end() )
                 {
                     members_.emplace_back(*it);
@@ -881,12 +884,12 @@ namespace jsoncons {
                 if (hint != members_.end() && hint->key() <= (*it).key())
                 {
                     pos = std::lower_bound(hint,members_.end(), (*it).key(), 
-                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                          Comp());        
                 }
                 else
                 {
                     pos = std::lower_bound(members_.begin(),members_.end(), (*it).key(), 
-                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                          Comp());        
                 }
                 if (pos == members_.end() )
                 {
@@ -951,6 +954,7 @@ namespace jsoncons {
         using key_value_type = key_value<KeyT,Json>;
         using implementation_policy = typename Json::implementation_policy;
     private:
+
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
@@ -958,6 +962,19 @@ namespace jsoncons {
 
         key_value_container_type members_;
         index_container_type index_;
+
+        struct Comp
+        {
+            const key_value_container_type& members_;
+
+            Comp(const key_value_container_type& members_)
+                : members_(members_)
+            {
+            }
+
+            bool operator() (std::size_t i, string_view_type k) const { return members_.at(i).key() < k; }
+            bool operator() (string_view_type k, std::size_t i) const { return k < members_.at(i).key(); }
+        };
     public:
         using iterator = typename key_value_container_type::iterator;
         using const_iterator = typename key_value_container_type::const_iterator;
@@ -1181,7 +1198,7 @@ namespace jsoncons {
         iterator find(const string_view_type& name) noexcept
         {
             auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                        [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                        Comp(members_));        
             if (it != index_.end() && members_.at(*it).key() == name)
             {
                 return members_.begin() + *it;
@@ -1195,7 +1212,7 @@ namespace jsoncons {
         const_iterator find(const string_view_type& name) const noexcept
         {
             auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                        [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                        Comp(members_));        
             if (it != index_.end() && members_.at(*it).key() == name)
             {
                 return members_.begin() + *it;
@@ -1650,7 +1667,7 @@ namespace jsoncons {
             JSONCONS_ASSERT(pos <= index_.size());
 
             auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                        [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                        Comp(members_));        
 
             if (it == index_.end())
             {
