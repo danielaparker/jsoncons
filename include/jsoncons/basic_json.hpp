@@ -236,23 +236,28 @@ namespace jsoncons {
     struct sorted_policy 
     {
         template <class KeyT,class Json>
-        using object = sorted_json_object<KeyT,Json>;
+        using object = sorted_json_object<KeyT,Json,std::vector>;
 
-        using key_order = sort_key_order;
-
-        template <class T,class Allocator>
-        using sequence_container_type = std::vector<T,Allocator>;
+        template <class Json>
+        using array = json_array<Json,std::vector>;
 
         using parse_error_handler_type = default_json_parsing;
     };
 
-    struct preserve_order_policy : public sorted_policy
+    struct order_preserving_policy
     {
         template <class KeyT,class Json>
-        using object = order_preserving_json_object<KeyT,Json>;
+        using object = order_preserving_json_object<KeyT,Json,std::vector>;
 
-        using key_order = preserve_key_order;
+        template <class Json>
+        using array = json_array<Json,std::vector>;
+
+        using parse_error_handler_type = default_json_parsing;
     };
+
+    #if !defined(JSONCONS_NO_DEPRECATED)
+        using preserve_order_policy = order_preserving_policy;
+    #endif
 
     template <class IteratorT, class ConstIteratorT>
     class range 
@@ -359,7 +364,7 @@ namespace jsoncons {
         JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
     #endif
 
-        using array = json_array<basic_json>;
+        using array = typename ImplementationPolicy::template array<basic_json>;
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
 
@@ -5778,11 +5783,11 @@ namespace jsoncons {
 
     using json = basic_json<char,sorted_policy,std::allocator<char>>;
     using wjson = basic_json<wchar_t,sorted_policy,std::allocator<char>>;
-    using ojson = basic_json<char, preserve_order_policy, std::allocator<char>>;
-    using wojson = basic_json<wchar_t, preserve_order_policy, std::allocator<char>>;
+    using ojson = basic_json<char, order_preserving_policy, std::allocator<char>>;
+    using wojson = basic_json<wchar_t, order_preserving_policy, std::allocator<char>>;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use wojson") typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;
+    JSONCONS_DEPRECATED_MSG("Instead, use wojson") typedef basic_json<wchar_t, order_preserving_policy, std::allocator<wchar_t>> owjson;
     JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<json>") typedef json_decoder<json> json_deserializer;
     JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<wjson>") typedef json_decoder<wjson> wjson_deserializer;
     JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<ojson>") typedef json_decoder<ojson> ojson_deserializer;

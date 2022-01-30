@@ -227,17 +227,15 @@ namespace jsoncons {
 
 
     // Sort keys
-    template <class KeyT,class Json>
+    template <class KeyT,class Json,template<typename,typename> typename SequenceContainer = std::vector>
     class sorted_json_object : public allocator_holder<typename Json::allocator_type>    
     {
     public:
         using allocator_type = typename Json::allocator_type;
         using key_type = KeyT;
-        //using mapped_type = Json;
         using key_value_type = key_value<KeyT,Json>;
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
-        using implementation_policy = typename Json::implementation_policy;
     private:
         struct Comp
         {
@@ -246,7 +244,7 @@ namespace jsoncons {
         };
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;
-        using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
+        using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
 
         key_value_container_type members_;
     public:
@@ -934,7 +932,7 @@ namespace jsoncons {
     };
 
     // Preserve order
-    template <class KeyT,class Json>
+    template <class KeyT,class Json,template<typename,typename> typename SequenceContainer = std::vector>
     class order_preserving_json_object : public allocator_holder<typename Json::allocator_type>
     {
     public:
@@ -944,13 +942,14 @@ namespace jsoncons {
         //using mapped_type = Json;
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
-        using implementation_policy = typename Json::implementation_policy;
+        //using implementation_policy = typename Json::implementation_policy;
     private:
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
-        using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
+        using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
-        using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
+        //using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
+        using index_container_type = SequenceContainer<std::size_t,index_allocator_type>;
 
         key_value_container_type members_;
         index_container_type index_;

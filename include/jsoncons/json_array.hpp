@@ -26,16 +26,15 @@ namespace jsoncons {
 
     // json_array
 
-    template <class Json>
+    template <class Json,template<typename,typename> typename SequenceContainer = std::vector>
     class json_array : public allocator_holder<typename Json::allocator_type>
     {
     public:
         using allocator_type = typename Json::allocator_type;
         using value_type = Json;
-        using implementation_policy = typename Json::implementation_policy;
     private:
         using value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;                   
-        using value_container_type = typename implementation_policy::template sequence_container_type<value_type,value_allocator_type>;
+        using value_container_type = SequenceContainer<value_type,value_allocator_type>;
         value_container_type elements_;
     public:
         using iterator = typename value_container_type::iterator;
