@@ -1197,30 +1197,16 @@ namespace jsoncons {
 
         iterator find(const string_view_type& name) noexcept
         {
-            auto it = std::lower_bound(index_.begin(),index_.end(), name, 
+            auto p = std::equal_range(index_.begin(),index_.end(), name, 
                                         Comp(members_));        
-            if (it != index_.end() && members_.at(*it).key() == name)
-            {
-                return members_.begin() + *it;
-            }
-            else
-            {
-                return members_.end();
-            }
+            return p.first == p.second ? members_.end() : members_.begin() + *p.first;
         }
 
         const_iterator find(const string_view_type& name) const noexcept
         {
-            auto it = std::lower_bound(index_.begin(),index_.end(), name, 
+            auto p = std::equal_range(index_.begin(),index_.end(), name, 
                                         Comp(members_));        
-            if (it != index_.end() && members_.at(*it).key() == name)
-            {
-                return members_.begin() + *it;
-            }
-            else
-            {
-                return members_.end();
-            }
+            return p.first == p.second ? members_.end() : members_.begin() + *p.first;
         }
 
         void erase(const_iterator first, const_iterator last) 
