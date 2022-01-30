@@ -26,7 +26,7 @@ namespace jsoncons {
 
     // json_array
 
-    template <class Json,template<typename,typename> typename SequenceContainer = std::vector>
+    template <class Json,template<typename,typename> class SequenceContainer = std::vector>
     class json_array : public allocator_holder<typename Json::allocator_type>
     {
     public:
