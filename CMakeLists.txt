@@ -31,7 +31,7 @@ OPTION(JSONCONS_BUILD_TESTS "jsoncons test suite" ON)
 if(JSONCONS_BUILD_TESTS)
     include(CTest)
     enable_testing()
-    add_subdirectory(tests)
+    add_subdirectory(test)
 endif()
 
 # Installation
