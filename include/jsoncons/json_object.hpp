@@ -46,7 +46,7 @@ namespace jsoncons {
         value_type value_;
     public:
 
-        key_value()
+        key_value() noexcept
         {
         }
 
@@ -59,13 +59,6 @@ namespace jsoncons {
             : key_(name)
         {
         }
-
-        //template <class T>
-        //key_value(key_type&& name, T&& val)
-        //    : key_(std::forward<key_type>(name)), 
-        //      value_(std::forward<T>(val))
-        //{
-        //}
 
         template <typename... Args>
         key_value(const key_type& name,  Args&& ... args)

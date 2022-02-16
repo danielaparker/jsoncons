@@ -104,6 +104,16 @@
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
+#ifndef JSONCONS_HAS_CP14
+   #if defined(_MSVC_LANG) 
+       #if _MSVC_LANG >= 201402L
+           #define JSONCONS_HAS_CP14 
+       #endif
+   #elif __cplusplus >= 201402L
+        #define JSONCONS_HAS_CP14 
+   #endif
+#endif
+
 #if !defined(JSONCONS_HAS_2017)
 #  if defined(__clang__)
 #   if (__cplusplus >= 201703)
@@ -246,6 +256,7 @@
       #endif
    #endif
 #endif
+
 #if defined(JSONCONS_HAS_CP14_CONSTEXPR)
 #  define JSONCONS_CPP14_CONSTEXPR constexpr
 #else
@@ -305,6 +316,12 @@ namespace jsoncons {
    typedef __float128 float128_type;
 #  endif
 }
+#endif
+    
+#if defined(_MSC_VER) 
+    #define JSONCONS_COPY(first,last,d_first) std::copy(first, last, stdext::make_checked_array_iterator(d_first, static_cast<std::size_t>(std::distance(first, last))))
+#else 
+    #define JSONCONS_COPY(first,last,d_first) std::copy(first, last, d_first)
 #endif
 
 namespace jsoncons {
