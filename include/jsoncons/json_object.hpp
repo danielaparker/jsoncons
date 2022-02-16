@@ -205,6 +205,12 @@ namespace jsoncons {
         {
             return !(lhs < rhs);
         }
+
+        friend void swap(key_value& a, key_value& b) noexcept(
+            noexcept(std::declval<key_value&>().swap(std::declval<key_value&>()))) 
+        {
+            a.swap(b);
+        }
     };
 
     template <class KeyT, class ValueT>
