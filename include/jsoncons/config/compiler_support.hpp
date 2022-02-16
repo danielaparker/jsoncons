@@ -318,10 +318,16 @@ namespace jsoncons {
 }
 #endif
     
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER) && _MSC_VER <= 1900
     #define JSONCONS_COPY(first,last,d_first) std::copy(first, last, stdext::make_checked_array_iterator(d_first, static_cast<std::size_t>(std::distance(first, last))))
 #else 
     #define JSONCONS_COPY(first,last,d_first) std::copy(first, last, d_first)
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER <= 1900 
+#define JSONCONS_CONSTEXPR
+#else
+#define JSONCONS_CONSTEXPR constexpr
 #endif
 
 namespace jsoncons {

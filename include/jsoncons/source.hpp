@@ -477,11 +477,7 @@ namespace jsoncons {
         {
             std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
 
-#if defined(_MSC_VER) 
-        std::copy(current_, current_ + count, stdext::make_checked_array_iterator(data, count));
-#else 
-        std::copy(current_, current_ + count, data);
-#endif
+            JSONCONS_COPY(current_, current_ + count, data);
             current_ += count;
             position_ += count;
 
@@ -681,11 +677,7 @@ namespace jsoncons {
         read(value_type* data, std::size_t length)
         {
             std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-#if defined(_MSC_VER)
-        std::copy(current_, current_ + count, stdext::make_checked_array_iterator(data, count));
-#else 
-        std::copy(current_, current_ + count, data);
-#endif
+            JSONCONS_COPY(current_, current_ + count, data);
             current_ += count;
             position_ += count;
 
