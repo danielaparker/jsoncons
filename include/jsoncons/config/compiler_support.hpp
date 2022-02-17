@@ -134,6 +134,12 @@
 #  endif // defined(_MSC_VER)
 #endif
 
+#if defined(JSONCONS_HAS_2017)
+    #define JSONCONS_NODISCARD [[nodiscard]]
+#else
+    #define JSONCONS_NODISCARD
+#endif
+
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #  if (defined JSONCONS_HAS_2017)
 #    if defined(__clang__)
