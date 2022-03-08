@@ -20,6 +20,9 @@ The `_NAME_` macros are the most general. They allow optional
 parameters that affect data member mappings. Optionality is
 indicated by square brackets.
 
+The maximum number of parameters allowed in macros is 70 (since 0.168.4).
+Previously it was 50.
+
 ```c++
 #include <jsoncons/json_type_traits.hpp>
 

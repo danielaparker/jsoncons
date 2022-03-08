@@ -1,3 +1,17 @@
+0.168.4
+-------
+
+Issues fixed:
+
+- Fixed [issue \#352](https://github.com/danielaparker/jsoncons/issues/352)
+regarding `json_type_traits` macro failure when number of parameters 
+reached 47.
+
+Enhancement:
+
+Increased maximum number of parameters in `json_type_traits` macros
+from 50 to 70.
+
 0.168.3
 -------
 
