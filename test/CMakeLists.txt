@@ -43,7 +43,7 @@ endif()
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 
-set(JSONCONS_TESTS_DIR ${JSONCONS_PROJECT_DIR}/tests)
+set(JSONCONS_TESTS_DIR ${JSONCONS_PROJECT_DIR}/test)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
@@ -199,7 +199,7 @@ target_compile_options(unit_tests PRIVATE
 endif()
 
 add_test(jsoncons unit_tests
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
 
 target_include_directories (unit_tests 
                             PUBLIC ${JSONCONS_INCLUDE_DIR} 
