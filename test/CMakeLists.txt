@@ -149,6 +149,7 @@ add_executable(unit_tests
                src/json_swap_tests.cpp
                src/json_traits_macro_functional_tests.cpp
                src/json_traits_macro_tests.cpp
+               src/json_traits_macro_limit_tests.cpp
                src/json_traits_name_macro_tests.cpp
                src/json_type_traits_chrono_tests.cpp
                src/json_type_traits_container_tests.cpp

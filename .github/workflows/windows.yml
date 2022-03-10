@@ -1,42 +1,140 @@
 name: Windows
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
 
 jobs:
-  msvc2019:
+  vs2022:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: cmake
-      run: cmake -S . -B build -G "Visual Studio 16 2019" -D CMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
-    - name: build
-      run: cmake --build build --parallel 10
-    - name: test
-      run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
-  clang-cl-11-x64:
+    - run: cmake -E make_directory build
+
+    - shell: bash
+      working-directory: build/
+      run: cmake $GITHUB_WORKSPACE -G "Visual Studio 17 2022" -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+  vs2022-clang:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
     runs-on: windows-latest
-  
+
     steps:
-      - uses: actions/checkout@v2
-      - name: cmake
-        run: cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -T ClangCL -DJSONCONS_BUILD_TESTS=On 
-      - name: build
-        run: cmake --build build --config Debug --parallel 10
-      - name: test
-        run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
-  
-  clang-cl-11-x86:
-    runs-on: windows-latest
-  
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - run: cmake -E make_directory build
+
+    - shell: bash
+      working-directory: build/
+      run: cmake $GITHUB_WORKSPACE -G "Visual Studio 17 2022" -T ClangCL -DJSONCONS_BUILD_TESTS=On 
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+  vs2019:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    runs-on: windows-2019
+
     steps:
-      - uses: actions/checkout@v2
-      - name: cmake
-        run: cmake -S . -B build -G "Visual Studio 16 2019" -A Win32 -T ClangCL -DJSONCONS_BUILD_TESTS=On 
-      - name: build
-        run: cmake --build build --config Debug --parallel 10
-      - name: test
-        run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
-  
-  
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - run: cmake -E make_directory build
+
+    - shell: bash
+      working-directory: build/
+      run: cmake $GITHUB_WORKSPACE -G "Visual Studio 16 2019" -DJSONCONS_BUILD_TESTS=On 
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+  vs2019-clang:
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - run: cmake -E make_directory build
+
+    - shell: bash
+      working-directory: build/
+      run: cmake $GITHUB_WORKSPACE -G "Visual Studio 16 2019" -T ClangCL  -DJSONCONS_BUILD_TESTS=On 
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+
+  vs2017:
+    strategy:
+      fail-fast: false
+      matrix:
+        visual_studio:
+          - 'Visual Studio 15 2017'
+          - 'Visual Studio 15 2017 Win64'
+        build_type: [Debug, Release]
+
+    runs-on: windows-2016
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - run: cmake -E make_directory build
+
+    - shell: bash
+      working-directory: build/
+      run: cmake $GITHUB_WORKSPACE -G "${{ matrix.visual_studio }}" -DJSONCONS_BUILD_TESTS=On 
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure  

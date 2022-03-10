@@ -1,0 +1,42 @@
+name: Windows
+
+on: [push, pull_request]
+
+jobs:
+  msvc2019:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: cmake
+      run: cmake -S . -B build -G "Visual Studio 16 2019" -D CMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
+    - name: build
+      run: cmake --build build --parallel 10
+    - name: test
+      run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
+
+  clang-cl-11-x64:
+    runs-on: windows-latest
+  
+    steps:
+      - uses: actions/checkout@v2
+      - name: cmake
+        run: cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -T ClangCL -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        run: cmake --build build --config Debug --parallel 10
+      - name: test
+        run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
+  
+  clang-cl-11-x86:
+    runs-on: windows-latest
+  
+    steps:
+      - uses: actions/checkout@v2
+      - name: cmake
+        run: cmake -S . -B build -G "Visual Studio 16 2019" -A Win32 -T ClangCL -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        run: cmake --build build --config Debug --parallel 10
+      - name: test
+        run: cd build ; ctest -j 10 -C Debug --exclude-regex "test-unicode" --output-on-failure
+  
+  

@@ -19,7 +19,7 @@
         "cd",
         "cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
       	"cmake-3.14.0/bin/cmake --build . --target unit_tests",
-        "cd tests",
+        "cd test",
         "./unit_tests;"
         ]        
     },
@@ -35,7 +35,7 @@
         "g++ --version",
         "cmake . -DBUILD_TESTS=ON",
       	"cmake --build . --target unit_tests",
-        "cd tests",
+        "cd test",
         "./unit_tests;"
       ]
     }
