@@ -3776,7 +3776,7 @@ namespace jsoncons {
 
         void create_object_implicitly(std::true_type)
         {
-            *this = basic_json(object(Allocator()), tag());
+            *this = basic_json(json_object_arg, tag());
         }
 
         void reserve(std::size_t n)
