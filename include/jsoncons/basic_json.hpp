@@ -745,6 +745,12 @@ namespace jsoncons {
                 create(val.get_allocator(), val);
             }
 
+            array_storage(array&& val, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), length_(0), tag_(tag)
+            {
+                create(val.get_allocator(), std::forward<array>(val));
+            }
+
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
