@@ -3,7 +3,7 @@
 
 Issues fixed:
 
-- Fixed issue #355, [Array move constructor of basic_json copies provided array](https://github.com/danielaparker/jsoncons/issues/355).
+- Fixed issue #355, "Array move constructor of basic_json copies provided array".
 
 0.168.4
 -------
