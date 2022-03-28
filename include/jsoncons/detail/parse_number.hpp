@@ -78,12 +78,12 @@ struct to_integer_result
 {
     const CharT* ptr;
     to_integer_errc ec;
-    constexpr to_integer_result(const CharT* ptr)
-        : ptr(ptr), ec(to_integer_errc())
+    constexpr to_integer_result(const CharT* ptr_)
+        : ptr(ptr_), ec(to_integer_errc())
     {
     }
-    constexpr to_integer_result(const CharT* ptr, to_integer_errc ec)
-        : ptr(ptr), ec(ec)
+    constexpr to_integer_result(const CharT* ptr_, to_integer_errc ec_)
+        : ptr(ptr_), ec(ec_)
     {
     }
 
