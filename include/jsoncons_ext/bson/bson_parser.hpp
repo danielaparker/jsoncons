@@ -33,8 +33,8 @@ struct parse_state
     uint8_t type;
     std::size_t index;
 
-    parse_state(parse_mode mode, std::size_t length, std::size_t pos, uint8_t type = 0) noexcept
-        : mode(mode), length(length), pos(pos), type(type), index(0)
+    parse_state(parse_mode mode_, std::size_t length_, std::size_t pos_, uint8_t type_ = 0) noexcept
+        : mode(mode_), length(length_), pos(pos_), type(type_), index(0)
     {
     }
 
