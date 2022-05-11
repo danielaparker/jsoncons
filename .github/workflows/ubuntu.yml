@@ -2,6 +2,9 @@ name: Ubuntu
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   gcc_build:
     runs-on: ubuntu-latest

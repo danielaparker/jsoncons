@@ -2,6 +2,9 @@ name: Windows
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   msvc2019:
     runs-on: windows-latest
