@@ -440,14 +440,14 @@ namespace jsoncons {
     #endif
         }
 
-        void erase(const_iterator first, const_iterator last) 
+        iterator erase(const_iterator first, const_iterator last) 
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it1 = members_.begin() + (first - members_.begin());
             iterator it2 = members_.begin() + (last - members_.begin());
-            members_.erase(it1,it2);
+            return members_.erase(it1,it2);
     #else
-            members_.erase(first,last);
+            return members_.erase(first,last);
     #endif
         }
 
@@ -1221,7 +1221,7 @@ namespace jsoncons {
             }
         }
 
-        void erase(const_iterator first, const_iterator last) 
+        iterator erase(const_iterator first, const_iterator last) 
         {
             std::size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
             std::size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
@@ -1233,11 +1233,14 @@ namespace jsoncons {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
                 iterator it1 = members_.begin() + (first - members_.begin());
                 iterator it2 = members_.begin() + (last - members_.begin());
-                members_.erase(it1,it2);
+                return members_.erase(it1,it2);
     #else
-                members_.erase(first,last);
+                return members_.erase(first,last);
     #endif
-                //build_index();
+            }
+            else
+            {
+                return members_.end();
             }
         }
 
@@ -1710,14 +1713,10 @@ namespace jsoncons {
             const size_t n = index_.size() - offset;
             for (std::size_t i = 0; i < index_.size(); ++i)
             {
-                if (offset == index_.size())
-                {
-                    index_.erase(index_.begin()+i,index_.end());
-                    i += offset;
-                }
-                else if (index_[i] >= pos1 && index_[i] < pos2)
+                if (index_[i] >= pos1 && index_[i] < pos2)
                 {
                     index_.erase(index_.begin()+i);
+                    --i;
                 }
             }
             for (std::size_t i = 0; i < index_.size(); ++i)

@@ -486,4 +486,29 @@ TEST_CASE("test json_array erase with iterator")
         CHECK(j.size() == 1);
         CHECK(j[0] == "b");
     }
+
+    SECTION("json erase with iterator 2")
+    {
+        json j(jsoncons::json_array_arg);
+
+        j.push_back("a");
+        j.push_back("b");
+        j.push_back("c");
+
+        auto it = j.array_range().begin();
+        while (it != j.array_range().end())
+        {
+            if (*it == "a")
+            {
+                it = j.erase(it,it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j[0] == "c");
+    }
 }

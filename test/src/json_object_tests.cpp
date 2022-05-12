@@ -1325,7 +1325,33 @@ TEST_CASE("test json_object erase with iterator")
         }
 
         CHECK(j.size() == 1);
+        CHECK(j.at("b") == 2);
         CHECK(j["b"] == 2);
+    }
+    SECTION("json erase with iterator 2")
+    {
+        json j(jsoncons::json_object_arg);
+
+        j.try_emplace("a", 1);
+        j.try_emplace("b", 2);
+        j.try_emplace("c", 3);
+
+        auto it = j.object_range().begin();
+        while (it != j.object_range().end())
+        {
+            if (it->key() == "a")
+            {
+                it = j.erase(it,it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j.at("c") == 3);
+        CHECK(j["c"] == 3);
     }
     SECTION("ojson erase with iterator")
     {
@@ -1349,6 +1375,59 @@ TEST_CASE("test json_object erase with iterator")
         }
 
         CHECK(j.size() == 1);
+        CHECK(j.at("b") == 2);
         CHECK(j["b"] == 2);
+    }
+
+    SECTION("ojson erase with iterator 2")
+    {
+        ojson j(jsoncons::json_object_arg);
+
+        j.try_emplace("a", 1);
+        j.try_emplace("b", 2);
+        j.try_emplace("c", 3);
+
+        auto it = j.object_range().begin();
+        while (it != j.object_range().end())
+        {
+            if (it->key() == "a")
+            {
+                it = j.erase(it, it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j.at("c") == 3);
+        CHECK(j["c"] == 3);
+    }
+
+    SECTION("ojson erase with iterator 3")
+    {
+        ojson j(jsoncons::json_object_arg);
+
+        j.try_emplace("c", 1);
+        j.try_emplace("b", 2);
+        j.try_emplace("a", 3);
+
+        auto it = j.object_range().begin();
+        while (it != j.object_range().end())
+        {
+            if (it->key() == "c")
+            {
+                it = j.erase(it, it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j.at("a") == 3);
+        CHECK(j["a"] == 3);
     }
 }

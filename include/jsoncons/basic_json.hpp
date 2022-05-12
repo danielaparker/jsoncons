@@ -1386,9 +1386,9 @@ namespace jsoncons {
             }
             // Remove a range of elements from an object 
 
-            void erase(const_object_iterator first, const_object_iterator last)
+            object_iterator erase(const_object_iterator first, const_object_iterator last)
             {
-                evaluate().erase(first, last);
+                return evaluate().erase(first, last);
             }
             // Remove a range of elements from an object 
 
@@ -1403,9 +1403,9 @@ namespace jsoncons {
             }
             // Removes the element at pos 
 
-            void erase(const_array_iterator first, const_array_iterator last)
+            array_iterator erase(const_array_iterator first, const_array_iterator last)
             {
-                evaluate().erase(first, last);
+                return evaluate().erase(first, last);
             }
             // Remove a range of elements from an array 
 
@@ -4334,15 +4334,14 @@ namespace jsoncons {
             }
         }
 
-        void erase(const_object_iterator first, const_object_iterator last)
+        object_iterator erase(const_object_iterator first, const_object_iterator last)
         {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
-                break;
+                return object_range().end();
             case json_storage_kind::object_value:
-                object_value().erase(first, last);
-                break;
+                return object_iterator(object_value().erase(first, last));
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
                 break;
@@ -4360,13 +4359,12 @@ namespace jsoncons {
             }
         }
 
-        void erase(const_array_iterator first, const_array_iterator last)
+        array_iterator erase(const_array_iterator first, const_array_iterator last)
         {
             switch (storage_kind())
             {
             case json_storage_kind::array_value:
-                array_value().erase(first, last);
-                break;
+                return array_value().erase(first, last);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
                 break;

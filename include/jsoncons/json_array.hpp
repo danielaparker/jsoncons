@@ -174,14 +174,14 @@ namespace jsoncons {
     #endif
         }
 
-        void erase(const_iterator first, const_iterator last) 
+        iterator erase(const_iterator first, const_iterator last) 
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it1 = elements_.begin() + (first - elements_.begin());
             iterator it2 = elements_.begin() + (last - elements_.begin());
-            elements_.erase(it1,it2);
+            return elements_.erase(it1,it2);
     #else
-            elements_.erase(first,last);
+            return elements_.erase(first,last);
     #endif
         }
 
