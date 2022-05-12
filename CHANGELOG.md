@@ -1,3 +1,18 @@
+0.168.6
+-------
+
+Enhancement:
+
+- The `basic_json::erase` function return value, previously void, is now
+an iterator following the last removed element,
+
+```
+array_iterator erase(const_array_iterator pos)
+object_iterator erase(const_object_iterator pos)
+```
+
+See [Iterating an object and erasing members](https://github.com/danielaparker/jsoncons/discussions/361)
+
 0.168.5
 -------
 
