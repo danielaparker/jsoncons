@@ -1,11 +1,11 @@
 ### `jsoncons::basic_json::erase`
 
 ```c++
-void erase(const_array_iterator pos); (1)
+array_iterator erase(const_array_iterator pos); (1)
 
 void erase(const_array_iterator first, const_array_iterator last); (2)
 
-void erase(const_object_iterator pos); (3)
+object_iterator erase(const_object_iterator pos); (3)
 
 void erase(const_object_iterator first, const_object_iterator last); (4)
 
