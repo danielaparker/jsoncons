@@ -3562,6 +3562,10 @@ Output:
 #### Iterating an array and erasing elements (since 0.168.6)
 
 ```c++
+#include <jsoncons/json.hpp>
+
+using jsoncons::json;
+
 int main()
 {
     std::string input = R"(
@@ -3595,6 +3599,10 @@ Output:
 #### Iterating an object and erasing members (since 0.168.6)
 
 ```c++
+#include <jsoncons/json.hpp>
+
+using jsoncons::json;
+
 int main()
 {
     std::string input = R"(
