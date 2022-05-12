@@ -1301,3 +1301,54 @@ ojson source = ojson::parse(R"(
     //std::cout << "(2)\n" << source << std::endl;
 }
 
+TEST_CASE("test json_object erase with iterator")
+{
+    SECTION("json erase with iterator")
+    {
+        json j(jsoncons::json_object_arg);
+
+        j.try_emplace("a", 1);
+        j.try_emplace("b", 2);
+        j.try_emplace("c", 3);
+
+        auto it = j.object_range().begin();
+        while (it != j.object_range().end())
+        {
+            if (it->key() == "a" || it->key() == "c")
+            {
+                it = j.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j["b"] == 2);
+    }
+    SECTION("ojson erase with iterator")
+    {
+        ojson j(jsoncons::json_object_arg);
+
+        j.try_emplace("a", 1);
+        j.try_emplace("b", 2);
+        j.try_emplace("c", 3);
+
+        auto it = j.object_range().begin();
+        while (it != j.object_range().end())
+        {
+            if (it->key() == "a" || it->key() == "c")
+            {
+                it = j.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j["b"] == 2);
+    }
+}

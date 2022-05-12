@@ -460,3 +460,30 @@ TEST_CASE("test_array_as_vector_of_int_on_proxy")
     CHECK(v[3]==3);
 }
 
+TEST_CASE("test json_array erase with iterator")
+{
+    SECTION("json erase with iterator")
+    {
+        json j(jsoncons::json_array_arg);
+
+        j.push_back("a");
+        j.push_back("b");
+        j.push_back("c");
+
+        auto it = j.array_range().begin();
+        while (it != j.array_range().end())
+        {
+            if (*it == "a" || *it == "c")
+            {
+                it = j.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(j.size() == 1);
+        CHECK(j[0] == "b");
+    }
+}

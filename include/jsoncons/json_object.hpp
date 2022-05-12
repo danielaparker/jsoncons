@@ -430,13 +430,13 @@ namespace jsoncons {
             return p.first == p.second ? members_.end() : p.first;
         }
 
-        void erase(const_iterator pos) 
+        iterator erase(const_iterator pos) 
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it = members_.begin() + (pos - members_.begin());
-            members_.erase(it);
+            return members_.erase(it);
     #else
-            members_.erase(pos);
+            return members_.erase(pos);
     #endif
         }
 
@@ -1198,6 +1198,27 @@ namespace jsoncons {
             auto p = std::equal_range(index_.begin(),index_.end(), name, 
                                         Comp(members_));        
             return p.first == p.second ? members_.end() : members_.begin() + *p.first;
+        }
+
+        iterator erase(const_iterator pos) 
+        {
+            if (pos != members_.end())
+            {
+                std::size_t pos1 = pos - members_.begin();
+                std::size_t pos2 = pos1 + 1;
+
+                erase_index_entries(pos1, pos2);
+    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+                iterator it = members_.begin() + (pos - members_.begin());
+                return members_.erase(it);
+    #else
+                return members_.erase(pos);
+    #endif
+            }
+            else
+            {
+                return members_.end();
+            }
         }
 
         void erase(const_iterator first, const_iterator last) 
