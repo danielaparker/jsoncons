@@ -31,3 +31,67 @@ Throws `std::domain_error` if not an object.
 (5) Remove a member with the specified name from an object
 Throws `std::domain_error` if not an object.
 
+### Examples
+
+#### Iterating an array and erasing elements (since 0.168.6)
+
+```c++
+int main()
+{
+    std::string input = R"(
+        ["a","b","c","d","e","f"]
+)";
+
+    json j = json::parse(input);
+    auto it = j.array_range().begin();
+    while (it != j.array_range().end())
+    {
+        if (*it == "a" || *it == "c")
+        {
+            it = j.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+
+    std::cout << j << "\n\n";
+}
+```
+Output:
+```json
+["b","d","e","f"]
+```
+
+#### Iterating an object and erasing members (since 0.168.6)
+
+```c++
+int main()
+{
+    std::string input = R"(
+        {"a":1, "b":2, "c":3, "d":4}
+)";
+
+    json j = json::parse(input);
+    auto it = j.object_range().begin();
+    while (it != j.object_range().end())
+    {
+        if (it->key() == "a" || it->key() == "c")
+        {
+            it = j.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+
+    std::cout << j << "\n\n";
+}
+```
+Output:
+```json
+{"b":2,"d":4}
+```
+
