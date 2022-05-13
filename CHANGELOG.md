@@ -7,8 +7,11 @@ Enhancement:
 an iterator following the last removed element,
 
 ```
-array_iterator erase(const_array_iterator pos)
-object_iterator erase(const_object_iterator pos)
+array_iterator erase(const_array_iterator pos);
+object_iterator erase(const_object_iterator pos);
+
+array_iterator erase(const_array_iterator first, const_array_iterator last);
+object_iterator erase(const_object_iterator first, const_object_iterator last);
 ```
 
 See [Iterating an object and erasing members](https://github.com/danielaparker/jsoncons/discussions/361)
