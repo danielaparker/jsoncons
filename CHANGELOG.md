@@ -19,7 +19,7 @@ array_iterator erase(const_array_iterator first, const_array_iterator last);
 object_iterator erase(const_object_iterator first, const_object_iterator last);
 ```
 
-See [Iterating an object and erasing members](https://github.com/danielaparker/jsoncons/discussions/361)
+See [Issue \#363](https://github.com/danielaparker/jsoncons/issues/363)
 
 0.168.5
 -------
