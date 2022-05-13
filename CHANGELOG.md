@@ -1,6 +1,11 @@
 0.168.6
 -------
 
+Bug Fix:
+
+- Fixed an issue with the order preserving `ojson` erase function 
+that takes two iterator arguments.
+
 Enhancement:
 
 - The `basic_json::erase` function return value, previously void, is now
