@@ -1565,6 +1565,9 @@ TEST_CASE("csv_parser number detection")
     std::string data = R"(Number
 5001173100,
 5E10,
+5E-10,
+3e05,
+3e-05,
 5001173100E95978
 )";
 
@@ -1574,8 +1577,11 @@ TEST_CASE("csv_parser number detection")
 
     const auto csv = jsoncons::csv::decode_csv<jsoncons::json>(data, options);
 
-    CHECK(csv[0].at("Number").as<int64_t>() == 5001173100);
-    CHECK(csv[1].at("Number").as<double>() == 5E10);
-    CHECK(csv[2].at("Number").as<double>() == std::numeric_limits<double>::infinity()); // infinite
+    CHECK(5001173100 == csv[0].at("Number").as<int64_t>());
+    CHECK(5E10       == csv[1].at("Number").as<double>());
+    CHECK(5E-10      == Approx(csv[2].at("Number").as<double>()));
+    CHECK(3e5        == csv[3].at("Number").as<double>());
+    CHECK(3e-5       == Approx(csv[4].at("Number").as<double>()));
+    CHECK(std::numeric_limits<double>::infinity() == csv[5].at("Number").as<double>()); // infinite
 }
 
