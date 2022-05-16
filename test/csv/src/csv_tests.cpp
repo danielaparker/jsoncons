@@ -36,7 +36,7 @@ TEST_CASE("csv subfield delimiter tests")
        options.assume_header(true)
               .subfield_delimiter(';')
               .quote_style(csv::quote_style_kind::nonnumeric)
-              .mapping(csv::csv_mapping_kind::n_objects);
+              .mapping_kind(csv::csv_mapping_kind::n_objects);
 
        std::string output;
        csv::encode_csv(j, output, options);
@@ -84,7 +84,7 @@ TEST_CASE("csv subfield delimiter tests")
        csv::csv_options options;
        options.subfield_delimiter(';')
               .quote_style(csv::quote_style_kind::nonnumeric)
-              .mapping(csv::csv_mapping_kind::m_columns)
+              .mapping_kind(csv::csv_mapping_kind::m_columns)
               .assume_header(true)
               .ignore_empty_values(true);
 
@@ -132,7 +132,7 @@ TEST_CASE("n_objects_test")
     csv::csv_options options;
 
     options.assume_header(true)
-            .mapping(csv::csv_mapping_kind::n_rows);
+            .mapping_kind(csv::csv_mapping_kind::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
@@ -140,7 +140,7 @@ TEST_CASE("n_objects_test")
     CHECK(val1.size() == 4);
 
     options.assume_header(true);
-    options.mapping(csv::csv_mapping_kind::n_objects);
+    options.mapping_kind(csv::csv_mapping_kind::n_objects);
     csv::csv_reader reader2(bond_yields,decoder,options);
     reader2.read();
     ojson val2 = decoder.get_result();
@@ -160,7 +160,7 @@ TEST_CASE("m_columns_test")
     json_decoder<ojson> decoder;
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::csv_mapping_kind::m_columns);
+           .mapping_kind(csv::csv_mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
     csv::csv_stream_reader reader(is, decoder, options);
@@ -190,7 +190,7 @@ TEST_CASE("csv ignore_empty_value")
         csv::csv_options options;
         options.assume_header(true)
                .ignore_empty_values(true)
-               .mapping(csv::csv_mapping_kind::m_columns);
+               .mapping_kind(csv::csv_mapping_kind::m_columns);
 
         std::istringstream is(bond_yields);
         csv::csv_stream_reader reader(is, decoder, options);
@@ -211,7 +211,7 @@ TEST_CASE("csv ignore_empty_value")
         csv::csv_options options;
         options.assume_header(false)
                .ignore_empty_values(true)
-               .mapping(csv::csv_mapping_kind::n_rows);
+               .mapping_kind(csv::csv_mapping_kind::n_rows);
 
         std::istringstream is(bond_yields);
         csv::csv_stream_reader reader(is, decoder, options);
@@ -1281,7 +1281,7 @@ TEST_CASE("Test decode_csv, terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::csv_mapping_kind::m_columns);
+               .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1322,7 +1322,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::csv_mapping_kind::m_columns);
+               .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1374,7 +1374,7 @@ TEST_CASE("test_type_inference")
         )");
 
         csv::csv_options options;
-        options.mapping(csv::csv_mapping_kind::n_rows);
+        options.mapping_kind(csv::csv_mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
         REQUIRE(j == expected); //-V521
@@ -1421,7 +1421,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::csv_mapping_kind::n_objects);
+               .mapping_kind(csv::csv_mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected); //-V521
@@ -1442,7 +1442,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::csv_mapping_kind::m_columns);
+               .mapping_kind(csv::csv_mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected); //-V521
@@ -1459,7 +1459,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::csv_mapping_kind::n_objects)
+           .mapping_kind(csv::csv_mapping_kind::n_objects)
            .trim(true)
            .lossless_number(true);
 
@@ -1514,7 +1514,7 @@ TEST_CASE("csv_reader constructors")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::csv_mapping_kind::n_objects);
+               .mapping_kind(csv::csv_mapping_kind::n_objects);
 
         json_decoder<my_json,csv_test::FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
@@ -1538,7 +1538,7 @@ TEST_CASE("infinite loop")
         json_decoder<ojson> decoder;
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::csv_mapping_kind::n_rows);
+        options.mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
@@ -1552,7 +1552,7 @@ TEST_CASE("infinite loop")
         json_decoder<ojson> decoder;
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::csv_mapping_kind::n_rows);
+        options.mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
@@ -1562,26 +1562,52 @@ TEST_CASE("infinite loop")
 
 TEST_CASE("csv_parser number detection")
 {
-    std::string data = R"(Number
-5001173100,
-5E10,
-5E-10,
-3e05,
-3e-05,
-5001173100E95978
-)";
 
-    jsoncons::csv::csv_options options;
-    options.assume_header(true)
-           .field_delimiter(',');
+    SECTION("test 1")
+    {
+        std::string data = R"(Number
+5001173100
+5E10
+5E-10
+3e05
+3e-05
+5001173100E95978)";
+        jsoncons::csv::csv_options options;
+        options.assume_header(true)
+               .field_delimiter(',');
 
-    const auto csv = jsoncons::csv::decode_csv<jsoncons::json>(data, options);
+        const auto csv = jsoncons::csv::decode_csv<jsoncons::json>(data, options);
 
-    CHECK(5001173100 == csv[0].at("Number").as<int64_t>());
-    CHECK(5E10       == csv[1].at("Number").as<double>());
-    CHECK(5E-10      == Approx(csv[2].at("Number").as<double>()));
-    CHECK(3e5        == csv[3].at("Number").as<double>());
-    CHECK(3e-5       == Approx(csv[4].at("Number").as<double>()));
-    CHECK(std::numeric_limits<double>::infinity() == csv[5].at("Number").as<double>()); // infinite
+        CHECK(5001173100 == csv[0].at("Number").as<int64_t>());
+        CHECK(5E10       == csv[1].at("Number").as<double>());
+        CHECK(5E-10      == Approx(csv[2].at("Number").as<double>()));
+        CHECK(3e5        == csv[3].at("Number").as<double>());
+        CHECK(3e-5       == Approx(csv[4].at("Number").as<double>()));
+        CHECK(std::numeric_limits<double>::infinity() == csv[5].at("Number").as<double>()); // infinite
+    }
+
+    SECTION("test 2")
+    {
+        std::string data = R"(Number
+5001173100
+5e10
+5e-10
+3e05
+3e-05
+5001173100E95978)";
+        jsoncons::csv::csv_options options;
+        options.field_delimiter(',')
+               .header_lines(1)
+               .mapping_kind(jsoncons::csv::csv_mapping_kind::n_rows);
+
+        auto result = jsoncons::csv::decode_csv<std::vector<std::vector<double>>>(data, options);
+
+        CHECK(5001173100 == result[0][0]);
+        CHECK(5E10       == result[1][0]);
+        CHECK(5E-10      == Approx(result[2][0]));
+        CHECK(3e5        == result[3][0]);
+        CHECK(3e-5       == Approx(result[4][0]));
+        CHECK(std::numeric_limits<double>::infinity() == result[5][0]); // infinite
+    }
 }
 
