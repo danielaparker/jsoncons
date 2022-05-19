@@ -12,6 +12,9 @@ addressed.
 - Fixed csv parsing issue [Exponential formatted numbers with leading zeros in exponent]
 (https://github.com/danielaparker/jsoncons/issues/365)
 
+- Fixed [Issue with assignment of an object_iterator to const_object_iterator using empty object]
+(https://github.com/danielaparker/jsoncons/issues/372). This issue affects some xcode osx users.
+
 0.168.6
 -------
 
