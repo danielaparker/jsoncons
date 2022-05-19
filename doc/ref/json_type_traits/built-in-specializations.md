@@ -409,7 +409,7 @@ int main()
 
     csv::csv_options csv_options;
     options2.column_names("Pos,Driver,Entrant,Time,Gap");
-    options2.mapping(csv::csv_mapping_kind::n_rows);
+    options2.mapping_kind(csv::csv_mapping_kind::n_rows);
     std::string csv_data;
     options2.header_lines(1);
     csv::encode_csv(results, csv_data, csv_options);

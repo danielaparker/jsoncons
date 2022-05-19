@@ -430,7 +430,7 @@ namespace jsonschema {
                 reporter.error(validation_output("allOf", 
                                                  "",
                                                  instance_location.to_uri_fragment(), 
-                                                 "At least one keyword_validator failed to match, but all are required to match. ", 
+                                                 "At least one schema failed to match, but all are required to match. ", 
                                                  local_reporter.errors));
             return !local_reporter.errors.empty();
         }
@@ -531,7 +531,7 @@ namespace jsonschema {
                 reporter.error(validation_output("combined", 
                                                  this->absolute_keyword_location(), 
                                                  instance_location.to_uri_fragment(), 
-                                                 "No keyword_validator matched, but one of them is required to match", 
+                                                 "No schema matched, but one of them is required to match", 
                                                  local_reporter.errors));
             }
         }

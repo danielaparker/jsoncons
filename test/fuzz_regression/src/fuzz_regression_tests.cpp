@@ -94,7 +94,7 @@ TEST_CASE("oss-fuzz issues")
 
         csv::csv_options options;
         options.assume_header(true);
-        options.mapping(csv::csv_mapping_kind::n_rows);
+        options.mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_stream_reader reader(is,visitor,options);
 
         std::error_code ec;

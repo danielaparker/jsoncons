@@ -1,3 +1,47 @@
+0.168.7
+-------
+
+Defect fixes:
+
+- For release 0.167.0, the `csv_options::mapping()` accessor
+was renamed to `csv_options::mapping_kind()`, the old name was
+deprecated, but still supported. That release neglected to 
+similarily rename the corresponding mutator, which is now
+addressed. 
+
+- Fixed csv parsing issue [Exponential formatted numbers with leading zeros in exponent]
+(https://github.com/danielaparker/jsoncons/issues/365)
+
+0.168.6
+-------
+
+Bug Fix:
+
+- Fixed an issue with the order preserving `ojson` erase function 
+that takes two iterator arguments.
+
+Enhancement:
+
+- The `basic_json::erase` function return value, previously void, is now
+an iterator following the last removed element,
+
+```
+array_iterator erase(const_array_iterator pos);
+object_iterator erase(const_object_iterator pos);
+
+array_iterator erase(const_array_iterator first, const_array_iterator last);
+object_iterator erase(const_object_iterator first, const_object_iterator last);
+```
+
+See [Issue \#363](https://github.com/danielaparker/jsoncons/issues/363)
+
+0.168.5
+-------
+
+Issues fixed:
+
+- Fixed issue #355, "Array move constructor of basic_json copies provided array".
+
 0.168.4
 -------
 

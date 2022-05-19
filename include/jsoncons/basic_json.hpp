@@ -745,6 +745,12 @@ namespace jsoncons {
                 create(val.get_allocator(), val);
             }
 
+            array_storage(array&& val, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), length_(0), tag_(tag)
+            {
+                create(val.get_allocator(), std::forward<array>(val));
+            }
+
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
@@ -830,6 +836,12 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), length_(0), tag_(tag)
             {
                 create(val.get_allocator(), val);
+            }
+
+            explicit object_storage(object&& val, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), length_(0), tag_(tag)
+            {
+                create(val.get_allocator(), std::forward<object>(val));
             }
 
             explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
@@ -1368,15 +1380,15 @@ namespace jsoncons {
             }
             // Remove all elements from an array or object
 
-            void erase(const_object_iterator pos)
+            object_iterator erase(const_object_iterator pos)
             {
-                evaluate().erase(pos);
+                return evaluate().erase(pos);
             }
             // Remove a range of elements from an object 
 
-            void erase(const_object_iterator first, const_object_iterator last)
+            object_iterator erase(const_object_iterator first, const_object_iterator last)
             {
-                evaluate().erase(first, last);
+                return evaluate().erase(first, last);
             }
             // Remove a range of elements from an object 
 
@@ -1385,15 +1397,15 @@ namespace jsoncons {
                 evaluate().erase(name);
             }
 
-            void erase(const_array_iterator pos)
+            array_iterator erase(const_array_iterator pos)
             {
-                evaluate().erase(pos);
+                return evaluate().erase(pos);
             }
             // Removes the element at pos 
 
-            void erase(const_array_iterator first, const_array_iterator last)
+            array_iterator erase(const_array_iterator first, const_array_iterator last)
             {
-                evaluate().erase(first, last);
+                return evaluate().erase(first, last);
             }
             // Remove a range of elements from an array 
 
@@ -3764,7 +3776,7 @@ namespace jsoncons {
 
         void create_object_implicitly(std::true_type)
         {
-            *this = basic_json(object(Allocator()), tag());
+            *this = basic_json(json_object_arg, tag());
         }
 
         void reserve(std::size_t n)
@@ -4308,56 +4320,51 @@ namespace jsoncons {
             }
         }
 
-        void erase(const_object_iterator pos)
+        object_iterator erase(const_object_iterator pos)
         {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
-                break;
+                return object_range().end();
             case json_storage_kind::object_value:
-                object_value().erase(pos);
-                break;
+                return object_iterator(object_value().erase(pos));
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
                 break;
             }
         }
 
-        void erase(const_object_iterator first, const_object_iterator last)
+        object_iterator erase(const_object_iterator first, const_object_iterator last)
         {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
-                break;
+                return object_range().end();
             case json_storage_kind::object_value:
-                object_value().erase(first, last);
-                break;
+                return object_iterator(object_value().erase(first, last));
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
                 break;
             }
         }
 
-        void erase(const_array_iterator pos)
+        array_iterator erase(const_array_iterator pos)
         {
             switch (storage_kind())
             {
             case json_storage_kind::array_value:
-                array_value().erase(pos);
-                break;
+                return array_value().erase(pos);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
-                break;
             }
         }
 
-        void erase(const_array_iterator first, const_array_iterator last)
+        array_iterator erase(const_array_iterator first, const_array_iterator last)
         {
             switch (storage_kind())
             {
             case json_storage_kind::array_value:
-                array_value().erase(first, last);
-                break;
+                return array_value().erase(first, last);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
                 break;

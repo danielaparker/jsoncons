@@ -75,6 +75,8 @@
 [Insert a new value in an array at a specific position](#J1)  
 [Merge two json objects](#J2)  
 [Erase an object with a specified key from an array](#J3)  
+[Iterating an array and erasing elements](#J4)  
+[Iterating an object and erasing members](#J5)  
 
 ### Flatten and unflatten
 
@@ -3553,6 +3555,80 @@ Output:
         "type": "manager"
     }
 ]
+```
+
+<div id="J4"/>
+
+#### Iterating an array and erasing elements (since 0.168.6)
+
+```c++
+#include <jsoncons/json.hpp>
+
+using jsoncons::json;
+
+int main()
+{
+    std::string input = R"(
+        ["a","b","c","d","e","f"]
+)";
+
+    json j = json::parse(input);
+    auto it = j.array_range().begin();
+    while (it != j.array_range().end())
+    {
+        if (*it == "a" || *it == "c")
+        {
+            it = j.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+
+    std::cout << j << "\n\n";
+}
+```
+Output:
+```json
+["b","d","e","f"]
+```
+
+<div id="J5"/>
+
+#### Iterating an object and erasing members (since 0.168.6)
+
+```c++
+#include <jsoncons/json.hpp>
+
+using jsoncons::json;
+
+int main()
+{
+    std::string input = R"(
+        {"a":1, "b":2, "c":3, "d":4}
+)";
+
+    json j = json::parse(input);
+    auto it = j.object_range().begin();
+    while (it != j.object_range().end())
+    {
+        if (it->key() == "a" || it->key() == "c")
+        {
+            it = j.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+
+    std::cout << j << "\n\n";
+}
+```
+Output:
+```json
+{"b":2,"d":4}
 ```
 
 ### Search and Replace

@@ -875,7 +875,15 @@ public:
         return *this;
     }
 
+//#if !defined(JSONCONS_NO_DEPRECATED)
     basic_csv_options& mapping(csv_mapping_kind value)
+    {
+        this->mapping_ = value;
+        return *this;
+    }
+//#endif
+
+    basic_csv_options& mapping_kind(csv_mapping_kind value)
     {
         this->mapping_ = value;
         return *this;

@@ -163,24 +163,25 @@ namespace jsoncons {
             elements_.erase(elements_.cbegin()+from_index,elements_.cbegin()+to_index);
         }
     #endif
-        void erase(const_iterator pos) 
+
+        iterator erase(const_iterator pos) 
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
-            elements_.erase(it);
+            return elements_.erase(it);
     #else
-            elements_.erase(pos);
+            return elements_.erase(pos);
     #endif
         }
 
-        void erase(const_iterator first, const_iterator last) 
+        iterator erase(const_iterator first, const_iterator last) 
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it1 = elements_.begin() + (first - elements_.begin());
             iterator it2 = elements_.begin() + (last - elements_.begin());
-            elements_.erase(it1,it2);
+            return elements_.erase(it1,it2);
     #else
-            elements_.erase(first,last);
+            return elements_.erase(first,last);
     #endif
         }
 
