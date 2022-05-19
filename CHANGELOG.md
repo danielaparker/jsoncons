@@ -1,3 +1,17 @@
+0.168.7
+-------
+
+Defect fixes:
+
+- For release 0.167.0, the `csv_options::mapping()` accessor
+was renamed to `csv_options::mapping_kind()`, the old name was
+deprecated, but still supported. That release neglected to 
+similarily rename the corresponding mutator, which is now
+addressed. 
+
+- Fixed csv parsing issue [Exponential formatted numbers with leading zeros in exponent]
+(https://github.com/danielaparker/jsoncons/issues/365)
+
 0.168.6
 -------
 
