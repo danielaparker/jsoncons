@@ -13,6 +13,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("json(json_object_arg, first, last)")
 {
     SECTION("copy map into json")
@@ -1429,5 +1430,25 @@ TEST_CASE("test json_object erase with iterator")
         CHECK(j.size() == 1);
         CHECK(j.at("a") == 3);
         CHECK(j["a"] == 3);
+    }
+}
+#endif
+
+TEST_CASE("test empty json_object iterator")
+{
+    SECTION("test 1")
+    {
+        json j;
+
+        json::const_object_iterator it;
+        CHECK(!it.has_value());
+
+        it = j.find("Min");
+        CHECK(!it.has_value());
+
+        CHECK(!j.object_range().end().has_value());
+
+
+        CHECK ((bool)(it == j.object_range().end()));
     }
 }
