@@ -1431,3 +1431,17 @@ TEST_CASE("test json_object erase with iterator")
         CHECK(j["a"] == 3);
     }
 }
+
+TEST_CASE("test empty json_object iterator")
+{
+    SECTION("test 1")
+    {
+        json j;
+
+        json::const_object_iterator it;
+
+        it = j.find("Min");
+
+        CHECK ((bool)(it == j.object_range().end()));
+    }
+}
