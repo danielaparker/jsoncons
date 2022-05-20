@@ -4,16 +4,14 @@
 Defect fixes:
 
 - In release 0.167.0, the `csv_options::mapping()` accessor
-was renamed to `csv_options::mapping_kind()`, the old name was
-deprecated, but still supported. That release neglected to 
+was renamed to `csv_options::mapping_kind()`, and the old name was
+deprecated but still useable. That release neglected to 
 similarily rename the corresponding mutator, which is now
 addressed. 
 
-- Fixed csv parsing issue [Exponential formatted numbers with leading zeros in exponent]
-(https://github.com/danielaparker/jsoncons/issues/365)
+- Fixed csv parsing issue [Exponential formatted numbers with leading zeros in exponent](https://github.com/danielaparker/jsoncons/issues/365)
 
-- Fixed [Issue with assignment of an object_iterator to const_object_iterator using empty object]
-(https://github.com/danielaparker/jsoncons/issues/372). This issue affects some xcode osx users.
+- Fixed [Issue with assignment of an object_iterator to const_object_iterator using empty object](https://github.com/danielaparker/jsoncons/issues/372). This issue affects some xcode osx users.
 
 0.168.6
 -------
