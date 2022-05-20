@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: cmake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
     - name: build
