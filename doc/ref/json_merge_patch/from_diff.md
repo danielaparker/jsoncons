@@ -1,7 +1,7 @@
-### jsoncons::json_merge_patch::from_diff
+### jsoncons::mergepatch::from_diff
 
 ```c++
-#include <jsoncons_ext/json_merge_patch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
 
 template <class Json>
 Json from_diff(const Json& source, const Json& target)
@@ -21,10 +21,10 @@ This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#se
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_merge_patch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
 
 using jsoncons::json;
-namespace json_merge_patch = jsoncons::json_merge_patch;
+namespace mergepatch = jsoncons::mergepatch;
 
 int main()
 {
@@ -54,9 +54,9 @@ int main()
 }
     )");
 
-    auto patch = json_merge_patch::from_diff(source, target);
+    auto patch = mergepatch::from_diff(source, target);
 
-    json_merge_patch::apply_merge_patch(source, patch);
+    mergepatch::apply_merge_patch(source, patch);
 
     std::cout << "(1)\n" << pretty_print(patch) << std::endl;
     std::cout << "(2)\n" << pretty_print(source) << std::endl;

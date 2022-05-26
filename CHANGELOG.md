@@ -1,8 +1,17 @@
 master
 -----
 
-- Use `std::from_chars` for chars to double conversion
-when supported in GCC and VC.
+Performance Enhancement:
+
+- Use `std::from_chars` for chars to double conversion when 
+supported in GCC and VC.
+
+Changes:
+
+- For consistency with library naming conventions, the directory 
+`include/jsoncons/json_merge_patch` has been renamed to
+`include/jsoncons/mergepatch`, and the namespace `json_merge_patch`
+has been renamed to `mergepatch`.
 
 0.168.7
 -------

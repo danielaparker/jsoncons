@@ -36,7 +36,7 @@ or becoming a [:heart: sponsor](https://github.com/sponsors/danielaparker).
 - [csv](doc/ref/csv/csv.md) implements decode from and encode to CSV files.
 - [jmespath](doc/ref/jmespath/jmespath.md) implements [JMESPath](https://jmespath.org/), a query language for transforming JSON documents into other JSON documents.  
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
-- [json_merge_patch](doc/ref/json_merge_patch/json_merge_patch.md) implements the IETF standard [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386)
+- [mergepatch](doc/ref/mergepatch/json_merge_patch.md) implements the IETF standard [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JSONPath expressions.
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonschema](doc/ref/jsonschema/jsonschema.md) implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) specification for validating input JSON. (since 0.160.0)

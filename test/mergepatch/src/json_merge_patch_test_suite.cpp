@@ -6,7 +6,7 @@
 #endif
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_merge_patch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>
@@ -38,13 +38,13 @@ void json_merge_patch_tests(const std::string& fpath)
             if (test_case.contains("result"))
             {
                 json target = test_group.at("given");
-                json_merge_patch::apply_merge_patch(target, patch);
+                mergepatch::apply_merge_patch(target, patch);
                 const json& expected = test_case["result"];
                 if (target == expected)
                 {
                     json target2 = test_group.at("given");
-                    json patch2 = json_merge_patch::from_diff(target2, target);
-                    json_merge_patch::apply_merge_patch(target2, patch2);
+                    json patch2 = mergepatch::from_diff(target2, target);
+                    mergepatch::apply_merge_patch(target2, patch2);
                     if (target2 != target)
                     {
                         if (test_case.contains("comment"))
@@ -75,12 +75,12 @@ void json_merge_patch_tests(const std::string& fpath)
     }
 }
 
-TEST_CASE("json_merge_patch tests")
+TEST_CASE("mergepatch tests")
 {
     SECTION("compliance")
     {
-        json_merge_patch_tests("./json_merge_patch/input/compliance/rfc7396-test-cases.json");
-        //json_merge_patch_tests("./json_merge_patch/input/compliance/test.json");
+        json_merge_patch_tests("./mergepatch/input/compliance/rfc7396-test-cases.json");
+        //json_merge_patch_tests("./mergepatch/input/compliance/test.json");
     }
 }
 

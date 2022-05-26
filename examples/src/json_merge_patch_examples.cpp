@@ -2,10 +2,10 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_merge_patch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 using jsoncons::json;
-namespace json_merge_patch = jsoncons::json_merge_patch;
+namespace mergepatch = jsoncons::mergepatch;
 
 void apply_json_merge_patch()
 {
@@ -36,17 +36,17 @@ void apply_json_merge_patch()
 }
     )");
 
-    json_merge_patch::apply_merge_patch(doc, patch);
+    mergepatch::apply_merge_patch(doc, patch);
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
     // Create a JSON Patch
 
-    auto patch2 = json_merge_patch::from_diff(doc2,doc);
+    auto patch2 = mergepatch::from_diff(doc2,doc);
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    json_merge_patch::apply_merge_patch(doc2,patch2);
+    mergepatch::apply_merge_patch(doc2,patch2);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
@@ -79,9 +79,9 @@ void create_json_merge_patch()
 }
     )");
 
-    auto patch = json_merge_patch::from_diff(source, target);
+    auto patch = mergepatch::from_diff(source, target);
 
-    json_merge_patch::apply_merge_patch(source, patch);
+    mergepatch::apply_merge_patch(source, patch);
 
     std::cout << "(1)\n" << pretty_print(patch) << std::endl;
     std::cout << "(2)\n" << pretty_print(source) << std::endl;

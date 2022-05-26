@@ -1,6 +1,6 @@
-### json_merge_patch extension
+### mergepatch extension
 
-The json_merge_patch extension implements the IETF standard [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386)
+The mergepatch extension implements the IETF standard [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386)
 
 <table border="0">
   <tr>
@@ -19,10 +19,10 @@ This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#se
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_merge_patch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
 
 using jsoncons::json;
-namespace json_merge_patch = jsoncons::json_merge_patch;
+namespace mergepatch = jsoncons::mergepatch;
 
 int main()
 {
@@ -51,17 +51,17 @@ int main()
 }
     )");
 
-    json_merge_patch::apply_merge_patch(doc, patch);
+    mergepatch::apply_merge_patch(doc, patch);
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
     // Create a JSON Patch
 
-    auto patch2 = json_merge_patch::from_diff(doc2,doc);
+    auto patch2 = mergepatch::from_diff(doc2,doc);
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    json_merge_patch::apply_merge_patch(doc2,patch2);
+    mergepatch::apply_merge_patch(doc2,patch2);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
