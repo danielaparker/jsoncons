@@ -82,7 +82,7 @@ add_executable(unit_tests
                fuzz_regression/src/fuzz_regression_tests.cpp
                jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_tests.cpp
-               json_merge_patch/src/json_merge_patch_test_suite.cpp
+               mergepatch/src/json_merge_patch_test_suite.cpp
                jsonpatch/src/jsonpatch_test_suite.cpp
                jsonpatch/src/jsonpatch_tests.cpp
                jsonpath/src/jsonpath_flatten_tests.cpp
