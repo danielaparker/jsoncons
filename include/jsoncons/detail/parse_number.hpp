@@ -926,7 +926,11 @@ public:
     operator()(const CharT* s, std::size_t len) const
     {
         double val = 0;
-        std::from_chars(s, s+len, val);
+        const auto res = std::from_chars(s, s+len, val);
+        if (res.ec != std::errc())
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
         return val;
     }
 
@@ -941,7 +945,11 @@ public:
         }
 
         double val = 0;
-        std::from_chars(input.data(), input.data() + len, val);
+        const auto res = std::from_chars(input.data(), input.data() + len, val);
+        if (res.ec != std::errc())
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+        }
         return val;
     }
 };
