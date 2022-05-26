@@ -909,7 +909,43 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
     return to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-#if defined(JSONCONS_HAS_MSC_STRTOD_L)
+
+#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+
+class to_double_t
+{
+public:
+
+    char get_decimal_point() const
+    {
+        return '.';
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    operator()(const CharT* s, std::size_t len) const
+    {
+        double val = 0;
+        std::from_chars(s, s+len, val);
+        return val;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    operator()(const CharT* s, std::size_t len) const
+    {
+        std::string input(len,'0');
+        for (size_t i = 0; i < len; ++i)
+        {
+            input[i] = static_cast<char>(s[i]);
+        }
+
+        double val = 0;
+        std::from_chars(input.data(), input.data() + len, val);
+        return val;
+    }
+};
+#elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
 class to_double_t
 {
