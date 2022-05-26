@@ -520,7 +520,7 @@ private:
     std::size_t column_index_;
     std::size_t level_;
     std::size_t offset_;
-    jsoncons::detail::to_double_t to_double_; 
+    jsoncons::detail::chars_to to_double_; 
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;

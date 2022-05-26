@@ -1527,7 +1527,7 @@ namespace detail {
                     {
                         return value_type(sn);
                     }
-                    jsoncons::detail::to_double_t to_double;
+                    jsoncons::detail::chars_to to_double;
                     try
                     {
                         auto s = arg0.as_string();

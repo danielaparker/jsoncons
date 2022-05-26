@@ -294,7 +294,7 @@ namespace detail {
             return true;
         }
 
-        jsoncons::detail::to_double_t to_double_;
+        jsoncons::detail::chars_to to_double_;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -327,7 +327,7 @@ namespace detail {
             return true;
         }
 
-        jsoncons::detail::to_double_t to_double_;
+        jsoncons::detail::chars_to to_double_;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -394,7 +394,7 @@ namespace detail {
             return true;
         }
 
-        jsoncons::detail::to_double_t to_double_;
+        jsoncons::detail::chars_to to_double_;
 
         char buffer[100];
         int precision = std::numeric_limits<double>::digits10;
@@ -463,7 +463,7 @@ namespace detail {
     class write_double
     {
     private:
-        to_double_t to_double_;
+        chars_to to_double_;
         float_chars_format float_format_;
         int precision_;
         char decimal_point_;

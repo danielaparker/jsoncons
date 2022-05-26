@@ -156,7 +156,7 @@ private:
     bool done_;
 
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
-    jsoncons::detail::to_double_t to_double_;
+    jsoncons::detail::chars_to to_double_;
 
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<string_view_type,double>> string_double_map_;

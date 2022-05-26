@@ -4030,7 +4030,7 @@ namespace jsoncons {
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::long_string_value:
                 {
-                    jsoncons::detail::to_double_t to_double;
+                    jsoncons::detail::chars_to to_double;
                     // to_double() throws std::invalid_argument if conversion fails
                     return to_double(as_cstring(), as_string_view().length());
                 }

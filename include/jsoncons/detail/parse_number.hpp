@@ -912,7 +912,7 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS)
 
-class to_double_t
+class chars_to
 {
 public:
 
@@ -929,7 +929,7 @@ public:
         const auto res = std::from_chars(s, s+len, val);
         if (res.ec != std::errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert chars to double failed"));
         }
         return val;
     }
@@ -948,33 +948,33 @@ public:
         const auto res = std::from_chars(input.data(), input.data() + len, val);
         if (res.ec != std::errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert string to double failed"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Convert chars to double failed"));
         }
         return val;
     }
 };
 #elif defined(JSONCONS_HAS_MSC_STRTOD_L)
 
-class to_double_t
+class chars_to
 {
 private:
     _locale_t locale_;
 public:
-    to_double_t()
+    chars_to()
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
-    ~to_double_t() noexcept
+    ~chars_to() noexcept
     {
         _free_locale(locale_);
     }
 
-    to_double_t(const to_double_t&)
+    chars_to(const chars_to&)
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
 
-    to_double_t& operator=(const to_double_t&) 
+    chars_to& operator=(const chars_to&) 
     {
         // Don't assign locale
         return *this;
@@ -1014,26 +1014,26 @@ public:
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-class to_double_t
+class chars_to
 {
 private:
     locale_t locale_;
 public:
-    to_double_t()
+    chars_to()
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
-    ~to_double_t() noexcept
+    ~chars_to() noexcept
     {
         freelocale(locale_);
     }
 
-    to_double_t(const to_double_t&)
+    chars_to(const chars_to&)
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
 
-    to_double_t& operator=(const to_double_t&) 
+    chars_to& operator=(const chars_to&) 
     {
         return *this;
     }
@@ -1071,13 +1071,13 @@ public:
 };
 
 #else
-class to_double_t
+class chars_to
 {
 private:
     std::vector<char> buffer_;
     char decimal_point_;
 public:
-    to_double_t()
+    chars_to()
         : buffer_()
     {
         struct lconv * lc = localeconv();
@@ -1092,8 +1092,8 @@ public:
         buffer_.reserve(100);
     }
 
-    to_double_t(const to_double_t&) = default;
-    to_double_t& operator=(const to_double_t&) = default;
+    chars_to(const chars_to&) = default;
+    chars_to& operator=(const chars_to&) = default;
 
     char get_decimal_point() const
     {

@@ -1,3 +1,9 @@
+master
+-----
+
+- Use `std::from_chars` for chars to double conversion
+when supported in GCC and VC.
+
 0.168.7
 -------
 
