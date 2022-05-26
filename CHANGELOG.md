@@ -10,8 +10,9 @@ Changes:
 
 - For consistency with library naming conventions, the directory 
 `include/jsoncons/json_merge_patch` has been renamed to
-`include/jsoncons/mergepatch`, and the namespace `json_merge_patch`
-has been renamed to `mergepatch`.
+`include/jsoncons/mergepatch`, the namespace `json_merge_patch`
+to `mergepatch`, and the include file `json_merge_patch.hpp` to 
+`mergepatch.hpp`.
 
 0.168.7
 -------

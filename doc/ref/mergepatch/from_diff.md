@@ -1,7 +1,7 @@
 ### jsoncons::mergepatch::from_diff
 
 ```c++
-#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 template <class Json>
 Json from_diff(const Json& source, const Json& target)
@@ -21,7 +21,7 @@ This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#se
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 using jsoncons::json;
 namespace mergepatch = jsoncons::mergepatch;

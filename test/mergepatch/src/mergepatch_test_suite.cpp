@@ -6,7 +6,7 @@
 #endif
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>

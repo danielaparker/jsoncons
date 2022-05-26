@@ -1,7 +1,7 @@
 ### jsoncons::mergepatch::apply_merge_patch
 
 ```c++
-#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 template <class Json>
 void apply_merge_patch(Json& target, const Json& patch); 
@@ -25,7 +25,7 @@ This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#se
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/mergepatch/json_merge_patch.hpp>
+#include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 using jsoncons::json;
 namespace mergepatch = jsoncons::mergepatch;
