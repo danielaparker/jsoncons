@@ -30,7 +30,7 @@ or becoming a [:heart: sponsor](https://github.com/sponsors/danielaparker).
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the 
 old names but continues to support many of them. The deprecated names can be suppressed by defining the macro 
-`JSONCONS_NO_DEPRECATED`, and this is recommended for new code.
+`JSONCONS_NO_DEPRECATED`, and doing so is recommended for new code.
 
 ## Extensions
 
