@@ -457,7 +457,7 @@ namespace jsoncons {
 
         iterator erase(const_iterator pos) 
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = members_.begin() + (pos - members_.begin());
             return members_.erase(it);
     #else
@@ -467,7 +467,7 @@ namespace jsoncons {
 
         iterator erase(const_iterator first, const_iterator last) 
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it1 = members_.begin() + (first - members_.begin());
             iterator it2 = members_.begin() + (last - members_.begin());
             return members_.erase(it1,it2);
@@ -1233,7 +1233,7 @@ namespace jsoncons {
                 std::size_t pos2 = pos1 + 1;
 
                 erase_index_entries(pos1, pos2);
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it = members_.begin() + (pos - members_.begin());
                 return members_.erase(it);
     #else
@@ -1255,7 +1255,7 @@ namespace jsoncons {
             {
                 erase_index_entries(pos1,pos2);
 
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it1 = members_.begin() + (first - members_.begin());
                 iterator it2 = members_.begin() + (last - members_.begin());
                 return members_.erase(it1,it2);
@@ -1278,7 +1278,7 @@ namespace jsoncons {
                 std::size_t pos2 = pos1 + 1;
 
                 erase_index_entries(pos1, pos2);
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it = members_.begin() + (pos - members_.begin());
                 members_.erase(it);
     #else

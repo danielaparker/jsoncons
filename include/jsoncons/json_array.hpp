@@ -166,7 +166,7 @@ namespace jsoncons {
 
         iterator erase(const_iterator pos) 
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
             return elements_.erase(it);
     #else
@@ -176,7 +176,7 @@ namespace jsoncons {
 
         iterator erase(const_iterator first, const_iterator last) 
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it1 = elements_.begin() + (first - elements_.begin());
             iterator it2 = elements_.begin() + (last - elements_.begin());
             return elements_.erase(it1,it2);
@@ -209,7 +209,7 @@ namespace jsoncons {
         typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
             return elements_.emplace(it, std::forward<T>(value));
     #else
@@ -220,7 +220,7 @@ namespace jsoncons {
         typename std::enable_if<!type_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
             return elements_.emplace(it, std::forward<T>(value), get_allocator());
     #else
@@ -231,7 +231,7 @@ namespace jsoncons {
         template <class InputIt>
         iterator insert(const_iterator pos, InputIt first, InputIt last)
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
             elements_.insert(it, first, last);
             return first == last ? it : it + 1;
@@ -244,7 +244,7 @@ namespace jsoncons {
         typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type 
         emplace(const_iterator pos, Args&&... args)
         {
-    #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
+    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
             return elements_.emplace(it, std::forward<Args>(args)...);
     #else
