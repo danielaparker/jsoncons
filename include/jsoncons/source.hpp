@@ -37,7 +37,7 @@ namespace jsoncons {
             null_buffer(null_buffer&&) = default;
             null_buffer& operator=(null_buffer&&) = default;
 
-            int_type overflow( int_type ch = traits_type::eof() ) override
+            int_type overflow( int_type ch = typename std::basic_streambuf<CharT>::traits_type::eof() ) override
             {
                 return ch;
             }
