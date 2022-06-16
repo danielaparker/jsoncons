@@ -497,10 +497,6 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
-            if (cursor.current().size() > 0)
-            {
-                val.capacity(cursor.current().size());
-            }
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
@@ -544,10 +540,6 @@ namespace jsoncons {
             {
                 ec = conv_errc::not_map;
                 return val;
-            }
-            if (cursor.current().size() > 0)
-            {
-                val.capacity(cursor.current().size());
             }
             cursor.next(ec);
 
