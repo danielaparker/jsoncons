@@ -48,6 +48,13 @@ If `tag()` == `semantic_tag::ext`, returns a format specific tag associated with
 otherwise return 0. An example is a MessagePack `type` in the range 0-127 associated with the
 MessagePack ext format family, or a CBOR tag preceeding a byte string. 
 
+    size_t size() const
+If `event_type()` is a `staj_event_type::key` or a `staj_event_type::string_value` or a `staj_event_type::byte_string_value`, 
+returns the size of the key or string or byte string value.
+If `event_type()` is a `staj_event_type::begin_object` or a `staj_event_type::begin_array`, returns the size of the object
+or array if known, otherwise 0.
+For all other event types, returns 0.
+
     template <class T, class... Args>
     T get() const;
 Attempts to convert the json value to the template value type.

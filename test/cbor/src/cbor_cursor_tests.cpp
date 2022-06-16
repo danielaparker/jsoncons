@@ -40,6 +40,7 @@ TEST_CASE("cbor_cursor reputon test")
         cbor::cbor_bytes_cursor cursor(data);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        CHECK(cursor.current().size() == 2);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
@@ -48,6 +49,7 @@ TEST_CASE("cbor_cursor reputon test")
         CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        CHECK(cursor.current().size() == 1);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
