@@ -160,6 +160,11 @@ public:
     {
     }
 
+    basic_staj_event(staj_event_type event_type, std::size_t length, semantic_tag tag = semantic_tag::none)
+        : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(length)
+    {
+    }
+
     basic_staj_event(null_type, semantic_tag tag)
         : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
     {
@@ -217,6 +222,11 @@ public:
         : event_type_(event_type), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
+    }
+
+    std::size_t size() const
+    {
+        return length_;
     }
 
     template <class T>
@@ -994,6 +1004,12 @@ private:
         return !pred_(event_, context);
     }
 
+    bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(staj_event_type::begin_object, length, tag);
+        return !pred_(event_, context);
+    }
+
     bool visit_end_object(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
@@ -1003,6 +1019,12 @@ private:
     bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array, tag);
+        return !pred_(event_, context);
+    }
+
+    bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(staj_event_type::begin_array, length, tag);
         return !pred_(event_, context);
     }
 
