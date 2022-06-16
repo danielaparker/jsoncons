@@ -336,6 +336,10 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
+                    if (cursor.current().size() > 0)
+                    {
+                        v.capacity(cursor.current().size());
+                    }
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -375,6 +379,10 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
+                    if (cursor.current().size() > 0)
+                    {
+                        v.capacity(cursor.current().size());
+                    }
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -489,6 +497,10 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
+            if (cursor.current().size() > 0)
+            {
+                val.capacity(cursor.current().size());
+            }
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
@@ -532,6 +544,10 @@ namespace jsoncons {
             {
                 ec = conv_errc::not_map;
                 return val;
+            }
+            if (cursor.current().size() > 0)
+            {
+                val.capacity(cursor.current().size());
             }
             cursor.next(ec);
 
