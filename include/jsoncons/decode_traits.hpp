@@ -338,7 +338,7 @@ namespace jsoncons {
                     T v;
                     if (cursor.current().size() > 0)
                     {
-                        v.capacity(cursor.current().size());
+                        v.reserve(cursor.current().size());
                     }
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
@@ -381,7 +381,7 @@ namespace jsoncons {
                     T v;
                     if (cursor.current().size() > 0)
                     {
-                        v.capacity(cursor.current().size());
+                        v.reserve(cursor.current().size());
                     }
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
