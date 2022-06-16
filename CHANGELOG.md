@@ -9,9 +9,9 @@ supported in GCC and VC.
 Enhancements:
 
 - Added a `size()` accessor function to `basic_staj_event`.
-If the event type is a `semantic_tag::key` or a `semantic_tag::string_value` or a `semantic_tag::byte_string_value`, 
+If the event type is a `key` or a `string_value` or a `byte_string_value`, 
 returns the size of the key or string or byte string value.
-If the event type is a `semantic_tag::begin_object` or a `semantic_tag::begin_array`, returns the size of the object
+If the event type is a `begin_object` or a `begin_array`, returns the size of the object
 or array if known, otherwise 0.
 For all other event types, returns 0.
 
