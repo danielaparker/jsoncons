@@ -221,7 +221,10 @@ namespace jsoncons {
                 ec = conv_errc::not_vector;
                 return false;
             }
-            v_.reserve(size);
+            if (size > 0)
+            {
+                reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v_, size);
+            }
             return true;
         }
 
@@ -291,6 +294,17 @@ namespace jsoncons {
             v_ = std::vector<value_type>(data.begin(),data.end());
             return false;
         }
+
+        static
+        void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static
+        void reserve_storage(std::false_type, T&, std::size_t)
+        {
+        }
     };
 
     template <class T, class CharT>
@@ -321,6 +335,10 @@ namespace jsoncons {
                     if (!ec) 
                     {
                         T v;
+                        if (cursor.current().size() > 0)
+                        {
+                            reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                        }
                         for (auto ch : bytes)
                         {
                             v.push_back(static_cast<value_type>(ch));
@@ -336,6 +354,13 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
+<<<<<<< HEAD
+=======
+                    if (cursor.current().size() > 0)
+                    {
+                        reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                    }
+>>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -346,6 +371,15 @@ namespace jsoncons {
                     return T{};
                 }
             }
+        }
+
+        static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static void reserve_storage(std::false_type, T&, std::size_t)
+        {
         }
     };
 
@@ -375,6 +409,13 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
+<<<<<<< HEAD
+=======
+                    if (cursor.current().size() > 0)
+                    {
+                        reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+                    }
+>>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -385,6 +426,15 @@ namespace jsoncons {
                     return T{};
                 }
             }
+        }
+
+        static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static void reserve_storage(std::false_type, T&, std::size_t)
+        {
         }
     };
 
@@ -416,6 +466,10 @@ namespace jsoncons {
                 ec = conv_errc::not_vector;
                 return v;
             }
+            if (cursor.current().size() > 0)
+            {
+                reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
+            }
             cursor.next(ec);
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
@@ -425,6 +479,15 @@ namespace jsoncons {
                 if (ec) {return T{};}
             }
             return v;
+        }
+
+        static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static void reserve_storage(std::false_type, T&, std::size_t)
+        {
         }
     };
 
@@ -489,6 +552,13 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
+<<<<<<< HEAD
+=======
+            if (cursor.current().size() > 0)
+            {
+                reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
+            }
+>>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
@@ -508,6 +578,15 @@ namespace jsoncons {
                 if (ec) {return val;}
             }
             return val;
+        }
+
+        static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static void reserve_storage(std::false_type, T&, std::size_t)
+        {
         }
     };
 
@@ -533,6 +612,13 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
+<<<<<<< HEAD
+=======
+            if (cursor.current().size() > 0)
+            {
+                reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
+            }
+>>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
@@ -559,6 +645,15 @@ namespace jsoncons {
                 if (ec) {return val;}
             }
             return val;
+        }
+
+        static void reserve_storage(std::true_type, T& v, std::size_t new_cap)
+        {
+            v.reserve(new_cap);
+        }
+
+        static void reserve_storage(std::false_type, T&, std::size_t)
+        {
         }
     };
 
