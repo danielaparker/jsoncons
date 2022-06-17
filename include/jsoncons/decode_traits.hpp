@@ -354,13 +354,10 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
-<<<<<<< HEAD
-=======
                     if (cursor.current().size() > 0)
                     {
                         reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                     }
->>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -409,13 +406,10 @@ namespace jsoncons {
                 case staj_event_type::begin_array:
                 {
                     T v;
-<<<<<<< HEAD
-=======
                     if (cursor.current().size() > 0)
                     {
                         reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), v, cursor.current().size());
                     }
->>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
                     typed_array_visitor<T> visitor(v);
                     cursor.read_to(visitor, ec);
                     return v;
@@ -552,13 +546,10 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
-<<<<<<< HEAD
-=======
             if (cursor.current().size() > 0)
             {
                 reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
             }
->>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
@@ -612,13 +603,10 @@ namespace jsoncons {
                 ec = conv_errc::not_map;
                 return val;
             }
-<<<<<<< HEAD
-=======
             if (cursor.current().size() > 0)
             {
                 reserve_storage(typename std::integral_constant<bool, type_traits::has_reserve<T>::value>::type(), val, cursor.current().size());
             }
->>>>>>> b00070885c58cf595b3f8581274b9ff82ee669e9
             cursor.next(ec);
 
             while (cursor.current().event_type() != staj_event_type::end_object && !ec)
