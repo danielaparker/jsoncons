@@ -59,7 +59,7 @@ Json fun(const Json& val);
     <td>A function object that accepts a path and a reference to a Json value. 
 It must have function call signature equivalent to
 <br/><br/><code>
-void fun(const Json::string_type& path, Json& val);
+void fun(const Json::string_view_type& path, Json& val);
 </code><br/><br/>
   </tr>
 </table>
