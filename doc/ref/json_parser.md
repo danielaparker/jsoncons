@@ -112,11 +112,11 @@ Throws a [ser_error](ser_error.md) if parsing fails.
     void check_done(std::error_code& ec)
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
-    std::size_t reset() const
+    void reset() const
 Resets the state of the parser to its initial state. In this state
 `stopped()` returns `false` and `done()` returns `false`.
 
-    std::size_t restart() const
+    void restart() const
 Resets the `stopped` state of the parser to `false`, allowing parsing
 to continue.
 
