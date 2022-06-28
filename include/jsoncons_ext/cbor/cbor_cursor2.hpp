@@ -96,6 +96,48 @@ namespace cbor {
             }
         }
 
+        void reset()
+        {
+            parser_.reset();
+            eof_ = false;
+            if (!done())
+            {
+                next();
+            }
+        }
+
+        template <class Sourceable>
+        void reset(Sourceable&& source)
+        {
+            parser_.reset(std::forward<Sourceable>(source));
+            eof_ = false;
+            if (!done())
+            {
+                next();
+            }
+        }
+
+        void reset(std::error_code& ec)
+        {
+            parser_.reset();
+            eof_ = false;
+            if (!done())
+            {
+                next(ec);
+            }
+        }
+
+        template <class Sourceable>
+        void reset(Sourceable&& source, std::error_code& ec)
+        {
+            parser_.reset(std::forward<Sourceable>(source));
+            eof_ = false;
+            if (!done())
+            {
+                next(ec);
+            }
+        }
+
         bool done() const override
         {
             return parser_.done();

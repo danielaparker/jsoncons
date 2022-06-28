@@ -134,6 +134,21 @@ public:
         }
     }
 
+    void reset()
+    {
+        stack_.clear();
+        stringref_map_.clear();
+        bytestringref_map_.clear();
+        next_stringref_ = 0;
+        nesting_depth_ = 0;
+    }
+
+    void reset(Sink&& sink)
+    {
+        sink_ = std::move<Sink>(sink);
+        reset();
+    }
+
 private:
     // Implementing methods
 
