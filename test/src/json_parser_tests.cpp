@@ -274,6 +274,24 @@ TEST_CASE("test_incremental_parsing")
     CHECK_FALSE(j[0].as<bool>());
 }
 
+TEST_CASE("test_parser_reinitialization")
+{
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser;
 
+    parser.reset();
+    parser.update("false true", 10);
+    parser.finish_parse(decoder);
+    CHECK(parser.done());
+    json j1 = decoder.get_result();
+    REQUIRE(j1.is_bool());
+    CHECK_FALSE(j1.as<bool>());
 
-
+    parser.reinitialize();
+    parser.update("-42", 3);
+    parser.finish_parse(decoder);
+    CHECK(parser.done());
+    json j2 = decoder.get_result();
+    REQUIRE(j2.is_int64());
+    CHECK(j2.as<int64_t>() == -42);
+}

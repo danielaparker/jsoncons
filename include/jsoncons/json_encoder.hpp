@@ -413,7 +413,7 @@ namespace detail {
 
         void reset(Sink&& sink)
         {
-            sink_ = std::move<Sink>(sink);
+            sink_ = std::move(sink);
             reset();
         }
 
@@ -1144,6 +1144,17 @@ namespace detail {
             }
         }
 
+        void reset()
+        {
+            stack_.clear();
+            nesting_depth_ = 0;
+        }
+
+        void reset(Sink&& sink)
+        {
+            sink_ = std::move(sink);
+            reset();
+        }
 
     private:
         // Implementing methods

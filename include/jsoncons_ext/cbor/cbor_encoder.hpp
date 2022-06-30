@@ -145,7 +145,7 @@ public:
 
     void reset(Sink&& sink)
     {
-        sink_ = std::move<Sink>(sink);
+        sink_ = std::move(sink);
         reset();
     }
 

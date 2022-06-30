@@ -162,20 +162,25 @@ public:
         }
     }
 
-    template <class Sourceable,
-              typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0>
-    void reset(Sourceable&& source)
+    template <class Sourceable>
+    typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source)
     {
         source_ = std::forward<Sourceable>(source);
-        reset();
+        parser_.reinitialize();
+        done_ = false;
+        if (!done())
+        {
+            next();
+        }
     }
 
-    template <class Sourceable,
-             typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0>
-    void reset(Sourceable&& source)
+    template <class Sourceable>
+    typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source)
     {
         source_ = {};
-        parser_.reset();
+        parser_.reinitialize();
         done_ = false;
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
@@ -190,20 +195,25 @@ public:
         }
     }
 
-    template <class Sourceable,
-             typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0>
-    void reset(Sourceable&& source, std::error_code& ec)
+    template <class Sourceable>
+    typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source, std::error_code& ec)
     {
         source_ = std::forward<Sourceable>(source);
-        reset(ec);
+        parser_.reinitialize();
+        done_ = false;
+        if (!done())
+        {
+            next(ec);
+        }
     }
 
-    template <class Sourceable,
-             typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0>
-    void reset(Sourceable&& source, std::error_code& ec)
+    template <class Sourceable>
+    typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source, std::error_code& ec)
     {
-        source_ = std::forward<Sourceable>(source);
-        parser_.reset();
+        source_ = {};
+        parser_.reinitialize();
         done_ = false;
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
@@ -331,11 +341,8 @@ private:
         return true;
     }
 
-    template <class Sourceable>
-    void initialize_with_string_view(Sourceable&& source)
+    void initialize_with_string_view(string_view_type sv)
     {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
-
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {
@@ -349,10 +356,8 @@ private:
         }
     }
 
-    template <class Sourceable>
-    void initialize_with_string_view(Sourceable&& source, std::error_code& ec)
+    void initialize_with_string_view(string_view_type sv, std::error_code& ec)
     {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {
