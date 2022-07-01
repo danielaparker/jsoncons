@@ -186,7 +186,6 @@ public:
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
         typed_array_.clear();
-        index_ = 0;
         stringref_map_stack_.clear();
         nesting_depth_ = 0;
     }

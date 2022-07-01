@@ -263,3 +263,117 @@ TEST_CASE("cbor_cursor with filter tests")
     CHECK(filtered_c.done());
 }
 
+struct cbor_bytes_cursor_reset_test_traits
+{
+    using cursor_type = cbor::cbor_bytes_cursor;
+    using input_type = std::basic_string<uint8_t>;
+    static input_type make_input(input_type bytes) {return bytes;}
+};
+
+struct cbor_stream_cursor_reset_test_traits
+{
+    using cursor_type = cbor::cbor_stream_cursor;
+
+    // binary_stream_source::char_type is actually char, not uint8_t
+    using input_type = std::istringstream;
+
+    static input_type make_input(std::basic_string<uint8_t> bytes)
+    {
+        auto data = reinterpret_cast<const char*>(bytes.data());
+        std::string s(data, bytes.size());
+        return input_type(s);
+    }
+};
+
+TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
+                   cbor_bytes_cursor_reset_test_traits,
+                   cbor_stream_cursor_reset_test_traits)
+{
+    using traits = TestType;
+    using cursor_type = typename traits::cursor_type;
+    using source_type = typename cursor_type::source_type;
+    using event_type = staj_event_type;
+
+    SECTION("keeping same source")
+    {
+        auto input = traits::make_input({
+            0x63, 0x54, 0x6f, 0x6d, // text(3), "Tom"
+            0x38, 0x63, // negative(99)
+            0xf6 // null
+        });
+        source_type source(input);
+        cursor_type cursor(std::move(source));
+        std::error_code ec;
+
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(cursor.current().template get<jsoncons::string_view>() ==
+              jsoncons::string_view("Tom"));
+        cursor.next();
+        CHECK(cursor.done());
+
+        cursor.reset();
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(cursor.current().template get<int>() == -100);
+        cursor.next();
+        CHECK(cursor.done());
+
+        cursor.reset(ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == event_type::null_value);
+        CHECK(cursor.current().tag() == semantic_tag::none);
+        cursor.next(ec);
+        REQUIRE_FALSE(ec);
+        CHECK(cursor.done());
+    }
+
+    SECTION("with another source")
+    {
+        auto input0 = traits::make_input({});
+        auto input1 = traits::make_input({0x63, 0x54, 0x6f, 0x6d}); // text(3), "Tom"
+        auto input2 = traits::make_input({0xe0}); // invalid special
+        auto input3 = traits::make_input({0x38, 0x63}); // negative(99)
+        std::error_code ec;
+
+        // Constructing cursor with blank input results in unexpected_eof
+        // error because it eagerly parses the next event upon construction.
+        cursor_type cursor(input0, ec);
+        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+        CHECK_FALSE(cursor.done());
+
+        // Reset to valid input1
+        cursor.reset(input1);
+        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(cursor.current().template get<jsoncons::string_view>() ==
+              jsoncons::string_view("Tom"));
+        ec = cbor::cbor_errc::success;
+        REQUIRE_FALSE(cursor.done());
+        cursor.next(ec);
+        CHECK_FALSE(ec);
+        CHECK(cursor.done());
+
+        // Reset to invalid input2
+        cursor.reset(input2, ec);
+        CHECK(ec == cbor::cbor_errc::unknown_type);
+        CHECK_FALSE(cursor.done());
+
+        // Reset to valid input3
+        ec = cbor::cbor_errc::success;
+        cursor.reset(input3, ec);
+        REQUIRE_FALSE(ec);
+        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(cursor.current().template get<int>() == -100);
+        REQUIRE_FALSE(cursor.done());
+        cursor.next(ec);
+        CHECK_FALSE(ec);
+        CHECK(cursor.done());
+    }
+}

@@ -304,3 +304,53 @@ TEST_CASE("json_visitor2 cbor 6")
     }
 }
 
+TEST_CASE("cbor_parser reset")
+{
+    std::vector<uint8_t> input1 = {
+        0x82,0x01,0x02, // array(2), unsigned(1), unsigned(2)
+        0xa1,0x61,0x63,0x04, // map(1), text(1), "c", unsigned(4)
+    };
+
+    std::vector<uint8_t> input2 = {
+        0xa1,0x61,0x65,0x06, // map(1), text(1), "e", unsigned(6)
+    };
+
+    json expected1 = json::parse(R"([1,2])");
+    json expected2 = json::parse(R"({"c":4})");
+    json expected3 = json::parse(R"({"e":6})");
+
+    json_decoder<json> destination;
+    json_visitor2_to_visitor_adaptor visitor{destination};
+    cbor::basic_cbor_parser<bytes_source> parser{ input1 };
+    std::error_code ec;
+
+    SECTION("keeping same source")
+    {
+        parser.parse(visitor, ec);
+        REQUIRE_FALSE(ec);
+        CHECK(destination.get_result() == expected1);
+
+        destination.reset();
+        parser.reset();
+        parser.parse(visitor, ec);
+        CHECK_FALSE(ec);
+        CHECK(parser.stopped());
+        // TODO: This fails: CHECK(parser.done());
+        CHECK(destination.get_result() == expected2);
+    }
+
+    SECTION("with different source")
+    {
+        parser.parse(visitor, ec);
+        REQUIRE_FALSE(ec);
+        CHECK(destination.get_result() == expected1);
+
+        destination.reset();
+        parser.reset(input2);
+        parser.parse(visitor, ec);
+        CHECK_FALSE(ec);
+        CHECK(parser.stopped());
+        // TODO: This fails: CHECK(parser.done());
+        CHECK(destination.get_result() == expected3);
+    }
+}

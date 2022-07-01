@@ -615,25 +615,25 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         cursor_type cursor(input);
         std::error_code ec;
 
-        REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
+        REQUIRE_FALSE(cursor.done());
         cursor.next();
         CHECK(cursor.done());
 
         cursor.reset();
-        REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::int64_value);
         CHECK(cursor.current().template get<int>() == -100);
+        REQUIRE_FALSE(cursor.done());
         cursor.next();
         CHECK(cursor.done());
 
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
-        REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::null_value);
+        REQUIRE_FALSE(cursor.done());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
         CHECK(cursor.done());
