@@ -99,6 +99,7 @@ namespace cbor {
         void reset()
         {
             parser_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -110,6 +111,7 @@ namespace cbor {
         void reset(Sourceable&& source)
         {
             parser_.reset(std::forward<Sourceable>(source));
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -120,6 +122,7 @@ namespace cbor {
         void reset(std::error_code& ec)
         {
             parser_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -131,6 +134,7 @@ namespace cbor {
         void reset(Sourceable&& source, std::error_code& ec)
         {
             parser_.reset(std::forward<Sourceable>(source));
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {

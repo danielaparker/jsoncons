@@ -155,6 +155,7 @@ public:
     void reset()
     {
         parser_.reset();
+        cursor_visitor_.reset();
         done_ = false;
         if (!done())
         {
@@ -168,6 +169,7 @@ public:
     {
         source_ = std::forward<Sourceable>(source);
         parser_.reinitialize();
+        cursor_visitor_.reset();
         done_ = false;
         if (!done())
         {
@@ -181,6 +183,7 @@ public:
     {
         source_ = {};
         parser_.reinitialize();
+        cursor_visitor_.reset();
         done_ = false;
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
@@ -188,6 +191,7 @@ public:
     void reset(std::error_code& ec)
     {
         parser_.reset();
+        cursor_visitor_.reset();
         done_ = false;
         if (!done())
         {
@@ -201,6 +205,7 @@ public:
     {
         source_ = std::forward<Sourceable>(source);
         parser_.reinitialize();
+        cursor_visitor_.reset();
         done_ = false;
         if (!done())
         {

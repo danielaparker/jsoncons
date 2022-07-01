@@ -102,6 +102,8 @@ public:
     void reset()
     {
         parser_.reset();
+        cursor_visitor_.reset();
+        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!done())
         {
@@ -113,6 +115,8 @@ public:
     void reset(Sourceable&& source)
     {
         parser_.reset(std::forward<Sourceable>(source));
+        cursor_visitor_.reset();
+        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!done())
         {
@@ -123,6 +127,8 @@ public:
     void reset(std::error_code& ec)
     {
         parser_.reset();
+        cursor_visitor_.reset();
+        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!done())
         {
@@ -134,6 +140,8 @@ public:
     void reset(Sourceable&& source, std::error_code& ec)
     {
         parser_.reset(std::forward<Sourceable>(source));
+        cursor_visitor_.reset();
+        cursor_handler_adaptor_.reset();
         eof_ = false;
         if (!done())
         {

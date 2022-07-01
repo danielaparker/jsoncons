@@ -833,6 +833,14 @@ namespace jsoncons {
             level_stack_.emplace_back(target_t::destination,container_t::root); // root
         }
 
+        void reset()
+        {
+            key_.clear();
+            key_buffer_.clear();
+            level_stack_.clear();
+            level_stack_.emplace_back(target_t::destination,container_t::root); // root
+        }
+
         basic_json_visitor<char_type>& destination()
         {
             return *destination_;

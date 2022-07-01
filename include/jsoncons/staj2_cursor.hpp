@@ -468,6 +468,15 @@ namespace jsoncons {
         {
         }
 
+        void reset()
+        {
+            event_ = staj2_event_type::null_value;
+            state_ = {};
+            data_ = {};
+            shape_ = {};
+            index_ = 0;
+        }
+
         const basic_staj2_event<CharT>& event() const
         {
             return event_;
