@@ -82,8 +82,9 @@ TEST_CASE("cbor_cursor2 reputon test")
 struct cbor_bytes_cursor2_reset_test_traits
 {
     using cursor_type = cbor::cbor_bytes_cursor2;
-    using input_type = std::basic_string<uint8_t>;
-    static input_type make_input(input_type bytes) {return bytes;}
+    using input_type = std::vector<uint8_t>;
+
+    static void set_input(input_type& input, input_type bytes) {input = bytes;}
 };
 
 struct cbor_stream_cursor2_reset_test_traits
@@ -93,11 +94,11 @@ struct cbor_stream_cursor2_reset_test_traits
     // binary_stream_source::char_type is actually char, not uint8_t
     using input_type = std::istringstream;
 
-    static input_type make_input(std::basic_string<uint8_t> bytes)
+    static void set_input(input_type& input, std::vector<uint8_t> bytes)
     {
         auto data = reinterpret_cast<const char*>(bytes.data());
         std::string s(data, bytes.size());
-        return input_type(s);
+        input.str(s);
     }
 };
 
@@ -106,20 +107,22 @@ TEMPLATE_TEST_CASE("cbor_cursor2 reset test", "",
                    cbor_stream_cursor2_reset_test_traits)
 {
     using traits = TestType;
+    using input_type = typename traits::input_type;
     using cursor_type = typename traits::cursor_type;
     using source_type = typename cursor_type::source_type;
     using event_type = staj2_event_type;
 
     SECTION("keeping same source")
     {
-        auto input = traits::make_input({
+        std::error_code ec;
+        input_type input;
+        traits::set_input(input, {
             0x63, 0x54, 0x6f, 0x6d, // text(3), "Tom"
             0x38, 0x63, // negative(99)
             0xf6 // null
         });
         source_type source(input);
         cursor_type cursor(std::move(source));
-        std::error_code ec;
 
         REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == event_type::string_value);
@@ -150,11 +153,15 @@ TEMPLATE_TEST_CASE("cbor_cursor2 reset test", "",
 
     SECTION("with another source")
     {
-        auto input0 = traits::make_input({});
-        auto input1 = traits::make_input({0x63, 0x54, 0x6f, 0x6d}); // text(3), "Tom"
-        auto input2 = traits::make_input({0xe0}); // invalid special
-        auto input3 = traits::make_input({0x38, 0x63}); // negative(99)
         std::error_code ec;
+        input_type input0;
+        input_type input1;
+        input_type input2;
+        input_type input3;
+        traits::set_input(input0, {});
+        traits::set_input(input1, {0x63, 0x54, 0x6f, 0x6d}); // text(3), "Tom"
+        traits::set_input(input2, {0xe0}); // invalid special
+        traits::set_input(input3, {0x38, 0x63}); // negative(99)
 
         // Constructing cursor with blank input results in unexpected_eof
         // error because it eagerly parses the next event upon construction.
