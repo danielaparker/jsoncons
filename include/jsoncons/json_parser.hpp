@@ -469,6 +469,18 @@ public:
         }
     }
 
+    void reinitialize()
+    {
+        reset();
+        cp_ = 0;
+        cp2_ = 0;
+        saved_position_ = 0;
+        begin_input_ = nullptr;
+        end_input_ = nullptr;
+        input_ptr_ = nullptr;
+        string_buffer_.clear();
+    }
+
     void reset()
     {
         state_stack_.clear();

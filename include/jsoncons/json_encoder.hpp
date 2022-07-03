@@ -403,6 +403,20 @@ namespace detail {
             }
         }
 
+        void reset()
+        {
+            stack_.clear();
+            indent_amount_ = 0;
+            column_ = 0;
+            nesting_depth_ = 0;
+        }
+
+        void reset(Sink&& sink)
+        {
+            sink_ = std::move(sink);
+            reset();
+        }
+
     private:
         // Implementing methods
         void visit_flush() override
@@ -1130,6 +1144,17 @@ namespace detail {
             }
         }
 
+        void reset()
+        {
+            stack_.clear();
+            nesting_depth_ = 0;
+        }
+
+        void reset(Sink&& sink)
+        {
+            sink_ = std::move(sink);
+            reset();
+        }
 
     private:
         // Implementing methods

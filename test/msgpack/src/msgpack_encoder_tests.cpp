@@ -105,3 +105,84 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         encoder.flush();
     }
 }
+
+struct msgpack_bytes_encoder_reset_test_fixture
+{
+    std::vector<uint8_t> output1;
+    std::vector<uint8_t> output2;
+    msgpack::msgpack_bytes_encoder encoder;
+
+    msgpack_bytes_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return output1;}
+    std::vector<uint8_t> bytes2() const {return output2;}
+};
+
+struct msgpack_stream_encoder_reset_test_fixture
+{
+    std::ostringstream output1;
+    std::ostringstream output2;
+    msgpack::msgpack_stream_encoder encoder;
+
+    msgpack_stream_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return bytes_of(output1);}
+    std::vector<uint8_t> bytes2() const {return bytes_of(output2);}
+
+private:
+    static std::vector<uint8_t> bytes_of(const std::ostringstream& os)
+    {
+        auto str = os.str();
+        auto data = reinterpret_cast<const uint8_t*>(str.data());
+        std::vector<uint8_t> bytes(data, data + str.size());
+        return bytes;
+    }
+};
+
+TEMPLATE_TEST_CASE("test_msgpack_encoder_reset", "",
+                   msgpack_bytes_encoder_reset_test_fixture,
+                   msgpack_stream_encoder_reset_test_fixture)
+{
+    using fixture_type = TestType;
+    fixture_type f;
+
+    std::vector<uint8_t> expected_partial =
+        {
+            0x92, // array(2)
+                0xa3, // fixstr(3)
+                    0x66, 0x6F, 0x6F // "foo"
+                // second element missing
+        };
+
+    std::vector<uint8_t> expected_full =
+        {
+            0x92, // array(2)
+                0xa3, // fixstr(3)
+                    0x66, 0x6F, 0x6F, // "foo"
+                0x2A // positive fixint(42)
+        };
+
+    std::vector<uint8_t> expected_partial_then_full(expected_partial);
+    expected_partial_then_full.insert(expected_partial_then_full.end(),
+                                      expected_full.begin(), expected_full.end());
+
+    // Parially encode, reset, then fully encode to same sink
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.flush();
+    CHECK(f.bytes1() == expected_partial);
+    f.encoder.reset();
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.uint64_value(42);
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.bytes1() == expected_partial_then_full);
+
+    // Reset and encode to different sink
+    f.encoder.reset(f.output2);
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.uint64_value(42);
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.bytes2() == expected_full);
+}

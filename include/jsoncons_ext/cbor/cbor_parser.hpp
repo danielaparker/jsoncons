@@ -110,7 +110,7 @@ class basic_cbor_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     std::vector<uint8_t,byte_allocator_type> typed_array_;
     std::vector<std::size_t> shape_;
-    std::size_t index_;
+    std::size_t index_; // TODO: Never used!
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
     int nesting_depth_;
 
@@ -178,10 +178,23 @@ public:
 
     void reset()
     {
-        state_stack_.clear();
-        state_stack_.emplace_back(parse_mode::root,0);
         more_ = true;
         done_ = false;
+        text_buffer_.clear();
+        bytes_buffer_.clear();
+        item_tag_ = 0;
+        state_stack_.clear();
+        state_stack_.emplace_back(parse_mode::root,0);
+        typed_array_.clear();
+        stringref_map_stack_.clear();
+        nesting_depth_ = 0;
+    }
+
+    template <class Sourceable>
+    void reset(Sourceable&& source)
+    {
+        source_ = std::forward<Sourceable>(source);
+        reset();
     }
 
     bool done() const

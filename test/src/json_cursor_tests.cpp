@@ -602,3 +602,75 @@ TEST_CASE("staj event as object")
     }
 }
 
+TEMPLATE_TEST_CASE("json_cursor reset test", "",
+                   (std::pair<json_string_cursor, std::string>),
+                   (std::pair<json_stream_cursor, std::istringstream>))
+{
+    using cursor_type = typename TestType::first_type;
+    using input_type = typename TestType::second_type;
+
+    SECTION("keeping same source")
+    {
+        input_type input(R"("Tom" -100 null)");
+        cursor_type cursor(input);
+        std::error_code ec;
+
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(cursor.current().template get<jsoncons::string_view>() ==
+              jsoncons::string_view("Tom"));
+        REQUIRE_FALSE(cursor.done());
+        cursor.next();
+        CHECK(cursor.done());
+
+        cursor.reset();
+        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
+        CHECK(cursor.current().template get<int>() == -100);
+        REQUIRE_FALSE(cursor.done());
+        cursor.next();
+        CHECK(cursor.done());
+
+        cursor.reset(ec);
+        REQUIRE_FALSE(ec);
+        CHECK(cursor.current().event_type() == staj_event_type::null_value);
+        REQUIRE_FALSE(cursor.done());
+        cursor.next(ec);
+        REQUIRE_FALSE(ec);
+        CHECK(cursor.done());
+    }
+
+    SECTION("with another source")
+    {
+        input_type input0;
+        input_type input1(R"("Tom")");
+        input_type input2("bad");
+        input_type input3("-100");
+        cursor_type cursor(input0);
+        std::error_code ec;
+
+        REQUIRE(cursor.done());
+        cursor.reset(input1);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(cursor.current().template get<jsoncons::string_view>() ==
+              jsoncons::string_view("Tom"));
+        cursor.next();
+        CHECK(cursor.done());
+
+        cursor.reset(input2, ec);
+        CHECK(ec == json_errc::syntax_error);
+        CHECK_FALSE(cursor.done());
+
+        // Check that cursor can reused be upon reset following an error.
+        ec = json_errc::success;
+        cursor.reset(input3, ec);
+        REQUIRE_FALSE(ec);
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
+        CHECK(cursor.current().template get<int>() == -100);
+        cursor.next(ec);
+        REQUIRE_FALSE(ec);
+        CHECK(cursor.done());
+    }
+}
