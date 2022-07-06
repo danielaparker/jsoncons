@@ -369,6 +369,7 @@ TEMPLATE_TEST_CASE("msgpack_cursor reset test", "",
         CHECK(cursor.done());
 
         // Reset to invalid input2
+        ec = msgpack::msgpack_errc::success;
         cursor.reset(input2, ec);
         CHECK(ec == msgpack::msgpack_errc::unknown_type);
         CHECK_FALSE(cursor.done());

@@ -87,10 +87,56 @@ public:
                       Sourceable&& source,
                       const bson_decode_options& options,
                       std::error_code& ec)
-       : parser_(std::forward<Sourceable>(source), alloc, options), 
+       : parser_(std::forward<Sourceable>(source), options, alloc),
          cursor_visitor_(accept_all),
          eof_(false)
     {
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
+    void reset()
+    {
+        parser_.reset();
+        cursor_visitor_.reset();
+        eof_ = false;
+        if (!done())
+        {
+            next();
+        }
+    }
+
+    template <class Sourceable>
+    void reset(Sourceable&& source)
+    {
+        parser_.reset(std::forward<Sourceable>(source));
+        cursor_visitor_.reset();
+        eof_ = false;
+        if (!done())
+        {
+            next();
+        }
+    }
+
+    void reset(std::error_code& ec)
+    {
+        parser_.reset();
+        cursor_visitor_.reset();
+        eof_ = false;
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
+    template <class Sourceable>
+    void reset(Sourceable&& source, std::error_code& ec)
+    {
+        parser_.reset(std::forward<Sourceable>(source));
+        cursor_visitor_.reset();
+        eof_ = false;
         if (!done())
         {
             next(ec);
