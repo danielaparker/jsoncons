@@ -146,3 +146,81 @@ TEST_CASE("serialize big array to ubjson")
     CHECK(val2 == val);
 }
 
+struct ubjson_bytes_encoder_reset_test_fixture
+{
+    std::vector<uint8_t> output1;
+    std::vector<uint8_t> output2;
+    ubjson::ubjson_bytes_encoder encoder;
+
+    ubjson_bytes_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return output1;}
+    std::vector<uint8_t> bytes2() const {return output2;}
+};
+
+struct ubjson_stream_encoder_reset_test_fixture
+{
+    std::ostringstream output1;
+    std::ostringstream output2;
+    ubjson::ubjson_stream_encoder encoder;
+
+    ubjson_stream_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return bytes_of(output1);}
+    std::vector<uint8_t> bytes2() const {return bytes_of(output2);}
+
+private:
+    static std::vector<uint8_t> bytes_of(const std::ostringstream& os)
+    {
+        auto str = os.str();
+        auto data = reinterpret_cast<const uint8_t*>(str.data());
+        std::vector<uint8_t> bytes(data, data + str.size());
+        return bytes;
+    }
+};
+
+TEMPLATE_TEST_CASE("test_ubjson_encoder_reset", "",
+                   ubjson_bytes_encoder_reset_test_fixture,
+                   ubjson_stream_encoder_reset_test_fixture)
+{
+    using fixture_type = TestType;
+    fixture_type f;
+
+    std::vector<uint8_t> expected_partial =
+        {
+            '[', '#', 'U', 2, // begin array, 2 elements
+                'S', 'U', 3, 'f', 'o', 'o' // string(3) "foo"
+                // second element missing
+        };
+
+    std::vector<uint8_t> expected_full =
+        {
+            '[', '#', 'U', 2, // begin array, 2 elements
+                'S', 'U', 3, 'f', 'o', 'o', // string(3) "foo"
+                'U', 42 // int8(42)
+        };
+
+    std::vector<uint8_t> expected_partial_then_full(expected_partial);
+    expected_partial_then_full.insert(expected_partial_then_full.end(),
+                                      expected_full.begin(), expected_full.end());
+
+    // Parially encode, reset, then fully encode to same sink
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.flush();
+    CHECK(f.bytes1() == expected_partial);
+    f.encoder.reset();
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.uint64_value(42);
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.bytes1() == expected_partial_then_full);
+
+    // Reset and encode to different sink
+    f.encoder.reset(f.output2);
+    f.encoder.begin_array(2);
+    f.encoder.string_value("foo");
+    f.encoder.uint64_value(42);
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.bytes2() == expected_full);
+}
