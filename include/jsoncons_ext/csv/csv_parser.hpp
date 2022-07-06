@@ -246,6 +246,17 @@ namespace detail {
         {
         }
 
+        void reset()
+        {
+            name_index_ = 0;
+            level_ = 0;
+            state_ = cached_state::begin_object;
+            column_index_ = 0;
+            row_index_ = 0;
+            column_names_.clear();
+            cached_events_.clear();
+        }
+
         bool done() const
         {
             return state_ == cached_state::done;
@@ -564,9 +575,14 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      const TempAllocator& alloc = TempAllocator())
        : alloc_(alloc),
+         state_(csv_parse_state::start),
          visitor_(nullptr),
          err_handler_(err_handler),
+         column_(1),
+         line_(1),
+         depth_(default_depth),
          options_(options),
+         column_index_(0),
          level_(0),
          offset_(0),
          begin_input_(nullptr),
@@ -582,12 +598,6 @@ public:
          state_stack_(alloc),
          buffer_(alloc)
     {
-        depth_ = default_depth;
-        state_ = csv_parse_state::start;
-        line_ = 1;
-        column_ = 1;
-        column_index_ = 0;
-        stack_.reserve(default_depth);
         if (options_.enable_str_to_nan())
         {
             string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
@@ -600,24 +610,8 @@ public:
         {
             string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
-        stack_.push_back(csv_mode::initial);
 
-        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
-        jsoncons::csv::detail::parse_column_types(options.column_types(), column_types_);
-        jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults_);
-
-        if (options_.header_lines() > 0)
-        {
-            stack_.push_back(csv_mode::header);
-        }
-        else
-        {
-            stack_.push_back(csv_mode::data);
-        }
-        state_ = csv_parse_state::start;
-        column_index_ = 0;
-        column_ = 1;
-        level_ = 0;
+        initialize();
     }
 
     ~basic_csv_parser() noexcept
@@ -647,6 +641,32 @@ public:
     const std::vector<string_type,string_allocator_type>& column_labels() const
     {
         return column_names_;
+    }
+
+    void reinitialize()
+    {
+        state_ = csv_parse_state::start;
+        visitor_ = nullptr;
+        column_ = 1;
+        line_ = 1;
+        depth_ = default_depth;
+        column_index_ = 0;
+        level_ = 0;
+        offset_ = 0;
+        begin_input_ = nullptr;
+        input_end_ = nullptr;
+        input_ptr_ = nullptr;
+        more_ = true;
+        header_line_ = 1;
+        m_columns_filter_.reset();
+        stack_.clear();
+        column_names_.clear();
+        column_types_.clear();
+        column_defaults_.clear();
+        state_stack_.clear();
+        buffer_.clear();
+
+        initialize();
     }
 
     void restart()
@@ -1299,7 +1319,20 @@ public:
     {
         return column_;
     }
+
 private:
+    void initialize()
+    {
+        jsoncons::csv::detail::parse_column_names(options_.column_names(), column_names_);
+        jsoncons::csv::detail::parse_column_types(options_.column_types(), column_types_);
+        jsoncons::csv::detail::parse_column_names(options_.column_defaults(), column_defaults_);
+
+        stack_.reserve(default_depth);
+        stack_.push_back(csv_mode::initial);
+        stack_.push_back((options_.header_lines() > 0) ? csv_mode::header
+                                                       : csv_mode::data);
+    }
+
     // name
     void before_value(std::error_code& ec)
     {

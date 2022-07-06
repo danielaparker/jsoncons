@@ -134,6 +134,22 @@ public:
         }
     }
 
+    void reset()
+    {
+        stack_.clear();
+        strings_buffer_.clear();
+        buffered_line_.clear();
+        name_.clear();
+        column_index_ = 0;
+        row_counts_.clear();
+    }
+
+    void reset(Sink&& sink)
+    {
+        sink_ = std::move(sink);
+        reset();
+    }
+
 private:
 
     template<class AnyWriter>
@@ -713,7 +729,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool string_value(const CharT* s, std::size_t length, AnyWriter& sink)
+    bool do_string_value(const CharT* s, std::size_t length, AnyWriter& sink)
     {
         bool quote = false;
         if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
@@ -736,7 +752,7 @@ private:
     void write_string_value(const string_view_type& value, AnyWriter& sink)
     {
         begin_value(sink);
-        string_value(value.data(),value.length(),sink);
+        do_string_value(value.data(),value.length(),sink);
         end_value();
     }
 

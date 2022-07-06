@@ -283,6 +283,7 @@ TEST_CASE("test_parser_reinitialization")
     parser.update("false true", 10);
     parser.finish_parse(decoder);
     CHECK(parser.done());
+    CHECK_FALSE(parser.source_exhausted());
     json j1 = decoder.get_result();
     REQUIRE(j1.is_bool());
     CHECK_FALSE(j1.as<bool>());
@@ -291,6 +292,7 @@ TEST_CASE("test_parser_reinitialization")
     parser.update("-42", 3);
     parser.finish_parse(decoder);
     CHECK(parser.done());
+    CHECK(parser.source_exhausted());
     json j2 = decoder.get_result();
     REQUIRE(j2.is_int64());
     CHECK(j2.as<int64_t>() == -42);

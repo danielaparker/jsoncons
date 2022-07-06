@@ -154,3 +154,84 @@ TEST_CASE("encode decode csv source")
 }
 
 
+namespace
+{
+
+struct csv_string_encoder_reset_test_fixture
+{
+    std::string output1;
+    std::string output2;
+    csv::csv_string_encoder encoder;
+
+    csv_string_encoder_reset_test_fixture()
+        : encoder(output1, csv::csv_options().assume_header(true))
+    {}
+
+    std::string string1() const {return output1;}
+    std::string string2() const {return output2;}
+};
+
+struct csv_stream_encoder_reset_test_fixture
+{
+    std::ostringstream output1;
+    std::ostringstream output2;
+    csv::csv_stream_encoder encoder;
+
+    csv_stream_encoder_reset_test_fixture()
+        : encoder(output1, csv::csv_options().assume_header(true))
+    {}
+
+    std::string string1() const {return output1.str();}
+    std::string string2() const {return output2.str();}
+};
+
+} // namespace
+
+TEMPLATE_TEST_CASE("test_csv_encoder_reset", "",
+                   csv_string_encoder_reset_test_fixture,
+                   csv_stream_encoder_reset_test_fixture)
+{
+    using fixture_type = TestType;
+    fixture_type f;
+
+    // Parially encode, reset, then fully encode to same sink
+    f.encoder.begin_array();
+        f.encoder.begin_array();
+            f.encoder.string_value("h1");
+            f.encoder.string_value("h2");
+        f.encoder.end_array();
+        f.encoder.begin_array();
+            f.encoder.uint64_value(1);
+        // Missing column and array end
+    f.encoder.flush();
+
+    CHECK(f.string1() == "h1,h2\n1");
+    f.encoder.reset();
+    f.encoder.begin_array();
+        f.encoder.begin_array();
+            f.encoder.string_value("h3");
+            f.encoder.string_value("h4");
+        f.encoder.end_array();
+        f.encoder.begin_array();
+            f.encoder.uint64_value(3);
+            f.encoder.uint64_value(4);
+        f.encoder.end_array();
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.string1() == "h1,h2\n1h3,h4\n3,4\n");
+
+    // Reset and encode to different sink
+    f.encoder.reset(f.output2);
+    f.encoder.begin_array();
+        f.encoder.begin_array();
+            f.encoder.string_value("h5");
+            f.encoder.string_value("h6");
+        f.encoder.end_array();
+        f.encoder.begin_array();
+            f.encoder.uint64_value(5);
+            f.encoder.uint64_value(6);
+        f.encoder.end_array();
+    f.encoder.end_array();
+    f.encoder.flush();
+    CHECK(f.string2() == "h5,h6\n5,6\n");
+}
