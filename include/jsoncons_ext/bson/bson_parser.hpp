@@ -83,10 +83,19 @@ public:
 
     void reset()
     {
-        state_stack_.clear();
-        state_stack_.emplace_back(parse_mode::root,0,0);
         more_ = true;
         done_ = false;
+        bytes_buffer_.clear();
+        text_buffer_.clear();
+        state_stack_.clear();
+        state_stack_.emplace_back(parse_mode::root,0,0);
+    }
+
+    template <class Sourceable>
+    void reset(Sourceable&& source)
+    {
+        source_ = std::forward<Sourceable>(source);
+        reset();
     }
 
     bool done() const

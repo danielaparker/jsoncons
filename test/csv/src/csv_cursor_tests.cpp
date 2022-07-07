@@ -873,3 +873,107 @@ TEST_CASE("csv_cursor with filter tests")
     CHECK(filtered_c.done());
 }
 
+TEST_CASE("test_csv_parser_reinitialization")
+{
+    json_decoder<json> decoder;
+    csv::csv_parser parser(csv::csv_options().assume_header(true)
+                                             .max_lines(2));
+
+    parser.reinitialize();
+    std::string input = "h1,h2\n"
+                        "3,4\n"
+                        "5,6\n";
+    parser.update(input.data(), input.size());
+    int count = 0;
+    while (!parser.stopped() && count < 20)
+    {
+        parser.parse_some(decoder);
+        ++count;
+    }
+    REQUIRE(parser.stopped());
+    decoder.end_array();
+    REQUIRE(decoder.is_valid());
+    json j = decoder.get_result();
+    json expected = json::parse(R"([{"h1":3,"h2":4}])");
+    CHECK(j == expected);
+
+    parser.reinitialize();
+    input = "h7,h8\n"
+            "9,10\n";
+    parser.update(input.data(), input.size());
+    count = 0;
+    while (!parser.stopped() && count < 20)
+    {
+        parser.parse_some(decoder);
+        ++count;
+    }
+    REQUIRE(parser.stopped());
+    decoder.end_array();
+    REQUIRE(decoder.is_valid());
+    j = decoder.get_result();
+    expected = json::parse(R"([{"h7":9,"h8":10}])");
+    CHECK(j == expected);
+}
+
+template <class CursorType>
+void check_csv_cursor_table(std::string info, CursorType& cursor,
+                            std::string expected_key, unsigned expected_value)
+{
+    INFO(info);
+
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+
+    CHECK_FALSE(cursor.done());
+    cursor.next();
+    CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+
+    CHECK_FALSE(cursor.done());
+    cursor.next();
+    CHECK(cursor.current().event_type() == staj_event_type::key);
+    CHECK(cursor.current().template get<std::string>() == expected_key);
+
+    CHECK_FALSE(cursor.done());
+    cursor.next();
+    CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
+    CHECK(cursor.current().template get<unsigned>() == expected_value);
+
+    CHECK_FALSE(cursor.done());
+    cursor.next();
+    CHECK(cursor.current().event_type() == staj_event_type::end_object);
+
+    CHECK_FALSE(cursor.done());
+    cursor.next();
+    CHECK(cursor.current().event_type() == staj_event_type::end_array);
+
+    cursor.next();
+    CHECK(cursor.done());
+}
+
+TEMPLATE_TEST_CASE("csv_cursor reset test", "",
+                   (std::pair<csv::csv_string_cursor, std::string>),
+                   (std::pair<csv::csv_stream_cursor, std::istringstream>))
+{
+    using cursor_type = typename TestType::first_type;
+    using input_type = typename TestType::second_type;
+
+    SECTION("with another source")
+    {
+        input_type input1("h1\n1\n");
+        input_type input2("");
+        input_type input3("h3\n3\n");
+        auto options = csv::csv_options().assume_header(true);
+        std::error_code ec;
+        cursor_type cursor(input1, options, ec);
+        check_csv_cursor_table("with input1", cursor, "h1", 1);
+
+        cursor.reset(input2, ec);
+        CHECK(ec == csv::csv_errc::source_error);
+        CHECK_FALSE(cursor.done());
+
+        // Check that cursor can reused be upon reset following an error.
+        ec = csv::csv_errc::success;
+        cursor.reset(input3);
+        check_csv_cursor_table("with input3", cursor, "h3", 3);
+    }
+}

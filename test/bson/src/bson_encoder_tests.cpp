@@ -249,5 +249,75 @@ TEST_CASE("serialize object to bson")
     {
         std::cout << e.what() << std::endl;
     }
-} 
+}
 
+struct bson_bytes_encoder_reset_test_fixture
+{
+    std::vector<uint8_t> output1;
+    std::vector<uint8_t> output2;
+    bson::bson_bytes_encoder encoder;
+
+    bson_bytes_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return output1;}
+    std::vector<uint8_t> bytes2() const {return output2;}
+};
+
+struct bson_stream_encoder_reset_test_fixture
+{
+    std::ostringstream output1;
+    std::ostringstream output2;
+    bson::bson_stream_encoder encoder;
+
+    bson_stream_encoder_reset_test_fixture() : encoder(output1) {}
+    std::vector<uint8_t> bytes1() const {return bytes_of(output1);}
+    std::vector<uint8_t> bytes2() const {return bytes_of(output2);}
+
+private:
+    static std::vector<uint8_t> bytes_of(const std::ostringstream& os)
+    {
+        auto str = os.str();
+        auto data = reinterpret_cast<const uint8_t*>(str.data());
+        std::vector<uint8_t> bytes(data, data + str.size());
+        return bytes;
+    }
+};
+
+TEMPLATE_TEST_CASE("test_bson_encoder_reset", "",
+                   bson_bytes_encoder_reset_test_fixture,
+                   bson_stream_encoder_reset_test_fixture)
+{
+    using fixture_type = TestType;
+    fixture_type f;
+
+    std::vector<uint8_t> expected_full = {
+        0x0C, 0x00, 0x00, 0x00, // Document: 12 bytes
+        0x10, // int32 field type
+        0x62, 0x00, // "b" field name
+        0x02, 0x00, 0x00, 0x00, // int32(2) field value
+        0x00, // end of object marker
+    };
+
+    // Partially encode, reset, then fully encode to same sink.
+    // Note that partial BSON output is empty when flushed due to the
+    // unknown document byte length.
+    f.encoder.begin_object(1);
+    f.encoder.key("a");
+    f.encoder.flush();
+    CHECK(f.bytes1().empty());
+    f.encoder.reset();
+    f.encoder.begin_object(1);
+    f.encoder.key("b");
+    f.encoder.uint64_value(2);
+    f.encoder.end_object();
+    f.encoder.flush();
+    CHECK(f.bytes1() == expected_full);
+
+    // Reset and encode to different sink
+    f.encoder.reset(f.output2);
+    f.encoder.begin_object(1);
+    f.encoder.key("b");
+    f.encoder.uint64_value(2);
+    f.encoder.end_object();
+    f.encoder.flush();
+    CHECK(f.bytes2() == expected_full);
+}

@@ -19,7 +19,6 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
-#include <jsoncons_ext/csv/csv_cursor.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
@@ -78,17 +77,7 @@ public:
          cursor_visitor_(accept_all)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
-        auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
-        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
-        {
-            JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser_.line(),parser_.column()));
-        }
-        std::size_t offset = (r.ptr - sv.data());
-        parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
-        {
-            next();
-        }
+        initialize_with_string_view(sv);
     }
 
 
@@ -158,18 +147,52 @@ public:
          cursor_visitor_(accept_all)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
-        auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
-        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
+        initialize_with_string_view(sv, ec);
+    }
+
+    template <class Sourceable>
+    typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source)
+    {
+        source_ = std::forward<Sourceable>(source);
+        parser_.reinitialize();
+        cursor_visitor_.reset();
+        if (!done())
         {
-            ec = json_errc::illegal_unicode_character;
-            return;
+            next();
         }
-        std::size_t offset = (r.ptr - sv.data());
-        parser_.update(sv.data()+offset,sv.size()-offset);
+    }
+
+    template <class Sourceable>
+    typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source)
+    {
+        source_ = {};
+        parser_.reinitialize();
+        cursor_visitor_.reset();
+        initialize_with_string_view(std::forward<Sourceable>(source));
+    }
+
+    template <class Sourceable>
+    typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source, std::error_code& ec)
+    {
+        source_ = std::forward<Sourceable>(source);
+        parser_.reinitialize();
+        cursor_visitor_.reset();
         if (!done())
         {
             next(ec);
         }
+    }
+
+    template <class Sourceable>
+    typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
+    reset(Sourceable&& source, std::error_code& ec)
+    {
+        source_ = {};
+        parser_.reinitialize();
+        initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
 
     bool done() const override
@@ -264,6 +287,37 @@ public:
     }
 #endif
 private:
+
+    void initialize_with_string_view(string_view_type sv)
+    {
+        auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
+        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
+        {
+            JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser_.line(),parser_.column()));
+        }
+        std::size_t offset = (r.ptr - sv.data());
+        parser_.update(sv.data()+offset,sv.size()-offset);
+        if (!done())
+        {
+            next();
+        }
+    }
+
+    void initialize_with_string_view(string_view_type sv, std::error_code& ec)
+    {
+        auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
+        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
+        {
+            ec = json_errc::illegal_unicode_character;
+            return;
+        }
+        std::size_t offset = (r.ptr - sv.data());
+        parser_.update(sv.data()+offset,sv.size()-offset);
+        if (!done())
+        {
+            next(ec);
+        }
+    }
 
     void read_next(std::error_code& ec)
     {
