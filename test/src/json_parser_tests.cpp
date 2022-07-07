@@ -297,3 +297,44 @@ TEST_CASE("test_parser_reinitialization")
     REQUIRE(j2.is_int64());
     CHECK(j2.as<int64_t>() == -42);
 }
+
+TEST_CASE("test_diagnostics_visitor", "")
+{
+    SECTION("narrow char")
+    {
+        std::ostringstream os;
+        json_diagnostics_visitor visitor(os, "  ");
+        json_parser parser;
+        std::string input(R"({"foo":[42,null]})");
+        parser.update(input.data(), input.size());
+        parser.finish_parse(visitor);
+        std::ostringstream expected;
+        expected << "visit_begin_object"  << std::endl
+                 << "  visit_key:foo"     << std::endl
+                 << "  visit_begin_array" << std::endl
+                 << "    visit_uint64:42" << std::endl
+                 << "    visit_null"      << std::endl
+                 << "  visit_end_array"   << std::endl
+                 << "visit_end_object"    << std::endl;
+        CHECK(os.str() == expected.str());
+    }
+
+    SECTION("wide char")
+    {
+        std::wostringstream os;
+        wjson_diagnostics_visitor visitor(os, L"  ");
+        wjson_parser parser;
+        std::wstring input(LR"({"foo":[42,null]})");
+        parser.update(input.data(), input.size());
+        parser.finish_parse(visitor);
+        std::wostringstream expected;
+        expected << L"visit_begin_object"  << std::endl
+                 << L"  visit_key:foo"     << std::endl
+                 << L"  visit_begin_array" << std::endl
+                 << L"    visit_uint64:42" << std::endl
+                 << L"    visit_null"      << std::endl
+                 << L"  visit_end_array"   << std::endl
+                 << L"visit_end_object"    << std::endl;
+        CHECK(os.str() == expected.str());
+    }
+}
