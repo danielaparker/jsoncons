@@ -264,6 +264,34 @@ TEST_CASE("ubjson_parser reset", "")
     }
 }
 
+TEST_CASE("ubjson_parser with json_diagnostics_visitor", "")
+{
+    std::ostringstream os;
+    json_diagnostics_visitor visitor(os, "  ");
+    std::vector<uint8_t> input{
+        '{',
+            'U',3,'f','o','o',
+            '[',
+                'U',42,
+                'Z',
+            ']',
+        '}'
+    };
+    ubjson::basic_ubjson_parser<bytes_source> parser(input);
+    std::error_code ec;
+    parser.parse(visitor, ec);
+    CHECK_FALSE(ec);
+    std::ostringstream expected;
+    expected << "visit_begin_object"  << std::endl
+             << "  visit_key:foo"     << std::endl
+             << "  visit_begin_array" << std::endl
+             << "    visit_uint64:42" << std::endl
+             << "    visit_null"      << std::endl
+             << "  visit_end_array"   << std::endl
+             << "visit_end_object"    << std::endl;
+    CHECK(os.str() == expected.str());
+}
+
 struct ubjson_bytes_cursor_reset_test_traits
 {
     using cursor_type = ubjson::ubjson_bytes_cursor;

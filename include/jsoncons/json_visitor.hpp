@@ -7,7 +7,9 @@
 #ifndef JSONCONS_JSON_VISITOR_HPP
 #define JSONCONS_JSON_VISITOR_HPP
 
+#include <iostream>
 #include <string>
+#include <utility>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/bigint.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -1362,8 +1364,15 @@ namespace jsoncons {
     template <class CharT>
     class basic_json_diagnostics_visitor : public basic_default_json_visitor<CharT>
     {
+    public:
+        using stream_type = std::basic_ostream<CharT>;
+        using string_type = std::basic_string<CharT>;
+
+    private:
         using supertype = basic_default_json_visitor<CharT>;
         using string_view_type = typename supertype::string_view_type;
+
+        struct enabler {};
 
         static constexpr CharT visit_begin_array_name[] = {'v','i','s','i','t','_','b','e','g','i','n','_','a','r','r','a','y', 0};
         static constexpr CharT visit_end_array_name[] =  {'v','i','s','i','t','_','e','n','d','_','a','r','r','a','y', 0};
@@ -1379,66 +1388,146 @@ namespace jsoncons {
         static constexpr CharT visit_half_name[] =  {'v','i','s','i','t','_','h','a','l','f', 0};
         static constexpr CharT visit_double_name[] =  {'v','i','s','i','t','_','d','o','u','b','l','e', 0};
 
+        static constexpr CharT separator_ = ':';
+
+        stream_type& output_;
+        string_type indentation_;
+        long level_;
+
+    public:
+        // If CharT is char, then enable the default constructor which binds to
+        // std::cout.
+        template <class U = enabler>
+        basic_json_diagnostics_visitor(
+            typename std::enable_if<std::is_same<CharT, char>::value, U>::type = enabler{})
+            : basic_json_diagnostics_visitor(std::cout)
+        {
+        }
+
+        // If CharT is wchar_t, then enable the default constructor which binds
+        // to std::wcout.
+        template <class U = enabler>
+        basic_json_diagnostics_visitor(
+            typename std::enable_if<std::is_same<CharT, wchar_t>::value, U>::type = enabler{})
+            : basic_json_diagnostics_visitor(std::wcout)
+        {
+        }
+
+        explicit basic_json_diagnostics_visitor(
+            stream_type& output,
+            string_type indentation = string_type())
+            : output_(output),
+              indentation_(std::move(indentation)),
+              level_(0)
+        {
+        }
+
+    private:
+        void indent()
+        {
+            for (long i=0; i<level_; ++i)
+                output_ << indentation_;
+        }
+
         bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_begin_object_name << std::endl; 
+            indent();
+            output_ << visit_begin_object_name << std::endl;
+            ++level_;
             return true;
         }
 
         bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_begin_object_name << length << std::endl; 
+            indent();
+            output_ << visit_begin_object_name << separator_ << length << std::endl;
+            ++level_;
             return true;
         }
 
         bool visit_end_object(const ser_context&, std::error_code&) override
         {
-            std::cout << visit_end_object_name << std::endl; 
+            --level_;
+            indent();
+            output_ << visit_end_object_name << std::endl;
             return true;
         }
+
+        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            indent();
+            output_ << visit_begin_array_name << std::endl;
+            ++level_;
+            return true;
+        }
+
         bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_begin_array_name << length << std::endl; 
+            indent();
+            output_ << visit_begin_array_name << separator_  << length << std::endl;
+            ++level_;
             return true;
         }
 
         bool visit_end_array(const ser_context&, std::error_code&) override
         {
-            std::cout << visit_end_array_name << std::endl; 
+            --level_;
+            indent();
+            output_ << visit_end_array_name << std::endl;
             return true;
         }
 
         bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_key_name << s << std::endl; 
+            indent();
+            output_ << visit_key_name << separator_  << s << std::endl;
             return true;
         }
         bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_string_name << s << std::endl; 
+            indent();
+            output_ << visit_string_name << separator_  << s << std::endl;
             return true;
         }
         bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_int64_name << val << std::endl; 
+            indent();
+            output_ << visit_int64_name << separator_  << val << std::endl;
             return true;
         }
         bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_uint64_name << val << std::endl; 
+            indent();
+            output_ << visit_uint64_name << separator_ << val << std::endl;
             return true;
         }
         bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_bool_name << val << std::endl; 
+            indent();
+            output_ << visit_bool_name << separator_ << val << std::endl;
             return true;
         }
         bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << visit_null_name << std::endl; 
+            indent();
+            output_ << visit_null_name << std::endl;
             return true;
         }
     };
+
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_object_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_key_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_string_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_byte_string_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_null_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_bool_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_uint64_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
+    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
 
     using json_visitor = basic_json_visitor<char>;
     using wjson_visitor = basic_json_visitor<wchar_t>;
