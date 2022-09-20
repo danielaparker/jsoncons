@@ -82,7 +82,7 @@ public:
         done_ = false;
         text_buffer_.clear();
         state_stack_.clear();
-        state_stack_.emplace_back(parse_mode::root,0,0);
+        state_stack_.emplace_back(parse_mode::root,0,uint8_t(0));
         nesting_depth_ = 0;
     }
 
