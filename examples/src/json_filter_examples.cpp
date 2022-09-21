@@ -9,10 +9,10 @@
 
 using namespace jsoncons;
 
-class name_fix_up_filter : public json_filter
+class name_fixup_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_visitor& visitor)
+    name_fixup_filter(json_visitor& visitor)
         : json_filter(visitor)
     {
     }
@@ -65,7 +65,7 @@ private:
     std::string member_name_;
 };
 
-void name_fix_up_example1()
+void name_fixup_example1()
 {
     std::string in_file = "./input/address-book.json";
     std::string out_file = "./output/new-address-book1.json";
@@ -73,12 +73,12 @@ void name_fix_up_example1()
     std::ofstream os(out_file);
 
     json_stream_encoder encoder(os);
-    name_fix_up_filter filter(encoder);
+    name_fixup_filter filter(encoder);
     json_stream_reader reader(is, filter);
     reader.read_next();
 }
 
-void name_fix_up_example2()
+void name_fixup_example2()
 {
     std::string in_file = "./input/address-book.json";
     std::string out_file = "./output/new-address-book2.json";
@@ -89,7 +89,7 @@ void name_fix_up_example2()
     is >> j;
 
     json_stream_encoder encoder(os);
-    name_fix_up_filter filter(encoder);
+    name_fixup_filter filter(encoder);
     j.dump(filter);
 }
 
@@ -121,8 +121,8 @@ void change_member_name_example()
 void json_filter_examples()
 {
     std::cout << "\njson_filter examples\n\n";
-    name_fix_up_example1();
-    name_fix_up_example2();
+    name_fixup_example1();
+    name_fixup_example2();
     change_member_name_example();
 
     std::cout << std::endl;

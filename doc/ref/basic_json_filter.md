@@ -592,12 +592,12 @@ You can achieve the desired result by subclassing the [basic_json_filter](basic_
 using namespace jsoncons;
 
 
-class name_fix_up_filter : public json_filter
+class name_fixup_filter : public json_filter
 {
     std::string member_name_;
 
 public:
-    name_fix_up_filter(json_visitor& visitor)
+    name_fixup_filter(json_visitor& visitor)
         : json_filter(visitor)
     {
     }
@@ -651,7 +651,7 @@ Configure a [rename_object_key_filter](rename_object_key_filter.md) to emit json
 ```c++
 std::ofstream os("output/new-address-book.json");
 json_stream_encoder encoder(os);
-name_fix_up_filter filter(encoder);
+name_fixup_filter filter(encoder);
 ```
 Parse the input and send the json events through the filter ...
 ```c++

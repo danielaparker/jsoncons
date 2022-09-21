@@ -22,13 +22,13 @@ struct warning
     std::size_t column_number;
 };
 
-class name_fix_up_filter : public json_filter
+class name_fixup_filter : public json_filter
 {
     std::string member_name_;
 public:
     std::vector<warning> warnings;
 
-    name_fix_up_filter(json_visitor& visitor)
+    name_fixup_filter(json_visitor& visitor)
         : json_filter(visitor)
     {
     }
@@ -90,7 +90,7 @@ TEST_CASE("test_filter")
     std::ofstream os(out_file);
 
     json_stream_encoder encoder(os);
-    name_fix_up_filter filter(encoder);
+    name_fixup_filter filter(encoder);
     json_stream_reader reader(is, filter);
     reader.read_next();
 
@@ -109,7 +109,7 @@ TEST_CASE("test_filter2")
 
     json_stream_encoder encoder(os);
 
-    name_fix_up_filter filter2(encoder);
+    name_fixup_filter filter2(encoder);
 
     rename_object_key_filter filter1("email","email2",filter2);
 
