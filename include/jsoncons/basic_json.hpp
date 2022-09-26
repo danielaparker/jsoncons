@@ -2457,7 +2457,7 @@ namespace jsoncons {
         basic_byte_string<BAllocator> as_byte_string() const
         {
             using byte_string_type = basic_byte_string<BAllocator>;
-            converter<byte_string_type> convert;
+            converter2<byte_string_type> convert;
             std::error_code ec;
 
             switch (storage_kind())
@@ -3849,7 +3849,7 @@ namespace jsoncons {
                                  type_traits::is_basic_byte_string<T>::value,T>::type
         as(byte_string_arg_t, semantic_tag hint) const
         {
-            converter<T> convert;
+            converter2<T> convert;
             std::error_code ec;
             switch (storage_kind())
             {
@@ -4060,7 +4060,7 @@ namespace jsoncons {
         {
             using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
 
-            converter<string_type> convert;
+            converter2<string_type> convert;
             std::error_code ec;
             switch (storage_kind())
             {

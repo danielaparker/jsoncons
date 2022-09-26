@@ -246,7 +246,7 @@ public:
     typename std::enable_if<type_traits::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get(std::error_code& ec) const
     {
-        converter<T> conv;
+        converter2<T> conv;
         switch (event_type_)
         {
             case staj_event_type::key:
@@ -330,7 +330,7 @@ public:
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get(std::error_code& ec) const
     {
-        converter<T> conv;
+        converter2<T> conv;
         switch (event_type_)
         {
             case staj_event_type::byte_string_value:
