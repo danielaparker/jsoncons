@@ -37,32 +37,33 @@ TEST_CASE("convert into string")
         CHECK(s == expected);
     }
 }
-/*
+
 TEST_CASE("convert into list-like")
 {
     SECTION("from string")
     {
-        converter<std::vector<uint8_t>> convert;
+        converter<jsoncons::string_view, std::vector<uint8_t>> converter;
 
         std::vector<uint8_t> expected = {'f','o','o','b','a','r'};
 
         std::error_code ec;
-        std::vector<uint8_t> v = convert.from(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, ec);
+        std::vector<uint8_t> v = converter.convert(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, std::allocator<uint8_t>(), ec);
         REQUIRE(!ec); 
         
         CHECK(v == expected);
     }
     SECTION("from wstring")
     {
-        converter<std::vector<uint8_t>> convert;
+        converter<jsoncons::basic_string_view<wchar_t>,std::vector<uint8_t>> converter;
 
         std::vector<uint8_t> expected = { 'f','o','o','b','a','r' };
 
         std::error_code ec;
-        std::vector<uint8_t> v = convert.from(jsoncons::wstring_view(L"Zm9vYmFy"), semantic_tag::base64url, ec);
+        std::vector<uint8_t> v = converter.convert(jsoncons::wstring_view(L"Zm9vYmFy"), semantic_tag::base64url, 
+            std::allocator<uint8_t>(), ec);
         REQUIRE(!ec);
 
         CHECK(v == expected);
     }
 }
-*/
+
