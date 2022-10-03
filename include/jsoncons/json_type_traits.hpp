@@ -508,7 +508,6 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
         static typename std::enable_if<type_traits::is_byte<typename Container::value_type>::value,Container>::type
         as(const Json& j)
         {
-            converter2<T> convert;
             std::error_code ec;
             if (j.is_array())
             {
@@ -523,7 +522,8 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_byte_string_view())
             {
-                auto v = convert.from(j.as_byte_string_view(),j.tag(), ec);
+                converter<byte_string_view,T> converter;
+                auto v = converter.convert(j.as_byte_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(conv_error(ec));
@@ -532,7 +532,8 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_string())
             {
-                auto v = convert.from(j.as_string_view(),j.tag(), ec);
+                converter<basic_string_view,T> converter;
+                auto v = converter.convert(j.as_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(conv_error(ec));

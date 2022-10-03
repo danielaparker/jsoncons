@@ -2457,7 +2457,6 @@ namespace jsoncons {
         basic_byte_string<BAllocator> as_byte_string() const
         {
             using byte_string_type = basic_byte_string<BAllocator>;
-            converter2<byte_string_type> convert;
             std::error_code ec;
 
             switch (storage_kind())
@@ -2465,6 +2464,7 @@ namespace jsoncons {
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::long_string_value:
                 {
+                    converter<jsoncons::string_view, byte_string_type> convert;
                     byte_string_type v = convert.from(as_string_view(),tag(),ec);
                     if (ec)
                     {
@@ -3849,7 +3849,6 @@ namespace jsoncons {
                                  type_traits::is_basic_byte_string<T>::value,T>::type
         as(byte_string_arg_t, semantic_tag hint) const
         {
-            converter2<T> convert;
             std::error_code ec;
             switch (storage_kind())
             {
@@ -3862,7 +3861,8 @@ namespace jsoncons {
                         case semantic_tag::base64:
                         case semantic_tag::base64url:
                         {
-                            T v = convert.from(as_string_view(),tag(),ec);
+                            converter<jsoncons::basic_string_view<char_type>,T> convert;
+                            T v = convert.convert(as_string_view(),tag(),std::allocator<char_type>, ec);
                             if (ec)
                             {
                                 JSONCONS_THROW(ser_error(ec));
@@ -3871,7 +3871,8 @@ namespace jsoncons {
                         }
                         default:
                         {
-                            T v = convert.from(as_string_view(), hint, ec);
+                            converter<jsoncons::basic_string_view<char_type>, T> convert;
+                            T v = convert.convert(as_string_view(), hint, std::allocator<char_type>, ec);
                             if (ec)
                             {
                                 JSONCONS_THROW(ser_error(ec));
@@ -4060,7 +4061,6 @@ namespace jsoncons {
         {
             using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
 
-            converter2<string_type> convert;
             std::error_code ec;
             switch (storage_kind())
             {
@@ -4071,7 +4071,8 @@ namespace jsoncons {
                 }
                 case json_storage_kind::byte_string_value:
                 {
-                    auto s = convert.from(as_byte_string_view(), tag(), alloc, ec);
+                    converter<byte_string_view,string_type> convert;
+                    auto s = convert.convert(as_byte_string_view(), tag(), alloc, ec);
                     if (ec)
                     {
                         JSONCONS_THROW(ser_error(ec));

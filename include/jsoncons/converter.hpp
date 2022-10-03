@@ -25,7 +25,7 @@ namespace jsoncons {
     // From byte string, Into string
     template <class From, class Into>
     class converter<From, Into, 
-        typename std::enable_if<type_traits::is_byte_sequence<From>::value &&
+        typename std::enable_if<std::is_same<typename From::value_type,uint8_t>::value &&
             type_traits::is_basic_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
@@ -79,12 +79,44 @@ namespace jsoncons {
             return ws;
         }
     };
+    
+    // From narrow string, Into string
+    template <class From, class Into>
+    class converter<From, Into, 
+        typename std::enable_if<(type_traits::is_basic_string<From>::value || type_traits::is_basic_string_view<From>::value) &&
+            type_traits::is_basic_string<Into>::value>::type>
+    {
+        using allocator_type = typename Into::allocator_type;
+    public:
+        template <class CharT = typename Into::value_type>
+        JSONCONS_CPP14_CONSTEXPR 
+        typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
+        convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
+        {
+            return Into(value.begin(),value.end(),alloc);
+        }
+        template <class CharT = typename Into::value_type>
+        JSONCONS_CPP14_CONSTEXPR 
+        typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
+        convert(From value, semantic_tag, const allocator_type& alloc, std::error_code& ec)
+        {
+            Into ws(alloc);
+            auto retval = unicode_traits::convert(value.data(), value.size(), ws);
+            if (retval.ec != unicode_traits::conv_errc())
+            {
+                ec = conv_errc::not_wide_char;
+            }
+
+            return ws;
+        }
+    };
 
     // From string, Into byte_string
     template <class From, class Into>
     class converter<From, Into, 
         typename std::enable_if<type_traits::is_char_sequence<From>::value &&
-            (type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
+            (!type_traits::is_basic_string<Into>::value && 
+              type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
@@ -200,6 +232,59 @@ namespace jsoncons {
             jsoncons::detail::write_double f{float_chars_format::general,0};
             f(value, s);
             return s;
+        }
+    };
+
+    // From half, Into string
+    template <class Into>
+    class converter<half_arg_t, Into,
+        typename std::enable_if<type_traits::is_basic_string<Into>::value>::type>
+    {
+        using allocator_type = typename Into::allocator_type;
+    public:
+        JSONCONS_CPP14_CONSTEXPR 
+        Into convert(uint16_t value, semantic_tag, const allocator_type& alloc, std::error_code&)
+        {
+            Into s(alloc);
+            jsoncons::detail::write_double f{float_chars_format::general,0};
+            double x = binary::decode_half(value);
+            f(x, s);
+            return s;
+        }
+    };
+
+    // From bool, Into string
+    template <class From, class Into>
+    class converter<From, Into, 
+        typename std::enable_if<type_traits::is_bool<From>::value &&
+            type_traits::is_basic_string<Into>::value>::type>
+    {
+        using allocator_type = typename Into::allocator_type;
+        using char_type = typename Into::value_type;
+    public:
+        JSONCONS_CPP14_CONSTEXPR 
+        Into convert(From value, semantic_tag, const allocator_type&, std::error_code&)
+        {
+            constexpr const char_type* true_constant = JSONCONS_CSTRING_CONSTANT(char_type,"true"); 
+            constexpr const char_type* false_constant = JSONCONS_CSTRING_CONSTANT(char_type,"false"); 
+
+            return value ? Into(true_constant,4) : Into(false_constant,5);
+        }
+    };
+
+    // From null, Into string
+    template <class Into>
+    class converter<null_type, Into, void> 
+    {
+        using allocator_type = typename Into::allocator_type;
+        using char_type = typename Into::value_type;
+    public:
+        JSONCONS_CPP14_CONSTEXPR 
+        Into convert(null_type, semantic_tag, const allocator_type&, std::error_code&)
+        {
+            constexpr const char_type* null_constant = JSONCONS_CSTRING_CONSTANT(char_type,"null"); 
+
+            return Into(null_constant,4);
         }
     };
 
