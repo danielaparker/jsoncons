@@ -84,7 +84,7 @@ private:
 
 TEST_CASE("test_filter")
 {
-    std::string in_file = "./input/address-book.json";
+    std::string in_file = "./corelib/input/address-book.json";
     std::string out_file = "./output/address-book-new.json";
     std::ifstream is(in_file);
     std::ofstream os(out_file);
@@ -102,7 +102,7 @@ TEST_CASE("test_filter")
 
 TEST_CASE("test_filter2")
 {
-    std::string in_file = "./input/address-book.json";
+    std::string in_file = "./corelib/input/address-book.json";
     std::string out_file = "./output/address-book-new.json";
     std::ifstream is(in_file);
     std::ofstream os(out_file);

@@ -27,7 +27,7 @@ TEST_CASE("JSON Parsing Test Suite")
 {
     SECTION("Expected success")
     {
-        std::string path = "./input/JSONTestSuite";
+        std::string path = "./corelib/input/JSONTestSuite";
         for (auto& p : fs::directory_iterator(path))
         {
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'y')
@@ -47,7 +47,7 @@ TEST_CASE("JSON Parsing Test Suite")
     }
     SECTION("Expected failure")
     {
-        std::string path = "./input/JSONTestSuite";
+        std::string path = "./corelib/input/JSONTestSuite";
         for (auto& p : fs::directory_iterator(path))
         {
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'n')

@@ -211,7 +211,7 @@ TEST_CASE("test_uHHHH")
 
 TEST_CASE("test_multiline_comments")
 {
-    std::string path = "./input/json-multiline-comment.json";
+    std::string path = "./corelib/input/json-multiline-comment.json";
     std::fstream is(path);
     if (!is)
     {

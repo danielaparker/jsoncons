@@ -16,7 +16,7 @@ using namespace jsoncons;
 
 TEST_CASE("Test cyrillic.json")
 {
-    std::string path = "./input/cyrillic.json";
+    std::string path = "./corelib/input/cyrillic.json";
     std::fstream is(path);
     if (!is)
     {
