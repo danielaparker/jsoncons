@@ -88,8 +88,8 @@ namespace jsoncons {
         typename std::enable_if<!type_traits::is_basic_string<From>::value &&
         !type_traits::is_basic_string_view<From>::value &&
         type_traits::is_byte<typename From::value_type>::value &&
-            (!type_traits::is_basic_string<Into>::value && 
-              type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
+              !type_traits::is_basic_string<Into>::value && 
+              (type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
@@ -136,8 +136,8 @@ namespace jsoncons {
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_char_sequence<From>::value &&
-            (!type_traits::is_basic_string<Into>::value && 
-              type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
+            !type_traits::is_basic_string<Into>::value && 
+            (type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:

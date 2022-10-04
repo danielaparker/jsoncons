@@ -328,13 +328,18 @@ namespace jsoncons {
                                 std::is_same<typename T::value_type,uint8_t>::value,T>::type
         get(std::error_code& ec) const
         {
-            value_converter<T> converter;
             switch (event_type_)
             {
                 case staj2_event_type::byte_string_value:
+                {
+                    value_converter<byte_string_view,T> converter;
                     return converter.convert(byte_string_view(value_.byte_string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                }
                 case staj2_event_type::string_value:
+                {
+                    value_converter<basic_string_view<CharT>,T> converter;
                     return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                }
                 default:
                     ec = conv_errc::not_byte_string;
                     return T{};
