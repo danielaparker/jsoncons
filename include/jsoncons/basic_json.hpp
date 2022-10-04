@@ -2465,7 +2465,7 @@ namespace jsoncons {
                 case json_storage_kind::long_string_value:
                 {
                     converter<jsoncons::string_view, byte_string_type> convert;
-                    byte_string_type v = convert.from(as_string_view(),tag(),ec);
+                    byte_string_type v = convert.convert(as_string_view(),tag(),std::allocator<char>(), ec);
                     if (ec)
                     {
                         JSONCONS_THROW(ser_error(ec));
@@ -3862,7 +3862,7 @@ namespace jsoncons {
                         case semantic_tag::base64url:
                         {
                             converter<jsoncons::basic_string_view<char_type>,T> convert;
-                            T v = convert.convert(as_string_view(),tag(),std::allocator<char_type>, ec);
+                            T v = convert.convert(as_string_view(),tag(),std::allocator<char_type>(), ec);
                             if (ec)
                             {
                                 JSONCONS_THROW(ser_error(ec));
@@ -3872,7 +3872,7 @@ namespace jsoncons {
                         default:
                         {
                             converter<jsoncons::basic_string_view<char_type>, T> convert;
-                            T v = convert.convert(as_string_view(), hint, std::allocator<char_type>, ec);
+                            T v = convert.convert(as_string_view(), hint, std::allocator<char_type>(), ec);
                             if (ec)
                             {
                                 JSONCONS_THROW(ser_error(ec));

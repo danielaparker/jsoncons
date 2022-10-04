@@ -532,7 +532,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_string())
             {
-                converter<basic_string_view,T> converter;
+                converter<basic_string_view<char>,T> converter;
                 auto v = converter.convert(j.as_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
                 if (ec)
                 {

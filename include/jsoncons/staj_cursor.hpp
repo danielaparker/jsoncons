@@ -289,7 +289,7 @@ public:
             case staj_event_type::null_value:
             {
                 converter<null_type,T> conv;
-                return conv.convert(null_type(),tag(), std::allocator<CharT>(), ec);
+                return conv.convert(tag(), ec);
             }
             default:
             {

@@ -236,40 +236,50 @@ namespace jsoncons {
         typename std::enable_if<type_traits::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get(std::error_code& ec) const
         {
-            converter2<T> conv;
             switch (event_type_)
             {
                 case staj2_event_type::string_value:
-                    return conv.from(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
+                {
+                    converter<jsoncons::basic_string_view<CharT>,T> conv;
+                    return conv.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                }
                 case staj2_event_type::byte_string_value:
                 {
-                    return conv.from(byte_string_view(value_.byte_string_data_,length_),
+                    converter<byte_string_view,T> conv;
+                    return conv.convert(byte_string_view(value_.byte_string_data_,length_),
                                                    tag(),
+                        std::allocator<CharT>(),
                                                    ec);
                 }
                 case staj2_event_type::uint64_value:
                 {
-                    return conv.from(value_.uint64_value_, tag(), ec);
+                    converter<uint64_t,T> conv;
+                    return conv.convert(value_.uint64_value_, tag(), std::allocator<CharT>(), ec);
                 }
                 case staj2_event_type::int64_value:
                 {
-                    return conv.from(value_.int64_value_, tag(), ec);
+                    converter<int64_t,T> conv;
+                    return conv.convert(value_.int64_value_, tag(), std::allocator<CharT>(), ec);
                 }
                 case staj2_event_type::half_value:
                 {
-                    return conv.from(half_arg, value_.half_value_, tag(), ec);
+                    converter<half_arg_t,T> conv;
+                    return conv.convert(value_.half_value_, tag(), std::allocator<CharT>(), ec);
                 }
                 case staj2_event_type::double_value:
                 {
-                    return conv.from(value_.double_value_, tag(), ec);
+                    converter<double,T> conv;
+                    return conv.convert(value_.double_value_, tag(), std::allocator<CharT>(), ec);
                 }
                 case staj2_event_type::bool_value:
                 {
-                    return conv.from(value_.bool_value_,tag(),ec);
+                    converter<bool,T> conv;
+                    return conv.convert(value_.bool_value_,tag(), std::allocator<CharT>(),ec);
                 }
                 case staj2_event_type::null_value:
                 {
-                    return conv.from(null_type(),tag(),ec);
+                    converter<null_type,T> conv;
+                    return conv.convert(tag(),ec);
                 }
                 default:
                 {
@@ -318,13 +328,13 @@ namespace jsoncons {
                                 std::is_same<typename T::value_type,uint8_t>::value,T>::type
         get(std::error_code& ec) const
         {
-            converter2<T> conv;
+            converter<T> conv;
             switch (event_type_)
             {
                 case staj2_event_type::byte_string_value:
-                    return conv.from(byte_string_view(value_.byte_string_data_, length_), tag(), ec);
+                    return conv.convert(byte_string_view(value_.byte_string_data_, length_), tag(), std::allocator<CharT>(), ec);
                 case staj2_event_type::string_value:
-                    return conv.from(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
+                    return conv.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), std::allocator<CharT>(), ec);
                 default:
                     ec = conv_errc::not_byte_string;
                     return T{};
