@@ -18,13 +18,13 @@
 namespace jsoncons {
 
     template <class From, class Into, class Enable = void>
-    class converter
+    class value_converter
     {
     };
 
     // From byte string, Into string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<!type_traits::is_basic_string<From>::value &&
         !type_traits::is_basic_string_view<From>::value &&
         type_traits::is_byte<typename From::value_type>::value &&
@@ -84,7 +84,7 @@ namespace jsoncons {
 
     // From byte string, Into byte string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<!type_traits::is_basic_string<From>::value &&
         !type_traits::is_basic_string_view<From>::value &&
         type_traits::is_byte<typename From::value_type>::value &&
@@ -103,7 +103,7 @@ namespace jsoncons {
     
     // From narrow string, Into string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<(type_traits::is_basic_string<From>::value || type_traits::is_basic_string_view<From>::value) &&
             type_traits::is_basic_string<Into>::value>::type>
     {
@@ -134,7 +134,7 @@ namespace jsoncons {
 
     // From string, Into byte_string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_char_sequence<From>::value &&
             (!type_traits::is_basic_string<Into>::value && 
               type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
@@ -223,7 +223,7 @@ namespace jsoncons {
 
     // From integer, Into string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_integer<From>::value &&
             type_traits::is_basic_string<Into>::value>::type>
     {
@@ -240,7 +240,7 @@ namespace jsoncons {
 
     // From integer, Into string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<std::is_floating_point<From>::value &&
             type_traits::is_basic_string<Into>::value>::type>
     {
@@ -258,7 +258,7 @@ namespace jsoncons {
 
     // From half, Into string
     template <class Into>
-    class converter<half_arg_t, Into,
+    class value_converter<half_arg_t, Into,
         typename std::enable_if<type_traits::is_basic_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
@@ -276,7 +276,7 @@ namespace jsoncons {
 
     // From bool, Into string
     template <class From, class Into>
-    class converter<From, Into, 
+    class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_bool<From>::value &&
             type_traits::is_basic_string<Into>::value>::type>
     {
@@ -295,7 +295,7 @@ namespace jsoncons {
 
     // From null, Into string
     template <class Into>
-    class converter<null_type, Into, void> 
+    class value_converter<null_type, Into, void> 
     {
         using allocator_type = typename Into::allocator_type;
         using char_type = typename Into::value_type;

@@ -23,7 +23,7 @@
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/converter.hpp>
+#include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {
 

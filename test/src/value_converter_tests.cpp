@@ -3,7 +3,7 @@
 
 #include <catch/catch.hpp>
 #include <jsoncons/more_type_traits.hpp>
-#include <jsoncons/converter.hpp>
+#include <jsoncons/value_converter.hpp>
 #include <vector>
 
 using namespace jsoncons;
@@ -14,7 +14,7 @@ TEST_CASE("convert into string")
 
     SECTION("from byte_string into string")
     {
-        converter<byte_string_view,std::string> converter;
+        value_converter<byte_string_view,std::string> converter;
 
         std::string expected = "Zm9vYmFy";
 
@@ -26,7 +26,7 @@ TEST_CASE("convert into string")
     }
     SECTION("from byte string into wstring")
     {
-        converter<byte_string_view,std::wstring> converter;
+        value_converter<byte_string_view,std::wstring> converter;
 
         std::wstring expected = L"Zm9vYmFy";
 
@@ -42,7 +42,7 @@ TEST_CASE("convert into list-like")
 {
     SECTION("from string")
     {
-        converter<jsoncons::string_view, std::vector<uint8_t>> converter;
+        value_converter<jsoncons::string_view, std::vector<uint8_t>> converter;
 
         std::vector<uint8_t> expected = {'f','o','o','b','a','r'};
 
@@ -54,7 +54,7 @@ TEST_CASE("convert into list-like")
     }
     SECTION("from wstring")
     {
-        converter<jsoncons::basic_string_view<wchar_t>,std::vector<uint8_t>> converter;
+        value_converter<jsoncons::basic_string_view<wchar_t>,std::vector<uint8_t>> converter;
 
         std::vector<uint8_t> expected = { 'f','o','o','b','a','r' };
 

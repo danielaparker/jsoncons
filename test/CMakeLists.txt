@@ -109,7 +109,7 @@ add_executable(unit_tests
                src/bigint_tests.cpp
                src/source_adaptor_tests.cpp
                src/byte_string_tests.cpp
-               src/converter_tests.cpp
+               src/value_converter_tests.cpp
                src/decode_traits_tests.cpp
                src/detail/optional_tests.cpp
                src/detail/span_tests.cpp

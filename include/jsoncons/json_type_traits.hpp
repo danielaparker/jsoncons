@@ -30,7 +30,7 @@
 #include <memory>
 #include <bitset> // std::bitset
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/converter.hpp>
+#include <jsoncons/value_converter.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
   #include <variant>
@@ -522,7 +522,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_byte_string_view())
             {
-                converter<byte_string_view,T> converter;
+                value_converter<byte_string_view,T> converter;
                 auto v = converter.convert(j.as_byte_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
                 if (ec)
                 {
@@ -532,7 +532,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             }
             else if (j.is_string())
             {
-                converter<basic_string_view<char>,T> converter;
+                value_converter<basic_string_view<char>,T> converter;
                 auto v = converter.convert(j.as_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
                 if (ec)
                 {
