@@ -33,7 +33,6 @@ namespace jsoncons {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename Into::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
         convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code&)
         {
@@ -53,7 +52,6 @@ namespace jsoncons {
             return s;
         }
         template <class CharT = typename Into::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
         convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
@@ -93,7 +91,6 @@ namespace jsoncons {
     {
         using allocator_type = typename Into::allocator_type;
     public:
-        JSONCONS_CPP14_CONSTEXPR 
         Into convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(value.begin(),value.end(),alloc);
@@ -110,14 +107,12 @@ namespace jsoncons {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename Into::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
         convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             return Into(value.begin(),value.end(),alloc);
         }
         template <class CharT = typename Into::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
         convert(From value, semantic_tag, const allocator_type& alloc, std::error_code& ec)
         {
@@ -142,7 +137,6 @@ namespace jsoncons {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename From::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
         convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
@@ -178,7 +172,6 @@ namespace jsoncons {
         }
 
         template <class CharT = typename From::value_type>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
         convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
@@ -229,7 +222,6 @@ namespace jsoncons {
     {
         using allocator_type = typename Into::allocator_type;
     public:
-        JSONCONS_CPP14_CONSTEXPR 
         Into convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(alloc);
