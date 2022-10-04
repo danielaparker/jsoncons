@@ -246,7 +246,6 @@ namespace jsoncons {
     {
         using allocator_type = typename Into::allocator_type;
     public:
-        JSONCONS_CPP14_CONSTEXPR 
         Into convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(alloc);
@@ -263,7 +262,6 @@ namespace jsoncons {
     {
         using allocator_type = typename Into::allocator_type;
     public:
-        JSONCONS_CPP14_CONSTEXPR 
         Into convert(uint16_t value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(alloc);
