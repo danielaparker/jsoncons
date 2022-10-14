@@ -471,7 +471,7 @@ private:
     }
 
     template<class CharT>
-    friend bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
+    friend bool send_json_event(const basic_staj_event<CharT>& ev,
         basic_json_visitor<CharT>& visitor,
         const ser_context& context,
         std::error_code& ec)
@@ -703,7 +703,7 @@ public:
         {
             if (index_ != 0)
             {
-                more = staj_to_saj_event(event(), visitor, context, ec);
+                more = send_json_event(event(), visitor, context, ec);
                 while (more && is_typed_array())
                 {
                     if (index_ < data_.size())
@@ -838,7 +838,7 @@ public:
         }
         else
         {
-            more = staj_to_saj_event(event(), visitor, context, ec);
+            more = send_json_event(event(), visitor, context, ec);
         }
         return more;
     }

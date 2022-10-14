@@ -446,7 +446,7 @@ namespace jsoncons {
         }
     public:
         template<class CharT>
-        friend bool staj2_to_saj_event(const basic_staj2_event<CharT>& ev,
+        friend bool send_value_event(const basic_staj2_event<CharT>& ev,
             basic_json_visitor2<CharT>& visitor,
             const ser_context& context,
             std::error_code& ec)
@@ -674,7 +674,7 @@ namespace jsoncons {
             {
                 if (index_ != 0)
                 {
-                    more = staj2_to_saj_event(event(), visitor, context, ec);
+                    more = send_value_event(event(), visitor, context, ec);
                     while (more && is_typed_array())
                     {
                         if (index_ < data_.size())
@@ -809,7 +809,7 @@ namespace jsoncons {
             }
             else
             {
-                more = staj2_to_saj_event(event(), visitor, context, ec);
+                more = send_value_event(event(), visitor, context, ec);
             }
             return more;
         }

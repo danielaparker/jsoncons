@@ -218,7 +218,7 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
-        if (staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
+        if (send_json_event(cursor_visitor_.event(), visitor, *this, ec))
         {
             read_next(visitor, ec);
         }
