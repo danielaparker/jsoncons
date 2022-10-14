@@ -464,6 +464,16 @@ namespace type_traits {
     using
     container_size_t = decltype(std::declval<Container>().size());
 
+    // has_allocator_type
+
+    template <class T, class Enable=void>
+    struct has_allocator_type : std::false_type {};
+
+    template <class T>
+    struct has_allocator_type<T, 
+        typename std::enable_if<is_detected<container_allocator_type_t,T>::value
+    >::type> : std::true_type {};
+
     // is_string_or_string_view
 
     template <class T, class Enable=void>
@@ -484,7 +494,7 @@ namespace type_traits {
     template <class T>
     struct is_string<T, 
                      typename std::enable_if<is_string_or_string_view<T>::value &&
-                                             is_detected<container_allocator_type_t,T>::value
+                                             has_allocator_type<T>::value
     >::type> : std::true_type {};
 
     // is_string_view
