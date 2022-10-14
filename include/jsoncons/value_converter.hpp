@@ -22,19 +22,17 @@ namespace jsoncons {
     {
     };
 
-    // From byte string, Into string
+    // From any byte sequence, Into string
     template <class From, class Into>
     class value_converter<From, Into, 
-        typename std::enable_if<!type_traits::is_basic_string<From>::value &&
-        !type_traits::is_basic_string_view<From>::value &&
-        type_traits::is_byte<typename From::value_type>::value &&
-            type_traits::is_basic_string<Into>::value>::type>
+        typename std::enable_if<type_traits::is_byte_sequence<From>::value && !type_traits::is_string_or_string_view<From>::value &&
+            type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename Into::value_type>
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code&)
+        convert(const From& value, semantic_tag tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(alloc);
             switch (tag)
@@ -53,7 +51,7 @@ namespace jsoncons {
         }
         template <class CharT = typename Into::value_type>
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
+        convert(const From& value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
             std::string s;
             switch (tag)
@@ -83,38 +81,37 @@ namespace jsoncons {
     // From byte string, Into byte string
     template <class From, class Into>
     class value_converter<From, Into, 
-        typename std::enable_if<!type_traits::is_basic_string<From>::value &&
-        !type_traits::is_basic_string_view<From>::value &&
-        type_traits::is_byte<typename From::value_type>::value &&
-              !type_traits::is_basic_string<Into>::value && 
-              (type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
+        typename std::enable_if<type_traits::is_byte_sequence<From>::value && 
+            !type_traits::is_string_or_string_view<From>::value &&
+            !type_traits::is_string_or_string_view<Into>::value && 
+            type_traits::is_back_insertable_byte_container<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
-        Into convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
+        Into convert(const From& value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             Into s(value.begin(),value.end(),alloc);
             return s;
         }
     };
     
-    // From narrow string, Into string
+    // From string or string_view, Into string
     template <class From, class Into>
     class value_converter<From, Into, 
-        typename std::enable_if<(type_traits::is_basic_string<From>::value || type_traits::is_basic_string_view<From>::value) &&
-            type_traits::is_basic_string<Into>::value>::type>
+        typename std::enable_if<type_traits::is_string_or_string_view<From>::value &&
+            type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename Into::value_type>
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag, const allocator_type& alloc, std::error_code&)
+        convert(const From& value, semantic_tag, const allocator_type& alloc, std::error_code&)
         {
             return Into(value.begin(),value.end(),alloc);
         }
         template <class CharT = typename Into::value_type>
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag, const allocator_type& alloc, std::error_code& ec)
+        convert(const From& value, semantic_tag, const allocator_type& alloc, std::error_code& ec)
         {
             Into ws(alloc);
             auto retval = unicode_traits::convert(value.data(), value.size(), ws);
@@ -131,14 +128,14 @@ namespace jsoncons {
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_char_sequence<From>::value &&
-            !type_traits::is_basic_string<Into>::value && 
-            (type_traits::is_back_insertable_byte_container<Into>::value || type_traits::is_basic_byte_string<Into>::value)>::type>
+            !type_traits::is_string_or_string_view<Into>::value && 
+            type_traits::is_back_insertable_byte_container<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
         template <class CharT = typename From::value_type>
         typename std::enable_if<type_traits::is_narrow_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
+        convert(const From& value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
             Into bytes(alloc);
             switch (tag)
@@ -173,7 +170,7 @@ namespace jsoncons {
 
         template <class CharT = typename From::value_type>
         typename std::enable_if<type_traits::is_wide_character<CharT>::value,Into>::type
-        convert(From value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
+        convert(const From& value, semantic_tag tag, const allocator_type& alloc, std::error_code& ec)
         {
             Into bytes(alloc);
 
@@ -218,7 +215,7 @@ namespace jsoncons {
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_integer<From>::value &&
-            type_traits::is_basic_string<Into>::value>::type>
+            type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
@@ -234,7 +231,7 @@ namespace jsoncons {
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<std::is_floating_point<From>::value &&
-            type_traits::is_basic_string<Into>::value>::type>
+            type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
@@ -250,7 +247,7 @@ namespace jsoncons {
     // From half, Into string
     template <class Into>
     class value_converter<half_arg_t, Into,
-        typename std::enable_if<type_traits::is_basic_string<Into>::value>::type>
+        typename std::enable_if<type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
     public:
@@ -268,7 +265,7 @@ namespace jsoncons {
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<type_traits::is_bool<From>::value &&
-            type_traits::is_basic_string<Into>::value>::type>
+            type_traits::is_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
         using char_type = typename Into::value_type;

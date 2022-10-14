@@ -68,7 +68,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct decode_traits<T,CharT,
-        typename std::enable_if<type_traits::is_basic_string<T>::value &&
+        typename std::enable_if<type_traits::is_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
@@ -84,7 +84,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct decode_traits<T,CharT,
-        typename std::enable_if<type_traits::is_basic_string<T>::value &&
+        typename std::enable_if<type_traits::is_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value
     >::type>
     {

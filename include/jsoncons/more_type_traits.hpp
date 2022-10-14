@@ -476,24 +476,24 @@ namespace type_traits {
                                              is_detected<container_npos_t,T>::value
     >::type> : std::true_type {};
 
-    // is_basic_string
+    // is_string
 
     template <class T, class Enable=void>
-    struct is_basic_string : std::false_type {};
+    struct is_string : std::false_type {};
 
     template <class T>
-    struct is_basic_string<T, 
+    struct is_string<T, 
                      typename std::enable_if<is_string_or_string_view<T>::value &&
                                              is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
-    // is_basic_string_view
+    // is_string_view
 
     template <class T, class Enable=void>
-    struct is_basic_string_view : std::false_type {};
+    struct is_string_view : std::false_type {};
 
     template <class T>
-    struct is_basic_string_view<T, 
+    struct is_string_view<T, 
                           typename std::enable_if<is_string_or_string_view<T>::value &&
                                                   !is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};

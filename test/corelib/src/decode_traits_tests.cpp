@@ -50,7 +50,7 @@ TEST_CASE("decode_traits std::string")
 {
     SECTION("is_string")
     {
-        CHECK(type_traits::is_basic_string<std::string>::value);
+        CHECK(type_traits::is_string<std::string>::value);
     }
     SECTION("string")
     {

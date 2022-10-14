@@ -38,6 +38,36 @@ TEST_CASE("convert into string")
     }
 }
 
+/*TEST_CASE("convert into basic_string_view")
+{
+    std::vector<uint8_t> bytes = {'f','o','o','b','a','r'};
+
+    SECTION("from byte_string_view into string_view")
+    {
+        value_converter<byte_string_view,jsoncons::string_view> converter;
+
+        jsoncons::string_view expected = "Zm9vYmFy";
+
+        std::error_code ec;
+        jsoncons::string_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<char>(), ec);
+        REQUIRE(!ec); 
+        
+        CHECK(s == expected);
+    }
+    SECTION("from byte string_view into wstring_view")
+    {
+        value_converter<byte_string_view,jsoncons::wstring_view> converter;
+
+        jsoncons::wstring_view expected = L"Zm9vYmFy";
+
+        std::error_code ec;
+        jsoncons::wstring_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<wchar_t>(), ec);
+        REQUIRE(!ec);
+
+        CHECK(s == expected);
+    }
+}*/
+
 TEST_CASE("convert into list-like")
 {
     SECTION("from string")
