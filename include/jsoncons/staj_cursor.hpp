@@ -476,8 +476,6 @@ private:
         const ser_context& context,
         std::error_code& ec)
     {
-        using string_view_type = jsoncons::basic_string_view<CharT>;
-
         switch (ev.event_type())
         {
             case staj_event_type::begin_array:
