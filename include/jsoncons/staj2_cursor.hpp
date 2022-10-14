@@ -445,7 +445,6 @@ namespace jsoncons {
             }
         }
     public:
-        template<class CharT>
         friend bool send_value_event(const basic_staj2_event<CharT>& ev,
             basic_json_visitor2<CharT>& visitor,
             const ser_context& context,

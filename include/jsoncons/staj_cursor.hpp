@@ -470,7 +470,6 @@ private:
         }
     }
 
-    template<class CharT>
     friend bool send_json_event(const basic_staj_event<CharT>& ev,
         basic_json_visitor<CharT>& visitor,
         const ser_context& context,
