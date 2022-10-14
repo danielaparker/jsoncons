@@ -136,6 +136,9 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     return os;
 }
 
+template <class CharT>
+class basic_staj_visitor;
+
 template<class CharT>
 class basic_staj_event
 {
@@ -464,6 +467,47 @@ private:
             default:
                 ec = conv_errc::not_bool;
                 return bool();
+        }
+    }
+
+    template<class CharT>
+    friend bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
+        basic_json_visitor<CharT>& visitor,
+        const ser_context& context,
+        std::error_code& ec)
+    {
+        using string_view_type = jsoncons::basic_string_view<CharT>;
+
+        switch (ev.event_type())
+        {
+            case staj_event_type::begin_array:
+                return visitor.begin_array(ev.tag(), context);
+            case staj_event_type::end_array:
+                return visitor.end_array(context);
+            case staj_event_type::begin_object:
+                return visitor.begin_object(ev.tag(), context, ec);
+            case staj_event_type::end_object:
+                return visitor.end_object(context, ec);
+            case staj_event_type::key:
+                return visitor.key(string_view_type(ev.value_.string_data_,ev.length_), context);
+            case staj_event_type::string_value:
+                return visitor.string_value(string_view_type(ev.value_.string_data_,ev.length_), ev.tag(), context);
+            case staj_event_type::byte_string_value:
+                return visitor.byte_string_value(byte_string_view(ev.value_.byte_string_data_,ev.length_), ev.tag(), context);
+            case staj_event_type::null_value:
+                return visitor.null_value(ev.tag(), context);
+            case staj_event_type::bool_value:
+                return visitor.bool_value(ev.value_.bool_value_, ev.tag(), context);
+            case staj_event_type::int64_value:
+                return visitor.int64_value(ev.value_.int64_value_, ev.tag(), context);
+            case staj_event_type::uint64_value:
+                return visitor.uint64_value(ev.value_.uint64_value_, ev.tag(), context);
+            case staj_event_type::half_value:
+                return visitor.half_value(ev.value_.half_value_, ev.tag(), context);
+            case staj_event_type::double_value:
+                return visitor.double_value(ev.value_.double_value_, ev.tag(), context);
+            default:
+                return false;
         }
     }
 };
@@ -1069,44 +1113,6 @@ private:
     }
 };
 
-template<class CharT>
-bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
-                       basic_json_visitor<CharT>& visitor,
-                       const ser_context& context,
-                       std::error_code& ec)
-{
-    switch (ev.event_type())
-    {
-        case staj_event_type::begin_array:
-            return visitor.begin_array(ev.tag(), context);
-        case staj_event_type::end_array:
-            return visitor.end_array(context);
-        case staj_event_type::begin_object:
-            return visitor.begin_object(ev.tag(), context, ec);
-        case staj_event_type::end_object:
-            return visitor.end_object(context, ec);
-        case staj_event_type::key:
-            return visitor.key(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
-        case staj_event_type::string_value:
-            return visitor.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.tag(), context);
-        case staj_event_type::byte_string_value:
-            return visitor.byte_string_value(ev.template get<byte_string_view>(), ev.tag(), context);
-        case staj_event_type::null_value:
-            return visitor.null_value(ev.tag(), context);
-        case staj_event_type::bool_value:
-            return visitor.bool_value(ev.template get<bool>(), ev.tag(), context);
-        case staj_event_type::int64_value:
-            return visitor.int64_value(ev.template get<int64_t>(), ev.tag(), context);
-        case staj_event_type::uint64_value:
-            return visitor.uint64_value(ev.template get<uint64_t>(), ev.tag(), context);
-        case staj_event_type::half_value:
-            return visitor.half_value(ev.template get<uint16_t>(), ev.tag(), context);
-        case staj_event_type::double_value:
-            return visitor.double_value(ev.template get<double>(), ev.tag(), context);
-        default:
-            return false;
-    }
-}
 
 // basic_staj_cursor
 
