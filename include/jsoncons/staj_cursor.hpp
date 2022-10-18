@@ -245,9 +245,15 @@ public:
         return val;
     }
 
-    template<class T, class CharT_ = CharT>
+    template <class T>
+    T get(std::error_code& ec) const
+    {
+        return get_<T>(std::allocator<char>{}, ec);
+    }
+
+    template<class T, class Allocator, class CharT_ = CharT>
     typename std::enable_if<type_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-    get(std::error_code& ec) const
+    get_(Allocator,std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -302,9 +308,9 @@ public:
         }
     }
 
-    template<class T, class CharT_ = CharT>
+    template<class T, class Allocator, class CharT_ = CharT>
     typename std::enable_if<type_traits::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        get(std::error_code& ec) const
+        get_(Allocator, std::error_code& ec) const
     {
         T s;
         switch (event_type_)
@@ -320,9 +326,9 @@ public:
         return s;
     }
 
-    template<class T>
+    template<class T, class Allocator>
     typename std::enable_if<std::is_same<T, byte_string_view>::value, T>::type
-        get(std::error_code& ec) const
+        get_(Allocator, std::error_code& ec) const
     {
         T s;
         switch (event_type_)
@@ -337,10 +343,10 @@ public:
         return s;
     }
 
-    template<class T>
+    template<class T, class Allocator>
     typename std::enable_if<type_traits::is_list_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
-    get(std::error_code& ec) const
+    get_(Allocator, std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -360,9 +366,9 @@ public:
         }
     }
 
-    template <class IntegerType>
+    template <class IntegerType, class Allocator>
     typename std::enable_if<type_traits::is_integer<IntegerType>::value, IntegerType>::type
-    get(std::error_code& ec) const
+    get_(Allocator, std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -393,16 +399,16 @@ public:
         }
     }
 
-    template<class T>
+    template<class T, class Allocator>
     typename std::enable_if<std::is_floating_point<T>::value, T>::type
-        get(std::error_code& ec) const
+        get_(Allocator, std::error_code& ec) const
     {
         return static_cast<T>(as_double(ec));
     }
 
-    template<class T>
+    template<class T, class Allocator>
     typename std::enable_if<type_traits::is_bool<T>::value, T>::type
-        get(std::error_code& ec) const
+        get_(Allocator, std::error_code& ec) const
     {
         return as_bool(ec);
     }
