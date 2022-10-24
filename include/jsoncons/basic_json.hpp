@@ -247,6 +247,9 @@ namespace jsoncons {
         using array = json_array<Json,std::vector>;
 
         using parse_error_handler_type = default_json_parsing;
+        
+        template <class CharT, class CharTraits, class Allocator>
+        using string = std::basic_string<CharT, CharTraits, Allocator>;
     };
 
     struct order_preserving_policy
@@ -258,6 +261,9 @@ namespace jsoncons {
         using array = json_array<Json,std::vector>;
 
         using parse_error_handler_type = default_json_parsing;
+        
+        template <class CharT, class CharTraits, class Allocator>
+        using string = std::basic_string<CharT, CharTraits, Allocator>;
     };
 
     #if !defined(JSONCONS_NO_DEPRECATED)
@@ -352,7 +358,7 @@ namespace jsoncons {
 
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
 
-        using key_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
+        using key_type = typename ImplementationPolicy::template string<char_type,char_traits_type,char_allocator_type>;
 
 
         using reference = basic_json&;
