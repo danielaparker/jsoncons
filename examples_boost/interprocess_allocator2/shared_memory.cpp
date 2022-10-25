@@ -12,14 +12,14 @@ typedef boost::interprocess::allocator<int,
 
 struct boost_sorted_policy : public sorted_policy
 {
-    template <class T, class Allocator>
-    using sequence_container_type = boost::interprocess::vector<T,Allocator>;
+    template <class KeyT,class Json>
+    using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
+
+    template <class Json>
+    using array = json_array<Json,boost::interprocess::vector>;
 
     template <class CharT, class CharTraits, class Allocator>
-    using key_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
-
-    template <class CharT, class CharTraits, class Allocator>
-    using string_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+    using string = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
 using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
       shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
       j->push_back(10);
 
-      shm_json o(allocator);
+      shm_json o(json_object_arg, semantic_tag::none, allocator);
       //o.try_emplace("category", "reference",allocator);
       //o.try_emplace("author", "Nigel Rees",allocator);
       //o.try_emplace("title", "Sayings of the Century",allocator);

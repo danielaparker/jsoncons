@@ -42,7 +42,7 @@ Member type                         |Definition
 `pointer`|`basic_json*`
 `const_pointer`|`const basic_json*`
 `string_view_type`|`basic_string_view<char_type>`
-`key_type`|std::basic_string<char_type,char_traits_type,char_allocator_type>
+`key_type`|A [ContiguousContainer](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer) to `char_type`
 `key_value_type`|`key_value<key_type,basic_json>`
 `object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](json/key_value.md)
 `const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value.md)
