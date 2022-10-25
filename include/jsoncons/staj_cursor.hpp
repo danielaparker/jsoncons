@@ -266,9 +266,7 @@ public:
             case staj_event_type::byte_string_value:
             {
                 value_converter<jsoncons::byte_string_view,T> converter;
-                return converter.convert(byte_string_view(value_.byte_string_data_,length_),
-                                               tag(),
-                                               ec);
+                return converter.convert(byte_string_view(value_.byte_string_data_,length_),tag(),ec);
             }
             case staj_event_type::uint64_value:
             {

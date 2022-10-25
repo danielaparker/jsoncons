@@ -3878,7 +3878,7 @@ namespace jsoncons {
                         default:
                         {
                             value_converter<jsoncons::basic_string_view<char_type>, T> converter;
-                            T v = converter.convert(as_string_view(), hint, std::allocator<char_type>(), ec);
+                            T v = converter.convert(as_string_view(), hint, ec);
                             if (ec)
                             {
                                 JSONCONS_THROW(ser_error(ec));
@@ -4078,7 +4078,7 @@ namespace jsoncons {
                 case json_storage_kind::byte_string_value:
                 {
                     value_converter<byte_string_view,string_type> converter;
-                    auto s = converter.convert(as_byte_string_view(), tag(), alloc, ec);
+                    auto s = converter.convert(as_byte_string_view(), tag(), ec);
                     if (ec)
                     {
                         JSONCONS_THROW(ser_error(ec));
