@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include "sample_allocators.hpp"
+#include "freelist_allocator.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>

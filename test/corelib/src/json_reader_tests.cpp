@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
-#include "sample_allocators.hpp"
+#include "freelist_allocator.hpp"
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
