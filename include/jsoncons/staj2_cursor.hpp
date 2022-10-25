@@ -241,40 +241,37 @@ namespace jsoncons {
                 case staj2_event_type::string_value:
                 {
                     value_converter<jsoncons::basic_string_view<CharT>,T> converter;
-                    return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
                 }
                 case staj2_event_type::byte_string_value:
                 {
                     value_converter<byte_string_view,T> converter;
-                    return converter.convert(byte_string_view(value_.byte_string_data_,length_),
-                                                   tag(),
-                        std::allocator<CharT>(),
-                                                   ec);
+                    return converter.convert(byte_string_view(value_.byte_string_data_,length_),tag(),ec);
                 }
                 case staj2_event_type::uint64_value:
                 {
                     value_converter<uint64_t,T> converter;
-                    return converter.convert(value_.uint64_value_, tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(value_.uint64_value_, tag(), ec);
                 }
                 case staj2_event_type::int64_value:
                 {
                     value_converter<int64_t,T> converter;
-                    return converter.convert(value_.int64_value_, tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(value_.int64_value_, tag(), ec);
                 }
                 case staj2_event_type::half_value:
                 {
                     value_converter<half_arg_t,T> converter;
-                    return converter.convert(value_.half_value_, tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(value_.half_value_, tag(), ec);
                 }
                 case staj2_event_type::double_value:
                 {
                     value_converter<double,T> converter;
-                    return converter.convert(value_.double_value_, tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(value_.double_value_, tag(), ec);
                 }
                 case staj2_event_type::bool_value:
                 {
                     value_converter<bool,T> converter;
-                    return converter.convert(value_.bool_value_,tag(), std::allocator<CharT>(),ec);
+                    return converter.convert(value_.bool_value_,tag(),ec);
                 }
                 case staj2_event_type::null_value:
                 {
@@ -333,12 +330,12 @@ namespace jsoncons {
                 case staj2_event_type::byte_string_value:
                 {
                     value_converter<byte_string_view,T> converter;
-                    return converter.convert(byte_string_view(value_.byte_string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(byte_string_view(value_.byte_string_data_, length_), tag(), ec);
                 }
                 case staj2_event_type::string_value:
                 {
                     value_converter<basic_string_view<CharT>,T> converter;
-                    return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), std::allocator<CharT>(), ec);
+                    return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
                 }
                 default:
                     ec = conv_errc::not_byte_string;

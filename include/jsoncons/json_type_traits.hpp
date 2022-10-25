@@ -523,7 +523,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             else if (j.is_byte_string_view())
             {
                 value_converter<byte_string_view,T> converter;
-                auto v = converter.convert(j.as_byte_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
+                auto v = converter.convert(j.as_byte_string_view(),j.tag(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(conv_error(ec));
@@ -533,7 +533,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
             else if (j.is_string())
             {
                 value_converter<basic_string_view<char>,T> converter;
-                auto v = converter.convert(j.as_string_view(),j.tag(), std::allocator<uint8_t>(), ec);
+                auto v = converter.convert(j.as_string_view(),j.tag(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(conv_error(ec));

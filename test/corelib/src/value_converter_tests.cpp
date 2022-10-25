@@ -19,7 +19,7 @@ TEST_CASE("convert into string")
         std::string expected = "Zm9vYmFy";
 
         std::error_code ec;
-        std::string s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<char>(), ec);
+        std::string s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec); 
         
         CHECK(s == expected);
@@ -31,7 +31,7 @@ TEST_CASE("convert into string")
         std::wstring expected = L"Zm9vYmFy";
 
         std::error_code ec;
-        std::wstring s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<wchar_t>(), ec);
+        std::wstring s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec);
 
         CHECK(s == expected);
@@ -49,7 +49,7 @@ TEST_CASE("convert into string")
         jsoncons::string_view expected = "Zm9vYmFy";
 
         std::error_code ec;
-        jsoncons::string_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<char>(), ec);
+        jsoncons::string_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec); 
         
         CHECK(s == expected);
@@ -61,7 +61,7 @@ TEST_CASE("convert into string")
         jsoncons::wstring_view expected = L"Zm9vYmFy";
 
         std::error_code ec;
-        jsoncons::wstring_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, std::allocator<wchar_t>(), ec);
+        jsoncons::wstring_view s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec);
 
         CHECK(s == expected);
@@ -77,7 +77,7 @@ TEST_CASE("convert into list-like")
         std::vector<uint8_t> expected = {'f','o','o','b','a','r'};
 
         std::error_code ec;
-        std::vector<uint8_t> v = converter.convert(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, std::allocator<uint8_t>(), ec);
+        std::vector<uint8_t> v = converter.convert(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, ec);
         REQUIRE(!ec); 
         
         CHECK(v == expected);
@@ -89,8 +89,7 @@ TEST_CASE("convert into list-like")
         std::vector<uint8_t> expected = { 'f','o','o','b','a','r' };
 
         std::error_code ec;
-        std::vector<uint8_t> v = converter.convert(jsoncons::wstring_view(L"Zm9vYmFy"), semantic_tag::base64url, 
-            std::allocator<uint8_t>(), ec);
+        std::vector<uint8_t> v = converter.convert(jsoncons::wstring_view(L"Zm9vYmFy"), semantic_tag::base64url, ec);
         REQUIRE(!ec);
 
         CHECK(v == expected);
