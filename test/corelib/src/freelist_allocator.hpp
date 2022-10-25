@@ -1,8 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef SAMPLE_ALLOCATORS_HPP
-#define SAMPLE_ALLOCATORS_HPP
+#ifndef FREELIST_ALLOCATOR_HPP
+#define FREELIST_ALLOCATOR_HPP
 
 #include <algorithm>
 #include <iostream>
