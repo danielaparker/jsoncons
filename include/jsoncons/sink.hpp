@@ -16,7 +16,7 @@
 #include <memory> // std::addressof
 #include <cstring> // std::memcpy
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/more_type_traits.hpp>
+#include <jsoncons/traits_extension.hpp>
 
 namespace jsoncons { 
 
@@ -253,7 +253,7 @@ namespace jsoncons {
     };
 
     template <class Container>
-    class bytes_sink<Container,typename std::enable_if<type_traits::is_back_insertable_byte_container<Container>::value>::type> 
+    class bytes_sink<Container,typename std::enable_if<traits_extension::is_back_insertable_byte_container<Container>::value>::type> 
     {
     public:
         using container_type = Container;

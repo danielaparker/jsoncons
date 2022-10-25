@@ -87,14 +87,14 @@ namespace jsoncons {
                  std::tuple<U2...>
                      b) noexcept(noexcept(key_value(std::declval<std::tuple<U1...>&>(),
                                                std::declval<std::tuple<U2...>&>(),
-                                               jsoncons::type_traits::index_sequence_for<U1...>(),
-                                               jsoncons::type_traits::index_sequence_for<U2...>())))
-            : key_value(a, b, jsoncons::type_traits::index_sequence_for<U1...>(),
-                   jsoncons::type_traits::index_sequence_for<U2...>()) {
+                                               jsoncons::traits_extension::index_sequence_for<U1...>(),
+                                               jsoncons::traits_extension::index_sequence_for<U2...>())))
+            : key_value(a, b, jsoncons::traits_extension::index_sequence_for<U1...>(),
+                   jsoncons::traits_extension::index_sequence_for<U2...>()) {
         }
 
         template <typename... U1, size_t... I1, typename... U2, size_t... I2>
-        key_value(std::tuple<U1...>& a, std::tuple<U2...>& b, jsoncons::type_traits::index_sequence<I1...> /*unused*/, jsoncons::type_traits::index_sequence<I2...> /*unused*/) noexcept(
+        key_value(std::tuple<U1...>& a, std::tuple<U2...>& b, jsoncons::traits_extension::index_sequence<I1...> /*unused*/, jsoncons::traits_extension::index_sequence<I2...> /*unused*/) noexcept(
             noexcept(KeyT(std::forward<U1>(std::get<I1>(
                 std::declval<std::tuple<
                     U1...>&>()))...)) && noexcept(ValueT(std::
@@ -530,7 +530,7 @@ namespace jsoncons {
         // insert_or_assign
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             bool inserted;
@@ -559,7 +559,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             bool inserted;
@@ -590,7 +590,7 @@ namespace jsoncons {
         // try_emplace
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             bool inserted;
@@ -618,7 +618,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             bool inserted;
@@ -646,7 +646,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<traits_extension::is_stateless<A>::value,iterator>::type 
         try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
             iterator it = hint;
@@ -682,7 +682,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,iterator>::type 
         try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
             iterator it = hint;
@@ -718,7 +718,7 @@ namespace jsoncons {
         // insert_or_assign
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<traits_extension::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
             iterator it;
@@ -753,7 +753,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
             iterator it;
@@ -1337,7 +1337,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1356,7 +1356,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1376,7 +1376,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class T>
-        typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<traits_extension::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
             if (hint == members_.end())
@@ -1404,7 +1404,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class T>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
             if (hint == members_.end())
@@ -1569,7 +1569,7 @@ namespace jsoncons {
         // try_emplace
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1587,7 +1587,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& key, Args&&... args)
         {
             auto result = insert_index_entry(key,members_.size());
@@ -1606,7 +1606,7 @@ namespace jsoncons {
         }
      
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<type_traits::is_stateless<A>::value,iterator>::type
+        typename std::enable_if<traits_extension::is_stateless<A>::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
             if (hint == members_.end())
@@ -1633,7 +1633,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!type_traits::is_stateless<A>::value,iterator>::type
+        typename std::enable_if<!traits_extension::is_stateless<A>::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
             if (hint == members_.end())

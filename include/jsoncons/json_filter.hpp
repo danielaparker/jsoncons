@@ -530,8 +530,8 @@ class json_visitor_adaptor
 };
 
 template <class From,class To>
-class json_visitor_adaptor<From,To,typename std::enable_if<type_traits::is_narrow_character<typename From::char_type>::value &&
-                                                           type_traits::is_narrow_character<typename To::char_type>::value>::type> : public json_visitor_adaptor_base<From,To>
+class json_visitor_adaptor<From,To,typename std::enable_if<traits_extension::is_narrow_character<typename From::char_type>::value &&
+                                                           traits_extension::is_narrow_character<typename To::char_type>::value>::type> : public json_visitor_adaptor_base<From,To>
 {
     using supertype = json_visitor_adaptor_base<From,To>;
     using to_char_type = typename To::char_type;
@@ -573,8 +573,8 @@ private:
 };
 
 template <class From,class To>
-class json_visitor_adaptor<From,To,typename std::enable_if<!(type_traits::is_narrow_character<typename From::char_type>::value &&
-                                                             type_traits::is_narrow_character<typename To::char_type>::value)>::type> : public json_visitor_adaptor_base<From,To>
+class json_visitor_adaptor<From,To,typename std::enable_if<!(traits_extension::is_narrow_character<typename From::char_type>::value &&
+                                                             traits_extension::is_narrow_character<typename To::char_type>::value)>::type> : public json_visitor_adaptor_base<From,To>
 {
     using supertype = json_visitor_adaptor_base<From,To>;
 public:

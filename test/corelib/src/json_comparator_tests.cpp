@@ -106,8 +106,8 @@ TEST_CASE("basic_json object == basic_json object")
         CHECK_FALSE((o2 != o1));
 
         CHECK(std::is_convertible<decltype(o1.at("a")),json>::value);
-        CHECK(jsoncons::type_traits::is_basic_json<decltype(o1.at("a"))>::value);
-        CHECK(jsoncons::type_traits::is_basic_json<const json&>::value);
+        CHECK(jsoncons::traits_extension::is_basic_json<decltype(o1.at("a"))>::value);
+        CHECK(jsoncons::traits_extension::is_basic_json<const json&>::value);
 
         CHECK((o1.at("a") == 1)); // basic_json == int
         CHECK((1 == o1.at("a"))); // int == basic_json
@@ -133,7 +133,7 @@ TEST_CASE("basic_json proxy == basic_json")
 
         CHECK(is_proxy<typename std::decay<decltype(o1["a"])>::type>::value);
         CHECK(is_proxy_of<decltype(o1["a"]),json>::value);
-        CHECK(type_traits::is_basic_json<typename decltype(o1["a"])::proxied_type>::value);
+        CHECK(traits_extension::is_basic_json<typename decltype(o1["a"])::proxied_type>::value);
 
         CHECK_FALSE((o1["a"] == o2));
         CHECK_FALSE((o2 == o1["a"]));

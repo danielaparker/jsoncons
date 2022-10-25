@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-#include <jsoncons/more_type_traits.hpp>
+#include <jsoncons/traits_extension.hpp>
 #include <jsoncons/value_converter.hpp>
 #include <vector>
 

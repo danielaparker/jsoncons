@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MORE_TYPE_TRAITS_HPP
-#define JSONCONS_MORE_TYPE_TRAITS_HPP
+#ifndef JSONCONS_TRAITS_EXTENSION_HPP
+#define JSONCONS_TRAITS_EXTENSION_HPP
 
 #include <stdexcept>
 #include <string>
@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
-namespace type_traits {
+namespace traits_extension {
 
     // is_char8
     template <typename CharT, typename Enable=void>
@@ -878,7 +878,7 @@ namespace impl {
 
     #endif
 
-} // type_traits
+} // traits_extension
 } // jsoncons
 
 #endif

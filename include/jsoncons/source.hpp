@@ -18,7 +18,7 @@
 #include <type_traits> // std::enable_if
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
-#include <jsoncons/more_type_traits.hpp>
+#include <jsoncons/traits_extension.hpp>
 
 namespace jsoncons { 
 
@@ -323,7 +323,7 @@ namespace jsoncons {
 
         template <class Sourceable>
         string_source(const Sourceable& s,
-                      typename std::enable_if<type_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
+                      typename std::enable_if<traits_extension::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
             : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
         {
         }
@@ -528,7 +528,7 @@ namespace jsoncons {
 
         template <class Sourceable>
         bytes_source(const Sourceable& source,
-                     typename std::enable_if<type_traits::is_byte_sequence<Sourceable>::value,int>::type = 0)
+                     typename std::enable_if<traits_extension::is_byte_sequence<Sourceable>::value,int>::type = 0)
             : data_(reinterpret_cast<const value_type*>(source.data())), 
               current_(data_), 
               end_(data_+source.size())
@@ -713,8 +713,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                type_traits::has_reserve<Container>::value &&
-                                type_traits::has_data_exact<value_type*,Container>::value 
+                                traits_extension::has_reserve<Container>::value &&
+                                traits_extension::has_data_exact<value_type*,Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
@@ -736,8 +736,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                type_traits::has_reserve<Container>::value &&
-                                !type_traits::has_data_exact<value_type*, Container>::value 
+                                traits_extension::has_reserve<Container>::value &&
+                                !traits_extension::has_data_exact<value_type*, Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {

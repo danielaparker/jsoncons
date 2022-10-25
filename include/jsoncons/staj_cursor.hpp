@@ -252,7 +252,7 @@ public:
     }
 
     template<class T, class Allocator, class CharT_ = CharT>
-    typename std::enable_if<type_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<traits_extension::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get_(Allocator,std::error_code& ec) const
     {
         switch (event_type_)
@@ -307,7 +307,7 @@ public:
     }
 
     template<class T, class Allocator, class CharT_ = CharT>
-    typename std::enable_if<type_traits::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<traits_extension::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
         T s;
@@ -342,7 +342,7 @@ public:
     }
 
     template<class T, class Allocator>
-    typename std::enable_if<type_traits::is_list_like<T>::value &&
+    typename std::enable_if<traits_extension::is_list_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get_(Allocator, std::error_code& ec) const
     {
@@ -365,7 +365,7 @@ public:
     }
 
     template <class IntegerType, class Allocator>
-    typename std::enable_if<type_traits::is_integer<IntegerType>::value, IntegerType>::type
+    typename std::enable_if<traits_extension::is_integer<IntegerType>::value, IntegerType>::type
     get_(Allocator, std::error_code& ec) const
     {
         switch (event_type_)
@@ -405,7 +405,7 @@ public:
     }
 
     template<class T, class Allocator>
-    typename std::enable_if<type_traits::is_bool<T>::value, T>::type
+    typename std::enable_if<traits_extension::is_bool<T>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
         return as_bool(ec);

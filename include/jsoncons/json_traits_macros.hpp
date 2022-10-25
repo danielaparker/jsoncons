@@ -10,7 +10,7 @@
 #include <algorithm> // std::swap
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
-#include <jsoncons/more_type_traits.hpp>
+#include <jsoncons/traits_extension.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <limits> // std::numeric_limits
 #include <string>

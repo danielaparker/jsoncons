@@ -3020,7 +3020,7 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<type_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
+        typename std::enable_if<traits_extension::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  reference root,
                  const json_location_node_type& path, 

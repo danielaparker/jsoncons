@@ -164,7 +164,7 @@ namespace jsoncons {
         bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
                                const ser_context& context=ser_context(),
-                               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
+                               typename std::enable_if<traits_extension::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
             bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
@@ -179,7 +179,7 @@ namespace jsoncons {
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context=ser_context(),
-                               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
+                               typename std::enable_if<traits_extension::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
             bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
@@ -310,7 +310,7 @@ namespace jsoncons {
                                semantic_tag tag, 
                                const ser_context& context,
                                std::error_code& ec,
-                               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
+                               typename std::enable_if<traits_extension::is_byte_sequence<Source>::value,int>::type = 0)
         {
             return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
@@ -320,7 +320,7 @@ namespace jsoncons {
                                uint64_t ext_tag, 
                                const ser_context& context,
                                std::error_code& ec,
-                               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
+                               typename std::enable_if<traits_extension::is_byte_sequence<Source>::value,int>::type = 0)
         {
             return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
         }

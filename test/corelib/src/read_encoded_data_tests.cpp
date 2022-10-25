@@ -12,7 +12,7 @@
 using namespace jsoncons;
 
 template <class Source>
-typename std::enable_if<type_traits::is_byte<typename Source::value_type>::value,std::size_t>::type
+typename std::enable_if<traits_extension::is_byte<typename Source::value_type>::value,std::size_t>::type
 read_json(Source& source, char* buffer, std::size_t capacity, unicode_traits::encoding_kind& encoding)
 {
     using value_type = typename Source::value_type;
