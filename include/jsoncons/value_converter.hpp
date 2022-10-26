@@ -117,24 +117,33 @@ namespace jsoncons {
         }
     };
     
-    // From string or string_view, Into string
+    // From string or string_view, Into string, same character type
     template <class From, class Into>
     class value_converter<From, Into, 
         typename std::enable_if<traits_extension::is_string_or_string_view<From>::value &&
-            traits_extension::is_string<Into>::value>::type> : value_converter_base<Into>
+            traits_extension::is_string<Into>::value && 
+            std::is_same<typename From::value_type,typename Into::value_type>::value>::type> : value_converter_base<Into>
     {
     public:
         using allocator_type = typename value_converter_base<Into>::allocator_type;
 
-        template <class CharT = typename Into::value_type>
-        typename std::enable_if<traits_extension::is_narrow_character<CharT>::value,Into>::type
-        convert(const From& value, semantic_tag, std::error_code&)
+        Into convert(const From& value, semantic_tag, std::error_code&)
         {
             return Into(value.begin(),value.end(),this->get_allocator());
         }
-        template <class CharT = typename Into::value_type>
-        typename std::enable_if<traits_extension::is_wide_character<CharT>::value,Into>::type
-        convert(const From& value, semantic_tag, std::error_code& ec)
+    };
+
+    // From string or string_view, Into string, different character type
+    template <class From, class Into>
+    class value_converter<From, Into, 
+        typename std::enable_if<traits_extension::is_string_or_string_view<From>::value &&
+            traits_extension::is_string<Into>::value && 
+            !std::is_same<typename From::value_type,typename Into::value_type>::value>::type> : value_converter_base<Into>
+    {
+    public:
+        using allocator_type = typename value_converter_base<Into>::allocator_type;
+
+        Into convert(const From& value, semantic_tag, std::error_code& ec)
         {
             Into ws(this->get_allocator());
             auto retval = unicode_traits::convert(value.data(), value.size(), ws);
