@@ -9,6 +9,8 @@ contributed by [raplonu](https://github.com/raplonu)
 - Fixed and enhance basic_json_diagnostics_visitor,
 contributed by [ecorm](https://github.com/ecorm)
 
+- Fixed [Visual Studio 2022 Preview 17.4.0 compilation errors](https://github.com/danielaparker/jsoncons/issues/387)
+
 Performance Enhancement:
 
 - Use `std::from_chars` for chars to double conversion when 
