@@ -109,6 +109,13 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
     const ser_context& context() const override;
 Returns the current [context](../ser_context.md)
 
+    void reset();
+Reset cursor to read another value from the same source
+
+    template <class Sourceable>
+    reset(Sourceable&& source)
+Reset cursor to read new value from a new sources
+
 #### Non-member functions
 
    template <class CharT, class Source, class Allocator>

@@ -1,5 +1,13 @@
-master
------
+0.169.0
+-------
+
+Defect fixes:
+
+- Fixed issue with boost_interprocess examples not working with gcc,
+contributed by [raplonu](https://github.com/raplonu)
+
+- Fixed and enhance basic_json_diagnostics_visitor,
+contributed by [ecorm](https://github.com/ecorm)
 
 Performance Enhancement:
 
@@ -14,6 +22,10 @@ returns the size of the key or string or byte string value.
 If the event type is a `begin_object` or a `begin_array`, returns the size of the object
 or array if known, otherwise 0.
 For all other event types, returns 0.
+
+- Extended the parsers/cursors/encoder for JSON, CBOR, Msgpack,
+BSON, CSV, UBJSON so that they are resettable to new sources/sinks,
+contributed by [ecorm](https://github.com/ecorm)
 
 Changes:
 

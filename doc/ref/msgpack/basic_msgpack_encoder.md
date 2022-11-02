@@ -37,6 +37,13 @@ Constructs a new encoder that writes to the specified destination.
 
     virtual ~basic_msgpack_encoder() noexcept
 
+#### Member functions
+
+    void reset();
+Reset encoder to write another value to the same sink
+
+    void reset(Sink&& sink)
+Reset encoder to write a new value to a new sink
 
 #### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)
 
