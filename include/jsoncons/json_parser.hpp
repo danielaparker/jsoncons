@@ -703,6 +703,7 @@ public:
                                 break;
                             case '\"':
                                 state_ = json_parse_state::string;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 string_buffer_.clear();
@@ -712,6 +713,7 @@ public:
                             case '-':
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::minus;
@@ -722,6 +724,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 state_ = json_parse_state::zero;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 parse_number(visitor, ec);
@@ -730,6 +733,7 @@ public:
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::integer;
@@ -890,6 +894,7 @@ public:
                                 if (ec) return;
                                 break;
                             case '\"':
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 push_state(json_parse_state::member_name);
@@ -957,6 +962,7 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '\"':
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 push_state(json_parse_state::member_name);
@@ -1105,6 +1111,7 @@ public:
                                 if (ec) return;
                                 break;
                             case '\"':
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::string;
@@ -1115,6 +1122,7 @@ public:
                             case '-':
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::minus;
@@ -1124,6 +1132,7 @@ public:
                             case '0': 
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::zero;
@@ -1133,6 +1142,7 @@ public:
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::integer;
@@ -1256,6 +1266,7 @@ public:
                                 if (ec) return;
                                 break;
                             case '\"':
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::string;
@@ -1266,6 +1277,7 @@ public:
                             case '-':
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::minus;
@@ -1275,6 +1287,7 @@ public:
                             case '0': 
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::zero;
@@ -1284,6 +1297,7 @@ public:
                             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 state_ = json_parse_state::integer;
@@ -1503,6 +1517,7 @@ public:
                     ++position_;
                     break;
                 case json_parse_state::nul: 
+                    ++position_;
                     switch (*input_ptr_)
                     {
                     case 'l':
@@ -1523,7 +1538,6 @@ public:
                         return;
                     }
                     ++input_ptr_;
-                    ++position_;
                     break;
                 case json_parse_state::slash: 
                 {
@@ -1668,9 +1682,9 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
                 position_ += 4;
+                more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::accept;
@@ -1733,7 +1747,6 @@ public:
 
     void parse_number(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        saved_position_ = position_ - 1;
         const char_type* local_input_end = end_input_;
 
         switch (state_)
@@ -2151,7 +2164,6 @@ exp3:
 
     void parse_string(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        saved_position_ = position_ - 1;
         const char_type* local_input_end = end_input_;
         const char_type* sb = input_ptr_;
 
@@ -2289,7 +2301,7 @@ string_u1:
         // Buffer exhausted               
         {
             string_buffer_.append(sb,input_ptr_-sb);
-            position_ += (input_ptr_ - sb + 1);
+            position_ += (input_ptr_ - sb);
             state_ = json_parse_state::string;
             return;
         }
