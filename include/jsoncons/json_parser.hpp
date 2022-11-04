@@ -688,16 +688,18 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '{':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 begin_object(visitor, ec);
                                 if (ec) return;
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case '[':
-                                begin_array(visitor, ec);
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                begin_array(visitor, ec);
+                                if (ec) return;
                                 break;
                             case '\"':
                                 state_ = json_parse_state::string;
@@ -801,16 +803,18 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '}':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 end_object(visitor, ec);
                                 if (ec) return;
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case ']':
-                                end_array(visitor, ec);
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                end_array(visitor, ec);
+                                if (ec) return;
                                 break;
                             case ',':
                                 begin_member_or_element(ec);
@@ -879,10 +883,11 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '}':
-                                end_object(visitor, ec);
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                end_object(visitor, ec);
+                                if (ec) return;
                                 break;
                             case '\"':
                                 ++input_ptr_;
@@ -967,10 +972,11 @@ public:
                                     ec = json_errc::extra_comma;
                                     return;
                                 }
-                                end_object(visitor, ec);  // Recover
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                end_object(visitor, ec);  // Recover
+                                if (ec) return;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1085,16 +1091,18 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '{':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 begin_object(visitor, ec);
                                 if (ec) return;
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case '[':
-                                begin_array(visitor, ec);
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                begin_array(visitor, ec);
+                                if (ec) return;
                                 break;
                             case '\"':
                                 ++input_ptr_;
@@ -1144,6 +1152,9 @@ public:
                                 if (ec) {return;}
                                 break;
                             case ']':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 if (parent() == json_parse_state::array)
                                 {
                                     more_ = err_handler_(json_errc::extra_comma, *this);
@@ -1164,8 +1175,6 @@ public:
                                         return;
                                     }
                                 }
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1226,22 +1235,25 @@ public:
                                 state_ = json_parse_state::slash;
                                 break;
                             case '{':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 begin_object(visitor, ec);
                                 if (ec) return;
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case '[':
+                                saved_position_ = position_;
+                                ++input_ptr_;
+                                ++position_;
                                 begin_array(visitor, ec);
                                 if (ec) return;
-                                ++input_ptr_;
-                                ++position_;
                                 break;
                             case ']':
-                                end_array(visitor, ec);
-                                if (ec) return;
+                                saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                end_array(visitor, ec);
+                                if (ec) return;
                                 break;
                             case '\"':
                                 ++input_ptr_;
@@ -1373,6 +1385,8 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
+                            ++input_ptr_;
+                            ++position_;
                             more_ = visitor.bool_value(true,  semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
@@ -1389,8 +1403,6 @@ public:
                             more_ = false;
                             return;
                     }
-                    ++input_ptr_;
-                    ++position_;
                     break;
                 case json_parse_state::f: 
                     switch (*input_ptr_)
@@ -1441,6 +1453,8 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
+                            ++input_ptr_;
+                            ++position_;
                             more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
@@ -1457,8 +1471,6 @@ public:
                             more_ = false;
                             return;
                     }
-                    ++input_ptr_;
-                    ++position_;
                     break;
                 case json_parse_state::n: 
                     switch (*input_ptr_)
@@ -1621,9 +1633,9 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
                 position_ += 4;
+                more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::accept;
@@ -1691,9 +1703,9 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                 input_ptr_ += 5;
                 position_ += 5;
+                more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::accept;
@@ -2253,6 +2265,7 @@ string_u1:
                 }
                 case '\"':
                 {
+                    position_ += (input_ptr_ - sb + 1);
                     if (string_buffer_.length() == 0)
                     {
                         end_string_value(sb,input_ptr_-sb, visitor, ec);
@@ -2264,7 +2277,6 @@ string_u1:
                         end_string_value(string_buffer_.data(),string_buffer_.length(), visitor, ec);
                         if (ec) {return;}
                     }
-                    position_ += (input_ptr_ - sb + 1);
                     ++input_ptr_;
                     return;
                 }
@@ -2641,6 +2653,11 @@ escape_u8:
     std::size_t position() const override
     {
         return saved_position_;
+    }
+
+    std::size_t end_position() const override
+    {
+        return position_;
     }
 
     std::size_t offset() const 
