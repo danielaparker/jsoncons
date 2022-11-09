@@ -43,6 +43,19 @@ namespace jsoncons {
 
     namespace traits_extension {
 
+        template <class Container>
+        using 
+        container_array_iterator_type_t = decltype(Container::array_iterator_type);
+        template <class Container>
+        using 
+        container_const_array_iterator_type_t = decltype(Container::const_array_iterator_type);
+        template <class Container>
+        using 
+        container_object_iterator_type_t = decltype(Container::object_iterator_type);
+        template <class Container>
+        using 
+        container_const_object_iterator_type_t = decltype(Container::const_object_iterator_type);
+
         namespace detail {
 
             template <class T>
@@ -245,11 +258,11 @@ namespace jsoncons {
 
         template <class Json>
         using array = json_array<Json,std::vector>;
-
-        using parse_error_handler_type = default_json_parsing;
         
         template <class CharT, class CharTraits, class Allocator>
         using string = std::basic_string<CharT, CharTraits, Allocator>;
+
+        using parse_error_handler_type = default_json_parsing;
     };
 
     struct order_preserving_policy
@@ -259,11 +272,57 @@ namespace jsoncons {
 
         template <class Json>
         using array = json_array<Json,std::vector>;
-
-        using parse_error_handler_type = default_json_parsing;
         
         template <class CharT, class CharTraits, class Allocator>
         using string = std::basic_string<CharT, CharTraits, Allocator>;
+
+        using parse_error_handler_type = default_json_parsing;
+    };
+
+    template<class ImplementationPolicy, class KeyT,class Json, class Enable=void>
+    struct object_iterator_typedefs
+    {
+    };
+
+    template<class ImplementationPolicy, class KeyT,class Json>
+    struct object_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
+        !traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value &&
+        !traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, ImplementationPolicy>::value>::type>
+    {
+        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object<KeyT,Json>::iterator>;                    
+        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object<KeyT,Json>::const_iterator>;
+    };
+
+    template<class ImplementationPolicy,class KeyT,class Json>
+    struct object_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
+        traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value &&
+        traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, ImplementationPolicy>::value>::type>
+    {
+        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object_iterator<KeyT,Json>>;
+        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template const_object_iterator<KeyT,Json>>;
+    };
+
+    template<class ImplementationPolicy, class KeyT,class Json, class Enable=void>
+    struct array_iterator_typedefs
+    {
+    };
+
+    template<class ImplementationPolicy, class KeyT,class Json>
+    struct array_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
+        !traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value &&
+        !traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, ImplementationPolicy>::value>::type>
+    {
+        using array_iterator_type = typename ImplementationPolicy::template array<Json>::iterator;
+        using const_array_iterator_type = typename ImplementationPolicy::template array<Json>::const_iterator;
+    };
+
+    template<class ImplementationPolicy,class KeyT,class Json>
+    struct array_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
+        traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value &&
+        traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, ImplementationPolicy>::value>::type>
+    {
+        using array_iterator_type = typename ImplementationPolicy::template array_iterator_type<Json>;
+        using const_array_iterator_type = typename ImplementationPolicy::template const_array_iterator_type<Json>;
     };
 
     #if !defined(JSONCONS_NO_DEPRECATED)
@@ -381,10 +440,14 @@ namespace jsoncons {
 
         using object = typename ImplementationPolicy::template object<key_type,basic_json>;
 
-        using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;              
-        using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    
-        using array_iterator = typename array::iterator;
-        using const_array_iterator = typename array::const_iterator;
+        using object_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::object_iterator_type;                    
+        using const_object_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
+        using array_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::array_iterator_type;                    
+        using const_array_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::const_array_iterator_type;                    
+        //using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;                    
+        //using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    
+        //using array_iterator = typename array::iterator;
+        //using const_array_iterator = typename array::const_iterator;
 
     private:
 

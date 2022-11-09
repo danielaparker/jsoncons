@@ -128,7 +128,7 @@ namespace jsoncons {
             return elements_.empty();
         }
 
-        void swap(json_array<Json>& val) noexcept
+        void swap(json_array& val) noexcept
         {
             elements_.swap(val.elements_);
         }
@@ -267,18 +267,18 @@ namespace jsoncons {
 
         const_iterator end() const {return elements_.end();}
 
-        bool operator==(const json_array<Json>& rhs) const noexcept
+        bool operator==(const json_array& rhs) const noexcept
         {
             return elements_ == rhs.elements_;
         }
 
-        bool operator<(const json_array<Json>& rhs) const noexcept
+        bool operator<(const json_array& rhs) const noexcept
         {
             return elements_ < rhs.elements_;
         }
     private:
 
-        json_array& operator=(const json_array<Json>&) = delete;
+        json_array& operator=(const json_array&) = delete;
 
         void flatten_and_destroy() noexcept
         {
