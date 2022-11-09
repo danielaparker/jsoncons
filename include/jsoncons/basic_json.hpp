@@ -286,7 +286,7 @@ namespace jsoncons {
 
     template<class ImplementationPolicy, class KeyT,class Json>
     struct object_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        !traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value &&
+        !traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value ||
         !traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, ImplementationPolicy>::value>::type>
     {
         using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object<KeyT,Json>::iterator>;                    
@@ -309,7 +309,7 @@ namespace jsoncons {
 
     template<class ImplementationPolicy, class KeyT,class Json>
     struct array_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        !traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value &&
+        !traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value ||
         !traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, ImplementationPolicy>::value>::type>
     {
         using array_iterator_type = typename ImplementationPolicy::template array<Json>::iterator;
@@ -444,10 +444,6 @@ namespace jsoncons {
         using const_object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
         using array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::array_iterator_type;                    
         using const_array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::const_array_iterator_type;                    
-        //using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;                    
-        //using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    
-        //using array_iterator = typename array::iterator;
-        //using const_array_iterator = typename array::const_iterator;
 
     private:
 
