@@ -440,10 +440,10 @@ namespace jsoncons {
 
         using object = typename ImplementationPolicy::template object<key_type,basic_json>;
 
-        using object_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::object_iterator_type;                    
-        using const_object_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
-        using array_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::array_iterator_type;                    
-        using const_array_iterator = typename iterator_typedefs<implementation_policy,key_type,basic_json>::const_array_iterator_type;                    
+        using object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::object_iterator_type;                    
+        using const_object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
+        using array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::array_iterator_type;                    
+        using const_array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::const_array_iterator_type;                    
         //using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;                    
         //using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    
         //using array_iterator = typename array::iterator;
