@@ -118,7 +118,9 @@
 #  if defined(__GNUC__)
 #   if (__GNUC__ >= 11)
 #    if (__cplusplus >= 201703)
-#     define JSONCONS_HAS_STD_FROM_CHARS 1
+#     if !defined(__MINGW32__)
+#      define JSONCONS_HAS_STD_FROM_CHARS 1
+#     endif // !defined(__MINGW32__)
 #    endif // (__cplusplus >= 201703)
 #   endif // (__GNUC__ >= 11)
 #  endif // defined(__GNUC__)
