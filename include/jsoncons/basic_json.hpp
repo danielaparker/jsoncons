@@ -409,7 +409,7 @@ namespace jsoncons {
 
         using implementation_policy = ImplementationPolicy;
 
-        using parse_error_handler_type = typename ImplementationPolicy::parse_error_handler_type;
+        using parse_error_handler_type = typename implementation_policy::parse_error_handler_type;
 
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -417,7 +417,7 @@ namespace jsoncons {
 
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
 
-        using key_type = typename ImplementationPolicy::template string<char_type,char_traits_type,char_allocator_type>;
+        using key_type = typename implementation_policy::template string<char_type,char_traits_type,char_allocator_type>;
 
 
         using reference = basic_json&;
@@ -434,11 +434,11 @@ namespace jsoncons {
         JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
     #endif
 
-        using array = typename ImplementationPolicy::template array<basic_json>;
+        using array = typename implementation_policy::template array<basic_json>;
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
 
-        using object = typename ImplementationPolicy::template object<key_type,basic_json>;
+        using object = typename implementation_policy::template object<key_type,basic_json>;
 
         using object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::object_iterator_type;                    
         using const_object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
