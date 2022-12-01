@@ -130,7 +130,7 @@
 #   endif // (_MSC_VER >= 1924 && MSVC_LANG >= 201703)
 #  endif // defined(_MSC_VER)
 #endif
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
 #include <charconv>
 #endif
 
