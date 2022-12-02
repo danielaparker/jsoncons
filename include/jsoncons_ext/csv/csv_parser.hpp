@@ -1497,6 +1497,7 @@ private:
         }
         if (start != 0 || length != buffer_.size())
         {
+            // Do not use buffer_.substr(...), as this won't preserve the allocator state.
             buffer_.resize(length);
             buffer_.erase(0, start);
         }
