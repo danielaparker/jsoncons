@@ -1497,7 +1497,8 @@ private:
         }
         if (start != 0 || length != buffer_.size())
         {
-            buffer_ = buffer_.substr(start,length-start);
+            buffer_.resize(length);
+            buffer_.erase(0, start);
         }
     }
 
