@@ -910,7 +910,7 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
 }
 
 
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
 
 class chars_to
 {

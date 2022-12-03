@@ -114,23 +114,7 @@
    #endif
 #endif
 
-#if !defined(JSONCONS_HAS_STD_FROM_CHARS)
-#  if defined(__GNUC__)
-#   if (__GNUC__ >= 11)
-#    if (__cplusplus >= 201703)
-#     if !defined(__MINGW32__)
-#      define JSONCONS_HAS_STD_FROM_CHARS 1
-#     endif // !defined(__MINGW32__)
-#    endif // (__cplusplus >= 201703)
-#   endif // (__GNUC__ >= 11)
-#  endif // defined(__GNUC__)
-#  if defined(_MSC_VER)
-#   if (_MSC_VER >= 1924 && _MSVC_LANG >= 201703)
-#    define JSONCONS_HAS_STD_FROM_CHARS 1
-#   endif // (_MSC_VER >= 1924 && MSVC_LANG >= 201703)
-#  endif // defined(_MSC_VER)
-#endif
-#if defined(JSONCONS_HAS_STD_FROM_CHARS)
+#if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
 #include <charconv>
 #endif
 

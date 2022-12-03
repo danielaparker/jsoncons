@@ -52,6 +52,26 @@ TEST_CASE("wjson serialization tests")
     CHECK(testStr == L"{\"bar\":false,\"baz\":true,\"foo\":true}");
 }
 
+TEST_CASE("wjson pretty print tests")
+{
+    jsoncons::wjson testBlock;
+    testBlock[L"foo"] = true;
+    testBlock[L"bar"] = false;
+    testBlock[L"baz"] = true;
+    std::wostringstream actualStr;
+    actualStr << jsoncons::pretty_print(testBlock);
+
+    std::wostringstream expectedStr;
+    expectedStr << L"{" << std::endl;
+    expectedStr << L"    \"bar\": false, " << std::endl;
+    expectedStr << L"    \"baz\": true, " << std::endl;
+    expectedStr << L"    \"foo\": true" << std::endl;
+    expectedStr << L"}";
+
+    CHECK(actualStr.str().size() == expectedStr.str().size());
+    CHECK(actualStr.str() == expectedStr.str());
+}
+
 TEST_CASE("wjson test case")
 {
     std::wstring data = LR"(
