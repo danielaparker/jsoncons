@@ -54,13 +54,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install clang-10
+           sudo apt install clang-latest
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
       env:
-        CC:   clang-10
-        CXX:  clang++-10
+        CC:   clang-latest
+        CXX:  clang++-latest
     - name: build
       run: cmake --build build --parallel 10
     - name: test
@@ -74,13 +74,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install clang-10
+           sudo apt install clang-latest
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON
       env:
-        CC:   clang-10
-        CXX:  clang++-10
+        CC:   clang-latest
+        CXX:  clang++-latest
     - name: build
       run: cmake --build build --parallel 10
     - name: test
