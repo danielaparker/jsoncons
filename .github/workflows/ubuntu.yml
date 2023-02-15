@@ -26,6 +26,26 @@ jobs:
     - name: test
       run: cd build ; ctest -j 10 --output-on-failure
 
+  gcc_build12:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install gcc-12 g++-12
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
+      env:
+        CC:   gcc-12
+        CXX:  g++-12
+    - name: build
+      run: cmake --build build --parallel 10
+    - name: test
+      run: cd build ; ctest -j 10 --output-on-failure
+
   gcc_build_no_deprecated:
     runs-on: ubuntu-latest
 
