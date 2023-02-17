@@ -34,13 +34,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install gcc-12 g++-12
+           sudo apt install gcc-12.2 g++-12.2
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
       env:
-        CC:   gcc-12
-        CXX:  g++-12
+        CC:   gcc-12.2
+        CXX:  g++-12.2
     - name: build
       run: cmake --build build --parallel 10
     - name: test
