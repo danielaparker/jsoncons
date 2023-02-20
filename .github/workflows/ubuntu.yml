@@ -26,6 +26,26 @@ jobs:
     - name: test
       run: cd build ; ctest -j 10 --output-on-failure
 
+  gcc_build12:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install gcc-11 g++-11
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
+      env:
+        CC:   gcc-11
+        CXX:  g++-11
+    - name: build
+      run: cmake --build build --parallel 10
+    - name: test
+      run: cd build ; ctest -j 10 --output-on-failure
+
   gcc_build_no_deprecated:
     runs-on: ubuntu-latest
 
@@ -54,13 +74,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install clang-10
+           sudo apt install clang-13
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
       env:
-        CC:   clang-10
-        CXX:  clang++-10
+        CC:   clang-13
+        CXX:  clang++-13
     - name: build
       run: cmake --build build --parallel 10
     - name: test
@@ -74,13 +94,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install clang-10
+           sudo apt install clang-13
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON
       env:
-        CC:   clang-10
-        CXX:  clang++-10
+        CC:   clang-13
+        CXX:  clang++-13
     - name: build
       run: cmake --build build --parallel 10
     - name: test
