@@ -317,7 +317,7 @@ namespace detail {
                                             current[index], receiver, options);
                     }
                 }
-                else if (identifier_ == length_name && current.size() > 0)
+                else if (identifier_ == length_name && current.size() >= 0)
                 {
                     pointer ptr = resources.create_json(current.size());
                     this->tail_select(resources, root, 
