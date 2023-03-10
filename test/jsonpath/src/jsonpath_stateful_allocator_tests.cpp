@@ -37,6 +37,7 @@ TEST_CASE("jsonpath stateful allocator test")
   }
 ]
 )";
+    std::cout << "Statefull allocator test" << "\n";
 
     json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
                                                           FreelistAllocator<char>(2));
@@ -52,6 +53,7 @@ TEST_CASE("jsonpath stateful allocator test")
     jsoncons::string_view p{"$.store.book[?(@.price < 10)].author"};
     auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);   // this will not compile
     auto r = expr.evaluate(j);
+    std::cout << pretty_print(j) << "\n";
 }
 
 #endif
