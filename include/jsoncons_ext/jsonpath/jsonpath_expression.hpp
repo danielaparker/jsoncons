@@ -2552,23 +2552,6 @@ namespace detail {
             }
         }
 
-        static jsonpath_expression compile(const string_view_type& path)
-        {
-            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
-
-            evaluator_t e(std::allocator<char_type>());
-            json_selector_t expr = e.compile(*resources, path);
-            return jsonpath_expression(std::move(resources), std::move(expr));
-        }
-
-        static jsonpath_expression compile(const string_view_type& path, std::error_code& ec)
-        {
-            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
-            evaluator_t e(alloc_);
-            json_selector_t expr = e.compile(*resources, path, ec);
-            return jsonpath_expression(std::move(resources), std::move(expr));
-        }
-
         static jsonpath_expression compile(const string_view_type& path, 
                                            const custom_functions<Json>& functions)
         {
