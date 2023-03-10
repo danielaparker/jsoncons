@@ -13,12 +13,12 @@ using json_location = jsoncons::jsonpath::json_location<std::string>;
 
 TEST_CASE("test json_location equals")
 {
-    json_location_node component1('$');
+    json_location_node component1("$");
     json_location_node component2(&component1,"foo");
     json_location_node component3(&component2,"bar");
     json_location_node component4(&component3,0);
 
-    json_location_node component11('$');
+    json_location_node component11("$");
     json_location_node component12(&component11,"foo");
     json_location_node component13(&component12,"bar");
     json_location_node component14(&component13,0);
@@ -31,7 +31,7 @@ TEST_CASE("test json_location equals")
 
 TEST_CASE("test json_location to_string")
 {
-    json_location_node component1('$');
+    json_location_node component1("$");
     json_location_node component2(&component1,"foo");
     json_location_node component3(&component2,"bar");
     json_location_node component4(&component3,0);
@@ -43,7 +43,7 @@ TEST_CASE("test json_location to_string")
 
 TEST_CASE("test json_location with solidus to_string")
 {
-    json_location_node component1('$');
+    json_location_node component1("$");
     json_location_node component2(&component1,"foo's");
     json_location_node component3(&component2,"bar");
     json_location_node component4(&component3,0);

@@ -2523,7 +2523,7 @@ namespace detail {
         typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
-            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
             auto f = [&callback](const json_location_type& path, reference val)
             {
                 callback(path.to_string(), val);
@@ -2535,7 +2535,7 @@ namespace detail {
         {
             if ((options & result_options::path) == result_options::path)
             {
-                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
 
                 Json result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const json_location_type& p, reference)
@@ -2547,7 +2547,7 @@ namespace detail {
             }
             else
             {
-                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
                 return expr_.evaluate(resources, instance, resources.current_path_node(), instance, options);
             }
         }

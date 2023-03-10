@@ -2208,15 +2208,24 @@ namespace detail {
     template <class Json, class JsonReference>
     class dynamic_resources
     {
+        using allocator_type = typename Json::allocator_type;
+        using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using json_location_node_type = json_location_node<string_type>;
         using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
+
+        allocator_type alloc_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<json_location_node_type>> temp_path_node_values_;
         std::unordered_map<std::size_t,pointer> cache_;
     public:
+        dynamic_resources(const allocator_type& alloc = allocator_type())
+            : alloc_(alloc)
+        {
+        }
+
         bool is_cached(std::size_t id) const
         {
             return cache_.find(id) != cache_.end();
@@ -2247,13 +2256,13 @@ namespace detail {
 
         const json_location_node_type& root_path_node() const
         {
-            static json_location_node_type root('$');
+            static json_location_node_type root(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "$"), alloc_});
             return root;
         }
 
         const json_location_node_type& current_path_node() const
         {
-            static json_location_node_type root('@');
+            static json_location_node_type root(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "@"), alloc_});
             return root;
         }
 
