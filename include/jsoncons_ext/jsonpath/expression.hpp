@@ -2211,7 +2211,6 @@ namespace detail {
         using string_type = typename Json::string_type;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using string_type = typename Json::string_type;
         using json_location_node_type = json_location_node<string_type>;
         using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
