@@ -1367,7 +1367,8 @@ namespace detail {
             value_type j(json_array_arg, semantic_tag::none, alloc_);
             while (rit != rend) 
             {
-                j.emplace_back(rit->str());
+                auto s = rit->str();
+                j.emplace_back(s.c_str(), semantic_tag::none, alloc_);
                 ++rit;
             }
             return j;
@@ -1957,7 +1958,7 @@ namespace detail {
                 return value_type::null();
             }
 
-            auto arg0= args[0].value();
+            auto arg0 = args[0].value();
             if (!arg0.is_object())
             {
                 ec = jsonpath_errc::invalid_type;
@@ -1969,7 +1970,8 @@ namespace detail {
 
             for (auto& item : arg0.object_range())
             {
-                result.emplace_back(item.key());
+                auto s = item.key();
+                result.emplace_back(s.c_str(), semantic_tag::none, alloc_);
             }
             return result;
         }
@@ -2379,7 +2381,6 @@ namespace detail {
         std::vector<std::unique_ptr<selector_type>> selectors_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
 
         abs_function<Json> abs_func_;
         contains_function<Json> contains_func_;
@@ -2399,6 +2400,7 @@ namespace detail {
         tokenize_function<Json> tokenize_func_;
 #endif
         std::unordered_map<string_type,const function_base_type*> functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
 
         static_resources(const allocator_type& alloc = allocator_type())
             : alloc_(alloc), keys_func_(alloc_),
@@ -2430,32 +2432,8 @@ namespace detail {
 
         static_resources(const custom_functions<Json>& functions, 
             const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), keys_func_(alloc_),
-#if defined(JSONCONS_HAS_STD_REGEX)
-            tokenize_func_(alloc_),
-#endif
-            functions_{
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "abs"), alloc_}, &abs_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "contains"), alloc_}, &contains_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "starts_with"), alloc_}, &starts_with_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ends_with"), alloc_}, &ends_with_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ceil"), alloc_}, &ceil_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "floor"), alloc_}, &floor_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "to_number"), alloc_}, &to_number_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "sum"), alloc_}, &sum_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "prod"), alloc_}, &prod_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "avg"), alloc_}, &avg_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "min"), alloc_}, &min_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "max"), alloc_}, &max_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc_}, &length_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "keys"), alloc_}, &keys_func_},
-    #if defined(JSONCONS_HAS_STD_REGEX)
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "tokenize"), alloc_}, &tokenize_func_},
-    #endif
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "count"), alloc_}, &length_func_}
-            }
+            : static_resources(alloc)
         {
-
             for (const auto& item : functions)
             {
                 custom_functions_.emplace(item.name(),
@@ -3102,7 +3080,8 @@ namespace detail {
             {
                 auto callback = [&result](const json_location_type& path, reference)
                 {
-                    result.emplace_back(path.to_string());
+                    auto s = path.to_string();
+                    result.emplace_back(s.c_str(), semantic_tag::none, s.get_allocator()); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
             }

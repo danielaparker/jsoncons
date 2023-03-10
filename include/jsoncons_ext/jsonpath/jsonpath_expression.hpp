@@ -2539,7 +2539,8 @@ namespace detail {
                 Json result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const json_location_type& p, reference)
                 {
-                    result.emplace_back(p.to_string());
+                    auto s = p.to_string();
+                    result.emplace_back(s.c_str(), semantic_tag::none, s.get_allocator());
                 };
                 expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
                 return result;

@@ -25,7 +25,7 @@ TEST_CASE("jsonpath stateful allocator test")
       "isbn" : "0679743464",
       "publisher" : "Vintage",
       "date" : "1993-03-02",
-      "price": 18.90
+      "price": 9
   },
   { 
       "author" : "Graham Greene",
@@ -48,12 +48,12 @@ TEST_CASE("jsonpath stateful allocator test")
     reader.read();
 
     my_json j = decoder.get_result();
-    std::cout << pretty_print(j) << "\n";
+    //std::cout << pretty_print(j) << "\n";
 
-    jsoncons::string_view p{"$.store.book[?(@.price < 10)].author"};
+    jsoncons::string_view p{"$[?(@.price < 10)].author"};
     auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);   // this will not compile
     auto r = expr.evaluate(j);
-    std::cout << pretty_print(j) << "\n";
+    std::cout << pretty_print(r) << "\n";
 }
 
 //#endif
