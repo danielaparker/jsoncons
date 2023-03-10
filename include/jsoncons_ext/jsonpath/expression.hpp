@@ -2170,6 +2170,7 @@ namespace detail {
     class path_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
+        using allocator_type = typename Json::allocator_type;
         using reference = JsonReference;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
@@ -2177,12 +2178,18 @@ namespace detail {
         using json_location_type = json_location<string_type>;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
 
+        allocator_type alloc_;
         std::vector<path_value_pair_type> nodes;
+
+        path_value_receiver(const allocator_type& alloc)
+            : alloc_(alloc)
+        {
+        }
 
         void add(const json_location_node_type& path_tail, 
                  reference value) override
         {
-            nodes.emplace_back(json_location_type(path_tail), std::addressof(value));
+            nodes.emplace_back(json_location_type(path_tail, alloc_), std::addressof(value));
         }
     };
 
@@ -2224,6 +2231,11 @@ namespace detail {
         dynamic_resources(const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
         {
+        }
+
+        allocator_type get_allocator() const
+        {
+            return alloc_;
         }
 
         bool is_cached(std::size_t id) const
@@ -3010,23 +3022,27 @@ namespace detail {
     template <class Callback, class Json,class JsonReference>
     class callback_receiver : public node_receiver<Json,JsonReference>
     {
-        Callback& callback_;
     public:
+        using allocator_type = typename Json::allocator_type;
         using reference = JsonReference;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using json_location_node_type = json_location_node<string_type>;
         using json_location_type = json_location<string_type>;
+    private:
+        allocator_type alloc_;
+        Callback& callback_;
+    public:
 
-        callback_receiver(Callback& callback)
-            : callback_(callback)
+        callback_receiver(Callback& callback, const allocator_type& alloc)
+            : alloc_(alloc), callback_(callback)
         {
         }
 
         void add(const json_location_node_type& path_tail, 
                  reference value) override
         {
-            callback_(json_location_type(path_tail), value);
+            callback_(json_location_type(path_tail, alloc_), value);
         }
     };
 
@@ -3119,7 +3135,7 @@ namespace detail {
 
             if ((options & require_more) != result_options())
             {
-                path_value_receiver<Json,JsonReference> receiver;
+                path_value_receiver<Json,JsonReference> receiver{alloc_};
                 selector_->select(resources, root, path, current, receiver, options);
 
                 if (receiver.nodes.size() > 1 && (options & result_options::sort) == result_options::sort)
@@ -3172,7 +3188,7 @@ namespace detail {
             }
             else
             {
-                callback_receiver<Callback,Json,JsonReference> receiver(callback);
+                callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
                 selector_->select(resources, root, path, current, receiver, options);
             }
         }

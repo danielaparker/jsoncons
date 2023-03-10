@@ -280,7 +280,7 @@ namespace detail {
                     case path_state::json_string:
                     {
                         //std::cout << "literal: " << buffer << "\n";
-                        push_token(resources, token_type(literal_arg, Json(buffer)), ec);
+                        push_token(resources, token_type(literal_arg, Json(buffer,semantic_tag::none,alloc_)), ec);
                         if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); // json_value
@@ -576,7 +576,7 @@ namespace detail {
                             }
                             default:
                             {
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
@@ -1123,7 +1123,7 @@ namespace detail {
                         break;
                     }
                     case path_state::identifier:
-                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                         if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); 
@@ -1582,7 +1582,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1591,7 +1591,7 @@ namespace detail {
                                 break;
                             case '.':
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1601,7 +1601,7 @@ namespace detail {
                                 break;
                             case '[':
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
@@ -1610,7 +1610,7 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
@@ -1668,7 +1668,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1677,7 +1677,7 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
@@ -2053,7 +2053,7 @@ namespace detail {
                     case path_state::identifier_or_function_expr:
                         if (!buffer.empty()) // Can't be quoted string
                         {
-                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                             if (ec) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
@@ -2067,7 +2067,7 @@ namespace detail {
                     case path_state::identifier:
                         if (!buffer.empty()) // Can't be quoted string
                         {
-                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                             if (ec) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
@@ -2243,11 +2243,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)), alloc_)));
+                        output_stack_.back().selector_->append_selector(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)), alloc_))));
+                        output_stack_.emplace_back(token_type(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks))))));
                     }
                     break;
                 }
@@ -2497,7 +2497,6 @@ namespace detail {
         using reference = typename evaluator_t::reference;
         using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_value_pair_type = typename evaluator_t::path_value_pair_type;
         using json_location_type = typename evaluator_t::json_location_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
@@ -2568,7 +2567,6 @@ namespace detail {
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions, alloc);
 
-            using alloc_type = typename evaluator_t::allocator_type;
             evaluator_t e{alloc};
             json_selector_t expr = e.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr), alloc);

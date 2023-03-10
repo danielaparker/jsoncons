@@ -41,7 +41,7 @@ namespace jsonpath {
         json_location_node(string_type&& name)
             : parent_(nullptr), 
               node_kind_(json_location_node_kind::root), 
-              index_(0), name_(std::forward<string_type>(name))
+              name_(std::forward<string_type>(name)), index_(0)
         {
         }
 
@@ -268,15 +268,18 @@ namespace jsonpath {
     class json_location
     {
     public:
+        using allocator_type = typename StringT::allocator_type;
         using string_type = StringT;
         using json_location_node_type = json_location_node<StringT>;
     private:
+        allocator_type alloc_;
         std::vector<const json_location_node_type*> nodes_;
     public:
         using iterator = typename detail::json_location_iterator<typename std::vector<const json_location_node_type*>::iterator>;
         using const_iterator = typename detail::json_location_iterator<typename std::vector<const json_location_node_type*>::const_iterator>;
 
-        json_location(const json_location_node_type& node)
+        json_location(const json_location_node_type& node, const allocator_type& alloc = allocator_type())
+            : alloc_(alloc)
         {
             const json_location_node_type* p = std::addressof(node);
             do
@@ -316,7 +319,7 @@ namespace jsonpath {
 
         string_type to_string() const
         {
-            string_type buffer;
+            string_type buffer(alloc_);
 
             for (const auto& node : nodes_)
             {

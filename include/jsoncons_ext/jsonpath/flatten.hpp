@@ -372,7 +372,7 @@ namespace jsoncons { namespace jsonpath {
                                 {
                                     if (!part->is_array())
                                     {
-                                        *part = Json(json_array_arg);
+                                        *part = Json(json_array_arg, semantic_tag::none, value.get_allocator());
                                     }
                                     if (it != last-1)
                                     {

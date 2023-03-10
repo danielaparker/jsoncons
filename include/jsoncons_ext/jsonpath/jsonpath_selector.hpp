@@ -263,7 +263,6 @@ namespace detail {
     class identifier_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
-        using allocator_type = typename Json::allocator_type;
         using path_generator_type = path_generator<Json,JsonReference>;
     public:
         using char_type = typename Json::char_type;
@@ -279,8 +278,8 @@ namespace detail {
         string_type identifier_;
     public:
 
-        identifier_selector(const string_view_type& identifier, allocator_type alloc)
-            : base_selector<Json,JsonReference>(), identifier_(identifier.begin(), identifier.end(), alloc)
+        identifier_selector(const string_type& identifier)
+            : base_selector<Json,JsonReference>(), identifier_(identifier)
         {
         }
 
@@ -323,7 +322,7 @@ namespace detail {
                 }
                 else if (identifier_ == length_name && current.size() >= 0)
                 {
-                    pointer ptr = resources.create_json(current.size());
+                    pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
                     this->tail_select(resources, root, 
                                         path_generator_type::generate(resources, last, identifier_, options), 
                                         *ptr, 
@@ -334,7 +333,7 @@ namespace detail {
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.create_json(count);
+                pointer ptr = resources.create_json(count, semantic_tag::none, resources.get_allocator());
                 this->tail_select(resources, root, 
                                     path_generator_type::generate(resources, last, identifier_, options), 
                                     *ptr, receiver, options);
@@ -385,7 +384,7 @@ namespace detail {
                 }
                 else if (identifier_ == length_name && current.size() > 0)
                 {
-                    pointer ptr = resources.create_json(current.size());
+                    pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
                     return this->evaluate_tail(resources, root, 
                                                path_generator_type::generate(resources, last, identifier_, options), 
                                                *ptr, 
@@ -400,7 +399,7 @@ namespace detail {
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.create_json(count);
+                pointer ptr = resources.create_json(count, semantic_tag::none, resources.get_allocator());
                 return this->evaluate_tail(resources, root, 
                                            path_generator_type::generate(resources, last, identifier_, options), 
                                            *ptr, options, ec);
@@ -556,6 +555,7 @@ namespace detail {
     class parent_node_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
+        using allocator_type = typename Json::allocator_type;
 
         int ancestor_depth_;
 
@@ -591,7 +591,7 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor);
+                json_location_type path(*ancestor, resources.get_allocator());
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
@@ -617,7 +617,7 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor);
+                json_location_type path(*ancestor, resources.get_allocator());
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
@@ -794,7 +794,7 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
             select(resources, root, last, current, receiver, options);
             return *jptr;
@@ -869,7 +869,7 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
             select(resources, root, last, current, receiver, options);
             return *jptr;
@@ -950,7 +950,7 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
             select(resources,root,last,current,receiver,options);
             return *jptr;
@@ -1042,7 +1042,7 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
             select(resources, root, last, current, receiver, options);
             return *jptr;
@@ -1070,7 +1070,6 @@ namespace detail {
         using allocator_type = typename Json::allocator_type;
         using string_type = typename Json::string_type;
 
-        allocator_type alloc_;
         expression<Json,JsonReference> expr_;
 
     public:
@@ -1082,8 +1081,8 @@ namespace detail {
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;
 
-        index_expression_selector(expression<Json,JsonReference>&& expr, const allocator_type& alloc)
-            : base_selector<Json,JsonReference>(), alloc_(alloc), expr_(std::move(expr))
+        index_expression_selector(expression<Json,JsonReference>&& expr)
+            : base_selector<Json,JsonReference>(), expr_(std::move(expr))
         {
         }
 
@@ -1110,7 +1109,7 @@ namespace detail {
                 {
                     auto sv = j.as_string_view();
                     this->tail_select(resources, root, 
-                                      path_generator_type::generate(resources, last, string_type(sv.begin(),sv.end(), alloc_), options),
+                                      path_generator_type::generate(resources, last, string_type(sv.begin(),sv.end(), resources.get_allocator()), options),
                                       current.at(j.as_string_view()), receiver, options);
                 }
             }
@@ -1246,7 +1245,7 @@ namespace detail {
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg);
+            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
             json_array_receiver<Json,JsonReference> accum(jptr);
             select(resources, root, last, current, accum, options);
             return *jptr;

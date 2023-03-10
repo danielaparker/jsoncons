@@ -3068,6 +3068,7 @@ namespace jsoncons {
         basic_json(const T& val, const Allocator& alloc)
             : basic_json(json_type_traits<basic_json,T>::to_json(val,alloc))
         {
+            ;
         }
 
         basic_json(const char_type* s, semantic_tag tag = semantic_tag::none)
