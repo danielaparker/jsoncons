@@ -294,7 +294,7 @@ namespace detail {
             //buf.append("identifier selector: ");
             //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
 
-            static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
+            string_type length_name = string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), resources.get_allocator()};
 
             if (current.is_object())
             {
