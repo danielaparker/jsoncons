@@ -2377,13 +2377,29 @@ namespace detail {
         using function_base_type = function_base<Json>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
+        struct MyHash
+        {
+            std::size_t operator()(string_type const& s) const noexcept
+            {
+                const int p = 31;
+                const int m = static_cast<int>(1e9) + 9;
+                long long hash_value = 0;
+                long long p_pow = 1;
+                for (char c : s) {
+                    hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
+                    p_pow = (p_pow * p) % m;
+                }
+                return hash_value;   
+            }
+        };
+
         allocator_type alloc_;
         std::vector<std::unique_ptr<selector_type>> selectors_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
 
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>> functions_;
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> custom_functions_;
 
         static_resources(const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
@@ -3057,8 +3073,6 @@ namespace detail {
             {
                 auto callback = [&result](const json_location_type& path, reference)
                 {
-                    //auto s = path.to_string();
-                    //result.emplace_back(s.c_str(), semantic_tag::none, s.get_allocator()); 
                     result.emplace_back(path.to_string()); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
