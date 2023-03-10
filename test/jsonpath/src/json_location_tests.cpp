@@ -8,8 +8,8 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using json_location_node = jsoncons::jsonpath::json_location_node<char>;
-using json_location = jsoncons::jsonpath::json_location<char>;
+using json_location_node = jsoncons::jsonpath::json_location_node<std::string>;
+using json_location = jsoncons::jsonpath::json_location<std::string>;
 
 TEST_CASE("test json_location equals")
 {

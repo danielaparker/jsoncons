@@ -111,8 +111,8 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using json_location_type = json_location<char_type>;
-        using json_location_node_type = json_location_node<char_type>;
+        using json_location_type = json_location<string_type>;
+        using json_location_node_type = json_location_node<string_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
     private:

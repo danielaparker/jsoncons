@@ -113,7 +113,8 @@ namespace detail {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
-        using json_location_node_type = json_location_node<char_type>;
+        using string_type = typename Json::string_type;
+        using json_location_node_type = json_location_node<string_type>;
 
         Json* val;
 
@@ -133,8 +134,8 @@ namespace detail {
     {
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
-        using json_location_node_type = json_location_node<char_type>;
         using string_type = typename Json::string_type;
+        using json_location_node_type = json_location_node<string_type>;
 
         static const json_location_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
                                                        const json_location_node_type& last, 
@@ -176,6 +177,7 @@ namespace detail {
 
         supertype* tail_;
     public:
+        using string_type = typename Json::string_type;
         using value_type = typename supertype::value_type;
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
@@ -264,14 +266,14 @@ namespace detail {
         using allocator_type = typename Json::allocator_type;
         using path_generator_type = path_generator<Json,JsonReference>;
     public:
+        using char_type = typename Json::char_type;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
         using value_type = typename supertype::value_type;
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
-        using char_type = typename Json::char_type;
-        using string_type = typename Json::string_type;
-        using string_view_type = typename Json::string_view_type;
         using node_receiver_type = typename supertype::node_receiver_type;
     private:
         string_type identifier_;

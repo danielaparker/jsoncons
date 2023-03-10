@@ -4126,7 +4126,7 @@ namespace jsoncons {
         template <class SAllocator=std::allocator<char_type>>
         std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
         {
-            using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+            using string_type2 = std::basic_string<char_type,char_traits_type,SAllocator>;
 
             std::error_code ec;
             switch (storage_kind())
@@ -4134,11 +4134,11 @@ namespace jsoncons {
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::long_string_value:
                 {
-                    return string_type(as_string_view().data(),as_string_view().length(),alloc);
+                    return string_type2(as_string_view().data(),as_string_view().length(),alloc);
                 }
                 case json_storage_kind::byte_string_value:
                 {
-                    value_converter<byte_string_view,string_type> converter;
+                    value_converter<byte_string_view,string_type2> converter;
                     auto s = converter.convert(as_byte_string_view(), tag(), ec);
                     if (ec)
                     {
@@ -4148,9 +4148,9 @@ namespace jsoncons {
                 }
                 case json_storage_kind::array_value:
                 {
-                    string_type s(alloc);
+                    string_type2 s(alloc);
                     {
-                        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type2>> encoder(s);
                         dump(encoder);
                     }
                     return s;
@@ -4159,8 +4159,8 @@ namespace jsoncons {
                     return cast<json_const_pointer_storage>().value()->as_string(alloc);
                 default:
                 {
-                    string_type s(alloc);
-                    basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                    string_type2 s(alloc);
+                    basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type2>> encoder(s);
                     dump(encoder);
                     return s;
                 }
