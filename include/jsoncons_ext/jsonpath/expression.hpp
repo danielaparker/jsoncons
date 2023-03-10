@@ -3057,8 +3057,9 @@ namespace detail {
             {
                 auto callback = [&result](const json_location_type& path, reference)
                 {
-                    auto s = path.to_string();
-                    result.emplace_back(s.c_str(), semantic_tag::none, s.get_allocator()); 
+                    //auto s = path.to_string();
+                    //result.emplace_back(s.c_str(), semantic_tag::none, s.get_allocator()); 
+                    result.emplace_back(path.to_string()); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
             }
