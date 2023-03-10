@@ -2382,52 +2382,46 @@ namespace detail {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
 
-        abs_function<Json> abs_func_;
-        contains_function<Json> contains_func_;
-        starts_with_function<Json> starts_with_func_;
-        ends_with_function<Json> ends_with_func_;
-        ceil_function<Json> ceil_func_;
-        floor_function<Json> floor_func_;
-        to_number_function<Json> to_number_func_;
-        sum_function<Json> sum_func_;
-        prod_function<Json> prod_func_;
-        avg_function<Json> avg_func_;
-        min_function<Json> min_func_;
-        max_function<Json> max_func_;
-        length_function<Json> length_func_;
-        keys_function<Json> keys_func_;
-#if defined(JSONCONS_HAS_STD_REGEX)
-        tokenize_function<Json> tokenize_func_;
-#endif
-        std::unordered_map<string_type,const function_base_type*> functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>> functions_;
         std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
 
         static_resources(const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), keys_func_(alloc_),
-#if defined(JSONCONS_HAS_STD_REGEX)
-        tokenize_func_(alloc_),
-#endif
-            functions_{
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "abs"), alloc_}, &abs_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "contains"), alloc_}, &contains_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "starts_with"), alloc_}, &starts_with_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ends_with"), alloc_}, &ends_with_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ceil"), alloc_}, &ceil_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "floor"), alloc_}, &floor_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "to_number"), alloc_}, &to_number_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "sum"), alloc_}, &sum_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "prod"), alloc_}, &prod_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "avg"), alloc_}, &avg_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "min"), alloc_}, &min_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "max"), alloc_}, &max_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc_}, &length_func_},
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "keys"), alloc_}, &keys_func_},
-#if defined(JSONCONS_HAS_STD_REGEX)
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "tokenize"), alloc_}, &tokenize_func_},
-#endif
-                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "count"), alloc_}, &length_func_}
-            }
+            : alloc_(alloc)
         {
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "abs"), alloc_}, 
+                    jsoncons::make_unique<abs_function<Json>>());
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "contains"), alloc_ },
+                    jsoncons::make_unique<contains_function<Json>>());
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "starts_with"), alloc_ },
+                    jsoncons::make_unique<starts_with_function<Json>>());
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "ends_with"), alloc_ },
+                    jsoncons::make_unique<ends_with_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ceil"), alloc_}, 
+                    jsoncons::make_unique<ceil_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "floor"), alloc_}, 
+                    jsoncons::make_unique<floor_function<Json>>());
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "to_number"), alloc_ },
+                    jsoncons::make_unique<to_number_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "sum"), alloc_}, 
+                    jsoncons::make_unique<sum_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "prod"), alloc_}, 
+                    jsoncons::make_unique<prod_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "avg"), alloc_}, 
+                    jsoncons::make_unique<avg_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "min"), alloc_}, 
+                    jsoncons::make_unique<min_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "max"), alloc_}, 
+                    jsoncons::make_unique<max_function<Json>>());
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc_}, 
+                    jsoncons::make_unique<length_function<Json>>());
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "keys"), alloc_ },
+                    jsoncons::make_unique<keys_function<Json>>(alloc_));
+#if defined(JSONCONS_HAS_STD_REGEX)
+                functions_.emplace(string_type{ JSONCONS_CSTRING_CONSTANT(char_type, "tokenize"), alloc_ },
+                    jsoncons::make_unique<tokenize_function<Json>>(alloc_));
+#endif
+                functions_.emplace(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "count"), alloc_}, 
+                    jsoncons::make_unique<length_function<Json>>());
         }
 
         static_resources(const custom_functions<Json>& functions, 
@@ -2454,25 +2448,8 @@ namespace detail {
               selectors_(std::move(other.selectors_)),
               temp_json_values_(std::move(other.temp_json_values_)),
               unary_operators_(std::move(other.unary_operators_)),
-              custom_functions_(std::move(other.custom_functions_)),
-              abs_func_(std::move(other.abs_func_)),
-              contains_func_(std::move(other.contains_func_)),
-              starts_with_func_(std::move(other.starts_with_func_)),
-              ends_with_func_(std::move(other.ends_with_func_)),
-              ceil_func_(std::move(other.ceil_func_)),
-              floor_func_(std::move(other.floor_func_)),
-              to_number_func_(std::move(other.to_number_func_)),
-              sum_func_(std::move(other.sum_func_)),
-              prod_func_(std::move(other.prod_func_)),
-              avg_func_(std::move(other.avg_func_)),
-              min_func_(std::move(other.min_func_)),
-              max_func_(std::move(other.max_func_)),
-              length_func_(std::move(other.length_func_)),
-              keys_func_(std::move(other.keys_func_)),
-          #if defined(JSONCONS_HAS_STD_REGEX)
-              tokenize_func_(std::move(other.tokenize_func_)),
-          #endif
-              functions_(std::move(other.functions_))
+              functions_(std::move(other.functions_)),
+              custom_functions_(std::move(other.custom_functions_))
         {
         }
 
@@ -2494,7 +2471,7 @@ namespace detail {
             }
             else
             {
-                return it->second;
+                return it->second.get();
             }
         }
 
