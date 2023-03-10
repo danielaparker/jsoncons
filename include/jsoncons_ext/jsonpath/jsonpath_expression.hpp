@@ -2556,7 +2556,7 @@ namespace detail {
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
 
-            evaluator_t e(std::allocator());
+            evaluator_t e(std::allocator<char_type>());
             json_selector_t expr = e.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
@@ -2596,7 +2596,7 @@ namespace detail {
                                            std::error_code& ec)
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
-            evaluator_t e(std::allocator());
+            evaluator_t e(std::allocator<char_type>());
             json_selector_t expr = e.compile(*resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
