@@ -91,6 +91,7 @@ add_executable(unit_tests
                jsonpath/src/jsonpath_json_query_tests.cpp
                jsonpath/src/jsonpath_json_replace_tests.cpp
                jsonpath/src/jsonpath_test_suite.cpp
+               jsonpath/src/jsonpath_stateful_allocator_tests.cpp
                jsonpointer/src/jsonpointer_flatten_tests.cpp
                jsonpointer/src/jsonpointer_tests.cpp
                jsonschema/src/format_validator_tests.cpp

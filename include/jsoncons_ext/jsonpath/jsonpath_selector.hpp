@@ -132,8 +132,9 @@ namespace detail {
     struct path_generator
     {
         using char_type = typename Json::char_type;
+        using string_view_type = typename Json::string_view_type;
         using json_location_node_type = json_location_node<char_type>;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
 
         static const json_location_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
                                                        const json_location_node_type& last, 
@@ -260,6 +261,7 @@ namespace detail {
     class identifier_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
+        using allocator_type = typename Json::allocator_type;
         using path_generator_type = path_generator<Json,JsonReference>;
     public:
         using value_type = typename supertype::value_type;
@@ -268,15 +270,15 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using json_location_node_type = typename supertype::json_location_node_type;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
-        using string_view_type = basic_string_view<char_type>;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
         using node_receiver_type = typename supertype::node_receiver_type;
     private:
         string_type identifier_;
     public:
 
-        identifier_selector(const string_view_type& identifier)
-            : base_selector<Json,JsonReference>(), identifier_(identifier)
+        identifier_selector(const string_view_type& identifier, allocator_type alloc)
+            : base_selector<Json,JsonReference>(), identifier_(identifier.begin(), identifier.end(), alloc)
         {
         }
 
@@ -1063,7 +1065,10 @@ namespace detail {
     class index_expression_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
+        using allocator_type = typename Json::allocator_type;
+        using string_type = typename Json::string_type;
 
+        allocator_type alloc_;
         expression<Json,JsonReference> expr_;
 
     public:
@@ -1075,8 +1080,8 @@ namespace detail {
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;
 
-        index_expression_selector(expression<Json,JsonReference>&& expr)
-            : base_selector<Json,JsonReference>(), expr_(std::move(expr))
+        index_expression_selector(expression<Json,JsonReference>&& expr, const allocator_type& alloc)
+            : base_selector<Json,JsonReference>(), alloc_(alloc), expr_(std::move(expr))
         {
         }
 
@@ -1101,8 +1106,9 @@ namespace detail {
                 }
                 else if (j.is_string() && current.is_object())
                 {
+                    auto sv = j.as_string_view();
                     this->tail_select(resources, root, 
-                                      path_generator_type::generate(resources, last, j.as_string(), options),
+                                      path_generator_type::generate(resources, last, string_type(sv.begin(),sv.end(), alloc_), options),
                                       current.at(j.as_string_view()), receiver, options);
                 }
             }

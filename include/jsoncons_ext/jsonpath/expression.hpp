@@ -296,7 +296,7 @@ namespace jsonpath {
         using char_type = typename Json::char_type;
         using parameter_type = parameter<Json>;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
 
         string_type function_name_;
         optional<std::size_t> arity_;
@@ -344,7 +344,7 @@ namespace jsonpath {
     class custom_functions
     {
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
         using value_type = Json;
         using parameter_type = parameter<Json>;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
@@ -430,7 +430,7 @@ namespace detail {
         Json evaluate(JsonReference val, 
                       std::error_code&) const override
         {
-            return is_false(val) ? Json(true) : Json(false);
+            return is_false(val) ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
     };
 
@@ -447,11 +447,11 @@ namespace detail {
         {
             if (val.is_int64())
             {
-                return Json(-val.template as<int64_t>());
+                return Json(-val.template as<int64_t>(), semantic_tag::none);
             }
             else if (val.is_double())
             {
-                return Json(-val.as_double());
+                return Json(-val.as_double(), semantic_tag::none);
             }
             else
             {
@@ -464,7 +464,7 @@ namespace detail {
     class regex_operator final : public unary_operator<Json,JsonReference>
     {
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
         std::basic_regex<char_type> pattern_;
     public:
         regex_operator(std::basic_regex<char_type>&& pattern)
@@ -483,7 +483,7 @@ namespace detail {
             {
                 return Json::null();
             }
-            return std::regex_search(val.as_string(), pattern_) ? Json(true) : Json(false);
+            return std::regex_search(val.as_string(), pattern_) ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
     };
 
@@ -607,7 +607,7 @@ namespace detail {
 
         Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            return lhs == rhs ? Json(true) : Json(false);
+            return lhs == rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
 
         std::string to_string(int level = 0) const override
@@ -634,7 +634,7 @@ namespace detail {
 
         Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            return lhs != rhs ? Json(true) : Json(false);
+            return lhs != rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
 
         std::string to_string(int level = 0) const override
@@ -663,11 +663,11 @@ namespace detail {
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs < rhs ? Json(true) : Json(false);
+                return lhs < rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs < rhs ? Json(true) : Json(false);
+                return lhs < rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             return Json::null();
         }
@@ -698,11 +698,11 @@ namespace detail {
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs <= rhs ? Json(true) : Json(false);
+                return lhs <= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs <= rhs ? Json(true) : Json(false);
+                return lhs <= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             return Json::null();
         }
@@ -735,11 +735,11 @@ namespace detail {
 
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs > rhs ? Json(true) : Json(false);
+                return lhs > rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs > rhs ? Json(true) : Json(false);
+                return lhs > rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             return Json::null();
         }
@@ -770,11 +770,11 @@ namespace detail {
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs >= rhs ? Json(true) : Json(false);
+                return lhs >= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs >= rhs ? Json(true) : Json(false);
+                return lhs >= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
             return Json::null();
         }
@@ -809,15 +809,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return Json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())), semantic_tag::none);
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return Json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()), semantic_tag::none);
             }
             else
             {
-                return Json((lhs.as_double() + rhs.as_double()));
+                return Json((lhs.as_double() + rhs.as_double()), semantic_tag::none);
             }
         }
 
@@ -851,15 +851,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return Json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())), semantic_tag::none);
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return Json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()), semantic_tag::none);
             }
             else
             {
-                return Json((lhs.as_double() - rhs.as_double()));
+                return Json((lhs.as_double() - rhs.as_double()), semantic_tag::none);
             }
         }
 
@@ -893,15 +893,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return Json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())), semantic_tag::none);
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return Json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()), semantic_tag::none);
             }
             else
             {
-                return Json((lhs.as_double() * rhs.as_double()));
+                return Json((lhs.as_double() * rhs.as_double()), semantic_tag::none);
             }
         }
 
@@ -937,15 +937,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return Json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())), semantic_tag::none);
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return Json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()), semantic_tag::none);
             }
             else
             {
-                return Json((lhs.as_double() / rhs.as_double()));
+                return Json((lhs.as_double() / rhs.as_double()), semantic_tag::none);
             }
         }
 
@@ -981,15 +981,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return Json(((lhs.template as<int64_t>() % rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() % rhs.template as<int64_t>())), semantic_tag::none);
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return Json((lhs.template as<uint64_t>() % rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() % rhs.template as<uint64_t>()), semantic_tag::none);
             }
             else
             {
-                return Json(fmod(lhs.as_double(), rhs.as_double()));
+                return Json(fmod(lhs.as_double(), rhs.as_double()), semantic_tag::none);
             }
         }
 
@@ -1099,10 +1099,10 @@ namespace detail {
                     {
                         if (j == arg1)
                         {
-                            return value_type(true);
+                            return value_type(true, semantic_tag::none);
                         }
                     }
-                    return value_type(false);
+                    return value_type(false, semantic_tag::none);
                 case json_type::string_value:
                 {
                     if (!arg1.is_string())
@@ -1112,7 +1112,7 @@ namespace detail {
                     }
                     auto sv0 = arg0.template as<string_view_type>();
                     auto sv1 = arg1.template as<string_view_type>();
-                    return sv0.find(sv1) != string_view_type::npos ? value_type(true) : value_type(false);
+                    return sv0.find(sv1) != string_view_type::npos ? value_type(true, semantic_tag::none) : value_type(false, semantic_tag::none);
                 }
                 default:
                 {
@@ -1176,11 +1176,11 @@ namespace detail {
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
             {
-                return value_type(true);
+                return value_type(true, semantic_tag::none);
             }
             else
             {
-                return value_type(false);
+                return value_type(false, semantic_tag::none);
             }
         }
 
@@ -1238,11 +1238,11 @@ namespace detail {
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
             {
-                return value_type(true);
+                return value_type(true, semantic_tag::none);
             }
             else
             {
-                return value_type(false);
+                return value_type(false, semantic_tag::none);
             }
         }
 
@@ -1300,7 +1300,7 @@ namespace detail {
                 sum += j.template as<double>();
             }
 
-            return value_type(sum);
+            return value_type(sum, semantic_tag::none);
         }
 
         std::string to_string(int level = 0) const override
@@ -1321,14 +1321,19 @@ namespace detail {
     template <class Json>
     class tokenize_function : public function_base<Json>
     {
+        using allocator_type = typename Json::allocator_type;
+
+        allocator_type alloc_;
+
     public:
         using value_type = Json;
         using parameter_type = parameter<Json>;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
 
-        tokenize_function()
-            : function_base<Json>(2)
+        tokenize_function(const allocator_type& alloc)
+            : function_base<Json>(2), alloc_(alloc)
         {
         }
 
@@ -1347,16 +1352,19 @@ namespace detail {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            auto arg0 = args[0].value().template as<string_type>();
-            auto arg1 = args[1].value().template as<string_type>();
+            auto arg0 = args[0].value().template as<string_view_type>();
+            auto arg1 = args[1].value().template as<string_view_type>();
+
+            auto s0 = string_type(arg0.begin(), arg0.end(), alloc_);
+            auto s1 = string_type(arg1.begin(), arg1.end(), alloc_);
 
             std::regex::flag_type options = std::regex_constants::ECMAScript; 
-            std::basic_regex<char_type> pieces_regex(arg1, options);
+            std::basic_regex<char_type> pieces_regex(s1, options);
 
-            std::regex_token_iterator<typename string_type::const_iterator> rit ( arg0.begin(), arg0.end(), pieces_regex, -1);
+            std::regex_token_iterator<typename string_type::const_iterator> rit ( s0.begin(), s0.end(), pieces_regex, -1);
             std::regex_token_iterator<typename string_type::const_iterator> rend;
 
-            value_type j(json_array_arg);
+            value_type j(json_array_arg, semantic_tag::none, alloc_);
             while (rit != rend) 
             {
                 j.emplace_back(rit->str());
@@ -1407,11 +1415,11 @@ namespace detail {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return value_type(arg0.template as<double>());
+                    return value_type(arg0.template as<double>(), semantic_tag::none);
                 }
                 case json_type::double_value:
                 {
-                    return value_type(std::ceil(arg0.template as<double>()));
+                    return value_type(std::ceil(arg0.template as<double>()), semantic_tag::none);
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
@@ -1459,11 +1467,11 @@ namespace detail {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return value_type(arg0.template as<double>());
+                    return value_type(arg0.template as<double>(), semantic_tag::none);
                 }
                 case json_type::double_value:
                 {
-                    return value_type(std::floor(arg0.template as<double>()));
+                    return value_type(std::floor(arg0.template as<double>()), semantic_tag::none);
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
@@ -1519,20 +1527,20 @@ namespace detail {
                     auto result1 = jsoncons::detail::to_integer(sv.data(), sv.length(), un);
                     if (result1)
                     {
-                        return value_type(un);
+                        return value_type(un, semantic_tag::none);
                     }
                     int64_t sn{0};
                     auto result2 = jsoncons::detail::to_integer(sv.data(), sv.length(), sn);
                     if (result2)
                     {
-                        return value_type(sn);
+                        return value_type(sn, semantic_tag::none);
                     }
                     jsoncons::detail::chars_to to_double;
                     try
                     {
                         auto s = arg0.as_string();
                         double d = to_double(s.c_str(), s.length());
-                        return value_type(d);
+                        return value_type(d, semantic_tag::none);
                     }
                     catch (const std::exception&)
                     {
@@ -1597,7 +1605,7 @@ namespace detail {
                 prod *= j.template as<double>();
             }
 
-            return value_type(prod);
+            return value_type(prod, semantic_tag::none);
         }
 
         std::string to_string(int level = 0) const override
@@ -1655,7 +1663,7 @@ namespace detail {
                 sum += j.template as<double>();
             }
 
-            return value_type(sum / static_cast<double>(arg0.size()));
+            return value_type(sum / static_cast<double>(arg0.size()), semantic_tag::none);
         }
 
         std::string to_string(int level = 0) const override
@@ -1840,11 +1848,11 @@ namespace detail {
                     return arg0;
                 case json_type::int64_value:
                 {
-                    return arg0.template as<int64_t>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<int64_t>()));
+                    return arg0.template as<int64_t>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<int64_t>()), semantic_tag::none);
                 }
                 case json_type::double_value:
                 {
-                    return arg0.template as<double>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<double>()));
+                    return arg0.template as<double>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<double>()), semantic_tag::none);
                 }
                 default:
                 {
@@ -1896,12 +1904,12 @@ namespace detail {
             {
                 case json_type::object_value:
                 case json_type::array_value:
-                    return value_type(arg0.size());
+                    return value_type(arg0.size(), semantic_tag::none);
                 case json_type::string_value:
                 {
                     auto sv0 = arg0.template as<string_view_type>();
                     auto length = unicode_traits::count_codepoints(sv0.data(), sv0.size());
-                    return value_type(length);
+                    return value_type(length, semantic_tag::none);
                 }
                 default:
                 {
@@ -1927,13 +1935,16 @@ namespace detail {
     template <class Json>
     class keys_function : public function_base<Json>
     {
+        using allocator_type = typename Json::allocator_type;
+
+        allocator_type alloc_;
     public:
         using value_type = Json;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
-        keys_function()
-            : function_base<Json>(1)
+        keys_function(const allocator_type& alloc)
+            : function_base<Json>(1), alloc_(alloc)
         {
         }
 
@@ -1953,7 +1964,7 @@ namespace detail {
                 return value_type::null();
             }
 
-            value_type result(json_array_arg);
+            value_type result(json_array_arg, semantic_tag::none, alloc_);
             result.reserve(args.size());
 
             for (auto& item : arg0.object_range())
@@ -2052,7 +2063,7 @@ namespace detail {
     struct path_value_pair
     {
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using value_type = Json;
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
@@ -2113,7 +2124,7 @@ namespace detail {
     struct path_component_value_pair
     {
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using value_type = Json;
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
@@ -2217,8 +2228,8 @@ namespace detail {
 
         reference null_value()
         {
-            static Json j{ null_type{} };
-            return j;
+            static Json a_null = Json(null_type(), semantic_tag::none);
+            return a_null;
         }
 
         template <typename... Args>
@@ -2269,7 +2280,7 @@ namespace detail {
 
     public:
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using value_type = Json;
         using reference = JsonReference;
@@ -2331,24 +2342,95 @@ namespace detail {
     template <class Json, class JsonReference>
     struct static_resources
     {
+        using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
+        using string_type = typename Json::string_type;
         using value_type = Json;
         using reference = JsonReference;
         using function_base_type = function_base<Json>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
+        allocator_type alloc_;
         std::vector<std::unique_ptr<selector_type>> selectors_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
         std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
 
-        static_resources()
+        abs_function<Json> abs_func_;
+        contains_function<Json> contains_func_;
+        starts_with_function<Json> starts_with_func_;
+        ends_with_function<Json> ends_with_func_;
+        ceil_function<Json> ceil_func_;
+        floor_function<Json> floor_func_;
+        to_number_function<Json> to_number_func_;
+        sum_function<Json> sum_func_;
+        prod_function<Json> prod_func_;
+        avg_function<Json> avg_func_;
+        min_function<Json> min_func_;
+        max_function<Json> max_func_;
+        length_function<Json> length_func_;
+        keys_function<Json> keys_func_;
+#if defined(JSONCONS_HAS_STD_REGEX)
+        tokenize_function<Json> tokenize_func_;
+#endif
+        std::unordered_map<string_type,const function_base_type*> functions_;
+
+        static_resources(const allocator_type& alloc = allocator_type())
+            : alloc_(alloc), keys_func_(alloc_),
+#if defined(JSONCONS_HAS_STD_REGEX)
+        tokenize_func_(alloc_),
+#endif
+            functions_{
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "abs"), alloc_}, &abs_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "contains"), alloc_}, &contains_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "starts_with"), alloc_}, &starts_with_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ends_with"), alloc_}, &ends_with_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ceil"), alloc_}, &ceil_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "floor"), alloc_}, &floor_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "to_number"), alloc_}, &to_number_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "sum"), alloc_}, &sum_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "prod"), alloc_}, &prod_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "avg"), alloc_}, &avg_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "min"), alloc_}, &min_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "max"), alloc_}, &max_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc_}, &length_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "keys"), alloc_}, &keys_func_},
+#if defined(JSONCONS_HAS_STD_REGEX)
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "tokenize"), alloc_}, &tokenize_func_},
+#endif
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "count"), alloc_}, &length_func_}
+            }
         {
         }
 
-        static_resources(const custom_functions<Json>& functions)
+        static_resources(const custom_functions<Json>& functions, 
+            const allocator_type& alloc = allocator_type())
+            : alloc_(alloc), keys_func_(alloc_),
+#if defined(JSONCONS_HAS_STD_REGEX)
+            tokenize_func_(alloc_),
+#endif
+            functions_{
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "abs"), alloc_}, &abs_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "contains"), alloc_}, &contains_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "starts_with"), alloc_}, &starts_with_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ends_with"), alloc_}, &ends_with_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "ceil"), alloc_}, &ceil_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "floor"), alloc_}, &floor_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "to_number"), alloc_}, &to_number_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "sum"), alloc_}, &sum_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "prod"), alloc_}, &prod_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "avg"), alloc_}, &avg_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "min"), alloc_}, &min_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "max"), alloc_}, &max_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc_}, &length_func_},
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "keys"), alloc_}, &keys_func_},
+    #if defined(JSONCONS_HAS_STD_REGEX)
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "tokenize"), alloc_}, &tokenize_func_},
+    #endif
+                {string_type{JSONCONS_CSTRING_CONSTANT(char_type, "count"), alloc_}, &length_func_}
+            }
         {
+
             for (const auto& item : functions)
             {
                 custom_functions_.emplace(item.name(),
@@ -2356,60 +2438,45 @@ namespace detail {
             }
         }
 
-        static_resources(const static_resources&) = default;
+        static_resources(const static_resources&) = delete;
+
+        static_resources operator=(const static_resources&) = delete;
+
+        //static_resources(static_resources&&) = delete;
+
+        static_resources operator=(static_resources&&) = delete;
 
         static_resources(static_resources&& other) noexcept 
-            : selectors_(std::move(other.selectors_)),
+            : alloc_(std::move(other.alloc_)),
+              selectors_(std::move(other.selectors_)),
               temp_json_values_(std::move(other.temp_json_values_)),
               unary_operators_(std::move(other.unary_operators_)),
-              custom_functions_(std::move(other.custom_functions_))
+              custom_functions_(std::move(other.custom_functions_)),
+              abs_func_(std::move(other.abs_func_)),
+              contains_func_(std::move(other.contains_func_)),
+              starts_with_func_(std::move(other.starts_with_func_)),
+              ends_with_func_(std::move(other.ends_with_func_)),
+              ceil_func_(std::move(other.ceil_func_)),
+              floor_func_(std::move(other.floor_func_)),
+              to_number_func_(std::move(other.to_number_func_)),
+              sum_func_(std::move(other.sum_func_)),
+              prod_func_(std::move(other.prod_func_)),
+              avg_func_(std::move(other.avg_func_)),
+              min_func_(std::move(other.min_func_)),
+              max_func_(std::move(other.max_func_)),
+              length_func_(std::move(other.length_func_)),
+              keys_func_(std::move(other.keys_func_)),
+          #if defined(JSONCONS_HAS_STD_REGEX)
+              tokenize_func_(std::move(other.tokenize_func_)),
+          #endif
+              functions_(std::move(other.functions_))
         {
         }
 
         const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
-            static abs_function<Json> abs_func;
-            static contains_function<Json> contains_func;
-            static starts_with_function<Json> starts_with_func;
-            static ends_with_function<Json> ends_with_func;
-            static ceil_function<Json> ceil_func;
-            static floor_function<Json> floor_func;
-            static to_number_function<Json> to_number_func;
-            static sum_function<Json> sum_func;
-            static prod_function<Json> prod_func;
-            static avg_function<Json> avg_func;
-            static min_function<Json> min_func;
-            static max_function<Json> max_func;
-            static length_function<Json> length_func;
-            static keys_function<Json> keys_func;
-#if defined(JSONCONS_HAS_STD_REGEX)
-            static tokenize_function<Json> tokenize_func;
-#endif
-
-            static std::unordered_map<string_type,const function_base_type*> functions =
-            {
-                {string_type{'a','b','s'}, &abs_func},
-                {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
-                {string_type{'s','t','a','r','t','s','_','w','i','t','h'}, &starts_with_func},
-                {string_type{'e','n','d','s','_','w','i','t','h'}, &ends_with_func},
-                {string_type{'c','e','i','l'}, &ceil_func},
-                {string_type{'f','l','o','o','r'}, &floor_func},
-                {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},
-                {string_type{'s','u','m'}, &sum_func},
-                {string_type{'p','r','o', 'd'}, &prod_func},
-                {string_type{'a','v','g'}, &avg_func},
-                {string_type{'m','i','n'}, &min_func},
-                {string_type{'m','a','x'}, &max_func},
-                {string_type{'l','e','n','g','t','h'}, &length_func},
-                {string_type{'k','e','y','s'}, &keys_func},
-#if defined(JSONCONS_HAS_STD_REGEX)
-                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func},
-#endif
-                {string_type{'c','o','u','n','t'}, &length_func}
-            };
-
-            auto it = functions.find(name);
-            if (it == functions.end())
+            auto it = functions_.find(name);
+            if (it == functions_.end())
             {
                 auto it2 = custom_functions_.find(name);
                 if (it2 == custom_functions_.end())
@@ -2548,7 +2615,7 @@ namespace detail {
     {
     public:
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using value_type = Json;
         using reference = JsonReference;
@@ -2953,8 +3020,9 @@ namespace detail {
     class path_expression
     {
     public:
+        using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using string_view_type = typename Json::string_view_type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_value_pair_less_type = path_value_pair_less<Json,JsonReference>;
@@ -2969,25 +3037,26 @@ namespace detail {
         using json_location_type = json_location<char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
+        allocator_type alloc_;
         selector_type* selector_;
         result_options required_options_;
     public:
 
-        path_expression()
-            : required_options_()
-        {
-        }
-
-        path_expression(path_expression&& expr) = default;
-
-        path_expression(selector_type* selector, bool paths_required)
-            : selector_(selector), required_options_()
+        path_expression(selector_type* selector, bool paths_required, const allocator_type& alloc)
+            : alloc_(alloc), selector_(selector), required_options_()
         {
             if (paths_required)
             {
                 required_options_ |= result_options::path;
             }
         }
+
+        path_expression(const allocator_type& alloc)
+            : alloc_(alloc), required_options_()
+        {
+        }
+
+        path_expression(path_expression&& expr) = default;
 
         path_expression& operator=(path_expression&& expr) = default;
 
@@ -2997,7 +3066,7 @@ namespace detail {
                       reference instance,
                       result_options options) const
         {
-            Json result(json_array_arg);
+            Json result(json_array_arg, semantic_tag::none, alloc_);
 
             if ((options & result_options::path) == result_options::path)
             {
@@ -3120,7 +3189,7 @@ namespace detail {
         using pointer = typename path_value_pair_type::value_pointer;
         using const_pointer = const value_type*;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using string_view_type = typename Json::string_view_type;
         using path_value_pair_less_type = path_value_pair_less<Json,reference>;
         using path_value_pair_equal_type = path_value_pair_equal<Json,reference>;

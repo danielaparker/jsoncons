@@ -145,8 +145,7 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath/input/test_data/functions.json");
         jsonpath_tests("./jsonpath/input/test_data/slice.json"); 
         jsonpath_tests("./jsonpath/input/test_data/parent-operator.json"); 
-
-        //jsonpath_tests("./jsonpath/input/test.json");
+        jsonpath_tests("./jsonpath/input/test.json");
     }
 }
 

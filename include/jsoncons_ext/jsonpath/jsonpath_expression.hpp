@@ -100,8 +100,9 @@ namespace detail {
     class jsonpath_evaluator : public ser_context
     {
     public:
+        using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_type = typename Json::string_type;
         using string_view_type = typename Json::string_view_type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using value_type = Json;
@@ -116,6 +117,7 @@ namespace detail {
 
     private:
 
+        allocator_type alloc_;
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
@@ -129,15 +131,16 @@ namespace detail {
         std::vector<token_type> operator_stack_;
 
     public:
-        jsonpath_evaluator()
-            : line_(1), column_(1),
+        jsonpath_evaluator(const allocator_type& alloc = allocator_type())
+            : alloc_(alloc), line_(1), column_(1),
               begin_input_(nullptr), end_input_(nullptr),
               p_(nullptr)
         {
         }
 
-        jsonpath_evaluator(std::size_t line, std::size_t column)
-            : line_(line), column_(column),
+        jsonpath_evaluator(std::size_t line, std::size_t column, 
+            const allocator_type& alloc = allocator_type())
+            : alloc_(alloc), line_(line), column_(column),
               begin_input_(nullptr), end_input_(nullptr),
               p_(nullptr)
         {
@@ -170,8 +173,8 @@ namespace detail {
         {
             std::size_t selector_id = 0;
 
-            string_type buffer;
-            string_type buffer2;
+            string_type buffer(alloc_);
+            string_type buffer2(alloc_);
             uint32_t cp = 0;
             uint32_t cp2 = 0;
 
@@ -199,7 +202,7 @@ namespace detail {
                             case '@':
                             {
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
                                 ++column_;
@@ -224,7 +227,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(root_node_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -232,14 +235,14 @@ namespace detail {
                             case '@':
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::syntax_error;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::recursive_descent_or_expression_lhs:
@@ -247,7 +250,7 @@ namespace detail {
                         {
                             case '.':
                                 push_token(resources, token_type(resources.new_selector(recursive_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::name_or_lbracket;
@@ -278,7 +281,7 @@ namespace detail {
                     {
                         //std::cout << "literal: " << buffer << "\n";
                         push_token(resources, token_type(literal_arg, Json(buffer)), ec);
-                        if (ec) {return path_expression_type();}
+                        if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); // json_value
                         break;
@@ -300,7 +303,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expect_rparen;
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -323,7 +326,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, token_type(resources.get_unary_not()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 break;
                             }
                             case '-':
@@ -331,7 +334,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, token_type(resources.get_unary_minus()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 break;
                             }
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -357,13 +360,13 @@ namespace detail {
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -372,21 +375,21 @@ namespace detail {
                             }
                             default:
                             {
-                                json_decoder<Json> decoder;
+                                json_decoder<Json> decoder(result_allocator_arg, alloc_);
                                 basic_json_parser<char_type> parser;
                                 parser.update(buffer.data(),buffer.size());
                                 parser.parse_some(decoder, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 parser.finish_parse(decoder, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -396,21 +399,21 @@ namespace detail {
                     }
                     case path_state::json_value:
                     {
-                        json_decoder<Json> decoder;
+                        json_decoder<Json> decoder(result_allocator_arg, alloc_);
                         basic_json_parser<char_type> parser;
                         parser.update(buffer.data(),buffer.size());
                         parser.parse_some(decoder, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         parser.finish_parse(decoder, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                        if (ec) {return path_expression_type();}
+                        if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back();
                         break;
@@ -424,21 +427,21 @@ namespace detail {
                             case '{':
                             case '[':
                             {
-                                json_decoder<Json> decoder;
+                                json_decoder<Json> decoder(result_allocator_arg, alloc_);
                                 basic_json_parser<char_type> parser;
                                 parser.update(p_,end_input_ - p_);
                                 parser.parse_some(decoder, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 parser.finish_parse(decoder, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 p_ = parser.current();
@@ -492,7 +495,7 @@ namespace detail {
                                 if (p_ == end_input_)
                                 {
                                     ec = jsonpath_errc::unexpected_eof;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 buffer.push_back(*p_);
                                 ++p_;
@@ -519,7 +522,7 @@ namespace detail {
                                 break;
                             case '*':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -539,7 +542,7 @@ namespace detail {
                             case '[':
                             case '.':
                                 ec = jsonpath_errc::expected_relative_path;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                             default:
                                 buffer.clear();
                                 state_stack_.back() = path_state::identifier_or_function_expr;
@@ -559,12 +562,12 @@ namespace detail {
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -573,8 +576,8 @@ namespace detail {
                             }
                             default:
                             {
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type();}
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
@@ -594,12 +597,12 @@ namespace detail {
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 buffer.clear();
                                 push_token(resources, current_node_arg, ec);
                                 push_token(resources, token_type(f), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
                                 ++p_;
@@ -609,7 +612,7 @@ namespace detail {
                             default:
                             {
                                 ec = jsonpath_errc::expected_root_or_function;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                             }
                         }
                         break;
@@ -624,10 +627,10 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(resources, token_type(current_node_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type();}
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -637,7 +640,7 @@ namespace detail {
                             case ')':
                             {
                                 push_token(resources, token_type(end_function_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -645,7 +648,7 @@ namespace detail {
                             }
                             default:
                                 ec = jsonpath_errc::syntax_error;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -661,7 +664,7 @@ namespace detail {
                                 break;
                             default:
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::one_or_more_arguments;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -682,7 +685,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(resources, token_type(begin_expression_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -705,13 +708,13 @@ namespace detail {
                                 push_token(resources, token_type(end_argument_expression_arg), ec);
                                 push_token(resources, argument_arg, ec);
                                 //push_token(resources, argument_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
                             default:
                                 ec = jsonpath_errc::expected_comma_or_rparen;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -855,35 +858,35 @@ namespace detail {
                             case '+':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_plus_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '-':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_minus_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_mult_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '/':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_div_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '%':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(resources, token_type(resources.get_modulus_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 ++p_;
                                 ++column_;
                                 break;
@@ -893,7 +896,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_separator;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         };
                         break;
                     case path_state::expect_or:
@@ -902,14 +905,14 @@ namespace detail {
                         {
                             case '|':
                                 push_token(resources, token_type(resources.get_or_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_or;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -919,14 +922,14 @@ namespace detail {
                         {
                             case '&':
                                 push_token(resources, token_type(resources.get_and_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_and;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -956,7 +959,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jsonpath_errc::syntax_error;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 break;
                         }
@@ -970,7 +973,7 @@ namespace detail {
                             case '=':
                             {
                                 push_token(resources, token_type(resources.get_eq_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::path_or_literal_or_function;
                                 ++p_;
                                 ++column_;
@@ -991,7 +994,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jsonpath_errc::syntax_error;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 break;
                         }
@@ -1011,7 +1014,7 @@ namespace detail {
                                 break;
                             default: 
                                 ec = jsonpath_errc::expected_forward_slash;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         };
                         break;
                     case path_state::regex: 
@@ -1023,7 +1026,7 @@ namespace detail {
                         }
                         std::basic_regex<char_type> pattern(buffer, options);
                         push_token(resources, resources.get_regex_operator(std::move(pattern)), ec);
-                        if (ec) {return path_expression_type();}
+                        if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         buffer2.clear();
                         state_stack_.pop_back();
@@ -1069,14 +1072,14 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_lte_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(resources, token_type(resources.get_lt_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -1088,7 +1091,7 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_gte_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1096,7 +1099,7 @@ namespace detail {
                             default:
                                 //std::cout << "Parse: gt_operator\n";
                                 push_token(resources, token_type(resources.get_gt_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -1108,20 +1111,20 @@ namespace detail {
                         {
                             case '=':
                                 push_token(resources, token_type(resources.get_ne_operator()), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_comparator;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
                     case path_state::identifier:
-                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                        if (ec) {return path_expression_type();}
+                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                        if (ec) {return path_expression_type(alloc_);}
                         buffer.clear();
                         state_stack_.pop_back(); 
                         break;
@@ -1183,7 +1186,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_comma_or_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::expect_rbracket:
@@ -1199,7 +1202,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::expect_rparen:
@@ -1212,12 +1215,12 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(resources, rparen_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expression_rhs;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rparen;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::bracket_specifier_or_union:
@@ -1231,7 +1234,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(begin_expression_arg), ec);
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::expression);
                                 state_stack_.emplace_back(path_state::expect_rparen);
@@ -1245,7 +1248,7 @@ namespace detail {
                             {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(begin_filter_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::filter_expression);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1281,7 +1284,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, root_node_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_location);                                
                                 ++p_;
@@ -1291,7 +1294,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_location);
                                 ++p_;
@@ -1299,7 +1302,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_bracket_specifier_or_union;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::union_element:
@@ -1319,7 +1322,7 @@ namespace detail {
                             {
                                 push_token(resources, token_type(begin_expression_arg), ec);
                                 push_token(resources, lparen_arg, ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::expression;
                                 state_stack_.emplace_back(path_state::expect_rparen);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1331,7 +1334,7 @@ namespace detail {
                             case '?':
                             {
                                 push_token(resources, token_type(begin_filter_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::filter_expression;
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
@@ -1341,7 +1344,7 @@ namespace detail {
                             }
                             case '*':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1349,7 +1352,7 @@ namespace detail {
                             case '$':
                                 push_token(resources, token_type(root_node_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1357,7 +1360,7 @@ namespace detail {
                             case '@':
                                 push_token(resources, token_type(current_node_arg), ec); // ISSUE
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::relative_location;
                                 ++p_;
                                 ++column_;
@@ -1376,7 +1379,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_bracket_specifier_or_union;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
 
@@ -1418,17 +1421,17 @@ namespace detail {
                                 if (buffer.empty())
                                 {
                                     ec = jsonpath_errc::invalid_number;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 int64_t n{0};
                                 auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
                                 if (!r)
                                 {
                                     ec = jsonpath_errc::invalid_number;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back(); // index_or_slice_or_union
                                 ++p_;
@@ -1438,11 +1441,11 @@ namespace detail {
                             case ',':
                             {
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 if (buffer.empty())
                                 {
                                     ec = jsonpath_errc::invalid_number;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 else
                                 {
@@ -1451,15 +1454,15 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type();
+                                        return path_expression_type(alloc_);
                                     }
                                     push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                    if (ec) {return path_expression_type();}
+                                    if (ec) {return path_expression_type(alloc_);}
 
                                     buffer.clear();
                                 }
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);
@@ -1476,13 +1479,13 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type();
+                                        return path_expression_type(alloc_);
                                     }
                                     slic.start_ = n;
                                     buffer.clear();
                                 }
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::slice_expression_stop);
                                 state_stack_.emplace_back(path_state::integer);
@@ -1492,7 +1495,7 @@ namespace detail {
                             }
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::slice_expression_stop:
@@ -1504,7 +1507,7 @@ namespace detail {
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                             }
                             slic.stop_ = jsoncons::optional<int64_t>(n);
                             buffer.clear();
@@ -1517,7 +1520,7 @@ namespace detail {
                             case ']':
                             case ',':
                                 push_token(resources, token_type(resources.new_selector(slice_selector<Json,JsonReference>(slic))), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 break;
@@ -1529,7 +1532,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -1542,12 +1545,12 @@ namespace detail {
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                             }
                             if (n == 0)
                             {
                                 ec = jsonpath_errc::step_cannot_be_zero;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                             }
                             slic.step_ = n;
                             buffer.clear();
@@ -1560,14 +1563,14 @@ namespace detail {
                             case ']':
                             case ',':
                                 push_token(resources, token_type(resources.new_selector(slice_selector<Json,JsonReference>(slic))), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // slice_expression_step
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -1579,8 +1582,8 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type();}
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1588,8 +1591,8 @@ namespace detail {
                                 break;
                             case '.':
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type();}
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
@@ -1598,8 +1601,8 @@ namespace detail {
                                 break;
                             case '[':
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type();}
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
                                 ++p_;
@@ -1607,9 +1610,9 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::relative_path);                                
@@ -1641,21 +1644,21 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::union_element);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': 
                                 push_token(resources, token_type(end_union_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::identifier_or_union:
@@ -1665,8 +1668,8 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                                if (ec) {return path_expression_type();}
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1674,9 +1677,9 @@ namespace detail {
                                 break;
                             case ',': 
                                 push_token(resources, token_type(begin_union_arg), ec);
-                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                                push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);                                
@@ -1685,7 +1688,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::bracketed_wildcard:
@@ -1699,13 +1702,13 @@ namespace detail {
                             case ',':
                             case '.':
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::index_or_slice:
@@ -1720,7 +1723,7 @@ namespace detail {
                                 if (buffer.empty())
                                 {
                                     ec = jsonpath_errc::invalid_number;
-                                    return path_expression_type();
+                                    return path_expression_type(alloc_);
                                 }
                                 else
                                 {
@@ -1729,10 +1732,10 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type();
+                                        return path_expression_type(alloc_);
                                     }
                                     push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                    if (ec) {return path_expression_type();}
+                                    if (ec) {return path_expression_type(alloc_);}
 
                                     buffer.clear();
                                 }
@@ -1748,7 +1751,7 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type();
+                                        return path_expression_type(alloc_);
                                     }
                                     slic.start_ = n;
                                     buffer.clear();
@@ -1761,7 +1764,7 @@ namespace detail {
                             }
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::wildcard_or_union:
@@ -1772,7 +1775,7 @@ namespace detail {
                                 break;
                             case ']': 
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1782,7 +1785,7 @@ namespace detail {
                                 push_token(resources, token_type(begin_union_arg), ec);
                                 push_token(resources, token_type(resources.new_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 push_token(resources, token_type(separator_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::union_element);                                
@@ -1791,7 +1794,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::quoted_string_escape_char:
@@ -1858,14 +1861,14 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::illegal_escaped_character;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1875,7 +1878,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1885,7 +1888,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1895,7 +1898,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         if (unicode_traits::is_high_surrogate(cp))
                         {
@@ -1921,7 +1924,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::invalid_codepoint;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::escape_expect_surrogate_pair2:
@@ -1934,14 +1937,14 @@ namespace detail {
                                 break;
                             default:
                                 ec = jsonpath_errc::invalid_codepoint;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     case path_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1951,7 +1954,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1961,7 +1964,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         ++p_;
                         ++column_;
@@ -1972,7 +1975,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return path_expression_type();
+                            return path_expression_type(alloc_);
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
                         unicode_traits::convert(&codepoint, 1, buffer);
@@ -1992,13 +1995,13 @@ namespace detail {
                             case ']':
                             {
                                 push_token(resources, token_type(end_filter_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
                             default:
                                 ec = jsonpath_errc::expected_comma_or_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -2013,13 +2016,13 @@ namespace detail {
                             case ']':
                             {
                                 push_token(resources, token_type(end_index_expression_arg), ec);
-                                if (ec) {return path_expression_type();}
+                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.pop_back();
                                 break;
                             }
                             default:
                                 ec = jsonpath_errc::expected_comma_or_rbracket;
-                                return path_expression_type();
+                                return path_expression_type(alloc_);
                         }
                         break;
                     }
@@ -2033,7 +2036,7 @@ namespace detail {
             if (state_stack_.empty())
             {
                 ec = jsonpath_errc::syntax_error;
-                return path_expression_type();
+                return path_expression_type(alloc_);
             }
 
             while (state_stack_.size() > 1)
@@ -2050,8 +2053,8 @@ namespace detail {
                     case path_state::identifier_or_function_expr:
                         if (!buffer.empty()) // Can't be quoted string
                         {
-                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                            if (ec) {return path_expression_type();}
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                            if (ec) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
                         break;
@@ -2064,15 +2067,15 @@ namespace detail {
                     case path_state::identifier:
                         if (!buffer.empty()) // Can't be quoted string
                         {
-                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                            if (ec) {return path_expression_type();}
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer, alloc_))), ec);
+                            if (ec) {return path_expression_type(alloc_);}
                         }
                         state_stack_.pop_back(); 
                         break;
                     case path_state::parent_operator: 
                     {
                         push_token(resources, token_type(resources.new_selector(parent_node_selector<Json,JsonReference>(ancestor_depth))), ec);
-                        if (ec) { return path_expression_type(); }
+                        if (ec) { return path_expression_type(alloc_); }
                         paths_required = true;
                         state_stack_.pop_back(); 
                         break;
@@ -2082,14 +2085,14 @@ namespace detail {
                         break;
                     default:
                         ec = jsonpath_errc::syntax_error;
-                        return path_expression_type();
+                        return path_expression_type(alloc_);
                 }
             }
 
             if (state_stack_.size() > 2)
             {
                 ec = jsonpath_errc::unexpected_eof;
-                return path_expression_type();
+                return path_expression_type(alloc_);
             }
 
             //std::cout << "\nTokens\n\n";
@@ -2102,10 +2105,10 @@ namespace detail {
             if (output_stack_.empty() || !operator_stack_.empty())
             {
                 ec = jsonpath_errc::unexpected_eof;
-                return path_expression_type();
+                return path_expression_type(alloc_);
             }
 
-            return path_expression_type(output_stack_.back().selector_, paths_required);
+            return path_expression_type(output_stack_.back().selector_, paths_required, alloc_);
         }
 
         void advance_past_space_character()
@@ -2240,11 +2243,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)))));
+                        output_stack_.back().selector_->append_selector(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)), alloc_)));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks))))));
+                        output_stack_.emplace_back(token_type(resources.new_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)), alloc_))));
                     }
                     break;
                 }
@@ -2485,10 +2488,11 @@ namespace detail {
     class jsonpath_expression
     {
     public:
+        using allocator_type = typename Json::allocator_type;
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, JsonReference>;
-        using char_type = typename evaluator_t::char_type;
-        using string_type = typename evaluator_t::string_type;
-        using string_view_type = typename evaluator_t::string_view_type;
+        using char_type = typename Json::char_type;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using parameter_type = parameter<Json>;
@@ -2497,22 +2501,23 @@ namespace detail {
         using json_location_type = typename evaluator_t::json_location_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
-        jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources_;
+        allocator_type alloc_;
+        std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
         json_selector_t expr_;
     public:
-        jsonpath_expression(jsoncons::jsonpath::detail::static_resources<value_type,reference>&& resources,
-                            json_selector_t&& expr)
-            : static_resources_(std::move(resources)), 
+        jsonpath_expression(std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>>&& resources,
+                            json_selector_t&& expr, const allocator_type& alloc = allocator_type())
+            : alloc_(alloc),
+              static_resources_(std::move(resources)), 
               expr_(std::move(expr))
         {
         }
 
-        jsonpath_expression(jsoncons::jsonpath::detail::static_resources<value_type,reference>&& resources,
-                            json_selector_t&& expr, std::vector<function_type>&& custom_functions)
-            : static_resources_(std::move(resources)), 
-              expr_(std::move(expr), std::move(custom_functions))
-        {
-        }
+        jsonpath_expression(const jsonpath_expression&) = delete;
+        jsonpath_expression(jsonpath_expression&&) = delete;
+
+        jsonpath_expression& operator=(const jsonpath_expression&) = delete;
+        jsonpath_expression& operator=(jsonpath_expression&&) = delete;
 
         template <class BinaryCallback>
         typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
@@ -2532,7 +2537,7 @@ namespace detail {
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
-                Json result(json_array_arg);
+                Json result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const json_location_type& p, reference)
                 {
                     result.emplace_back(p.to_string());
@@ -2549,38 +2554,50 @@ namespace detail {
 
         static jsonpath_expression compile(const string_view_type& path)
         {
-            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
+            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
 
-            evaluator_t e;
-            json_selector_t expr = e.compile(resources, path);
+            evaluator_t e(std::allocator());
+            json_selector_t expr = e.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
 
         static jsonpath_expression compile(const string_view_type& path, std::error_code& ec)
         {
-            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
-            evaluator_t e;
-            json_selector_t expr = e.compile(resources, path, ec);
+            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
+            evaluator_t e(alloc_);
+            json_selector_t expr = e.compile(*resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
 
         static jsonpath_expression compile(const string_view_type& path, 
                                            const custom_functions<Json>& functions)
         {
-            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
+            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
 
-            evaluator_t e;
-            json_selector_t expr = e.compile(resources, path);
+            evaluator_t e{ std::allocator<char>() };
+            json_selector_t expr = e.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr));
+        }
+
+        template <class Alloc>
+        static jsonpath_expression compile(std::allocator_arg_t, Alloc alloc, const string_view_type& path, 
+            const custom_functions<Json>& functions)
+        {
+            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions, alloc);
+
+            using alloc_type = typename evaluator_t::allocator_type;
+            evaluator_t e(alloc);
+            json_selector_t expr = e.compile(*resources, path);
+            return jsonpath_expression(std::move(resources), std::move(expr), alloc);
         }
 
         static jsonpath_expression compile(const string_view_type& path, 
                                            const custom_functions<Json>& functions, 
                                            std::error_code& ec)
         {
-            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
-            evaluator_t e;
-            json_selector_t expr = e.compile(resources, path, ec);
+            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
+            evaluator_t e(std::allocator());
+            json_selector_t expr = e.compile(*resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
     };
@@ -2592,10 +2609,17 @@ namespace detail {
         return jsonpath_expression<Json>::compile(expr, functions);
     }
 
+    template <class Json, class Alloc>
+    jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, const typename Json::string_view_type& expr, 
+        const custom_functions<Json>& functions = custom_functions<Json>())
+    {
+        return jsonpath_expression<Json>::compile(std::allocator_arg, alloc, expr, functions);
+    }
+
     template <class Json>
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, std::error_code& ec)
     {
-        return jsonpath_expression<Json>::compile(expr, ec);
+        return make_expressions(expr, custom_functions<Json>(), ec);
     }
 
     template <class Json>

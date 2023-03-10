@@ -42,15 +42,14 @@ namespace jsonpath {
                      const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using json_location_type = typename evaluator_t::json_location_type;
 
-        jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
         evaluator_t e;
-        json_selector_t expr = e.compile(static_resources, path);
+        json_selector_t expr = e.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto callback = [&new_value](const json_location_type&, reference v)
@@ -65,15 +64,14 @@ namespace jsonpath {
     json_replace(Json& instance, const typename Json::string_view_type& path , UnaryCallback callback)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using json_location_type = typename evaluator_t::json_location_type;
 
-        jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources;
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
         evaluator_t e;
-        json_selector_t expr = e.compile(static_resources, path);
+        json_selector_t expr = e.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto f = [callback](const json_location_type&, reference v)
@@ -90,15 +88,14 @@ namespace jsonpath {
                  const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using json_location_type = typename evaluator_t::json_location_type;
 
-        jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
         evaluator_t e;
-        json_selector_t expr = e.compile(static_resources, path);
+        json_selector_t expr = e.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 

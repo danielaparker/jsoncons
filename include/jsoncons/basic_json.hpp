@@ -417,6 +417,8 @@ namespace jsoncons {
 
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
 
+        using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
+
         using key_type = typename implementation_policy::template string<char_type,char_traits_type,char_allocator_type>;
 
 
@@ -429,7 +431,7 @@ namespace jsoncons {
 
     #if !defined(JSONCONS_NO_DEPRECATED)
         JSONCONS_DEPRECATED_MSG("no replacement") typedef basic_json value_type;
-        JSONCONS_DEPRECATED_MSG("no replacement") typedef std::basic_string<char_type> string_type;
+        //JSONCONS_DEPRECATED_MSG("no replacement") typedef std::basic_string<char_type> string_type;
         JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type kvp_type;
         JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
     #endif
@@ -4848,9 +4850,9 @@ namespace jsoncons {
 
         std::basic_string<char_type> to_string() const noexcept
         {
-            using string_type = std::basic_string<char_type>;
-            string_type s;
-            basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s);
+            using string_type2 = std::basic_string<char_type>;
+            string_type2 s;
+            basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type2>> encoder(s);
             dump(encoder);
             return s;
         }
