@@ -2514,10 +2514,10 @@ namespace detail {
         }
 
         jsonpath_expression(const jsonpath_expression&) = delete;
-        jsonpath_expression(jsonpath_expression&&) = delete;
+        jsonpath_expression(jsonpath_expression&&) = default;
 
         jsonpath_expression& operator=(const jsonpath_expression&) = delete;
-        jsonpath_expression& operator=(jsonpath_expression&&) = delete;
+        jsonpath_expression& operator=(jsonpath_expression&&) = default;
 
         template <class BinaryCallback>
         typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
