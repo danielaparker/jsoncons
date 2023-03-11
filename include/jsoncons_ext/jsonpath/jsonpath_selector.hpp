@@ -290,10 +290,6 @@ namespace detail {
                     node_receiver_type& receiver,
                     result_options options) const override
         {
-            //std::string buf;
-            //buf.append("identifier selector: ");
-            //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
-
             string_type length_name = string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), resources.get_allocator()};
 
             if (current.is_object())
@@ -348,7 +344,7 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
-            static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
+            string_type length_name = string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), resources.get_allocator()};
 
             if (current.is_object())
             {
