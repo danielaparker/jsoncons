@@ -17,6 +17,8 @@ Enhancements:
 
 - The jsonpath library now works with stateful allocators.
 
+- Merged PR danielaparker/jsoncons/#395 that added a `ser_context::end_position()` function.
+
 0.169.0
 -------
 
