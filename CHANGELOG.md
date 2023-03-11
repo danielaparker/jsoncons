@@ -1,3 +1,11 @@
+0.170.0
+-------
+
+Defect fixes:
+
+- Fixed issue [danielaparker/jsoncons#416] where test with jsonpath `length` operator failed
+for length of zero. 
+
 0.169.0
 -------
 
