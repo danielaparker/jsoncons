@@ -3,13 +3,13 @@
 
 Defect fixes:
 
-- Fixed issue #416 where test with jsonpath `length` operator failed
+- Fixed issue danielaparker/jsoncons/#416 where test with jsonpath `length` operator failed
 for length of zero.
  
-- Fixed issue #411 where an overeager g++ 12.2.0 compiler reported a
+- Fixed issue danielaparker/jsoncons/#411 where an overeager g++ 12.2.0 compiler reported a
 spurious `stringop-overflow` warning.
 
-- Merged PR #406 that fixed multiple float parsing and boolean pretty print 
+- Merged PR danielaparker/jsoncons/#406 that fixed multiple float parsing and boolean pretty print 
 issues with wjson. This included reverting a change to use `std::from_chars`
 in 0.169.0.
 
