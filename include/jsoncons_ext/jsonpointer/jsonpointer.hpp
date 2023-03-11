@@ -413,7 +413,7 @@ namespace jsoncons { namespace jsonpointer {
 
         friend bool operator==( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
-            return lhs.tokens_ == rhs.okens_;
+            return lhs.tokens_ == rhs.tokens_;
         }
 
         friend bool operator!=( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
