@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-//#if !(defined(__GNUC__) && (__GNUC__ == 4)) && (defined(__GNUC__) && __GNUC_MINOR__ < 9)
+#if !(defined(__GNUC__) && (__GNUC__ == 4)) || !(defined(__GNUC__) && __GNUC_MINOR__ < 9)
 
 TEST_CASE("jsonpath stateful allocator test")
 {
@@ -56,4 +56,4 @@ TEST_CASE("jsonpath stateful allocator test")
     std::cout << pretty_print(r) << "\n";
 }
 
-//#endif
+#endif
