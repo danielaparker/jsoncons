@@ -1,10 +1,21 @@
-0.170.0
+0.170.0 (next release)
 -------
 
 Defect fixes:
 
-- Fixed issue [danielaparker/jsoncons#416] where test with jsonpath `length` operator failed
-for length of zero. 
+- Fixed issue #416 where test with jsonpath `length` operator failed
+for length of zero.
+ 
+- Fixed issue #411 where an overeager g++ 12.2.0 compiler reported a
+spurious `stringop-overflow` warning.
+
+- Merged PR #406 that fixed multiple float parsing and boolean pretty print 
+issues with wjson. This included reverting a change to use `std::from_chars`
+in 0.169.0.
+
+Enhancements:
+
+- The jsonpath library now works with stateful allocators.
 
 0.169.0
 -------
