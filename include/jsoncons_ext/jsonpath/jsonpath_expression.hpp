@@ -2573,8 +2573,8 @@ namespace detail {
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
 
-            evaluator_type e{ std::allocator<char>() };
-            path_expression_type expr = e.compile(*resources, path);
+            evaluator_type evaluator{ std::allocator<char>() };
+            path_expression_type expr = evaluator.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
 
@@ -2584,8 +2584,8 @@ namespace detail {
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions, alloc);
 
-            evaluator_type e{alloc};
-            path_expression_type expr = e.compile(*resources, path);
+            evaluator_type evaluator{alloc};
+            path_expression_type expr = evaluator.compile(*resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr), alloc);
         }
 
@@ -2594,8 +2594,8 @@ namespace detail {
                                            std::error_code& ec)
         {
             auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
-            evaluator_type e{std::allocator<char_type>()};
-            path_expression_type expr = e.compile(*resources, path, ec);
+            evaluator_type evaluator{std::allocator<char_type>()};
+            path_expression_type expr = evaluator.compile(*resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
     };

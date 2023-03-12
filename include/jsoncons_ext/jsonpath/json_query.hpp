@@ -50,8 +50,8 @@ namespace jsonpath {
         using json_location_type = typename jsonpath_traits_type::json_location_type;
 
         auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
-        evaluator_type e;
-        path_expression_type expr = e.compile(*static_resources, path);
+        evaluator_type evaluator;
+        path_expression_type expr = evaluator.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto callback = [&new_value](const json_location_type&, reference v)
@@ -74,8 +74,8 @@ namespace jsonpath {
         using json_location_type = typename jsonpath_traits_type::json_location_type;
 
         auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
-        evaluator_type e;
-        path_expression_type expr = e.compile(*static_resources, path);
+        evaluator_type evaluator;
+        path_expression_type expr = evaluator.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto f = [callback](const json_location_type&, reference v)
@@ -100,8 +100,8 @@ namespace jsonpath {
         using json_location_type = typename jsonpath_traits_type::json_location_type;
 
         auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
-        evaluator_type e;
-        path_expression_type expr = e.compile(*static_resources, path);
+        evaluator_type evaluator;
+        path_expression_type expr = evaluator.compile(*static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
