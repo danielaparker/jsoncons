@@ -3,8 +3,8 @@
 
 Defect fixes:
 
-- Fixed issue danielaparker/jsoncons/#416 where test with jsonpath `length` operator failed
-for length of zero.
+- Fixed issue danielaparker/jsoncons/#416 where `length` operator failed
+for array of length zero.
  
 - Fixed issue danielaparker/jsoncons/#411 where an overeager g++ 12.2.0 compiler reported a
 spurious `stringop-overflow` warning.
