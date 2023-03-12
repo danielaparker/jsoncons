@@ -15,7 +15,6 @@
 #include <utility> // std::move
 #include <algorithm> // std::copy
 #include <iterator> // std::back_inserter
-#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 namespace jsoncons { namespace jsonpath {
 
