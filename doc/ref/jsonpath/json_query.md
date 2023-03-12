@@ -7,36 +7,52 @@
 ```c++
 template<class Json>
 Json json_query(const Json& root value, 
-                const Json::string_view_type& expr,
-                result_options options = result_options());       (until 0.164.0)
-
-template<class Json>                                          (1)
+    const Json::string_view_type& expr,                                     (until 0.164.0)
+    result_options options = result_options());                             
+                                                                       (1)
+template<class Json>                                              
 Json json_query(const Json& root value, 
-                const Json::string_view_type& expr,
-                result_options options = result_options(),
-                const custom_functions<Json>& funcs = 
-                    custom_functions<Json>());                    (since 0.164.0)
+    const Json::string_view_type& expr,                                     (since 0.164.0)
+    result_options options = result_options(),
+    const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
 ```c++
 template<class Json, class BinaryCallback>
 void json_query(const Json& root value, 
-                const Json::string_view_type& expr,
-                BinaryCallback callback
-                result_options options = result_options());       (until 0.164.0)
-
-template<class Json, class BinaryCallback>                    (2)
+    const Json::string_view_type& expr,                                     (until 0.164.0)
+    BinaryCallback callback
+    result_options options = result_options());       
+                                                                       (2)
+template<class Json, class BinaryCallback>                        
 void json_query(const Json& root value, 
-                const Json::string_view_type& expr,
-                BinaryCallback callback,
-                result_options options = result_options(),
-                const custom_functions<Json>& funcs = 
-                    custom_functions<Json>());                      (since 0.164.0)
+    const Json::string_view_type& expr,                                     (since 0.164.0)
+    BinaryCallback callback,
+    result_options options = result_options(),
+    const custom_functions<Json>& funcs = custom_functions<Json>());        
+```
+
+```c++
+template<class Json>                                              
+Json json_query(std::allocator_arg_t, const Alloc& alloc, 
+    const Json& root value, const Json::string_view_type& expr,        (3) (since 0.170.0)
+    result_options options = result_options(),
+    const custom_functions<Json>& funcs = custom_functions<Json>());                    
+```
+```c++
+template<class Json, class BinaryCallback>                        
+void json_query(std::allocator_arg_t, const Alloc& alloc, 
+    const Json& root value, const Json::string_view_type& expr,        (4) (since 0.170.0)
+    BinaryCallback callback,
+    result_options options = result_options(),
+    const custom_functions<Json>& funcs = custom_functions<Json>());                      
 ```
 (1) Evaluates the root value against the JSONPath expression `expr` and returns an array of values or 
 normalized path expressions. 
 
 (2) Evaluates the root value against the JSONPath expression `expr` and calls a provided
 callback repeatedly with the results. 
+
+(3)-(4) Same as (1-2) except that `alloc` is used to allocate memory.
 
 #### Parameters
 
