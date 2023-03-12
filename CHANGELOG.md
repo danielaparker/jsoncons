@@ -23,7 +23,9 @@ in 0.169.0.
 
 Enhancements:
 
-- The jsonpath library now works with stateful allocators.
+- The jsonpath library now works with stateful allocators. In particular, the `json_query` and
+`make_expression` functions now accept an allocator argument for use in allocating memory
+during expression compilation and evaluation.
 
 - Merged PR danielaparker/jsoncons/#395 that added a `ser_context::end_position()` function.
 

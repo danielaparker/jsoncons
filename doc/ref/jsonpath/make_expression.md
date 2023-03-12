@@ -45,7 +45,7 @@ jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc,
 
 (2-3) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
-(4-6) Same as (1-3) except that `alloc` is used to allocate memory.
+(4-6) Same as (1-3) except that `alloc` is used to allocate memory during expression compilation and evaluation.
 
 #### Parameters
 

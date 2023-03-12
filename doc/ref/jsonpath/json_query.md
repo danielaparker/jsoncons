@@ -52,7 +52,7 @@ normalized path expressions.
 (2) Evaluates the root value against the JSONPath expression `expr` and calls a provided
 callback repeatedly with the results. 
 
-(3)-(4) Same as (1-2) except that `alloc` is used to allocate memory.
+(3)-(4) Same as (1-2) except that `alloc` is used to allocate memory during expression compilation and evaluation.
 
 #### Parameters
 
