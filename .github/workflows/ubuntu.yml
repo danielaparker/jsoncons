@@ -22,9 +22,9 @@ jobs:
         CC:   gcc-10
         CXX:  g++-10
     - name: build
-      run: cmake --build build --parallel 10
+      run: cmake --build build
     - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+      run: cd build ; ctest --output-on-failure
 
   gcc_build12:
     runs-on: ubuntu-latest
