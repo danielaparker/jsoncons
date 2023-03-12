@@ -61,7 +61,7 @@ TEST_CASE("jsonpath stateful allocator test")
         CHECK(result[0].as_string_view() == "Sword of Honour");
         CHECK(result[1].as_string_view() == "Moby Dick");
     }
-    SECTION("json_query")
+    SECTION("json_query 1")
     {
         json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
                                                               FreelistAllocator<char>(2));
@@ -73,11 +73,74 @@ TEST_CASE("jsonpath stateful allocator test")
 
         my_json j = decoder.get_result();
 
-        auto result = jsoncons::jsonpath::json_query(std::allocator_arg, myAlloc, j,"$..book[?(@.category == 'fiction')].title");
+        auto result = jsoncons::jsonpath::json_query(std::allocator_arg, myAlloc, 
+            j,"$..book[?(@.category == 'fiction')].title");
 
         CHECK(result.size() == 2);
         CHECK(result[0].as_string_view() == "Sword of Honour");
         CHECK(result[1].as_string_view() == "Moby Dick");
+    }
+    SECTION("json_query 2")
+    {
+        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
+                                                              FreelistAllocator<char>(2));
+
+        auto myAlloc = FreelistAllocator<char>(3);        
+
+        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        reader.read();
+
+        my_json j = decoder.get_result();
+
+        jsonpath::json_query(std::allocator_arg, myAlloc, 
+            j, "$..book[?(@.title == 'Sword of Honour')].title", 
+            [](const my_json::string_view_type&, const my_json& title) 
+            {
+                CHECK((title.as<jsoncons::string_view>() == "Sword of Honour")); 
+            }
+        );
+    }
+    SECTION("json_replace 1")
+    {
+        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
+                                                              FreelistAllocator<char>(2));
+
+        auto myAlloc = FreelistAllocator<char>(3);        
+
+        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        reader.read();
+
+        my_json j = decoder.get_result();
+
+        jsonpath::json_replace(std::allocator_arg, myAlloc,
+            j,"$..book[?(@.price==12.99)].price", 30.9);
+
+        CHECK(30.9 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
+    }
+    SECTION("json_replace 2")
+    {
+        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
+                                                              FreelistAllocator<char>(2));
+
+        auto myAlloc = FreelistAllocator<char>(3);        
+
+        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        reader.read();
+
+        my_json j = decoder.get_result();
+
+        // make a discount on all books
+        jsonpath::json_replace(std::allocator_arg, myAlloc,
+            j, "$.store.book[*].price",
+            [](const typename my_json::string_view_type&, my_json& price) 
+            {
+                price = my_json(std::round(price.as<double>() - 1.0), semantic_tag::none); 
+            }
+        );
+
+        CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
+        CHECK(8.0 == Approx(j["store"]["book"][2]["price"].as<double>()).epsilon(0.001));
     }
 }
 

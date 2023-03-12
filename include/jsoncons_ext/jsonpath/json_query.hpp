@@ -105,7 +105,7 @@ namespace jsonpath {
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc};
         auto callback = [&new_value](const json_location_type&, reference v)
         {
-            v = std::forward<T>(new_value);
+            v = Json(std::forward<T>(new_value), semantic_tag::none);
         };
         expr.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
     }
