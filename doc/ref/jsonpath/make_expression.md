@@ -29,12 +29,23 @@ jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc,
     Json::string_view_type& expr,
     const custom_functions<Json>& funcs = custom_functions<Json>());                
 ```
+```c++
+template <class Json, class Alloc>                                              (5) (since 0.170.0)
+jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
+    Json::string_view_type& expr, std::error_code& ec);                
+```
+```c++
+template <class Json, class Alloc>                                              (6) (since 0.170.0)
+jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
+    Json::string_view_type& expr,
+    const custom_functions<Json>& funcs, std::error_code& ec);                
+```
 
 (1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
 (2-3) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
-(4) Same as (1) except that alloc is used to allocate memory.
+(4-6) Same as (1-3) except that `alloc` is used to allocate memory.
 
 #### Parameters
 
