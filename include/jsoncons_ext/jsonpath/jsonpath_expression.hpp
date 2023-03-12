@@ -2639,7 +2639,7 @@ namespace detail {
     template <class Json, class Alloc>
     jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
         const typename Json::string_view_type& path, 
-        const custom_functions<Json>&, std::error_code& ec)
+        const custom_functions<Json>& functions, std::error_code& ec)
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json>;
 
