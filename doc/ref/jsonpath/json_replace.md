@@ -6,29 +6,46 @@
 ```c++
 template<class Json, class T>
 void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value, 
-                  result_options options = result_options::nodups);                              (until 0.164.0)
+    result_options options = result_options::nodups);                                            (until 0.164.0)
 
 template<class Json, class T>
 void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value,             (1)
-                  result_options options = result_options::nodups,
-                  const custom_functions<Json>& funcs = custom_functions<Json>());               (since 0.164.0)
+    result_options options = result_options::nodups,
+    const custom_functions<Json>& funcs = custom_functions<Json>());                             (since 0.164.0)
 ```
 
 ```c++
 template<class Json, class BinaryCallback>
 void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
-                  result_options options = result_options::nodups);                              (until 0.164.0)
+    result_options options = result_options::nodups);                                            (until 0.164.0)
 
 template<class Json, class BinaryCallback>                                                   (2)
 void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
-                  result_options options = result_options::nodups,
-                  const custom_functions<Json>& funcs = custom_functions<Json>());               (since 0.164.0)
+    result_options options = result_options::nodups,
+    const custom_functions<Json>& funcs = custom_functions<Json>());                              (since 0.164.0)
+```
+```c++
+template<class Json, class T, class Alloc>
+void json_replace(std::allocator_arg_t, const Alloc& alloc, 
+    Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.170.0)
+    result_options options = result_options::nodups,
+    const custom_functions<Json>& funcs = custom_functions<Json>());               
+```
+
+```c++
+template<class Json, class BinaryCallback>                                                   
+void json_replace(std::allocator_arg_t, const Alloc& alloc, 
+    Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.170.0)
+    result_options options = result_options::nodups,
+    const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
 (1) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
 
 (2) Searches for all values that match a JSONPath expression `expr` and, for each result, 
 calls a callback provided by the user with a path and mutable reference to the value.
+
+(3)-(4) Same as (1-2) except that `alloc` is used to allocate memory during expression compilation and evaluation.
 
 #### Parameters
 
