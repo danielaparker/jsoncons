@@ -36,10 +36,10 @@ namespace jsonpath {
     }
 
     template<class Json, class Alloc>
-    Json json_query(std::allocator_arg_t, const Alloc& alloc, const Json& instance,
-                    const typename Json::string_view_type& path, 
-                    result_options options = result_options(),
-                    const custom_functions<Json>& functions = custom_functions<Json>())
+    Json json_query(std::allocator_arg_t, const Alloc& alloc, 
+        const Json& instance, const typename Json::string_view_type& path, 
+        result_options options = result_options(),
+        const custom_functions<Json>& functions = custom_functions<Json>())
     {
         auto expr = make_expression<Json>(std::allocator_arg, alloc, path, functions);
         return expr.evaluate(instance, options);
