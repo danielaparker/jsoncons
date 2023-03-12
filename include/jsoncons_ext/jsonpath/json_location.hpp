@@ -15,6 +15,7 @@
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
@@ -331,18 +332,7 @@ namespace jsonpath {
                     case json_location_node_kind::name:
                         buffer.push_back('[');
                         buffer.push_back('\'');
-                        for (auto c : node->name())
-                        {
-                            if (c == '\'')
-                            {
-                                buffer.push_back('\\');
-                                buffer.push_back('\'');
-                            }
-                            else
-                            {
-                                buffer.push_back(c);
-                            }
-                        }
+                        jsoncons::jsonpath::escape_string(node->name().data(), node->name().size(), buffer);
                         buffer.push_back('\'');
                         buffer.push_back(']');
                         break;

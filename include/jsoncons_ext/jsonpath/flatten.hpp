@@ -16,64 +16,9 @@
 #include <algorithm> // std::copy
 #include <iterator> // std::back_inserter
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { namespace jsonpath {
-
-    template <class CharT, class Sink>
-    std::size_t escape_string(const CharT* s, std::size_t length,
-                              Sink& sink)
-    {
-        std::size_t count = 0;
-        const CharT* begin = s;
-        const CharT* end = s + length;
-        for (const CharT* it = begin; it != end; ++it)
-        {
-            CharT c = *it;
-            switch (c)
-            {
-                case '\\':
-                    sink.push_back('\\');
-                    sink.push_back('\\');
-                    count += 2;
-                    break;
-                case '\'':
-                    sink.push_back('\\');
-                    sink.push_back('\'');
-                    count += 2;
-                    break;
-                case '\b':
-                    sink.push_back('\\');
-                    sink.push_back('b');
-                    count += 2;
-                    break;
-                case '\f':
-                    sink.push_back('\\');
-                    sink.push_back('f');
-                    count += 2;
-                    break;
-                case '\n':
-                    sink.push_back('\\');
-                    sink.push_back('n');
-                    count += 2;
-                    break;
-                case '\r':
-                    sink.push_back('\\');
-                    sink.push_back('r');
-                    count += 2;
-                    break;
-                case '\t':
-                    sink.push_back('\\');
-                    sink.push_back('t');
-                    count += 2;
-                    break;
-                default:
-                    sink.push_back(c);
-                    ++count;
-                    break;
-            }
-        }
-        return count;
-    }
 
     template<class Json>
     void flatten_(const typename Json::string_type& parent_key,
