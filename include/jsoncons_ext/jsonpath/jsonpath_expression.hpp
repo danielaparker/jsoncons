@@ -2567,26 +2567,6 @@ namespace detail {
                 return expr_.evaluate(resources, instance, resources.current_path_node(), instance, options);
             }
         }
-
-        static jsonpath_expression compile(const string_view_type& path, 
-                                           const custom_functions<Json>& functions)
-        {
-            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
-
-            evaluator_type evaluator{ std::allocator<char>() };
-            path_expression_type expr = evaluator.compile(*resources, path);
-            return jsonpath_expression(std::move(resources), std::move(expr));
-        }
-
-        static jsonpath_expression compile(const string_view_type& path, 
-                                           const custom_functions<Json>& functions, 
-                                           std::error_code& ec)
-        {
-            auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions);
-            evaluator_type evaluator{std::allocator<char_type>()};
-            path_expression_type expr = evaluator.compile(*resources, path, ec);
-            return jsonpath_expression(std::move(resources), std::move(expr));
-        }
     };
 
     template <class Json>
