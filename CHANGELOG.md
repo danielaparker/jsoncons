@@ -14,6 +14,9 @@ for array of length zero.
 - Fixed issue danielaparker/jsoncons/#411 where an overeager g++ 12.2.0 compiler reported a
 spurious `stringop-overflow` warning.
 
+- Fixed issue danielaparker/jsoncons/#410 where `jsoncons::jsonpath::json_location::to_string`
+escaped only single quotes.
+
 - Merged PR danielaparker/jsoncons/#406 that fixed multiple float parsing and boolean pretty print 
 issues with wjson. This included reverting a change to use `std::from_chars`
 in 0.169.0.
