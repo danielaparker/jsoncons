@@ -24,7 +24,7 @@ namespace jsonpath {
     }
 
     template<class Json,class Callback>
-    typename std::enable_if<traits_extension::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
+    typename std::enable_if<traits_extension::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
     json_query(const Json& instance, 
                const typename Json::string_view_type& path, 
                Callback callback,
@@ -32,6 +32,28 @@ namespace jsonpath {
                const custom_functions<Json>& functions = custom_functions<Json>())
     {
         auto expr = make_expression<Json>(path, functions);
+        expr.evaluate(instance, callback, options);
+    }
+
+    template<class Json, class Alloc>
+    Json json_query(std::allocator_arg_t, const Alloc& alloc, const Json& instance,
+                    const typename Json::string_view_type& path, 
+                    result_options options = result_options(),
+                    const custom_functions<Json>& functions = custom_functions<Json>())
+    {
+        auto expr = make_expression<Json>(std::allocator_arg, alloc, path, functions);
+        return expr.evaluate(instance, options);
+    }
+
+    template<class Json,class Callback,class Alloc>
+    typename std::enable_if<traits_extension::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    json_query(std::allocator_arg_t, const Alloc& alloc, const Json& instance,
+               const typename Json::string_view_type& path, 
+               Callback callback,
+               result_options options = result_options(),
+               const custom_functions<Json>& functions = custom_functions<Json>())
+    {
+        auto expr = make_expression<Json>(std::allocator_arg, alloc, path, functions);
         expr.evaluate(instance, callback, options);
     }
 
@@ -86,7 +108,7 @@ namespace jsonpath {
     }
 
     template<class Json, class BinaryCallback>
-    typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const std::basic_string<typename Json::char_type>&,Json&>::value,void>::type
+    typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
                  result_options options = result_options::nodups,
                  const custom_functions<Json>& funcs = custom_functions<Json>())

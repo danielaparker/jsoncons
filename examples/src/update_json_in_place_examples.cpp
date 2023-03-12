@@ -46,7 +46,7 @@ namespace {
 
         bool visit_key(const string_view_type& key, const ser_context&, std::error_code&) override
         {
-            current_.back() = key;
+            current_.back() = std::string(key);
             return true;
         }
 
@@ -72,13 +72,16 @@ namespace {
                          const std::string& from,
                          const std::string& to)
     {
-        string_locator locator(input.data(), input.size(), path, from);
-        jsoncons::json_string_reader reader(input, locator);
-        reader.read();
-
-        for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)
+        if (input.size() > 0)
         {
-            input.replace(*it, from.size(), to);
+            string_locator locator(&input[0], input.size(), path, from);
+            jsoncons::json_string_reader reader(input, locator);
+            reader.read();
+
+            for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)
+            {
+                input.replace(*it, from.size(), to);
+            }
         }
     }
 

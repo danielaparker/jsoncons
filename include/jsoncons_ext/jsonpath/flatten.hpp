@@ -76,7 +76,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json>
-    void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
+    void flatten_(const typename Json::string_type& parent_key,
                   const Json& parent_value,
                   Json& result)
     {
@@ -139,7 +139,7 @@ namespace jsoncons { namespace jsonpath {
     Json flatten(const Json& value)
     {
         Json result;
-        std::basic_string<typename Json::char_type> parent_key = {'$'};
+        typename Json::string_type parent_key = {'$'};
         flatten_(parent_key, value, result);
         return result;
     }

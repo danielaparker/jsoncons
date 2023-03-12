@@ -1,6 +1,11 @@
 0.170.0 (next release)
 -------
 
+Changed:
+
+- Removed static functions `jsonpath_expression::compile`. These have long been
+superceded with function `make_expression`.
+
 Defect fixes:
 
 - Fixed issue danielaparker/jsoncons/#416 where `length` operator failed
