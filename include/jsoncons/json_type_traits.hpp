@@ -338,11 +338,11 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
         }
         static Json to_json(jsoncons::null_type)
         {
-            return Json::null();
+            return Json(jsoncons::null_type{}, semantic_tag::none);
         }
         static Json to_json(jsoncons::null_type, const allocator_type&)
         {
-            return Json::null();
+            return Json(jsoncons::null_type{}, semantic_tag::none);
         }
     };
 

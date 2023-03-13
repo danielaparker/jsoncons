@@ -147,4 +147,48 @@ TEST_CASE("jsonschema-tests")
 
         jsonschema_tests("./jsonschema/input/compliance/draft7/optional/content.json");
     }
+
+
+    SECTION("#417")
+    {
+        jsoncons::json schema = jsoncons::json::parse(R"(
+    {
+      "$id": "https://example.com/polygon",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$defs": {
+        "point": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" }
+          },
+          "additionalProperties": false,
+          "required": [ "x", "y" ]
+        }
+      },
+      "type": "array",
+      "items": { "$ref": "#/$defs/point" },
+      "minItems": 3,
+      "maxItems": 1
+    }
+            )");
+
+            jsoncons::json instance = jsoncons::json::parse(R"(
+    [
+      {
+        "x": 2.5,
+        "y": 1.3
+      },
+      {
+        "x": 1,
+        "z": 6.7
+      }
+    ]
+            )");
+
+            auto sch = jsoncons::jsonschema::make_schema(schema);
+            jsoncons::jsonschema::json_validator<jsoncons::json> validator(sch);
+
+            CHECK_FALSE(validator.is_valid(instance));
+    }
 }
