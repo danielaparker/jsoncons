@@ -78,6 +78,20 @@ TEST_CASE("jsonpath json_query json test")
     }
 }
 
+TEST_CASE("jsonpath normalized path test")
+{
+   const json j = json::parse(R"({"\\":0})");
+
+   const std::string path = R"($['\\'])";
+   auto paths = jsonpath::json_query(j, path, jsonpath::result_options::path);
+   CHECK(paths.size() == 1);
+
+   auto result = jsonpath::json_query(j, paths[0].as_string_view());
+
+   CHECK(result.size() == 1);
+   CHECK(result[0].as<int>() == 0);
+}
+
 TEST_CASE("jsonpath json_query wjson test")
 {
     wjson j;
