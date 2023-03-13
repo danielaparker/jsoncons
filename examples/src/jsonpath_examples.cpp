@@ -808,41 +808,48 @@ namespace {
         using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
         std::string json_string = R"(
-    { "store": {
-        "book": [ 
-          { "category": "reference",
-            "author": "Nigel Rees",
-            "title": "Sayings of the Century",
-            "price": 8.95
-          },
-          { "category": "fiction",
-            "author": "Evelyn Waugh",
-            "title": "Sword of Honour",
-            "price": 12.99
-          },
-          { "category": "fiction",
-            "author": "Herman Melville",
-            "title": "Moby Dick",
-            "isbn": "0-553-21311-3",
-            "price": 8.99
-          }
-        ]
-      }
-    }
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
     )";
 
-        jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, my_alloc(1), my_alloc(2));
+        auto alloc = my_alloc(1);        
 
-        auto myAlloc = my_alloc(3);        
+        jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
 
-        jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_string, decoder, myAlloc);
+        jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_string, decoder, alloc);
         reader.read();
 
         my_json doc = decoder.get_result();
         std::cout << pretty_print(doc) << "\n\n";
 
-        jsoncons::string_view p{"$..book[?(@.category == 'fiction')].title"};
-        auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);  
+        jsoncons::string_view p{"$.books[?(@.category == 'fiction')].title"};
+        auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, alloc, p);  
         auto result = expr.evaluate(doc);
 
         std::cout << pretty_print(result) << "\n\n";

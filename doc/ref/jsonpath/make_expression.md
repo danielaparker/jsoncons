@@ -198,3 +198,42 @@ Output:
 ```
 [{"bar": 10,"foo": 60}]
 ```
+
+#### make_expression with stateful allocator
+
+```
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include "sample_allocators.hpp" // for FreelistAllocator
+
+using my_alloc = FreelistAllocator<char>; // an allocator with a single-argument constructor
+using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
+
+int main()
+{
+    auto alloc = my_alloc(1);        
+
+    jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+
+    std::ifstream is("./input/books.json");
+
+    jsoncons::basic_json_reader<char,jsoncons::stream_source<char>,my_alloc> reader(is, decoder, alloc);
+    reader.read();
+
+    my_json doc = decoder.get_result();
+
+    jsoncons::string_view p{"$.books[?(@.category == 'fiction')].title"};
+    auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, alloc, p);  
+    auto result = expr.evaluate(doc);
+
+    std::cout << pretty_print(result) << "\n\n";
+}
+```
+Output:
+```json
+[
+    "A Wild Sheep Chase",
+    "The Night Watch",
+    "The Comedians"
+]
+```
