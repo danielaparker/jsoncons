@@ -225,9 +225,9 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
             return j.template as_integer<T>();
         }
 
-        static Json to_json(T val, const allocator_type& = allocator_type())
+        static Json to_json(T val, const allocator_type& alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none);
+            return Json(val, semantic_tag::none, alloc);
         }
     };
 
