@@ -54,7 +54,7 @@ TEST_CASE("jsonpath stateful allocator test")
         my_json j = decoder.get_result();
 
         jsoncons::string_view p{"$..book[?(@.category == 'fiction')].title"};
-        auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);   // this will not compile
+        auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);  
         auto result = expr.evaluate(j);
 
         CHECK(result.size() == 2);
@@ -134,7 +134,7 @@ TEST_CASE("jsonpath stateful allocator test")
             j, "$.store.book[*].price",
             [](const typename my_json::string_view_type&, my_json& price) 
             {
-                price = my_json(std::round(price.as<double>() - 1.0), semantic_tag::none); 
+                price = std::round(price.as<double>() - 1.0); 
             }
         );
 
