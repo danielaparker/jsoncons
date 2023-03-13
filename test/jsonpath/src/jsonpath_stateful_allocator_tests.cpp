@@ -94,7 +94,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
         jsonpath::json_query(std::allocator_arg, myAlloc, 
             j, "$..book[?(@.title == 'Sword of Honour')].title", 
-            [](const my_json::string_view_type&, const my_json& title) 
+            [](const jsoncons::string_view&, const my_json& title) 
             {
                 CHECK((title.as<jsoncons::string_view>() == "Sword of Honour")); 
             }
@@ -132,7 +132,7 @@ TEST_CASE("jsonpath stateful allocator test")
         // make a discount on all books
         jsonpath::json_replace(std::allocator_arg, myAlloc,
             j, "$.store.book[*].price",
-            [](const typename my_json::string_view_type&, my_json& price) 
+            [](const jsoncons::string_view&, my_json& price) 
             {
                 price = std::round(price.as<double>() - 1.0); 
             }

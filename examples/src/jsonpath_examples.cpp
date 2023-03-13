@@ -7,6 +7,7 @@
 #include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include "sample_allocators.hpp"
 
 // for brevity
 using jsoncons::json; 
@@ -801,6 +802,52 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
     }
 
+    void make_expression_with_stateful_allocator()
+    {
+        using my_alloc = FreelistAllocator<char>; // an allocator with a single-argument constructor
+        using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
+
+        std::string json_string = R"(
+    { "store": {
+        "book": [ 
+          { "category": "reference",
+            "author": "Nigel Rees",
+            "title": "Sayings of the Century",
+            "price": 8.95
+          },
+          { "category": "fiction",
+            "author": "Evelyn Waugh",
+            "title": "Sword of Honour",
+            "price": 12.99
+          },
+          { "category": "fiction",
+            "author": "Herman Melville",
+            "title": "Moby Dick",
+            "isbn": "0-553-21311-3",
+            "price": 8.99
+          }
+        ]
+      }
+    }
+    )";
+
+        jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, my_alloc(1), my_alloc(2));
+
+        auto myAlloc = my_alloc(3);        
+
+        jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_string, decoder, myAlloc);
+        reader.read();
+
+        my_json doc = decoder.get_result();
+        std::cout << pretty_print(doc) << "\n\n";
+
+        jsoncons::string_view p{"$..book[?(@.category == 'fiction')].title"};
+        auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, myAlloc, p);  
+        auto result = expr.evaluate(doc);
+
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -837,6 +884,8 @@ void jsonpath_examples()
 
     union_example();
     parent_operator_example();
+
+    make_expression_with_stateful_allocator();
     std::cout << "\n";
 }
 

@@ -464,11 +464,11 @@ int main()
 
         bson_examples();
 
-        jsonpath_examples();
-
         json_merge_patch_examples();
 
         json_reader_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {
