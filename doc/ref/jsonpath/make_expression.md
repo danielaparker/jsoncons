@@ -201,7 +201,7 @@ Output:
 
 #### make_expression with stateful allocator
 
-```
+```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include "sample_allocators.hpp" // for FreelistAllocator
