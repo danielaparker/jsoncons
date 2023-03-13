@@ -1,4 +1,4 @@
-// Copyright 2018 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
 #include <boost/pool/pool_alloc.hpp>

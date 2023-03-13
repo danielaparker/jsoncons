@@ -202,6 +202,7 @@ Output:
 #### make_expression with stateful allocator
 
 ```c++
+#include <string_view> // Assuming C++ 17
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include "sample_allocators.hpp" // for FreelistAllocator
@@ -222,7 +223,7 @@ int main()
 
     my_json doc = decoder.get_result();
 
-    jsoncons::string_view p{"$.books[?(@.category == 'fiction')].title"};
+    std::string_view p{"$.books[?(@.category == 'fiction')].title"};
     auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, alloc, p);  
     auto result = expr.evaluate(doc);
 

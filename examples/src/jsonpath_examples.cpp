@@ -1,7 +1,7 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
-#include <string>
+#include <string_view>
 #include <fstream>
 #include <cmath>
 #include <cassert>
@@ -848,7 +848,7 @@ namespace {
         my_json doc = decoder.get_result();
         std::cout << pretty_print(doc) << "\n\n";
 
-        jsoncons::string_view p{"$.books[?(@.category == 'fiction')].title"};
+        std::string_view p{"$.books[?(@.category == 'fiction')].title"};
         auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, alloc, p);  
         auto result = expr.evaluate(doc);
 

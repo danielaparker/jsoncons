@@ -1,4 +1,4 @@
-// Copyright 2017 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -111,8 +111,8 @@ namespace {
                        const std::string& path, 
                        const std::string& value)
     {
-    	auto result = jsoncons::jsonpath::json_query(doc, path);
-    	CHECK_FALSE(result.empty()); // must match //-V521
+        auto result = jsoncons::jsonpath::json_query(doc, path);
+        CHECK_FALSE(result.empty()); // must match //-V521
         CHECK_FALSE(result.size() > 1); // too many matches //-V521
 
         auto matched_value = result[0].as<std::string>();
