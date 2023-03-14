@@ -1,4 +1,4 @@
-0.170.0 (next release)
+0.170.0 
 -------
 
 Changed:
