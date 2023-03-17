@@ -21,12 +21,22 @@ namespace jsonschema {
     {
         std::vector<schema_location> uris_;
     public:
+        compilation_context(const schema_location& location)
+            : uris_(std::vector<schema_location>{{location}})
+        {
+        }
+
+        compilation_context(schema_location&& location)
+            : uris_(std::vector<schema_location>{{std::move(location)}})
+        {
+        }
+
         explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
         }
         explicit compilation_context(std::vector<schema_location>&& uris)
-            : uris_(uris)
+            : uris_(std::move(uris))
         {
         }
 
