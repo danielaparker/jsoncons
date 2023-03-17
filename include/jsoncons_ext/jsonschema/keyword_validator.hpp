@@ -997,7 +997,7 @@ namespace jsonschema {
                         {
                             auto location = context.make_absolute_keyword_location("dependencies");
                             dependencies_.emplace(dep.key(),
-                                builder->make_required_validator(compilation_context({ {location} }),
+                                builder->make_required_validator(compilation_context(std::vector<schema_location>{{location}}),
                                                                                  dep.value().template as<std::vector<std::string>>()));
                             break;
                         }

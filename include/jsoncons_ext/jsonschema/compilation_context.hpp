@@ -25,6 +25,10 @@ namespace jsonschema {
             : uris_(uris)
         {
         }
+        explicit compilation_context(std::vector<schema_location>&& uris)
+            : uris_(uris)
+        {
+        }
 
         const std::vector<schema_location>& uris() const {return uris_;}
 
