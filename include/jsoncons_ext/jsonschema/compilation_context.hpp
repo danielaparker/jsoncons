@@ -22,7 +22,7 @@ namespace jsonschema {
     {
         std::vector<schema_location> uris_;
     public:
-        compilation_context(const std::vector<schema_location>& uris)
+        explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
         }
