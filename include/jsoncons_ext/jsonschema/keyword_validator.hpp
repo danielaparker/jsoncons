@@ -41,11 +41,9 @@ namespace jsonschema {
 
         virtual validator_pointer make_null_validator(const std::vector<schema_location>& uris) = 0;
 
-        virtual validator_pointer make_true_validator(const Json& schema,
-            const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_true_validator(const std::vector<schema_location>& uris) = 0;
 
-        virtual validator_pointer make_false_validator(const Json& schema,
-            const std::vector<schema_location>& uris) = 0;
+        virtual validator_pointer make_false_validator(const std::vector<schema_location>& uris) = 0;
 
         virtual validator_pointer make_object_validator(const Json& schema, 
                                                         const std::vector<schema_location>& uris) = 0;
@@ -774,15 +772,20 @@ namespace jsonschema {
         }
     };
 
-    // null_validator
+    // null
 
     template <class Json>
     class null_validator : public keyword_validator<Json>
     {
     public:
-        null_validator(const std::vector<schema_location>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+        null_validator(const std::string& absolute_keyword_location)
+            : keyword_validator<Json>(absolute_keyword_location)
         {
+        }
+
+        static std::unique_ptr<null_validator> compile(const compilation_context<Json>& context)
+        {
+            return jsoncons::make_unique<null_validator<Json>>(context.get_absolute_keyword_location());
         }
     private:
         void do_validate(const Json& instance, 
@@ -827,8 +830,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<true_validator> compile(abstract_keyword_validator_factory<Json>*,
-            const Json&, const compilation_context<Json>& context)
+        static std::unique_ptr<true_validator> compile(const compilation_context<Json>& context)
         {
             return jsoncons::make_unique<true_validator<Json>>(context.get_absolute_keyword_location());
         }
@@ -852,8 +854,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<false_validator> compile(abstract_keyword_validator_factory<Json>*,
-            const Json&, const compilation_context<Json>& context)
+        static std::unique_ptr<false_validator> compile(const compilation_context<Json>& context)
         {
             return jsoncons::make_unique<false_validator<Json>>(context.get_absolute_keyword_location());
         }
@@ -878,16 +879,23 @@ namespace jsonschema {
         std::vector<std::string> items_;
 
     public:
-        required_validator(const std::vector<schema_location>& uris,
-                         const std::vector<std::string>& items)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
-        required_validator(const std::string& absolute_keyword_location, const std::vector<std::string>& items)
-            : keyword_validator<Json>(absolute_keyword_location), items_(items) {}
+        required_validator(const std::string& absolute_keyword_location,
+            const std::vector<std::string>& items)
+            : keyword_validator<Json>(absolute_keyword_location), items_(items)
+        {
+        }
 
         required_validator(const required_validator&) = delete;
         required_validator(required_validator&&) = default;
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
+
+        static std::unique_ptr<required_validator> compile(const compilation_context<Json>& context,
+            const std::vector<std::string>& items)
+        {
+            return jsoncons::make_unique<required_validator<Json>>(context.get_absolute_keyword_location(), items);
+        }
+
     private:
 
         void do_validate(const Json& instance, 
