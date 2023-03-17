@@ -170,7 +170,7 @@ namespace jsonschema {
         validator_pointer make_required_validator(const std::vector<schema_location>& uris,
                                                   const std::vector<std::string>& r) override
         {
-            auto validator = required_validator<Json>::compile(compilation_context<Json>(uris), r);
+            auto validator = required_validator<Json>::compile(compilation_context(uris), r);
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
@@ -178,7 +178,7 @@ namespace jsonschema {
 
         validator_pointer make_null_validator(const std::vector<schema_location>& uris) override
         {
-            auto validator = null_validator<Json>::compile(compilation_context<Json>(uris));
+            auto validator = null_validator<Json>::compile(compilation_context(uris));
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
@@ -186,7 +186,7 @@ namespace jsonschema {
 
         validator_pointer make_true_validator(const std::vector<schema_location>& uris) override
         {
-            auto validator = true_validator<Json>::compile(compilation_context<Json>(uris));
+            auto validator = true_validator<Json>::compile(compilation_context(uris));
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
@@ -194,7 +194,7 @@ namespace jsonschema {
 
         validator_pointer make_false_validator(const std::vector<schema_location>& uris) override
         {
-            auto validator = false_validator<Json>::compile(compilation_context<Json>(uris));
+            auto validator = false_validator<Json>::compile(compilation_context(uris));
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
@@ -258,7 +258,7 @@ namespace jsonschema {
         validator_pointer make_not_validator(const Json& schema,
                                              const std::vector<schema_location>& uris) override
         {
-            auto validator = not_validator<Json>::compile(this, schema, compilation_context<Json>(uris));
+            auto validator = not_validator<Json>::compile(this, schema, compilation_context(uris));
 
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));

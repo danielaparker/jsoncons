@@ -17,7 +17,6 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
     class compilation_context
     {
         std::vector<schema_location> uris_;

@@ -384,7 +384,7 @@ namespace jsonschema {
         }
 
         static std::unique_ptr<not_validator> compile(abstract_keyword_validator_factory<Json>* builder,
-            const Json& schema, const compilation_context<Json>& context)
+            const Json& schema, const compilation_context& context)
         {
             return jsoncons::make_unique<not_validator<Json>>(context.get_absolute_keyword_location(), 
                 builder->make_keyword_validator(schema, context.uris(), {"not"}));
@@ -783,7 +783,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<null_validator> compile(const compilation_context<Json>& context)
+        static std::unique_ptr<null_validator> compile(const compilation_context& context)
         {
             return jsoncons::make_unique<null_validator<Json>>(context.get_absolute_keyword_location());
         }
@@ -830,7 +830,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<true_validator> compile(const compilation_context<Json>& context)
+        static std::unique_ptr<true_validator> compile(const compilation_context& context)
         {
             return jsoncons::make_unique<true_validator<Json>>(context.get_absolute_keyword_location());
         }
@@ -854,7 +854,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<false_validator> compile(const compilation_context<Json>& context)
+        static std::unique_ptr<false_validator> compile(const compilation_context& context)
         {
             return jsoncons::make_unique<false_validator<Json>>(context.get_absolute_keyword_location());
         }
@@ -890,7 +890,7 @@ namespace jsonschema {
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
 
-        static std::unique_ptr<required_validator> compile(const compilation_context<Json>& context,
+        static std::unique_ptr<required_validator> compile(const compilation_context& context,
             const std::vector<std::string>& items)
         {
             return jsoncons::make_unique<required_validator<Json>>(context.get_absolute_keyword_location(), items);
