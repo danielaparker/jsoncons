@@ -826,11 +826,6 @@ namespace jsonschema {
         {
         }
 
-        true_validator(const std::vector<schema_location>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
-        {
-        }
-
         static std::unique_ptr<true_validator> compile(abstract_keyword_validator_factory<Json>*,
             const Json&, const compilation_context<Json>& context)
         {
