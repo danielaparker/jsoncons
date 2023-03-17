@@ -76,6 +76,11 @@ namespace jsonschema {
             return compilation_context(new_uris);
         }
 
+        schema_location resolve_back(const schema_location& relative)
+        {
+            return relative.resolve(uris_.back());
+        }
+
         std::string make_absolute_keyword_location(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
