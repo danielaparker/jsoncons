@@ -170,68 +170,68 @@ namespace jsonschema {
         validator_pointer make_required_validator(const std::vector<schema_location>& uris,
                                                   const std::vector<std::string>& r) override
         {
-            auto sch_orig = jsoncons::make_unique<required_validator<Json>>(uris, r);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<required_validator<Json>>(uris, r);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_null_validator(const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<null_validator<Json>>(uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<null_validator<Json>>(uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_true_validator(const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<true_validator<Json>>(uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<true_validator<Json>>(uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_false_validator(const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<false_validator<Json>>(uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<false_validator<Json>>(uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_object_validator(const Json& schema,
                                                 const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<object_validator<Json>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<object_validator<Json>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_array_validator(const Json& schema,
                                                const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<array_validator<Json>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<array_validator<Json>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_string_validator(const Json& schema,
                                                 const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<string_validator<Json>>(schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<string_validator<Json>>(schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_boolean_validator(const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<boolean_validator<Json>>(uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<boolean_validator<Json>>(uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
@@ -239,9 +239,9 @@ namespace jsonschema {
                                                  const std::vector<schema_location>& uris, 
                                                  std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<integer_validator<Json>>(schema, uris, keywords);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<integer_validator<Json>>(schema, uris, keywords);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
@@ -249,54 +249,55 @@ namespace jsonschema {
                                                 const std::vector<schema_location>& uris, 
                                                 std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<number_validator<Json>>(schema, uris, keywords);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<number_validator<Json>>(schema, uris, keywords);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_not_validator(const Json& schema,
                                              const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<not_validator<Json>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = not_validator<Json>::compile(this, schema, uris);
+
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_all_of_validator(const Json& schema,
                                                 const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_any_of_validator(const Json& schema,
                                                 const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_one_of_validator(const Json& schema,
                                                 const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
         validator_pointer make_type_validator(const Json& schema,
                                               const std::vector<schema_location>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<type_validator<Json>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
+            auto validator = jsoncons::make_unique<type_validator<Json>>(this, schema, uris);
+            auto sch = validator.get();
+            subschemas_.emplace_back(std::move(validator));
             return sch;
         }
 
