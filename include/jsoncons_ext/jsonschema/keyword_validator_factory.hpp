@@ -184,9 +184,9 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_true_validator(const std::vector<schema_location>& uris) override
+        validator_pointer make_true_validator(const Json& schema, const std::vector<schema_location>& uris) override
         {
-            auto validator = jsoncons::make_unique<true_validator<Json>>(uris);
+            auto validator = true_validator<Json>::compile(this, schema, compilation_context<Json>(uris));
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
@@ -258,7 +258,7 @@ namespace jsonschema {
         validator_pointer make_not_validator(const Json& schema,
                                              const std::vector<schema_location>& uris) override
         {
-            auto validator = not_validator<Json>::compile(this, schema, uris);
+            auto validator = not_validator<Json>::compile(this, schema, compilation_context<Json>(uris));
 
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
@@ -314,7 +314,7 @@ namespace jsonschema {
                 case json_type::bool_value:
                     if (schema.template as<bool>())
                     {
-                        sch = make_true_validator(new_uris);
+                        sch = make_true_validator(schema, new_uris);
                     }
                     else
                     {
