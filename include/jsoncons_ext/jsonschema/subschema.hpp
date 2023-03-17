@@ -53,12 +53,12 @@ namespace jsonschema {
     template <class Json>
     class keyword_validator 
     {
-        std::string absolute_keyword_location_;
+        std::string schema_path_;
     public:
         using self_pointer = keyword_validator<Json>*;
 
-        keyword_validator(const std::string& absolute_keyword_location)
-            : absolute_keyword_location_(absolute_keyword_location)
+        keyword_validator(const std::string& schema_path)
+            : schema_path_(schema_path)
         {
         }
 
@@ -69,9 +69,9 @@ namespace jsonschema {
 
         virtual ~keyword_validator() = default;
 
-        const std::string& absolute_keyword_location() const
+        const std::string& schema_path() const
         {
-            return absolute_keyword_location_;
+            return schema_path_;
         }
 
         void validate(const Json& instance, 

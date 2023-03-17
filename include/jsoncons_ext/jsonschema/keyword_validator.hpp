@@ -362,9 +362,9 @@ namespace jsonschema {
         validator_pointer rule_;
 
     public:
-        not_validator(const std::string& absolute_keyword_location,
+        not_validator(const std::string& schema_path,
             validator_pointer rule)
-            : keyword_validator<Json>(absolute_keyword_location), 
+            : keyword_validator<Json>(schema_path), 
               rule_(rule)
         {
         }
@@ -389,7 +389,7 @@ namespace jsonschema {
             if (local_reporter.errors.empty())
             {
                 reporter.error(validation_output("not", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance must not be valid against schema"));
             }
@@ -521,7 +521,7 @@ namespace jsonschema {
             if (count == 0)
             {
                 reporter.error(validation_output("combined", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "No schema matched, but one of them is required to match", 
                                                  local_reporter.errors));
@@ -694,6 +694,38 @@ namespace jsonschema {
         }
     };
 
+    template <class Json,class T>
+    class maximum_validator : public keyword_validator<Json>
+    {
+        T maximum_;
+
+    public:
+        maximum_validator(const std::string& schema_path, T maximum)
+            : keyword_validator<Json>(schema_path), maximum_(maximum)
+        {
+        }
+
+        static std::unique_ptr<maximum_validator> compile(const compilation_context& context, T maximum)
+        {
+            return jsoncons::make_unique<maximum_validator<Json>>(context.get_absolute_keyword_location(), maximum);
+        }
+
+    protected:
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter, 
+                         Json&) const 
+        {
+            if (value > maximum_)
+            {
+                reporter.error(validation_output("maximum", 
+                    this->schema_path(), 
+                    instance_location.to_uri_fragment(), 
+                    instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_)));
+            }
+        }
+    };
+
     template <class Json>
     class integer_validator : public numeric_validator_base<Json,int64_t>
     {
@@ -713,7 +745,7 @@ namespace jsonschema {
             if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
             {
                 reporter.error(validation_output("integer", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance is not an integer"));
                 if (reporter.fail_early())
@@ -745,7 +777,7 @@ namespace jsonschema {
             if (!(instance.template is_integer<int64_t>() || instance.is_double()))
             {
                 reporter.error(validation_output("number", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance is not a number"));
                 if (reporter.fail_early())
@@ -764,8 +796,8 @@ namespace jsonschema {
     class null_validator : public keyword_validator<Json>
     {
     public:
-        null_validator(const std::string& absolute_keyword_location)
-            : keyword_validator<Json>(absolute_keyword_location)
+        null_validator(const std::string& schema_path)
+            : keyword_validator<Json>(schema_path)
         {
         }
 
@@ -782,7 +814,7 @@ namespace jsonschema {
             if (!instance.is_null())
             {
                 reporter.error(validation_output("null", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Expected to be null"));
             }
@@ -811,8 +843,8 @@ namespace jsonschema {
     class true_validator : public keyword_validator<Json>
     {
     public:
-        true_validator(const std::string& absolute_keyword_location)
-            : keyword_validator<Json>(absolute_keyword_location)
+        true_validator(const std::string& schema_path)
+            : keyword_validator<Json>(schema_path)
         {
         }
 
@@ -835,8 +867,8 @@ namespace jsonschema {
     class false_validator : public keyword_validator<Json>
     {
     public:
-        false_validator(const std::string& absolute_keyword_location)
-            : keyword_validator<Json>(absolute_keyword_location)
+        false_validator(const std::string& schema_path)
+            : keyword_validator<Json>(schema_path)
         {
         }
 
@@ -851,7 +883,7 @@ namespace jsonschema {
                          Json&) const override
         {
             reporter.error(validation_output("false", 
-                                             this->absolute_keyword_location(), 
+                                             this->schema_path(), 
                                              instance_location.to_uri_fragment(), 
                                              "False schema always fails"));
         }
@@ -865,9 +897,9 @@ namespace jsonschema {
         std::vector<std::string> items_;
 
     public:
-        required_validator(const std::string& absolute_keyword_location,
+        required_validator(const std::string& schema_path,
             const std::vector<std::string>& items)
-            : keyword_validator<Json>(absolute_keyword_location), items_(items)
+            : keyword_validator<Json>(schema_path), items_(items)
         {
         }
 
@@ -894,7 +926,7 @@ namespace jsonschema {
                 if (instance.find(key) == instance.object_range().end())
                 {
                     reporter.error(validation_output("required", 
-                                                     this->absolute_keyword_location(), 
+                                                     this->schema_path(), 
                                                      instance_location.to_uri_fragment(), 
                                                      "Required property \"" + key + "\" not found"));
                     if (reporter.fail_early())
@@ -1096,7 +1128,7 @@ namespace jsonschema {
                     if (!local_reporter.errors.empty())
                     {
                         reporter.error(validation_output("additionalProperties", 
-                                                         additional_properties_->absolute_keyword_location(), 
+                                                         additional_properties_->schema_path(), 
                                                          instance_location.to_uri_fragment(), 
                                                          "Additional property \"" + property.key() + "\" found but was invalid."));
                         if (reporter.fail_early())
@@ -1280,7 +1312,7 @@ namespace jsonschema {
                 if (!array_has_unique_items(instance))
                 {
                     reporter.error(validation_output("uniqueItems", 
-                                                     this->absolute_keyword_location(), 
+                                                     this->schema_path(), 
                                                      instance_location.to_uri_fragment(), 
                                                      "Array items are not unique"));
                     if (reporter.fail_early())
@@ -1342,7 +1374,7 @@ namespace jsonschema {
                 if (!contained)
                 {
                     reporter.error(validation_output("contains", 
-                                                     this->absolute_keyword_location(), 
+                                                     this->schema_path(), 
                                                      instance_location.to_uri_fragment(), 
                                                      "Expected at least one array item to match \"contains\" schema", 
                                                      local_reporter.errors));
@@ -1461,7 +1493,7 @@ namespace jsonschema {
             if (!in_range)
             {
                 reporter.error(validation_output("enum", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  instance.template as<std::string>() + " is not a valid enum value"));
                 if (reporter.fail_early())
@@ -1492,7 +1524,7 @@ namespace jsonschema {
         {
             if (const_validator_ != instance)
                 reporter.error(validation_output("const", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance is not const"));
         }
@@ -1642,7 +1674,7 @@ namespace jsonschema {
                 ss << ", found " << instance.type();
 
                 reporter.error(validation_output("type", 
-                                                 this->absolute_keyword_location(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  ss.str()));
                 if (reporter.fail_early())

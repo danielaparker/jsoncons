@@ -62,23 +62,23 @@ TEST_CASE("jsonschema output format tests")
         {
             if (o.keyword() == "minItems")
             {
-                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/minItems"));
+                CHECK(o.schema_path() == std::string("https://example.com/polygon#/minItems"));
             }
             else if (o.keyword() == "maxItems")
             {
-                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/maxItems"));
+                CHECK(o.schema_path() == std::string("https://example.com/polygon#/maxItems"));
             }
             else if (o.keyword() == "required")
             {
-                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/$defs/point/required"));
+                CHECK(o.schema_path() == std::string("https://example.com/polygon#/$defs/point/required"));
             }
             else if (o.keyword() == "additionalProperties")
             {
-                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/$defs/point/additionalProperties"));
+                CHECK(o.schema_path() == std::string("https://example.com/polygon#/$defs/point/additionalProperties"));
             }
             else
             {
-                std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.absolute_keyword_location() << "\n";
+                std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.schema_path() << "\n";
                 for (const auto& nested : o.nested_errors())
                 {
                     std::cout << "    " << nested.message() << "\n";
