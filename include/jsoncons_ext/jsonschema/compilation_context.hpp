@@ -42,9 +42,15 @@ namespace jsonschema {
 
         const std::vector<schema_location>& uris() const {return uris_;}
 
-        std::string get_absolute_keyword_location() const
+        std::string get_schema_path() const
         {
             return (!uris_.empty() && uris_.back().is_absolute()) ? uris_.back().string() : "";
+        }
+
+        template <class Json>
+        compilation_context update_uris(const Json& schema, const std::string& key) const
+        {
+            return update_uris(schema, std::vector<std::string>{{key}});
         }
 
         template <class Json>
@@ -91,7 +97,7 @@ namespace jsonschema {
             return relative.resolve(uris_.back());
         }
 
-        std::string make_absolute_keyword_location(const std::string& keyword) const
+        std::string make_schema_path_with(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
