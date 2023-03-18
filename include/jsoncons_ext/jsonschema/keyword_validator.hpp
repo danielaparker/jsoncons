@@ -753,7 +753,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            int64_t value = instance.template as<int64_t>(); 
+            T value = instance.template as<T>(); 
             if (value > value_)
             {
                 reporter.error(validation_output("maximum", 
@@ -786,7 +786,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            int64_t value = instance.template as<int64_t>(); 
+            T value = instance.template as<T>(); 
             if (value >= value_)
             {
                 reporter.error(validation_output("exclusive_maximum", 
@@ -819,7 +819,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            int64_t value = instance.template as<int64_t>(); 
+            T value = instance.template as<T>(); 
             if (value < value_)
             {
                 reporter.error(validation_output("minimum", 
@@ -852,7 +852,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            int64_t value = instance.template as<int64_t>(); 
+            T value = instance.template as<T>(); 
             if (value <= value_)
             {
                 reporter.error(validation_output("exclusive_minimum", 
@@ -885,13 +885,16 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            int64_t value = instance.template as<int64_t>(); 
-            if (!is_multiple_of(value, value_))
+            T value = instance.template as<T>();
+            if (value != 0) // Exclude zero
             {
-                reporter.error(validation_output("multipleOf", 
-                    this->schema_path(),
-                                                 instance_location.to_uri_fragment(), 
-                                                 instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
+                if (!is_multiple_of(value, value_))
+                {
+                    reporter.error(validation_output("multipleOf", 
+                        this->schema_path(),
+                        instance_location.to_uri_fragment(), 
+                        instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
+                }
             }
         }
 
@@ -951,20 +954,29 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class number_validator : public numeric_validator_base<Json,double>
+    class number_validator : public keyword_validator<Json>
     {
+        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+
+        std::vector<validator_pointer> validators_;
     public:
-        number_validator(const Json& schema,
-                          const compilation_context& context, 
-                          std::set<std::string>& keywords)
-            : numeric_validator_base<Json, double>(schema, context, keywords)
+        number_validator(const std::string& schema_path, 
+            const std::vector<validator_pointer>& validators)
+            : keyword_validator<Json>(schema_path), validators_(validators)
         {
         }
+
+        static std::unique_ptr<number_validator> compile(const compilation_context& context,
+            const std::vector<validator_pointer>& validators)
+        {
+            return jsoncons::make_unique<number_validator<Json>>(context.get_schema_path(), validators);
+        }
+
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
                          error_reporter& reporter, 
-                         Json&) const 
+                         Json& patch) const 
         {
             if (!(instance.template is_integer<int64_t>() || instance.is_double()))
             {
@@ -977,8 +989,14 @@ namespace jsonschema {
                     return;
                 }
             }
-            double value = instance.template as<double>(); 
-            this->apply_kewords(value, instance_location, instance, reporter);
+            for (const auto& validator : validators_)
+            {
+                validator->validate(instance, instance_location, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
         }
     };
 
