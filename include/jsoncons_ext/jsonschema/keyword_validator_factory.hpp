@@ -261,11 +261,10 @@ namespace jsonschema {
             auto it = schema.find("maximum");
             if (it != schema.object_range().end()) 
             {
-                auto maximum = get_number<int64_t>(it->value(), "maximum");
                 keywords.insert("maximum");
                 std::string schema_path = context1.make_schema_path_with("maximum");
                 auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = maximum_validator<Json,int64_t>::compile(context2, maximum);
+                auto validator = maximum_validator<Json,int64_t>::compile(it->value(), context2);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -338,11 +337,10 @@ namespace jsonschema {
             auto it = schema.find("maximum");
             if (it != schema.object_range().end()) 
             {
-                auto maximum = get_number<double>(it->value(), "maximum");
                 keywords.insert("maximum");
                 std::string schema_path = context.make_schema_path_with("maximum");
                 auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = maximum_validator<Json,double>::compile(context2, maximum);
+                auto validator = maximum_validator<Json,double>::compile(it->value(), context2);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }

@@ -352,6 +352,46 @@ namespace jsonschema {
         }
     };
 
+    template <class Json>
+    class max_length_validator : public keyword_validator<Json>
+    {
+        std::size_t max_length_;
+    public:
+        max_length_validator(const compilation_context& context, std::size_t max_length)
+            : keyword_validator<Json>(context.get_schema_path()), max_length_(max_length)
+        {
+        }
+
+        static std::unique_ptr<max_length_validator> compile(const compilation_context& context,
+            std::size_t max_length)
+        {
+            return jsoncons::make_unique<max_length_validator<Json>>(context.get_schema_path(), 
+                max_length);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json&) const override
+        {
+            std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
+            if (length > max_length_)
+            {
+                reporter.error(validation_output("maxLength", 
+                                                 max_length_location_, 
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::string("Expected maxLength: ") + std::to_string(max_length_)
+                    + ", actual: " + std::to_string(length)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }          
+        }
+    };
+
     // not_validator
 
     template <class Json>
@@ -540,9 +580,15 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<maximum_validator> compile(const compilation_context& context, T maximum)
+        static std::unique_ptr<maximum_validator> compile(Json schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<maximum_validator<Json,T>>(context.get_schema_path(), maximum);
+            if (!schema.is_number())
+            {
+                std::string message("maximum must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<T>();
+            return jsoncons::make_unique<maximum_validator<Json,T>>(context.get_schema_path(), value);
         }
 
     private:
