@@ -351,7 +351,7 @@ namespace jsonschema {
             }
         }
     };
-
+/*
     template <class Json>
     class max_length_validator : public keyword_validator<Json>
     {
@@ -370,7 +370,7 @@ namespace jsonschema {
                 std::string message("maxLength must be a number value");
                 JSONCONS_THROW(schema_error(message));
             }
-            auto value = schema.template as<T>();
+            auto value = schema.template as<std::size_t>();
             return jsoncons::make_unique<max_length_validator<Json>>(schema_path, value);
         }
 
@@ -396,6 +396,54 @@ namespace jsonschema {
             }          
         }
     };
+
+    // minLength
+
+    template <class Json>
+    class min_length_validator : public keyword_validator<Json>
+    {
+        std::size_t min_length_;
+
+    public:
+        min_length_validator(const std::string& schema_path, std::size_t min_length)
+            : keyword_validator<Json>(schema_path), min_length_(min_length)
+        {
+        }
+        static std::unique_ptr<min_length_validator> compile(Json schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("minLength");
+            if (!schema.is_number())
+            {
+                std::string message("minLength must be an integer value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<std::size_t>();
+            return jsoncons::make_unique<min_length_validator<Json>>(schema_path, value);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json&) const override
+        {
+            std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
+            if (length < *min_length_) 
+            {
+                reporter.error(validation_output("minLength", 
+                                                 min_length_location_, 
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::string("Expected minLength: ") + std::to_string(*min_length_)
+                                          + ", actual: " + std::to_string(length)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+        }
+    };
+*/
 
     // not_validator
 
