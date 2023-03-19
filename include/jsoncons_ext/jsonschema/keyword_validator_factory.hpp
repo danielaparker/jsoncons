@@ -279,11 +279,8 @@ namespace jsonschema {
             it = schema.find("exclusiveMaximum");
             if (it != schema.object_range().end()) 
             {
-                int64_t exclusive_maximum = get_number<int64_t>(it->value(), "exclusiveMaximum");
                 keywords.insert("exclusiveMaximum");
-                std::string schema_path = context1.make_schema_path_with("exclusiveMaximum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = exclusive_maximum_validator<Json,int64_t>::compile(context2, exclusive_maximum);
+                auto validator = exclusive_maximum_validator<Json,int64_t>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -291,11 +288,8 @@ namespace jsonschema {
             it = schema.find("exclusiveMinimum");
             if (it != schema.object_range().end()) 
             {
-                int64_t exclusive_minimum = get_number<int64_t>(it->value(), "exclusiveMinimum");
                 keywords.insert("exclusiveMinimum");
-                std::string schema_path = context1.make_schema_path_with("exclusiveMinimum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = exclusive_minimum_validator<Json,int64_t>::compile(context2, exclusive_minimum);
+                auto validator = exclusive_minimum_validator<Json,int64_t>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -333,9 +327,7 @@ namespace jsonschema {
             if (it != schema.object_range().end()) 
             {
                 keywords.insert("maximum");
-                std::string schema_path = context.make_schema_path_with("maximum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = maximum_validator<Json,double>::compile(it->value(), context2);
+                auto validator = maximum_validator<Json,double>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -352,11 +344,8 @@ namespace jsonschema {
             it = schema.find("exclusiveMaximum");
             if (it != schema.object_range().end()) 
             {
-                double exclusive_maximum = get_number<double>(it->value(), "exclusiveMaximum");
                 keywords.insert("exclusiveMaximum");
-                std::string schema_path = context1.make_schema_path_with("exclusiveMaximum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = exclusive_maximum_validator<Json,double>::compile(context2, exclusive_maximum);
+                auto validator = exclusive_maximum_validator<Json,double>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -364,11 +353,8 @@ namespace jsonschema {
             it = schema.find("exclusiveMinimum");
             if (it != schema.object_range().end()) 
             {
-                double exclusive_minimum = get_number<double>(it->value(), "exclusiveMinimum");
                 keywords.insert("exclusiveMinimum");
-                std::string schema_path = context1.make_schema_path_with("exclusiveMinimum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = exclusive_minimum_validator<Json,double>::compile(context2, exclusive_minimum);
+                auto validator = exclusive_minimum_validator<Json,double>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }

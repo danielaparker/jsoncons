@@ -620,9 +620,16 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<exclusive_maximum_validator> compile(const compilation_context& context, T value)
+        static std::unique_ptr<exclusive_maximum_validator> compile(Json schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<exclusive_maximum_validator<Json,T>>(context.get_schema_path(), value);
+            std::string schema_path = context.make_schema_path_with("exclusiveMaximum");
+            if (!schema.is_number())
+            {
+                std::string message("exclusiveMaximum must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<T>();
+            return jsoncons::make_unique<exclusive_maximum_validator<Json,T>>(schema_path, value);
         }
 
     private:
@@ -634,10 +641,10 @@ namespace jsonschema {
             T value = instance.template as<T>(); 
             if (value >= value_)
             {
-                reporter.error(validation_output("exclusive_maximum", 
+                reporter.error(validation_output("exclusiveMaximum", 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds exclusive maximum of " + std::to_string(value_)));
+                    instance.template as<std::string>() + " exceeds exclusiveMaximum of " + std::to_string(value_)));
             }
         }
     };
@@ -693,9 +700,16 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<exclusive_minimum_validator> compile(const compilation_context& context, T value)
+        static std::unique_ptr<exclusive_minimum_validator> compile(Json schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<exclusive_minimum_validator<Json,T>>(context.get_schema_path(), value);
+            std::string schema_path = context.make_schema_path_with("exclusiveMinimum");
+            if (!schema.is_number())
+            {
+                std::string message("exclusiveMinimum must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<T>();
+            return jsoncons::make_unique<exclusive_minimum_validator<Json,T>>(schema_path, value);
         }
 
     private:
@@ -707,10 +721,10 @@ namespace jsonschema {
             T value = instance.template as<T>(); 
             if (value <= value_)
             {
-                reporter.error(validation_output("exclusive_minimum", 
+                reporter.error(validation_output("exclusiveMinimum", 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds exclusive_minimum of " + std::to_string(value_)));
+                    instance.template as<std::string>() + " exceeds exclusiveMinimum of " + std::to_string(value_)));
             }
         }
     };
