@@ -653,9 +653,16 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<minimum_validator> compile(const compilation_context& context, T minimum)
+        static std::unique_ptr<minimum_validator> compile(Json schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<minimum_validator<Json,T>>(context.get_schema_path(), minimum);
+            std::string schema_path = context.make_schema_path_with("minimum");
+            if (!schema.is_number())
+            {
+                std::string message("minimum must be a number");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<T>();
+            return jsoncons::make_unique<minimum_validator<Json,T>>(schema_path, value);
         }
 
     private:

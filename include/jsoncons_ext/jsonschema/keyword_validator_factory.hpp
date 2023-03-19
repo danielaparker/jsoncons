@@ -270,11 +270,8 @@ namespace jsonschema {
             it = schema.find("minimum");
             if (it != schema.object_range().end()) 
             {
-                int64_t minimum = get_number<int64_t>(it->value(), "minimum");
                 keywords.insert("minimum");
-                std::string schema_path = context1.make_schema_path_with("minimum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = minimum_validator<Json,int64_t>::compile(context2, minimum);
+                auto validator = minimum_validator<Json,int64_t>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -346,11 +343,8 @@ namespace jsonschema {
             it = schema.find("minimum");
             if (it != schema.object_range().end()) 
             {
-                double minimum = get_number<double>(it->value(), "minimum");
                 keywords.insert("minimum");
-                std::string schema_path = context1.make_schema_path_with("minimum");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = minimum_validator<Json,double>::compile(context2, minimum);
+                auto validator = minimum_validator<Json,double>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
