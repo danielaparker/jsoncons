@@ -582,13 +582,14 @@ namespace jsonschema {
 
         static std::unique_ptr<maximum_validator> compile(Json schema, const compilation_context& context)
         {
+            std::string schema_path = context.make_schema_path_with("maximum");
             if (!schema.is_number())
             {
                 std::string message("maximum must be a number value");
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = schema.template as<T>();
-            return jsoncons::make_unique<maximum_validator<Json,T>>(context.get_schema_path(), value);
+            return jsoncons::make_unique<maximum_validator<Json,T>>(schema_path, value);
         }
 
     private:
