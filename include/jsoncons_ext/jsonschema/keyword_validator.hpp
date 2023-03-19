@@ -740,9 +740,16 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<multiple_of_validator> compile(const compilation_context& context, T multiple_of)
+        static std::unique_ptr<multiple_of_validator> compile(Json schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<multiple_of_validator<Json,T>>(context.get_schema_path(), multiple_of);
+            std::string schema_path = context.make_schema_path_with("multipleOf");
+            if (!schema.is_number())
+            {
+                std::string message("multipleOf must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<T>();
+            return jsoncons::make_unique<multiple_of_validator<Json,T>>(context.get_schema_path(), value);
         }
 
     private:

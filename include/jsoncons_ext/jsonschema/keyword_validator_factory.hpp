@@ -297,11 +297,8 @@ namespace jsonschema {
             it = schema.find("multipleOf");
             if (it != schema.object_range().end()) 
             {
-                double multiple_of = get_number<double>(it->value(), "multipleOf");
                 keywords.insert("multipleOf");
-                std::string schema_path = context1.make_schema_path_with("multipleOf");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = multiple_of_validator<Json,int64_t>::compile(context2, multiple_of);
+                auto validator = multiple_of_validator<Json,int64_t>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
@@ -362,11 +359,8 @@ namespace jsonschema {
             it = schema.find("multipleOf");
             if (it != schema.object_range().end()) 
             {
-                double multiple_of = get_number<double>(it->value(), "multipleOf");
                 keywords.insert("multipleOf");
-                std::string schema_path = context1.make_schema_path_with("multipleOf");
-                auto context2 = context1.update_uris(schema, schema_path);
-                auto validator = multiple_of_validator<Json,double>::compile(context2, multiple_of);
+                auto validator = multiple_of_validator<Json,double>::compile(it->value(), context1);
                 validators.push_back(validator.get());
                 subschemas_.emplace_back(std::move(validator));
             }
