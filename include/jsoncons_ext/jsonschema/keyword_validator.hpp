@@ -381,7 +381,8 @@ namespace jsonschema {
                          error_reporter& reporter,
                          Json&) const override
         {
-            std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
+            auto sv = instance.as_string_view();
+            std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length > max_length_)
             {
                 reporter.error(validation_output("maxLength", 
@@ -428,13 +429,14 @@ namespace jsonschema {
                          error_reporter& reporter,
                          Json&) const override
         {
-            std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
-            if (length < *min_length_) 
+            auto sv = instance.as_string_view();
+            std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
+            if (length < min_length_) 
             {
                 reporter.error(validation_output("minLength", 
                                                  this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
-                                                 std::string("Expected minLength: ") + std::to_string(*min_length_)
+                                                 std::string("Expected minLength: ") + std::to_string(min_length_)
                                           + ", actual: " + std::to_string(length)));
                 if (reporter.fail_early())
                 {
