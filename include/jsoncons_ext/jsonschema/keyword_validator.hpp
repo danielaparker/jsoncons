@@ -351,7 +351,7 @@ namespace jsonschema {
             }
         }
     };
-/*
+
     template <class Json>
     class max_length_validator : public keyword_validator<Json>
     {
@@ -385,7 +385,7 @@ namespace jsonschema {
             if (length > max_length_)
             {
                 reporter.error(validation_output("maxLength", 
-                                                 max_length_location_, 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  std::string("Expected maxLength: ") + std::to_string(max_length_)
                     + ", actual: " + std::to_string(length)));
@@ -432,7 +432,7 @@ namespace jsonschema {
             if (length < *min_length_) 
             {
                 reporter.error(validation_output("minLength", 
-                                                 min_length_location_, 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  std::string("Expected minLength: ") + std::to_string(*min_length_)
                                           + ", actual: " + std::to_string(length)));
@@ -443,7 +443,6 @@ namespace jsonschema {
             }
         }
     };
-*/
 
     // not_validator
 
