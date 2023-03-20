@@ -91,87 +91,6 @@ namespace jsonschema {
         }
     };
 
-    // string 
-
-    template <class Json>
-    class string_validator : public keyword_validator<Json>
-    {
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-
-        std::vector<validator_type> validators_;
-    public:
-        string_validator(const std::string& schema_path,
-            std::vector<validator_type>&& validators)
-            : keyword_validator<Json>(schema_path), validators_(std::move(validators))
-        {
-        }
-
-        static std::unique_ptr<string_validator> compile(const Json& schema,
-            const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("string");
-
-            std::vector<validator_type> validators;
-            auto it = schema.find("maxLength");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(max_length_validator<Json>::compile(it->value(), context));
-            }
-
-            it = schema.find("minLength");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(min_length_validator<Json>::compile(it->value(), context));
-            }
-
-            it = schema.find("contentEncoding");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(content_encoding_validator<Json>::compile(it->value(), context));
-                // If "contentEncoding" is set to "binary", a Json value
-                // of type json_type::byte_string_value is accepted.
-            }
-
-            it = schema.find("contentMediaType");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(content_media_type_validator<Json>::compile(it->value(), context));
-            }
-
-#if defined(JSONCONS_HAS_STD_REGEX)
-            it = schema.find("pattern");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(pattern_validator<Json>::compile(it->value(), context));
-            }
-#endif
-
-            it = schema.find("format");
-            if (it != schema.object_range().end())
-            {
-                validators.emplace_back(format_validator<Json>::compile(it->value(), context));
-            }
-
-            return jsoncons::make_unique<string_validator<Json>>(schema_path, std::move(validators));
-        }
-
-    private:
-        void do_validate(const Json& instance,
-            const jsonpointer::json_pointer& instance_location,
-            error_reporter& reporter,
-            Json& patch) const
-        {
-            for (const auto& validator : validators_)
-            {
-                validator->validate(instance, instance_location, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-        }
-    };
-
     // contentEncoding
 
     template <class Json>
@@ -543,7 +462,88 @@ namespace jsonschema {
         }
     };
 
-    // not_validator
+    // string 
+
+    template <class Json>
+    class string_validator : public keyword_validator<Json>
+    {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+
+        std::vector<validator_type> validators_;
+    public:
+        string_validator(const std::string& schema_path,
+            std::vector<validator_type>&& validators)
+            : keyword_validator<Json>(schema_path), validators_(std::move(validators))
+        {
+        }
+
+        static std::unique_ptr<string_validator> compile(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("string");
+
+            std::vector<validator_type> validators;
+            auto it = schema.find("maxLength");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(max_length_validator<Json>::compile(it->value(), context));
+            }
+
+            it = schema.find("minLength");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(min_length_validator<Json>::compile(it->value(), context));
+            }
+
+            it = schema.find("contentEncoding");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(content_encoding_validator<Json>::compile(it->value(), context));
+                // If "contentEncoding" is set to "binary", a Json value
+                // of type json_type::byte_string_value is accepted.
+            }
+
+            it = schema.find("contentMediaType");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(content_media_type_validator<Json>::compile(it->value(), context));
+            }
+
+#if defined(JSONCONS_HAS_STD_REGEX)
+            it = schema.find("pattern");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(pattern_validator<Json>::compile(it->value(), context));
+            }
+#endif
+
+            it = schema.find("format");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(format_validator<Json>::compile(it->value(), context));
+            }
+
+            return jsoncons::make_unique<string_validator<Json>>(schema_path, std::move(validators));
+        }
+
+    private:
+        void do_validate(const Json& instance,
+            const jsonpointer::json_pointer& instance_location,
+            error_reporter& reporter,
+            Json& patch) const
+        {
+            for (const auto& validator : validators_)
+            {
+                validator->validate(instance, instance_location, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
+        }
+    };
+
+    // not
 
     template <class Json>
     class not_validator : public keyword_validator<Json>
