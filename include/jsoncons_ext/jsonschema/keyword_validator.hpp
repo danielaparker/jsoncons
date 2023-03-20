@@ -563,7 +563,8 @@ namespace jsonschema {
         static std::unique_ptr<not_validator> compile(abstract_keyword_validator_factory<Json>* builder,
             const Json& schema, const compilation_context& context)
         {
-            return jsoncons::make_unique<not_validator<Json>>(context.get_schema_path(), 
+            std::string schema_path = context.make_schema_path_with("not");
+            return jsoncons::make_unique<not_validator<Json>>(schema_path, 
                 builder->make_keyword_validator(schema, context, {"not"}));
         }
 
@@ -900,7 +901,7 @@ namespace jsonschema {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = schema.template as<T>();
-            return jsoncons::make_unique<multiple_of_validator<Json,T>>(context.get_schema_path(), value);
+            return jsoncons::make_unique<multiple_of_validator<Json,T>>(schema_path, value);
         }
 
     private:
@@ -946,7 +947,8 @@ namespace jsonschema {
         static std::unique_ptr<integer_validator> compile(const compilation_context& context,
             const std::vector<validator_pointer>& validators)
         {
-            return jsoncons::make_unique<integer_validator<Json>>(context.get_schema_path(), validators);
+            std::string schema_path = context.make_schema_path_with("integer");
+            return jsoncons::make_unique<integer_validator<Json>>(schema_path, validators);
         }
 
     private:
@@ -993,7 +995,8 @@ namespace jsonschema {
         static std::unique_ptr<number_validator> compile(const compilation_context& context,
             const std::vector<validator_pointer>& validators)
         {
-            return jsoncons::make_unique<number_validator<Json>>(context.get_schema_path(), validators);
+            std::string schema_path = context.make_schema_path_with("number");
+            return jsoncons::make_unique<number_validator<Json>>(schema_path, validators);
         }
 
     private:
@@ -1037,7 +1040,8 @@ namespace jsonschema {
 
         static std::unique_ptr<null_validator> compile(const compilation_context& context)
         {
-            return jsoncons::make_unique<null_validator<Json>>(context.get_schema_path());
+            std::string schema_path = context.make_schema_path_with("null");
+            return jsoncons::make_unique<null_validator<Json>>(schema_path);
         }
     private:
         void do_validate(const Json& instance, 
@@ -1084,7 +1088,8 @@ namespace jsonschema {
 
         static std::unique_ptr<true_validator> compile(const compilation_context& context)
         {
-            return jsoncons::make_unique<true_validator<Json>>(context.get_schema_path());
+            std::string schema_path = context.make_schema_path_with("true");
+            return jsoncons::make_unique<true_validator<Json>>(schema_path);
         }
     private:
         void do_validate(const Json&, 
@@ -1108,7 +1113,8 @@ namespace jsonschema {
 
         static std::unique_ptr<false_validator> compile(const compilation_context& context)
         {
-            return jsoncons::make_unique<false_validator<Json>>(context.get_schema_path());
+            std::string schema_path = context.make_schema_path_with("false");
+            return jsoncons::make_unique<false_validator<Json>>(schema_path);
         }
     private:
         void do_validate(const Json&, 
@@ -1145,7 +1151,8 @@ namespace jsonschema {
         static std::unique_ptr<required_validator> compile(const compilation_context& context,
             const std::vector<std::string>& items)
         {
-            return jsoncons::make_unique<required_validator<Json>>(context.get_schema_path(), items);
+            std::string schema_path = context.make_schema_path_with("required");
+            return jsoncons::make_unique<required_validator<Json>>(schema_path, items);
         }
 
     private:
