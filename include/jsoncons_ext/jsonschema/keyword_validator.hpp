@@ -190,8 +190,8 @@ namespace jsonschema {
         {
             if (content_media_type_ == "application/Json")
             {
-                std::string content;
-                json_string_reader reader(content);
+                auto sv = instance.as_string_view();
+                json_string_reader reader(sv);
                 std::error_code ec;
                 reader.read(ec);
 
