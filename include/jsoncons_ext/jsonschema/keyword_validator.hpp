@@ -588,11 +588,11 @@ namespace jsonschema {
                          error_reporter& reporter,
                          Json&) const override
         {
-
-            if (!std::regex_search(content, regex_))
+            auto s = instance.template as<std::string>();
+            if (!std::regex_search(s, regex_))
             {
                 std::string message("String \"");
-                message.append(instance.template as<std::string>());
+                message.append(s);
                 message.append("\" does not match pattern \"");
                 message.append(pattern_string_);
                 message.append("\"");
