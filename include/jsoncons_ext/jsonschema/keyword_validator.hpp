@@ -1023,21 +1023,61 @@ namespace jsonschema {
     template <class Json>
     class number_validator : public keyword_validator<Json>
     {
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::vector<validator_pointer> validators_;
+        std::vector<validator_type> validators_;
     public:
         number_validator(const std::string& schema_path, 
-            const std::vector<validator_pointer>& validators)
-            : keyword_validator<Json>(schema_path), validators_(validators)
+            std::vector<validator_type>&& validators)
+            : keyword_validator<Json>(schema_path), validators_(std::move(validators))
         {
         }
 
-        static std::unique_ptr<number_validator> compile(const compilation_context& context,
-            const std::vector<validator_pointer>& validators)
+        static std::unique_ptr<number_validator> compile(const Json& schema,
+            const compilation_context& context, std::set<std::string>& keywords)
         {
             std::string schema_path = context.make_schema_path_with("number");
-            return jsoncons::make_unique<number_validator<Json>>(schema_path, validators);
+            auto new_context = context.update_uris(schema, schema_path);
+
+            std::vector<validator_type> validators;
+
+            auto it = schema.find("maximum");
+            if (it != schema.object_range().end()) 
+            {
+                keywords.insert("maximum");
+                validators.emplace_back(maximum_validator<Json,double>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("minimum");
+            if (it != schema.object_range().end()) 
+            {
+                keywords.insert("minimum");
+                validators.emplace_back(minimum_validator<Json,double>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("exclusiveMaximum");
+            if (it != schema.object_range().end()) 
+            {
+                keywords.insert("exclusiveMaximum");
+                validators.emplace_back(exclusive_maximum_validator<Json,double>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("exclusiveMinimum");
+            if (it != schema.object_range().end()) 
+            {
+                keywords.insert("exclusiveMinimum");
+                validators.emplace_back(exclusive_minimum_validator<Json,double>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("multipleOf");
+            if (it != schema.object_range().end()) 
+            {
+                keywords.insert("multipleOf");
+                validators.emplace_back(multiple_of_validator<Json,double>::compile(it->value(), new_context));
+            }
+
+
+            return jsoncons::make_unique<number_validator<Json>>(schema_path, std::move(validators));
         }
 
     private:
