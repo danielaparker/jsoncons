@@ -363,7 +363,7 @@ namespace jsonschema {
 
             for (const auto& uri : new_context.uris()) 
             { 
-                insert(uri, sch);
+                insert_schema(uri, sch);
 
                 if (schema.type() == json_type::object_value)
                 {
@@ -441,7 +441,7 @@ namespace jsonschema {
 
     private:
 
-        void insert(const schema_location& uri, validator_pointer s)
+        void insert_schema(const schema_location& uri, validator_pointer s)
         {
             auto& file = get_or_create_file(std::string(uri.base()));
             auto schemas_it = file.schemas.find(std::string(uri.fragment()));
@@ -459,7 +459,6 @@ namespace jsonschema {
             {
                 unresolved_it->second->set_referred_schema(s);
                 file.unresolved.erase(unresolved_it);
-
             }
         }
 

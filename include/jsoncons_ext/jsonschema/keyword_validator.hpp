@@ -91,6 +91,28 @@ namespace jsonschema {
         }
     };
 
+    // reference_validator
+
+    template <class Json>
+    class reference_validator : public keyword_validator<Json>
+    {
+        const keyword_validator<Json>* validator_;
+    public:
+        reference_validator(const keyword_validator<Json>* validator)
+            : keyword_validator<Json>(validator->schema_path()), 
+              validator_(validator)
+        {
+        }
+    private:
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter, 
+                         Json& patch) const override
+        {
+            validator_->do_validate(instance, instance_location, reporter, patch);
+        }
+    };
+
     // contentEncoding
 
     template <class Json>
