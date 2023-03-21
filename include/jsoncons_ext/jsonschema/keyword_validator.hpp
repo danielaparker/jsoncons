@@ -622,7 +622,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<items_object_validator> compile(const Json& parent, const Json& schema, 
+        static std::unique_ptr<items_object_validator> compile(const Json& /* parent */, const Json& schema, 
             const compilation_context& context, 
             abstract_keyword_validator_factory<Json>* builder)
         {
