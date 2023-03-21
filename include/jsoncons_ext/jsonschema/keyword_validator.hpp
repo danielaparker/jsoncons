@@ -390,6 +390,8 @@ namespace jsonschema {
     };
 #endif
 
+    // maxLength
+
     template <class Json>
     class max_length_validator : public keyword_validator<Json>
     {
@@ -433,6 +435,155 @@ namespace jsonschema {
                     return;
                 }
             }          
+        }
+    };
+
+    // maxItems
+
+    template <class Json>
+    class max_items_validator : public keyword_validator<Json>
+    {
+        std::size_t max_items_;
+    public:
+        max_items_validator(const std::string& schema_path, std::size_t max_items)
+            : keyword_validator<Json>(schema_path), max_items_(max_items)
+        {
+        }
+
+        static std::unique_ptr<max_items_validator> compile(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("maxItems");
+            if (!schema.is_number())
+            {
+                std::string message("maxItems must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<std::size_t>();
+            return jsoncons::make_unique<max_items_validator<Json>>(schema_path, value);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json&) const override
+        {
+            if (instance.size() > max_items_)
+            {
+                std::string message("Expected maximum item count: " + std::to_string(max_items_));
+                message.append(", found: " + std::to_string(instance.size()));
+                reporter.error(validation_output("maxItems", 
+                                                 this->schema_path(),
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::move(message)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }          
+        }
+    };
+
+    // minItems
+
+    template <class Json>
+    class min_items_validator : public keyword_validator<Json>
+    {
+        std::size_t min_items_;
+    public:
+        min_items_validator(const std::string& schema_path, std::size_t min_items)
+            : keyword_validator<Json>(schema_path), min_items_(min_items)
+        {
+        }
+
+        static std::unique_ptr<min_items_validator> compile(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("minItems");
+            if (!schema.is_number())
+            {
+                std::string message("minItems must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<std::size_t>();
+            return jsoncons::make_unique<min_items_validator<Json>>(schema_path, value);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json&) const override
+        {
+            if (instance.size() < min_items_)
+            {
+                std::string message("Expected maximum item count: " + std::to_string(min_items_));
+                message.append(", found: " + std::to_string(instance.size()));
+                reporter.error(validation_output("minItems", 
+                                                 this->schema_path(),
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::move(message)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }          
+        }
+    };
+
+    // uniqueItems
+
+    template <class Json>
+    class unique_items_validator : public keyword_validator<Json>
+    {
+        bool are_unique_;
+    public:
+        unique_items_validator(const std::string& schema_path, bool are_unique)
+            : keyword_validator<Json>(schema_path), are_unique_(are_unique)
+        {
+        }
+
+        static std::unique_ptr<unique_items_validator> compile(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("uniqueItems");
+            bool are_unique = schema.template as<bool>();
+            return jsoncons::make_unique<unique_items_validator<Json>>(schema_path, are_unique);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json&) const override
+        {
+            if (are_unique_ && !array_has_unique_items(instance))
+            {
+                reporter.error(validation_output("uniqueItems", 
+                                                 this->schema_path(), 
+                                                 instance_location.to_uri_fragment(), 
+                                                 "Array items are not unique"));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+        }
+
+        static bool array_has_unique_items(const Json& a) 
+        {
+            for (auto it = a.array_range().begin(); it != a.array_range().end(); ++it) 
+            {
+                for (auto jt = it+1; jt != a.array_range().end(); ++jt) 
+                {
+                    if (*it == *jt) 
+                    {
+                        return false; // contains duplicates 
+                    }
+                }
+            }
+            return true; // elements are unique
         }
     };
 
@@ -1525,91 +1676,103 @@ namespace jsonschema {
         }
     };
 
-    // array_validator
+    // array
 
     template <class Json>
     class array_validator : public keyword_validator<Json>
     {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+
+        std::vector<validator_type> validators_;
+
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
-        jsoncons::optional<std::size_t> max_items_;
-        std::string absolute_max_items_location_;
-        jsoncons::optional<std::size_t> min_items_;
-        std::string absolute_min_items_location_;
-        bool unique_items_ = false;
         validator_pointer items_validator_;
         std::vector<validator_pointer> item_validators_;
         validator_pointer additional_items_validator_;
         validator_pointer contains_validator_;
 
     public:
-        array_validator(abstract_keyword_validator_factory<Json>* builder, 
-                   const Json& schema, 
-                   const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path()), 
-              max_items_(), min_items_(), items_validator_(nullptr), additional_items_validator_(nullptr), contains_validator_(nullptr)
+        array_validator(const std::string& schema_path, std::vector<validator_type>&& validators,
+            validator_pointer items_validator,
+            std::vector<validator_pointer>&& item_validators,
+            validator_pointer additional_items_validator,
+            validator_pointer contains_validator)
+            : keyword_validator<Json>(schema_path), validators_(std::move(validators)),
+              items_validator_(items_validator),
+              item_validators_(std::move(item_validators)),
+              additional_items_validator_(additional_items_validator),
+              contains_validator_(contains_validator)
         {
+        }
+
+        static std::unique_ptr<array_validator> compile(const Json& schema,
+            const compilation_context& context, abstract_keyword_validator_factory<Json>* builder)
+        {
+            std::string schema_path = context.make_schema_path_with("array");
+            auto new_context = context.update_uris(schema, schema_path);
+
+            std::vector<validator_type> validators;
+
+            auto it = schema.find("maxItems");
+            if (it != schema.object_range().end()) 
             {
-                auto it = schema.find("maxItems");
-                if (it != schema.object_range().end()) 
-                {
-                    max_items_ = it->value().template as<std::size_t>();
-                    absolute_max_items_location_ = context.make_schema_path_with("maxItems");
-                }
+                validators.emplace_back(max_items_validator<Json>::compile(it->value(), context));
             }
 
+            it = schema.find("minItems");
+            if (it != schema.object_range().end()) 
             {
-                auto it = schema.find("minItems");
-                if (it != schema.object_range().end()) 
-                {
-                    min_items_ = it->value().template as<std::size_t>();
-                    absolute_min_items_location_ = context.make_schema_path_with("minItems");
-                }
+                validators.emplace_back(min_items_validator<Json>::compile(it->value(), context));
             }
 
+            it = schema.find("uniqueItems");
+            if (it != schema.object_range().end()) 
             {
-                auto it = schema.find("uniqueItems");
-                if (it != schema.object_range().end()) 
-                {
-                    unique_items_ = it->value().template as<bool>();
-                }
+                validators.emplace_back(unique_items_validator<Json>::compile(it->value(), context));
             }
+            
+            validator_pointer items_validator = nullptr;
+            std::vector<validator_pointer> item_validators;
+            validator_pointer additional_items_validator = nullptr;
+            validator_pointer contains_validator = nullptr;
 
+            it = schema.find("items");
+            if (it != schema.object_range().end()) 
             {
-                auto it = schema.find("items");
-                if (it != schema.object_range().end()) 
-                {
 
-                    if (it->value().type() == json_type::array_value) 
+                if (it->value().type() == json_type::array_value) 
+                {
+                    size_t c = 0;
+                    for (const auto& subsch : it->value().array_range())
+                        item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
+
+                    auto attr_add = schema.find("additionalItems");
+                    if (attr_add != schema.object_range().end()) 
                     {
-                        size_t c = 0;
-                        for (const auto& subsch : it->value().array_range())
-                            item_validators_.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
-
-                        auto attr_add = schema.find("additionalItems");
-                        if (attr_add != schema.object_range().end()) 
-                        {
-                            additional_items_validator_ = builder->make_keyword_validator(attr_add->value(), context, {"additionalItems"});
-                        }
-
-                    } 
-                    else if (it->value().type() == json_type::object_value ||
-                               it->value().type() == json_type::bool_value)
-                    {
-                        items_validator_ = builder->make_keyword_validator(it->value(), context, {"items"});
+                        additional_items_validator = builder->make_keyword_validator(attr_add->value(), context, {"additionalItems"});
                     }
 
-                }
-            }
-
-            {
-                auto it = schema.find("contains");
-                if (it != schema.object_range().end()) 
+                } 
+                else if (it->value().type() == json_type::object_value ||
+                           it->value().type() == json_type::bool_value)
                 {
-                    contains_validator_ = builder->make_keyword_validator(it->value(), context, {"contains"});
+                    items_validator = builder->make_keyword_validator(it->value(), context, {"items"});
                 }
+
             }
+            
+            it = schema.find("contains");
+            if (it != schema.object_range().end()) 
+            {
+                contains_validator = builder->make_keyword_validator(it->value(), context, {"contains"});
+            }
+            
+            return jsoncons::make_unique<array_validator<Json>>(schema_path, std::move(validators),
+                items_validator, std::move(item_validators), 
+                additional_items_validator, contains_validator);
         }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -1617,52 +1780,12 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json& patch) const override
         {
-            if (max_items_)
+            for (const auto& validator : validators_)
             {
-                if (instance.size() > *max_items_)
+                validator->validate(instance, instance_location, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
                 {
-                    std::string message("Expected maximum item count: " + std::to_string(*max_items_));
-                    message.append(", found: " + std::to_string(instance.size()));
-                    reporter.error(validation_output("maxItems", 
-                                                     absolute_max_items_location_, 
-                                                     instance_location.to_uri_fragment(), 
-                                                     std::move(message)));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
-                }
-            }
-
-            if (min_items_)
-            {
-                if (instance.size() < *min_items_)
-                {
-                    std::string message("Expected minimum item count: " + std::to_string(*min_items_));
-                    message.append(", found: " + std::to_string(instance.size()));
-                    reporter.error(validation_output("minItems", 
-                                                     absolute_min_items_location_, 
-                                                     instance_location.to_uri_fragment(), 
-                                                     std::move(message)));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
-                }
-            }
-
-            if (unique_items_) 
-            {
-                if (!array_has_unique_items(instance))
-                {
-                    reporter.error(validation_output("uniqueItems", 
-                                                     this->schema_path(), 
-                                                     instance_location.to_uri_fragment(), 
-                                                     "Array items are not unique"));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 
@@ -1728,21 +1851,6 @@ namespace jsonschema {
                     }
                 }
             }
-        }
-
-        static bool array_has_unique_items(const Json& a) 
-        {
-            for (auto it = a.array_range().begin(); it != a.array_range().end(); ++it) 
-            {
-                for (auto jt = it+1; jt != a.array_range().end(); ++jt) 
-                {
-                    if (*it == *jt) 
-                    {
-                        return false; // contains duplicates 
-                    }
-                }
-            }
-            return true; // elements are unique
         }
     };
 
@@ -2047,7 +2155,6 @@ namespace jsonschema {
                     return;
                 }
             }
-
 
             if (conditional_validator_)
             { 

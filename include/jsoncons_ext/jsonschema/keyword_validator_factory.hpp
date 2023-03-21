@@ -212,7 +212,7 @@ namespace jsonschema {
         validator_pointer make_array_validator(const Json& schema,
                                                const compilation_context& context) override
         {
-            auto validator = jsoncons::make_unique<array_validator<Json>>(this, schema, context);
+            auto validator = array_validator<Json>::compile(schema, context, this);
             auto sch = validator.get();
             subschemas_.emplace_back(std::move(validator));
             return sch;
