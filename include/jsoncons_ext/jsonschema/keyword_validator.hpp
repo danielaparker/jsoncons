@@ -532,6 +532,85 @@ namespace jsonschema {
         }
     };
 
+    // items
+
+    template <class Json>
+    class array_items_validator : public keyword_validator<Json>
+    {
+        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+
+        std::vector<validator_pointer> item_validators_;
+        validator_pointer additional_items_validator_;
+    public:
+        array_items_validator(const std::string& schema_path, 
+            std::vector<validator_pointer>&& item_validators,
+            validator_pointer additional_items_validator)
+            : keyword_validator<Json>(schema_path), 
+              item_validators_(std::move(item_validators)), 
+              additional_items_validator_(additional_items_validator)
+        {
+        }
+
+        static std::unique_ptr<array_items_validator> compile(const Json& schema, const compilation_context& context, 
+            abstract_keyword_validator_factory<Json>* builder)
+        {
+            std::vector<validator_pointer> item_validators;
+            validator_pointer additional_items_validator = nullptr;
+
+            std::string schema_path = context.make_schema_path_with("items");
+
+            auto it = schema.find("items");
+            if (it != schema.object_range().end()) 
+            {
+                if (it->value().type() == json_type::array_value) 
+                {
+                    size_t c = 0;
+                    for (const auto& subsch : it->value().array_range())
+                        item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
+
+                    auto attr_add = schema.find("additionalItems");
+                    if (attr_add != schema.object_range().end()) 
+                    {
+                        additional_items_validator = builder->make_keyword_validator(attr_add->value(), context, {"additionalItems"});
+                    }
+                }
+            }
+            
+            return jsoncons::make_unique<array_items_validator<Json>>(schema_path, 
+                std::move(item_validators), additional_items_validator);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter,
+                         Json& patch) const override
+        {
+            size_t index = 0;
+            auto validator_it = item_validators_.cbegin();
+            for (const auto& item : instance.array_range()) 
+            {
+                validator_pointer item_validator = nullptr;
+                if (validator_it != item_validators_.cend())
+                {
+                    item_validator = *validator_it;
+                    ++validator_it;
+                }
+                else if (additional_items_validator_ != nullptr)
+                {
+                    item_validator = additional_items_validator_;
+                }
+                else
+                    break;
+
+                jsonpointer::json_pointer pointer(instance_location);
+                pointer /= index++;
+                item_validator->validate(item, pointer, reporter, patch);
+            }
+        }
+    };
+
     // uniqueItems
 
     template <class Json>
@@ -1688,20 +1767,14 @@ namespace jsonschema {
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         validator_pointer items_validator_;
-        std::vector<validator_pointer> item_validators_;
-        validator_pointer additional_items_validator_;
         validator_pointer contains_validator_;
 
     public:
         array_validator(const std::string& schema_path, std::vector<validator_type>&& validators,
             validator_pointer items_validator,
-            std::vector<validator_pointer>&& item_validators,
-            validator_pointer additional_items_validator,
             validator_pointer contains_validator)
             : keyword_validator<Json>(schema_path), validators_(std::move(validators)),
               items_validator_(items_validator),
-              item_validators_(std::move(item_validators)),
-              additional_items_validator_(additional_items_validator),
               contains_validator_(contains_validator)
         {
         }
@@ -1733,8 +1806,6 @@ namespace jsonschema {
             }
             
             validator_pointer items_validator = nullptr;
-            std::vector<validator_pointer> item_validators;
-            validator_pointer additional_items_validator = nullptr;
             validator_pointer contains_validator = nullptr;
 
             it = schema.find("items");
@@ -1743,15 +1814,7 @@ namespace jsonschema {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    size_t c = 0;
-                    for (const auto& subsch : it->value().array_range())
-                        item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
-
-                    auto attr_add = schema.find("additionalItems");
-                    if (attr_add != schema.object_range().end()) 
-                    {
-                        additional_items_validator = builder->make_keyword_validator(attr_add->value(), context, {"additionalItems"});
-                    }
+                    validators.emplace_back(array_items_validator<Json>::compile(schema, context, builder));
 
                 } 
                 else if (it->value().type() == json_type::object_value ||
@@ -1759,7 +1822,6 @@ namespace jsonschema {
                 {
                     items_validator = builder->make_keyword_validator(it->value(), context, {"items"});
                 }
-
             }
             
             it = schema.find("contains");
@@ -1769,8 +1831,7 @@ namespace jsonschema {
             }
             
             return jsoncons::make_unique<array_validator<Json>>(schema_path, std::move(validators),
-                items_validator, std::move(item_validators), 
-                additional_items_validator, contains_validator);
+                items_validator, contains_validator);
         }
 
     private:
@@ -1798,29 +1859,6 @@ namespace jsonschema {
                     pointer /= index;
                     items_validator_->validate(i, pointer, reporter, patch);
                     index++;
-                }
-            }
-            else 
-            {
-                auto validator_it = item_validators_.cbegin();
-                for (const auto& item : instance.array_range()) 
-                {
-                    validator_pointer item_validator = nullptr;
-                    if (validator_it != item_validators_.cend())
-                    {
-                        item_validator = *validator_it;
-                        ++validator_it;
-                    }
-                    else if (additional_items_validator_ != nullptr)
-                    {
-                        item_validator = additional_items_validator_;
-                    }
-                    else
-                        break;
-
-                    jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= index;
-                    item_validator->validate(item, pointer, reporter, patch);
                 }
             }
 
