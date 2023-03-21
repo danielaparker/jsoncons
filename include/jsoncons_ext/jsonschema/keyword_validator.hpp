@@ -624,7 +624,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<contains_validator> compile(const Json& parent, const Json& schema, 
+        static std::unique_ptr<contains_validator> compile(const Json& /*parent*/, const Json& schema,
             const compilation_context& context, 
             abstract_keyword_validator_factory<Json>* builder)
         {
@@ -1246,10 +1246,10 @@ namespace jsonschema {
     template <class Json,class T>
     class multiple_of_validator : public keyword_validator<Json>
     {
-        double value_;
+        T value_;
 
     public:
-        multiple_of_validator(const std::string& schema_path, double value)
+        multiple_of_validator(const std::string& schema_path, T value)
             : keyword_validator<Json>(schema_path), value_(value)
         {
         }
@@ -1275,7 +1275,7 @@ namespace jsonschema {
             T value = instance.template as<T>();
             if (value != 0) // Exclude zero
             {
-                if (!is_multiple_of(value, value_))
+                if (!is_multiple_of(value, static_cast<double>(value_)))
                 {
                     reporter.error(validation_output("multipleOf", 
                         this->schema_path(),
