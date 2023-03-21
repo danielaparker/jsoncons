@@ -535,14 +535,14 @@ namespace jsonschema {
     // items
 
     template <class Json>
-    class array_items_validator : public keyword_validator<Json>
+    class items_array_validator : public keyword_validator<Json>
     {
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         std::vector<validator_pointer> item_validators_;
         validator_pointer additional_items_validator_;
     public:
-        array_items_validator(const std::string& schema_path, 
+        items_array_validator(const std::string& schema_path, 
             std::vector<validator_pointer>&& item_validators,
             validator_pointer additional_items_validator)
             : keyword_validator<Json>(schema_path), 
@@ -551,7 +551,8 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<array_items_validator> compile(const Json& schema, const compilation_context& context, 
+        static std::unique_ptr<items_array_validator> compile(const Json& parent, const Json& schema, 
+            const compilation_context& context, 
             abstract_keyword_validator_factory<Json>* builder)
         {
             std::vector<validator_pointer> item_validators;
@@ -559,24 +560,20 @@ namespace jsonschema {
 
             std::string schema_path = context.make_schema_path_with("items");
 
-            auto it = schema.find("items");
-            if (it != schema.object_range().end()) 
+            if (schema.type() == json_type::array_value) 
             {
-                if (it->value().type() == json_type::array_value) 
-                {
-                    size_t c = 0;
-                    for (const auto& subsch : it->value().array_range())
-                        item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
+                size_t c = 0;
+                for (const auto& subsch : schema.array_range())
+                    item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
 
-                    auto attr_add = schema.find("additionalItems");
-                    if (attr_add != schema.object_range().end()) 
-                    {
-                        additional_items_validator = builder->make_keyword_validator(attr_add->value(), context, {"additionalItems"});
-                    }
+                auto it = parent.find("additionalItems");
+                if (it != parent.object_range().end()) 
+                {
+                    additional_items_validator = builder->make_keyword_validator(it->value(), context, {"additionalItems"});
                 }
             }
             
-            return jsoncons::make_unique<array_items_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<items_array_validator<Json>>(schema_path, 
                 std::move(item_validators), additional_items_validator);
         }
 
@@ -1814,7 +1811,8 @@ namespace jsonschema {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(array_items_validator<Json>::compile(schema, context, builder));
+                    validators.emplace_back(items_array_validator<Json>::compile(schema, it->value(), 
+                        context, builder));
 
                 } 
                 else if (it->value().type() == json_type::object_value ||
