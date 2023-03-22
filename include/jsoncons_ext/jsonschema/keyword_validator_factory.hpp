@@ -377,7 +377,7 @@ namespace jsonschema {
                     auto &subsch = unprocessed_keywords_it->second; 
                     auto s = make_subschema_validator(subsch, compilation_context(uri), {});       //  A JSON Schema MUST be an object or a boolean.
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return std::move(s);
+                    return s;
                 }
             }
 
