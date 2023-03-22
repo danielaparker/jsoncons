@@ -33,7 +33,7 @@ namespace jsonschema {
 
         virtual ~abstract_keyword_validator_factory() = default;
 
-        virtual validator_pointer make_keyword_validator(const Json& schema,
+        virtual validator_pointer make_subschema_validator(const Json& schema,
                                                          const compilation_context& context,
                                                          const std::vector<std::string>& keys) = 0;
         virtual validator_pointer make_required_validator(const compilation_context& context,
@@ -564,12 +564,12 @@ namespace jsonschema {
             {
                 size_t c = 0;
                 for (const auto& subsch : schema.array_range())
-                    item_validators.push_back(builder->make_keyword_validator(subsch, context, {"items", std::to_string(c++)}));
+                    item_validators.push_back(builder->make_subschema_validator(subsch, context, {"items", std::to_string(c++)}));
 
                 auto it = parent.find("additionalItems");
                 if (it != parent.object_range().end()) 
                 {
-                    additional_items_validator = builder->make_keyword_validator(it->value(), context, {"additionalItems"});
+                    additional_items_validator = builder->make_subschema_validator(it->value(), context, {"additionalItems"});
                 }
             }
             
@@ -630,7 +630,7 @@ namespace jsonschema {
         {
             std::string schema_path = context.make_schema_path_with("contains");
 
-            auto validator = builder->make_keyword_validator(schema, context, {"contains"});
+            auto validator = builder->make_subschema_validator(schema, context, {"contains"});
 
             return jsoncons::make_unique<contains_validator<Json>>(schema_path, validator);
         }
@@ -693,7 +693,7 @@ namespace jsonschema {
         {
             std::string schema_path = context.make_schema_path_with("items");
 
-            auto items_validator = builder->make_keyword_validator(schema, context, {"items"});
+            auto items_validator = builder->make_subschema_validator(schema, context, {"items"});
 
             return jsoncons::make_unique<items_object_validator<Json>>(schema_path, 
                 items_validator);
@@ -927,7 +927,7 @@ namespace jsonschema {
         {
             std::string schema_path = context.make_schema_path_with("not");
             return jsoncons::make_unique<not_validator<Json>>(schema_path, 
-                builder->make_keyword_validator(schema, context, {"not"}));
+                builder->make_subschema_validator(schema, context, {"not"}));
         }
 
     private:
@@ -1045,7 +1045,7 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                subschemas_.push_back(builder->make_keyword_validator(subsch, context, {Criterion::key(), std::to_string(c++)}));
+                subschemas_.push_back(builder->make_subschema_validator(subsch, context, {Criterion::key(), std::to_string(c++)}));
             }
 
             // Validate value of allOf, anyOf, and oneOf "MUST be a non-empty array"
@@ -1680,7 +1680,7 @@ namespace jsonschema {
                     properties_.emplace(
                         std::make_pair(
                             prop.key(),
-                            builder->make_keyword_validator(prop.value(), context, {"properties", prop.key()})));
+                            builder->make_subschema_validator(prop.value(), context, {"properties", prop.key()})));
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1691,14 +1691,14 @@ namespace jsonschema {
                     pattern_properties_.emplace_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
-                            builder->make_keyword_validator(prop.value(), context, {prop.key()})));
+                            builder->make_subschema_validator(prop.value(), context, {prop.key()})));
             }
     #endif
 
             it = schema.find("additionalProperties");
             if (it != schema.object_range().end()) 
             {
-                additional_properties_ = builder->make_keyword_validator(it->value(), context, {"additionalProperties"});
+                additional_properties_ = builder->make_subschema_validator(it->value(), context, {"additionalProperties"});
             }
 
             it = schema.find("dependencies");
@@ -1719,7 +1719,7 @@ namespace jsonschema {
                         default:
                         {
                             dependencies_.emplace(dep.key(),
-                                                  builder->make_keyword_validator(dep.value(), context, {"dependencies", dep.key()}));
+                                                  builder->make_subschema_validator(dep.value(), context, {"dependencies", dep.key()}));
                             break;
                         }
                     }
@@ -1729,7 +1729,7 @@ namespace jsonschema {
             auto property_names_it = schema.find("propertyNames");
             if (property_names_it != schema.object_range().end()) 
             {
-                property_name_validator_ = builder->make_keyword_validator(property_names_it->value(), context, {"propertyNames"});
+                property_name_validator_ = builder->make_subschema_validator(property_names_it->value(), context, {"propertyNames"});
             }
         }
     private:
@@ -1973,16 +1973,16 @@ namespace jsonschema {
 
             if (then_it != schema.object_range().end() || else_it != schema.object_range().end()) 
             {
-                if_validator_ = builder->make_keyword_validator(sch_if, context, {"if"});
+                if_validator_ = builder->make_subschema_validator(sch_if, context, {"if"});
 
                 if (then_it != schema.object_range().end()) 
                 {
-                    then_validator_ = builder->make_keyword_validator(then_it->value(), context, {"then"});
+                    then_validator_ = builder->make_subschema_validator(then_it->value(), context, {"then"});
                 }
 
                 if (else_it != schema.object_range().end()) 
                 {
-                    else_validator_ = builder->make_keyword_validator(else_it->value(), context, {"else"});
+                    else_validator_ = builder->make_subschema_validator(else_it->value(), context, {"else"});
                 }
             }
         }

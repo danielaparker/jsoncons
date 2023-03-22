@@ -313,9 +313,9 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_keyword_validator(const Json& schema,
-                                                 const compilation_context& context,
-                                                 const std::vector<std::string>& keys) override
+        validator_pointer make_subschema_validator(const Json& schema,
+            const compilation_context& context,
+            const std::vector<std::string>& keys) override
         {
             auto new_context = context.update_uris(schema, keys);
 
@@ -339,7 +339,7 @@ namespace jsonschema {
                     if (it != schema.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
-                            make_keyword_validator(def.value(), new_context, {"definitions", def.key()});
+                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
                     }
 
                     it = schema.find("$ref");
@@ -396,7 +396,7 @@ namespace jsonschema {
         void load(const Json& sch)
         {
             subschema_registries_.clear();
-            root_ = make_keyword_validator(sch, compilation_context(schema_location("#")), {});
+            root_ = make_subschema_validator(sch, compilation_context(schema_location("#")), {});
 
             // load all external schemas that have not already been loaded
 
@@ -416,7 +416,7 @@ namespace jsonschema {
                         if (resolver_) 
                         {
                             Json external_schema = resolver_(loc);
-                            make_keyword_validator(external_schema, compilation_context(schema_location(loc)), {});
+                            make_subschema_validator(external_schema, compilation_context(schema_location(loc)), {});
                             ++loaded_count;
                         } 
                         else 
@@ -476,7 +476,7 @@ namespace jsonschema {
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
-                    make_keyword_validator(value, compilation_context(new_uri), {});
+                    make_subschema_validator(value, compilation_context(new_uri), {});
                 else // no, nothing ref'd it, keep for later
                     file.unprocessed_keywords[fragment] = value;
 
@@ -509,7 +509,7 @@ namespace jsonschema {
                 if (unprocessed_keywords_it != file.unprocessed_keywords.end()) 
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_keyword_validator(subsch, compilation_context(uri), {});       //  A JSON Schema MUST be an object or a boolean.
+                    auto s = make_subschema_validator(subsch, compilation_context(uri), {});       //  A JSON Schema MUST be an object or a boolean.
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
                     return s;
                 }
