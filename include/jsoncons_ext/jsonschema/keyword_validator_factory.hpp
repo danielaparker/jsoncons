@@ -170,39 +170,6 @@ namespace jsonschema {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
 
-        validator_pointer make_required_validator(const compilation_context& context,
-                                                  const std::vector<std::string>& r) override
-        {
-            auto validator = required_validator<Json>::compile(context, r);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_null_validator(const compilation_context& context) override
-        {
-            auto validator = null_validator<Json>::compile(context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_true_validator(const compilation_context& context) override
-        {
-            auto validator = true_validator<Json>::compile(context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_false_validator(const compilation_context& context) override
-        {
-            auto validator = false_validator<Json>::compile(context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
         validator_pointer make_object_validator(const Json& schema,
                                                 const compilation_context& context) override
         {
@@ -270,43 +237,6 @@ namespace jsonschema {
             return sch;
         }
 
-        validator_pointer make_not_validator(const Json& schema,
-                                             const compilation_context& context) override
-        {
-            auto validator = not_validator<Json>::compile(this, schema, context);
-
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_all_of_validator(const Json& schema,
-                                                const compilation_context& context) override
-        {
-            auto validator = jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(this, schema, context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_any_of_validator(const Json& schema,
-                                                const compilation_context& context) override
-        {
-            auto validator = jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(this, schema, context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
-        validator_pointer make_one_of_validator(const Json& schema,
-                                                const compilation_context& context) override
-        {
-            auto validator = jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(this, schema, context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
-        }
-
         validator_pointer make_type_validator(const Json& schema,
                                               const compilation_context& context) override
         {
@@ -329,11 +259,11 @@ namespace jsonschema {
                 case json_type::bool_value:
                     if (schema.template as<bool>())
                     {
-                        sch = make_true_validator(new_context);
+                        return true_validator<Json>::compile(new_context);
                     }
                     else
                     {
-                        sch = make_false_validator(new_context);
+                        return false_validator<Json>::compile(new_context);
                     }
                     break;
                 case json_type::object_value:
