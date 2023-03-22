@@ -55,6 +55,7 @@ namespace jsonschema {
     {
         std::string schema_path_;
     public:
+        using validator_type = std::unique_ptr<keyword_validator<Json>>;
         using self_pointer = keyword_validator<Json>*;
 
         keyword_validator(const std::string& schema_path)
