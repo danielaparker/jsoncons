@@ -147,7 +147,7 @@ namespace jsonschema {
         uri_resolver<Json> resolver_;
         validator_type root_;
 
-        // Owns all schemas
+        // Owns all subschemas
         std::vector<std::unique_ptr<keyword_validator<Json>>> subschemas_;
 
         // Map location to subschema_registry
@@ -192,11 +192,15 @@ namespace jsonschema {
                 case json_type::bool_value:
                     if (schema.template as<bool>())
                     {
-                        return true_validator<Json>::compile(new_context);
+                        auto ref =  true_validator<Json>::compile(new_context);
+                        sch = ref.get();
+                        subschemas_.emplace_back(std::move(ref));
                     }
                     else
                     {
-                        return false_validator<Json>::compile(new_context);
+                        auto ref = false_validator<Json>::compile(new_context);
+                        sch = ref.get();
+                        subschemas_.emplace_back(std::move(ref));
                     }
                     break;
                 case json_type::object_value:
@@ -205,7 +209,7 @@ namespace jsonschema {
                     if (it != schema.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
-                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
+                            subschemas_.emplace_back(make_subschema_validator(def.value(), new_context, {"definitions", def.key()}));
                     }
 
                     it = schema.find("$ref");
@@ -215,7 +219,9 @@ namespace jsonschema {
 
                         auto id = new_context.resolve_back(relative);
                         //sch = get_or_create_reference(id);
-                        return get_or_create_reference(id);
+                        auto ref =  get_or_create_reference(id);
+                        sch = ref.get();
+                        subschemas_.emplace_back(std::move(ref));
                     } 
                     else 
                     {
@@ -299,7 +305,7 @@ namespace jsonschema {
             {
                 if (!file.second.unresolved.empty())
                 {
-                    JSONCONS_THROW(schema_error("after all files have been parsed, '" +
+                    JSONCONS_THROW(schema_error("After all files have been parsed, '" +
                                                 (file.first == "" ? "<root>" : file.first) +
                                                 "' has still undefined references."));
                 }
