@@ -209,7 +209,7 @@ namespace jsonschema {
                     if (it != schema.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
-                            subschemas_.emplace_back(make_subschema_validator(def.value(), new_context, {"definitions", def.key()}));
+                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
                     }
 
                     it = schema.find("$ref");
