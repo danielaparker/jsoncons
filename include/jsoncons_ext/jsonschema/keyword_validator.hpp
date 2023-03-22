@@ -499,7 +499,6 @@ namespace jsonschema {
     class items_array_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         std::vector<validator_type> item_validators_;
         validator_type additional_items_validator_;
