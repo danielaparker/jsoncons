@@ -33,6 +33,7 @@ namespace jsonschema {
     template <class Json>
     class reference_schema : public keyword_validator<Json>
     {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         validator_pointer referred_schema_;
@@ -85,6 +86,7 @@ namespace jsonschema {
     template <class Json>
     class json_schema
     {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         friend class keyword_validator_factory<Json>;
@@ -132,6 +134,7 @@ namespace jsonschema {
     template <class Json>
     class keyword_validator_factory : public abstract_keyword_validator_factory<Json>
     {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         struct subschema_registry
