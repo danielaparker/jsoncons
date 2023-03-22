@@ -26,20 +26,17 @@
 namespace jsoncons {
 namespace jsonschema {
     template <class Json>
-    class abstract_keyword_validator_factory
+    class subschema_validator_factory
     {
     public:
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
-        virtual ~abstract_keyword_validator_factory() = default;
+        virtual ~subschema_validator_factory() = default;
 
         virtual validator_type make_subschema_validator(const Json& schema,
             const compilation_context& context,
             const std::vector<std::string>& keys) = 0;
-
-        virtual validator_pointer make_type_validator(const Json& schema,
-                                                      const compilation_context& context) = 0;
     };
 
     struct collecting_error_reporter : public error_reporter
@@ -518,7 +515,7 @@ namespace jsonschema {
 
         static std::unique_ptr<items_array_validator> compile(const Json& parent, const Json& schema, 
             const compilation_context& context, 
-            abstract_keyword_validator_factory<Json>* builder)
+            subschema_validator_factory<Json>* builder)
         {
             std::vector<validator_type> item_validators;
             validator_type additional_items_validator = nullptr;
@@ -591,7 +588,7 @@ namespace jsonschema {
 
         static std::unique_ptr<contains_validator> compile(const Json& /*parent*/, const Json& schema,
             const compilation_context& context, 
-            abstract_keyword_validator_factory<Json>* builder)
+            subschema_validator_factory<Json>* builder)
         {
             std::string schema_path = context.make_schema_path_with("contains");
 
@@ -653,7 +650,7 @@ namespace jsonschema {
 
         static std::unique_ptr<items_object_validator> compile(const Json& /* parent */, const Json& schema, 
             const compilation_context& context, 
-            abstract_keyword_validator_factory<Json>* builder)
+            subschema_validator_factory<Json>* builder)
         {
             std::string schema_path = context.make_schema_path_with("items");
 
@@ -884,7 +881,7 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<not_validator> compile(abstract_keyword_validator_factory<Json>* builder,
+        static std::unique_ptr<not_validator> compile(subschema_validator_factory<Json>* builder,
             const Json& schema, const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("not");
@@ -999,7 +996,7 @@ namespace jsonschema {
         std::vector<validator_type> subschemas_;
 
     public:
-        combining_validator(abstract_keyword_validator_factory<Json>* builder,
+        combining_validator(subschema_validator_factory<Json>* builder,
                             const Json& schema,
                             const compilation_context& context)
             : keyword_validator<Json>(context.get_schema_path())
@@ -1608,7 +1605,7 @@ namespace jsonschema {
         validator_type property_name_validator_;
 
     public:
-        object_validator(abstract_keyword_validator_factory<Json>* builder,
+        object_validator(subschema_validator_factory<Json>* builder,
                     const Json& schema,
                     const compilation_context& context)
             : keyword_validator<Json>(context.get_schema_path()), 
@@ -1844,7 +1841,7 @@ namespace jsonschema {
         }
 
         static std::unique_ptr<array_validator> compile(const Json& schema,
-            const compilation_context& context, abstract_keyword_validator_factory<Json>* builder)
+            const compilation_context& context, subschema_validator_factory<Json>* builder)
         {
             std::string schema_path = context.make_schema_path_with("array");
             auto new_context = context.update_uris(schema, schema_path);
@@ -1924,7 +1921,7 @@ namespace jsonschema {
         validator_type else_validator_;
 
     public:
-        conditional_validator(abstract_keyword_validator_factory<Json>* builder,
+        conditional_validator(subschema_validator_factory<Json>* builder,
                          const Json& sch_if,
                          const Json& schema,
                          const compilation_context& context)
@@ -2062,7 +2059,7 @@ namespace jsonschema {
         type_validator(type_validator&&) = default;
         type_validator& operator=(type_validator&&) = default;
 
-        type_validator(abstract_keyword_validator_factory<Json>* builder,
+        type_validator(subschema_validator_factory<Json>* builder,
                      const Json& schema,
                      const compilation_context& context)
             : keyword_validator<Json>(context.get_schema_path()), default_value_(jsoncons::null_type()), 
@@ -2234,7 +2231,7 @@ namespace jsonschema {
             return default_value_;
         }
 
-        void initialize_type_mapping(abstract_keyword_validator_factory<Json>* builder,
+        void initialize_type_mapping(subschema_validator_factory<Json>* builder,
                                      const std::string& type,
                                      const Json& schema,
                                      const compilation_context& context,

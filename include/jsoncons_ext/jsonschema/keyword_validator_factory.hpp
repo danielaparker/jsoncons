@@ -131,7 +131,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class keyword_validator_factory : public abstract_keyword_validator_factory<Json>
+    class keyword_validator_factory : public subschema_validator_factory<Json>
     {
         using reference_validator_type = reference_validator<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -168,15 +168,6 @@ namespace jsonschema {
         std::shared_ptr<json_schema<Json>> get_schema()
         {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
-        }
-
-        validator_pointer make_type_validator(const Json& schema,
-                                              const compilation_context& context) override
-        {
-            auto validator = jsoncons::make_unique<type_validator<Json>>(this, schema, context);
-            auto sch = validator.get();
-            subschemas_.emplace_back(std::move(validator));
-            return sch;
         }
 
         validator_type make_subschema_validator(const Json& schema,
@@ -225,7 +216,9 @@ namespace jsonschema {
                     } 
                     else 
                     {
-                        sch = make_type_validator(schema, new_context);
+                        auto ref = jsoncons::make_unique<type_validator<Json>>(this, schema, new_context);
+                        sch = ref.get();
+                        subschemas_.emplace_back(std::move(ref));
                     }
                     break;
                 }
