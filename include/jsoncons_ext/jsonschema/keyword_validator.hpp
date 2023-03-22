@@ -38,25 +38,6 @@ namespace jsonschema {
             const compilation_context& context,
             const std::vector<std::string>& keys) = 0;
 
-        virtual validator_pointer make_object_validator(const Json& schema, 
-                                                        const compilation_context& context) = 0;
-
-        virtual validator_pointer make_array_validator(const Json& schema,
-                                                       const compilation_context& context) = 0;
-
-        virtual validator_pointer make_string_validator(const Json& schema,
-                                                        const compilation_context& context) = 0;
-
-        virtual validator_pointer make_boolean_validator(const compilation_context& context) = 0;
-
-        virtual validator_pointer make_integer_validator(const Json& schema, 
-                                                         const compilation_context& context, 
-                                                         std::set<std::string>& keywords) = 0;
-
-        virtual validator_pointer make_number_validator(const Json& schema, 
-                                                        const compilation_context& context, 
-                                                        std::set<std::string>& keywords) = 0;
-
         virtual validator_pointer make_type_validator(const Json& schema,
                                                       const compilation_context& context) = 0;
     };
@@ -1486,9 +1467,14 @@ namespace jsonschema {
     class boolean_validator : public keyword_validator<Json>
     {
     public:
-        boolean_validator(const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path())
+        boolean_validator(const std::string& schema_path)
+            : keyword_validator<Json>(schema_path)
         {
+        }
+        static std::unique_ptr<boolean_validator> compile(const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("boolean");
+            return jsoncons::make_unique<boolean_validator<Json>>(schema_path);
         }
     private:
         void do_validate(const Json&, 
@@ -2260,49 +2246,49 @@ namespace jsonschema {
             }
             else if (type == "object")
             {
-                type_mapping_[(uint8_t)json_type::object_value] = jsoncons::make_unique<reference_validator_type>(builder->make_object_validator(schema, context));
+                type_mapping_[(uint8_t)json_type::object_value] = jsoncons::make_unique<object_validator<Json>>(builder, schema, context);
             }
             else if (type == "array")
             {
-                type_mapping_[(uint8_t)json_type::array_value] = jsoncons::make_unique<reference_validator_type>(builder->make_array_validator(schema, context));
+                type_mapping_[(uint8_t)json_type::array_value] = array_validator<Json>::compile(schema, context, builder);
             }
             else if (type == "string")
             {
-                type_mapping_[(uint8_t)json_type::string_value] = jsoncons::make_unique<reference_validator_type>(builder->make_string_validator(schema, context));
+                type_mapping_[(uint8_t)json_type::string_value] = string_validator<Json>::compile(schema, context);
                 // For binary types
-                type_mapping_[(uint8_t) json_type::byte_string_value] = jsoncons::make_unique<reference_validator_type>(builder->make_string_validator(schema, context));
+                type_mapping_[(uint8_t) json_type::byte_string_value] = string_validator<Json>::compile(schema, context);
             }
             else if (type == "boolean")
             {
-                type_mapping_[(uint8_t)json_type::bool_value] = jsoncons::make_unique<reference_validator_type>(builder->make_boolean_validator(context));
+                type_mapping_[(uint8_t)json_type::bool_value] = boolean_validator<Json>::compile(context);
             }
             else if (type == "integer")
             {
-                type_mapping_[(uint8_t)json_type::int64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::uint64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::double_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
+                type_mapping_[(uint8_t)json_type::int64_value] = integer_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::uint64_value] = integer_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::double_value] = integer_validator<Json>::compile(schema, context, keywords);
             }
             else if (type == "number")
             {
-                type_mapping_[(uint8_t)json_type::double_value] = jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::int64_value] =  jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::uint64_value] =  jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
+                type_mapping_[(uint8_t)json_type::double_value] = number_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::int64_value] =  number_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::uint64_value] =  number_validator<Json>::compile(schema, context, keywords);
             }
             else if (type.empty())
             {
                 type_mapping_[(uint8_t)json_type::null_value] = null_validator<Json>::compile(context);
-                type_mapping_[(uint8_t)json_type::object_value] = jsoncons::make_unique<reference_validator_type>(builder->make_object_validator(schema, context));
-                type_mapping_[(uint8_t)json_type::array_value] = jsoncons::make_unique<reference_validator_type>(builder->make_array_validator(schema, context));
-                type_mapping_[(uint8_t)json_type::string_value] = jsoncons::make_unique<reference_validator_type>(builder->make_string_validator(schema, context));
+                type_mapping_[(uint8_t)json_type::object_value] = jsoncons::make_unique<object_validator<Json>>(builder, schema, context);
+                type_mapping_[(uint8_t)json_type::array_value] = array_validator<Json>::compile(schema, context, builder);
+                type_mapping_[(uint8_t)json_type::string_value] = string_validator<Json>::compile(schema, context);
                 // For binary types
-                type_mapping_[(uint8_t) json_type::byte_string_value] = jsoncons::make_unique<reference_validator_type>(builder->make_string_validator(schema, context));
-                type_mapping_[(uint8_t)json_type::bool_value] = jsoncons::make_unique<reference_validator_type>(builder->make_boolean_validator(context));
-                type_mapping_[(uint8_t)json_type::int64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::uint64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::double_value] = jsoncons::make_unique<reference_validator_type>(builder->make_integer_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::double_value] = jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::int64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
-                type_mapping_[(uint8_t)json_type::uint64_value] = jsoncons::make_unique<reference_validator_type>(builder->make_number_validator(schema, context, keywords));
+                type_mapping_[(uint8_t) json_type::byte_string_value] = string_validator<Json>::compile(schema, context);
+                type_mapping_[(uint8_t)json_type::bool_value] = boolean_validator<Json>::compile(context);
+                type_mapping_[(uint8_t)json_type::int64_value] = integer_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::uint64_value] = integer_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::double_value] = integer_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::double_value] = number_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::int64_value] = number_validator<Json>::compile(schema, context, keywords);
+                type_mapping_[(uint8_t)json_type::uint64_value] = number_validator<Json>::compile(schema, context, keywords);
             }
         }
     };
