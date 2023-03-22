@@ -548,24 +548,25 @@ namespace jsonschema {
         {
             size_t index = 0;
             auto validator_it = item_validators_.cbegin();
+
             for (const auto& item : instance.array_range()) 
             {
-                validator_pointer item_validator = nullptr;
+                jsonpointer::json_pointer pointer(instance_location);
+
                 if (validator_it != item_validators_.cend())
                 {
-                    item_validator = validator_it->get();
+                    pointer /= index++;
+                    (*validator_it)->validate(item, pointer, reporter, patch);
                     ++validator_it;
                 }
                 else if (additional_items_validator_ != nullptr)
                 {
-                    item_validator = additional_items_validator_.get();
+                    pointer /= index++;
+                    additional_items_validator_->validate(item, pointer, reporter, patch);
                 }
                 else
                     break;
 
-                jsonpointer::json_pointer pointer(instance_location);
-                pointer /= index++;
-                item_validator->validate(item, pointer, reporter, patch);
             }
         }
     };
