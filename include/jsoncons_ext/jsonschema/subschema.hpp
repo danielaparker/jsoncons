@@ -1,4 +1,4 @@
-// Copyright 2020 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -97,6 +97,90 @@ namespace jsonschema {
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;
     };
+
+    template <class Json>
+    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
+
+    template <class Json>
+    class reference_schema : public keyword_validator<Json>
+    {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+
+        validator_pointer referred_schema_;
+
+    public:
+        reference_schema(const std::string& id)
+            : keyword_validator<Json>(id), referred_schema_(nullptr) {}
+
+        void set_referred_schema(validator_pointer target) { referred_schema_ = target; }
+
+    private:
+
+        void do_validate(const Json& instance, 
+                         const jsonpointer::json_pointer& instance_location, 
+                         error_reporter& reporter, 
+                         Json& patch) const override
+        {
+            if (!referred_schema_)
+            {
+                reporter.error(validation_output("", 
+                                                 this->schema_path(), 
+                                                 instance_location.to_uri_fragment(), 
+                                                 "Unresolved schema reference " + this->schema_path()));
+                return;
+            }
+
+            referred_schema_->validate(instance, instance_location, reporter, patch);
+        }
+
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
+                                                   const Json& instance, 
+                                                   error_reporter& reporter) const override
+        {
+            if (!referred_schema_)
+            {
+                reporter.error(validation_output("", 
+                                                 this->schema_path(), 
+                                                 instance_location.to_uri_fragment(), 
+                                                 "Unresolved schema reference " + this->schema_path()));
+                return jsoncons::optional<Json>();
+            }
+
+            return referred_schema_->get_default_value(instance_location, instance, reporter);
+        }
+    };
+
+    template <class Json>
+    class json_schema
+    {
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+
+        std::vector<validator_type> subschemas_;
+        validator_type root_;
+    public:
+        json_schema(std::vector<validator_type>&& subschemas, validator_type&& root)
+            : subschemas_(std::move(subschemas)), root_(std::move(root))
+        {
+            if (root_ == nullptr)
+                JSONCONS_THROW(schema_error("There is no root schema to validate an instance against"));
+        }
+
+        json_schema(const json_schema&) = delete;
+        json_schema(json_schema&&) = default;
+        json_schema& operator=(const json_schema&) = delete;
+        json_schema& operator=(json_schema&&) = default;
+
+        void validate(const Json& instance, 
+                      const jsonpointer::json_pointer& instance_location, 
+                      error_reporter& reporter, 
+                      Json& patch) const 
+        {
+            JSONCONS_ASSERT(root_ != nullptr);
+            root_->validate(instance, instance_location, reporter, patch);
+        }
+    };
+
 
 } // namespace jsonschema
 } // namespace jsoncons

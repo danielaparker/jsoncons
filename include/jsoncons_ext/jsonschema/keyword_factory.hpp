@@ -1,11 +1,11 @@
-// Copyright 2020 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_FACTORY_HPP
+#ifndef JSONCONS_JSONSCHEMA_KEYWORD_FACTORY_HPP
+#define JSONCONS_JSONSCHEMA_KEYWORD_FACTORY_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -28,95 +28,6 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
-    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
-
-    template <class Json>
-    class reference_schema : public keyword_validator<Json>
-    {
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
-
-        validator_pointer referred_schema_;
-
-    public:
-        reference_schema(const std::string& id)
-            : keyword_validator<Json>(id), referred_schema_(nullptr) {}
-
-        void set_referred_schema(validator_pointer target) { referred_schema_ = target; }
-
-    private:
-
-        void do_validate(const Json& instance, 
-                         const jsonpointer::json_pointer& instance_location, 
-                         error_reporter& reporter, 
-                         Json& patch) const override
-        {
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output("", 
-                                                 this->schema_path(), 
-                                                 instance_location.to_uri_fragment(), 
-                                                 "Unresolved schema reference " + this->schema_path()));
-                return;
-            }
-
-            referred_schema_->validate(instance, instance_location, reporter, patch);
-        }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
-                                                   const Json& instance, 
-                                                   error_reporter& reporter) const override
-        {
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output("", 
-                                                 this->schema_path(), 
-                                                 instance_location.to_uri_fragment(), 
-                                                 "Unresolved schema reference " + this->schema_path()));
-                return jsoncons::optional<Json>();
-            }
-
-            return referred_schema_->get_default_value(instance_location, instance, reporter);
-        }
-    };
-
-    template <class Json>
-    class keyword_validator_factory;
-
-    template <class Json>
-    class json_schema
-    {
-        using validator_type = typename keyword_validator<Json>::validator_type;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
-
-        friend class keyword_validator_factory<Json>;
-
-        std::vector<validator_type> subschemas_;
-        validator_type root_;
-    public:
-        json_schema(std::vector<validator_type>&& subschemas, validator_type&& root)
-            : subschemas_(std::move(subschemas)), root_(std::move(root))
-        {
-            if (root_ == nullptr)
-                JSONCONS_THROW(schema_error("There is no root schema to validate an instance against"));
-        }
-
-        json_schema(const json_schema&) = delete;
-        json_schema(json_schema&&) = default;
-        json_schema& operator=(const json_schema&) = delete;
-        json_schema& operator=(json_schema&&) = default;
-
-        void validate(const Json& instance, 
-                      const jsonpointer::json_pointer& instance_location, 
-                      error_reporter& reporter, 
-                      Json& patch) const 
-        {
-            JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(instance, instance_location, reporter, patch);
-        }
-    };
-
-    template <class Json>
     struct default_uri_resolver
     {
         Json operator()(const jsoncons::uri& uri)
@@ -131,12 +42,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class keyword_validator_factory : public subschema_validator_factory<Json>
+    class keyword_factory : public subschema_validator_factory<Json>
     {
+    public:
         using reference_validator_type = reference_validator<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
-
+    private:
         struct subschema_registry
         {
             std::map<std::string, validator_pointer> schemas; // schemas
@@ -154,16 +66,16 @@ namespace jsonschema {
         std::map<std::string, subschema_registry> subschema_registries_;
 
     public:
-        keyword_validator_factory(uri_resolver<Json>&& resolver) noexcept
+        keyword_factory(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
         {
         }
 
-        keyword_validator_factory(const keyword_validator_factory&) = delete;
-        keyword_validator_factory& operator=(const keyword_validator_factory&) = delete;
-        keyword_validator_factory(keyword_validator_factory&&) = default;
-        keyword_validator_factory& operator=(keyword_validator_factory&&) = default;
+        keyword_factory(const keyword_factory&) = delete;
+        keyword_factory& operator=(const keyword_factory&) = delete;
+        keyword_factory(keyword_factory&&) = default;
+        keyword_factory& operator=(keyword_factory&&) = default;
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {
@@ -414,20 +326,20 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        keyword_validator_factory<Json> loader{default_uri_resolver<Json>()};
-        loader.load_root(schema);
+        keyword_factory<Json> kwFactory{default_uri_resolver<Json>()};
+        kwFactory.load_root(schema);
 
-        return loader.get_schema();
+        return kwFactory.get_schema();
     }
 
     template <class Json,class URIResolver>
     typename std::enable_if<traits_extension::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
-        keyword_validator_factory<Json> loader(resolver);
-        loader.load_root(schema);
+        keyword_factory<Json> kwFactory(resolver);
+        kwFactory.load_root(schema);
 
-        return loader.get_schema();
+        return kwFactory.get_schema();
     }
 
 } // namespace jsonschema

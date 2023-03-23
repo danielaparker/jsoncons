@@ -1,4 +1,4 @@
-// Copyright 2020 Daniel Parker
+// Copyright 2013-2023 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,7 +11,7 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/keyword_validator_factory.hpp>
+#include <jsoncons_ext/jsonschema/keyword_factory.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
