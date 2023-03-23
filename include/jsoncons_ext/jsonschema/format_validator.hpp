@@ -965,4 +965,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_FORMAT_CHECKERS_HPP
+#endif // JSONCONS_JSONSCHEMA_FORMAT_VALIDATOR_HPP

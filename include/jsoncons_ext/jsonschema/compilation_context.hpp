@@ -113,4 +113,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_RULE_HPP
+#endif // JSONCONS_JSONSCHEMA_COMPILATION_CONTEXT_HPP

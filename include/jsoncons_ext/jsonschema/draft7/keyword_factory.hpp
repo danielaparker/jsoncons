@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_KEYWORD_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_KEYWORD_FACTORY_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -13,7 +13,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/schema.hpp>
 #include <jsoncons_ext/jsonschema/keywords.hpp>
-#include <jsoncons_ext/jsonschema/schema_draft7.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <jsoncons_ext/jsonschema/schema_version.hpp>
 #include <cassert>
 #include <set>
@@ -26,6 +26,7 @@
 
 namespace jsoncons {
 namespace jsonschema {
+namespace draft7 {
 
     template <class Json>
     struct default_uri_resolver
@@ -34,7 +35,7 @@ namespace jsonschema {
         {
             if (uri.path() == "/draft-07/schema") 
             {
-                return jsoncons::jsonschema::schema_draft7<Json>::get_schema();
+                return schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
@@ -342,7 +343,8 @@ namespace jsonschema {
         return kwFactory.get_schema();
     }
 
+} // namespace draft7
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_SCHEMA_LOADER_HPP
+#endif // JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP

@@ -52,4 +52,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_RULE_HPP
+#endif // JSONCONS_JSONSCHEMA_SCHEMA_HPP

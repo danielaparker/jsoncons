@@ -11,6 +11,7 @@
 
 namespace jsoncons {
 namespace jsonschema {
+namespace draft7 {
     
     template <class Json>
     struct schema_draft7
@@ -192,6 +193,7 @@ namespace jsonschema {
         }
     };
 
+} // namespace draft7
 } // namespace jsonschema
 } // namespace jsoncons
 

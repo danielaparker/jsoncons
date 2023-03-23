@@ -2293,4 +2293,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_VALUE_RULES_HPP
+#endif // JSONCONS_JSONSCHEMA_KEYWORDS_HPP
