@@ -18,6 +18,15 @@
 namespace jsoncons { 
 namespace detail {
 
+    template<std::size_t Len, std::size_t Align>
+    struct jsoncons_aligned_storage
+    {
+        struct type
+        {
+            alignas(Align) unsigned char data[Len];
+        };
+    };
+
     // From boost 1_71
     template <class T, class U>
     T launder_cast(U* u)
@@ -98,7 +107,7 @@ namespace detail {
             str_t data;
             char_type c[1];
         };
-        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
+        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
 
         string_pointer ptr_;
     public:
@@ -263,7 +272,7 @@ namespace detail {
             str_t data;
             char_type c[1];
         };
-        typedef typename std::aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
+        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
 
         string_pointer ptr_;
     public:
