@@ -14,16 +14,16 @@
 // From http://coliru.stacked-crooked.com/a/cfd0c5c5021596ad
 
 template<std::size_t Len, std::size_t Align>
-struct jsoncons_aligned_storage
-{
-    struct type
-    {
-        alignas(Align) unsigned char data[Len];
-    };
-};
-
 template <typename T>
 class FreelistAllocator {
+    struct jsoncons_aligned_storage
+    {
+        struct type
+        {
+            alignas(Align) unsigned char data[Len];
+        };
+    };
+
     union node {
         node* next;
         typename jsoncons_aligned_storage<sizeof(T), alignof(T)>::type storage;
