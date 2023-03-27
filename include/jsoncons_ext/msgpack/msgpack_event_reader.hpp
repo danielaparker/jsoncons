@@ -18,7 +18,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj2_cursor.hpp>
+#include <jsoncons/item_event_reader.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace msgpack {
 
     template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-    class basic_msgpack_event_reader : public basic_staj2_cursor<char>, private virtual ser_context
+    class basic_msgpack_event_reader : public basic_item_event_reader<char>, private virtual ser_context
     {
     public:
         using source_type = Source;
