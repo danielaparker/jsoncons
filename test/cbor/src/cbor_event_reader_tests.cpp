@@ -39,41 +39,41 @@ TEST_CASE("cbor_event_reader reputon test")
     {
         cbor::cbor_bytes_cursor2 cursor(data);
 
-        CHECK(cursor.current().event_type() == staj2_event_type::begin_object);
+        CHECK(cursor.current().event_type() == item_event_type::begin_object);
         CHECK(cursor.current().size() == 2);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);
+        CHECK(cursor.current().event_type() == item_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::begin_array);
+        CHECK(cursor.current().event_type() == item_event_type::begin_array);
         CHECK(cursor.current().size() == 1);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::begin_object);
+        CHECK(cursor.current().event_type() == item_event_type::begin_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);
+        CHECK(cursor.current().event_type() == item_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);
+        CHECK(cursor.current().event_type() == item_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);
+        CHECK(cursor.current().event_type() == item_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::string_value);  // key
+        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::double_value);
+        CHECK(cursor.current().event_type() == item_event_type::double_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::end_object);
+        CHECK(cursor.current().event_type() == item_event_type::end_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::end_array);
+        CHECK(cursor.current().event_type() == item_event_type::end_array);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj2_event_type::end_object);
+        CHECK(cursor.current().event_type() == item_event_type::end_object);
         cursor.next();
         CHECK(cursor.done());
     }
@@ -110,7 +110,7 @@ TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
     using input_type = typename traits::input_type;
     using cursor_type = typename traits::cursor_type;
     using source_type = typename cursor_type::source_type;
-    using event_type = staj2_event_type;
+    using event_type = item_event_type;
 
     SECTION("keeping same source")
     {

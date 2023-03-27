@@ -147,7 +147,7 @@ namespace msgpack {
             return parser_.done();
         }
 
-        const staj2_event& current() const override
+        const item_event& current() const override
         {
             return cursor_visitor_.event();
         }
@@ -208,13 +208,13 @@ namespace msgpack {
 
         friend
         staj2_filter_view operator|(basic_msgpack_event_reader& cursor, 
-                                   std::function<bool(const staj2_event&, const ser_context&)> pred)
+                                   std::function<bool(const item_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
         }
 
     private:
-        static bool accept_all(const staj2_event&, const ser_context&) 
+        static bool accept_all(const item_event&, const ser_context&) 
         {
             return true;
         }
