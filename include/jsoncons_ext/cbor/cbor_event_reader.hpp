@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_CURSOR2_HPP
-#define JSONCONS_MSGPACK_MSGPACK_CURSOR2_HPP
+#ifndef JSONCONS_CBOR_EVENT_READER_HPP
+#define JSONCONS_CBOR_EVENT_READER_HPP
 
 #include <memory> // std::allocator
 #include <string>
@@ -20,36 +20,36 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj2_cursor.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons_ext/msgpack/msgpack_parser.hpp>
+#include <jsoncons_ext/cbor/cbor_parser.hpp>
 
 namespace jsoncons { 
-namespace msgpack {
+namespace cbor {
 
     template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-    class basic_msgpack_cursor2 : public basic_staj2_cursor<char>, private virtual ser_context
+    class basic_cbor_event_reader : public basic_staj2_cursor<char>, private virtual ser_context
     {
     public:
         using source_type = Source;
         using char_type = char;
         using allocator_type = Allocator;
     private:
-        basic_msgpack_parser<Source,Allocator> parser_;
+        basic_cbor_parser<Source,Allocator> parser_;
         basic_staj2_visitor<char_type> cursor_visitor_;
         bool eof_;
 
         // Noncopyable and nonmoveable
-        basic_msgpack_cursor2(const basic_msgpack_cursor2&) = delete;
-        basic_msgpack_cursor2& operator=(const basic_msgpack_cursor2&) = delete;
+        basic_cbor_event_reader(const basic_cbor_event_reader&) = delete;
+        basic_cbor_event_reader& operator=(const basic_cbor_event_reader&) = delete;
 
     public:
         using string_view_type = string_view;
 
         template <class Sourceable>
-        basic_msgpack_cursor2(Sourceable&& source,
-                             const msgpack_decode_options& options = msgpack_decode_options(),
-                             const Allocator& alloc = Allocator())
+        basic_cbor_event_reader(Sourceable&& source,
+                          const cbor_decode_options& options = cbor_decode_options(),
+                          const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc), 
-              cursor_visitor_(accept_all),
+              cursor_visitor_(accept_all), 
               eof_(false)
         {
             if (!done())
@@ -61,31 +61,31 @@ namespace msgpack {
         // Constructors that set parse error codes
 
         template <class Sourceable>
-        basic_msgpack_cursor2(Sourceable&& source,
-                             std::error_code& ec)
-           : basic_msgpack_cursor2(std::allocator_arg, Allocator(),
-                                  std::forward<Sourceable>(source), 
-                                  msgpack_decode_options(), 
-                                  ec)
+        basic_cbor_event_reader(Sourceable&& source, 
+                          std::error_code& ec)
+            : basic_cbor_event_reader(std::allocator_arg, Allocator(),
+                                std::forward<Sourceable>(source), 
+                                cbor_decode_options(), 
+                                ec)
         {
         }
 
         template <class Sourceable>
-        basic_msgpack_cursor2(Sourceable&& source,
-                             const msgpack_decode_options& options,
-                             std::error_code& ec)
-           : basic_msgpack_cursor2(std::allocator_arg, Allocator(),
-                                  std::forward<Sourceable>(source), 
-                                  options, 
-                                  ec)
+        basic_cbor_event_reader(Sourceable&& source, 
+                          const cbor_decode_options& options,
+                          std::error_code& ec)
+            : basic_cbor_event_reader(std::allocator_arg, Allocator(),
+                                std::forward<Sourceable>(source), 
+                                options, 
+                                ec)
         {
         }
 
         template <class Sourceable>
-        basic_msgpack_cursor2(std::allocator_arg_t, const Allocator& alloc, 
-                             Sourceable&& source,
-                             const msgpack_decode_options& options,
-                             std::error_code& ec)
+        basic_cbor_event_reader(std::allocator_arg_t, const Allocator& alloc, 
+                          Sourceable&& source,
+                          const cbor_decode_options& options,
+                          std::error_code& ec)
            : parser_(std::forward<Sourceable>(source), options, alloc), 
              cursor_visitor_(accept_all),
              eof_(false)
@@ -147,6 +147,11 @@ namespace msgpack {
             return parser_.done();
         }
 
+        bool is_typed_array() const
+        {
+            return cursor_visitor_.is_typed_array();
+        }
+
         const staj2_event& current() const override
         {
             return cursor_visitor_.event();
@@ -163,7 +168,7 @@ namespace msgpack {
         }
 
         void read_to(basic_item_event_visitor<char_type>& visitor,
-                    std::error_code& ec) override
+                     std::error_code& ec) override
         {
             if (cursor_visitor_.dump(visitor, *this, ec))
             {
@@ -207,7 +212,7 @@ namespace msgpack {
         }
 
         friend
-        staj2_filter_view operator|(basic_msgpack_cursor2& cursor, 
+        staj2_filter_view operator|(basic_cbor_event_reader& cursor, 
                                    std::function<bool(const staj2_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
@@ -238,21 +243,22 @@ namespace msgpack {
 
         void read_next(basic_item_event_visitor<char_type>& visitor, std::error_code& ec)
         {
+            parser_.restart();
+            while (!parser_.stopped())
             {
-                parser_.restart();
-                while (!parser_.stopped())
+                parser_.parse(visitor, ec);
+                if (ec)
                 {
-                    parser_.parse(visitor, ec);
-                    if (ec) return;
+                    return;
                 }
             }
         }
     };
 
-    using msgpack_stream_cursor2 = basic_msgpack_cursor2<jsoncons::binary_stream_source>;
-    using msgpack_bytes_cursor2 = basic_msgpack_cursor2<jsoncons::bytes_source>;
+    using cbor_stream_cursor2 = basic_cbor_event_reader<jsoncons::binary_stream_source>;
+    using cbor_bytes_cursor2 = basic_cbor_event_reader<jsoncons::bytes_source>;
 
-} // namespace msgpack
+} // namespace cbor
 } // namespace jsoncons
 
 #endif

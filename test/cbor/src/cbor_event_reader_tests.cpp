@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons_ext/cbor/cbor_cursor2.hpp>
+#include <jsoncons_ext/cbor/cbor_event_reader.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("cbor_cursor2 reputon test")
+TEST_CASE("cbor_event_reader reputon test")
 {
     ojson j = ojson::parse(R"(
     {
@@ -102,7 +102,7 @@ struct cbor_stream_cursor2_reset_test_traits
     }
 };
 
-TEMPLATE_TEST_CASE("cbor_cursor2 reset test", "",
+TEMPLATE_TEST_CASE("cbor_event_reader reset test", "",
                    cbor_bytes_cursor2_reset_test_traits,
                    cbor_stream_cursor2_reset_test_traits)
 {

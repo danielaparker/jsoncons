@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons_ext/msgpack/msgpack_cursor2.hpp>
+#include <jsoncons_ext/msgpack/msgpack_event_reader.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("msgpack_cursor2 reputon test")
+TEST_CASE("msgpack_event_reader reputon test")
 {
     ojson j = ojson::parse(R"(
     {
@@ -100,7 +100,7 @@ struct msgpack_stream_cursor2_reset_test_traits
     }
 };
 
-TEMPLATE_TEST_CASE("msgpack_cursor2 reset test", "",
+TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
                    msgpack_bytes_cursor2_reset_test_traits,
                    msgpack_stream_cursor2_reset_test_traits)
 {
