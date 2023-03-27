@@ -13,13 +13,13 @@
 namespace jsoncons { 
 
     template <class CharT, class Allocator = std::allocator<char>>
-    class basic_item_event_to_json_visitor_adaptor;
+    class basic_item_event_visitor_to_json_visitor;
 
     template <class CharT>
     class basic_item_event_visitor 
     {
         template <class Ch, class Allocator>
-        friend class basic_item_event_to_json_visitor_adaptor;
+        friend class basic_item_event_visitor_to_json_visitor;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -743,7 +743,7 @@ namespace jsoncons {
     };
 
  template <class CharT, class Allocator>
-    class basic_item_event_to_json_visitor_adaptor : public basic_item_event_visitor<CharT>
+    class basic_item_event_visitor_to_json_visitor : public basic_item_event_visitor<CharT>
     {
     public:
         using typename basic_item_event_visitor<CharT>::char_type;
@@ -815,17 +815,17 @@ namespace jsoncons {
         const std::basic_string<char> false_constant = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
-        basic_item_event_to_json_visitor_adaptor(const basic_item_event_to_json_visitor_adaptor&) = delete;
-        basic_item_event_to_json_visitor_adaptor& operator=(const basic_item_event_to_json_visitor_adaptor&) = delete;
+        basic_item_event_visitor_to_json_visitor(const basic_item_event_visitor_to_json_visitor&) = delete;
+        basic_item_event_visitor_to_json_visitor& operator=(const basic_item_event_visitor_to_json_visitor&) = delete;
     public:
-        explicit basic_item_event_to_json_visitor_adaptor(const Allocator& alloc = Allocator())
+        explicit basic_item_event_visitor_to_json_visitor(const Allocator& alloc = Allocator())
             : default_visitor_(), destination_(std::addressof(default_visitor_)),
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(target_t::destination,container_t::root); // root
         }
 
-        explicit basic_item_event_to_json_visitor_adaptor(basic_json_visitor<char_type>& visitor, 
+        explicit basic_item_event_visitor_to_json_visitor(basic_json_visitor<char_type>& visitor, 
                                                      const Allocator& alloc = Allocator())
             : destination_(std::addressof(visitor)), 
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
@@ -1862,10 +1862,10 @@ namespace jsoncons {
         }
     };
 
-    // basic_json_to_item_event_visitor_adaptor
+    // basic_json_visitor_to_item_event_visitor
 
     template <class CharT>
-    class basic_json_to_item_event_visitor_adaptor : public basic_json_visitor<CharT>
+    class basic_json_visitor_to_item_event_visitor : public basic_json_visitor<CharT>
     {
     public:
         using typename basic_json_visitor<CharT>::char_type;
@@ -1874,10 +1874,10 @@ namespace jsoncons {
         basic_item_event_visitor<char_type>& destination_;
 
         // noncopyable and nonmoveable
-        basic_json_to_item_event_visitor_adaptor(const basic_json_to_item_event_visitor_adaptor&) = delete;
-        basic_json_to_item_event_visitor_adaptor& operator=(const basic_json_to_item_event_visitor_adaptor&) = delete;
+        basic_json_visitor_to_item_event_visitor(const basic_json_visitor_to_item_event_visitor&) = delete;
+        basic_json_visitor_to_item_event_visitor& operator=(const basic_json_visitor_to_item_event_visitor&) = delete;
     public:
-        basic_json_to_item_event_visitor_adaptor(basic_item_event_visitor<char_type>& visitor)
+        basic_json_visitor_to_item_event_visitor(basic_item_event_visitor<char_type>& visitor)
             : destination_(visitor)
         {
         }
@@ -2072,7 +2072,7 @@ namespace jsoncons {
 
     using item_event_visitor = basic_item_event_visitor<char>;
     using default_item_event_visitor = basic_default_item_event_visitor<char>;
-    using item_event_visitor_to_visitor_adaptor = basic_item_event_to_json_visitor_adaptor<char>;
+    using item_event_visitor_to_visitor_adaptor = basic_item_event_visitor_to_json_visitor<char>;
 
 } // namespace jsoncons
 

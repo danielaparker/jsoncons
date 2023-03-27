@@ -27,7 +27,7 @@ class basic_msgpack_reader
     using char_type = char;
 
     basic_msgpack_parser<Source,Allocator> parser_;
-    basic_item_event_to_json_visitor_adaptor<char_type,Allocator> adaptor_;
+    basic_item_event_visitor_to_json_visitor<char_type,Allocator> adaptor_;
     item_event_visitor& visitor_;
 public:
     template <class Sourceable>
