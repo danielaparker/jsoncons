@@ -34,7 +34,7 @@ namespace cbor {
         using allocator_type = Allocator;
     private:
         basic_cbor_parser<Source,Allocator> parser_;
-        basic_staj2_visitor<char_type> cursor_visitor_;
+        basic_item_event_collector<char_type> cursor_visitor_;
         bool eof_;
 
         // Noncopyable and nonmoveable

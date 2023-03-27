@@ -479,7 +479,7 @@ namespace jsoncons {
         }
     };
 
-    // basic_staj2_visitor
+    // basic_item_event_collector
 
     enum class item_event_reader_state
     {
@@ -489,7 +489,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    class basic_staj2_visitor : public basic_item_event_visitor<CharT>
+    class basic_item_event_collector : public basic_item_event_visitor<CharT>
     {
         using super_type = basic_item_event_visitor<CharT>;
     public:
@@ -504,13 +504,13 @@ namespace jsoncons {
         jsoncons::span<const size_t> shape_;
         std::size_t index_;
     public:
-        basic_staj2_visitor()
+        basic_item_event_collector()
             : pred_(accept), event_(item_event_type::null_value),
               state_(), data_(), shape_(), index_(0)
         {
         }
 
-        basic_staj2_visitor(std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
+        basic_item_event_collector(std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
             : pred_(pred), event_(item_event_type::null_value),
               state_(), data_(), shape_(), index_(0)
         {

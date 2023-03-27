@@ -1862,10 +1862,10 @@ namespace jsoncons {
         }
     };
 
-    // basic_json_visitor_to_visitor2_adaptor
+    // basic_json_to_item_event_visitor_adaptor
 
     template <class CharT>
-    class basic_json_visitor_to_visitor2_adaptor : public basic_json_visitor<CharT>
+    class basic_json_to_item_event_visitor_adaptor : public basic_json_visitor<CharT>
     {
     public:
         using typename basic_json_visitor<CharT>::char_type;
@@ -1874,10 +1874,10 @@ namespace jsoncons {
         basic_item_event_visitor<char_type>& destination_;
 
         // noncopyable and nonmoveable
-        basic_json_visitor_to_visitor2_adaptor(const basic_json_visitor_to_visitor2_adaptor&) = delete;
-        basic_json_visitor_to_visitor2_adaptor& operator=(const basic_json_visitor_to_visitor2_adaptor&) = delete;
+        basic_json_to_item_event_visitor_adaptor(const basic_json_to_item_event_visitor_adaptor&) = delete;
+        basic_json_to_item_event_visitor_adaptor& operator=(const basic_json_to_item_event_visitor_adaptor&) = delete;
     public:
-        basic_json_visitor_to_visitor2_adaptor(basic_item_event_visitor<char_type>& visitor)
+        basic_json_to_item_event_visitor_adaptor(basic_item_event_visitor<char_type>& visitor)
             : destination_(visitor)
         {
         }
