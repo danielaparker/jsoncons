@@ -16,7 +16,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_visitor2.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj2_cursor.hpp>
 #include <jsoncons/source.hpp>
@@ -152,7 +152,7 @@ namespace msgpack {
             return cursor_visitor_.event();
         }
 
-        void read_to(basic_json_visitor2<char_type>& visitor) override
+        void read_to(basic_item_event_visitor<char_type>& visitor) override
         {
             std::error_code ec;
             read_to(visitor, ec);
@@ -162,7 +162,7 @@ namespace msgpack {
             }
         }
 
-        void read_to(basic_json_visitor2<char_type>& visitor,
+        void read_to(basic_item_event_visitor<char_type>& visitor,
                     std::error_code& ec) override
         {
             if (cursor_visitor_.dump(visitor, *this, ec))
@@ -236,7 +236,7 @@ namespace msgpack {
             }
         }
 
-        void read_next(basic_json_visitor2<char_type>& visitor, std::error_code& ec)
+        void read_next(basic_item_event_visitor<char_type>& visitor, std::error_code& ec)
         {
             {
                 parser_.restart();

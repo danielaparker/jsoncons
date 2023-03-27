@@ -19,7 +19,7 @@
 #include <jsoncons_ext/msgpack/msgpack_type.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
-#include <jsoncons/json_visitor2.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -122,7 +122,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_visitor2& visitor, std::error_code& ec)
+    void parse(item_event_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -197,7 +197,7 @@ public:
     }
 private:
 
-    void read_item(json_visitor2& visitor, std::error_code& ec)
+    void read_item(item_event_visitor& visitor, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -614,7 +614,7 @@ private:
         }
     }
 
-    void begin_array(json_visitor2& visitor, uint8_t type, std::error_code& ec)
+    void begin_array(item_event_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -631,7 +631,7 @@ private:
         more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
     }
 
-    void end_array(json_visitor2& visitor, std::error_code& ec)
+    void end_array(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -639,7 +639,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(json_visitor2& visitor, uint8_t type, std::error_code& ec)
+    void begin_object(item_event_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -656,7 +656,7 @@ private:
         more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
     }
 
-    void end_object(json_visitor2& visitor, std::error_code& ec)
+    void end_object(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         more_ = visitor.end_object(*this, ec);

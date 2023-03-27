@@ -230,7 +230,7 @@ TEST_CASE("msgpack_parser reset", "")
     json expected3 = json::parse(R"({"e":6})");
 
     json_decoder<json> destination;
-    json_visitor2_to_visitor_adaptor visitor{destination};
+    item_event_visitor_to_visitor_adaptor visitor{destination};
     msgpack::basic_msgpack_parser<bytes_source> parser{ input1 };
     std::error_code ec;
 

@@ -19,7 +19,7 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
-#include <jsoncons/json_visitor2.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -217,7 +217,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_visitor2& visitor, std::error_code& ec)
+    void parse(item_event_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -335,7 +335,7 @@ public:
         }
     }
 private:
-    void read_item(json_visitor2& visitor, std::error_code& ec)
+    void read_item(item_event_visitor& visitor, std::error_code& ec)
     {
         read_tags(ec);
         if (!more_)
@@ -587,7 +587,7 @@ private:
         other_tags_[item_tag] = false;
     }
 
-    void begin_array(json_visitor2& visitor, uint8_t info, std::error_code& ec)
+    void begin_array(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -626,7 +626,7 @@ private:
         }
     }
 
-    void end_array(json_visitor2& visitor, std::error_code& ec)
+    void end_array(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -638,7 +638,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(json_visitor2& visitor, uint8_t info, std::error_code& ec)
+    void begin_object(item_event_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -676,7 +676,7 @@ private:
         }
     }
 
-    void end_object(json_visitor2& visitor, std::error_code& ec)
+    void end_object(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         more_ = visitor.end_object(*this, ec);
@@ -1438,7 +1438,7 @@ private:
         }
     }
 
-    void handle_string(json_visitor2& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(item_event_visitor& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1479,7 +1479,7 @@ private:
     }
 
     template <typename Read>
-    void write_byte_string(Read read, json_visitor2& visitor, std::error_code& ec)
+    void write_byte_string(Read read, item_event_visitor& visitor, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -1852,7 +1852,7 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(json_visitor2& visitor, 
+    void produce_begin_multi_dim(item_event_visitor& visitor, 
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
@@ -1877,7 +1877,7 @@ private:
         more_ = visitor.begin_multi_dim(shape_, tag, *this, ec);
     }
 
-    void produce_end_multi_dim(json_visitor2& visitor, std::error_code& ec)
+    void produce_end_multi_dim(item_event_visitor& visitor, std::error_code& ec)
     {
         more_ = visitor.end_multi_dim(*this, ec);
         state_stack_.pop_back();

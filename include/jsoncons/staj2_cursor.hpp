@@ -16,7 +16,7 @@
 #include <array> // std::array
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor2.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/bigint.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -443,7 +443,7 @@ namespace jsoncons {
         }
     public:
         friend bool send_value_event(const basic_staj2_event<CharT>& ev,
-            basic_json_visitor2<CharT>& visitor,
+            basic_item_event_visitor<CharT>& visitor,
             const ser_context& context,
             std::error_code& ec)
         {
@@ -489,9 +489,9 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    class basic_staj2_visitor : public basic_json_visitor2<CharT>
+    class basic_staj2_visitor : public basic_item_event_visitor<CharT>
     {
-        using super_type = basic_json_visitor2<CharT>;
+        using super_type = basic_item_event_visitor<CharT>;
     public:
         using char_type = CharT;
         using typename super_type::string_view_type;
@@ -663,7 +663,7 @@ namespace jsoncons {
             }
         }
 
-        bool dump(basic_json_visitor2<CharT>& visitor, const ser_context& context, std::error_code& ec)
+        bool dump(basic_item_event_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
         {
             bool more = true;
             if (is_typed_array())
@@ -1094,9 +1094,9 @@ namespace jsoncons {
 
         virtual const basic_staj2_event<CharT>& current() const = 0;
 
-        virtual void read_to(basic_json_visitor2<CharT>& visitor) = 0;
+        virtual void read_to(basic_item_event_visitor<CharT>& visitor) = 0;
 
-        virtual void read_to(basic_json_visitor2<CharT>& visitor,
+        virtual void read_to(basic_item_event_visitor<CharT>& visitor,
                              std::error_code& ec) = 0;
 
         virtual void next() = 0;
@@ -1132,12 +1132,12 @@ namespace jsoncons {
             return cursor_->current();
         }
 
-        void read_to(basic_json_visitor2<CharT>& visitor) override
+        void read_to(basic_item_event_visitor<CharT>& visitor) override
         {
             cursor_->read_to(visitor);
         }
 
-        void read_to(basic_json_visitor2<CharT>& visitor,
+        void read_to(basic_item_event_visitor<CharT>& visitor,
                      std::error_code& ec) override
         {
             cursor_->read_to(visitor, ec);

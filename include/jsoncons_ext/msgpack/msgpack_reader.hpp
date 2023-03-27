@@ -27,8 +27,8 @@ class basic_msgpack_reader
     using char_type = char;
 
     basic_msgpack_parser<Source,Allocator> parser_;
-    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> adaptor_;
-    json_visitor2& visitor_;
+    basic_item_event_visitor_to_visitor_adaptor<char_type,Allocator> adaptor_;
+    item_event_visitor& visitor_;
 public:
     template <class Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
@@ -52,7 +52,7 @@ public:
     }
     template <class Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
-                      json_visitor2& visitor, 
+                      item_event_visitor& visitor, 
                       const Allocator alloc)
        : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
@@ -63,7 +63,7 @@ public:
 
     template <class Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
-                      json_visitor2& visitor, 
+                      item_event_visitor& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator alloc=Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc),

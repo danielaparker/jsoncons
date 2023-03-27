@@ -35,7 +35,7 @@ public:
 private:
     basic_cbor_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
-    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> cursor_handler_adaptor_;
+    basic_item_event_visitor_to_visitor_adaptor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -312,10 +312,10 @@ private:
         {
             struct resource_wrapper
             {
-                basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor;
+                basic_item_event_visitor_to_visitor_adaptor<char_type,Allocator>& adaptor;
                 basic_json_visitor<char_type>& original;
 
-                resource_wrapper(basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor,
+                resource_wrapper(basic_item_event_visitor_to_visitor_adaptor<char_type,Allocator>& adaptor,
                                  basic_json_visitor<char_type>& visitor)
                     : adaptor(adaptor), original(adaptor.destination())
                 {
