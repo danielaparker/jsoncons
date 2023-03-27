@@ -1,3 +1,11 @@
+master
+------
+
+Defect fixes:
+
+- Fixed issue danielaparker/jsoncons/#418 where use of `std::aligned_storage` 
+produced a diagnostic that it is deprecated in C++2023.
+
 0.170.0 
 -------
 
