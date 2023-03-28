@@ -1343,42 +1343,48 @@ namespace jsoncons {
             }
         }
 
+        static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
+        {
+            int comp = item1.name.compare(item2.name); 
+            if (comp < 0) return true;
+            if (comp == 0) return item1.index < item2.index;
+
+            return false;
+        }
+
         void insert(index_key_value<Json>* items, std::size_t count)
         {
             if (count > 0)
             {
-                auto first = items;
-                auto last = items + count;
-
-                members_.reserve(members_.size() + count);
-                for (auto it = first; it != last; ++it)
+                index_.reserve(count);
+                for (std::size_t i = 0; i < count; ++i)
                 {
-                    members_.emplace_back(it->name, std::move(it->value));
+                    index_.push_back(i);
                 }
+                std::sort(index_.begin(),index_.end(),
+                    [&](std::size_t i, std::size_t j) -> bool 
+                    {
+                        int comp = items[i].name.compare(items[j].name); 
+                        if (comp < 0) return true;
+                        if (comp == 0) return items[i].index < items[j].index;
 
-                build_index();
+                        return false;
+                    }
+                );
                 auto last_unique = std::unique(index_.begin(), index_.end(),
-                    [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
-
+                    [&](std::size_t i, std::size_t j) { 
+                        return items[i].name.compare(items[j].name) == 0; 
+                    });
                 if (last_unique != index_.end())
                 {
                     index_.erase(last_unique, index_.end());
-                    std::sort(index_.begin(), index_.end());
-
-                    auto result = index_.rbegin();
-                    if (*result != members_.size())
-                    {
-                        members_.erase(members_.begin() + (*result + 1), members_.end());
-                    }
-                    for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
-                    {
-                        if (*result - *it > 1)
-                        {
-                            members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
-                        }
-                    }
                 }
-                build_index();
+
+                members_.resize(index_.size());
+                for (auto i : index_)
+                {
+                    members_[i] = key_value_type(std::move(items[i].name), std::move(items[i].value));
+                }
             }
         }
 
