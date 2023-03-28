@@ -26,6 +26,28 @@
 
 namespace jsoncons {
 
+    template <class Json>
+    struct index_key_value
+    {
+        using key_type = typename Json::key_type;
+
+        std::size_t index;
+        key_type name;
+        Json value;
+
+        template <class... Args>
+        index_key_value(std::size_t index, key_type&& name, Args&& ... args) 
+            : index(index), name(std::move(name)), value(std::forward<Args>(args)...)
+        {
+        }
+
+        index_key_value() = default;
+        index_key_value(const index_key_value&) = default;
+        index_key_value(index_key_value&&) = default;
+        index_key_value& operator=(const index_key_value&) = default;
+        index_key_value& operator=(index_key_value&&) = default;
+    };
+
     struct sorted_unique_range_tag
     {
         explicit sorted_unique_range_tag() = default; 
@@ -482,6 +504,40 @@ namespace jsoncons {
             if (it != members_.end())
             {
                 members_.erase(it);
+            }
+        }
+
+        static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
+        {
+            int comp = item1.name.compare(item2.name); 
+            if (comp < 0) return true;
+            if (comp == 0) return item1.index < item2.index;
+
+            return false;
+        }
+
+        void insert(index_key_value<Json>* items, std::size_t count)
+        {
+            auto first = items;
+            if (count > 0)
+            {
+                members_.reserve(members_.size() + count);
+
+                auto last = first + count;
+
+                std::sort(first, last, compare);
+                first = items;
+                last = first + count;
+                members_.emplace_back(first->name, std::move(first->value));
+                auto prev_it = first;
+                for (auto it = first+1; it != last; ++it)
+                {
+                    if (it->name.compare(prev_it->name) != 0)
+                    {
+                        members_.emplace_back(it->name, std::move(it->value));
+                    }
+                    ++prev_it;
+                }
             }
         }
 
@@ -1284,6 +1340,45 @@ namespace jsoncons {
     #else
                 members_.erase(pos);
     #endif
+            }
+        }
+
+        void insert(index_key_value<Json>* items, std::size_t count)
+        {
+            if (count > 0)
+            {
+                auto first = items;
+                auto last = items + count;
+
+                members_.reserve(members_.size() + count);
+                for (auto it = first; it != last; ++it)
+                {
+                    members_.emplace_back(it->name, std::move(it->value));
+                }
+
+                build_index();
+                auto last_unique = std::unique(index_.begin(), index_.end(),
+                    [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+
+                if (last_unique != index_.end())
+                {
+                    index_.erase(last_unique, index_.end());
+                    std::sort(index_.begin(), index_.end());
+
+                    auto result = index_.rbegin();
+                    if (*result != members_.size())
+                    {
+                        members_.erase(members_.begin() + (*result + 1), members_.end());
+                    }
+                    for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
+                    {
+                        if (*result - *it > 1)
+                        {
+                            members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
+                        }
+                    }
+                }
+                build_index();
             }
         }
 
