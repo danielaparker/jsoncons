@@ -6,6 +6,11 @@ Defect fixes:
 - Fixed issue danielaparker/jsoncons/#418 where use of `std::aligned_storage` 
 produced a diagnostic that it is deprecated in C++2023.
 
+Enhancements:
+
+- Fixed issue danielaparker/jsoncons/#391 where parsing JSON resulted
+in temporary allocations from `std::stable_sort`
+
 0.170.0 
 -------
 
