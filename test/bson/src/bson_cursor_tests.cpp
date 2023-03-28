@@ -167,29 +167,28 @@ template <typename CursorType>
 void check_bson_cursor_document(std::string info, CursorType& cursor,
                                 std::string expectedKey, int expectedValue)
 {
-    using event_type = staj_event_type;
     INFO(info);
 
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == event_type::begin_object);
+    CHECK(cursor.current().event_type() == staj_event_type::begin_object);
     CHECK(cursor.current().tag() == semantic_tag::none);
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(cursor.current().event_type() == event_type::key);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     CHECK(cursor.current().tag() == semantic_tag::none);
     CHECK(cursor.current().template get<std::string>() == expectedKey);
     CHECK(cursor.current().template get<jsoncons::string_view>() == expectedKey);
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(cursor.current().event_type() == event_type::int64_value);
+    CHECK(cursor.current().event_type() == staj_event_type::int64_value);
     CHECK(cursor.current().tag() == semantic_tag::none);
     CHECK(cursor.current().template get<int>() == expectedValue);
 
     REQUIRE_FALSE(cursor.done());
     cursor.next();
-    CHECK(cursor.current().event_type() == event_type::end_object);
+    CHECK(cursor.current().event_type() == staj_event_type::end_object);
     CHECK(cursor.current().tag() == semantic_tag::none);
 
     // Extra next() required to pop out of document state
@@ -206,7 +205,6 @@ TEMPLATE_TEST_CASE("bson_cursor reset test", "",
     using input_type = typename traits::input_type;
     using cursor_type = typename traits::cursor_type;
     using source_type = typename cursor_type::source_type;
-    using event_type = staj_event_type;
 
     SECTION("keeping same source")
     {
@@ -283,13 +281,13 @@ TEMPLATE_TEST_CASE("bson_cursor reset test", "",
         cursor.reset(input2, ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::begin_object);
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         CHECK(cursor.current().tag() == semantic_tag::none);
         REQUIRE_FALSE(cursor.done());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::key);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<std::string>() == std::string("b"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==

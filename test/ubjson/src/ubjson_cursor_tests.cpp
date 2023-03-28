@@ -323,7 +323,6 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
     using input_type = typename traits::input_type;
     using cursor_type = typename traits::cursor_type;
     using source_type = typename cursor_type::source_type;
-    using event_type = staj_event_type;
 
     SECTION("keeping same source")
     {
@@ -338,7 +337,7 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
         cursor_type cursor(std::move(source));
 
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
@@ -348,7 +347,7 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
 
         cursor.reset();
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<int>() == -100);
         cursor.next();
@@ -357,7 +356,7 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::null_value);
+        CHECK(cursor.current().event_type() == staj_event_type::null_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         cursor.next(ec);
         REQUIRE_FALSE(ec);
@@ -384,7 +383,7 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
 
         // Reset to valid input1
         cursor.reset(input1);
-        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
@@ -405,7 +404,7 @@ TEMPLATE_TEST_CASE("ubjson_cursor reset test", "",
         ec = ubjson::ubjson_errc::success;
         cursor.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<int>() == -100);
         REQUIRE_FALSE(cursor.done());
