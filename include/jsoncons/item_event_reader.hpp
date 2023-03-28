@@ -28,7 +28,7 @@
 
 namespace jsoncons {
 
-    enum class item_event_type
+    enum class item_event_kind
     {
         begin_array,
         end_array,
@@ -45,7 +45,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, item_event_type tag)
+    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, item_event_kind tag)
     {
         static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
         static constexpr const CharT* end_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "end_array");
@@ -62,62 +62,62 @@ namespace jsoncons {
 
         switch (tag)
         {
-            case item_event_type::begin_array:
+            case item_event_kind::begin_array:
             {
                 os << begin_array_name;
                 break;
             }
-            case item_event_type::end_array:
+            case item_event_kind::end_array:
             {
                 os << end_array_name;
                 break;
             }
-            case item_event_type::begin_object:
+            case item_event_kind::begin_object:
             {
                 os << begin_object_name;
                 break;
             }
-            case item_event_type::end_object:
+            case item_event_kind::end_object:
             {
                 os << end_object_name;
                 break;
             }
-            case item_event_type::string_value:
+            case item_event_kind::string_value:
             {
                 os << string_value_name;
                 break;
             }
-            case item_event_type::byte_string_value:
+            case item_event_kind::byte_string_value:
             {
                 os << byte_string_value_name;
                 break;
             }
-            case item_event_type::null_value:
+            case item_event_kind::null_value:
             {
                 os << null_value_name;
                 break;
             }
-            case item_event_type::bool_value:
+            case item_event_kind::bool_value:
             {
                 os << bool_value_name;
                 break;
             }
-            case item_event_type::int64_value:
+            case item_event_kind::int64_value:
             {
                 os << int64_value_name;
                 break;
             }
-            case item_event_type::uint64_value:
+            case item_event_kind::uint64_value:
             {
                 os << uint64_value_name;
                 break;
             }
-            case item_event_type::half_value:
+            case item_event_kind::half_value:
             {
                 os << half_value_name;
                 break;
             }
-            case item_event_type::double_value:
+            case item_event_kind::double_value:
             {
                 os << double_value_name;
                 break;
@@ -129,7 +129,7 @@ namespace jsoncons {
     template<class CharT>
     class basic_item_event
     {
-        item_event_type event_type_;
+        item_event_kind event_type_;
         semantic_tag tag_;
         uint64_t ext_tag_;
         union
@@ -146,71 +146,71 @@ namespace jsoncons {
     public:
         using string_view_type = jsoncons::basic_string_view<CharT>;
 
-        basic_item_event(item_event_type event_type, semantic_tag tag = semantic_tag::none)
-            : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(0)
+        basic_item_event(item_event_kind event_kind, semantic_tag tag = semantic_tag::none)
+            : event_type_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(0)
         {
         }
 
-        basic_item_event(item_event_type event_type, std::size_t length, semantic_tag tag = semantic_tag::none)
-            : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(length)
+        basic_item_event(item_event_kind event_kind, std::size_t length, semantic_tag tag = semantic_tag::none)
+            : event_type_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(length)
         {
         }
 
         basic_item_event(null_type, semantic_tag tag)
-            : event_type_(item_event_type::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
+            : event_type_(item_event_kind::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
         {
         }
 
         basic_item_event(bool value, semantic_tag tag)
-            : event_type_(item_event_type::bool_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_type_(item_event_kind::bool_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.bool_value_ = value;
         }
 
         basic_item_event(int64_t value, semantic_tag tag)
-            : event_type_(item_event_type::int64_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_type_(item_event_kind::int64_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.int64_value_ = value;
         }
 
         basic_item_event(uint64_t value, semantic_tag tag)
-            : event_type_(item_event_type::uint64_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_type_(item_event_kind::uint64_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.uint64_value_ = value;
         }
 
         basic_item_event(half_arg_t, uint16_t value, semantic_tag tag)
-            : event_type_(item_event_type::half_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_type_(item_event_kind::half_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.half_value_ = value;
         }
 
         basic_item_event(double value, semantic_tag tag)
-            : event_type_(item_event_type::double_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_type_(item_event_kind::double_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.double_value_ = value;
         }
 
         basic_item_event(const string_view_type& s,
-            item_event_type event_type,
+            item_event_kind event_kind,
             semantic_tag tag = semantic_tag::none)
-            : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.length())
+            : event_type_(event_kind), tag_(tag), ext_tag_(0), length_(s.length())
         {
             value_.string_data_ = s.data();
         }
 
         basic_item_event(const byte_string_view& s,
-            item_event_type event_type,
+            item_event_kind event_kind,
             semantic_tag tag = semantic_tag::none)
-            : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.size())
+            : event_type_(event_kind), tag_(tag), ext_tag_(0), length_(s.size())
         {
             value_.byte_string_data_ = s.data();
         }
 
         basic_item_event(const byte_string_view& s,
-            item_event_type event_type,
+            item_event_kind event_kind,
             uint64_t ext_tag)
-            : event_type_(event_type), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
+            : event_type_(event_kind), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
         {
             value_.byte_string_data_ = s.data();
         }
@@ -238,42 +238,42 @@ namespace jsoncons {
         {
             switch (event_type_)
             {
-                case item_event_type::string_value:
+                case item_event_kind::string_value:
                 {
                     value_converter<jsoncons::basic_string_view<CharT>,T> converter;
                     return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
                 }
-                case item_event_type::byte_string_value:
+                case item_event_kind::byte_string_value:
                 {
                     value_converter<byte_string_view,T> converter;
                     return converter.convert(byte_string_view(value_.byte_string_data_,length_),tag(),ec);
                 }
-                case item_event_type::uint64_value:
+                case item_event_kind::uint64_value:
                 {
                     value_converter<uint64_t,T> converter;
                     return converter.convert(value_.uint64_value_, tag(), ec);
                 }
-                case item_event_type::int64_value:
+                case item_event_kind::int64_value:
                 {
                     value_converter<int64_t,T> converter;
                     return converter.convert(value_.int64_value_, tag(), ec);
                 }
-                case item_event_type::half_value:
+                case item_event_kind::half_value:
                 {
                     value_converter<half_arg_t,T> converter;
                     return converter.convert(value_.half_value_, tag(), ec);
                 }
-                case item_event_type::double_value:
+                case item_event_kind::double_value:
                 {
                     value_converter<double,T> converter;
                     return converter.convert(value_.double_value_, tag(), ec);
                 }
-                case item_event_type::bool_value:
+                case item_event_kind::bool_value:
                 {
                     value_converter<bool,T> converter;
                     return converter.convert(value_.bool_value_,tag(),ec);
                 }
-                case item_event_type::null_value:
+                case item_event_kind::null_value:
                 {
                     value_converter<null_type,T> converter;
                     return converter.convert(tag(),ec);
@@ -293,7 +293,7 @@ namespace jsoncons {
             T s;
             switch (event_type_)
             {
-            case item_event_type::string_value:
+            case item_event_kind::string_value:
                 s = T(value_.string_data_, length_);
                 break;
             default:
@@ -310,7 +310,7 @@ namespace jsoncons {
             T s;
             switch (event_type_)
             {
-                case item_event_type::byte_string_value:
+                case item_event_kind::byte_string_value:
                     s = T(value_.byte_string_data_, length_);
                     break;
                 default:
@@ -327,12 +327,12 @@ namespace jsoncons {
         {
             switch (event_type_)
             {
-                case item_event_type::byte_string_value:
+                case item_event_kind::byte_string_value:
                 {
                     value_converter<byte_string_view,T> converter;
                     return converter.convert(byte_string_view(value_.byte_string_data_, length_), tag(), ec);
                 }
-                case item_event_type::string_value:
+                case item_event_kind::string_value:
                 {
                     value_converter<basic_string_view<CharT>,T> converter;
                     return converter.convert(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
@@ -349,7 +349,7 @@ namespace jsoncons {
         {
             switch (event_type_)
             {
-                case item_event_type::string_value:
+                case item_event_kind::string_value:
                 {
                     IntegerType val;
                     auto result = jsoncons::detail::to_integer(value_.string_data_, length_, val);
@@ -360,15 +360,15 @@ namespace jsoncons {
                     }
                     return val;
                 }
-                case item_event_type::half_value:
+                case item_event_kind::half_value:
                     return static_cast<IntegerType>(value_.half_value_);
-                case item_event_type::double_value:
+                case item_event_kind::double_value:
                     return static_cast<IntegerType>(value_.double_value_);
-                case item_event_type::int64_value:
+                case item_event_kind::int64_value:
                     return static_cast<IntegerType>(value_.int64_value_);
-                case item_event_type::uint64_value:
+                case item_event_kind::uint64_value:
                     return static_cast<IntegerType>(value_.uint64_value_);
-                case item_event_type::bool_value:
+                case item_event_kind::bool_value:
                     return static_cast<IntegerType>(value_.bool_value_ ? 1 : 0);
                 default:
                     ec = conv_errc::not_integer;
@@ -390,7 +390,7 @@ namespace jsoncons {
             return as_bool(ec);
         }
 
-        item_event_type event_type() const noexcept { return event_type_; }
+        item_event_kind event_kind() const noexcept { return event_type_; }
 
         semantic_tag tag() const noexcept { return tag_; }
 
@@ -402,18 +402,18 @@ namespace jsoncons {
         {
             switch (event_type_)
             {
-                case item_event_type::string_value:
+                case item_event_kind::string_value:
                 {
                     jsoncons::detail::chars_to f;
                     return f(value_.string_data_, length_);
                 }
-                case item_event_type::double_value:
+                case item_event_kind::double_value:
                     return value_.double_value_;
-                case item_event_type::int64_value:
+                case item_event_kind::int64_value:
                     return static_cast<double>(value_.int64_value_);
-                case item_event_type::uint64_value:
+                case item_event_kind::uint64_value:
                     return static_cast<double>(value_.uint64_value_);
-                case item_event_type::half_value:
+                case item_event_kind::half_value:
                 {
                     double x = binary::decode_half(value_.half_value_);
                     return static_cast<double>(x);
@@ -428,13 +428,13 @@ namespace jsoncons {
         {
             switch (event_type_)
             {
-                case item_event_type::bool_value:
+                case item_event_kind::bool_value:
                     return value_.bool_value_;
-                case item_event_type::double_value:
+                case item_event_kind::double_value:
                     return value_.double_value_ != 0.0;
-                case item_event_type::int64_value:
+                case item_event_kind::int64_value:
                     return value_.int64_value_ != 0;
-                case item_event_type::uint64_value:
+                case item_event_kind::uint64_value:
                     return value_.uint64_value_ != 0;
                 default:
                     ec = conv_errc::not_bool;
@@ -447,31 +447,31 @@ namespace jsoncons {
             const ser_context& context,
             std::error_code& ec)
         {
-            switch (ev.event_type())
+            switch (ev.event_kind())
             {
-                case item_event_type::begin_array:
+                case item_event_kind::begin_array:
                     return visitor.begin_array(ev.tag(), context);
-                case item_event_type::end_array:
+                case item_event_kind::end_array:
                     return visitor.end_array(context);
-                case item_event_type::begin_object:
+                case item_event_kind::begin_object:
                     return visitor.begin_object(ev.tag(), context, ec);
-                case item_event_type::end_object:
+                case item_event_kind::end_object:
                     return visitor.end_object(context, ec);
-                case item_event_type::string_value:
+                case item_event_kind::string_value:
                     return visitor.string_value(string_view_type(ev.value_.string_data_,ev.length_), ev.tag(), context);
-                case item_event_type::byte_string_value:
+                case item_event_kind::byte_string_value:
                     return visitor.byte_string_value(byte_string_view(ev.value_.byte_string_data_,ev.length_), ev.tag(), context);
-                case item_event_type::null_value:
+                case item_event_kind::null_value:
                     return visitor.null_value(ev.tag(), context);
-                case item_event_type::bool_value:
+                case item_event_kind::bool_value:
                     return visitor.bool_value(ev.value_.bool_value_, ev.tag(), context);
-                case item_event_type::int64_value:
+                case item_event_kind::int64_value:
                     return visitor.int64_value(ev.value_.int64_value_, ev.tag(), context);
-                case item_event_type::uint64_value:
+                case item_event_kind::uint64_value:
                     return visitor.uint64_value(ev.value_.uint64_value_, ev.tag(), context);
-                case item_event_type::half_value:
+                case item_event_kind::half_value:
                     return visitor.half_value(ev.value_.half_value_, ev.tag(), context);
-                case item_event_type::double_value:
+                case item_event_kind::double_value:
                     return visitor.double_value(ev.value_.double_value_, ev.tag(), context);
                 default:
                     return false;
@@ -505,20 +505,20 @@ namespace jsoncons {
         std::size_t index_;
     public:
         basic_item_event_collector()
-            : pred_(accept), event_(item_event_type::null_value),
+            : pred_(accept), event_(item_event_kind::null_value),
               state_(), data_(), shape_(), index_(0)
         {
         }
 
         basic_item_event_collector(std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
-            : pred_(pred), event_(item_event_type::null_value),
+            : pred_(pred), event_(item_event_kind::null_value),
               state_(), data_(), shape_(), index_(0)
         {
         }
 
         void reset()
         {
-            event_ = item_event_type::null_value;
+            event_ = item_event_kind::null_value;
             state_ = {};
             data_ = {};
             shape_ = {};
@@ -818,43 +818,43 @@ namespace jsoncons {
 
         bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::begin_object, tag);
+            event_ = basic_item_event<CharT>(item_event_kind::begin_object, tag);
             return !pred_(event_, context);
         }
 
         bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::begin_object, length, tag);
+            event_ = basic_item_event<CharT>(item_event_kind::begin_object, length, tag);
             return !pred_(event_, context);
         }
 
         bool visit_end_object(const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::end_object);
+            event_ = basic_item_event<CharT>(item_event_kind::end_object);
             return !pred_(event_, context);
         }
 
         bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::begin_array, tag);
+            event_ = basic_item_event<CharT>(item_event_kind::begin_array, tag);
             return !pred_(event_, context);
         }
 
         bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::begin_array, length, tag);
+            event_ = basic_item_event<CharT>(item_event_kind::begin_array, length, tag);
             return !pred_(event_, context);
         }
 
         bool visit_end_array(const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::end_array);
+            event_ = basic_item_event<CharT>(item_event_kind::end_array);
             return !pred_(event_, context);
         }
 
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(item_event_type::null_value, tag);
+            event_ = basic_item_event<CharT>(item_event_kind::null_value, tag);
             return !pred_(event_, context);
         }
 
@@ -866,7 +866,7 @@ namespace jsoncons {
 
         bool visit_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(s, item_event_type::string_value, tag);
+            event_ = basic_item_event<CharT>(s, item_event_kind::string_value, tag);
             return !pred_(event_, context);
         }
 
@@ -875,7 +875,7 @@ namespace jsoncons {
                                const ser_context& context,
                                std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(s, item_event_type::byte_string_value, tag);
+            event_ = basic_item_event<CharT>(s, item_event_kind::byte_string_value, tag);
             return !pred_(event_, context);
         }
 
@@ -884,7 +884,7 @@ namespace jsoncons {
                                const ser_context& context,
                                std::error_code&) override
         {
-            event_ = basic_item_event<CharT>(s, item_event_type::byte_string_value, ext_tag);
+            event_ = basic_item_event<CharT>(s, item_event_kind::byte_string_value, ext_tag);
             return !pred_(event_, context);
         }
 
@@ -1084,7 +1084,7 @@ namespace jsoncons {
 
         virtual void array_expected(std::error_code& ec)
         {
-            if (!(current().event_type() == item_event_type::begin_array || current().event_type() == item_event_type::byte_string_value))
+            if (!(current().event_kind() == item_event_kind::begin_array || current().event_kind() == item_event_kind::byte_string_value))
             {
                 ec = conv_errc::not_vector;
             }

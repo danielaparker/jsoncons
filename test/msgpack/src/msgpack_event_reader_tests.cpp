@@ -39,39 +39,39 @@ TEST_CASE("msgpack_event_reader reputon test")
     {
         msgpack::msgpack_bytes_cursor2 cursor(data);
 
-        CHECK(cursor.current().event_type() == item_event_type::begin_object);
+        CHECK(cursor.current().event_kind() == item_event_kind::begin_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::begin_array);
+        CHECK(cursor.current().event_kind() == item_event_kind::begin_array);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::begin_object);
+        CHECK(cursor.current().event_kind() == item_event_kind::begin_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::string_value);  // key
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);  // key
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::double_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::double_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::end_object);
+        CHECK(cursor.current().event_kind() == item_event_kind::end_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::end_array);
+        CHECK(cursor.current().event_kind() == item_event_kind::end_array);
         cursor.next();
-        CHECK(cursor.current().event_type() == item_event_type::end_object);
+        CHECK(cursor.current().event_kind() == item_event_kind::end_object);
         cursor.next();
         CHECK(cursor.done());
     }
@@ -108,7 +108,6 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
     using input_type = typename traits::input_type;
     using cursor_type = typename traits::cursor_type;
     using source_type = typename cursor_type::source_type;
-    using event_type = item_event_type;
 
     SECTION("keeping same source")
     {
@@ -123,7 +122,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
         cursor_type cursor(std::move(source));
 
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
@@ -133,7 +132,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
 
         cursor.reset();
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::int64_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<int>() == -100);
         cursor.next();
@@ -142,7 +141,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == event_type::null_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::null_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         cursor.next(ec);
         REQUIRE_FALSE(ec);
@@ -169,7 +168,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
 
         // Reset to valid input1
         cursor.reset(input1);
-        CHECK(cursor.current().event_type() == event_type::string_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::string_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
@@ -189,7 +188,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
         ec = msgpack::msgpack_errc::success;
         cursor.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(cursor.current().event_type() == event_type::int64_value);
+        CHECK(cursor.current().event_kind() == item_event_kind::int64_value);
         CHECK(cursor.current().tag() == semantic_tag::none);
         CHECK(cursor.current().template get<int>() == -100);
         REQUIRE_FALSE(cursor.done());
