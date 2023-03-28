@@ -129,7 +129,7 @@ namespace jsoncons {
     template<class CharT>
     class basic_item_event
     {
-        item_event_kind event_type_;
+        item_event_kind event_kind_;
         semantic_tag tag_;
         uint64_t ext_tag_;
         union
@@ -147,46 +147,46 @@ namespace jsoncons {
         using string_view_type = jsoncons::basic_string_view<CharT>;
 
         basic_item_event(item_event_kind event_kind, semantic_tag tag = semantic_tag::none)
-            : event_type_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(0)
+            : event_kind_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(0)
         {
         }
 
         basic_item_event(item_event_kind event_kind, std::size_t length, semantic_tag tag = semantic_tag::none)
-            : event_type_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(length)
+            : event_kind_(event_kind), tag_(tag), ext_tag_(0), value_(), length_(length)
         {
         }
 
         basic_item_event(null_type, semantic_tag tag)
-            : event_type_(item_event_kind::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
+            : event_kind_(item_event_kind::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
         {
         }
 
         basic_item_event(bool value, semantic_tag tag)
-            : event_type_(item_event_kind::bool_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_kind_(item_event_kind::bool_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.bool_value_ = value;
         }
 
         basic_item_event(int64_t value, semantic_tag tag)
-            : event_type_(item_event_kind::int64_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_kind_(item_event_kind::int64_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.int64_value_ = value;
         }
 
         basic_item_event(uint64_t value, semantic_tag tag)
-            : event_type_(item_event_kind::uint64_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_kind_(item_event_kind::uint64_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.uint64_value_ = value;
         }
 
         basic_item_event(half_arg_t, uint16_t value, semantic_tag tag)
-            : event_type_(item_event_kind::half_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_kind_(item_event_kind::half_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.half_value_ = value;
         }
 
         basic_item_event(double value, semantic_tag tag)
-            : event_type_(item_event_kind::double_value), tag_(tag), ext_tag_(0), length_(0)
+            : event_kind_(item_event_kind::double_value), tag_(tag), ext_tag_(0), length_(0)
         {
             value_.double_value_ = value;
         }
@@ -194,7 +194,7 @@ namespace jsoncons {
         basic_item_event(const string_view_type& s,
             item_event_kind event_kind,
             semantic_tag tag = semantic_tag::none)
-            : event_type_(event_kind), tag_(tag), ext_tag_(0), length_(s.length())
+            : event_kind_(event_kind), tag_(tag), ext_tag_(0), length_(s.length())
         {
             value_.string_data_ = s.data();
         }
@@ -202,7 +202,7 @@ namespace jsoncons {
         basic_item_event(const byte_string_view& s,
             item_event_kind event_kind,
             semantic_tag tag = semantic_tag::none)
-            : event_type_(event_kind), tag_(tag), ext_tag_(0), length_(s.size())
+            : event_kind_(event_kind), tag_(tag), ext_tag_(0), length_(s.size())
         {
             value_.byte_string_data_ = s.data();
         }
@@ -210,7 +210,7 @@ namespace jsoncons {
         basic_item_event(const byte_string_view& s,
             item_event_kind event_kind,
             uint64_t ext_tag)
-            : event_type_(event_kind), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
+            : event_kind_(event_kind), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
         {
             value_.byte_string_data_ = s.data();
         }
@@ -236,7 +236,7 @@ namespace jsoncons {
         typename std::enable_if<traits_extension::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get(std::error_code& ec) const
         {
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::string_value:
                 {
@@ -291,7 +291,7 @@ namespace jsoncons {
             get(std::error_code& ec) const
         {
             T s;
-            switch (event_type_)
+            switch (event_kind_)
             {
             case item_event_kind::string_value:
                 s = T(value_.string_data_, length_);
@@ -308,7 +308,7 @@ namespace jsoncons {
             get(std::error_code& ec) const
         {
             T s;
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::byte_string_value:
                     s = T(value_.byte_string_data_, length_);
@@ -325,7 +325,7 @@ namespace jsoncons {
                                 std::is_same<typename T::value_type,uint8_t>::value,T>::type
         get(std::error_code& ec) const
         {
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::byte_string_value:
                 {
@@ -347,7 +347,7 @@ namespace jsoncons {
         typename std::enable_if<traits_extension::is_integer<IntegerType>::value, IntegerType>::type
         get(std::error_code& ec) const
         {
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::string_value:
                 {
@@ -390,7 +390,7 @@ namespace jsoncons {
             return as_bool(ec);
         }
 
-        item_event_kind event_kind() const noexcept { return event_type_; }
+        item_event_kind event_kind() const noexcept { return event_kind_; }
 
         semantic_tag tag() const noexcept { return tag_; }
 
@@ -400,7 +400,7 @@ namespace jsoncons {
 
         double as_double(std::error_code& ec) const
         {
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::string_value:
                 {
@@ -426,7 +426,7 @@ namespace jsoncons {
 
         bool as_bool(std::error_code& ec) const
         {
-            switch (event_type_)
+            switch (event_kind_)
             {
                 case item_event_kind::bool_value:
                     return value_.bool_value_;
