@@ -147,7 +147,7 @@ namespace msgpack {
             return parser_.done();
         }
 
-        const basic_item_event<char_type>& current() const
+        const basic_item_event<char_type>& current() const override
         {
             return event_receiver_.event();
         }
