@@ -34,7 +34,7 @@ namespace msgpack {
         using allocator_type = Allocator;
     private:
         basic_msgpack_parser<Source,Allocator> parser_;
-        basic_item_event_collector<char_type> cursor_visitor_;
+        basic_item_event_receiver<char_type> event_receiver_;
         bool eof_;
 
         // Noncopyable and nonmoveable
@@ -49,7 +49,7 @@ namespace msgpack {
                              const msgpack_decode_options& options = msgpack_decode_options(),
                              const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc), 
-              cursor_visitor_(accept_all),
+              event_receiver_(accept_all),
               eof_(false)
         {
             if (!done())
@@ -87,7 +87,7 @@ namespace msgpack {
                              const msgpack_decode_options& options,
                              std::error_code& ec)
            : parser_(std::forward<Sourceable>(source), options, alloc), 
-             cursor_visitor_(accept_all),
+             event_receiver_(accept_all),
              eof_(false)
         {
             if (!done())
@@ -99,7 +99,7 @@ namespace msgpack {
         void reset()
         {
             parser_.reset();
-            cursor_visitor_.reset();
+            event_receiver_.reset();
             eof_ = false;
             if (!done())
             {
@@ -111,7 +111,7 @@ namespace msgpack {
         void reset(Sourceable&& source)
         {
             parser_.reset(std::forward<Sourceable>(source));
-            cursor_visitor_.reset();
+            event_receiver_.reset();
             eof_ = false;
             if (!done())
             {
@@ -122,7 +122,7 @@ namespace msgpack {
         void reset(std::error_code& ec)
         {
             parser_.reset();
-            cursor_visitor_.reset();
+            event_receiver_.reset();
             eof_ = false;
             if (!done())
             {
@@ -134,7 +134,7 @@ namespace msgpack {
         void reset(Sourceable&& source, std::error_code& ec)
         {
             parser_.reset(std::forward<Sourceable>(source));
-            cursor_visitor_.reset();
+            event_receiver_.reset();
             eof_ = false;
             if (!done())
             {
@@ -147,10 +147,33 @@ namespace msgpack {
             return parser_.done();
         }
 
-        const item_event& current() const override
+        const basic_item_event<char_type>& current() const
         {
-            return cursor_visitor_.event();
+            return event_receiver_.event();
         }
+
+        std::size_t size() const
+        {
+            return event_receiver_.event().size();
+        }
+
+        template <class T>
+        T get() const
+        {
+            return event_receiver_.event().get<T>();
+        }
+
+        template <class T>
+        T get(std::error_code& ec) const
+        {
+            return event_receiver_.event().get<T>(ec);
+        }
+
+        item_event_kind event_kind() const noexcept { return event_receiver_.event().event_kind(); }
+
+        semantic_tag tag() const noexcept { return event_receiver_.event().tag(); }
+
+        uint64_t ext_tag() const noexcept { return event_receiver_.event().ext_tag(); }
 
         void read_to(basic_item_event_visitor<char_type>& visitor) override
         {
@@ -165,7 +188,7 @@ namespace msgpack {
         void read_to(basic_item_event_visitor<char_type>& visitor,
                     std::error_code& ec) override
         {
-            if (cursor_visitor_.dump(visitor, *this, ec))
+            if (event_receiver_.dump(visitor, *this, ec))
             {
                 read_next(visitor, ec);
             }
@@ -221,16 +244,16 @@ namespace msgpack {
 
         void read_next(std::error_code& ec)
         {
-            if (cursor_visitor_.in_available())
+            if (event_receiver_.in_available())
             {
-                cursor_visitor_.send_available(ec);
+                event_receiver_.send_available(ec);
             }
             else
             {
                 parser_.restart();
                 while (!parser_.stopped())
                 {
-                    parser_.parse(cursor_visitor_, ec);
+                    parser_.parse(event_receiver_, ec);
                     if (ec) return;
                 }
             }
@@ -249,8 +272,8 @@ namespace msgpack {
         }
     };
 
-    using msgpack_stream_cursor2 = basic_msgpack_event_reader<jsoncons::binary_stream_source>;
-    using msgpack_bytes_cursor2 = basic_msgpack_event_reader<jsoncons::bytes_source>;
+    using msgpack_stream_event_reader = basic_msgpack_event_reader<jsoncons::binary_stream_source>;
+    using msgpack_bytes_event_reader = basic_msgpack_event_reader<jsoncons::bytes_source>;
 
 } // namespace msgpack
 } // namespace jsoncons

@@ -479,7 +479,7 @@ namespace jsoncons {
         }
     };
 
-    // basic_item_event_collector
+    // basic_item_event_receiver
 
     enum class item_event_reader_state
     {
@@ -489,7 +489,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    class basic_item_event_collector : public basic_item_event_visitor<CharT>
+    class basic_item_event_receiver : public basic_item_event_visitor<CharT>
     {
         using super_type = basic_item_event_visitor<CharT>;
     public:
@@ -504,13 +504,13 @@ namespace jsoncons {
         jsoncons::span<const size_t> shape_;
         std::size_t index_;
     public:
-        basic_item_event_collector()
+        basic_item_event_receiver()
             : pred_(accept), event_(item_event_kind::null_value),
               state_(), data_(), shape_(), index_(0)
         {
         }
 
-        basic_item_event_collector(std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
+        basic_item_event_receiver(std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
             : pred_(pred), event_(item_event_kind::null_value),
               state_(), data_(), shape_(), index_(0)
         {
@@ -1112,7 +1112,7 @@ namespace jsoncons {
         basic_item_event_reader<CharT>* cursor_;
         std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred_;
     public:
-        basic_staj2_filter_view(basic_item_event_reader<CharT>& cursor, 
+        basic_staj2_filter_view(basic_item_event_reader<CharT>& cursor,
                          std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
             : cursor_(std::addressof(cursor)), pred_(pred)
         {
@@ -1167,7 +1167,7 @@ namespace jsoncons {
         }
 
         friend
-        basic_staj2_filter_view<CharT> operator|(basic_staj2_filter_view& cursor, 
+            basic_staj2_filter_view<CharT> operator|(basic_staj2_filter_view& cursor,
                                           std::function<bool(const basic_item_event<CharT>&, const ser_context&)> pred)
         {
             return basic_staj2_filter_view<CharT>(cursor, pred);
