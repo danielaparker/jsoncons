@@ -152,34 +152,10 @@ namespace cbor {
             return event_receiver_.is_typed_array();
         }
 
-
-        std::size_t size() const
-        {
-            return event_receiver_.event().size();
-        }
-
-        template <class T>
-        T get() const
-        {
-            return event_receiver_.event().get<T>();
-        }
-
-        template <class T>
-        T get(std::error_code& ec) const
-        {
-            return event_receiver_.event().get<T>(ec);
-        }
-
         const basic_item_event<char_type>& current() const
         {
             return event_receiver_.event();
         }
-
-        item_event_kind event_kind() const noexcept { return event_receiver_.event().event_kind(); }
-
-        semantic_tag tag() const noexcept { return event_receiver_.event().tag(); }
-
-        uint64_t ext_tag() const noexcept { return event_receiver_.event().ext_tag(); }
 
         void read_to(basic_item_event_visitor<char_type>& visitor) override
         {

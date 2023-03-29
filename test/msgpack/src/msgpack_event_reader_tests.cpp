@@ -37,43 +37,43 @@ TEST_CASE("msgpack_event_reader reputon test")
 
     SECTION("test 1")
     {
-        msgpack::msgpack_bytes_event_reader event_reader(data);
+        msgpack::msgpack_bytes_event_reader reader(data);
 
-        CHECK(event_reader.event_kind() == item_event_kind::begin_object);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::begin_array);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::begin_object);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);  // key
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::double_value);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::end_object);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::end_array);
-        event_reader.next();
-        CHECK(event_reader.event_kind() == item_event_kind::end_object);
-        event_reader.next();
-        CHECK(event_reader.done());
+        CHECK(reader.current().event_kind() == item_event_kind::begin_object);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::begin_array);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::begin_object);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);  // key
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::double_value);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::end_object);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::end_array);
+        reader.next();
+        CHECK(reader.current().event_kind() == item_event_kind::end_object);
+        reader.next();
+        CHECK(reader.done());
     }
 }
 
@@ -119,33 +119,33 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
             0xc0 // nil
         });
         source_type source(input);
-        cursor_type event_reader(std::move(source));
+        cursor_type reader(std::move(source));
 
-        REQUIRE_FALSE(event_reader.done());
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        CHECK(event_reader.tag() == semantic_tag::none);
-        CHECK(event_reader.template get<std::string>() == std::string("Tom"));
-        CHECK(event_reader.template get<jsoncons::string_view>() ==
+        REQUIRE_FALSE(reader.done());
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().template get<std::string>() == std::string("Tom"));
+        CHECK(reader.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
-        event_reader.next();
-        CHECK(event_reader.done());
+        reader.next();
+        CHECK(reader.done());
 
-        event_reader.reset();
-        REQUIRE_FALSE(event_reader.done());
-        CHECK(event_reader.event_kind() == item_event_kind::int64_value);
-        CHECK(event_reader.tag() == semantic_tag::none);
-        CHECK(event_reader.template get<int>() == -100);
-        event_reader.next();
-        CHECK(event_reader.done());
+        reader.reset();
+        REQUIRE_FALSE(reader.done());
+        CHECK(reader.current().event_kind() == item_event_kind::int64_value);
+        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().template get<int>() == -100);
+        reader.next();
+        CHECK(reader.done());
 
-        event_reader.reset(ec);
+        reader.reset(ec);
         REQUIRE_FALSE(ec);
-        REQUIRE_FALSE(event_reader.done());
-        CHECK(event_reader.event_kind() == item_event_kind::null_value);
-        CHECK(event_reader.tag() == semantic_tag::none);
-        event_reader.next(ec);
+        REQUIRE_FALSE(reader.done());
+        CHECK(reader.current().event_kind() == item_event_kind::null_value);
+        CHECK(reader.current().tag() == semantic_tag::none);
+        reader.next(ec);
         REQUIRE_FALSE(ec);
-        CHECK(event_reader.done());
+        CHECK(reader.done());
     }
 
     SECTION("with another source")
@@ -160,40 +160,40 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
         traits::set_input(input2, {0xc1}); // never used
         traits::set_input(input3, {0xd0, 0x9c}); // int8(-100)
 
-        // Constructing event_reader with blank input results in unexpected_eof
+        // Constructing reader with blank input results in unexpected_eof
         // error because it eagerly parses the next event upon construction.
-        cursor_type event_reader(input0, ec);
+        cursor_type reader(input0, ec);
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
-        CHECK_FALSE(event_reader.done());
+        CHECK_FALSE(reader.done());
 
         // Reset to valid input1
-        event_reader.reset(input1);
-        CHECK(event_reader.event_kind() == item_event_kind::string_value);
-        CHECK(event_reader.tag() == semantic_tag::none);
-        CHECK(event_reader.template get<std::string>() == std::string("Tom"));
-        CHECK(event_reader.template get<jsoncons::string_view>() ==
+        reader.reset(input1);
+        CHECK(reader.current().event_kind() == item_event_kind::string_value);
+        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().template get<std::string>() == std::string("Tom"));
+        CHECK(reader.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
         ec = msgpack::msgpack_errc::success;
-        REQUIRE_FALSE(event_reader.done());
-        event_reader.next(ec);
+        REQUIRE_FALSE(reader.done());
+        reader.next(ec);
         CHECK_FALSE(ec);
-        CHECK(event_reader.done());
+        CHECK(reader.done());
 
         // Reset to invalid input2
-        event_reader.reset(input2, ec);
+        reader.reset(input2, ec);
         CHECK(ec == msgpack::msgpack_errc::unknown_type);
-        CHECK_FALSE(event_reader.done());
+        CHECK_FALSE(reader.done());
 
         // Reset to valid input3
         ec = msgpack::msgpack_errc::success;
-        event_reader.reset(input3, ec);
+        reader.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(event_reader.event_kind() == item_event_kind::int64_value);
-        CHECK(event_reader.tag() == semantic_tag::none);
-        CHECK(event_reader.template get<int>() == -100);
-        REQUIRE_FALSE(event_reader.done());
-        event_reader.next(ec);
+        CHECK(reader.current().event_kind() == item_event_kind::int64_value);
+        CHECK(reader.current().tag() == semantic_tag::none);
+        CHECK(reader.current().template get<int>() == -100);
+        REQUIRE_FALSE(reader.done());
+        reader.next(ec);
         CHECK_FALSE(ec);
-        CHECK(event_reader.done());
+        CHECK(reader.done());
     }
 }
