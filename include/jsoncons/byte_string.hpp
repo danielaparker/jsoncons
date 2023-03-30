@@ -107,7 +107,7 @@ namespace detail {
                 return decode_result<InputIt>{first, conv_errc::conversion_failed};
             }
 
-            a4[i++] = *first++; 
+            a4[i++] = static_cast<uint8_t>(*first++); 
             if (i == 4)
             {
                 for (i = 0; i < 4; ++i) 
@@ -277,11 +277,11 @@ namespace detail {
             auto a = *it++;
             if (a >= '0' && a <= '9') 
             {
-                val = (a - '0') << 4;
+                val = static_cast<uint8_t>(a - '0') << 4;
             } 
             else if ((a | 0x20) >= 'a' && (a | 0x20) <= 'f') 
             {
-                val = ((a | 0x20) - 'a' + 10) << 4;
+                val = (static_cast<uint8_t>((a | 0x20) - 'a') + 10) << 4;
             } 
             else 
             {
