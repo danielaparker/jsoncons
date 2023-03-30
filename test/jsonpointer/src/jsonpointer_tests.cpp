@@ -276,6 +276,21 @@ TEST_CASE("jsonpointer path tests")
     }
 }
 
+TEST_CASE("wjsonpointer path tests")
+{
+    SECTION("/a~1b")
+    {
+        jsonpointer::wjson_pointer ptr(L"/a~1b");
+
+        auto it = ptr.begin();
+        auto end = ptr.end();
+
+        CHECK(it != end);
+        CHECK((*it++ == L"a/b"));
+        CHECK(it == end);
+    }
+}
+
 TEST_CASE("jsonpointer concatenation")
 {
     // Example from RFC 6901

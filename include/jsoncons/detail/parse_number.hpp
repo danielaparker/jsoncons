@@ -328,13 +328,13 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
                     switch(*s)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            x = c - '0';
+                            x = static_cast<T>(c - '0');
                             break;
                         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                            x = c - ('a' - 10);
+                            x = static_cast<T>(c - ('a' - 10));
                             break;
                         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                            x = c - ('A' - 10);
+                            x = static_cast<T>(c - ('A' - 10));
                             break;
                         default:
                             return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
