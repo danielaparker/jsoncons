@@ -6,6 +6,9 @@ Defect fixes:
 - Fixed issue danielaparker/jsoncons/#418 where use of `std::aligned_storage` 
 produced a diagnostic that it is deprecated in C++2023.
 
+- Fixed issue danielaparker/jsoncons/#420 where `to_integer_base16` produced
+warnings when passed a wide character string.
+
 Enhancements:
 
 - Fixed issue danielaparker/jsoncons/#391 where parsing JSON resulted
