@@ -3053,7 +3053,7 @@ namespace detail {
         }
 
         path_expression(const allocator_type& alloc)
-            : alloc_(alloc), required_options_()
+            : alloc_(alloc), selector_(nullptr), required_options_()
         {
         }
 
@@ -3104,7 +3104,7 @@ namespace detail {
 
             const result_options require_more = result_options::nodups | result_options::sort;
 
-            if ((options & require_more) != result_options())
+            if (selector_ != nullptr && (options & require_more) != result_options())
             {
                 path_value_receiver<Json,JsonReference> receiver{alloc_};
                 selector_->select(resources, root, path, current, receiver, options);
@@ -3173,7 +3173,10 @@ namespace detail {
                 s.append(level*2, ' ');
             }
             s.append("expression ");
-            s.append(selector_->to_string(level+1));
+            if (selector_ != nullptr)
+            {
+                s.append(selector_->to_string(level+1));
+            }
 
             return s;
 
