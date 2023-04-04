@@ -1043,7 +1043,7 @@ namespace jsoncons {
                              const ser_context& context,
                              std::error_code& ec) override
         {
-            bool retval = true;
+            bool retval;
 
             if (level_stack_.back().is_key())
             {
@@ -1094,8 +1094,6 @@ namespace jsoncons {
                                   const ser_context& context,
                                   std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
@@ -1113,6 +1111,7 @@ namespace jsoncons {
                 }
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1162,14 +1161,13 @@ namespace jsoncons {
                                const ser_context& context,
                                std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
                 encode_base64url(value.begin(), value.end(),key_);
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1216,14 +1214,13 @@ namespace jsoncons {
 
         bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
                 jsoncons::detail::from_integer(value,key_);
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1266,14 +1263,13 @@ namespace jsoncons {
 
         bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
                 jsoncons::detail::from_integer(value,key_);
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1316,8 +1312,6 @@ namespace jsoncons {
 
         bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
@@ -1327,6 +1321,7 @@ namespace jsoncons {
                 f(x, sink);
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1369,8 +1364,6 @@ namespace jsoncons {
 
         bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
@@ -1379,6 +1372,7 @@ namespace jsoncons {
                 f(value, sink);
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1421,13 +1415,12 @@ namespace jsoncons {
 
         bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_ = value ? true_constant : false_constant;
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())
@@ -1470,13 +1463,12 @@ namespace jsoncons {
 
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool retval = true;
-
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_ = null_constant;
             }
 
+            bool retval;
             if (level_stack_.back().is_key())
             {
                 switch (level_stack_.back().target())

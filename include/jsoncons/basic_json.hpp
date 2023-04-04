@@ -1554,7 +1554,7 @@ namespace jsoncons {
             template <class... Args> 
             array_iterator emplace(const_array_iterator pos, Args&&... args)
             {
-                evaluate_with_default().emplace(pos, std::forward<Args>(args)...);
+                return evaluate_with_default().emplace(pos, std::forward<Args>(args)...);
             }
 
             template <class... Args> 

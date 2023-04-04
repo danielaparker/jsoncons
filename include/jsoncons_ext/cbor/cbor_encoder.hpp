@@ -505,9 +505,6 @@ private:
                     switch (c)
                     {
                         case '-':
-                            s.push_back(c);
-                            state = decimal_parse_state::integer;
-                            break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             s.push_back(c);
                             state = decimal_parse_state::integer;
@@ -549,9 +546,6 @@ private:
                             state = decimal_parse_state::exp2;
                             break;
                         case '-':
-                            exponent.push_back(c);
-                            state = decimal_parse_state::exp2;
-                            break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             exponent.push_back(c);
                             state = decimal_parse_state::exp2;
@@ -730,9 +724,6 @@ private:
                             state = hexfloat_parse_state::exp2;
                             break;
                         case '-':
-                            exponent.push_back(c);
-                            state = hexfloat_parse_state::exp2;
-                            break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                             exponent.push_back(c);
                             state = hexfloat_parse_state::exp2;

@@ -444,11 +444,6 @@ namespace detail {
                     switch (options_.object_object_line_splits())
                     {
                         case line_split_kind::same_line:
-                            if (column_ >= options_.line_length_limit())
-                            {
-                                break_line();
-                            }
-                            break;
                         case line_split_kind::new_line:
                             if (column_ >= options_.line_length_limit())
                             {

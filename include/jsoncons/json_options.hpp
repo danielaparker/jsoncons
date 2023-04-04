@@ -821,8 +821,6 @@ private:
                     state = input_state::begin_quote;
                     break;
                 case input_state::begin_quote:
-                    state = input_state::end_quote;
-                    break;
                 case input_state::character:
                     state = input_state::end_quote;
                     break;

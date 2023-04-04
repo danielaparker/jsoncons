@@ -278,7 +278,6 @@ namespace detail {
             {
                 result.push_back('.');
                 result.push_back('0');
-                needs_dot = true;
             }
         }
     }

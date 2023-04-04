@@ -601,9 +601,6 @@ public:
                     if (ec) return;
                     break;
                 case json_parse_state::fraction2:
-                    end_fraction_value(visitor, ec);
-                    if (ec) return;
-                    break;
                 case json_parse_state::exp3:
                     end_fraction_value(visitor, ec);
                     if (ec) return;
@@ -1607,8 +1604,6 @@ public:
                     switch (*input_ptr_)
                     {
                     case '\r':
-                        state_ = pop_state();
-                        break;
                     case '\n':
                         state_ = pop_state();
                         break;
@@ -1832,10 +1827,6 @@ zero:
                 state_ = json_parse_state::slash;
                 return;
             case '}':
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                state_ = json_parse_state::expect_comma_or_end;
-                return;
             case ']':
                 end_integer_value(visitor, ec);
                 if (ec) return;
@@ -1910,10 +1901,6 @@ integer:
                 state_ = json_parse_state::slash;
                 return;
             case '}':
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                state_ = json_parse_state::expect_comma_or_end;
-                return;
             case ']':
                 end_integer_value(visitor, ec);
                 if (ec) return;
