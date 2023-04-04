@@ -355,9 +355,11 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
+
+        bool is_done = parser_.done() || done_;
+        if (!is_done)
         {
-            next();
+            read_next();
         }
     }
 
@@ -374,6 +376,16 @@ private:
         if (!done())
         {
             next(ec);
+        }
+    }
+
+    void read_next()
+    {
+        std::error_code ec;
+        read_next(cursor_visitor_, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 

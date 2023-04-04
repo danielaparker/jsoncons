@@ -630,7 +630,6 @@ namespace detail {
                                 if (ec) {return path_expression_type(alloc_);}
                                 push_token(resources, token_type(begin_expression_arg), ec);
                                 if (ec) {return path_expression_type(alloc_);}
-                                if (ec) {return path_expression_type(alloc_);}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);

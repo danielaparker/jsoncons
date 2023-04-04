@@ -102,13 +102,13 @@ namespace jsonpath {
                 switch (node_kind_)
                 {
                     case json_location_node_kind::root:
+                    case json_location_node_kind::name:
                         diff = (*name_).compare(*(other.name_));
                         break;
                     case json_location_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
-                    case json_location_node_kind::name:
-                        diff = (*name_).compare(*(other.name_));
+                    default:
                         break;
                 }
             }
