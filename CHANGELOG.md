@@ -12,6 +12,8 @@ warnings when passed a wide character string.
 - Fixed issue danielaparker/jsoncons/#391 where parsing JSON resulted
 in temporary allocations from `std::stable_sort`
 
+- Fixed issue danielaparker/jsoncons/#421 where PVS-Studio found vulnerabilities in code.
+
 0.170.0 
 -------
 
