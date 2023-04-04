@@ -373,9 +373,10 @@ private:
         }
         std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
+        bool is_done = parser_.done() || done_;
+        if (!is_done)
         {
-            next(ec);
+            read_next(ec);
         }
     }
 
