@@ -13,7 +13,7 @@
 
 using namespace jsoncons;
 
-#if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 TEST_CASE("test_string_allocation")
 {
 

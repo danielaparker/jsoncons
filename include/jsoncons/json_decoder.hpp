@@ -51,7 +51,7 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<index_key_value<Json>> stack_item_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<key_index_value<Json>> stack_item_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  
     result_allocator_type result_allocator_;
@@ -61,7 +61,7 @@ private:
 
     std::size_t index_;
     key_type name_;
-    std::vector<index_key_value<Json>,stack_item_allocator_type> item_stack_;
+    std::vector<key_index_value<Json>,stack_item_allocator_type> item_stack_;
     std::vector<structure_info,structure_info_allocator_type> structure_stack_;
     bool is_valid_;
 
@@ -157,7 +157,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(index_++, std::forward<key_type>(name_), json_object_arg, tag, result_allocator_);
+        item_stack_.emplace_back(std::forward<key_type>(name_), index_++, json_object_arg, tag, result_allocator_);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
@@ -196,7 +196,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(index_++, std::forward<key_type>(name_), json_array_arg, tag, result_allocator_);
+        item_stack_.emplace_back(std::forward<key_type>(name_), index_++, json_array_arg, tag, result_allocator_);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
@@ -248,7 +248,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), sv, tag, result_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, sv, tag, result_allocator_);
                 break;
             case structure_type::root_t:
                 result_ = Json(sv, tag, result_allocator_);
@@ -267,7 +267,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), byte_string_arg, b, tag, result_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, byte_string_arg, b, tag, result_allocator_);
                 break;
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, tag, result_allocator_);
@@ -286,7 +286,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), byte_string_arg, b, ext_tag, result_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, byte_string_arg, b, ext_tag, result_allocator_);
                 break;
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, ext_tag, result_allocator_);
@@ -305,7 +305,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value,tag);
@@ -324,7 +324,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value,tag);
@@ -343,7 +343,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), half_arg, value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, half_arg, value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(half_arg, value, tag);
@@ -362,7 +362,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value, tag);
@@ -378,7 +378,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value, tag);
@@ -394,7 +394,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(index_++, std::forward<key_type>(name_), null_type(), tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), index_++, null_type(), tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(null_type(), tag);
@@ -403,17 +403,8 @@ private:
         }
         return true;
     }
-
-    static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
-    {
-        int comp = item1.name_.compare(item2.name_); 
-        if (comp < 0) return true;
-        if (comp == 0) return item1.index_ < item2.index_;
-
-        return false;
-    }
 };
 
-}
+} // namespace jsoncons
 
 #endif

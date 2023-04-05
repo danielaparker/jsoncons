@@ -27,25 +27,25 @@
 namespace jsoncons {
 
     template <class Json>
-    struct index_key_value
+    struct key_index_value
     {
         using key_type = typename Json::key_type;
 
-        std::size_t index;
         key_type name;
+        std::size_t index;
         Json value;
 
         template <class... Args>
-        index_key_value(std::size_t index, key_type&& name, Args&& ... args) 
-            : index(index), name(std::move(name)), value(std::forward<Args>(args)...)
+        key_index_value(key_type&& name, std::size_t index, Args&& ... args) 
+            : name(std::move(name)), index(index), value(std::forward<Args>(args)...)
         {
         }
 
-        index_key_value() = default;
-        index_key_value(const index_key_value&) = default;
-        index_key_value(index_key_value&&) = default;
-        index_key_value& operator=(const index_key_value&) = default;
-        index_key_value& operator=(index_key_value&&) = default;
+        key_index_value() = default;
+        key_index_value(const key_index_value&) = default;
+        key_index_value(key_index_value&&) = default;
+        key_index_value& operator=(const key_index_value&) = default;
+        key_index_value& operator=(key_index_value&&) = default;
     };
 
     struct sorted_unique_range_tag
@@ -507,7 +507,7 @@ namespace jsoncons {
             }
         }
 
-        static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
+        static bool compare(const key_index_value<Json>& item1, const key_index_value<Json>& item2)
         {
             int comp = item1.name.compare(item2.name); 
             if (comp < 0) return true;
@@ -516,7 +516,7 @@ namespace jsoncons {
             return false;
         }
 
-        void init(index_key_value<Json>* items, std::size_t count)
+        void init(key_index_value<Json>* items, std::size_t count)
         {
             if (!members_.empty())
             {
@@ -1345,7 +1345,7 @@ namespace jsoncons {
             }
         }
 
-        void init(index_key_value<Json>* items, std::size_t count)
+        void init(key_index_value<Json>* items, std::size_t count)
         {
             if (!members_.empty() || !index_.empty())
             {
