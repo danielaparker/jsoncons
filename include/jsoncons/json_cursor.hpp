@@ -442,8 +442,8 @@ using wjson_cursor = basic_json_cursor<wchar_t>;
 template<class CharT,class Source,class Allocator=std::allocator<CharT>>
 using basic_json_pull_reader = basic_json_cursor<CharT,Source,Allocator>;
 
-JSONCONS_DEPRECATED_MSG("Instead, use json_cursor") typedef json_cursor json_pull_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_cursor") typedef wjson_cursor wjson_pull_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use json_stream_cursor") typedef json_cursor json_pull_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_cursor") typedef wjson_cursor wjson_pull_reader;
 
 template<class CharT,class Source,class Allocator=std::allocator<CharT>>
 using basic_json_stream_reader = basic_json_cursor<CharT,Source,Allocator>;
