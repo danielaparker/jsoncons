@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace msgpack {
 
     template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-    class basic_msgpack_event_reader : public basic_item_event_reader<char>, private virtual ser_context
+    class msgpack_event_reader : public basic_item_event_reader<char>, private virtual ser_context
     {
     public:
         using source_type = Source;
@@ -38,14 +38,14 @@ namespace msgpack {
         bool eof_;
 
         // Noncopyable and nonmoveable
-        basic_msgpack_event_reader(const basic_msgpack_event_reader&) = delete;
-        basic_msgpack_event_reader& operator=(const basic_msgpack_event_reader&) = delete;
+        msgpack_event_reader(const msgpack_event_reader&) = delete;
+        msgpack_event_reader& operator=(const msgpack_event_reader&) = delete;
 
     public:
         using string_view_type = string_view;
 
         template <class Sourceable>
-        basic_msgpack_event_reader(Sourceable&& source,
+        msgpack_event_reader(Sourceable&& source,
                              const msgpack_decode_options& options = msgpack_decode_options(),
                              const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc), 
@@ -61,9 +61,9 @@ namespace msgpack {
         // Constructors that set parse error codes
 
         template <class Sourceable>
-        basic_msgpack_event_reader(Sourceable&& source,
+        msgpack_event_reader(Sourceable&& source,
                              std::error_code& ec)
-           : basic_msgpack_event_reader(std::allocator_arg, Allocator(),
+           : msgpack_event_reader(std::allocator_arg, Allocator(),
                                   std::forward<Sourceable>(source), 
                                   msgpack_decode_options(), 
                                   ec)
@@ -71,10 +71,10 @@ namespace msgpack {
         }
 
         template <class Sourceable>
-        basic_msgpack_event_reader(Sourceable&& source,
+        msgpack_event_reader(Sourceable&& source,
                              const msgpack_decode_options& options,
                              std::error_code& ec)
-           : basic_msgpack_event_reader(std::allocator_arg, Allocator(),
+           : msgpack_event_reader(std::allocator_arg, Allocator(),
                                   std::forward<Sourceable>(source), 
                                   options, 
                                   ec)
@@ -82,7 +82,7 @@ namespace msgpack {
         }
 
         template <class Sourceable>
-        basic_msgpack_event_reader(std::allocator_arg_t, const Allocator& alloc, 
+        msgpack_event_reader(std::allocator_arg_t, const Allocator& alloc, 
                              Sourceable&& source,
                              const msgpack_decode_options& options,
                              std::error_code& ec)
@@ -207,7 +207,7 @@ namespace msgpack {
         }
 
         friend
-        staj2_filter_view operator|(basic_msgpack_event_reader& cursor, 
+        staj2_filter_view operator|(msgpack_event_reader& cursor, 
                                    std::function<bool(const item_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
@@ -248,9 +248,6 @@ namespace msgpack {
             }
         }
     };
-
-    using msgpack_stream_event_reader = basic_msgpack_event_reader<jsoncons::binary_stream_source>;
-    using msgpack_bytes_event_reader = basic_msgpack_event_reader<jsoncons::bytes_source>;
 
 } // namespace msgpack
 } // namespace jsoncons

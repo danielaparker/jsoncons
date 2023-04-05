@@ -37,7 +37,7 @@ TEST_CASE("msgpack_event_reader reputon test")
 
     SECTION("test 1")
     {
-        msgpack::msgpack_bytes_event_reader reader(data);
+        msgpack::msgpack_event_reader<bytes_source> reader(data);
 
         CHECK(reader.current().event_kind() == item_event_kind::begin_object);
         reader.next();
@@ -79,7 +79,7 @@ TEST_CASE("msgpack_event_reader reputon test")
 
 struct msgpack_bytes_cursor2_reset_test_traits
 {
-    using cursor_type = msgpack::msgpack_bytes_event_reader;
+    using event_reader_type = msgpack::msgpack_event_reader<bytes_source>;
     using input_type = std::vector<uint8_t>;
 
     static void set_input(input_type& input, input_type bytes) {input = bytes;}
@@ -87,7 +87,7 @@ struct msgpack_bytes_cursor2_reset_test_traits
 
 struct msgpack_stream_cursor2_reset_test_traits
 {
-    using cursor_type = msgpack::msgpack_stream_event_reader;
+    using event_reader_type = msgpack::msgpack_event_reader<jsoncons::binary_stream_source>;
 
     // binary_stream_source::char_type is actually char, not uint8_t
     using input_type = std::istringstream;
@@ -106,8 +106,8 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
 {
     using traits = TestType;
     using input_type = typename traits::input_type;
-    using cursor_type = typename traits::cursor_type;
-    using source_type = typename cursor_type::source_type;
+    using event_reader_type = typename traits::event_reader_type;
+    using source_type = typename event_reader_type::source_type;
 
     SECTION("keeping same source")
     {
@@ -119,7 +119,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
             0xc0 // nil
         });
         source_type source(input);
-        cursor_type reader(std::move(source));
+        event_reader_type reader(std::move(source));
 
         REQUIRE_FALSE(reader.done());
         CHECK(reader.current().event_kind() == item_event_kind::string_value);
@@ -162,7 +162,7 @@ TEMPLATE_TEST_CASE("msgpack_event_reader reset test", "",
 
         // Constructing reader with blank input results in unexpected_eof
         // error because it eagerly parses the next event upon construction.
-        cursor_type reader(input0, ec);
+        event_reader_type reader(input0, ec);
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
         CHECK_FALSE(reader.done());
 

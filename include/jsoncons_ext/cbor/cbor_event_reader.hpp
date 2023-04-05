@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace cbor {
 
     template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-    class basic_cbor_event_reader : public basic_item_event_reader<char>, private virtual ser_context
+    class cbor_event_reader : public basic_item_event_reader<char>, private virtual ser_context
     {
     public:
         using source_type = Source;
@@ -38,14 +38,14 @@ namespace cbor {
         bool eof_;
 
         // Noncopyable and nonmoveable
-        basic_cbor_event_reader(const basic_cbor_event_reader&) = delete;
-        basic_cbor_event_reader& operator=(const basic_cbor_event_reader&) = delete;
+        cbor_event_reader(const cbor_event_reader&) = delete;
+        cbor_event_reader& operator=(const cbor_event_reader&) = delete;
 
     public:
         using string_view_type = string_view;
 
         template <class Sourceable>
-        basic_cbor_event_reader(Sourceable&& source,
+        cbor_event_reader(Sourceable&& source,
                           const cbor_decode_options& options = cbor_decode_options(),
                           const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc), 
@@ -61,9 +61,9 @@ namespace cbor {
         // Constructors that set parse error codes
 
         template <class Sourceable>
-        basic_cbor_event_reader(Sourceable&& source, 
+        cbor_event_reader(Sourceable&& source, 
                           std::error_code& ec)
-            : basic_cbor_event_reader(std::allocator_arg, Allocator(),
+            : cbor_event_reader(std::allocator_arg, Allocator(),
                                 std::forward<Sourceable>(source), 
                                 cbor_decode_options(), 
                                 ec)
@@ -71,10 +71,10 @@ namespace cbor {
         }
 
         template <class Sourceable>
-        basic_cbor_event_reader(Sourceable&& source, 
+        cbor_event_reader(Sourceable&& source, 
                           const cbor_decode_options& options,
                           std::error_code& ec)
-            : basic_cbor_event_reader(std::allocator_arg, Allocator(),
+            : cbor_event_reader(std::allocator_arg, Allocator(),
                                 std::forward<Sourceable>(source), 
                                 options, 
                                 ec)
@@ -82,7 +82,7 @@ namespace cbor {
         }
 
         template <class Sourceable>
-        basic_cbor_event_reader(std::allocator_arg_t, const Allocator& alloc, 
+        cbor_event_reader(std::allocator_arg_t, const Allocator& alloc, 
                           Sourceable&& source,
                           const cbor_decode_options& options,
                           std::error_code& ec)
@@ -212,7 +212,7 @@ namespace cbor {
         }
 
         friend
-        staj2_filter_view operator|(basic_cbor_event_reader& cursor, 
+        staj2_filter_view operator|(cbor_event_reader& cursor, 
                                    std::function<bool(const item_event&, const ser_context&)> pred)
         {
             return staj2_filter_view(cursor, pred);
@@ -254,9 +254,6 @@ namespace cbor {
             }
         }
     };
-
-    using cbor_stream_event_reader = basic_cbor_event_reader<jsoncons::binary_stream_source>;
-    using cbor_bytes_event_reader = basic_cbor_event_reader<jsoncons::bytes_source>;
 
 } // namespace cbor
 } // namespace jsoncons
