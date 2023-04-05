@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
-#include "freelist_allocator.hpp"
+#include <common/FreeListAllocator.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -76,13 +76,13 @@ TEST_CASE("json_reader constructors")
 
     SECTION("stateful allocator")
     {
-        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
+        using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
 
-        FreelistAllocator<char> my_allocator{1}; 
+        FreeListAllocator<char> my_allocator{1}; 
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, my_allocator);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, my_allocator);
         reader.read();
 
         my_json j = decoder.get_result();

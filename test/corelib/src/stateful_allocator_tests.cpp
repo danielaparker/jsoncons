@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include "freelist_allocator.hpp"
+#include <common/FreeListAllocator.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -13,15 +13,13 @@
 
 using namespace jsoncons;
 
-#if !(defined(__GNUC__))
-// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
-// and gcc doesn't support allocators with no default constructor
+#if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 TEST_CASE("test_string_allocation")
 {
 
-    FreelistAllocator<char> alloc(true); 
+    FreeListAllocator<char> alloc(true); 
 
-    using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
+    using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
 
     SECTION("construct")
     {
@@ -45,12 +43,12 @@ TEST_CASE("test_string_allocation")
 
     SECTION("parse")
     {
-        FreelistAllocator<char> alloc2(true); 
+        FreeListAllocator<char> alloc2(true); 
 
         std::string s = "String too long for short string";
         std::string input = "\"" + s + "\"";
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
         JSONCONS_TRY
         {
             json_string_reader reader(input,decoder);

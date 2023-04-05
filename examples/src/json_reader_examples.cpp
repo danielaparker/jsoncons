@@ -7,7 +7,7 @@
 #include <map>
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include "sample_allocators.hpp"
+#include "FreeListAllocator.hpp"
 
 using namespace jsoncons;
 
@@ -119,7 +119,7 @@ namespace {
 
     void read_with_stateful_allocator()
     {
-        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
+        using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
         std::string input = R"(
     [ 
       { 
@@ -141,12 +141,12 @@ namespace {
     ]
     )";
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();

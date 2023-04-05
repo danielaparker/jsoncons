@@ -205,9 +205,9 @@ Output:
 #include <string_view> // Assuming C++ 17
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
-#include "sample_allocators.hpp" // for FreelistAllocator
+#include "FreeListAllocator.hpp" // for FreeListAllocator
 
-using my_alloc = FreelistAllocator<char>; // an allocator with a single-argument constructor
+using my_alloc = FreeListAllocator<char>; // an allocator with a single-argument constructor
 using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
 int main()

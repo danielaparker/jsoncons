@@ -8,7 +8,7 @@
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
-#include <common/sample_allocators.hpp>
+#include <common/FreeListAllocator.hpp>
 
 using namespace jsoncons;
 
@@ -16,7 +16,7 @@ using namespace jsoncons;
 
 TEST_CASE("jsonpath stateful allocator test")
 {
-    using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
+    using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
     std::string input = R"(
 { "store": {
     "book": [ 
@@ -43,12 +43,12 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -63,12 +63,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 1")
     {
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -82,12 +82,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 2")
     {
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -102,12 +102,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_replace 1")
     {
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -119,12 +119,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_replace 2")
     {
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
-                                                              FreelistAllocator<char>(2));
+        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
+                                                              FreeListAllocator<char>(2));
 
-        auto myAlloc = FreelistAllocator<char>(3);        
+        auto myAlloc = FreeListAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();

@@ -14,7 +14,8 @@
 // From http://coliru.stacked-crooked.com/a/cfd0c5c5021596ad
 
 template <typename T>
-class FreelistAllocator {
+class FreeListAllocator {
+
     union node {
         node* next;
         alignas(alignof(T)) unsigned char storage[sizeof(T)];
@@ -37,28 +38,28 @@ public:
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
 
-    FreelistAllocator(int) noexcept 
+    FreeListAllocator(int) noexcept 
     {}
-    FreelistAllocator(const FreelistAllocator&) noexcept {}
+    FreeListAllocator(const FreeListAllocator&) noexcept {}
     template <typename U>
-    FreelistAllocator(const FreelistAllocator<U>&) noexcept {}
-    FreelistAllocator(FreelistAllocator&& other) noexcept :  list(other.list) {
+    FreeListAllocator(const FreeListAllocator<U>&) noexcept {}
+    FreeListAllocator(FreeListAllocator&& other) noexcept :  list(other.list) {
         other.list = nullptr;
     }
 
-    FreelistAllocator& operator = (const FreelistAllocator&) noexcept {
+    FreeListAllocator& operator = (const FreeListAllocator&) noexcept {
         // noop
         return *this;
     }
 
-    FreelistAllocator& operator = (FreelistAllocator&& other) noexcept {
+    FreeListAllocator& operator = (FreeListAllocator&& other) noexcept {
         clear();
         list = other.list;
         other.list = nullptr;
         return *this;
     }
 
-    ~FreelistAllocator() noexcept { clear(); }
+    ~FreeListAllocator() noexcept { clear(); }
 
     T* allocate(size_type n) {
         //std::cout << "Allocate(" << n << ") from ";
@@ -94,7 +95,7 @@ public:
     template<typename U>
     struct rebind
     {
-        using other = FreelistAllocator<U>;
+        using other = FreeListAllocator<U>;
     };
     using pointer = T*;
     using const_pointer = const T*;
@@ -104,12 +105,12 @@ public:
 };
 
 template <typename T, typename U>
-inline bool operator == (const FreelistAllocator<T>&, const FreelistAllocator<U>&) {
+inline bool operator == (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
     return true;
 }
 
 template <typename T, typename U>
-inline bool operator != (const FreelistAllocator<T>&, const FreelistAllocator<U>&) {
+inline bool operator != (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
     return false;
 }
 
