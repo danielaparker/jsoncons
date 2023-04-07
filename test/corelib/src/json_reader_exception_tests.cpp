@@ -16,7 +16,7 @@ using namespace jsoncons;
 TEST_CASE("test_filename_invalid")
 {
     std::string in_file = "./corelib/input/json-exception--1.json";
-    std::ifstream is(in_file);
+    std::ifstream is(in_file, std::ios::binary);
 
     json_decoder<json> decoder;
 
@@ -34,7 +34,7 @@ TEST_CASE("test_filename_invalid")
 TEST_CASE("test_exception_left_brace")
 {
     std::string in_file = "./corelib/input/json-exception-1.json";
-    std::ifstream is(in_file);
+    std::ifstream is(in_file, std::ios::binary);
     REQUIRE(is);
 
     json_decoder<json> decoder;
@@ -54,7 +54,7 @@ TEST_CASE("test_exception_left_brace")
 TEST_CASE("test_exception_rbrace")
 {
     std::string in_file = "./corelib/input/json-exception-2.json";
-    std::ifstream is(in_file);
+    std::ifstream is(in_file, std::ios::binary);
     REQUIRE(is);
 
     json_decoder<json> decoder;

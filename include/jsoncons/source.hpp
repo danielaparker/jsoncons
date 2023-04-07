@@ -169,7 +169,7 @@ namespace jsoncons {
                 buffer_data_ += len;
                 buffer_length_ -= len;
             }
-            while ((length - len) > 0)
+            while (len < length)
             {
                 fill_buffer();
                 if (buffer_length_ == 0)

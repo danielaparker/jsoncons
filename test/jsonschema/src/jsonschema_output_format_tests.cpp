@@ -74,7 +74,7 @@ TEST_CASE("jsonschema output format tests")
             }
             else if (o.keyword() == "additionalProperties")
             {
-                CHECK(o.schema_path() == std::string("https://example.com/polygon#/$defs/point/additionalProperties"));
+                CHECK(o.schema_path() == std::string("https://example.com/polygon#/$defs/point/additionalProperties/false"));
             }
             else
             {
