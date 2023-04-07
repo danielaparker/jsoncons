@@ -66,12 +66,12 @@ json j = json::parse(R"(
 )");
 
     std::ofstream os;
-    os.open("./output/store.cbor", std::ios::binary | std::ios::out);
+    os.open("./corelib/output/store.cbor", std::ios::binary | std::ios::out);
     cbor::encode_cbor(j,os);
 
     std::vector<uint8_t> v;
     std::ifstream is;
-    is.open("./output/store.cbor", std::ios::binary | std::ios::in);
+    is.open("./corelib/output/store.cbor", std::ios::binary | std::ios::in);
 
     json j2 = cbor::decode_cbor<json>(is);
 

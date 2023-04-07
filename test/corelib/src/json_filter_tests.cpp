@@ -85,9 +85,9 @@ private:
 TEST_CASE("test_filter")
 {
     std::string in_file = "./corelib/input/address-book.json";
-    std::string out_file = "./output/address-book-new.json";
+    std::string out_file = "./corelib/output/address-book-new.json";
     std::ifstream is(in_file, std::ios::binary);
-    std::ofstream os(out_file);
+    std::ofstream os(out_file, std::ios::binary);
 
     json_stream_encoder encoder(os);
     name_fixup_filter filter(encoder);
@@ -103,7 +103,7 @@ TEST_CASE("test_filter")
 TEST_CASE("test_filter2")
 {
     std::string in_file = "./corelib/input/address-book.json";
-    std::string out_file = "./output/address-book-new.json";
+    std::string out_file = "./corelib/output/address-book-new.json";
     std::ifstream is(in_file, std::ios::binary);
     std::ofstream os(out_file);
 
