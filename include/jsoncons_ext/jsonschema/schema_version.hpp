@@ -17,7 +17,7 @@ namespace jsonschema {
     public:
         static bool contains(const string_view& url)
         {
-            if (url.find("json-schema.org/draft-07/schema#") != string_view::npos)
+            if (url.find("json-schema.org/draft-07/schema") != string_view::npos)
             {
                 return true;
             }
