@@ -61,7 +61,6 @@ namespace jsoncons {
     public:
         using key_type = KeyT;
         using value_type = ValueT;
-        using allocator_type = typename ValueT::allocator_type;
         using string_view_type = typename value_type::string_view_type;
     private:
 
