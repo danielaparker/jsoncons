@@ -16,6 +16,8 @@ in temporary allocations from `std::stable_sort`
 
 - Fixed issue danielaparker/jsoncons/#425 where `basic_byte_string::assign` and `basic_byte_string::append` failed to compile
 
+- Fixed issue danielaparker/jsoncons/#426 where enum keyed maps didn't serialize correctly.
+
 0.170.0 
 -------
 
