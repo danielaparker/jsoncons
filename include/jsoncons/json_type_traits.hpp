@@ -996,9 +996,16 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
             for (const auto& item : val)
             {
                 auto temp = json_type_traits<Json,key_type>::to_json(item.first);
-                typename Json::key_type key;
-                temp.dump(key);
-                j.try_emplace(std::move(key), item.second);
+                if (temp.is_string_view())
+                {
+                    j.try_emplace(Json::key_type(temp.as_string_view()), item.second);
+                }
+                else
+                {
+                    typename Json::key_type key;
+                    temp.dump(key);
+                    j.try_emplace(std::move(key), item.second);
+                }
             }
             return j;
         }
@@ -1009,10 +1016,17 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
             j.reserve(val.size());
             for (const auto& item : val)
             {
-                auto temp = json_type_traits<Json,key_type>::to_json(item.first, alloc);
-                typename Json::key_type key(alloc);
-                temp.dump(key);
-                j.try_emplace(std::move(key), item.second, alloc);
+                auto temp = json_type_traits<Json, key_type>::to_json(item.first, alloc);
+                if (temp.is_string_view())
+                {
+                    j.try_emplace(Json::key_type(temp.as_string_view(), alloc), item.second);
+                }
+                else
+                {
+                    typename Json::key_type key(alloc);
+                    temp.dump(key);
+                    j.try_emplace(std::move(key), item.second, alloc);
+                }
             }
             return j;
         }
