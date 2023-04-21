@@ -178,6 +178,40 @@ TEST_CASE("byte_string_view constructors")
     }
 }
 
+TEST_CASE("byte_string mutators")
+{
+    SECTION("append")
+    {
+        std::vector<uint8_t> u = {'b','a','z'};
+        std::vector<uint8_t> v = {'f','o','o','b','a','r'};
+        byte_string bstr(u.data(),3);
+        bstr.append(v.data(), 6);
+
+        CHECK(bstr[0] == 'b');
+        CHECK(bstr[1] == 'a');
+        CHECK(bstr[2] == 'z');
+        CHECK(bstr[3] == 'f');
+        CHECK(bstr[4] == 'o');
+        CHECK(bstr[5] == 'o');
+        CHECK(bstr[6] == 'b');
+        CHECK(bstr[7] == 'a');
+        CHECK(bstr[8] == 'r');
+    }
+    SECTION("assign")
+    {
+        std::vector<uint8_t> v = {'f','o','o','b','a','r'};
+        byte_string bstr;
+        bstr.assign(v.data(), 6);
+
+        CHECK(bstr[0] == 'f');
+        CHECK(bstr[1] == 'o');
+        CHECK(bstr[2] == 'o');
+        CHECK(bstr[3] == 'b');
+        CHECK(bstr[4] == 'a');
+        CHECK(bstr[5] == 'r');
+    }
+}
+
 TEST_CASE("byte_string_view iterators")
 {
     SECTION("begin/end")

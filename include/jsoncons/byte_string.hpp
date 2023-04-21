@@ -576,12 +576,12 @@ namespace detail {
         void assign(const uint8_t* s, std::size_t count)
         {
             data_.clear();
-            data_.insert(s, s+count);
+            data_.insert(data_.end(), s, s+count);
         }
 
         void append(const uint8_t* s, std::size_t count)
         {
-            data_.insert(s, s+count);
+            data_.insert(data_.end(), s, s+count);
         }
 
         void clear()

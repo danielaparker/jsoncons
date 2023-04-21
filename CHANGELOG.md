@@ -14,6 +14,8 @@ in temporary allocations from `std::stable_sort`
 
 - Fixed issue danielaparker/jsoncons/#421 where PVS-Studio found vulnerabilities in code.
 
+- Fixed issue danielaparker/jsoncons/#425 where `basic_byte_string::assign` and `basic_byte_string::append` failed to compile
+
 0.170.0 
 -------
 
