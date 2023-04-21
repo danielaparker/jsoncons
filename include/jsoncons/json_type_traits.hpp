@@ -998,7 +998,7 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
                 auto temp = json_type_traits<Json,key_type>::to_json(item.first);
                 if (temp.is_string_view())
                 {
-                    j.try_emplace(Json::key_type(temp.as_string_view()), item.second);
+                    j.try_emplace(typename Json::key_type(temp.as_string_view()), item.second);
                 }
                 else
                 {
@@ -1019,7 +1019,7 @@ has_can_convert = traits_extension::is_detected<traits_can_convert_t, Json, T>;
                 auto temp = json_type_traits<Json, key_type>::to_json(item.first, alloc);
                 if (temp.is_string_view())
                 {
-                    j.try_emplace(Json::key_type(temp.as_string_view(), alloc), item.second);
+                    j.try_emplace(typename Json::key_type(temp.as_string_view(), alloc), item.second);
                 }
                 else
                 {
