@@ -721,7 +721,6 @@ namespace jsoncons \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            std::cout << "enum: " << Json(it->second,alloc) << "\n\n"; \
             return Json(it->second,alloc); \
         } \
     }; \
