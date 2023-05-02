@@ -846,7 +846,7 @@ namespace jsoncons {
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
-                                            std::forward<T>(value),get_allocator());
+                    Json(std::forward<T>(value), get_allocator()));
                 it = members_.begin() + (members_.size() - 1);
             }
             else if (it->key() == name)
@@ -855,9 +855,8 @@ namespace jsoncons {
             }
             else
             {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end(), get_allocator()),
-                                            std::forward<T>(value),get_allocator());
+                it = members_.emplace(it, key_type(name.begin(),name.end(), get_allocator()),
+                    Json(std::forward<T>(value), get_allocator()));
             }
             return it;
         }
@@ -1479,7 +1478,7 @@ namespace jsoncons {
             if (result.second)
             {
                 members_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), 
-                                      std::forward<T>(value),get_allocator());
+                    Json(std::forward<T>(value), get_allocator()));
                 auto it = members_.begin() + result.first;
                 return std::make_pair(it,true);
             }
@@ -1536,8 +1535,8 @@ namespace jsoncons {
                 if (result.second)
                 {
                     auto it = members_.emplace(hint, 
-                                               key_type(key.begin(),key.end(),get_allocator()), 
-                                               std::forward<T>(value),get_allocator());
+                        key_type(key.begin(),key.end(),get_allocator()), 
+                        Json(std::forward<T>(value), get_allocator()));
                     return it;
                 }
                 else

@@ -22,6 +22,8 @@ TEST_CASE("Test polymorhic allocator")
 
     const char* long_string = "String too long for short string";
 
+    CHECK_FALSE(traits_extension::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+
     SECTION("construct string")
     {
         pmr_json j(long_string, alloc);

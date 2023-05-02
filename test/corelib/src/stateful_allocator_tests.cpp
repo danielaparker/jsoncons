@@ -23,6 +23,8 @@ TEST_CASE("test stateful allocator")
 
     const char* long_string = "String too long for short string";
 
+    CHECK_FALSE(traits_extension::is_stateless<FreeListAllocator<char>>::value);
+
     SECTION("construct from string")
     {
         custom_json j(long_string, alloc);
