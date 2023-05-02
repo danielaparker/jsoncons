@@ -2979,7 +2979,7 @@ namespace jsoncons {
         }
 
         explicit basic_json(json_object_arg_t, 
-                            semantic_tag tag = semantic_tag::none,
+                            semantic_tag tag,
                             const Allocator& alloc = Allocator()) 
         {
             construct<object_storage>(object(alloc), tag);
