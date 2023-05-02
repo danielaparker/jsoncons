@@ -34,11 +34,21 @@ TEST_CASE("test_string_allocation")
 
     SECTION("construct")
     {
-        {
-            my_json j("String too long for short string", alloc);
-        }
-        //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+        my_json j("String too long for short string", alloc);
+       //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
        // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+    }
+
+    SECTION("emplace_back")
+    {
+        my_json j(json_array_arg, semantic_tag::none, alloc);
+        j.emplace_back("String too long for short string", alloc);
+
+        std::cout << j << "\n";
+
+
+        //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+        // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
     }
 
     SECTION("parse")
