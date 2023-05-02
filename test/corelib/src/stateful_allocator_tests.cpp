@@ -44,6 +44,18 @@ TEST_CASE("test stateful allocator")
         CHECK(j.at("bar").as_string_view() == long_string);
     }
 
+    SECTION("insert_or_assign")
+    {
+        custom_json j(json_object_arg, alloc);
+
+        j.insert_or_assign("foo", custom_json{});
+        j.insert_or_assign("bar", custom_json(long_string, alloc));
+
+        CHECK(j.size() == 2);
+        CHECK(j.at("foo") == custom_json{});
+        CHECK(j.at("bar").as_string_view() == long_string);
+    }
+
     SECTION("emplace_back")
     {
         custom_json j(json_array_arg, alloc);

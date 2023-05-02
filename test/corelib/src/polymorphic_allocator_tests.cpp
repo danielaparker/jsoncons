@@ -44,6 +44,18 @@ TEST_CASE("Test polymorhic allocator")
         CHECK(j.at("bar").as_string_view() == long_string);
     }
 
+    SECTION("insert_or_assign")
+    {
+        pmr_json j(json_object_arg, alloc);
+
+        j.insert_or_assign("foo", pmr_json{});
+        j.insert_or_assign("bar", long_string);
+
+        CHECK(j.size() == 2);
+        CHECK(j.at("foo") == pmr_json{});
+        CHECK(j.at("bar").as_string_view() == long_string);
+    }
+
     SECTION("emplace_back")
     {
         pmr_json j(json_array_arg, alloc);

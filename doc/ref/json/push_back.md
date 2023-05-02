@@ -1,10 +1,11 @@
 ### jsoncons::basic_json::push_back
 
 ```c++
-template <class T>
-void push_back(T&& val)
+void push_back(const value_type& val)
+
+void push_back(value_type&& val)
 ```
-Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
+Adds a new json element at the end of a json array. 
 Throws `std::domain_error` if not an array.
 
 ### Examples

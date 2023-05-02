@@ -615,12 +615,10 @@ namespace jsoncons {
         insert_or_assign(const string_view_type& name, T&& value)
         {
             bool inserted;
-            auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       Comp());        
+            auto it = std::lower_bound(members_.begin(),members_.end(), name, Comp());        
             if (it == members_.end())
             {
-                members_.emplace_back(key_type(name.begin(),name.end()), 
-                                            std::forward<T>(value));
+                members_.emplace_back(key_type(name.begin(),name.end()), std::forward<T>(value));
                 inserted = true;
                 it = members_.begin() + members_.size() - 1;
             }
@@ -631,9 +629,7 @@ namespace jsoncons {
             }
             else
             {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end()),
-                                            std::forward<T>(value));
+                it = members_.emplace(it, key_type(name.begin(),name.end()), std::forward<T>(value));
                 inserted = true;
             }
             return std::make_pair(it,inserted);
@@ -649,7 +645,7 @@ namespace jsoncons {
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
-                                            std::forward<T>(value),get_allocator());
+                    std::forward<T>(value));
                 inserted = true;
                 it = members_.begin() + members_.size() - 1;
             }
@@ -660,9 +656,8 @@ namespace jsoncons {
             }
             else
             {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end(), get_allocator()),
-                                            std::forward<T>(value),get_allocator());
+                it = members_.emplace(it, key_type(name.begin(),name.end(), get_allocator()),
+                    std::forward<T>(value));
                 inserted = true;
             }
             return std::make_pair(it,inserted);
