@@ -826,7 +826,7 @@ namespace jsoncons {
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
-                create(array_allocator(a), val);
+                create(array_allocator(a), val, a);
             }
 
             array_storage(const array_storage& val)
@@ -845,7 +845,7 @@ namespace jsoncons {
             array_storage(const array_storage& val, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(val.tag_)
             {
-                create(array_allocator(a), *(val.ptr_));
+                create(array_allocator(a), *(val.ptr_), a);
             }
             ~array_storage() noexcept
             {
@@ -919,7 +919,7 @@ namespace jsoncons {
             explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
-                create(object_allocator(a), val);
+                create(object_allocator(a), val, a);
             }
 
             explicit object_storage(const object_storage& val)
@@ -938,7 +938,7 @@ namespace jsoncons {
             explicit object_storage(const object_storage& val, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(val.tag_)
             {
-                create(object_allocator(a), *(val.ptr_));
+                create(object_allocator(a), *(val.ptr_), a);
             }
 
             ~object_storage() noexcept
@@ -2946,11 +2946,15 @@ namespace jsoncons {
             construct<empty_object_storage>(tag);
         }
 
-        // Undeprecated
-        explicit basic_json(const Allocator&) 
+    #if !defined(JSONCONS_NO_DEPRECATED)
+
+        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,semantic_tag,const Allocator&)")
+        explicit basic_json(const Allocator& alloc, semantic_tag tag = semantic_tag::none) 
         {
-            construct<empty_object_storage>(semantic_tag::none);
+            construct<object_storage>(object(alloc), tag);
         }
+
+    #endif
 
         basic_json(const basic_json& other)
         {
