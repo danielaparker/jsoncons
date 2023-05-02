@@ -19,40 +19,58 @@ TEST_CASE("test stateful allocator")
     FreeListAllocator<char> alloc(true); 
 
     using custom_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
+    using custom_string = std::basic_string<char,std::char_traits<char>,FreeListAllocator<char>>;
+
+    const char* long_string = "String too long for short string";
 
     SECTION("construct from string")
     {
-        custom_json j("String too long for short string", alloc);
-        CHECK(j.as<std::string>() == "String too long for short string");
+        custom_json j(long_string, alloc);
+        CHECK(j.as<std::string>() == long_string);
+    }
+
+    SECTION("try_emplace")
+    {
+        custom_json j(json_object_arg, alloc);
+
+        custom_string key1{"foo", alloc};
+        custom_string key2{"bar", alloc};
+
+        j.try_emplace(key1, custom_json{});
+        j.try_emplace(std::move(key2), long_string, alloc);
+
+        CHECK(j.size() == 2);
+        CHECK(j.at("foo") == custom_json{});
+        CHECK(j.at("bar").as_string_view() == long_string);
     }
 
     SECTION("emplace_back")
     {
         custom_json j(json_array_arg, alloc);
         j.emplace_back(1);
-        j.emplace_back("String too long for short string", alloc);
+        j.emplace_back(long_string, alloc);
 
         CHECK(j.size() == 2);
         CHECK(j.at(0) == 1);
-        CHECK(j.at(1).as<std::string>() == "String too long for short string");
+        CHECK(j.at(1).as<std::string>() == long_string);
     }
 
     SECTION("push_back")
     {
         custom_json j(json_array_arg, alloc);
         j.push_back(1);
-        j.push_back(custom_json("String too long for short string", alloc));
+        j.push_back(custom_json(long_string, alloc));
 
         CHECK(j.size() == 2);
         CHECK(j.at(0) == 1);
-        CHECK(j.at(1).as<std::string>() == "String too long for short string");
+        CHECK(j.at(1).as<std::string>() == long_string);
     }
 
     SECTION("parse")
     {
         FreeListAllocator<char> alloc2(true); 
 
-        std::string s = "String too long for short string";
+        std::string s = long_string;
         std::string input = "\"" + s + "\"";
 
         json_decoder<custom_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
