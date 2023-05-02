@@ -41,26 +41,28 @@ int main(int argc, char *argv[])
                                                          "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
-      const shmem_allocator allocator(segment.get_segment_manager());
+      const shmem_allocator alloc(segment.get_segment_manager());
 
       // Create json value with all dynamic allocations in shared memory
 
-      shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
+      //shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(alloc));
+      shm_json* j = segment.construct<shm_json>("my json")(json_array_arg, alloc);
       j->push_back(10);
 
-      shm_json o(json_object_arg, semantic_tag::none, allocator);
-      //o.try_emplace("category", "reference",allocator);
-      //o.try_emplace("author", "Nigel Rees",allocator);
-      //o.try_emplace("title", "Sayings of the Century",allocator);
-      //o.try_emplace("price", 8.95, allocator);
-      o.insert_or_assign("category", "reference");
-      o.insert_or_assign("author", "Nigel Rees");
-      o.insert_or_assign("title", "Sayings of the Century");
+      shm_json o(json_object_arg, alloc);
+      //o.try_emplace("category", "reference",alloc);
+      //o.try_emplace("author", "Nigel Rees",alloc);
+      //o.try_emplace("title", "Sayings of the Century",alloc);
+      //o.try_emplace("price", 8.95, alloc);
+      
+      o.insert_or_assign("category", shm_json("reference",alloc));
+      o.insert_or_assign("author", shm_json("Nigel Rees",alloc));
+      o.insert_or_assign("title", shm_json("Sayings of the Century",alloc));
       o.insert_or_assign("price", 8.95);
 
       j->push_back(o);
 
-      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
+      shm_json a = shm_json::array(2,shm_json::object(alloc),alloc);
       a[0]["first"] = 1;
 
       j->push_back(a);

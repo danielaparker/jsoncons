@@ -43,13 +43,13 @@ int f1(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      my_json* j = segment.construct<my_json>("MyJson1")(json_array_arg, semantic_tag::none, alloc);
+      my_json* j = segment.construct<my_json>("MyJson1")(json_array_arg, alloc);
       j->push_back(10);
 
-      my_json o(json_object_arg, semantic_tag::none, alloc);
-      o.insert_or_assign("category", "reference");
-      o.insert_or_assign("author", "Nigel Rees");
-      o.insert_or_assign("title", "Sayings of the Century");
+      my_json o(json_object_arg, alloc);
+      o.insert_or_assign("category", my_json("reference", alloc));
+      o.insert_or_assign("author", my_json("Nigel Rees", alloc));
+      o.insert_or_assign("title", my_json("Sayings of the Century", alloc));
       o.insert_or_assign("price", 8.95);
 
       j->push_back(o);
