@@ -49,7 +49,7 @@ TEST_CASE("test stateful allocator")
         custom_json j(json_object_arg, alloc);
 
         j.insert_or_assign("foo", custom_json{});
-        j.insert_or_assign("bar", custom_json(long_string, alloc));
+        j.insert_or_assign("bar", long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at("foo") == custom_json{});
