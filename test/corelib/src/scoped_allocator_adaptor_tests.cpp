@@ -79,7 +79,7 @@ TEST_CASE("scoped allocator adaptor tests")
     {
         custom_json j(json_array_arg, alloc);
         j.push_back(1);
-        j.push_back(custom_json(long_string, alloc));
+        j.push_back(long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at(0) == 1);

@@ -1566,14 +1566,10 @@ namespace jsoncons {
                 return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
             }
 
-            void push_back(const basic_json& val)
+            template <class T>
+            void push_back(T&& val)
             {
-                evaluate_with_default().push_back(val);
-            }
-
-            void push_back(basic_json&& val)
-            {
-                evaluate_with_default().push_back(std::move(val));
+                evaluate_with_default().push_back(std::forward<T>(val));
             }
 
             template <class T>
@@ -4793,12 +4789,13 @@ namespace jsoncons {
             a.swap(b);
         }
 
-        void push_back(const basic_json& val)
+        template <class T>
+        void push_back(T&& val)
         {
             switch (storage_kind())
             {
             case json_storage_kind::array_value:
-                array_value().push_back(val);
+                array_value().push_back(std::forward<T>(val));
                 break;
             default:
                 {

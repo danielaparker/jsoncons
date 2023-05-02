@@ -191,14 +191,10 @@ namespace jsoncons {
 
         // push_back
 
-        void push_back(const value_type& value)
+        template <class T>
+        void push_back(T&& value)
         {
-            elements_.push_back(value);
-        }
-
-        void push_back(value_type&& value)
-        {
-            elements_.push_back(std::move(value));
+            elements_.emplace_back(std::forward<T>(value));
         }
 
         template <class T, class A=allocator_type>

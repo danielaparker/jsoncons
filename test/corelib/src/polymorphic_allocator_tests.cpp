@@ -78,17 +78,6 @@ TEST_CASE("Test polymorhic allocator")
         CHECK(j.at(1).as<std::string>() == long_string);
     }
 /*
-    SECTION("emplace_back")
-    {
-        pmr_json j(json_array_arg, semantic_tag::none, alloc);
-        j.emplace_back(long_string, alloc);
-
-        std::cout << j << "\n";
-
-
-        //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
-        // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
-    }
 
     SECTION("parse")
     {
