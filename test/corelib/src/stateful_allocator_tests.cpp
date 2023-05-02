@@ -14,41 +14,38 @@
 using namespace jsoncons;
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
-TEST_CASE("test_string_allocation")
+TEST_CASE("test stateful allocator")
 {
-
     FreeListAllocator<char> alloc(true); 
 
-    using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
+    using custom_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
 
-    SECTION("construct")
+    SECTION("construct from string")
     {
-        {
-            my_json j("String too long for short string", alloc);
-        }
-        //std::cout << "Allocate count = " << a_pool.allocate_count_ 
-        //          << ", construct count = " << a_pool.construct_count_ 
-        //          << ", destroy count = " << a_pool.destroy_count_ 
-        //          << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
-    }
-
-    SECTION("construct")
-    {
-        my_json j("String too long for short string", alloc);
-       //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
-       // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+        custom_json j("String too long for short string", alloc);
+        CHECK(j.as<std::string>() == "String too long for short string");
     }
 
     SECTION("emplace_back")
     {
-        my_json j(json_array_arg, semantic_tag::none, alloc);
+        custom_json j(json_array_arg, alloc);
+        j.emplace_back(1);
         j.emplace_back("String too long for short string", alloc);
 
-        std::cout << j << "\n";
+        CHECK(j.size() == 2);
+        CHECK(j.at(0) == 1);
+        CHECK(j.at(1).as<std::string>() == "String too long for short string");
+    }
 
+    SECTION("push_back")
+    {
+        custom_json j(json_array_arg, alloc);
+        j.push_back(1);
+        j.push_back(custom_json("String too long for short string", alloc));
 
-        //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
-        // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+        CHECK(j.size() == 2);
+        CHECK(j.at(0) == 1);
+        CHECK(j.at(1).as<std::string>() == "String too long for short string");
     }
 
     SECTION("parse")
@@ -58,7 +55,7 @@ TEST_CASE("test_string_allocation")
         std::string s = "String too long for short string";
         std::string input = "\"" + s + "\"";
 
-        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
+        json_decoder<custom_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
         JSONCONS_TRY
         {
             json_string_reader reader(input,decoder);

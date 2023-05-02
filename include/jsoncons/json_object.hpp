@@ -61,8 +61,8 @@ namespace jsoncons {
     public:
         using key_type = KeyT;
         using value_type = ValueT;
-        using allocator_type = typename ValueT::allocator_type;
         using string_view_type = typename value_type::string_view_type;
+        using allocator_type = typename ValueT::allocator_type;
     private:
 
         key_type key_;
@@ -95,8 +95,25 @@ namespace jsoncons {
         {
         }
 
+        template <typename... Args>
+        key_value(const key_type& name,  Args&& ... args, const allocator_type& alloc)
+            : key_(name, alloc), value_(std::forward<Args>(args)..., alloc)
+        {
+        }
+
+        template <typename... Args>
+        key_value(key_type&& name,  Args&& ... args, const allocator_type& alloc) noexcept
+            : key_(std::move(name),alloc), value_(std::forward<Args>(args)...,alloc)
+        {
+        }
+
         key_value(const key_value& member)
             : key_(member.key_), value_(member.value_)
+        {
+        }
+
+        key_value(const key_value& member, const allocator_type& alloc)
+            : key_(member.key_, alloc), value_(member.value_, alloc)
         {
         }
 
@@ -104,6 +121,12 @@ namespace jsoncons {
             : key_(std::move(member.key_)), value_(std::move(member.value_))
         {
         }
+
+        key_value(key_value&& member, const allocator_type& alloc) noexcept
+            : key_(std::move(member.key_), alloc), value_(std::move(member.value_), alloc)
+        {
+        }
+
         template <typename... U1, typename... U2>
         JSONCONS_CONSTEXPR key_value(std::piecewise_construct_t /*unused*/, std::tuple<U1...> a,
                  std::tuple<U2...>
@@ -316,9 +339,20 @@ namespace jsoncons {
         {
         }
 
+        sorted_json_object(const sorted_json_object& val, const allocator_type& alloc) 
+            : allocator_holder<allocator_type>(alloc), 
+              members_(val.members_,key_value_allocator_type(alloc))
+        {
+        }
+
         sorted_json_object(sorted_json_object&& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
               members_(std::move(val.members_))
+        {
+        }
+
+        sorted_json_object(sorted_json_object&& val,const allocator_type& alloc) 
+            : allocator_holder<allocator_type>(alloc), members_(std::move(val.members_),key_value_allocator_type(alloc))
         {
         }
 
@@ -333,17 +367,6 @@ namespace jsoncons {
         {
             val.swap(*this);
             return *this;
-        }
-
-        sorted_json_object(const sorted_json_object& val, const allocator_type& alloc) 
-            : allocator_holder<allocator_type>(alloc), 
-              members_(val.members_,key_value_allocator_type(alloc))
-        {
-        }
-
-        sorted_json_object(sorted_json_object&& val,const allocator_type& alloc) 
-            : allocator_holder<allocator_type>(alloc), members_(std::move(val.members_),key_value_allocator_type(alloc))
-        {
         }
 
         template<class InputIt>
@@ -667,8 +690,7 @@ namespace jsoncons {
             }
             else
             {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end()),
+                it = members_.emplace(it, key_type(name.begin(),name.end()),
                                             std::forward<Args>(args)...);
                 inserted = true;
             }
@@ -1072,6 +1094,13 @@ namespace jsoncons {
         {
         }
 
+        order_preserving_json_object(order_preserving_json_object&& val,const allocator_type& alloc) 
+            : allocator_holder<allocator_type>(alloc), 
+              members_(std::move(val.members_),key_value_allocator_type(alloc)),
+              index_(std::move(val.index_),index_allocator_type(alloc))
+        {
+        }
+
         order_preserving_json_object(order_preserving_json_object&& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
               members_(std::move(val.members_)),
@@ -1083,13 +1112,6 @@ namespace jsoncons {
             : allocator_holder<allocator_type>(alloc), 
               members_(val.members_,key_value_allocator_type(alloc)),
               index_(val.index_,index_allocator_type(alloc))
-        {
-        }
-
-        order_preserving_json_object(order_preserving_json_object&& val,const allocator_type& alloc) 
-            : allocator_holder<allocator_type>(alloc), 
-              members_(std::move(val.members_),key_value_allocator_type(alloc)),
-              index_(std::move(val.index_),index_allocator_type(alloc))
         {
         }
 

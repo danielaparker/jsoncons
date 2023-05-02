@@ -191,18 +191,14 @@ namespace jsoncons {
 
         // push_back
 
-        template <class T, class A=allocator_type>
-        typename std::enable_if<traits_extension::is_stateless<A>::value,void>::type 
-        push_back(T&& value)
+        void push_back(const value_type& value)
         {
-            elements_.emplace_back(std::forward<T>(value));
+            elements_.push_back(value);
         }
 
-        template <class T, class A=allocator_type>
-        typename std::enable_if<!traits_extension::is_stateless<A>::value,void>::type 
-        push_back(T&& value)
+        void push_back(value_type&& value)
         {
-            elements_.emplace_back(std::forward<T>(value),get_allocator());
+            elements_.push_back(std::move(value));
         }
 
         template <class T, class A=allocator_type>

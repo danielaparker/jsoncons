@@ -166,6 +166,7 @@ add_executable(unit_tests
                corelib/src/short_string_tests.cpp
                corelib/src/source_tests.cpp
                corelib/src/staj_iterator_tests.cpp
+               corelib/src/polymorphic_allocator_tests.cpp
                corelib/src/stateful_allocator_tests.cpp
                corelib/src/string_to_double_tests.cpp
                corelib/src/unicode_conv_tests.cpp

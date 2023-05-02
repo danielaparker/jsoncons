@@ -38,6 +38,9 @@
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/string_wrapper.hpp>
+#if defined(JSONCONS_HAS_2017)
+#include <memory_resource> // std::poymorphic_allocator
+#endif
 
 namespace jsoncons { 
 
@@ -826,7 +829,7 @@ namespace jsoncons {
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
-                create(array_allocator(a), val, a);
+                create(array_allocator(a), val);
             }
 
             array_storage(const array_storage& val)
@@ -845,7 +848,7 @@ namespace jsoncons {
             array_storage(const array_storage& val, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(val.tag_)
             {
-                create(array_allocator(a), *(val.ptr_), a);
+                create(array_allocator(a), *(val.ptr_));
             }
             ~array_storage() noexcept
             {
@@ -919,7 +922,7 @@ namespace jsoncons {
             explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(tag)
             {
-                create(object_allocator(a), val, a);
+                create(object_allocator(a), val);
             }
 
             explicit object_storage(const object_storage& val)
@@ -938,7 +941,7 @@ namespace jsoncons {
             explicit object_storage(const object_storage& val, const Allocator& a)
                 : storage_kind_(val.storage_kind_), length_(0), tag_(val.tag_)
             {
-                create(object_allocator(a), *(val.ptr_), a);
+                create(object_allocator(a), *(val.ptr_));
             }
 
             ~object_storage() noexcept
@@ -1563,10 +1566,14 @@ namespace jsoncons {
                 return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
             }
 
-            template <class T>
-            void push_back(T&& val)
+            void push_back(const basic_json& val)
             {
-                evaluate_with_default().push_back(std::forward<T>(val));
+                evaluate_with_default().push_back(val);
+            }
+
+            void push_back(basic_json&& val)
+            {
+                evaluate_with_default().push_back(std::move(val));
             }
 
             template <class T>
@@ -2941,20 +2948,15 @@ namespace jsoncons {
             construct<empty_object_storage>(semantic_tag::none);
         }
 
+        explicit basic_json(const Allocator&) 
+        {
+            construct<empty_object_storage>(semantic_tag::none);
+        }
+
         basic_json(semantic_tag tag) 
         {
             construct<empty_object_storage>(tag);
         }
-
-    #if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,semantic_tag,const Allocator&)")
-        explicit basic_json(const Allocator& alloc, semantic_tag tag = semantic_tag::none) 
-        {
-            construct<object_storage>(object(alloc), tag);
-        }
-
-    #endif
 
         basic_json(const basic_json& other)
         {
@@ -2983,6 +2985,11 @@ namespace jsoncons {
             construct<object_storage>(object(alloc), tag);
         }
 
+        explicit basic_json(json_object_arg_t, const Allocator& alloc = Allocator()) 
+        {
+            construct<object_storage>(object(alloc), semantic_tag::none);
+        }
+
         template<class InputIt>
         basic_json(json_object_arg_t, 
                    InputIt first, InputIt last, 
@@ -2998,6 +3005,11 @@ namespace jsoncons {
                    const Allocator& alloc = Allocator()) 
         {
             construct<object_storage>(object(init,alloc), tag);
+        }
+
+        explicit basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
+        {
+            construct<array_storage>(array(alloc), semantic_tag::none);
         }
 
         explicit basic_json(json_array_arg_t, 
@@ -4781,13 +4793,26 @@ namespace jsoncons {
             a.swap(b);
         }
 
-        template <class T>
-        void push_back(T&& val)
+        void push_back(const basic_json& val)
         {
             switch (storage_kind())
             {
             case json_storage_kind::array_value:
-                array_value().push_back(std::forward<T>(val));
+                array_value().push_back(val);
+                break;
+            default:
+                {
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to insert into a value that is not an array"));
+                }
+            }
+        }
+
+        void push_back(basic_json&& val)
+        {
+            switch (storage_kind())
+            {
+            case json_storage_kind::array_value:
+                array_value().push_back(std::move(val));
                 break;
             default:
                 {
@@ -5911,6 +5936,15 @@ namespace jsoncons {
     }
 
     } // inline namespace literals
+
+    #if defined(JSONCONS_HAS_2017)
+    namespace pmr {
+        using json = basic_json<char,sorted_policy,std::pmr::polymorphic_allocator<char>>;
+        using wjson = basic_json<wchar_t,sorted_policy,std::pmr::polymorphic_allocator<char>>;
+        using ojson = basic_json<char, order_preserving_policy, std::pmr::polymorphic_allocator<char>>;
+        using wojson = basic_json<wchar_t, order_preserving_policy, std::pmr::polymorphic_allocator<char>>;
+    } // namespace pmr
+    #endif
 
 } // namespace jsoncons
 
