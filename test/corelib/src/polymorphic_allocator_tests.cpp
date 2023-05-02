@@ -5,7 +5,7 @@
 #include <catch/catch.hpp>
 #include <common/FreeListAllocator.hpp>
 
-#if defined(JSONCONS_HAS_2017)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 
 #include <memory_resource> 
 

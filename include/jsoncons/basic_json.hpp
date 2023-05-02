@@ -38,7 +38,7 @@
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/string_wrapper.hpp>
-#if defined(JSONCONS_HAS_2017)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator
 #endif
 
@@ -3013,7 +3013,7 @@ namespace jsoncons {
         }
 
         explicit basic_json(json_array_arg_t, 
-                            semantic_tag tag = semantic_tag::none, 
+                            semantic_tag tag, 
                             const Allocator& alloc = Allocator()) 
         {
             construct<array_storage>(array(alloc), tag);
@@ -5937,7 +5937,7 @@ namespace jsoncons {
 
     } // inline namespace literals
 
-    #if defined(JSONCONS_HAS_2017)
+    #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
     namespace pmr {
         using json = basic_json<char,sorted_policy,std::pmr::polymorphic_allocator<char>>;
         using wjson = basic_json<wchar_t,sorted_policy,std::pmr::polymorphic_allocator<char>>;
