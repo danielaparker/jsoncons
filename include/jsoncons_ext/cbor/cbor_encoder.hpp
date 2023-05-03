@@ -81,9 +81,9 @@ private:
 
     };
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>> string_size_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>> byte_string_size_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
+    using string_size_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>>;
+    using byte_string_size_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>>;
+    using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item>;
 
     Sink sink_;
     const cbor_encode_options options_;

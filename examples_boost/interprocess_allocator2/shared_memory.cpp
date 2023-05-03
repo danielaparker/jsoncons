@@ -45,20 +45,21 @@ int main(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      //shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(alloc));
       shm_json* j = segment.construct<shm_json>("my json")(json_array_arg, alloc);
       j->push_back(10);
 
       shm_json o(json_object_arg, alloc);
-      //o.try_emplace("category", "reference",alloc);
-      //o.try_emplace("author", "Nigel Rees",alloc);
-      //o.try_emplace("title", "Sayings of the Century",alloc);
-      //o.try_emplace("price", 8.95, alloc);
+      o.try_emplace("category", "reference", alloc);
+      o.try_emplace("author", "Nigel Rees", alloc);
+      o.try_emplace("title", "Sayings of the Century", alloc);
+      o.try_emplace("price", 8.95, alloc);
       
-      o.insert_or_assign("category", shm_json("reference",alloc));
-      o.insert_or_assign("author", shm_json("Nigel Rees",alloc));
-      o.insert_or_assign("title", shm_json("Sayings of the Century",alloc));
-      o.insert_or_assign("price", 8.95);
+      //o.insert_or_assign("category", shm_json("reference",alloc));
+      //o.insert_or_assign("author", shm_json("Nigel Rees",alloc));
+      //o.insert_or_assign("title", shm_json("Sayings of the Century",alloc));
+      //o.insert_or_assign("price", 8.95);
+
+      std::cout << o << "\n\n";
 
       j->push_back(o);
 

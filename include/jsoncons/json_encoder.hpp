@@ -302,7 +302,7 @@ namespace detail {
             }
 
         };
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
+        using encoding_context_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context>;
 
         Sink sink_;
         basic_json_encode_options<CharT> options_;
@@ -1096,7 +1096,7 @@ namespace detail {
                 return type_ == container_type::array;
             }
         };
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
+        using encoding_context_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context>;
 
         Sink sink_;
         basic_json_encode_options<CharT> options_;

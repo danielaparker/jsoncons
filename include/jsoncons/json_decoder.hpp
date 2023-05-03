@@ -33,7 +33,7 @@ public:
     using json_string_allocator = typename key_type::allocator_type;
     using json_array_allocator = typename array::allocator_type;
     using json_object_allocator = typename object::allocator_type;
-    typedef typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
+    using json_byte_allocator_type = typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t>;
 private:
 
     enum class structure_type {root_t, array_t, object_t};
@@ -51,8 +51,8 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<key_index_value<Json>> stack_item_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
+    using stack_item_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<key_index_value<Json>>;
+    using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  
     result_allocator_type result_allocator_;
     temp_allocator_type temp_allocator_;

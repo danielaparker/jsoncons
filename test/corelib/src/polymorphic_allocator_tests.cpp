@@ -11,6 +11,38 @@
 
 using namespace jsoncons;
 
+TEST_CASE("string polymorhic allocator tests")
+{
+    char buffer1[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
+    std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+
+    char buffer2[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
+    std::pmr::polymorphic_allocator<char> alloc2(&pool2);
+
+    using pmr_json = jsoncons::pmr::json;
+
+    const char* long_string1 = "String too long for short string";
+
+    CHECK_FALSE(traits_extension::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+    CHECK_FALSE(alloc1 == alloc2);
+    CHECK(alloc1 == alloc1);
+
+    SECTION("construct string")
+    {
+        pmr_json j1(long_string1, alloc1);
+        pmr_json j2(j1, alloc2);
+
+        CHECK(j1.as<std::string>() == long_string1);
+        CHECK(j2.as<std::string>() == long_string1);
+        CHECK(j1.cast<pmr_json::long_string_storage>().get_allocator() == alloc1);
+        CHECK(j2.cast<pmr_json::long_string_storage>().get_allocator() == alloc2);
+        CHECK_FALSE(j1.cast<pmr_json::long_string_storage>().get_allocator() ==
+            j2.cast<pmr_json::long_string_storage>().get_allocator());
+    }
+}
+
 TEST_CASE("Test polymorhic allocator")
 {
     char buffer[1024] = {}; // a small buffer on the stack

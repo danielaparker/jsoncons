@@ -1038,16 +1038,13 @@ namespace jsoncons {
         using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
         using key_type = KeyT;
-        //using mapped_type = Json;
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
-        //using implementation_policy = typename Json::implementation_policy;
     private:
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
-        //using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
+        using index_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;
         using index_container_type = SequenceContainer<std::size_t,index_allocator_type>;
 
         key_value_container_type members_;

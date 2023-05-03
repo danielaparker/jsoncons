@@ -37,7 +37,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/detail/string_wrapper.hpp>
+#include <jsoncons/detail/heap_string_box.hpp>
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator
 #endif
@@ -455,6 +455,7 @@ namespace jsoncons {
         static constexpr uint8_t major_type_shift = 0x04;
         static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
+    public:
         class common_storage final
         {
         public:
@@ -651,7 +652,7 @@ namespace jsoncons {
             uint8_t length_:4;
             semantic_tag tag_;
         private:
-            jsoncons::detail::string_wrapper<char_type,Allocator> s_;
+            jsoncons::detail::heap_string_box<char_type,Allocator> s_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
@@ -721,7 +722,7 @@ namespace jsoncons {
             uint8_t length_:4;
             semantic_tag tag_;
         private:
-            jsoncons::detail::tagged_string_wrapper<uint8_t,Allocator> s_;
+            jsoncons::detail::tagged_heap_string_box<uint8_t,Allocator> s_;
         public:
 
             byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
@@ -980,7 +981,7 @@ namespace jsoncons {
                 std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
             }
         };
-
+    private:
         class json_const_pointer_storage final
         {
         public:
@@ -2027,7 +2028,7 @@ namespace jsoncons {
 
         template <class T>
         struct identity { using type = T*; };
-
+    public:
         template <class T> 
         T& cast()
         {
@@ -2169,7 +2170,7 @@ namespace jsoncons {
         {
             return json_const_pointer_stor_;
         }
-
+    private:
         template <class TypeA, class TypeB>
         void swap_a_b(basic_json& other)
         {
@@ -3080,6 +3081,11 @@ namespace jsoncons {
 
         basic_json(const string_type& s)
             : basic_json(s.data(), s.size(), semantic_tag::none, s.get_allocator())
+        {
+        }
+
+        basic_json(const string_view_type& s, const allocator_type& alloc = allocator_type())
+            : basic_json(s.data(), s.size(), semantic_tag::none, alloc)
         {
         }
 

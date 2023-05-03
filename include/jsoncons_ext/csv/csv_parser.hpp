@@ -510,13 +510,13 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
     using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
+    using string_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type>;
+    using csv_mode_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode>;
+    using csv_type_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info>;
+    using string_vector_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>>;
+    using csv_parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state>;
 
     static constexpr int default_depth = 3;
 
