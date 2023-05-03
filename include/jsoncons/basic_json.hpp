@@ -652,12 +652,12 @@ namespace jsoncons {
             uint8_t length_:4;
             semantic_tag tag_;
         private:
-            jsoncons::detail::heap_string_box<char_type,Allocator> s_;
+            jsoncons::detail::heap_string_box<char_type,null_type,Allocator> s_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_string_value)), length_(0), tag_(tag),
-                  s_(data, length, a)
+                  s_(data, length, null_type(), a)
             {
             }
 
@@ -722,7 +722,7 @@ namespace jsoncons {
             uint8_t length_:4;
             semantic_tag tag_;
         private:
-            jsoncons::detail::tagged_heap_string_box<uint8_t,Allocator> s_;
+            jsoncons::detail::heap_string_box<uint8_t,uint64_t,Allocator> s_;
         public:
 
             byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
@@ -771,7 +771,7 @@ namespace jsoncons {
 
             uint64_t ext_tag() const
             {
-                return s_.tag();
+                return s_.extra();
             }
 
             allocator_type get_allocator() const

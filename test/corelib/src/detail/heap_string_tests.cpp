@@ -14,7 +14,8 @@ using namespace jsoncons;
 TEST_CASE("test heap_string_box char")
 {
     std::string input = "Hello World";
-    jsoncons::detail::heap_string_box<char, std::allocator<char>> s(input.data(), input.size(), std::allocator<char>());
+    jsoncons::detail::heap_string_box<char, jsoncons::null_type, std::allocator<char>> s(input.data(), input.size(), 
+        jsoncons::null_type(), std::allocator<char>());
 
     CHECK(input == std::string(s.c_str()));
     CHECK(s.length() == 11);
@@ -23,29 +24,30 @@ TEST_CASE("test heap_string_box char")
 TEST_CASE("test heap_string_box wchar_t")
 {
     std::wstring input = L"Hello World";
-    jsoncons::detail::heap_string_box<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), std::allocator<wchar_t>());
+    jsoncons::detail::heap_string_box<wchar_t, jsoncons::null_type, std::allocator<wchar_t>> s(input.data(), input.size(), 
+        jsoncons::null_type(), std::allocator<wchar_t>());
 
     CHECK(input == std::wstring(s.c_str()));
     CHECK(s.length() == 11);
 }
 
-TEST_CASE("test tagged_heap_string_box char")
+TEST_CASE("test heap_string_box char uint8_t")
 {
     std::string input = "Hello World";
-    jsoncons::detail::tagged_heap_string_box<char, std::allocator<char>> s(input.data(), input.size(), 100, std::allocator<char>());
+    jsoncons::detail::heap_string_box<char, uint64_t, std::allocator<char>> s(input.data(), input.size(), 100, std::allocator<char>());
 
     CHECK(input == std::string(s.c_str()));
-    CHECK(s.tag() == 100);
+    CHECK(s.extra() == 100);
     CHECK(s.length() == 11);
 }
 
-TEST_CASE("test tagged_heap_string_box wchar_t")
+TEST_CASE("test heap_string_box wchar_t uint8_t")
 {
     std::wstring input = L"Hello World";
-    jsoncons::detail::tagged_heap_string_box<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), 100, std::allocator<wchar_t>());
+    jsoncons::detail::heap_string_box<wchar_t, uint64_t, std::allocator<wchar_t>> s(input.data(), input.size(), 100, std::allocator<wchar_t>());
 
     CHECK(input == std::wstring(s.c_str()));
-    CHECK(s.tag() == 100);
+    CHECK(s.extra() == 100);
     CHECK(s.length() == 11);
 }
 
