@@ -2205,7 +2205,7 @@ namespace jsoncons {
             }
         }
 
-        void Init_(const basic_json& val)
+        void uninitialized_copy(const basic_json& val)
         {
             switch (val.storage_kind())
             {
@@ -2253,7 +2253,7 @@ namespace jsoncons {
             }
         }
 
-        void Init_(const basic_json& val, const Allocator& a)
+        void uninitialized_copy_a(const basic_json& val, const Allocator& a)
         {
             switch (val.storage_kind())
             {
@@ -2266,7 +2266,7 @@ namespace jsoncons {
                 case json_storage_kind::double_value:
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::json_const_pointer:
-                    Init_(val);
+                    uninitialized_copy(val);
                     break;
                 case json_storage_kind::long_string_value:
                     construct<long_string_storage>(val.cast<long_string_storage>(),a);
@@ -2285,7 +2285,7 @@ namespace jsoncons {
             }
         }
 
-        void Init_rv_(basic_json&& val) noexcept
+        void uninitialized_move(basic_json&& val) noexcept
         {
             switch (val.storage_kind())
             {
@@ -2298,7 +2298,7 @@ namespace jsoncons {
                 case json_storage_kind::bool_value:
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::json_const_pointer:
-                    Init_(val);
+                    uninitialized_copy(val);
                     break;
                 case json_storage_kind::long_string_value:
                 case json_storage_kind::byte_string_value:
@@ -2315,12 +2315,12 @@ namespace jsoncons {
             }
         }
 
-        void Init_rv_(basic_json&& val, const Allocator&, std::true_type) noexcept
+        void uninitialized_move_a(std::true_type, basic_json&& val, const Allocator&) noexcept
         {
-            Init_rv_(std::forward<basic_json>(val));
+            uninitialized_move(std::forward<basic_json>(val));
         }
 
-        void Init_rv_(basic_json&& val, const Allocator& a, std::false_type) noexcept
+        void uninitialized_move_a(std::false_type, basic_json&& val, const Allocator& a) noexcept
         {
             switch (val.storage_kind())
             {
@@ -2333,17 +2333,17 @@ namespace jsoncons {
                 case json_storage_kind::bool_value:
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::json_const_pointer:
-                    Init_(std::forward<basic_json>(val));
+                    uninitialized_copy(std::forward<basic_json>(val));
                     break;
                 case json_storage_kind::long_string_value:
                 {
                     if (a == val.cast<long_string_storage>().get_allocator())
                     {
-                        Init_rv_(std::forward<basic_json>(val), a, std::true_type());
+                        uninitialized_move_a(std::true_type(), std::forward<basic_json>(val), a);
                     }
                     else
                     {
-                        Init_(val,a);
+                        uninitialized_copy_a(val,a);
                     }
                     break;
                 }
@@ -2351,11 +2351,11 @@ namespace jsoncons {
                 {
                     if (a == val.cast<byte_string_storage>().get_allocator())
                     {
-                        Init_rv_(std::forward<basic_json>(val), a, std::true_type());
+                        uninitialized_move_a(std::true_type(), std::forward<basic_json>(val), a);
                     }
                     else
                     {
-                        Init_(val,a);
+                        uninitialized_copy_a(val,a);
                     }
                     break;
                 }
@@ -2363,11 +2363,11 @@ namespace jsoncons {
                 {
                     if (a == val.cast<object_storage>().get_allocator())
                     {
-                        Init_rv_(std::forward<basic_json>(val), a, std::true_type());
+                        uninitialized_move_a(std::true_type(), std::forward<basic_json>(val), a);
                     }
                     else
                     {
-                        Init_(val,a);
+                        uninitialized_copy_a(val,a);
                     }
                     break;
                 }
@@ -2375,11 +2375,11 @@ namespace jsoncons {
                 {
                     if (a == val.cast<array_storage>().get_allocator())
                     {
-                        Init_rv_(std::forward<basic_json>(val), a, std::true_type());
+                        uninitialized_move_a(std::true_type(), std::forward<basic_json>(val), a);
                     }
                     else
                     {
-                        Init_(val,a);
+                        uninitialized_copy_a(val,a);
                     }
                     break;
                 }
@@ -2420,7 +2420,7 @@ namespace jsoncons {
             if (this != &val)
             {
                 Destroy_();
-                Init_(val);
+                uninitialized_copy(val);
             }
             return *this;
         }
@@ -2957,22 +2957,22 @@ namespace jsoncons {
 
         basic_json(const basic_json& other)
         {
-            Init_(other);
+            uninitialized_copy(other);
         }
 
         basic_json(const basic_json& other, const Allocator& alloc)
         {
-            Init_(other,alloc);
+            uninitialized_copy_a(other,alloc);
         }
 
         basic_json(basic_json&& other) noexcept
         {
-            Init_rv_(std::forward<basic_json>(other));
+            uninitialized_move(std::forward<basic_json>(other));
         }
 
         basic_json(basic_json&& other, const Allocator&) noexcept
         {
-            Init_rv_(std::forward<basic_json>(other));
+            uninitialized_move(std::forward<basic_json>(other));
         }
 
         explicit basic_json(json_object_arg_t, 
