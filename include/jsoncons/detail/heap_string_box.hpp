@@ -129,14 +129,47 @@ namespace detail {
             ptr_ = create(data, length, extra, alloc);
         }
 
-        heap_string_box(const heap_string_box& val) 
+        heap_string_box(const heap_string_box& other) 
         {
-            ptr_ = create(val.data(), val.length(), val.extra(), val.get_allocator());
+            ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
         }
 
-        heap_string_box(const heap_string_box& val, const Allocator& alloc) 
+        heap_string_box(const heap_string_box& other, const Allocator& alloc) 
         {
-            ptr_ = create(val.data(), val.length(), val.extra(), alloc);
+            ptr_ = create(other.data(), other.length(), other.extra(), alloc);
+        }
+
+        heap_string_box(heap_string_box&& other)
+            : ptr_(nullptr)
+        {
+            std::swap(ptr_,other.ptr_);
+        }
+
+        heap_string_box(heap_string_box&& other, const Allocator& alloc)
+            : ptr_(nullptr)
+        {
+            if (alloc == other.get_allocator())
+            {
+                std::swap(ptr_,other.ptr_);
+            }
+            else
+            {
+                ptr_ = create(other.data(), other.length(), other.extra(), alloc);
+            }
+        }
+
+        heap_string_box& operator=(const heap_string_box& other)
+        {
+            destroy(ptr_);
+            ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
+            return *this;
+        }
+
+        template <class U = Allocator>
+        heap_string_box& operator=(heap_string_box&& other)
+        {
+            move_assignment(std::allocator_traits<U>::propagate_on_container_move_assignment, std::move(other));
+            return *this;
         }
 
         ~heap_string_box() noexcept
@@ -177,6 +210,28 @@ namespace detail {
             return ptr_->get_allocator();
         }
     private:
+        void move_assignment(std::true_type, heap_string_box&& other)
+        {
+            destroy(ptr_);
+            ptr_ = other.ptr_;
+            other.ptr_ = nullptr;
+        }
+
+        void move_assignment(std::false_type, heap_string_box&& other)
+        {
+            if (get_allocator() == other.get_allocator())
+            {
+                destroy(ptr_);
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
+            }
+            else
+            {
+                destroy(ptr_);
+                ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
+            }
+        }
+
         static size_t aligned_size(std::size_t n)
         {
             return sizeof(json_storage_kind) + n;
