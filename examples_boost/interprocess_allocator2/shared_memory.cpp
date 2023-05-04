@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
       //o.insert_or_assign("title", shm_json("Sayings of the Century",alloc));
       //o.insert_or_assign("price", 8.95);
 
-      std::cout << o << "\n\n";
+      //std::cout << o << std::endl;
 
       j->push_back(o);
 
