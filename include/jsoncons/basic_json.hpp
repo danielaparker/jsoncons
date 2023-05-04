@@ -685,13 +685,27 @@ namespace jsoncons {
             {
             }
 
+            long_string_storage& operator=(const long_string_storage& other)
+            {
+                storage_kind_ = other.storage_kind_;
+                length_ = other.length_;
+                tag_ = other.tag_;
+                s_ = other.s_;
+                return *this;
+            }
+
+            long_string_storage& operator=(long_string_storage&& other)
+            {
+                storage_kind_ = other.storage_kind_;
+                length_ = other.length_;
+                tag_ = other.tag_;
+                s_ = std::move(other.s_);
+                return *this;
+            }
+
             ~long_string_storage() noexcept
             {
             }
-
-            long_string_storage& operator=(const long_string_storage& val) = delete;
-
-            long_string_storage& operator=(long_string_storage&& val) noexcept = delete;
 
             void swap(long_string_storage& val) noexcept
             {
@@ -758,6 +772,24 @@ namespace jsoncons {
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
                   s_(std::move(other.s_), alloc)
             {
+            }
+
+            byte_string_storage& operator=(const byte_string_storage& other)
+            {
+                storage_kind_ = other.storage_kind_;
+                length_ = other.length_;
+                tag_ = other.tag_;
+                s_ = other.s_;
+                return *this;
+            }
+
+            byte_string_storage& operator=(byte_string_storage&& other)
+            {
+                storage_kind_ = other.storage_kind_;
+                length_ = other.length_;
+                tag_ = other.tag_;
+                s_ = std::move(other.s_);
+                return *this;
             }
 
             ~byte_string_storage() noexcept
@@ -2417,21 +2449,58 @@ namespace jsoncons {
             return *this;
         }
 
-        basic_json& operator=(const basic_json& val)
+        basic_json& operator=(const basic_json& other)
         {
-            if (this != &val)
+            if (this != &other)
             {
-                Destroy_();
-                uninitialized_copy(val);
+                if (storage_kind() == other.storage_kind())
+                {
+                    switch (other.storage_kind())
+                    {
+                        case json_storage_kind::long_string_value:
+                            cast<long_string_storage>() = other.cast<long_string_storage>();
+                            break;
+                        case json_storage_kind::byte_string_value:
+                            cast<byte_string_storage>() = other.cast<byte_string_storage>();
+                            break;
+                        default:
+                            Destroy_();
+                            uninitialized_copy(other);
+                            break;
+                    }
+                }
+                else
+                {
+                    Destroy_();
+                    uninitialized_copy(other);
+                }
             }
             return *this;
         }
 
-        basic_json& operator=(basic_json&& val) noexcept
+        basic_json& operator=(basic_json&& other)
         {
-            if (this !=&val)
+            if (this != &other)
             {
-                swap(val);
+                if (storage_kind() == other.storage_kind())
+                {
+                    switch (other.storage_kind())
+                    {
+                        case json_storage_kind::long_string_value:
+                            cast<long_string_storage>() = std::move(other.cast<long_string_storage>());
+                            break;
+                        case json_storage_kind::byte_string_value:
+                            cast<byte_string_storage>() = std::move(other.cast<byte_string_storage>());
+                            break;
+                        default:
+                            swap(other);
+                            break;
+                    }
+                }
+                else
+                {
+                    swap(other);
+                }
             }
             return *this;
         }

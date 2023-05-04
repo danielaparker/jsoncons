@@ -168,7 +168,7 @@ namespace detail {
         template <class U = Allocator>
         heap_string_box& operator=(heap_string_box&& other)
         {
-            move_assignment(std::allocator_traits<U>::propagate_on_container_move_assignment, std::move(other));
+            move_assignment(std::integral_constant<bool,std::allocator_traits<U>::propagate_on_container_move_assignment::value>(), std::move(other));
             return *this;
         }
 
