@@ -334,7 +334,7 @@ public:
     basic_json_decode_options(const basic_json_decode_options&) = default;
 
     basic_json_decode_options(basic_json_decode_options&& other)
-        : super_type(std::forward<basic_json_decode_options>(other)),
+        : super_type(std::move(other)),
                      lossless_number_(other.lossless_number_)
     {
     }
@@ -409,7 +409,7 @@ public:
     basic_json_encode_options(const basic_json_encode_options&) = default;
 
     basic_json_encode_options(basic_json_encode_options&& other)
-        : super_type(std::forward<basic_json_encode_options>(other)),
+        : super_type(std::move(other)),
           escape_all_non_ascii_(other.escape_all_non_ascii_),
           escape_solidus_(other.escape_solidus_),
           pad_inside_object_braces_(other.pad_inside_object_braces_),

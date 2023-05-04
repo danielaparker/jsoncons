@@ -498,7 +498,7 @@ public:
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;
 
     basic_csv_decode_options(basic_csv_decode_options&& other)
-        : super_type(std::forward<basic_csv_decode_options>(other)),
+        : super_type(std::move(other)),
           assume_header_(other.assume_header_),
           ignore_empty_values_(other.ignore_empty_values_),
           ignore_empty_lines_(other.ignore_empty_lines_),
@@ -640,7 +640,7 @@ public:
     basic_csv_encode_options(const basic_csv_encode_options& other) = default;
 
     basic_csv_encode_options(basic_csv_encode_options&& other)
-        : super_type(std::forward<basic_csv_encode_options>(other)),
+        : super_type(std::move(other)),
           quote_style_(other.quote_style_),
           float_format_(other.float_format_),
           precision_(other.precision_),
