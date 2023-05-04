@@ -31,6 +31,13 @@ TEST_CASE("string polymorhic allocator tests")
 
     SECTION("construct string")
     {
+
+        std::cout << "Polymorphic Allocator\n\n";
+
+        std::cout << "propagate_on_container_copy_assignment: " << std::allocator_traits<std::pmr::polymorphic_allocator<char>>::propagate_on_container_copy_assignment::value << "\n";
+        std::cout << "propagate_on_container_move_assignment: " << std::allocator_traits<std::pmr::polymorphic_allocator<char>>::propagate_on_container_move_assignment::value << "\n";
+        std::cout << "propagate_on_container_swap: " << std::allocator_traits<std::pmr::polymorphic_allocator<char>>::propagate_on_container_swap::value << "\n";
+
         pmr_json j1(long_string1, alloc1);
         pmr_json j2(j1, alloc2);
 

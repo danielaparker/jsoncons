@@ -29,6 +29,11 @@ TEST_CASE("test stateful allocator")
     {
         custom_json j(long_string, alloc);
         CHECK(j.as<std::string>() == long_string);
+
+        std::cout << "Stateful Allocator\n\n";
+        std::cout << "propagate_on_container_copy_assignment: " << std::allocator_traits<FreeListAllocator<char>>::propagate_on_container_copy_assignment::value << "\n";
+        std::cout << "propagate_on_container_move_assignment: " << std::allocator_traits<FreeListAllocator<char>>::propagate_on_container_move_assignment::value << "\n";
+        std::cout << "propagate_on_container_swap: " << std::allocator_traits<FreeListAllocator<char>>::propagate_on_container_swap::value << "\n";
     }
 
     SECTION("try_emplace")

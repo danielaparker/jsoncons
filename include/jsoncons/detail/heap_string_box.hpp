@@ -99,18 +99,18 @@ namespace detail {
     {
     public:
         using char_type = CharT;
-        using tagged_heap_string_type = heap_string<CharT,Extra,Allocator>;
+        using heap_string_type = heap_string<CharT,Extra,Allocator>;
     private:
 
         using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;  
         using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
-        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<tagged_heap_string_type>;  
+        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
         using heap_string_pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
 
         struct storage_t
         {
-            tagged_heap_string_type data;
+            heap_string_type data;
             char_type c[1];
         };
         typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
@@ -245,21 +245,21 @@ namespace detail {
             byte_pointer ptr = byte_alloc.allocate(mem_size);
 
             char* storage = traits_extension::to_plain_pointer(ptr);
-            tagged_heap_string_type* ps = new(storage)tagged_heap_string_type(extra, byte_alloc);
+            heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
 
             CharT* p = new(&psa->c)char_type[length + 1];
             std::memcpy(p, s, length*sizeof(char_type));
             p[length] = 0;
-            ps->p_ = std::pointer_traits<typename tagged_heap_string_type::pointer>::pointer_to(*p);
+            ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
             return std::pointer_traits<heap_string_pointer>::pointer_to(*ps);
         }
 
         static void destroy(heap_string_pointer ptr)
         {
-            tagged_heap_string_type* rawp = traits_extension::to_plain_pointer(ptr);
+            heap_string_type* rawp = traits_extension::to_plain_pointer(ptr);
 
             char* p = launder_cast<char*>(rawp);
 

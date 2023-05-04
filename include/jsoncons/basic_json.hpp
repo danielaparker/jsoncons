@@ -888,24 +888,28 @@ namespace jsoncons {
             array_storage(const array_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
             {
-                create(array_allocator(alloc), *(other.ptr_));
-            }
-
-            /*array_storage(array_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
-                  ptr_(nullptr)
-            {
-                if (alloc == other.get_allocator())
+                if (other.get_allocator() == alloc)
                 {
-                    other.length_ = 0;
-                    other.tag_ = semantic_tag::none;
-                    std::swap(other.ptr_, ptr_);
+                    create(array_allocator(alloc), *(other.ptr_));
                 }
                 else
                 {
-                    create(array_allocator(alloc), *(other.ptr_), alloc);
+                    create(array_allocator(alloc), array(*(other.ptr_), alloc));
                 }
-            }*/
+            }
+
+            array_storage(array_storage&& other, const Allocator& alloc)
+                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
+            {
+                if (other.get_allocator() == alloc)
+                {
+                    std::swap(other.ptr_,ptr_);
+                }
+                else
+                {
+                    create(array_allocator(alloc), array(*(other.ptr_), alloc));
+                }
+            }
 
             ~array_storage() noexcept
             {
@@ -964,13 +968,13 @@ namespace jsoncons {
                 }
             }
         public:
-            explicit object_storage(const object& val, semantic_tag tag)
+            object_storage(const object& val, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), length_(0), tag_(tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            explicit object_storage(object&& val, semantic_tag tag)
+            object_storage(object&& val, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), length_(0), tag_(tag)
             {
                 create(val.get_allocator(), std::move(val));
@@ -989,15 +993,21 @@ namespace jsoncons {
                 std::swap(other.ptr_,ptr_);
             }
 
-            explicit object_storage(const object_storage& other, const Allocator& alloc)
+            object_storage(const object_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
             {
-                create(object_allocator(alloc), *(other.ptr_));
+                if (other.get_allocator() == alloc)
+                {
+                    create(object_allocator(alloc), *(other.ptr_));
+                }
+                else
+                {
+                    create(object_allocator(alloc), object(*(other.ptr_), alloc));
+                }
             }
 
-            /*explicit object_storage(object_storage&& other, const Allocator& alloc) 
-                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
-                  ptr_(nullptr)
+            object_storage(object_storage&& other, const Allocator& alloc)
+                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
             {
                 if (other.get_allocator() == alloc)
                 {
@@ -1005,9 +1015,9 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(object_allocator(alloc), *(other.ptr_), alloc);
+                    create(object_allocator(alloc), object(*(other.ptr_), alloc));
                 }
-            }*/
+            }
 
             ~object_storage() noexcept
             {

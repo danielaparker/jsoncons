@@ -333,39 +333,39 @@ namespace jsoncons {
         {
         }
 
-        sorted_json_object(const sorted_json_object& val)
-            : allocator_holder<allocator_type>(val.get_allocator()),
-              members_(val.members_)
+        sorted_json_object(const sorted_json_object& other)
+            : allocator_holder<allocator_type>(other.get_allocator()),
+              members_(other.members_)
         {
         }
 
-        sorted_json_object(const sorted_json_object& val, const allocator_type& alloc) 
+        sorted_json_object(const sorted_json_object& other, const allocator_type& alloc) 
             : allocator_holder<allocator_type>(alloc), 
-              members_(val.members_,key_value_allocator_type(alloc))
+              members_(other.members_,key_value_allocator_type(alloc))
         {
         }
 
-        sorted_json_object(sorted_json_object&& val)
-            : allocator_holder<allocator_type>(val.get_allocator()), 
-              members_(std::move(val.members_))
+        sorted_json_object(sorted_json_object&& other)
+            : allocator_holder<allocator_type>(other.get_allocator()), 
+              members_(std::move(other.members_))
         {
         }
 
-        sorted_json_object(sorted_json_object&& val,const allocator_type& alloc) 
-            : allocator_holder<allocator_type>(alloc), members_(std::move(val.members_),key_value_allocator_type(alloc))
+        sorted_json_object(sorted_json_object&& other,const allocator_type& alloc) 
+            : allocator_holder<allocator_type>(alloc), members_(std::move(other.members_),key_value_allocator_type(alloc))
         {
         }
 
-        sorted_json_object& operator=(const sorted_json_object& val)
+        sorted_json_object& operator=(const sorted_json_object& other)
         {
-            allocator_holder<allocator_type>::operator=(val.get_allocator());
-            members_ = val.members_;
+            allocator_holder<allocator_type>::operator=(other.get_allocator());
+            members_ = other.members_;
             return *this;
         }
 
-        sorted_json_object& operator=(sorted_json_object&& val)
+        sorted_json_object& operator=(sorted_json_object&& other)
         {
-            val.swap(*this);
+            other.swap(*this);
             return *this;
         }
 

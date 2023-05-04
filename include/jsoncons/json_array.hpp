@@ -75,25 +75,26 @@ namespace jsoncons {
               elements_(begin,end,value_allocator_type(alloc))
         {
         }
-        json_array(const json_array& val)
-            : allocator_holder<allocator_type>(val.get_allocator()),
-              elements_(val.elements_)
+
+        json_array(const json_array& other)
+            : allocator_holder<allocator_type>(other.get_allocator()),
+              elements_(other.elements_)
         {
         }
-        json_array(const json_array& val, const allocator_type& alloc)
+        json_array(const json_array& other, const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              elements_(val.elements_,value_allocator_type(alloc))
+              elements_(other.elements_,value_allocator_type(alloc))
         {
         }
 
-        json_array(json_array&& val) noexcept
-            : allocator_holder<allocator_type>(val.get_allocator()), 
-              elements_(std::move(val.elements_))
+        json_array(json_array&& other) noexcept
+            : allocator_holder<allocator_type>(other.get_allocator()), 
+              elements_(std::move(other.elements_))
         {
         }
-        json_array(json_array&& val, const allocator_type& alloc)
+        json_array(json_array&& other, const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              elements_(std::move(val.elements_),value_allocator_type(alloc))
+              elements_(std::move(other.elements_),value_allocator_type(alloc))
         {
         }
 
