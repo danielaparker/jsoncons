@@ -880,9 +880,11 @@ namespace jsoncons {
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
                   ptr_(nullptr)
             {
+                std::swap(other.ptr_, ptr_);
+
+                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
                 other.length_ = 0;
                 other.tag_ = semantic_tag::none;
-                std::swap(other.ptr_, ptr_);
             }
 
             array_storage(const array_storage& other, const Allocator& alloc)
@@ -903,7 +905,11 @@ namespace jsoncons {
             {
                 if (other.get_allocator() == alloc)
                 {
-                    std::swap(other.ptr_,ptr_);
+                    ptr_ = other.ptr_;
+                    other.ptr_ = nullptr;
+                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+                    other.length_ = 0;
+                    other.tag_ = semantic_tag::none;
                 }
                 else
                 {
@@ -986,13 +992,6 @@ namespace jsoncons {
                 create(other.ptr_->get_allocator(), *(other.ptr_));
             }
 
-            explicit object_storage(object_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
-                  ptr_(nullptr)
-            {
-                std::swap(other.ptr_,ptr_);
-            }
-
             object_storage(const object_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
             {
@@ -1006,12 +1005,27 @@ namespace jsoncons {
                 }
             }
 
+            explicit object_storage(object_storage&& other) noexcept
+                : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_),
+                  ptr_(nullptr)
+            {
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
+                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+                other.length_ = 0;
+                other.tag_ = semantic_tag::none;
+            }
+
             object_storage(object_storage&& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), length_(0), tag_(other.tag_)
             {
                 if (other.get_allocator() == alloc)
                 {
-                    std::swap(other.ptr_,ptr_);
+                    ptr_ = other.ptr_;
+                    other.ptr_ = nullptr;
+                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+                    other.length_ = 0;
+                    other.tag_ = semantic_tag::none;
                 }
                 else
                 {

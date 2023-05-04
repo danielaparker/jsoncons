@@ -215,9 +215,9 @@ namespace jsoncons {
         {
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.emplace(it, std::forward<T>(value), get_allocator());
+            return elements_.emplace(it, std::forward<T>(value));
     #else
-            return elements_.emplace(pos, std::forward<T>(value), get_allocator());
+            return elements_.emplace(pos, std::forward<T>(value));
     #endif
         }
 
