@@ -90,7 +90,7 @@ TEST_CASE("test stateful allocator")
         custom_json j(json_array_arg, alloc1);
 
         j.insert(j.array_range().end(), custom_json{});
-        j.insert(j.array_range().end(), custom_json(long_string, alloc1));
+        j.insert(j.array_range().end(), long_string);
 
         CHECK(j.size() == 2);
         CHECK(j[0] == custom_json{});
