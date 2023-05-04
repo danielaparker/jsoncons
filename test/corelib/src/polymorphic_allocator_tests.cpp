@@ -11,6 +11,9 @@
 
 using namespace jsoncons;
 
+using pmr_json = jsoncons::pmr::json;
+using pmr_ojson = jsoncons::pmr::ojson;
+
 TEST_CASE("string polymorhic allocator tests")
 {
     char buffer1[1024] = {}; // a small buffer on the stack
@@ -21,8 +24,6 @@ TEST_CASE("string polymorhic allocator tests")
     std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
     std::pmr::polymorphic_allocator<char> alloc2(&pool2);
 
-    using pmr_json = jsoncons::pmr::json;
-    using pmr_ojson = jsoncons::pmr::ojson;
 
     const char* long_string1 = "String too long for short string";
 
@@ -60,9 +61,6 @@ TEST_CASE("Test polymorhic allocator")
     char buffer2[1024] = {}; // a small buffer on the stack
     std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
     std::pmr::polymorphic_allocator<char> alloc2(&pool2);
-
-    using pmr_json = jsoncons::pmr::json;
-    using pmr_ojson = jsoncons::pmr::ojson;
 
     const char* long_string = "String too long for short string";
 
