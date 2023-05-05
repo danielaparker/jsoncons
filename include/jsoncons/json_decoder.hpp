@@ -51,7 +51,7 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    using stack_item_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<key_index_value<Json>>;
+    using stack_item_allocator_type = typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<key_index_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  
     result_allocator_type result_allocator_;
@@ -72,7 +72,7 @@ public:
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(temp_allocator_),
+          item_stack_(result_allocator_type()),
           structure_stack_(temp_allocator_),
           is_valid_(false) 
     {
@@ -88,7 +88,7 @@ public:
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(),
+          item_stack_(result_alloc),
           structure_stack_(),
           is_valid_(false)
     {
@@ -105,7 +105,7 @@ public:
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(temp_allocator_),
+          item_stack_(result_alloc),
           structure_stack_(temp_allocator_),
           is_valid_(false)
     {
@@ -157,7 +157,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag, result_allocator_);
+        item_stack_.emplace_back(std::move(name_), index_++, json_object_arg, tag);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
@@ -196,7 +196,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag, result_allocator_);
+        item_stack_.emplace_back(std::move(name_), index_++, json_array_arg, tag);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
@@ -248,7 +248,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(std::move(name_), index_++, sv, tag, result_allocator_);
+                item_stack_.emplace_back(std::move(name_), index_++, sv, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(sv, tag, result_allocator_);
@@ -267,7 +267,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, tag, result_allocator_);
+                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, tag, result_allocator_);
@@ -286,7 +286,7 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag, result_allocator_);
+                item_stack_.emplace_back(std::move(name_), index_++, byte_string_arg, b, ext_tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(byte_string_arg, b, ext_tag, result_allocator_);

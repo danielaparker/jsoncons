@@ -48,7 +48,7 @@ TEST_CASE("jsonpath stateful allocator test")
     SECTION("make_expression")
     {
         json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
-                                                              ScopedTestAllocator<char>(2));
+            ScopedTestAllocator<char>(2));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
 

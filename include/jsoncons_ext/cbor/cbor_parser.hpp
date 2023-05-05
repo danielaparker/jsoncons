@@ -599,7 +599,7 @@ private:
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map_stack_.emplace_back(alloc_);
+            stringref_map_stack_.emplace_back();
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
@@ -649,7 +649,7 @@ private:
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map_stack_.emplace_back(alloc_);
+            stringref_map_stack_.emplace_back();
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }

@@ -3238,6 +3238,11 @@ namespace jsoncons {
             construct<half_storage>(val, tag);
         }
 
+        basic_json(half_arg_t, uint16_t val, semantic_tag tag, const allocator_type&)
+        {
+            construct<half_storage>(val, tag);
+        }
+
         basic_json(double val, semantic_tag tag)
         {
             construct<double_storage>(val, tag);
@@ -3313,7 +3318,17 @@ namespace jsoncons {
             construct<null_storage>(tag);
         }
 
+        basic_json(null_type, semantic_tag tag, const Allocator&)
+        {
+            construct<null_storage>(tag);
+        }
+
         basic_json(bool val, semantic_tag tag)
+        {
+            construct<bool_storage>(val,tag);
+        }
+
+        basic_json(bool val, semantic_tag tag, const Allocator&)
         {
             construct<bool_storage>(val,tag);
         }

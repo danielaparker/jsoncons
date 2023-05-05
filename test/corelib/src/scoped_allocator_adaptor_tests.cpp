@@ -24,7 +24,8 @@ using custom_string = std::basic_string<char, std::char_traits<char>, ScopedTest
 
 TEST_CASE("scoped allocator adaptor tests")
 {
-    ScopedTestAllocator<char> alloc1(true);
+
+    ScopedTestAllocator<char> alloc1(1);
 
     using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
     using custom_string = std::basic_string<char,std::char_traits<char>,ScopedTestAllocator<char>>;

@@ -357,7 +357,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag, alloc_);
+                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag);
                 
                 ++level_;
             }
@@ -368,7 +368,7 @@ namespace detail {
         {
             if (level_ > 0)
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none, alloc_);
+                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none);
                 ++name_index_;
                 --level_;
             }
@@ -389,7 +389,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -402,7 +402,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
 
                 if (level_ == 0)
                 {
@@ -419,7 +419,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -435,7 +435,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -451,7 +451,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -467,7 +467,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -480,7 +480,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag, alloc_);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++name_index_;
