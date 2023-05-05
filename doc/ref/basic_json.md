@@ -38,10 +38,10 @@ Type                |Definition
 [jsoncons::ojson](ojson.md)   |`jsoncons::basic_json<char,jsoncons::order_preserving_policy,std::allocator<char>>`
 [jsoncons::wjson](wjson.md)   |`jsoncons::basic_json<wchar_t,jsoncons::jsoncons::sorted_policy,std::allocator<char>>`
 [jsoncons::wojson](wojson.md) |`jsoncons::basic_json<wchar_t,jsoncons::order_preserving_policy,std::allocator<char>>`
-jsoncons::pmr::json (since 0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::sorted_policy>`
-jsoncons::pmr::ojson (since 0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::order_preserving_policy>`
-jsoncons::pmr::wjson (since 0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::sorted_policy>`
-jsoncons::pmr::wojson (since 0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::order_preserving_policy>`
+`jsoncons::pmr::json` (0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::sorted_policy>`
+`jsoncons::pmr::ojson` (0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::order_preserving_policy>`
+`jsoncons::pmr::wjson` (0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::sorted_policy>`
+`jsoncons::pmr::wojson` (0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::order_preserving_policy>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
