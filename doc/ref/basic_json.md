@@ -5,12 +5,12 @@
 
 template< 
     class CharT,
-    class ImplementationPolicy = sorted_policy,
+    class Policy = sorted_policy,
     class Allocator = std::allocator<char>
 > class basic_json;
 
 namespace pmr {
-    template<class CharT, class ImplementationPolicy>
+    template<class CharT, class Policy>
     using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
     using json = basic_json<char,sorted_policy>;                                                    (since 0.171.0)
     using wjson = basic_json<wchar_t,sorted_policy>;
@@ -26,7 +26,7 @@ null, `bool`, `int64_t`, `uint64_t`, `double`, text string, byte string, array, 
 When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
 
 The definition of the character type of text strings is supplied via the `CharT` template parameter.
-Implementation policies for arrays and objects are provided via the `ImplementationPolicy` template parameter.
+Implementation policies for arrays and objects are provided via the `Policy` template parameter.
 A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
 rebind to internal data structures. 
 
@@ -46,7 +46,7 @@ jsoncons::pmr::wojson (since 0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsonco
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|CharT
-`implementation_policy`|ImplementationPolicy
+`implementation_policy`|Policy
 `allocator_type`|Allocator
 `char_traits_type`|`std::char_traits<char_type>`
 `char_allocator_type`|`allocator_type` rebound to `char_type`

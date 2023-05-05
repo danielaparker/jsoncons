@@ -282,50 +282,50 @@ namespace jsoncons {
         using parse_error_handler_type = default_json_parsing;
     };
 
-    template<class ImplementationPolicy, class KeyT,class Json, class Enable=void>
+    template<class Policy, class KeyT,class Json, class Enable=void>
     struct object_iterator_typedefs
     {
     };
 
-    template<class ImplementationPolicy, class KeyT,class Json>
-    struct object_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        !traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value ||
-        !traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, ImplementationPolicy>::value>::type>
+    template<class Policy, class KeyT,class Json>
+    struct object_iterator_typedefs<Policy, KeyT, Json, typename std::enable_if<
+        !traits_extension::is_detected<traits_extension::container_object_iterator_type_t, Policy>::value ||
+        !traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, Policy>::value>::type>
     {
-        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object<KeyT,Json>::iterator>;                    
-        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object<KeyT,Json>::const_iterator>;
+        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename Policy::template object<KeyT,Json>::iterator>;                    
+        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename Policy::template object<KeyT,Json>::const_iterator>;
     };
 
-    template<class ImplementationPolicy,class KeyT,class Json>
-    struct object_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        traits_extension::is_detected<traits_extension::container_object_iterator_type_t, ImplementationPolicy>::value &&
-        traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, ImplementationPolicy>::value>::type>
+    template<class Policy,class KeyT,class Json>
+    struct object_iterator_typedefs<Policy, KeyT, Json, typename std::enable_if<
+        traits_extension::is_detected<traits_extension::container_object_iterator_type_t, Policy>::value &&
+        traits_extension::is_detected<traits_extension::container_const_object_iterator_type_t, Policy>::value>::type>
     {
-        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template object_iterator<KeyT,Json>>;
-        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename ImplementationPolicy::template const_object_iterator<KeyT,Json>>;
+        using object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename Policy::template object_iterator<KeyT,Json>>;
+        using const_object_iterator_type = jsoncons::detail::random_access_iterator_wrapper<typename Policy::template const_object_iterator<KeyT,Json>>;
     };
 
-    template<class ImplementationPolicy, class KeyT,class Json, class Enable=void>
+    template<class Policy, class KeyT,class Json, class Enable=void>
     struct array_iterator_typedefs
     {
     };
 
-    template<class ImplementationPolicy, class KeyT,class Json>
-    struct array_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        !traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value ||
-        !traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, ImplementationPolicy>::value>::type>
+    template<class Policy, class KeyT,class Json>
+    struct array_iterator_typedefs<Policy, KeyT, Json, typename std::enable_if<
+        !traits_extension::is_detected<traits_extension::container_array_iterator_type_t, Policy>::value ||
+        !traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, Policy>::value>::type>
     {
-        using array_iterator_type = typename ImplementationPolicy::template array<Json>::iterator;
-        using const_array_iterator_type = typename ImplementationPolicy::template array<Json>::const_iterator;
+        using array_iterator_type = typename Policy::template array<Json>::iterator;
+        using const_array_iterator_type = typename Policy::template array<Json>::const_iterator;
     };
 
-    template<class ImplementationPolicy,class KeyT,class Json>
-    struct array_iterator_typedefs<ImplementationPolicy, KeyT, Json, typename std::enable_if<
-        traits_extension::is_detected<traits_extension::container_array_iterator_type_t, ImplementationPolicy>::value &&
-        traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, ImplementationPolicy>::value>::type>
+    template<class Policy,class KeyT,class Json>
+    struct array_iterator_typedefs<Policy, KeyT, Json, typename std::enable_if<
+        traits_extension::is_detected<traits_extension::container_array_iterator_type_t, Policy>::value &&
+        traits_extension::is_detected<traits_extension::container_const_array_iterator_type_t, Policy>::value>::type>
     {
-        using array_iterator_type = typename ImplementationPolicy::template array_iterator_type<Json>;
-        using const_array_iterator_type = typename ImplementationPolicy::template const_array_iterator_type<Json>;
+        using array_iterator_type = typename Policy::template array_iterator_type<Json>;
+        using const_array_iterator_type = typename Policy::template const_array_iterator_type<Json>;
     };
 
     #if !defined(JSONCONS_NO_DEPRECATED)
@@ -403,14 +403,14 @@ namespace jsoncons {
     struct is_proxy<T,typename std::enable_if<is_proxy_of<T,typename T::proxied_type>::value>::type
     > : std::true_type {};
 
-    template <class CharT, class ImplementationPolicy, class Allocator>
+    template <class CharT, class Policy, class Allocator>
     class basic_json
     {
     public:
 
         using allocator_type = Allocator; 
 
-        using implementation_policy = ImplementationPolicy;
+        using implementation_policy = Policy;
 
         using parse_error_handler_type = typename implementation_policy::parse_error_handler_type;
 
@@ -6045,7 +6045,7 @@ namespace jsoncons {
 
     #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
     namespace pmr {
-        template< class CharT, class ImplementationPolicy>
+        template< class CharT, class Policy>
         using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
         using json = basic_json<char,sorted_policy>;
         using wjson = basic_json<wchar_t,sorted_policy>;

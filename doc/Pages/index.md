@@ -867,7 +867,7 @@ The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md
 and sorts object members in alphabetically order.
 ```c++
 typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<char>> json;
 ```
 If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) instead.
@@ -875,7 +875,7 @@ If you prefer to retain the original insertion order, use [ojson](https://github
 The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/ref/doc/wjson.md)
 ```c++
 typedef basic_json<wchar_t,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
 If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md) instead.

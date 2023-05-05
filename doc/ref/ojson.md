@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 
 typedef basic_json<char,
-                   ImplementationPolicy = order_preserving_policy,
+                   Policy = order_preserving_policy,
                    Allocator = std::allocator<char>> ojson
 ```
 The `ojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 

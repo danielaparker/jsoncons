@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 
 typedef basic_json<wchar_t,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson
 ```
 

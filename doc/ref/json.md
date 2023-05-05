@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 
 typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<char>> json
 ```
 The class `json` is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. 
