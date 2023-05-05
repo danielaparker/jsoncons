@@ -160,7 +160,7 @@ bool is_base10(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && !traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_decimal(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -195,7 +195,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::decimal:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_10 = max_value / 10;
                 for (; s < end; ++s)
                 {
@@ -230,7 +230,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_decimal(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -247,7 +247,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
         --length;
     }
 
-    using U = typename traits_extension::make_unsigned<T>::type;
+    using U = typename extension_traits::make_unsigned<T>::type;
 
     U u;
     auto ru = to_integer_decimal(s, length, u);
@@ -257,7 +257,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
     }
     if (is_negative)
     {
-        if (u > static_cast<U>(-((traits_extension::integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u > static_cast<U>(-((extension_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -269,7 +269,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        if (u > static_cast<U>((traits_extension::integer_limits<T>::max)()))
+        if (u > static_cast<U>((extension_traits::integer_limits<T>::max)()))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -282,7 +282,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && !traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_base16(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -319,7 +319,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::base16:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_16 = max_value / 16;
                 for (; s < end; ++s)
                 {
@@ -361,7 +361,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_base16(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -378,7 +378,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
         --length;
     }
 
-    using U = typename traits_extension::make_unsigned<T>::type;
+    using U = typename extension_traits::make_unsigned<T>::type;
 
     U u;
     auto ru = to_integer_base16(s, length, u);
@@ -388,7 +388,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
     }
     if (is_negative)
     {
-        if (u > static_cast<U>(-((traits_extension::integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u > static_cast<U>(-((extension_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -400,7 +400,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        if (u > static_cast<U>((traits_extension::integer_limits<T>::max)()))
+        if (u > static_cast<U>((extension_traits::integer_limits<T>::max)()))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -413,7 +413,7 @@ to_integer_base16(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && !traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -469,7 +469,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::binary:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_2 = max_value / 2;
                 for (; s < end; ++s)
                 {
@@ -497,7 +497,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::octal:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_8 = max_value / 8;
                 for (; s < end; ++s)
                 {
@@ -525,7 +525,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::decimal:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_10 = max_value / 10;
                 for (; s < end; ++s)
                 {
@@ -553,7 +553,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
             }
             case integer_chars_state::base16:
             {
-                static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
                 static constexpr T max_value_div_16 = max_value / 16;
                 for (; s < end; ++s)
                 {
@@ -596,7 +596,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
@@ -613,7 +613,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
         --length;
     }
 
-    using U = typename traits_extension::make_unsigned<T>::type;
+    using U = typename extension_traits::make_unsigned<T>::type;
 
     U u;
     auto ru = to_integer(s, length, u);
@@ -623,7 +623,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
     }
     if (is_negative)
     {
-        if (u > static_cast<U>(-((traits_extension::integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u > static_cast<U>(-((extension_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -635,7 +635,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        if (u > static_cast<U>((traits_extension::integer_limits<T>::max)()))
+        if (u > static_cast<U>((extension_traits::integer_limits<T>::max)()))
         {
             return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
         }
@@ -648,7 +648,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, T& n)
 {
     return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s), n);
@@ -662,17 +662,17 @@ to_integer(const CharT* s, T& n)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && !traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 {
-    static_assert(traits_extension::integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (traits_extension::integer_limits<T>::lowest)();
+        static constexpr T min_value = (extension_traits::integer_limits<T>::lowest)();
         static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
@@ -693,7 +693,7 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+        static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
         static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
@@ -723,10 +723,10 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 {
-    static_assert(traits_extension::integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     n = 0;
@@ -734,7 +734,7 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (traits_extension::integer_limits<T>::lowest)();
+        static constexpr T min_value = (extension_traits::integer_limits<T>::lowest)();
         static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
@@ -755,7 +755,7 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+        static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
         static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
@@ -780,10 +780,10 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 // base16_to_integer
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 base16_to_integer(const CharT* s, std::size_t length, T& n)
 {
-    static_assert(traits_extension::integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     n = 0;
@@ -791,7 +791,7 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (traits_extension::integer_limits<T>::lowest)();
+        static constexpr T min_value = (extension_traits::integer_limits<T>::lowest)();
         static constexpr T min_value_div_16 = min_value / 16;
         ++s;
         for (; s < end; ++s)
@@ -826,7 +826,7 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
     }
     else
     {
-        static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+        static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
         static constexpr T max_value_div_16 = max_value / 16;
         for (; s < end; ++s)
         {
@@ -864,16 +864,16 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
 }
 
 template <class T, class CharT>
-typename std::enable_if<traits_extension::integer_limits<T>::is_specialized && !traits_extension::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
+typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 base16_to_integer(const CharT* s, std::size_t length, T& n)
 {
-    static_assert(traits_extension::integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     n = 0;
     const CharT* end = s + length; 
 
-    static constexpr T max_value = (traits_extension::integer_limits<T>::max)();
+    static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
     static constexpr T max_value_div_16 = max_value / 16;
     for (; s < end; ++s)
     {

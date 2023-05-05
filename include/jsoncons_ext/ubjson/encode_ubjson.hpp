@@ -21,8 +21,8 @@ namespace jsoncons {
 namespace ubjson {
 
     template<class T, class Container>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_ubjson(const T& j, 
                   Container& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -34,8 +34,8 @@ namespace ubjson {
     }
 
     template<class T, class Container>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_ubjson(const T& val, 
                   Container& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -50,7 +50,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& j, 
                   std::ostream& os, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -62,7 +62,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& val, 
                   std::ostream& os, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -79,8 +79,8 @@ namespace ubjson {
     // with temp_allocator_arg_t
 
     template<class T, class Container, class TempAllocator>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& j, 
                   Container& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -92,8 +92,8 @@ namespace ubjson {
     }
 
     template<class T, class Container, class TempAllocator>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& val, 
                   Container& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -108,7 +108,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const T& j, 
                   std::ostream& os, 
@@ -121,7 +121,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const T& val, 
                   std::ostream& os, 

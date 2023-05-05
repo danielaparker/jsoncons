@@ -8,6 +8,10 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include "FreeListAllocator.hpp"
+#include <scoped_allocator>
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 // for brevity
 using jsoncons::json; 
@@ -804,7 +808,7 @@ namespace {
 
     void make_expression_with_stateful_allocator()
     {
-        using my_alloc = FreeListAllocator<char>; // an allocator with a single-argument constructor
+        using my_alloc = ScopedTestAllocator<char>; // an allocator with a single-argument constructor
         using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
         std::string json_string = R"(

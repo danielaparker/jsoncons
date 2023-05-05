@@ -55,8 +55,8 @@ namespace detail {
 
         ~heap_string() noexcept = default; 
 
-        const char_type* c_str() const { return traits_extension::to_plain_pointer(p_); }
-        const char_type* data() const { return traits_extension::to_plain_pointer(p_); }
+        const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
+        const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
         std::size_t length() const { return length_; }
         Extra extra() const { return this->extra_; }
 
@@ -160,7 +160,10 @@ namespace detail {
 
         heap_string_box& operator=(const heap_string_box& other)
         {
-            destroy(ptr_);
+            if (ptr_ != nullptr)
+            {
+                destroy(ptr_);
+            }
             ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
             return *this;
         }
@@ -212,7 +215,10 @@ namespace detail {
     private:
         void move_assignment(std::true_type, heap_string_box&& other)
         {
-            destroy(ptr_);
+            if (ptr_ != nullptr)
+            {
+                destroy(ptr_);
+            }
             ptr_ = other.ptr_;
             other.ptr_ = nullptr;
         }
@@ -221,13 +227,19 @@ namespace detail {
         {
             if (get_allocator() == other.get_allocator())
             {
-                destroy(ptr_);
+                if (ptr_ != nullptr)
+                {
+                    destroy(ptr_);
+                }
                 ptr_ = other.ptr_;
                 other.ptr_ = nullptr;
             }
             else
             {
-                destroy(ptr_);
+                if (ptr_ != nullptr)
+                {
+                    destroy(ptr_);
+                }
                 ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
             }
         }
@@ -244,7 +256,7 @@ namespace detail {
             byte_allocator_type byte_alloc(alloc);
             byte_pointer ptr = byte_alloc.allocate(mem_size);
 
-            char* storage = traits_extension::to_plain_pointer(ptr);
+            char* storage = extension_traits::to_plain_pointer(ptr);
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
@@ -259,7 +271,7 @@ namespace detail {
 
         static void destroy(heap_string_pointer ptr)
         {
-            heap_string_type* rawp = traits_extension::to_plain_pointer(ptr);
+            heap_string_type* rawp = extension_traits::to_plain_pointer(ptr);
 
             char* p = launder_cast<char*>(rawp);
 

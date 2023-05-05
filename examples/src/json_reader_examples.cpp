@@ -8,8 +8,12 @@
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include "FreeListAllocator.hpp"
+#include <scoped_allocator>
 
 using namespace jsoncons;
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 namespace {
 
@@ -119,7 +123,7 @@ namespace {
 
     void read_with_stateful_allocator()
     {
-        using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
+        using my_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
         std::string input = R"(
     [ 
       { 
@@ -141,12 +145,12 @@ namespace {
     ]
     )";
 
-        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, FreeListAllocator<char>(1),
-                                                              FreeListAllocator<char>(2));
+        json_decoder<my_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+            ScopedTestAllocator<char>(2));
 
-        auto myAlloc = FreeListAllocator<char>(3);        
+        auto myAlloc = ScopedTestAllocator<char>(3);
 
-        basic_json_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>, ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -155,14 +159,12 @@ namespace {
 
 } // namespace
 
-void json_reader_examples()
+int main()
 {
     std::cout << "\njson_reader examples\n\n";
 
-    read_mulitple_json_objects();
+    //read_mulitple_json_objects();
     read_with_stateful_allocator();
-    custom_iterator_source();
-    read_json_lines();
-
-    std::cout << "\n\n";
+    //custom_iterator_source();
+    //read_json_lines();
 }

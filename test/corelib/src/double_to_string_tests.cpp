@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/traits_extension.hpp>
+#include <jsoncons/extension_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>

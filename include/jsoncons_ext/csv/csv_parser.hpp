@@ -267,7 +267,7 @@ namespace detail {
             for (const auto& name : column_names)
             {
                 column_names_.push_back(name);
-                cached_events_.emplace_back(alloc_);
+                cached_events_.emplace_back();
             }
             name_index_ = 0;
             level_ = 0;

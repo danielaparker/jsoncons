@@ -24,8 +24,8 @@ namespace cbor {
     // to bytes 
 
     template<class T, class Container>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_cbor(const T& j, 
                 Container& v, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -37,8 +37,8 @@ namespace cbor {
     }
 
     template<class T, class Container>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_cbor(const T& val, Container& v, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
@@ -54,7 +54,7 @@ namespace cbor {
     // stream
 
     template<class T>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const T& j, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -66,7 +66,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(const T& val, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -85,8 +85,8 @@ namespace cbor {
     // to bytes 
 
     template<class T, class Container, class TempAllocator>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 Container& v, 
@@ -99,8 +99,8 @@ namespace cbor {
     }
 
     template<class T, class Container, class TempAllocator>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value &&
-                            traits_extension::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
+                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 Container& v, 
@@ -118,7 +118,7 @@ namespace cbor {
     // stream
 
     template<class T,class TempAllocator>
-    typename std::enable_if<traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::ostream& os, 
@@ -131,7 +131,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!traits_extension::is_basic_json<T>::value,void>::type 
+    typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::ostream& os, 

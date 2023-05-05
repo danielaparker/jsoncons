@@ -1368,7 +1368,7 @@ namespace detail {
             while (rit != rend) 
             {
                 auto s = rit->str();
-                j.emplace_back(s.c_str(), semantic_tag::none, alloc_);
+                j.emplace_back(s.c_str(), semantic_tag::none);
                 ++rit;
             }
             return j;
@@ -1971,7 +1971,7 @@ namespace detail {
             for (auto& item : arg0.object_range())
             {
                 auto s = item.key();
-                result.emplace_back(s.c_str(), semantic_tag::none, alloc_);
+                result.emplace_back(s.c_str(), semantic_tag::none);
             }
             return result;
         }
@@ -3090,7 +3090,7 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<traits_extension::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
+        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  reference root,
                  const json_location_node_type& path, 

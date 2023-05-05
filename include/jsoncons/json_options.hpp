@@ -11,7 +11,7 @@
 #include <limits> // std::numeric_limits
 #include <cwchar>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/traits_extension.hpp>
+#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons {
 

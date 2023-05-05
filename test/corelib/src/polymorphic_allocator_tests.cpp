@@ -6,9 +6,7 @@
 #include <common/FreeListAllocator.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
-
 #include <memory_resource> 
-
 using namespace jsoncons;
 
 using pmr_json = jsoncons::pmr::json;
@@ -27,7 +25,7 @@ TEST_CASE("string polymorhic allocator tests")
 
     const char* long_string1 = "String too long for short string";
 
-    CHECK_FALSE(traits_extension::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+    CHECK_FALSE(extension_traits::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
     CHECK_FALSE(alloc1 == alloc2);
     CHECK(alloc1 == alloc1);
 
@@ -64,7 +62,7 @@ TEST_CASE("Test polymorhic allocator")
 
     const char* a_long_string = "String too long for short string";
 
-    CHECK_FALSE(traits_extension::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+    CHECK_FALSE(extension_traits::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
 
     pmr_json an_object1(json_object_arg, alloc1);
     an_object1.try_emplace("true", true);

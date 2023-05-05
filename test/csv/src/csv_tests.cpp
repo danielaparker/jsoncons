@@ -14,9 +14,13 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <scoped_allocator>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("csv subfield delimiter tests")
 {
@@ -1508,17 +1512,17 @@ TEST_CASE("csv_reader constructors")
 
     SECTION("stateful allocator")
     {
-        using my_json = basic_json<char,sorted_policy,FreeListAllocator<char>>;
+        using my_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
 
-        FreeListAllocator<char> my_allocator{1}; 
+        ScopedTestAllocator<char> my_allocator{1}; 
 
         csv::csv_options options;
         options.assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_objects);
 
-        json_decoder<my_json,FreeListAllocator<char>> decoder(result_allocator_arg, my_allocator,
+        json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
-        csv::basic_csv_reader<char,string_source<char>,FreeListAllocator<char>> reader(input, decoder, options, my_allocator);
+        csv::basic_csv_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
         my_json j = decoder.get_result();
