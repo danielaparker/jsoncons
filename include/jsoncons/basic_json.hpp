@@ -6045,7 +6045,7 @@ namespace jsoncons {
 
     #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
     namespace pmr {
-        template< class CharT, class Policy>
+        template< class CharT, class ImplementationPolicy>
         using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
         using json = basic_json<char,sorted_policy>;
         using wjson = basic_json<wchar_t,sorted_policy>;

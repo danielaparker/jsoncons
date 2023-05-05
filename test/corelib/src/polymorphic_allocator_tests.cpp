@@ -62,45 +62,54 @@ TEST_CASE("Test polymorhic allocator")
     std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
     std::pmr::polymorphic_allocator<char> alloc2(&pool2);
 
-    const char* long_string = "String too long for short string";
+    const char* a_long_string = "String too long for short string";
 
     CHECK_FALSE(traits_extension::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
 
+    pmr_json an_object1(json_object_arg, alloc1);
+    an_object1.try_emplace("true", true);
+    an_object1.try_emplace("false", false);
+    an_object1.try_emplace("null", null_type());
+    an_object1.try_emplace("Key to long for short string", a_long_string);
+
+    std::pmr::string key1{"foo", alloc1};
+    std::pmr::string key2{"bar", alloc1};
+
     SECTION("construct string")
     {
-        pmr_json j(long_string, alloc1);
+        pmr_json j(a_long_string, alloc1);
 
-        CHECK(j.as<std::string>() == long_string);
+        CHECK(j.as<std::string>() == a_long_string);
     }
 
     SECTION("try_emplace json")
     {
         pmr_json j(json_object_arg, alloc1);
 
-        std::pmr::string key1{"foo", alloc1};
-        std::pmr::string key2{"bar", alloc1};
+        pmr_json an_object1_copy(an_object1);
 
         j.try_emplace(key1, pmr_json{});
-        j.try_emplace(std::move(key2), long_string);
+        j.try_emplace(std::move(key2), a_long_string);
+        j.try_emplace("baz", an_object1);
+        j.try_emplace("qux", std::move(an_object1_copy));
 
-        CHECK(j.size() == 2);
+        CHECK(j.size() == 4);
         CHECK(j.at("foo") == pmr_json{});
-        CHECK(j.at("bar").as_string_view() == long_string);
+        CHECK(j.at("bar").as_string_view() == a_long_string);
+        CHECK(j.at("baz") == an_object1);
+        CHECK(j.at("qux") == an_object1);
     }
 
     SECTION("try_emplace ojson")
     {
         pmr_ojson j(json_object_arg, alloc1);
 
-        std::pmr::string key1{"foo", alloc1};
-        std::pmr::string key2{"bar", alloc1};
-
         j.try_emplace(key1, pmr_ojson{});
-        j.try_emplace(std::move(key2), long_string);
+        j.try_emplace(std::move(key2), a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at("foo") == pmr_ojson{});
-        CHECK(j.at("bar").as_string_view() == long_string);
+        CHECK(j.at("bar").as_string_view() == a_long_string);
     }
 
     SECTION("insert_or_assign json")
@@ -108,11 +117,11 @@ TEST_CASE("Test polymorhic allocator")
         pmr_json j(json_object_arg, alloc1);
 
         j.insert_or_assign("foo", pmr_json{});
-        j.insert_or_assign("bar", long_string);
+        j.insert_or_assign("bar", a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at("foo") == pmr_json{});
-        CHECK(j.at("bar").as_string_view() == long_string);
+        CHECK(j.at("bar").as_string_view() == a_long_string);
     }
 
     SECTION("insert_or_assign ojson")
@@ -120,33 +129,33 @@ TEST_CASE("Test polymorhic allocator")
         pmr_ojson j(json_object_arg, alloc1);
 
         j.insert_or_assign("foo", pmr_ojson{});
-        j.insert_or_assign("bar", long_string);
+        j.insert_or_assign("bar", a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at("foo") == pmr_ojson{});
-        CHECK(j.at("bar").as_string_view() == long_string);
+        CHECK(j.at("bar").as_string_view() == a_long_string);
     }
 
     SECTION("emplace_back")
     {
         pmr_json j(json_array_arg, alloc1);
         j.emplace_back(1);
-        j.emplace_back(long_string);
+        j.emplace_back(a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at(0) == 1);
-        CHECK(j.at(1).as<std::string>() == long_string);
+        CHECK(j.at(1).as<std::string>() == a_long_string);
     }
 
     SECTION("push_back")
     {
         pmr_json j(json_array_arg, alloc1);
         j.push_back(1);
-        j.push_back(long_string);
+        j.push_back(a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j.at(0) == 1);
-        CHECK(j.at(1).as<std::string>() == long_string);
+        CHECK(j.at(1).as<std::string>() == a_long_string);
     }
 
     SECTION("insert")
@@ -154,11 +163,11 @@ TEST_CASE("Test polymorhic allocator")
         pmr_json j(json_array_arg, alloc1);
 
         j.insert(j.array_range().end(), pmr_json{});
-        j.insert(j.array_range().end(), long_string);
+        j.insert(j.array_range().end(), a_long_string);
 
         CHECK(j.size() == 2);
         CHECK(j[0] == pmr_json{});
-        CHECK(j[1].as_string_view() == long_string);
+        CHECK(j[1].as_string_view() == a_long_string);
     }
 /*
 
@@ -166,7 +175,7 @@ TEST_CASE("Test polymorhic allocator")
     {
         FreeListAllocator<char> alloc2(true); 
 
-        std::string s = long_string;
+        std::string s = a_long_string;
         std::string input = "\"" + s + "\"";
 
         json_decoder<pmr_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc1, alloc2);

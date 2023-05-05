@@ -8,6 +8,15 @@ template<
     class ImplementationPolicy = sorted_policy,
     class Allocator = std::allocator<char>
 > class basic_json;
+
+namespace pmr {
+    template<class CharT, class ImplementationPolicy>
+    using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
+    using json = basic_json<char,sorted_policy>;                                                    (since 0.171.0)
+    using wjson = basic_json<wchar_t,sorted_policy>;
+    using ojson = basic_json<char, order_preserving_policy>;
+    using wojson = basic_json<wchar_t, order_preserving_policy>;
+}
 ```
 
 The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:
@@ -25,10 +34,14 @@ Several typedefs for common character types and policies for ordering an object'
 
 Type                |Definition
 --------------------|------------------------------
-[json](json.md)     |`basic_json<char,sorted_policy,std::allocator<char>>`
-[ojson](ojson.md)   |`basic_json<char, order_preserving_policy, std::allocator<char>>`
-[wjson](wjson.md)   |`basic_json<wchar_t,sorted_policy,std::allocator<char>>`
-[wojson](wojson.md) |`basic_json<wchar_t, order_preserving_policy, std::allocator<char>>`
+[jsoncons::json](json.md)     |`jsoncons::basic_json<char,jsoncons::sorted_policy,std::allocator<char>>`
+[jsoncons::ojson](ojson.md)   |`jsoncons::basic_json<char,jsoncons::order_preserving_policy,std::allocator<char>>`
+[jsoncons::wjson](wjson.md)   |`jsoncons::basic_json<wchar_t,jsoncons::jsoncons::sorted_policy,std::allocator<char>>`
+[jsoncons::wojson](wojson.md) |`jsoncons::basic_json<wchar_t,jsoncons::order_preserving_policy,std::allocator<char>>`
+jsoncons::pmr::json (since 0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::sorted_policy>`
+jsoncons::pmr::ojson (since 0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::order_preserving_policy>`
+jsoncons::pmr::wjson (since 0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::sorted_policy>`
+jsoncons::pmr::wojson (since 0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::order_preserving_policy>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
