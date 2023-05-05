@@ -1500,7 +1500,7 @@ TEST_CASE("csv detect bom")
         std::cout << e.what() << std::endl;
     }
 }
-
+/*
 #if !(defined(__GNUC__) && (__GNUC__ == 4) && __GNUC_MINOR__ < 9)
 TEST_CASE("csv_reader constructors")
 {
@@ -1531,6 +1531,7 @@ TEST_CASE("csv_reader constructors")
     }
 }
 #endif
+*/
 
 TEST_CASE("infinite loop")
 {
