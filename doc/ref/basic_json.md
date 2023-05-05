@@ -12,7 +12,7 @@ template<
 namespace pmr {
     template<class CharT, class Policy>
     using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
-    using json = basic_json<char,sorted_policy>;                                                    (since 0.171.0)
+    using json = basic_json<char,sorted_policy>;                                                     (since 0.171.0)
     using wjson = basic_json<wchar_t,sorted_policy>;
     using ojson = basic_json<char, order_preserving_policy>;
     using wojson = basic_json<wchar_t, order_preserving_policy>;

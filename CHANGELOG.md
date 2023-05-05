@@ -18,6 +18,15 @@ in temporary allocations from `std::stable_sort`
 
 - Fixed issue danielaparker/jsoncons/#426 where enum keyed maps didn't serialize correctly.
 
+Enhancements:
+
+- Support allocators that automatically propagate,  
+
+    - `std::pmr::polymorphic_allocator`
+
+    - `std::scoped_allocator_adaptor`
+
+
 0.170.0 
 -------
 
