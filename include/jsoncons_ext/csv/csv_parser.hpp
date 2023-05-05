@@ -96,6 +96,8 @@ namespace detail {
     template <class CharT,class TempAllocator>
     class parse_event
     {
+        using allocator_type = TempAllocator;
+
         using temp_allocator_type = TempAllocator;
         using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
@@ -115,7 +117,7 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(staj_event_type event_type, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(event_type), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -123,7 +125,7 @@ namespace detail {
         {
         }
 
-        parse_event(const string_view_type& value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(const string_view_type& value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::string_value), 
               string_value(value.data(),value.length(),alloc), 
               byte_string_value(alloc),
@@ -131,7 +133,7 @@ namespace detail {
         {
         }
 
-        parse_event(const byte_string_view& value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(const byte_string_view& value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::byte_string_value), 
               string_value(alloc),
               byte_string_value(value.data(),value.size(),alloc), 
@@ -139,7 +141,7 @@ namespace detail {
         {
         }
 
-        parse_event(bool value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(bool value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::bool_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -148,7 +150,7 @@ namespace detail {
         {
         }
 
-        parse_event(int64_t value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(int64_t value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::int64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -157,7 +159,7 @@ namespace detail {
         {
         }
 
-        parse_event(uint64_t value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(uint64_t value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::uint64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -166,7 +168,7 @@ namespace detail {
         {
         }
 
-        parse_event(double value, semantic_tag tag, const TempAllocator& alloc)
+        parse_event(double value, semantic_tag tag, const TempAllocator& alloc = TempAllocator())
             : event_type(staj_event_type::double_value), 
               string_value(alloc),
               byte_string_value(alloc),
