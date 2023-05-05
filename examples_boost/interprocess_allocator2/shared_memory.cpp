@@ -4,11 +4,14 @@
 #include <boost/interprocess/containers/string.hpp>
 #include <cstdlib> //std::system
 #include <jsoncons/json.hpp>
+#include <scoped_allocator>
 
 using namespace jsoncons;
 
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
+
+using ScopedTestAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
 
 struct boost_sorted_policy : public sorted_policy
 {
@@ -22,7 +25,7 @@ struct boost_sorted_policy : public sorted_policy
     using string = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
+using shm_json = basic_json<char,boost_sorted_policy, ScopedTestAllocator>;
 
 int main(int argc, char *argv[])
 {
@@ -49,15 +52,15 @@ int main(int argc, char *argv[])
       j->push_back(10);
 
       shm_json o(json_object_arg, alloc);
-      o.try_emplace("category", "reference", alloc);
-      o.try_emplace("author", "Nigel Rees", alloc);
-      o.try_emplace("title", "Sayings of the Century", alloc);
-      o.try_emplace("price", 8.95, alloc);
+      //o.try_emplace("category", "reference");
+      //o.try_emplace("author", "Nigel Rees");
+      //o.try_emplace("title", "Sayings of the Century");
+      //o.try_emplace("price", 8.95);
       
-      //o.insert_or_assign("category", shm_json("reference",alloc));
-      //o.insert_or_assign("author", shm_json("Nigel Rees",alloc));
-      //o.insert_or_assign("title", shm_json("Sayings of the Century",alloc));
-      //o.insert_or_assign("price", 8.95);
+      o.insert_or_assign("category", "reference");
+      o.insert_or_assign("author", "Nigel Rees");
+      o.insert_or_assign("title", "Sayings of the Century");
+      o.insert_or_assign("price", 8.95);
 
       //std::cout << o << std::endl;
 

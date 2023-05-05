@@ -5087,28 +5087,6 @@ namespace jsoncons {
         {
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(const byte_string_view& ,semantic_tag)")
-        basic_json(const byte_string_view& bytes, 
-                   byte_string_chars_format encoding_hint,
-                   semantic_tag tag = semantic_tag::none)
-            : basic_json(bytes, tag)
-        {
-            switch (encoding_hint)
-            {
-                case byte_string_chars_format::base16:
-                    *this = basic_json(bytes, semantic_tag::base16);
-                    break;
-                case byte_string_chars_format::base64:
-                    *this = basic_json(bytes, semantic_tag::base64);
-                    break;
-                case byte_string_chars_format::base64url:
-                    *this = basic_json(bytes, semantic_tag::base64url);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         template<class InputIterator>
         basic_json(InputIterator first, InputIterator last, const Allocator& alloc = Allocator())
             : basic_json(json_array_arg,first,last,alloc)

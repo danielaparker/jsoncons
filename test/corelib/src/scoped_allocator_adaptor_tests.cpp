@@ -103,7 +103,7 @@ TEST_CASE("scoped allocator adaptor tests")
 
     SECTION("parse")
     {
-        ScopedTestAllocator<char> alloc2(true); 
+        ScopedTestAllocator<char> alloc2(2); 
 
         std::string s = long_string;
         std::string input = "\"" + s + "\"";
