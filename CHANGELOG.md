@@ -3,16 +3,20 @@
 
 Enhancements:
 
-- Support allocators that automatically propagate,  
+- `basic_json` supports allocators that automatically propagate,  
 
     - `std::pmr::polymorphic_allocator`
 
     - `std::scoped_allocator_adaptor`
 
+- Defines aliases and alias templates for `basic_json` using polymorphic allocators
+in the `jsoncons::pmr` namespace.
+
 Changes:
 
 - Non-propagating stateful allocators are no longer supported.
-Regular stateful allocators must now be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
+Attempting to use a regular stateful allocators will produce a compile error.
+Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
 
 0.170.1
 -------
