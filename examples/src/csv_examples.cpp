@@ -10,8 +10,6 @@
 
 using namespace jsoncons;
 
-namespace {
-
 void encode_n_objects()
 {
     const std::string input = R"(
@@ -641,9 +639,7 @@ void grouped_into_strongly_typed_records()
     }
 }
 
-} // namespace
-
-void csv_examples()
+int main()
 {
     std::cout << "\nCSV examples\n\n";
     read_write_csv_tasks();

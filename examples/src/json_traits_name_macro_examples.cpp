@@ -249,85 +249,83 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person,
    )
 )
 
-namespace {
+using namespace jsoncons;
 
-    using namespace jsoncons;
+void json_type_traits_book_examples()
+{
+    const std::string input = R"(
+    [
+        {
+            "Category" : "Fiction",
+            "Author" : "Haruki Murakami",
+            "Title" : "Kafka on the Shore",
+            "Price" : 25.17
+        },
+        {
+            "Category" : "Biography",
+            "Author" : "Robert A. Caro",
+            "Title" : "The Path to Power: The Years of Lyndon Johnson I",
+            "Price" : 16.99
+        }
+    ]
+    )";
 
-    void json_type_traits_book_examples()
+    std::cout << "(1)\n\n";
+    auto books1 = decode_json<std::vector<ns::Book1>>(input);
+    for (const auto& item : books1)
     {
-        const std::string input = R"(
-        [
-            {
-                "Category" : "Fiction",
-                "Author" : "Haruki Murakami",
-                "Title" : "Kafka on the Shore",
-                "Price" : 25.17
-            },
-            {
-                "Category" : "Biography",
-                "Author" : "Robert A. Caro",
-                "Title" : "The Path to Power: The Years of Lyndon Johnson I",
-                "Price" : 16.99
-            }
-        ]
-        )";
-
-        std::cout << "(1)\n\n";
-        auto books1 = decode_json<std::vector<ns::Book1>>(input);
-        for (const auto& item : books1)
-        {
-            std::cout << item.category << ", "
-                      << item.author << ", " 
-                      << item.title << ", " 
-                      << item.price << "\n";
-        }
-        std::cout << "\n";
-        encode_json_pretty(books1, std::cout);
-        std::cout << "\n\n";
-
-        std::cout << "(2)\n\n";
-        auto books2 = decode_json<std::vector<ns::Book2>>(input);
-        for (const auto& item : books2)
-        {
-            std::cout << item.category() << ", "
-                      << item.author() << ", " 
-                      << item.title() << ", " 
-                      << item.price() << "\n";
-        }
-        std::cout << "\n";
-        encode_json_pretty(books2, std::cout);
-        std::cout << "\n\n";
-
-        std::cout << "(3)\n\n";
-        auto books3 = decode_json<std::vector<ns::Book3>>(input);
-        for (const auto& item : books3)
-        {
-            std::cout << item.category() << ", "
-                      << item.author() << ", " 
-                      << item.title() << ", " 
-                      << item.price() << "\n";
-        }
-        std::cout << "\n";
-        encode_json_pretty(books3, std::cout);
-        std::cout << "\n\n";
-
-        std::cout << "(4)\n\n";
-        auto books4 = decode_json<std::vector<ns::Book4>>(input);
-        for (const auto& item : books4)
-        {
-            std::cout << item.getCategory() << ", "
-                      << item.getAuthor() << ", " 
-                      << item.getTitle() << ", " 
-                      << item.getPrice() << "\n";
-        }
-        std::cout << "\n";
-        encode_json_pretty(books4, std::cout);
-        std::cout << "\n\n";
+        std::cout << item.category << ", "
+                  << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
     }
+    std::cout << "\n";
+    encode_json_pretty(books1, std::cout);
+    std::cout << "\n\n";
 
-    void translate_ids_from_to_employees()
+    std::cout << "(2)\n\n";
+    auto books2 = decode_json<std::vector<ns::Book2>>(input);
+    for (const auto& item : books2)
     {
-        std::string input = R"(
+        std::cout << item.category() << ", "
+                  << item.author() << ", " 
+                  << item.title() << ", " 
+                  << item.price() << "\n";
+    }
+    std::cout << "\n";
+    encode_json_pretty(books2, std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(3)\n\n";
+    auto books3 = decode_json<std::vector<ns::Book3>>(input);
+    for (const auto& item : books3)
+    {
+        std::cout << item.category() << ", "
+                  << item.author() << ", " 
+                  << item.title() << ", " 
+                  << item.price() << "\n";
+    }
+    std::cout << "\n";
+    encode_json_pretty(books3, std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(4)\n\n";
+    auto books4 = decode_json<std::vector<ns::Book4>>(input);
+    for (const auto& item : books4)
+    {
+        std::cout << item.getCategory() << ", "
+                  << item.getAuthor() << ", " 
+                  << item.getTitle() << ", " 
+                  << item.getPrice() << "\n";
+    }
+    std::cout << "\n";
+    encode_json_pretty(books4, std::cout);
+    std::cout << "\n\n";
+}
+
+void translate_ids_from_to_employees()
+{
+    std::string input = R"(
 {
     "company": "ExampleInc",
     "resources": [
@@ -341,25 +339,25 @@ namespace {
         }
     ]
 }
-    )";
+)";
 
-        auto company = decode_json<ns::Company>(input);
+    auto company = decode_json<ns::Company>(input);
 
-        std::cout << "(1)\n" << company.getName() << "\n";
-        for (auto id : company.getIds())
-        {
-            std::cout << id << "\n";
-        }
-        std::cout << "\n";
-
-        std::string output;
-        encode_json_pretty(company, output);
-        std::cout << "(2)\n" << output << "\n\n";
-    }
-
-    void tidy_member()
+    std::cout << "(1)\n" << company.getName() << "\n";
+    for (auto id : company.getIds())
     {
-        std::string input = R"(
+        std::cout << id << "\n";
+    }
+    std::cout << "\n";
+
+    std::string output;
+    encode_json_pretty(company, output);
+    std::cout << "(2)\n" << output << "\n\n";
+}
+
+void tidy_member()
+{
+    std::string input = R"(
 [
     {
         "name": "John Smith",
@@ -372,25 +370,23 @@ namespace {
 ]
     )";
 
-        auto persons = decode_json<std::vector<ns::Person>>(input);
+    auto persons = decode_json<std::vector<ns::Person>>(input);
 
-        std::cout << "(1)\n";
-        for (const auto& person : persons)
-        {
-            std::cout << person.getName() << ", " 
-                      << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
-        }
-        std::cout << "\n";
-
-        std::string output;
-        encode_json_pretty(persons, output);
-        std::cout << "(2)\n" << output << "\n";
-
+    std::cout << "(1)\n";
+    for (const auto& person : persons)
+    {
+        std::cout << person.getName() << ", " 
+                  << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
     }
+    std::cout << "\n";
 
-} // namespace
+    std::string output;
+    encode_json_pretty(persons, output);
+    std::cout << "(2)\n" << output << "\n";
 
-void json_traits_name_macro_examples()
+}
+
+int main()
 {
     std::cout << "\njson_type_traits macro named examples\n\n";
 

@@ -181,7 +181,7 @@ void templated_struct_example()
     assert(val2 == val);
 }
 
-void type_extensibility_examples()
+int main()
 {
     std::cout << std::setprecision(6);
 

@@ -137,7 +137,7 @@ void parse_nan_replacement_example()
     }
 }
 
-void json_parser_examples()
+int main()
 {
     std::cout << "\njson_parser examples\n\n";
     incremental_parsing_example1();

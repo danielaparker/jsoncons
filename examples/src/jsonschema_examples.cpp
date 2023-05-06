@@ -213,7 +213,6 @@ namespace {
 
 #include <variant>
 
-namespace {
 namespace ns {
 
     struct os_properties {
@@ -234,134 +233,129 @@ namespace ns {
     };
 
 } // namespace ns
-} // namespace
 
     JSONCONS_N_MEMBER_TRAITS(ns::os_properties, 1, command)
     JSONCONS_N_MEMBER_TRAITS(ns::db_properties, 1, query)
     JSONCONS_N_MEMBER_TRAITS(ns::api_properties, 1, target)
     JSONCONS_N_MEMBER_TRAITS(ns::job_properties, 2, name, run)
 
-namespace {
-
-    std::string test_schema = R"(
-    {
-      "title": "job",
-      "description": "job properties json schema",
-      "definitions": {
-        "os_properties": {
-          "type": "object",
-          "properties": {
-            "command": {
-              "description": "this is the OS command to run",
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [ "command" ],
-          "additionalProperties": false
-        },
-        "db_properties": {
-          "type": "object",
-          "properties": {
-            "query": {
-              "description": "this is db query to run",
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [ "query" ],
-          "additionalProperties": false
-        },
-
-        "api_properties": {
-          "type": "object",
-          "properties": {
-            "target": {
-              "description": "this is api target to run",
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [ "target" ],
-          "additionalProperties": false
-        }
-      },
-
+std::string test_schema = R"(
+{
+  "title": "job",
+  "description": "job properties json schema",
+  "definitions": {
+    "os_properties": {
       "type": "object",
       "properties": {
-        "name": {
-          "description": "name of the flow",
+        "command": {
+          "description": "this is the OS command to run",
           "type": "string",
           "minLength": 1
-        },
-        "run": {
-          "description": "job run properties",
-          "type": "object",
-          "oneOf": [
-
-            { "$ref": "#/definitions/os_properties" },
-            { "$ref": "#/definitions/db_properties" },
-            { "$ref": "#/definitions/api_properties" }
-
-          ]
         }
       },
-      "required": [ "name", "run" ],
-      "additionalProperties":  false
-    }
-    )";
-
-    std::string test_data = R"(
-    {
-        "name": "testing flow", 
-        "run" : {
-                "command": "some command"    
-                }
-    }
-
-    )";
-
-    void validate_before_decode_example() 
-    {
-        try
-        {
-            json schema = json::parse(test_schema);
-            json data = json::parse(test_data);
-
-            // Throws schema_error if JSON Schema loading fails
-            auto sch = jsonschema::make_schema(schema);
-
-            jsonschema::json_validator<json> validator(sch);
-
-            // Test that input is valid before attempting to decode
-            if (validator.is_valid(data))
-            {
-                const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse test_data 
-
-                std::string output;
-                jsoncons::encode_json_pretty(v, output);
-                std::cout << output << std::endl;
-
-                // Verify that output is valid
-                json test = json::parse(output);
-                assert(validator.is_valid(test));
-            }
-            else
-            {
-                std::cout << "Invalid input\n";
-            }
+      "required": [ "command" ],
+      "additionalProperties": false
+    },
+    "db_properties": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "this is db query to run",
+          "type": "string",
+          "minLength": 1
         }
-        catch (const std::exception& e)
+      },
+      "required": [ "query" ],
+      "additionalProperties": false
+    },
+
+    "api_properties": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "description": "this is api target to run",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [ "target" ],
+      "additionalProperties": false
+    }
+  },
+
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "name of the flow",
+      "type": "string",
+      "minLength": 1
+    },
+    "run": {
+      "description": "job run properties",
+      "type": "object",
+      "oneOf": [
+
+        { "$ref": "#/definitions/os_properties" },
+        { "$ref": "#/definitions/db_properties" },
+        { "$ref": "#/definitions/api_properties" }
+
+      ]
+    }
+  },
+  "required": [ "name", "run" ],
+  "additionalProperties":  false
+}
+)";
+
+std::string test_data = R"(
+{
+    "name": "testing flow", 
+    "run" : {
+            "command": "some command"    
+            }
+}
+
+)";
+
+void validate_before_decode_example() 
+{
+    try
+    {
+        json schema = json::parse(test_schema);
+        json data = json::parse(test_data);
+
+        // Throws schema_error if JSON Schema loading fails
+        auto sch = jsonschema::make_schema(schema);
+
+        jsonschema::json_validator<json> validator(sch);
+
+        // Test that input is valid before attempting to decode
+        if (validator.is_valid(data))
         {
-            std::cout << e.what() << '\n';
+            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse test_data 
+
+            std::string output;
+            jsoncons::encode_json_pretty(v, output);
+            std::cout << output << std::endl;
+
+            // Verify that output is valid
+            json test = json::parse(output);
+            assert(validator.is_valid(test));
+        }
+        else
+        {
+            std::cout << "Invalid input\n";
         }
     }
-
-} // namespace
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << '\n';
+    }
+}
 
 #endif // JSONCONS_HAS_STD_VARIANT
 
-void jsonschema_examples()
+int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 

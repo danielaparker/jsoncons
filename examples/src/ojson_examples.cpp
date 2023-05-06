@@ -6,7 +6,7 @@
 
 using namespace jsoncons;
 
-void ojson_examples()
+int main()
 {
     std::cout << "\nojson examples\n\n";
 

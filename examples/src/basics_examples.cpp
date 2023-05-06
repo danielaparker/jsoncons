@@ -161,7 +161,7 @@ void basics_json_example2()
     std::cout << "(5) " << result << std::endl;
 }
 
-void basics_examples()
+int main()
 {
     std::cout << "\nBasics\n\n";
     basics_json_example1();

@@ -105,7 +105,7 @@ void data_model_example2()
     std::cout << "(2)\n" << pretty_print(j) << "\n\n";
 }
 
-void data_model_examples()
+int main()
 {
     std::cout << "\ndata model examples\n\n";
     data_model_example2();

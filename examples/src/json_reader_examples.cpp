@@ -15,90 +15,88 @@ using namespace jsoncons;
 template<typename T>
 using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-namespace {
+class MyIterator
+{
+    const char* p_;
+public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = char;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const char*; 
+    using reference = const char&;
 
-    class MyIterator
+    MyIterator(const char* p)
+        : p_(p)
     {
-        const char* p_;
-    public:
-        using iterator_category = std::input_iterator_tag;
-        using value_type = char;
-        using difference_type = std::ptrdiff_t;
-        using pointer = const char*; 
-        using reference = const char&;
-
-        MyIterator(const char* p)
-            : p_(p)
-        {
-        }
-
-        reference operator*() const
-        {
-            return *p_;
-        }
-
-        pointer operator->() const 
-        {
-            return p_;
-        }
-
-        MyIterator& operator++()
-        {
-            ++p_;
-            return *this;
-        }
-
-        MyIterator operator++(int) 
-        {
-            MyIterator temp(*this);
-            ++*this;
-            return temp;
-        }
-
-        bool operator!=(const MyIterator& rhs) const
-        {
-            return p_ != rhs.p_;
-        }
-    };
-
-    void custom_iterator_source()
-    {
-        char source[] = {'[','\"', 'f','o','o','\"',',','\"', 'b','a','r','\"',']'};
-
-        MyIterator first(source);
-        MyIterator last(source + sizeof(source));
-
-        json j = json::parse(first, last);
-
-        std::cout << j << "\n\n";
     }
 
-    void read_mulitple_json_objects()
+    reference operator*() const
     {
-        std::ifstream is("./input/multiple-json-objects.json");
-        if (!is.is_open())
-        {
-            throw std::runtime_error("Cannot open file");
-        }
-
-        json_decoder<json> decoder;
-        json_stream_reader reader(is, decoder);
-
-        while (!reader.eof())
-        {
-            reader.read_next();
-            if (!reader.eof())
-            {
-                json j = decoder.get_result();
-                std::cout << j << std::endl;
-            }
-        }
+        return *p_;
     }
 
-    // https://jsonlines.org/
-    void read_json_lines()
+    pointer operator->() const 
     {
-        std::string data = R"(
+        return p_;
+    }
+
+    MyIterator& operator++()
+    {
+        ++p_;
+        return *this;
+    }
+
+    MyIterator operator++(int) 
+    {
+        MyIterator temp(*this);
+        ++*this;
+        return temp;
+    }
+
+    bool operator!=(const MyIterator& rhs) const
+    {
+        return p_ != rhs.p_;
+    }
+};
+
+void custom_iterator_source()
+{
+    char source[] = {'[','\"', 'f','o','o','\"',',','\"', 'b','a','r','\"',']'};
+
+    MyIterator first(source);
+    MyIterator last(source + sizeof(source));
+
+    json j = json::parse(first, last);
+
+    std::cout << j << "\n\n";
+}
+
+void read_mulitple_json_objects()
+{
+    std::ifstream is("./input/multiple-json-objects.json");
+    if (!is.is_open())
+    {
+        throw std::runtime_error("Cannot open file");
+    }
+
+    json_decoder<json> decoder;
+    json_stream_reader reader(is, decoder);
+
+    while (!reader.eof())
+    {
+        reader.read_next();
+        if (!reader.eof())
+        {
+            json j = decoder.get_result();
+            std::cout << j << std::endl;
+        }
+    }
+}
+
+// https://jsonlines.org/
+void read_json_lines()
+{
+    std::string data = R"(
 ["Name", "Session", "Score", "Completed"]
 ["Gilbert", "2013", 24, true]
 ["Alexa", "2013", 29, true]
@@ -106,58 +104,56 @@ namespace {
 ["Deloise", "2012A", 19, true] 
         )";
 
-        std::stringstream is(data);
-        json_decoder<json> decoder;
-        json_stream_reader reader(is, decoder);
+    std::stringstream is(data);
+    json_decoder<json> decoder;
+    json_stream_reader reader(is, decoder);
 
-        while (!reader.eof())
+    while (!reader.eof())
+    {
+        reader.read_next();
+        if (!reader.eof())
         {
-            reader.read_next();
-            if (!reader.eof())
-            {
-                json j = decoder.get_result();
-                std::cout << j << std::endl;
-            }
+            json j = decoder.get_result();
+            std::cout << j << std::endl;
         }
     }
+}
 
-    void read_with_stateful_allocator()
-    {
-        using my_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
-        std::string input = R"(
-    [ 
-      { 
-          "author" : "Haruki Murakami",
-          "title" : "Hard-Boiled Wonderland and the End of the World",
-          "isbn" : "0679743464",
-          "publisher" : "Vintage",
-          "date" : "1993-03-02",
-          "price": 18.90
-      },
-      { 
-          "author" : "Graham Greene",
-          "title" : "The Comedians",
-          "isbn" : "0099478374",
-          "publisher" : "Vintage Classics",
-          "date" : "2005-09-21",
-          "price": 15.74
-      }
-    ]
-    )";
+void read_with_stateful_allocator()
+{
+    using my_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
+    std::string input = R"(
+[ 
+  { 
+      "author" : "Haruki Murakami",
+      "title" : "Hard-Boiled Wonderland and the End of the World",
+      "isbn" : "0679743464",
+      "publisher" : "Vintage",
+      "date" : "1993-03-02",
+      "price": 18.90
+  },
+  { 
+      "author" : "Graham Greene",
+      "title" : "The Comedians",
+      "isbn" : "0099478374",
+      "publisher" : "Vintage Classics",
+      "date" : "2005-09-21",
+      "price": 15.74
+  }
+]
+)";
 
-        json_decoder<my_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
-            ScopedTestAllocator<char>(2));
+    json_decoder<my_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+        ScopedTestAllocator<char>(2));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);
+    auto myAlloc = ScopedTestAllocator<char>(3);
 
-        basic_json_reader<char,string_source<char>, ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
-        reader.read();
+    basic_json_reader<char,string_source<char>, ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+    reader.read();
 
-        my_json j = decoder.get_result();
-        std::cout << pretty_print(j) << "\n";
-    }
-
-} // namespace
+    my_json j = decoder.get_result();
+    std::cout << pretty_print(j) << "\n";
+}
 
 int main()
 {
