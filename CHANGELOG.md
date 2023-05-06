@@ -15,7 +15,7 @@ in the `jsoncons::pmr` namespace.
 Changes:
 
 - Non-propagating stateful allocators are no longer supported.
-Attempting to use a regular stateful allocators will produce a compile error.
+Attempting to use a regular stateful allocator will produce a compile error.
 Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
 
 0.170.1
