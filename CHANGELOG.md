@@ -1,3 +1,19 @@
+0.171.0
+-------
+
+Enhancements:
+
+- Support allocators that automatically propagate,  
+
+    - `std::pmr::polymorphic_allocator`
+
+    - `std::scoped_allocator_adaptor`
+
+Changes:
+
+- Non-propagating stateful allocators are no longer supported.
+Regular stateful allocators must now be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
+
 0.170.1
 -------
 
@@ -17,7 +33,6 @@ in temporary allocations from `std::stable_sort`
 - Fixed issue danielaparker/jsoncons/#425 where `basic_byte_string::assign` and `basic_byte_string::append` failed to compile
 
 - Fixed issue danielaparker/jsoncons/#426 where enum keyed maps didn't serialize correctly.
-
 
 0.170.0 
 -------
