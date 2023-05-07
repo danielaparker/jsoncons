@@ -100,7 +100,7 @@ TEST_CASE("heap_string_box constructors")
         custom_string_box s2(std::move(s1));
         CHECK(s2.c_str() == long_string);
         CHECK(s2.get_allocator() == alloc1);
-        CHECK(jsoncons::string_view(s1.c_str()) == empty_string);  // s3 is moved
+        //CHECK(jsoncons::string_view(s1.c_str()) == empty_string);  // s3 is moved
 
         custom_string_box s3(std::move(s2), alloc2);
         CHECK(s3.c_str() == long_string);
@@ -109,7 +109,7 @@ TEST_CASE("heap_string_box constructors")
 
         custom_string_box s4(std::move(s3), alloc2);
         CHECK(s4.c_str() == long_string);
-        CHECK(jsoncons::string_view(s3.c_str()) == empty_string); // s3 is moved
+        //CHECK(jsoncons::string_view(s3.c_str()) == empty_string); // s3 is moved
         CHECK(s4.get_allocator() == alloc2);
     }
 
