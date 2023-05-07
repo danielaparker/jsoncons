@@ -755,54 +755,63 @@ namespace jsoncons {
             uint8_t small_string_length_:4;
             semantic_tag tag_;
         private:
-            jsoncons::detail::heap_string_box<uint8_t,uint64_t,Allocator> s_;
+            using heap_string_factory_type = jsoncons::detail::heap_string_factory<uint8_t,uint64_t,Allocator>;
+            using pointer = typename heap_string_factory_type::pointer;
+
+            pointer ptr_;
         public:
 
             byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_string_value)), small_string_length_(0), tag_(tag),
-                  s_(data, length, ext_tag, alloc)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_string_value)), small_string_length_(0), tag_(tag)
             {
+                ptr_ = heap_string_factory_type::create(data, length, ext_tag, alloc);
             }
 
             byte_string_storage(const byte_string_storage& other)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_),
-                  s_(other.s_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), other.get_allocator());
             }
 
             byte_string_storage(const byte_string_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_),
-                  s_(other.s_, alloc)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
             byte_string_storage(byte_string_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_),
-                  s_(std::move(other.s_))
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
             }
 
             byte_string_storage(byte_string_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_),
-                  s_(std::move(other.s_), alloc)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
+                if (other.get_allocator() == alloc)
+                {
+                    ptr_ = other.ptr_;
+                    other.ptr_ = nullptr;
+                }
+                else
+                {
+                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
+                }
             }
 
             byte_string_storage& operator=(const byte_string_storage& other)
             {
-                storage_kind_ = other.storage_kind_;
-                small_string_length_ = other.small_string_length_;
                 tag_ = other.tag_;
-                s_ = other.s_;
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), other.get_allocator());
                 return *this;
             }
 
             byte_string_storage& operator=(byte_string_storage&& other)
             {
-                storage_kind_ = other.storage_kind_;
-                small_string_length_ = other.small_string_length_;
                 tag_ = other.tag_;
-                s_ = std::move(other.s_);
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
                 return *this;
             }
 
@@ -810,29 +819,29 @@ namespace jsoncons {
             {
             }
 
-            void swap(byte_string_storage& val) noexcept
+            void swap(byte_string_storage& other) noexcept
             {
-                s_.swap(val.s_);
+                std::swap(ptr_, other.ptr_);
             }
 
             const uint8_t* data() const
             {
-                return s_.data();
+                return ptr_->data();
             }
 
             std::size_t length() const
             {
-                return s_.length();
+                return ptr_->length();
             }
 
             uint64_t ext_tag() const
             {
-                return s_.extra();
+                return ptr_->extra();
             }
 
             allocator_type get_allocator() const
             {
-                return s_.get_allocator();
+                return ptr_->get_allocator();
             }
         };
 
