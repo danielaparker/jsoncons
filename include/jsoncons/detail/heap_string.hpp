@@ -184,7 +184,10 @@ namespace detail {
 
         heap_string_pointer ptr_;
     public:
-        //heap_string_box() = default;
+        heap_string_box()
+            : ptr_(nullptr)
+        {
+        }
 
         heap_string_box(heap_string_pointer ptr)
             : ptr_(ptr)
