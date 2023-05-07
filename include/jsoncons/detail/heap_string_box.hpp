@@ -13,7 +13,7 @@
 #include <ostream>
 #include <cstring> // std::memcpy
 #include <memory> // std::allocator
-#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -190,26 +190,29 @@ namespace detail {
 
         const char_type* data() const
         {
-            return ptr_->data();
+            static const char_type* c = JSONCONS_CSTRING_CONSTANT(char_type, "");
+            return ptr_ == nullptr ? c : ptr_->data();
         }
 
         const char_type* c_str() const
         {
-            return ptr_->c_str();
+            static const char_type* c = JSONCONS_CSTRING_CONSTANT(char_type,"");
+            return ptr_ == nullptr ? c : ptr_->c_str();
         }
 
         std::size_t length() const
         {
-            return ptr_->length();
+            return ptr_ == nullptr ? 0 : ptr_->length();
         }
 
         Extra extra() const
         {
-            return ptr_->extra();
+            return ptr_ == nullptr ? Extra() : ptr_->extra();
         }
 
         Allocator get_allocator() const
         {
+            JSONCONS_ASSERT(ptr_ != nullptr);
             return ptr_->get_allocator();
         }
     private:

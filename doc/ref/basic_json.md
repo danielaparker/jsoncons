@@ -30,7 +30,7 @@ Implementation policies for arrays and objects are provided via the `Policy` tem
 A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
 rebind to internal data structures. 
 
-Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
+Several aliases for common character types and policies for ordering an object's name/value pairs are provided:
 
 Type                |Definition
 --------------------|------------------------------
