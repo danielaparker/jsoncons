@@ -92,198 +92,6 @@ namespace detail {
     #endif
     }
 
-    // heap_string_box
-
-    template <class CharT,class Extra,class Allocator>
-    class heap_string_box
-    {
-    public:
-        using char_type = CharT;
-        using heap_string_type = heap_string<CharT,Extra,Allocator>;
-    private:
-
-        using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;  
-        using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
-
-        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
-        using heap_string_pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
-
-        struct storage_t
-        {
-            heap_string_type data;
-            char_type c[1];
-        };
-        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
-
-        heap_string_pointer ptr_;
-    public:
-        heap_string_box() = default;
-
-        heap_string_box(heap_string_pointer ptr)
-            : ptr_(ptr)
-        {
-        }
-
-        heap_string_box(const char_type* data, std::size_t length, Extra extra, const Allocator& alloc) 
-        {
-            ptr_ = create(data, length, extra, alloc);
-        }
-
-        heap_string_box(const heap_string_box& other) 
-        {
-            ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
-        }
-
-        heap_string_box(const heap_string_box& other, const Allocator& alloc) 
-        {
-            ptr_ = create(other.data(), other.length(), other.extra(), alloc);
-        }
-
-        heap_string_box(heap_string_box&& other)
-            : ptr_(nullptr)
-        {
-            std::swap(ptr_,other.ptr_);
-        }
-
-        heap_string_box(heap_string_box&& other, const Allocator& alloc)
-            : ptr_(nullptr)
-        {
-            if (alloc == other.get_allocator())
-            {
-                std::swap(ptr_,other.ptr_);
-            }
-            else
-            {
-                ptr_ = create(other.data(), other.length(), other.extra(), alloc);
-            }
-        }
-
-        heap_string_box& operator=(const heap_string_box& other)
-        {
-            if (ptr_ != nullptr)
-            {
-                destroy(ptr_);
-            }
-            ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
-            return *this;
-        }
-
-        template <class U = Allocator>
-        heap_string_box& operator=(heap_string_box&& other)
-        {
-            move_assignment(std::integral_constant<bool,std::allocator_traits<U>::propagate_on_container_move_assignment::value>(), std::move(other));
-            return *this;
-        }
-
-        ~heap_string_box() noexcept
-        {
-            if (ptr_ != nullptr)
-            {
-                destroy(ptr_);
-            }
-        }
-
-        void swap(heap_string_box& other) noexcept
-        {
-            std::swap(ptr_,other.ptr_);
-        }
-
-        const char_type* data() const
-        {
-            return ptr_->data();
-        }
-
-        const char_type* c_str() const
-        {
-            return ptr_->c_str();
-        }
-
-        std::size_t length() const
-        {
-            return ptr_->length();
-        }
-
-        Extra extra() const
-        {
-            return ptr_->extra();
-        }
-
-        Allocator get_allocator() const
-        {
-            return ptr_->get_allocator();
-        }
-    private:
-        void move_assignment(std::true_type, heap_string_box&& other)
-        {
-            if (ptr_ != nullptr)
-            {
-                destroy(ptr_);
-            }
-            ptr_ = other.ptr_;
-            other.ptr_ = nullptr;
-        }
-
-        void move_assignment(std::false_type, heap_string_box&& other)
-        {
-            if (get_allocator() == other.get_allocator())
-            {
-                if (ptr_ != nullptr)
-                {
-                    destroy(ptr_);
-                }
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-            }
-            else
-            {
-                if (ptr_ != nullptr)
-                {
-                    destroy(ptr_);
-                }
-                ptr_ = create(other.data(), other.length(), other.extra(), other.get_allocator());
-            }
-        }
-
-        static size_t aligned_size(std::size_t n)
-        {
-            return sizeof(json_storage_kind) + n;
-        }
-
-        static heap_string_pointer create(const char_type* s, std::size_t length, Extra extra, const Allocator& alloc)
-        {
-            std::size_t mem_size = aligned_size(length*sizeof(char_type));
-
-            byte_allocator_type byte_alloc(alloc);
-            byte_pointer ptr = byte_alloc.allocate(mem_size);
-
-            char* storage = extension_traits::to_plain_pointer(ptr);
-            heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
-
-            auto psa = launder_cast<storage_t*>(storage); 
-
-            CharT* p = new(&psa->c)char_type[length + 1];
-            std::memcpy(p, s, length*sizeof(char_type));
-            p[length] = 0;
-            ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
-            ps->length_ = length;
-            return std::pointer_traits<heap_string_pointer>::pointer_to(*ps);
-        }
-
-        static void destroy(heap_string_pointer ptr)
-        {
-            if (ptr != nullptr)
-            {
-                heap_string_type* rawp = extension_traits::to_plain_pointer(ptr);
-
-                char* p = launder_cast<char*>(rawp);
-
-                std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
-                byte_allocator_type byte_alloc(ptr->get_allocator());
-                byte_alloc.deallocate(p,mem_size);
-            }
-        }
-    };
-
     // heap_string_factory
 
     template <class CharT,class Extra,class Allocator>
@@ -298,6 +106,7 @@ namespace detail {
         using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
         using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
+    public:
         using pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
 
         struct storage_t
@@ -345,6 +154,160 @@ namespace detail {
                 std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
                 byte_allocator_type byte_alloc(ptr->get_allocator());
                 byte_alloc.deallocate(p,mem_size);
+            }
+        }
+    };
+
+    // heap_string_box
+
+    template <class CharT,class Extra,class Allocator>
+    class heap_string_box
+    {
+        using heap_string_factory_type = heap_string_factory<CharT,Extra,Allocator>;
+    public:
+        using char_type = CharT;
+        using heap_string_type = heap_string<CharT,Extra,Allocator>;
+    private:
+
+        using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;  
+        using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
+
+        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
+        using heap_string_pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
+
+        struct storage_t
+        {
+            heap_string_type data;
+            char_type c[1];
+        };
+        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
+
+        heap_string_pointer ptr_;
+    public:
+        //heap_string_box() = default;
+
+        heap_string_box(heap_string_pointer ptr)
+            : ptr_(ptr)
+        {
+        }
+
+        heap_string_box(const char_type* data, std::size_t length, Extra extra, const Allocator& alloc) 
+        {
+            ptr_ = heap_string_factory_type::create(data, length, extra, alloc);
+        }
+
+        heap_string_box(const heap_string_box& other) 
+        {
+            ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.extra(), other.get_allocator());
+        }
+
+        heap_string_box(const heap_string_box& other, const Allocator& alloc) 
+        {
+            ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.extra(), alloc);
+        }
+
+        heap_string_box(heap_string_box&& other)
+            : ptr_(nullptr)
+        {
+            std::swap(ptr_,other.ptr_);
+        }
+
+        heap_string_box(heap_string_box&& other, const Allocator& alloc)
+            : ptr_(nullptr)
+        {
+            if (alloc == other.get_allocator())
+            {
+                std::swap(ptr_,other.ptr_);
+            }
+            else
+            {
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.extra(), alloc);
+            }
+        }
+
+        heap_string_box& operator=(const heap_string_box& other)
+        {
+            if (ptr_ != nullptr)
+            {
+                heap_string_factory_type::destroy(ptr_);
+            }
+            ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.extra(), other.get_allocator());
+            return *this;
+        }
+
+        template <class U = Allocator>
+        heap_string_box& operator=(heap_string_box&& other)
+        {
+            move_assignment(std::integral_constant<bool,std::allocator_traits<U>::propagate_on_container_move_assignment::value>(), std::move(other));
+            return *this;
+        }
+
+        ~heap_string_box() noexcept
+        {
+            if (ptr_ != nullptr)
+            {
+                heap_string_factory_type::destroy(ptr_);
+            }
+        }
+
+        void swap(heap_string_box& other) noexcept
+        {
+            std::swap(ptr_,other.ptr_);
+        }
+
+        const char_type* data() const
+        {
+            return ptr_->data();
+        }
+
+        const char_type* c_str() const
+        {
+            return ptr_->c_str();
+        }
+
+        std::size_t length() const
+        {
+            return ptr_->length();
+        }
+
+        Extra extra() const
+        {
+            return ptr_->extra();
+        }
+
+        Allocator get_allocator() const
+        {
+            return ptr_->get_allocator();
+        }
+    private:
+        void move_assignment(std::true_type, heap_string_box&& other)
+        {
+            if (ptr_ != nullptr)
+            {
+                heap_string_factory_type::destroy(ptr_);
+            }
+            ptr_ = other.ptr_;
+            other.ptr_ = nullptr;
+        }
+
+        void move_assignment(std::false_type, heap_string_box&& other)
+        {
+            if (get_allocator() == other.get_allocator())
+            {
+                if (ptr_ != nullptr)
+                {
+                    heap_string_factory_type::destroy(ptr_);
+                }
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
+            }
+            else
+            {
+                if (ptr_ != nullptr)
+                {
+                    heap_string_factory_type::destroy(ptr_);
+                }
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.extra(), other.get_allocator());
             }
         }
     };

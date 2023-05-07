@@ -69,7 +69,7 @@ TEST_CASE("heap_string_box constructors")
     std::pmr::polymorphic_allocator<char> alloc2(&pool2);
 
     jsoncons::string_view long_string = "String too long for short string";
-    jsoncons::string_view empty_string = "";
+    //jsoncons::string_view empty_string = "";
 
     using custom_string_box = jsoncons::detail::heap_string_box<char, null_type, std::pmr::polymorphic_allocator<char>>;
 
