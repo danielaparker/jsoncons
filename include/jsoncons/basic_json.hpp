@@ -37,7 +37,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/detail/heap_string_box.hpp>
+#include <jsoncons/detail/heap_string.hpp>
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator
 #endif
