@@ -223,5 +223,6 @@ TEST_CASE("test_multiline_comments")
     CHECK(j.is_array());
     CHECK(j.is_array());
     CHECK(j.size() == 0);
+    CHECK(false);
 }
 
