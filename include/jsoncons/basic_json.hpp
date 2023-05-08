@@ -2645,7 +2645,7 @@ namespace jsoncons {
         template <class TypeR>
         void move_assignment_r(basic_json&& other)
         {
-            switch (other.storage_kind())
+            switch (storage_kind())
             {
                 case json_storage_kind::null_value:          move_assignment_l_r<null_storage,TypeR>(std::move(other));break;
                 case json_storage_kind::empty_object_value:  move_assignment_l_r<empty_object_storage,TypeR>(std::move(other));break;
