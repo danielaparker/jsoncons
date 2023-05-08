@@ -684,27 +684,6 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
-            long_string_storage(long_string_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
-            {
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-            }
-
-            long_string_storage(long_string_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-                }
-                else
-                {
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
-                }
-            }
-
             long_string_storage& operator=(const long_string_storage& other)
             {
                 tag_ = other.tag_;
@@ -804,27 +783,6 @@ namespace jsoncons {
                 : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
-            }
-
-            byte_string_storage(byte_string_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
-            {
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-            }
-
-            byte_string_storage(byte_string_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-                }
-                else
-                {
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
-                }
             }
 
             byte_string_storage& operator=(const byte_string_storage& other)
