@@ -686,6 +686,7 @@ namespace jsoncons {
 
             long_string_storage& operator=(const long_string_storage& other)
             {
+                storage_kind_ = other.storage_kind_;
                 tag_ = other.tag_;
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
                 return *this;
@@ -693,6 +694,7 @@ namespace jsoncons {
 
             long_string_storage& operator=(long_string_storage&& other)
             {
+                storage_kind_ = other.storage_kind_;
                 tag_ = other.tag_;
 
                 ptr_ = other.ptr_;
@@ -787,6 +789,7 @@ namespace jsoncons {
 
             byte_string_storage& operator=(const byte_string_storage& other)
             {
+                storage_kind_ = other.storage_kind_;
                 tag_ = other.tag_;
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), other.get_allocator());
                 return *this;
@@ -794,6 +797,7 @@ namespace jsoncons {
 
             byte_string_storage& operator=(byte_string_storage&& other)
             {
+                storage_kind_ = other.storage_kind_;
                 tag_ = other.tag_;
                 ptr_ = other.ptr_;
                 other.ptr_ = nullptr;
