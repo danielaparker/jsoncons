@@ -2598,10 +2598,106 @@ namespace jsoncons {
         {
             if (this != &other)
             {
-                Destroy_();
-                uninitialized_copy(std::move(other));
+                move_assignment(std::move(other));
             }
             return *this;
+        }
+
+        template <class TypeL, class TypeR>
+        void move_assignment_l_r(basic_json&& other)
+        {
+            Destroy_();
+            uninitialized_copy(std::move(other));
+        }
+
+        template <>
+        void move_assignment_l_r<long_string_storage,long_string_storage>(basic_json&& other)
+        {
+            auto ptr = cast<long_string_storage>().get();
+            cast<long_string_storage>().set(other.cast<long_string_storage>().get());
+            other.cast<long_string_storage>().set(ptr);
+        }
+
+        template <>
+        void move_assignment_l_r<byte_string_storage,byte_string_storage>(basic_json&& other)
+        {
+            auto ptr = cast<byte_string_storage>().get();
+            cast<byte_string_storage>().set(other.cast<byte_string_storage>().get());
+            other.cast<byte_string_storage>().set(ptr);
+        }
+
+        template <>
+        void move_assignment_l_r<array_storage,array_storage>(basic_json&& other)
+        {
+            auto ptr = cast<array_storage>().get();
+            cast<array_storage>().set(other.cast<array_storage>().get());
+            other.cast<array_storage>().set(ptr);
+        }
+
+        template <>
+        void move_assignment_l_r<object_storage,object_storage>(basic_json&& other)
+        {
+            auto ptr = cast<object_storage>().get();
+            cast<object_storage>().set(other.cast<object_storage>().get());
+            other.cast<object_storage>().set(ptr);
+        }
+
+        template <class TypeR>
+        void move_assignment_r(basic_json&& other)
+        {
+            switch (other.storage_kind())
+            {
+                case json_storage_kind::null_value:          move_assignment_l_r<null_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::empty_object_value:  move_assignment_l_r<empty_object_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::bool_value:          move_assignment_l_r<bool_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::int64_value:         move_assignment_l_r<int64_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::uint64_value:        move_assignment_l_r<uint64_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::half_value:          move_assignment_l_r<half_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::double_value:        move_assignment_l_r<double_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::short_string_value:  move_assignment_l_r<short_string_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::json_const_pointer:  move_assignment_l_r<json_const_pointer_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::long_string_value:   move_assignment_l_r<long_string_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::byte_string_value:   move_assignment_l_r<byte_string_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::array_value:         move_assignment_l_r<array_storage,TypeR>(std::move(other));break;
+                case json_storage_kind::object_value:        move_assignment_l_r<object_storage,TypeR>(std::move(other));break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
+        }
+
+        void move_assignment(basic_json&& other)
+        {
+            switch (other.storage_kind())
+            {
+                case json_storage_kind::null_value:
+                case json_storage_kind::empty_object_value:
+                case json_storage_kind::bool_value:
+                case json_storage_kind::int64_value:
+                case json_storage_kind::uint64_value:
+                case json_storage_kind::half_value:
+                case json_storage_kind::double_value:
+                case json_storage_kind::short_string_value:
+                case json_storage_kind::json_const_pointer:
+                    Destroy_();
+                    uninitialized_copy(std::move(other));
+                    break;
+                case json_storage_kind::long_string_value:
+                    move_assignment_r<long_string_storage>(std::move(other));
+                    break;
+                case json_storage_kind::byte_string_value:
+                    move_assignment_r<byte_string_storage>(std::move(other));
+                    break;
+                case json_storage_kind::array_value:
+                    move_assignment_r<array_storage>(std::move(other));
+                    break;
+                case json_storage_kind::object_value:
+                    move_assignment_r<object_storage>(std::move(other));
+                    break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
         }
 
         json_storage_kind storage_kind() const
