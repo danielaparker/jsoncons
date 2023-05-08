@@ -621,14 +621,14 @@ namespace jsoncons {
                 data_[length] = 0;
             }
 
-            short_string_storage(const short_string_storage& val)
-                : storage_kind_(val.storage_kind_), small_string_length_(val.small_string_length_), tag_(val.tag_)
+            short_string_storage(const short_string_storage& other)
+                : storage_kind_(other.storage_kind_), small_string_length_(other.small_string_length_), tag_(other.tag_)
             {
-                std::memcpy(data_,val.data_,val.small_string_length_*sizeof(char_type));
+                std::memcpy(data_,other.data_,other.small_string_length_*sizeof(char_type));
                 data_[small_string_length_] = 0;
             }
            
-            short_string_storage& operator=(const short_string_storage& val) = delete;
+            short_string_storage& operator=(const short_string_storage& other) = delete;
 
             uint8_t length() const
             {
@@ -957,9 +957,9 @@ namespace jsoncons {
                 return ptr_->get_allocator();
             }
 
-            void swap(array_storage& val) noexcept
+            void swap(array_storage& other) noexcept
             {
-                std::swap(val.ptr_,ptr_);
+                std::swap(other.ptr_,ptr_);
             }
 
             array& value()
@@ -1068,9 +1068,9 @@ namespace jsoncons {
                 }
             }
 
-            void swap(object_storage& val) noexcept
+            void swap(object_storage& other) noexcept
             {
-                std::swap(val.ptr_,ptr_);
+                std::swap(other.ptr_,ptr_);
             }
 
             object& value()
@@ -1724,9 +1724,9 @@ namespace jsoncons {
                 evaluate().dump_pretty(std::forward<Args>(args)...);
             }
 
-            void swap(basic_json& val) 
+            void swap(basic_json& other) 
             {
-                evaluate_with_default().swap(val);
+                evaluate_with_default().swap(other);
             }
 
             friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const proxy& o)

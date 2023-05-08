@@ -129,9 +129,9 @@ namespace jsoncons {
             return elements_.empty();
         }
 
-        void swap(json_array& val) noexcept
+        void swap(json_array& other) noexcept
         {
-            elements_.swap(val.elements_);
+            elements_.swap(other.elements_);
         }
 
         std::size_t size() const {return elements_.size();}

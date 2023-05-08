@@ -436,9 +436,9 @@ namespace jsoncons {
             return members_.empty();
         }
 
-        void swap(sorted_json_object& val) noexcept
+        void swap(sorted_json_object& other) noexcept
         {
-            members_.swap(val.members_);
+            members_.swap(other.members_);
         }
 
         iterator begin()
@@ -1215,9 +1215,9 @@ namespace jsoncons {
             return *this;
         }
 
-        void swap(order_preserving_json_object& val) noexcept
+        void swap(order_preserving_json_object& other) noexcept
         {
-            members_.swap(val.members_);
+            members_.swap(other.members_);
         }
 
         bool empty() const
