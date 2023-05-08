@@ -818,14 +818,14 @@ namespace jsoncons {
                 ptr_ = ptr;
             }
 
-            void swap(byte_string_storage& other) noexcept
-            {
-                std::swap(ptr_, other.ptr_);
-            }
-
             semantic_tag tag() const
             {
                 return tag_;
+            }
+
+            void swap(byte_string_storage& other) noexcept
+            {
+                std::swap(ptr_, other.ptr_);
             }
 
             const uint8_t* data() const
@@ -903,6 +903,12 @@ namespace jsoncons {
                 create(other.ptr_->get_allocator(), *(other.ptr_));
             }
 
+            array_storage(semantic_tag tag, pointer ptr)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), small_string_length_(0), 
+                  tag_(tag), ptr_(ptr)
+            {
+            }
+
             array_storage(array_storage&& other) noexcept
                 : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_),
                   ptr_(nullptr)
@@ -950,6 +956,21 @@ namespace jsoncons {
                 {
                     destroy();
                 }
+            }
+
+            pointer get()
+            {
+                return ptr_;
+            }
+
+            void set(pointer ptr)
+            {
+                ptr_ = ptr;
+            }
+
+            semantic_tag tag() const
+            {
+                return tag_;
             }
 
             allocator_type get_allocator() const
@@ -1005,6 +1026,12 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), tag_(tag)
             {
                 create(val.get_allocator(), val);
+            }
+
+            object_storage(semantic_tag tag, pointer ptr)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), 
+                  tag_(tag), ptr_(ptr)
+            {
             }
 
             object_storage(object&& val, semantic_tag tag)
@@ -1066,6 +1093,21 @@ namespace jsoncons {
                 {
                     destroy();
                 }
+            }
+
+            pointer get()
+            {
+                return ptr_;
+            }
+
+            void set(pointer ptr)
+            {
+                ptr_ = ptr;
+            }
+
+            semantic_tag tag() const
+            {
+                return tag_;
             }
 
             void swap(object_storage& other) noexcept
@@ -2430,11 +2472,15 @@ namespace jsoncons {
                     other = basic_json(null_type());
                     break;
                 case json_storage_kind::array_value:
-                    construct<array_storage>(std::move(other.cast<array_storage>()));
+                    construct<array_storage>(other.cast<array_storage>().tag(),
+                        other.cast<array_storage>().get());
+                    other.cast<array_storage>().set(nullptr);
                     other = basic_json(null_type());
                     break;
                 case json_storage_kind::object_value:
-                    construct<object_storage>(std::move(other.cast<object_storage>()));
+                    construct<object_storage>(other.cast<object_storage>().tag(),
+                        other.cast<object_storage>().get());
+                    other.cast<object_storage>().set(nullptr);
                     other = basic_json(null_type());
                     break;
                 default:
@@ -2486,12 +2532,24 @@ namespace jsoncons {
                     }
                     break;
                 case json_storage_kind::array_value:
-                    construct<array_storage>(std::move(other.cast<array_storage>()), alloc);
-                    other = basic_json(null_type());
+                    if (other.cast<array_storage>().get_allocator() == alloc)
+                    {
+                        uninitialized_move(std::move(other));
+                    }
+                    else
+                    {
+                        construct<array_storage>(other.cast<array_storage>(), alloc);
+                    }
                     break;
                 case json_storage_kind::object_value:
-                    construct<object_storage>(std::move(other.cast<object_storage>()), alloc);
-                    other = basic_json(null_type());
+                    if (other.cast<object_storage>().get_allocator() == alloc)
+                    {
+                        uninitialized_move(std::move(other));
+                    }
+                    else
+                    {
+                        construct<object_storage>(other.cast<object_storage>(), alloc);
+                    }
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
