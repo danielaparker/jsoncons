@@ -2364,6 +2364,7 @@ namespace jsoncons {
                     construct<json_const_pointer_storage>(other.cast<json_const_pointer_storage>());
                     break;
                 default:
+                    JSONCONS_UNREACHABLE();
                     break;
             }
         }
@@ -2396,6 +2397,7 @@ namespace jsoncons {
                     construct<object_storage>(other.cast<object_storage>(),alloc);
                     break;
                 default:
+                    JSONCONS_UNREACHABLE();
                     break;
             }
         }
@@ -2492,6 +2494,7 @@ namespace jsoncons {
                     other = basic_json(null_type());
                     break;
                 default:
+                    JSONCONS_UNREACHABLE();
                     break;
             }
         }
@@ -2525,7 +2528,7 @@ namespace jsoncons {
 
         basic_json& operator=(const basic_json& other)
         {
-            if (this != & other)
+            if (this != &other)
             {
                 Destroy_();
                 uninitialized_copy(other);
