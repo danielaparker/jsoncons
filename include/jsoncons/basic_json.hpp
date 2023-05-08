@@ -2606,36 +2606,38 @@ namespace jsoncons {
         template <class TypeL, class TypeR>
         void move_assignment_l_r(basic_json&& other)
         {
+            move_assignment_l_r(identity<TypeL>(), identity<TypeR>(), std::move(other));
+        }
+
+        template <class TypeL, class TypeR>
+        void move_assignment_l_r(identity<TypeL>,identity<TypeR>,basic_json&& other)
+        {
             Destroy_();
             uninitialized_copy(std::move(other));
         }
 
-        template <>
-        void move_assignment_l_r<long_string_storage,long_string_storage>(basic_json&& other)
+        void move_assignment_l_r(identity<long_string_storage>,identity<long_string_storage>,basic_json&& other)
         {
             auto ptr = cast<long_string_storage>().get();
             cast<long_string_storage>().set(other.cast<long_string_storage>().get());
             other.cast<long_string_storage>().set(ptr);
         }
 
-        template <>
-        void move_assignment_l_r<byte_string_storage,byte_string_storage>(basic_json&& other)
+        void move_assignment_l_r(identity<byte_string_storage>,identity<byte_string_storage>,basic_json&& other)
         {
             auto ptr = cast<byte_string_storage>().get();
             cast<byte_string_storage>().set(other.cast<byte_string_storage>().get());
             other.cast<byte_string_storage>().set(ptr);
         }
 
-        template <>
-        void move_assignment_l_r<array_storage,array_storage>(basic_json&& other)
+        void move_assignment_l_r(identity<array_storage>,identity<array_storage>,basic_json&& other)
         {
             auto ptr = cast<array_storage>().get();
             cast<array_storage>().set(other.cast<array_storage>().get());
             other.cast<array_storage>().set(ptr);
         }
 
-        template <>
-        void move_assignment_l_r<object_storage,object_storage>(basic_json&& other)
+        void move_assignment_l_r(identity<object_storage>,identity<object_storage>,basic_json&& other)
         {
             auto ptr = cast<object_storage>().get();
             cast<object_storage>().set(other.cast<object_storage>().get());

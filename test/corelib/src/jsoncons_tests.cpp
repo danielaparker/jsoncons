@@ -41,7 +41,7 @@ TEST_CASE("test_assignment")
     CHECK(root["myobject"]["int_2"].as<long long>() == 0);
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 }
-#if 0
+
 TEST_CASE("test_1")
 {
     basic_json<char32_t> j; 
@@ -224,4 +224,4 @@ TEST_CASE("test_multiline_comments")
     CHECK(j.is_array());
     CHECK(j.size() == 0);
 }
-#endif
+
