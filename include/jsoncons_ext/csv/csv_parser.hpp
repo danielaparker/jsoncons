@@ -545,7 +545,7 @@ private:
     std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
     string_type buffer_;
-    std::vector<std::pair<string_view_type,double>> string_double_map_;
+    std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
 public:
     basic_csv_parser(const TempAllocator& alloc = TempAllocator())
