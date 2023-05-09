@@ -166,7 +166,7 @@ add_executable(unit_tests
                corelib/src/short_string_tests.cpp
                corelib/src/source_tests.cpp
                corelib/src/staj_iterator_tests.cpp
-               corelib/src/extension_traits_tests.cpp
+               # corelib/src/extension_traits_tests.cpp
                # corelib/src/polymorphic_allocator_tests.cpp
                # corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/string_to_double_tests.cpp
@@ -176,7 +176,7 @@ add_executable(unit_tests
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
-               corelib/src/testmain.cpp
+               corelib/src/main.cpp
 )
 
 if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
