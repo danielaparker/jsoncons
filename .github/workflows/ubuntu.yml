@@ -23,10 +23,10 @@ jobs:
         CXX:  g++-10
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config ubuntu-latest
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest -C ubuntu-latest --output-on-failure
 
   gcc_build12:
     runs-on: ubuntu-latest
@@ -45,10 +45,10 @@ jobs:
         CXX:  g++-11
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config ubuntu-latest
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest -C ubuntu-latest --output-on-failure
 
   gcc_build_no_deprecated:
     runs-on: ubuntu-latest
@@ -67,10 +67,10 @@ jobs:
         CXX:  g++-10
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config ubuntu-latest
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest -C ubuntu-latest --output-on-failure
 
   clang_build:
     runs-on: ubuntu-latest
@@ -89,10 +89,10 @@ jobs:
         CXX:  clang++-13
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config ubuntu-latest
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest -C ubuntu-latest --output-on-failure
 
   clang_build_cxx20:
     runs-on: ubuntu-latest
@@ -111,10 +111,10 @@ jobs:
         CXX:  clang++-13
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config ubuntu-latest
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest -C ubuntu-latest --output-on-failure
 
 #  gcc_build_48:
 #    name: GCC 4.8
