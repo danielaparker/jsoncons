@@ -806,6 +806,7 @@ namespace jsoncons {
 
             ~byte_string_storage() noexcept
             {
+                heap_string_factory_type::destroy(ptr_);
             }
 
             pointer get()
