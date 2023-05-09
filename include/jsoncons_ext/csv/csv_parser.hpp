@@ -96,8 +96,6 @@ namespace detail {
     template <class CharT,class TempAllocator>
     class parse_event
     {
-        using allocator_type = TempAllocator;
-
         using temp_allocator_type = TempAllocator;
         using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
@@ -117,67 +115,6 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag)
-            : event_type(event_type), 
-              string_value(),
-              byte_string_value(),
-              tag(tag)
-        {
-        }
-
-        parse_event(const string_view_type& value, semantic_tag tag)
-            : event_type(staj_event_type::string_value), 
-              string_value(value.data(),value.length()), 
-              byte_string_value(),
-              tag(tag)
-        {
-        }
-
-        parse_event(const byte_string_view& value, semantic_tag tag)
-            : event_type(staj_event_type::byte_string_value), 
-              string_value(),
-              byte_string_value(value.data(),value.size()), 
-              tag(tag)
-        {
-        }
-
-        parse_event(bool value, semantic_tag tag)
-            : event_type(staj_event_type::bool_value), 
-              string_value(),
-              byte_string_value(),
-              bool_value(value), 
-              tag(tag)
-        {
-        }
-
-        parse_event(int64_t value, semantic_tag tag)
-            : event_type(staj_event_type::int64_value), 
-              string_value(),
-              byte_string_value(),
-              int64_value(value), 
-              tag(tag)
-        {
-        }
-
-        parse_event(uint64_t value, semantic_tag tag)
-            : event_type(staj_event_type::uint64_value), 
-              string_value(),
-              byte_string_value(),
-              uint64_value(value), 
-              tag(tag)
-        {
-        }
-
-        parse_event(double value, semantic_tag tag)
-            : event_type(staj_event_type::double_value), 
-              string_value(),
-              byte_string_value(),
-              double_value(value), 
-              tag(tag)
-        {
-        }
-
-        //
         parse_event(staj_event_type event_type, semantic_tag tag, const TempAllocator& alloc)
             : event_type(event_type), 
               string_value(alloc),
@@ -330,7 +267,7 @@ namespace detail {
             for (const auto& name : column_names)
             {
                 column_names_.push_back(name);
-                cached_events_.emplace_back();
+                cached_events_.emplace_back(alloc_);
             }
             name_index_ = 0;
             level_ = 0;
@@ -420,7 +357,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag, alloc_);
                 
                 ++level_;
             }
@@ -431,7 +368,7 @@ namespace detail {
         {
             if (level_ > 0)
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none);
+                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none, alloc_);
                 ++name_index_;
                 --level_;
             }
@@ -452,7 +389,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -465,7 +402,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
 
                 if (level_ == 0)
                 {
@@ -482,7 +419,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -498,7 +435,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -514,7 +451,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -530,7 +467,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -543,7 +480,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, alloc_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -573,13 +510,13 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
-    using string_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type>;
-    using csv_mode_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode>;
-    using csv_type_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info>;
-    using string_vector_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>>;
-    using csv_parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state>;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
 
     static constexpr int default_depth = 3;
 
@@ -608,7 +545,7 @@ private:
     std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
     string_type buffer_;
-    std::vector<std::pair<string_view_type,double>> string_double_map_;
+    std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
 public:
     basic_csv_parser(const TempAllocator& alloc = TempAllocator())
