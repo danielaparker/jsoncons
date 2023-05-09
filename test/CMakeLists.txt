@@ -203,13 +203,5 @@ target_compile_options(unit_tests PRIVATE
 )
 endif()
 
-add_test(jsoncons unit_tests
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
-
-target_include_directories (unit_tests 
-                            PUBLIC ${JSONCONS_INCLUDE_DIR} 
-                            PRIVATE ${JSONCONS_TESTS_DIR}
-                            PRIVATE ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
-
-target_link_libraries(unit_tests catch)
+add_test(NAME unit_tests COMMAND unit_tests)
 
