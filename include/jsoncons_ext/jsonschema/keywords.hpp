@@ -70,6 +70,13 @@ namespace jsonschema {
         {
             validator_->validate(instance, instance_location, reporter, patch);
         }
+
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
+                                                   const Json& instance, 
+                                                   error_reporter& reporter) const override
+        {
+            return validator_->get_default_value(instance_location, instance, reporter);
+        }
     };
 
     // contentEncoding
