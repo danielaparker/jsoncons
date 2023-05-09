@@ -205,3 +205,8 @@ endif()
 
 add_test(NAME unit_tests COMMAND unit_tests)
 
+target_include_directories (unit_tests 
+                            PUBLIC ${JSONCONS_INCLUDE_DIR} 
+                            PRIVATE ${JSONCONS_TESTS_DIR}
+                            PRIVATE ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
+
