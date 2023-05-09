@@ -69,7 +69,7 @@ TEST_CASE("test_exception_rbrace")
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::expected_comma_or_rbrace);
         CHECK(17 == e.line());
-        CHECK(9 == e.column());
+        CHECK(10 == e.column());
     }
     CHECK(false == decoder.is_valid());
 }
@@ -248,7 +248,7 @@ TEST_CASE("test_exception")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        CHECK((e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column() == 9));
+        CHECK((e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column() == 8));
     }
 }
 

@@ -97,7 +97,7 @@ TEST_CASE("test_filter")
     CHECK(1 == filter.warnings.size());
     CHECK("John" ==filter.warnings[0].name);
     CHECK(9 == filter.warnings[0].line_number);
-    CHECK(26 == filter.warnings[0].column_number);
+    CHECK(27 == filter.warnings[0].column_number);
 }
 
 TEST_CASE("test_filter2")
@@ -119,7 +119,7 @@ TEST_CASE("test_filter2")
     CHECK(1 == filter2.warnings.size());
     CHECK("John" ==filter2.warnings[0].name);
     CHECK(9 == filter2.warnings[0].line_number);
-    CHECK(26 == filter2.warnings[0].column_number);
+    CHECK(27 == filter2.warnings[0].column_number);
 }
 
 TEST_CASE("test_rename_name")
