@@ -475,7 +475,7 @@ int main()
     try
     {
        // will throw schema_error if JSON Schema loading fails 
-       auto sch = jsonschema::make_schema(schema, resolver); 
+       auto sch = jsonschema::make_schema(schema); 
 
        jsonschema::json_validator<json> validator(sch); 
 
