@@ -115,7 +115,7 @@ add_executable(unit_tests
                corelib/src/detail/optional_tests.cpp
                corelib/src/detail/span_tests.cpp
                corelib/src/detail/string_view_tests.cpp
-               corelib/src/detail/string_wrapper_tests.cpp
+               corelib/src/detail/heap_string_tests.cpp
                corelib/src/detail/to_integer_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
@@ -166,7 +166,9 @@ add_executable(unit_tests
                corelib/src/short_string_tests.cpp
                corelib/src/source_tests.cpp
                corelib/src/staj_iterator_tests.cpp
-               corelib/src/stateful_allocator_tests.cpp
+               corelib/src/extension_traits_tests.cpp
+               corelib/src/polymorphic_allocator_tests.cpp
+               corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/string_to_double_tests.cpp
                corelib/src/unicode_conv_tests.cpp
                corelib/src/wjson_tests.cpp
@@ -174,7 +176,7 @@ add_executable(unit_tests
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
-               corelib/src/main.cpp
+               corelib/src/testmain.cpp
 )
 
 if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
@@ -201,8 +203,7 @@ target_compile_options(unit_tests PRIVATE
 )
 endif()
 
-add_test(jsoncons unit_tests
-         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+add_test(NAME unit_tests COMMAND unit_tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
 
 target_include_directories (unit_tests 
                             PUBLIC ${JSONCONS_INCLUDE_DIR} 
