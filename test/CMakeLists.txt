@@ -176,7 +176,7 @@ add_executable(unit_tests
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
                ubjson/src/ubjson_encoder_tests.cpp
-               corelib/src/main.cpp
+               corelib/src/testmain.cpp
 )
 
 if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
