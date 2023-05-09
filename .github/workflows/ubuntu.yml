@@ -21,10 +21,12 @@ jobs:
       env:
         CC:   gcc-10
         CXX:  g++-10
-    - name: build
-      run: cmake --build build --parallel 4
-    - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
 
   gcc_build12:
     runs-on: ubuntu-latest
@@ -41,10 +43,12 @@ jobs:
       env:
         CC:   gcc-11
         CXX:  g++-11
-    - name: build
-      run: cmake --build build --parallel 10
-    - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
 
   gcc_build_no_deprecated:
     runs-on: ubuntu-latest
@@ -61,10 +65,12 @@ jobs:
       env:
         CC:   gcc-10
         CXX:  g++-10
-    - name: build
-      run: cmake --build build --parallel 10
-    - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
 
   clang_build:
     runs-on: ubuntu-latest
@@ -81,10 +87,12 @@ jobs:
       env:
         CC:   clang-13
         CXX:  clang++-13
-    - name: build
-      run: cmake --build build --parallel 10
-    - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
 
   clang_build_cxx20:
     runs-on: ubuntu-latest
@@ -101,10 +109,12 @@ jobs:
       env:
         CC:   clang-13
         CXX:  clang++-13
-    - name: build
-      run: cmake --build build --parallel 10
-    - name: test
-      run: cd build ; ctest -j 10 --output-on-failure
+
+    - working-directory: build/
+      run: cmake --build . --config ${{ matrix.build_type }}
+
+    - working-directory: build/
+      run: ctest -C ${{ matrix.build_type }} --output-on-failure
 
 #  gcc_build_48:
 #    name: GCC 4.8
