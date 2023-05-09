@@ -159,7 +159,7 @@ private:
     jsoncons::detail::chars_to to_double_;
 
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
-    std::vector<std::pair<string_view_type,double>> string_double_map_;
+    std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
