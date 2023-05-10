@@ -684,6 +684,31 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
+            long_string_storage(long_string_storage&& other)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+            {
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
+                other.tag_ = semantic_tag::none;
+                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+            }
+
+            long_string_storage(long_string_storage&& other, const Allocator& alloc)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+            {
+                if (other.get_allocator() == alloc)
+                {
+                    ptr_ = other.ptr_;
+                    other.ptr_ = nullptr;
+                    other.tag_ = semantic_tag::none;
+                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+                }
+                else
+                {
+                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
+                }
+            }
+
             long_string_storage& operator=(const long_string_storage& other)
             {
                 storage_kind_ = other.storage_kind_;
@@ -2378,12 +2403,12 @@ namespace jsoncons {
                 case json_storage_kind::null_value         : swap_l_r<TypeL, null_storage>(other); break;
                 case json_storage_kind::empty_object_value : swap_l_r<TypeL, empty_object_storage>(other); break;
                 case json_storage_kind::bool_value         : swap_l_r<TypeL, bool_storage>(other); break;
-                case json_storage_kind::int64_value      : swap_l_r<TypeL, int64_storage>(other); break;
-                case json_storage_kind::uint64_value     : swap_l_r<TypeL, uint64_storage>(other); break;
-                case json_storage_kind::half_value       : swap_l_r<TypeL, half_storage>(other); break;
+                case json_storage_kind::int64_value        : swap_l_r<TypeL, int64_storage>(other); break;
+                case json_storage_kind::uint64_value       : swap_l_r<TypeL, uint64_storage>(other); break;
+                case json_storage_kind::half_value         : swap_l_r<TypeL, half_storage>(other); break;
                 case json_storage_kind::double_value       : swap_l_r<TypeL, double_storage>(other); break;
                 case json_storage_kind::short_string_value : swap_l_r<TypeL, short_string_storage>(other); break;
-                case json_storage_kind::long_string_value       : swap_l_r<TypeL, long_string_storage>(other); break;
+                case json_storage_kind::long_string_value  : swap_l_r<TypeL, long_string_storage>(other); break;
                 case json_storage_kind::byte_string_value  : swap_l_r<TypeL, byte_string_storage>(other); break;
                 case json_storage_kind::array_value        : swap_l_r<TypeL, array_storage>(other); break;
                 case json_storage_kind::object_value       : swap_l_r<TypeL, object_storage>(other); break;
@@ -2492,10 +2517,11 @@ namespace jsoncons {
                     uninitialized_copy(other);
                     break;
                 case json_storage_kind::long_string_value:
-                    construct<long_string_storage>(other.cast<long_string_storage>().tag(),
-                        other.cast<long_string_storage>().get());
-                    other.cast<long_string_storage>().set(nullptr);
-                    other = basic_json(null_type());
+                    construct<long_string_storage>(std::move(other.cast<long_string_storage>()));
+                    //construct<long_string_storage>(other.cast<long_string_storage>().tag(),
+                    //    other.cast<long_string_storage>().get());
+                    //other.cast<long_string_storage>().set(nullptr);
+                    //other = basic_json(null_type());
                     break;
                 case json_storage_kind::byte_string_value:
                     construct<byte_string_storage>(other.cast<byte_string_storage>().tag(),
@@ -2544,14 +2570,15 @@ namespace jsoncons {
                     uninitialized_copy(other);
                     break;
                 case json_storage_kind::long_string_value:
-                    if (other.cast<long_string_storage>().get_allocator() == alloc)
+                    construct<long_string_storage>(std::move(other.cast<long_string_storage>()), alloc);
+                    /* if (other.cast<long_string_storage>().get_allocator() == alloc)
                     {
                         uninitialized_move(std::move(other));
                     }
                     else
                     {
                         construct<long_string_storage>(other.cast<long_string_storage>(), alloc);
-                    }
+                    }*/
                     break;
                 case json_storage_kind::byte_string_value:
                     if (other.cast<byte_string_storage>().get_allocator() == alloc)
@@ -2604,30 +2631,34 @@ namespace jsoncons {
 
         void move_assignment_l_r(identity<long_string_storage>,identity<long_string_storage>,basic_json&& other)
         {
-            auto ptr = cast<long_string_storage>().get();
-            cast<long_string_storage>().set(other.cast<long_string_storage>().get());
-            other.cast<long_string_storage>().set(ptr);
+            cast<long_string_storage>().swap(other.cast<long_string_storage>());
+            //auto ptr = cast<long_string_storage>().get();
+            //cast<long_string_storage>().set(other.cast<long_string_storage>().get());
+            //other.cast<long_string_storage>().set(ptr);
         }
 
         void move_assignment_l_r(identity<byte_string_storage>,identity<byte_string_storage>,basic_json&& other)
         {
-            auto ptr = cast<byte_string_storage>().get();
-            cast<byte_string_storage>().set(other.cast<byte_string_storage>().get());
-            other.cast<byte_string_storage>().set(ptr);
+            cast<byte_string_storage>().swap(other.cast<byte_string_storage>());
+            //auto ptr = cast<byte_string_storage>().get();
+            //cast<byte_string_storage>().set(other.cast<byte_string_storage>().get());
+            //other.cast<byte_string_storage>().set(ptr);
         }
 
         void move_assignment_l_r(identity<array_storage>,identity<array_storage>,basic_json&& other)
         {
-            auto ptr = cast<array_storage>().get();
-            cast<array_storage>().set(other.cast<array_storage>().get());
-            other.cast<array_storage>().set(ptr);
+            cast<array_storage>().swap(other.cast<array_storage>());
+            //auto ptr = cast<array_storage>().get();
+            //cast<array_storage>().set(other.cast<array_storage>().get());
+            //other.cast<array_storage>().set(ptr);
         }
 
         void move_assignment_l_r(identity<object_storage>,identity<object_storage>,basic_json&& other)
         {
-            auto ptr = cast<object_storage>().get();
-            cast<object_storage>().set(other.cast<object_storage>().get());
-            other.cast<object_storage>().set(ptr);
+            cast<object_storage>().swap(other.cast<object_storage>());
+            //auto ptr = cast<object_storage>().get();
+            //cast<object_storage>().set(other.cast<object_storage>().get());
+            //other.cast<object_storage>().set(ptr);
         }
 
         template <class TypeR>
