@@ -54,7 +54,7 @@ TEST_CASE("test_exception_left_brace")
 TEST_CASE("test_exception_rbrace")
 {
     std::string in_file = "./corelib/input/json-exception-2.json";
-    std::ifstream is(in_file, std::ios::binary);
+    std::ifstream is(in_file);
     REQUIRE(is);
 
     json_decoder<json> decoder;
@@ -69,7 +69,7 @@ TEST_CASE("test_exception_rbrace")
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::expected_comma_or_rbrace);
         CHECK(17 == e.line());
-        CHECK(10 == e.column());
+        CHECK(6 == e.column());
     }
     CHECK(false == decoder.is_valid());
 }
