@@ -5,7 +5,7 @@
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/traits_extension.hpp>
+#include <jsoncons/extension_traits.hpp>
 #include <iterator>
 #include <limits>
 
@@ -59,7 +59,7 @@ namespace detail
 
         template <typename C>
         constexpr span(C& c,
-                       typename std::enable_if<!is_span<C>::value && !traits_extension::is_std_array<C>::value && traits_extension::is_compatible_element<C,element_type>::value && traits_extension::has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !extension_traits::is_std_array<C>::value && extension_traits::is_compatible_element<C,element_type>::value && extension_traits::has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
@@ -86,7 +86,7 @@ namespace detail
 
         template <typename C>
         constexpr span(const C& c,
-                       typename std::enable_if<!is_span<C>::value && !traits_extension::is_std_array<C>::value && traits_extension::is_compatible_element<C,element_type>::value && traits_extension::has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !extension_traits::is_std_array<C>::value && extension_traits::is_compatible_element<C,element_type>::value && extension_traits::has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }

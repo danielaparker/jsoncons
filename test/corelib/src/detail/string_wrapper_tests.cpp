@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/string_wrapper.hpp>
+#include <jsoncons/detail/heap_string.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>

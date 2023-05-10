@@ -18,7 +18,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/traits_extension.hpp>
+#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -32,7 +32,7 @@ namespace detail {
     // from_integer
 
     template<class Integer,class Result>
-    typename std::enable_if<traits_extension::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<extension_traits::is_integer<Integer>::value,std::size_t>::type
     from_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
@@ -79,7 +79,7 @@ namespace detail {
     // integer_to_string_hex
 
     template<class Integer,class Result>
-    typename std::enable_if<traits_extension::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<extension_traits::is_integer<Integer>::value,std::size_t>::type
     integer_to_string_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;

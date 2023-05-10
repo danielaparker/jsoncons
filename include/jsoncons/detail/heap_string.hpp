@@ -81,8 +81,8 @@ namespace detail {
 
             ~str_t() noexcept = default; 
 
-            const char_type* c_str() const { return traits_extension::to_plain_pointer(p_); }
-            const char_type* data() const { return traits_extension::to_plain_pointer(p_); }
+            const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
+            const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
             std::size_t length() const { return length_; }
         
             str_t(const Allocator& alloc)
@@ -178,7 +178,7 @@ namespace detail {
             byte_allocator_type byte_alloc(alloc);
             byte_pointer ptr = byte_alloc.allocate(mem_size);
 
-            char* storage = traits_extension::to_plain_pointer(ptr);
+            char* storage = extension_traits::to_plain_pointer(ptr);
             str_t* ps = new(storage)str_t(byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
@@ -193,7 +193,7 @@ namespace detail {
 
         static void destroy(string_pointer ptr)
         {
-            str_t* rawp = traits_extension::to_plain_pointer(ptr);
+            str_t* rawp = extension_traits::to_plain_pointer(ptr);
 
             char* p = launder_cast<char*>(rawp);
 
@@ -245,8 +245,8 @@ namespace detail {
 
             ~str_t() noexcept = default; 
 
-            const char_type* c_str() const { return traits_extension::to_plain_pointer(p_); }
-            const char_type* data() const { return traits_extension::to_plain_pointer(p_); }
+            const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
+            const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
             std::size_t length() const { return length_; }
             uint64_t tag() const { return tag_; }
 
@@ -348,7 +348,7 @@ namespace detail {
             byte_allocator_type byte_alloc(alloc);
             byte_pointer ptr = byte_alloc.allocate(mem_size);
 
-            char* storage = traits_extension::to_plain_pointer(ptr);
+            char* storage = extension_traits::to_plain_pointer(ptr);
             str_t* ps = new(storage)str_t(tag, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
@@ -363,7 +363,7 @@ namespace detail {
 
         static void destroy(string_pointer ptr)
         {
-            str_t* rawp = traits_extension::to_plain_pointer(ptr);
+            str_t* rawp = extension_traits::to_plain_pointer(ptr);
 
             char* p = launder_cast<char*>(rawp);
 

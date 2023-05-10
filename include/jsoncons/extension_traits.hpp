@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
-namespace traits_extension {
+namespace extension_traits {
 
     // is_char8
     template <typename CharT, typename Enable=void>
@@ -878,7 +878,7 @@ namespace impl {
 
     #endif
 
-} // traits_extension
+} // extension_traits
 } // jsoncons
 
 #endif

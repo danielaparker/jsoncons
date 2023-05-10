@@ -2535,7 +2535,7 @@ namespace detail {
         jsonpath_expression& operator=(jsonpath_expression&&) = default;
 
         template <class BinaryCallback>
-        typename std::enable_if<traits_extension::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
+        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
