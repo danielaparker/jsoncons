@@ -1,3 +1,11 @@
+0.170.2 preview (on master)
+---------------
+
+Defect fixes
+
+- Fixed issue with jsonschema default values (likely introduced in 0.170.0)
+
+
 0.170.1
 -------
 
