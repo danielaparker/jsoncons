@@ -711,7 +711,7 @@ namespace jsoncons {
 
             void assign(const long_string_storage& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_copy_assignment(), other);
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
             }
 
             void assign(std::true_type, const  long_string_storage& other)
@@ -731,7 +731,7 @@ namespace jsoncons {
 
             void assign(long_string_storage&& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_move_assignment(),
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
                     std::move(other));
             }
 
@@ -857,7 +857,7 @@ namespace jsoncons {
 
             void assign(const byte_string_storage& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_copy_assignment(), other);
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
             }
 
             void assign(std::true_type, const byte_string_storage& other)
@@ -877,7 +877,7 @@ namespace jsoncons {
 
             void assign(byte_string_storage&& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_move_assignment(),
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
                     std::move(other));
             }
 
@@ -1050,7 +1050,7 @@ namespace jsoncons {
 
             void assign(const array_storage& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_copy_assignment(), other);
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
             }
 
             void assign(std::true_type, const array_storage& other)
@@ -1070,7 +1070,7 @@ namespace jsoncons {
 
             void assign(array_storage&& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_move_assignment(),
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
                     std::move(other));
             }
 
@@ -1224,7 +1224,7 @@ namespace jsoncons {
 
             void assign(const object_storage& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_copy_assignment(), other);
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
             }
 
             void assign(std::true_type, const object_storage& other)
@@ -1244,7 +1244,7 @@ namespace jsoncons {
 
             void assign(object_storage&& other)
             {
-                assign(std::allocator_traits<Allocator>::propagate_on_container_move_assignment(),
+                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
                     std::move(other));
             }
 
