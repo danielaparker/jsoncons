@@ -813,6 +813,31 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
+            byte_string_storage(byte_string_storage&& other)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+            {
+                ptr_ = other.ptr_;
+                other.ptr_ = nullptr;
+                other.tag_ = semantic_tag::none;
+                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+            }
+
+            byte_string_storage(byte_string_storage&& other, const Allocator& alloc)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+            {
+                if (other.get_allocator() == alloc)
+                {
+                    ptr_ = other.ptr_;
+                    other.ptr_ = nullptr;
+                    other.tag_ = semantic_tag::none;
+                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null_value);
+                }
+                else
+                {
+                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
+                }
+            }
+
             byte_string_storage& operator=(const byte_string_storage& other)
             {
                 storage_kind_ = other.storage_kind_;
@@ -2524,22 +2549,25 @@ namespace jsoncons {
                     //other = basic_json(null_type());
                     break;
                 case json_storage_kind::byte_string_value:
-                    construct<byte_string_storage>(other.cast<byte_string_storage>().tag(),
-                        other.cast<byte_string_storage>().get());
-                    other.cast<byte_string_storage>().set(nullptr);
-                    other = basic_json(null_type());
+                    construct<byte_string_storage>(std::move(other.cast<byte_string_storage>()));
+                    //construct<byte_string_storage>(other.cast<byte_string_storage>().tag(),
+                    //    other.cast<byte_string_storage>().get());
+                    //other.cast<byte_string_storage>().set(nullptr);
+                    //other = basic_json(null_type());
                     break;
                 case json_storage_kind::array_value:
-                    construct<array_storage>(other.cast<array_storage>().tag(),
-                        other.cast<array_storage>().get());
-                    other.cast<array_storage>().set(nullptr);
-                    other = basic_json(null_type());
+                    construct<array_storage>(std::move(other.cast<array_storage>()));
+                    //construct<array_storage>(other.cast<array_storage>().tag(),
+                    //    other.cast<array_storage>().get());
+                    //other.cast<array_storage>().set(nullptr);
+                    //other = basic_json(null_type());
                     break;
                 case json_storage_kind::object_value:
-                    construct<object_storage>(other.cast<object_storage>().tag(),
-                        other.cast<object_storage>().get());
-                    other.cast<object_storage>().set(nullptr);
-                    other = basic_json(null_type());
+                    construct<object_storage>(std::move(other.cast<object_storage>()));
+                    //construct<object_storage>(other.cast<object_storage>().tag(),
+                    //    other.cast<object_storage>().get());
+                    //other.cast<object_storage>().set(nullptr);
+                    //other = basic_json(null_type());
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
@@ -2581,34 +2609,37 @@ namespace jsoncons {
                     }*/
                     break;
                 case json_storage_kind::byte_string_value:
-                    if (other.cast<byte_string_storage>().get_allocator() == alloc)
-                    {
-                        uninitialized_move(std::move(other));
-                    }
-                    else
-                    {
-                        construct<byte_string_storage>(other.cast<byte_string_storage>(), alloc);
-                    }
+                    construct<byte_string_storage>(std::move(other.cast<byte_string_storage>()), alloc);
+                    //if (other.cast<byte_string_storage>().get_allocator() == alloc)
+                    //{
+                    //    uninitialized_move(std::move(other));
+                    //}
+                    //else
+                    //{
+                    //    construct<byte_string_storage>(other.cast<byte_string_storage>(), alloc);
+                    //}
                     break;
                 case json_storage_kind::array_value:
-                    if (other.cast<array_storage>().get_allocator() == alloc)
-                    {
-                        uninitialized_move(std::move(other));
-                    }
-                    else
-                    {
-                        construct<array_storage>(other.cast<array_storage>(), alloc);
-                    }
+                    construct<array_storage>(std::move(other.cast<array_storage>()), alloc);
+                    //if (other.cast<array_storage>().get_allocator() == alloc)
+                    //{
+                    //    uninitialized_move(std::move(other));
+                    //}
+                    //else
+                    //{
+                    //    construct<array_storage>(other.cast<array_storage>(), alloc);
+                    //}
                     break;
                 case json_storage_kind::object_value:
-                    if (other.cast<object_storage>().get_allocator() == alloc)
-                    {
-                        uninitialized_move(std::move(other));
-                    }
-                    else
-                    {
-                        construct<object_storage>(other.cast<object_storage>(), alloc);
-                    }
+                    construct<object_storage>(std::move(other.cast<object_storage>()), alloc);
+                    //if (other.cast<object_storage>().get_allocator() == alloc)
+                    //{
+                    //    uninitialized_move(std::move(other));
+                    //}
+                    //else
+                    //{
+                    //    construct<object_storage>(other.cast<object_storage>(), alloc);
+                    //}
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
