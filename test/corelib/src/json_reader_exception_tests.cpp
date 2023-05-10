@@ -34,7 +34,7 @@ TEST_CASE("test_filename_invalid")
 TEST_CASE("test_exception_left_brace")
 {
     std::string in_file = "./corelib/input/json-exception-1.json";
-    std::ifstream is(in_file, std::ios::binary);
+    std::ifstream is(in_file);
     REQUIRE(is);
 
     json_decoder<json> decoder;
