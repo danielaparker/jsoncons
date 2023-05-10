@@ -717,13 +717,16 @@ namespace jsoncons {
             void assign(std::true_type, const  long_string_storage& other)
             {
                 tag_ = other.tag_;
+                heap_string_factory_type::destroy(ptr_);
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
             }
 
             void assign(std::false_type, const long_string_storage& other)
             {
+                auto alloc = get_allocator();
                 tag_ = other.tag_;
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), get_allocator());
+                heap_string_factory_type::destroy(ptr_);
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
             void assign(long_string_storage&& other)
@@ -745,8 +748,10 @@ namespace jsoncons {
                 }
                 else
                 {
+                    auto alloc = get_allocator();
                     tag_ = other.tag_;
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), get_allocator());
+                    heap_string_factory_type::destroy(ptr_);
+                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
                 }
             }
 
@@ -858,13 +863,16 @@ namespace jsoncons {
             void assign(std::true_type, const byte_string_storage& other)
             {
                 tag_ = other.tag_;
+                heap_string_factory_type::destroy(ptr_);
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
             }
 
             void assign(std::false_type, const byte_string_storage& other)
             {
+                auto alloc = get_allocator();
                 tag_ = other.tag_;
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), get_allocator());
+                heap_string_factory_type::destroy(ptr_);
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
             void assign(byte_string_storage&& other)
@@ -886,8 +894,10 @@ namespace jsoncons {
                 }
                 else
                 {
+                    auto alloc = get_allocator();
                     tag_ = other.tag_;
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), get_allocator());
+                    heap_string_factory_type::destroy(ptr_);
+                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
                 }
             }
 
@@ -1008,7 +1018,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(array_allocator(alloc), array(*(other.ptr_), alloc));
+                    create(array_allocator(alloc), *(other.ptr_));
                 }
             }
 
@@ -1026,7 +1036,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(array_allocator(alloc), array(*(other.ptr_), alloc));
+                    create(array_allocator(alloc), *(other.ptr_));
                 }
             }
 
@@ -1046,13 +1056,16 @@ namespace jsoncons {
             void assign(std::true_type, const array_storage& other)
             {
                 tag_ = other.tag_;
+                destroy();
                 create(array_allocator(other.get_allocator()), *(other.ptr_));
             }
 
             void assign(std::false_type, const array_storage& other)
             {
+                auto alloc = get_allocator();
                 tag_ = other.tag_;
-                create(array_allocator(get_allocator()), *(other.ptr_));
+                destroy();
+                create(array_allocator(alloc), *(other.ptr_));
             }
 
             void assign(array_storage&& other)
@@ -1074,8 +1087,10 @@ namespace jsoncons {
                 }
                 else
                 {
+                    auto alloc = get_allocator();
                     tag_ = other.tag_;
-                    create(array_allocator(get_allocator()), *(other.ptr_));
+                    destroy();
+                    create(alloc, *(other.ptr_));
                 }
             }
 
@@ -1167,7 +1182,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(object_allocator(alloc), object(*(other.ptr_), alloc));
+                    create(object_allocator(alloc), *(other.ptr_));
                 }
             }
 
@@ -1195,7 +1210,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(object_allocator(alloc), object(*(other.ptr_), alloc));
+                    create(object_allocator(alloc), *(other.ptr_));
                 }
             }
 
@@ -1215,13 +1230,16 @@ namespace jsoncons {
             void assign(std::true_type, const object_storage& other)
             {
                 tag_ = other.tag_;
+                destroy();
                 create(object_allocator(other.get_allocator()), *(other.ptr_));
             }
 
             void assign(std::false_type, const object_storage& other)
             {
+                auto alloc = get_allocator();
                 tag_ = other.tag_;
-                create(object_allocator(get_allocator()), *(other.ptr_));
+                destroy();
+                create(object_allocator(alloc), *(other.ptr_));
             }
 
             void assign(object_storage&& other)
@@ -1243,8 +1261,10 @@ namespace jsoncons {
                 }
                 else
                 {
+                    auto alloc = get_allocator();
                     tag_ = other.tag_;
-                    create(object_allocator(get_allocator()), *(other.ptr_));
+                    destroy();
+                    create(object_allocator(alloc), *(other.ptr_));
                 }
             }
 
