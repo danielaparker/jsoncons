@@ -684,7 +684,7 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
-            long_string_storage(long_string_storage&& other)
+            long_string_storage(long_string_storage&& other) noexcept
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_string_value)), small_string_length_(0), tag_(other.tag_)
             {
                 ptr_ = other.ptr_;
@@ -830,7 +830,7 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
-            byte_string_storage(byte_string_storage&& other)
+            byte_string_storage(byte_string_storage&& other) noexcept
                 : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
                 ptr_ = other.ptr_;
@@ -1012,14 +1012,7 @@ namespace jsoncons {
             array_storage(const array_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
-                if (other.get_allocator() == alloc)
-                {
-                    create(array_allocator(alloc), *(other.ptr_));
-                }
-                else
-                {
-                    create(array_allocator(alloc), *(other.ptr_));
-                }
+                create(array_allocator(alloc), *(other.ptr_));
             }
 
             array_storage(array_storage&& other, const Allocator& alloc)
@@ -1176,14 +1169,7 @@ namespace jsoncons {
             object_storage(const object_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
             {
-                if (other.get_allocator() == alloc)
-                {
-                    create(object_allocator(alloc), *(other.ptr_));
-                }
-                else
-                {
-                    create(object_allocator(alloc), *(other.ptr_));
-                }
+                create(object_allocator(alloc), *(other.ptr_));
             }
 
             explicit object_storage(object_storage&& other) noexcept
@@ -2927,7 +2913,7 @@ namespace jsoncons {
             return *this;
         }
 
-        basic_json& operator=(basic_json&& other)
+        basic_json& operator=(basic_json&& other) noexcept
         {
             if (this != &other)
             {

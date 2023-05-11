@@ -52,17 +52,10 @@ int main(int argc, char *argv[])
       j->push_back(10);
 
       shm_json o(json_object_arg, alloc);
-      //o.try_emplace("category", "reference");
-      //o.try_emplace("author", "Nigel Rees");
-      //o.try_emplace("title", "Sayings of the Century");
-      //o.try_emplace("price", 8.95);
-      
-      o.insert_or_assign("category", "reference");
-      o.insert_or_assign("author", "Nigel Rees");
+      o.try_emplace("category", "reference");
+      o.try_emplace("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
       o.insert_or_assign("price", 8.95);
-
-      //std::cout << o << std::endl;
 
       j->push_back(o);
 

@@ -46,11 +46,11 @@ namespace jsoncons {
         key_index_value(const key_index_value&) = default;
         key_index_value(key_index_value&&) = default;
         key_index_value(const key_index_value& other, const allocator_type& alloc) 
-            : name(other.name, alloc), value(other.value, alloc) 
+            : name(other.name, alloc), index(0), value(other.value, alloc) 
         {
         }
         key_index_value(key_index_value&& other, const allocator_type& alloc)
-            : name(std::move(other.name), alloc), value(std::move(other.value), alloc) 
+            : name(std::move(other.name), alloc), index(0), value(std::move(other.value), alloc) 
         {
 
         }
@@ -355,7 +355,7 @@ namespace jsoncons {
         {
         }
 
-        sorted_json_object(sorted_json_object&& other)
+        sorted_json_object(sorted_json_object&& other) noexcept
             : allocator_holder<allocator_type>(other.get_allocator()), 
               members_(std::move(other.members_))
         {
@@ -1095,7 +1095,7 @@ namespace jsoncons {
         {
         }
 
-        order_preserving_json_object(order_preserving_json_object&& val)
+        order_preserving_json_object(order_preserving_json_object&& val) noexcept
             : allocator_holder<allocator_type>(val.get_allocator()), 
               members_(std::move(val.members_)),
               index_(std::move(val.index_))
