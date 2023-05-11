@@ -146,7 +146,9 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 
 (22) Constructs a `basic_json` value from a [byte_string_view](../byte_string_view.md).
 
-(23) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
+(23) Constructs a `basic_json` value from a `span<const uint8_t>`.
+
+(24) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
 with a generic tag.
 Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
 with width of exactly 8 bits (since 0.152.0.)
@@ -154,7 +156,7 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
-(24) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
+(25) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
 with a format specific tag.
 Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
 with width of exactly 8 bits (since 0.152.0.)
@@ -162,7 +164,7 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
-(25) Constructs a `basic_json` value that provides a non-owning view of
+(26) Constructs a `basic_json` value that provides a non-owning view of
 another `basic_json` value. If second argument `j_ptr` is null,
 constructs a `null` value.
 
