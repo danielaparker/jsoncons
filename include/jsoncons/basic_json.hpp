@@ -2710,6 +2710,97 @@ namespace jsoncons {
         }
 
         template <class TypeL, class TypeR>
+        void copy_assignment_l_r(const basic_json& other)
+        {
+            copy_assignment_l_r(identity<TypeL>(), identity<TypeR>(), other);
+        }
+
+        template <class TypeL, class TypeR>
+        void copy_assignment_l_r(identity<TypeL>,identity<TypeR>,const basic_json& other)
+        {
+            destroy();
+            uninitialized_copy(other);
+        }
+
+        void copy_assignment_l_r(identity<long_string_storage>,identity<long_string_storage>,const basic_json& other)
+        {
+            cast<long_string_storage>().assign(other.cast<long_string_storage>());
+        }
+
+        void copy_assignment_l_r(identity<byte_string_storage>,identity<byte_string_storage>,const basic_json& other)
+        {
+            cast<byte_string_storage>().assign(other.cast<byte_string_storage>());
+        }
+
+        void copy_assignment_l_r(identity<array_storage>,identity<array_storage>,const basic_json& other)
+        {
+            cast<array_storage>().assign(other.cast<array_storage>());
+        }
+
+        void copy_assignment_l_r(identity<object_storage>,identity<object_storage>,const basic_json& other)
+        {
+            cast<object_storage>().assign(other.cast<object_storage>());
+        }
+
+        template <class TypeR>
+        void copy_assignment_r(const basic_json& other)
+        {
+            switch (storage_kind())
+            {
+                case json_storage_kind::null_value:          copy_assignment_l_r<null_storage,TypeR>(other);break;
+                case json_storage_kind::empty_object_value:  copy_assignment_l_r<empty_object_storage,TypeR>(other);break;
+                case json_storage_kind::bool_value:          copy_assignment_l_r<bool_storage,TypeR>(other);break;
+                case json_storage_kind::int64_value:         copy_assignment_l_r<int64_storage,TypeR>(other);break;
+                case json_storage_kind::uint64_value:        copy_assignment_l_r<uint64_storage,TypeR>(other);break;
+                case json_storage_kind::half_value:          copy_assignment_l_r<half_storage,TypeR>(other);break;
+                case json_storage_kind::double_value:        copy_assignment_l_r<double_storage,TypeR>(other);break;
+                case json_storage_kind::short_string_value:  copy_assignment_l_r<short_string_storage,TypeR>(other);break;
+                case json_storage_kind::json_const_pointer:  copy_assignment_l_r<json_const_pointer_storage,TypeR>(other);break;
+                case json_storage_kind::long_string_value:   copy_assignment_l_r<long_string_storage,TypeR>(other);break;
+                case json_storage_kind::byte_string_value:   copy_assignment_l_r<byte_string_storage,TypeR>(other);break;
+                case json_storage_kind::array_value:         copy_assignment_l_r<array_storage,TypeR>(other);break;
+                case json_storage_kind::object_value:        copy_assignment_l_r<object_storage,TypeR>(other);break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
+        }
+
+        void copy_assignment(const basic_json& other)
+        {
+            switch (other.storage_kind())
+            {
+                case json_storage_kind::null_value:
+                case json_storage_kind::empty_object_value:
+                case json_storage_kind::bool_value:
+                case json_storage_kind::int64_value:
+                case json_storage_kind::uint64_value:
+                case json_storage_kind::half_value:
+                case json_storage_kind::double_value:
+                case json_storage_kind::short_string_value:
+                case json_storage_kind::json_const_pointer:
+                    destroy();
+                    uninitialized_copy(other);
+                    break;
+                case json_storage_kind::long_string_value:
+                    copy_assignment_r<long_string_storage>(other);
+                    break;
+                case json_storage_kind::byte_string_value:
+                    copy_assignment_r<byte_string_storage>(other);
+                    break;
+                case json_storage_kind::array_value:
+                    copy_assignment_r<array_storage>(other);
+                    break;
+                case json_storage_kind::object_value:
+                    copy_assignment_r<object_storage>(other);
+                    break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
+        }
+
+        template <class TypeL, class TypeR>
         void move_assignment_l_r(basic_json&& other)
         {
             move_assignment_l_r(identity<TypeL>(), identity<TypeR>(), std::move(other));
@@ -2831,8 +2922,7 @@ namespace jsoncons {
         {
             if (this != &other)
             {
-                destroy();
-                uninitialized_copy(other);
+                copy_assignment(other);
             }
             return *this;
         }
