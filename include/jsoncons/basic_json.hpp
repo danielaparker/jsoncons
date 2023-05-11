@@ -5155,6 +5155,8 @@ namespace jsoncons {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
+                create_object_implicitly();
+                JSONCONS_FALLTHROUGH;
             case json_storage_kind::object_value:
                 object_value().insert(first, last, get_key_value<key_type,basic_json>());
                 break;
@@ -5171,6 +5173,8 @@ namespace jsoncons {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
+                create_object_implicitly();
+                JSONCONS_FALLTHROUGH;
             case json_storage_kind::object_value:
                 object_value().insert(tag, first, last, get_key_value<key_type,basic_json>());
                 break;
@@ -5905,9 +5909,6 @@ namespace jsoncons {
         {
             switch (storage_kind())
             {
-                case json_storage_kind::empty_object_value:
-                    create_object_implicitly();
-                    JSONCONS_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return cast<object_storage>().value();
                 default:
@@ -5920,9 +5921,6 @@ namespace jsoncons {
         {
             switch (storage_kind())
             {
-                case json_storage_kind::empty_object_value:
-                    const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
-                    JSONCONS_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return cast<object_storage>().value();
                 case json_storage_kind::json_const_pointer:
