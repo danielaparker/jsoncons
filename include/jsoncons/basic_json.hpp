@@ -731,28 +731,7 @@ namespace jsoncons {
 
             void assign(long_string_storage&& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
-                    std::move(other));
-            }
-
-            void assign(std::true_type, long_string_storage&& other)
-            {
                 swap(other);
-            }
-
-            void assign(std::false_type, long_string_storage&& other)
-            {
-                if (other.get_allocator() == get_allocator())
-                {
-                    swap(other);
-                }
-                else
-                {
-                    auto alloc = get_allocator();
-                    tag_ = other.tag_;
-                    heap_string_factory_type::destroy(ptr_);
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
-                }
             }
 
             ~long_string_storage() noexcept
@@ -877,28 +856,7 @@ namespace jsoncons {
 
             void assign(byte_string_storage&& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
-                    std::move(other));
-            }
-
-            void assign(std::true_type, byte_string_storage&& other)
-            {
                 swap(other);
-            }
-
-            void assign(std::false_type, byte_string_storage&& other)
-            {
-                if (other.get_allocator() == get_allocator())
-                {
-                    swap(other);
-                }
-                else
-                {
-                    auto alloc = get_allocator();
-                    tag_ = other.tag_;
-                    heap_string_factory_type::destroy(ptr_);
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
-                }
             }
 
             ~byte_string_storage() noexcept
@@ -1063,28 +1021,7 @@ namespace jsoncons {
 
             void assign(array_storage&& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
-                    std::move(other));
-            }
-
-            void assign(std::true_type, array_storage&& other)
-            {
                 swap(other);
-            }
-
-            void assign(std::false_type, array_storage&& other)
-            {
-                if (other.get_allocator() == get_allocator())
-                {
-                    swap(other);
-                }
-                else
-                {
-                    auto alloc = get_allocator();
-                    tag_ = other.tag_;
-                    destroy();
-                    create(alloc, *(other.ptr_));
-                }
             }
 
             void swap(array_storage& other)
@@ -1230,28 +1167,7 @@ namespace jsoncons {
 
             void assign(object_storage&& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value>(),
-                    std::move(other));
-            }
-
-            void assign(std::true_type, object_storage&& other)
-            {
                 swap(other);
-            }
-
-            void assign(std::false_type, object_storage&& other)
-            {
-                if (other.get_allocator() == get_allocator())
-                {
-                    swap(other);
-                }
-                else
-                {
-                    auto alloc = get_allocator();
-                    tag_ = other.tag_;
-                    destroy();
-                    create(object_allocator(alloc), *(other.ptr_));
-                }
             }
 
             void swap(object_storage& other)
