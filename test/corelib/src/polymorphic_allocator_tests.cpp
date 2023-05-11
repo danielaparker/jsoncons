@@ -167,16 +167,13 @@ TEST_CASE("Test polymorhic allocator")
         CHECK(j[0] == pmr_json{});
         CHECK(j[1].as_string_view() == a_long_string);
     }
-/*
 
     SECTION("parse")
     {
-        FreeListAllocator<char> alloc2(true); 
-
         std::string s = a_long_string;
         std::string input = "\"" + s + "\"";
 
-        json_decoder<pmr_json,FreeListAllocator<char>> decoder(result_allocator_arg, alloc1, alloc2);
+        json_decoder<pmr_json> decoder(result_allocator_arg, alloc1);
         JSONCONS_TRY
         {
             json_string_reader reader(input,decoder);
@@ -189,7 +186,6 @@ TEST_CASE("Test polymorhic allocator")
         auto j = decoder.get_result();
         CHECK(j.as<std::string>() == s);
     }
-    */
 }
 #endif // namespace JSONCONS_HAS_2017
 
