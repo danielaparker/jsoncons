@@ -549,12 +549,8 @@ namespace jsoncons {
             return false;
         }
 
-        void init(key_index_value<Json>* items, std::size_t count)
+        void uninitialized_init(key_index_value<Json>* items, std::size_t count)
         {
-            if (!members_.empty())
-            {
-                members_.clear();
-            }
             auto first = items;
             if (count > 0)
             {
@@ -1361,13 +1357,8 @@ namespace jsoncons {
             }
         }
 
-        void init(key_index_value<Json>* items, std::size_t count)
+        void uninitialized_init(key_index_value<Json>* items, std::size_t count)
         {
-            if (!members_.empty() || !index_.empty())
-            {
-                index_.clear();
-                members_.clear();
-            }
             if (count > 0)
             {
                 index_.reserve(count);

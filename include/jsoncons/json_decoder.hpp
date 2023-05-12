@@ -173,7 +173,8 @@ private:
 
         if (count > 0)
         {
-            item_stack_[structure_index].value.object_value().init(&item_stack_[structure_index+1], count);
+            item_stack_[structure_index].value.template cast<typename Json::object_storage>().value().uninitialized_init(
+                &item_stack_[structure_index+1], count);
         }
 
         item_stack_.erase(first, item_stack_.end());
