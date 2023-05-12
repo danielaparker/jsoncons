@@ -12,11 +12,33 @@ Enhancements:
 - Defines aliases and alias templates for `basic_json` using polymorphic allocators
 in the `jsoncons::pmr` namespace.
 
+```
+namespace jsoncons { namespace pmr {
+    template<class CharT, class Policy>
+    using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
+
+    using json = basic_json<char,sorted_policy>;
+    using wjson = basic_json<wchar_t,sorted_policy>;
+    using ojson = basic_json<char, order_preserving_policy>;
+    using wojson = basic_json<wchar_t, order_preserving_policy>;
+}}
+
+```
+
 Changes:
 
 - Non-propagating stateful allocators are no longer supported.
 Attempting to use a regular stateful allocator will produce a compile error.
 Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
+
+Note: Non-stateful allocators are supported as before.
+
+0.170.2 (master)
+---------------
+
+Defect fixes
+
+- Fixed issue with jsonschema default values (likely introduced in 0.170.0)
 
 0.170.1
 -------
