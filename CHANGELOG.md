@@ -33,12 +33,12 @@ Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor]
 
 Note: Non-stateful allocators are supported as before.
 
-0.170.2 (master)
----------------
+0.170.2
+-------
 
 Defect fixes
 
-- Fixed issue with jsonschema default values (likely introduced in 0.170.0)
+- Fixed issue with jsonschema default values (introduced in 0.170.0)
 
 0.170.1
 -------
