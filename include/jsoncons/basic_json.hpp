@@ -3548,6 +3548,11 @@ namespace jsoncons {
             construct<double_storage>(val, tag);
         }
 
+        basic_json(double val, semantic_tag tag, const allocator_type&)
+        {
+            construct<double_storage>(val, tag);
+        }
+
         template <class IntegerType>
         basic_json(IntegerType val, semantic_tag tag, 
                    typename std::enable_if<extension_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)

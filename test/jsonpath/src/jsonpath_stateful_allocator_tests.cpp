@@ -47,8 +47,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
-            ScopedTestAllocator<char>(2));
+        json_decoder<my_json> decoder(result_allocator_arg, ScopedTestAllocator<char>(1));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
 
@@ -104,10 +103,10 @@ TEST_CASE("jsonpath stateful allocator test")
             }
         );
     }
+
     SECTION("json_replace 1")
     {
-        json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
-                                                              ScopedTestAllocator<char>(2));
+        json_decoder<my_json> decoder(result_allocator_arg, ScopedTestAllocator<char>(1));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
 
@@ -116,11 +115,18 @@ TEST_CASE("jsonpath stateful allocator test")
 
         my_json j = decoder.get_result();
 
+        auto res = jsonpath::json_query(std::allocator_arg, myAlloc, j, "$..book[?(@.price==12.99)].price");
+
+        //std::cout << "res:\n" << pretty_print(res) << "\n\n";
+
         jsonpath::json_replace(std::allocator_arg, myAlloc,
             j,"$..book[?(@.price==12.99)].price", 30.9);
 
+        //std::cout << "j:\n" << pretty_print(j) << "\n\n"; 
+
         CHECK(30.9 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
     }
+
     SECTION("json_replace 2")
     {
         json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
