@@ -22,7 +22,7 @@ using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 using custom_json = jsoncons::basic_json<char, jsoncons::sorted_policy, ScopedTestAllocator<char>>;
 using custom_string = std::basic_string<char, std::char_traits<char>, ScopedTestAllocator<char>>;
 
-TEST_CASE("scoped allocator adaptor tests")
+TEST_CASE("scoped allocator adaptor basic_json tests")
 {
 
     ScopedTestAllocator<char> alloc1(1);
@@ -100,26 +100,58 @@ TEST_CASE("scoped allocator adaptor tests")
         CHECK(j[0] == custom_json{});
         CHECK(j[1].as_string_view() == long_string);
     }
+}
+
+TEST_CASE("scoped allocator adaptor parse tests")
+{
+    using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+    using custom_string = std::basic_string<char,std::char_traits<char>,ScopedTestAllocator<char>>;
+
+    CHECK_FALSE(extension_traits::is_stateless<ScopedTestAllocator<char>>::value);
+
+    ScopedTestAllocator<char> alloc1(1); 
+    ScopedTestAllocator<char> alloc2(2); 
+
+    custom_string data = custom_string(R"(
+
+{"foo" : [{"short" : "bar",
+          "long" : "string to long for short string", 
+          "false" : false, 
+          "true" : true,
+          "null" : null,
+          "integer" : 10,
+          "double" : 1000.1}]
+}
+    )", alloc2);
 
     SECTION("parse")
     {
-        ScopedTestAllocator<char> alloc2(2); 
-
-        std::string s = long_string;
-        std::string input = "\"" + s + "\"";
-
         json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, alloc1, alloc2);
         JSONCONS_TRY
         {
-            json_string_reader reader(input,decoder);
+            json_string_reader reader(data,decoder);
             reader.read_next();
         }
-        JSONCONS_CATCH (const std::exception&)
+        JSONCONS_CATCH (const std::exception& ex)
         {
+            std::cout << ex.what() << "\n\n";
         }
         CHECK(decoder.is_valid());
         auto j = decoder.get_result();
-        CHECK(j.as<std::string>() == s);
+
+        CHECK(j.contains("foo"));
+
+        custom_json& a = j.at("foo");
+        CHECK(a.size() == 1);
+        custom_json& b = a[0];
+
+        CHECK(b.at("double").as<double>() == Approx(1000.1).epsilon(0.001));
+        CHECK(b.at("integer").as<int>() == 10);
+        CHECK(b.at("null") == custom_json::null());
+        CHECK(b.at("false") == custom_json(false));
+        CHECK(b.at("true") == custom_json(true));
+        CHECK(b.at("short") == custom_json("bar", alloc1));
+        CHECK(b.at("long") == custom_json("string to long for short string", alloc1));
     }
 
 }
