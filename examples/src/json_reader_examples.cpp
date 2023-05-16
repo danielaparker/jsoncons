@@ -121,7 +121,7 @@ void read_json_lines()
 
 void read_with_stateful_allocator()
 {
-    using my_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
+    using custom_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
     std::string input = R"(
 [ 
   { 
@@ -143,7 +143,7 @@ void read_with_stateful_allocator()
 ]
 )";
 
-    json_decoder<my_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+    json_decoder<custom_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
         ScopedTestAllocator<char>(2));
 
     auto myAlloc = ScopedTestAllocator<char>(3);
@@ -151,7 +151,7 @@ void read_with_stateful_allocator()
     basic_json_reader<char,string_source<char>, ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
     reader.read();
 
-    my_json j = decoder.get_result();
+    custom_json j = decoder.get_result();
     std::cout << pretty_print(j) << "\n";
 }
 

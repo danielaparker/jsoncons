@@ -807,7 +807,7 @@ void custom_functions2()
 void make_expression_with_stateful_allocator()
 {
     using my_alloc = ScopedTestAllocator<char>; // an allocator with a single-argument constructor
-    using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
+    using custom_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
     std::string json_string = R"(
 {
@@ -842,16 +842,16 @@ void make_expression_with_stateful_allocator()
 
     auto alloc = my_alloc(1);        
 
-    jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+    jsoncons::json_decoder<custom_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
 
     jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_string, decoder, alloc);
     reader.read();
 
-    my_json doc = decoder.get_result();
+    custom_json doc = decoder.get_result();
     std::cout << pretty_print(doc) << "\n\n";
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsoncons::jsonpath::make_expression<my_json>(std::allocator_arg, alloc, p);  
+    auto expr = jsoncons::jsonpath::make_expression<custom_json>(std::allocator_arg, alloc, p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";

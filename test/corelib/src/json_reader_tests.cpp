@@ -53,47 +53,6 @@ void test_json_reader_ec(const std::string& text, const std::error_code& expecte
     CHECK(ec == expected);
 }
 
-#if !(defined(__GNUC__))
-// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
-TEST_CASE("json_reader constructors")
-{
-    std::string input = R"(
-{
-  "store": {
-    "book": [
-      {
-        "category": "reference",
-        "author": "Margaret Weis",
-        "title": "Dragonlance Series",
-        "price": 31.96
-      },
-      {
-        "category": "reference",
-        "author": "Brent Weeks",
-        "title": "Night Angel Trilogy",
-        "price": 14.70
-      }
-    ]
-  }
-}
-)";
-
-    SECTION("stateful allocator")
-    {
-        using my_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
-
-        ScopedTestAllocator<char> my_allocator{1}; 
-
-        json_decoder<my_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, my_allocator,
-                                                              my_allocator);
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, my_allocator);
-        reader.read();
-
-        my_json j = decoder.get_result();
-        //std::cout << pretty_print(j) << "\n";
-    }
-}
-
 TEST_CASE("test_missing_separator")
 {
     std::string jtext = R"({"field1"{}})";    
@@ -208,7 +167,6 @@ TEST_CASE("test_read_primitive_fail")
     test_json_reader_error("\"string\"{}", jsoncons::json_errc::extra_character);
     test_json_reader_error("\"string\"[]", jsoncons::json_errc::extra_character);
 }
-#endif
 
 TEST_CASE("test_read_multiple")
 {
@@ -300,3 +258,45 @@ TEST_CASE("json_reader json lines")
         CHECK(reader.eof());
     }
 }
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+TEST_CASE("json_reader stateful allocator tests")
+{
+    std::string input = R"(
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Margaret Weis",
+        "title": "Dragonlance Series",
+        "price": 31.96
+      },
+      {
+        "category": "reference",
+        "author": "Brent Weeks",
+        "title": "Night Angel Trilogy",
+        "price": 14.70
+      }
+    ]
+  }
+}
+)";
+
+    SECTION("stateful allocator")
+    {
+        using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+
+        ScopedTestAllocator<char> my_allocator{1}; 
+
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, my_allocator,
+                                                              my_allocator);
+        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, my_allocator);
+        reader.read();
+
+        custom_json j = decoder.get_result();
+        //std::cout << pretty_print(j) << "\n";
+    }
+}
+#endif

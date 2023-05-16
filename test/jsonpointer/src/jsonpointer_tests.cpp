@@ -14,6 +14,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <scoped_allocator>
 
 using namespace jsoncons;
 using namespace jsoncons::literals;
@@ -655,3 +656,13 @@ TEST_CASE("to_uri_fragment test")
     }
 }
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+#include <common/FreeListAllocator.hpp>
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+
+#endif
