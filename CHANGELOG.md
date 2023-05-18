@@ -31,6 +31,11 @@ Changes:
 Attempting to use a regular stateful allocator will produce a compile error.
 Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
 
+- Until 0.171.0, the `basic_json` functions `try_emplace`, `emplace`, and `emplace_back` allowed an allocator argument,
+and one was required when using stateful allocators. Since 0.171.0, `try_emplace`, `emplace`, and `emplace_back`
+must not be passed an allocator argument, because both `std::pmr::polymorphic_allocator` and `std::scoped_allocator_adaptor`
+use uses-allocator construction.   
+
 Note: Non-stateful allocators are supported as before.
 
 0.170.2
