@@ -264,8 +264,6 @@ namespace jsoncons {
         
         template <class CharT, class CharTraits, class Allocator>
         using string = std::basic_string<CharT, CharTraits, Allocator>;
-
-        using parse_error_handler_type = default_json_parsing;
     };
 
     struct order_preserving_policy
@@ -278,8 +276,6 @@ namespace jsoncons {
         
         template <class CharT, class CharTraits, class Allocator>
         using string = std::basic_string<CharT, CharTraits, Allocator>;
-
-        using parse_error_handler_type = default_json_parsing;
     };
 
     template<class Policy, class KeyT,class Json, class Enable=void>
@@ -413,8 +409,6 @@ namespace jsoncons {
         using allocator_type = Allocator; 
 
         using policy_type = Policy;
-
-        using parse_error_handler_type = typename policy_type::parse_error_handler_type;
 
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -5382,8 +5376,7 @@ namespace jsoncons {
         JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&)")
         static basic_json parse(const char_type* s, std::size_t length)
         {
-            parse_error_handler_type err_handler;
-            return parse(s,length,err_handler);
+            return parse(jsoncons::string_view(s,length));
         }
 
         //JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&, parse_error_handler)")
@@ -5395,16 +5388,15 @@ namespace jsoncons {
         JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&)")
         static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
         {
-            parse_error_handler_type err_handler;
-            return parse_file(filename,err_handler);
+            std::basic_ifstream<char_type> is(filename);
+            return parse(is);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&, std::function<bool(json_errc,const ser_context&)>)")
         static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                      std::function<bool(json_errc,const ser_context&)> err_handler)
         {
-            std::basic_ifstream<char_type> is(filename);
-            return parse(is,err_handler);
+            return parse(is);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&)")
