@@ -30,7 +30,13 @@ Implementation policies for arrays and objects are provided via the `Policy` tem
 A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
 rebind to internal data structures. 
 
-A `basic_json` can support multiple readers concurrently, as long as it is not being modified. 
+A `basic_json` can support multiple readers concurrently, as long as it is not being modified.
+If it is being modified, it must be by one writer with no concurrent readers.
+
+Since 0.171.0, `basic_json` supports [std::uses_allocator](https://en.cppreference.com/w/cpp/memory/uses_allocator) construction.
+The allocator template parameter may be a stateless allocator, a [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator), or a [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor).
+Non-propagating stateful allocators, such as the [Boost.Interprocess allocators](https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction),
+must be wrapped by a `std::scoped_allocator_adaptor`.
 
 Several aliases for common character types and policies for ordering an object's name/value pairs are provided:
 
@@ -49,7 +55,8 @@ Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|CharT
 `policy_type`|Policy
-`allocator_type`|Allocator
+`allocator_type` (until 0.171.0)|A stateless allocator, or a non-propagating stateful allocator
+`allocator_type` (after 0.171.0)|A stateless allocator, [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator), or [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
 `char_traits_type`|`std::char_traits<char_type>`
 `char_allocator_type`|`allocator_type` rebound to `char_type`
 `reference`|`basic_json&`
