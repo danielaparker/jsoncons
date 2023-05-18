@@ -45,16 +45,16 @@ and by the pull parser [basic_json_cursor](basic_json_cursor.md).
                 std::function<bool(json_errc,const ser_context&)> err_handler); (4)
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
-and a default [err_handler](parse_error_handler.md).
+and a default [err_handler](JSONParsingErrorHandling.md).
 
 (2) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
-and a default [err_handler](parse_error_handler.md).
+and a default [err_handler](JSONParsingErrorHandling.md).
 
 (3) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
-and a specified [err_handler](parse_error_handler.md).
+and a specified [err_handler](JSONParsingErrorHandling.md).
 
 (4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
-and a specified [err_handler](parse_error_handler.md).
+and a specified [err_handler](JSONParsingErrorHandling.md).
 
 Note: It is the programmer's responsibility to ensure that a `basic_json_parser` does not outlive any string passed in the constuctor.
 
