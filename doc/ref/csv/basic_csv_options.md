@@ -51,7 +51,7 @@ column_defaults|A comma separated list of strings containing default json values
 float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 precision| |Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

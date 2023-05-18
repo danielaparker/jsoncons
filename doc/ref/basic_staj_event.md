@@ -9,7 +9,7 @@ class basic_staj_event
 
 A JSON-like parse event.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

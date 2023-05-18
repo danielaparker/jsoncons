@@ -14,7 +14,7 @@ Defines an interface for filtering JSON events.
 
 ![basic_json_filter](./diagrams/basic_json_filter.png)
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

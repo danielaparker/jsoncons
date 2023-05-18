@@ -25,6 +25,7 @@ inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
+err_handler (since 0.171.0)|Defaults to [default_json_parsing](parse_error_handler.md).|
 indent_size| |The indent size, the default is 4
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
@@ -47,7 +48,7 @@ The default floating point format is [float_chars_format::general](float_chars_f
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

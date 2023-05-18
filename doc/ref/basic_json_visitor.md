@@ -10,7 +10,7 @@ template <
 
 Defines an interface for producing and consuming JSON events. 
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

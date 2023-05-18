@@ -20,7 +20,7 @@ representing the events from `begin_array` to `end_array`.
 
 `basic_json_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

@@ -13,7 +13,7 @@ A [basic_json_visitor](basic_json_visitor.md) that discards all incoming json ev
 
 ![basic_default_json_visitor](./diagrams/basic_default_json_visitor.png)
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
