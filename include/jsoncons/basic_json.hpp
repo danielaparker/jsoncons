@@ -3289,7 +3289,7 @@ namespace jsoncons {
 
         static basic_json parse(std::basic_istream<char_type>& is, 
                                 const basic_json_decode_options<char_type>& options, 
-                                std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+                                std::function<bool(json_errc,const ser_context&)> err_handler)
         {
             json_decoder<basic_json> visitor;
             basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor, options, err_handler);
