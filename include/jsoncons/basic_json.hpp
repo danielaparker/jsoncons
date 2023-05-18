@@ -3190,20 +3190,20 @@ namespace jsoncons {
         template <class Source>
         static
          typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-            parse(const Source& s, 
+            parse(const Source& source, 
               const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
               const allocator_type& alloc = allocator_type())
         {
             json_decoder<basic_json> decoder(result_allocator_arg, alloc);
             basic_json_parser<char_type> parser(options);
 
-            auto r = unicode_traits::detect_encoding_from_bom(s.data(), s.size());
+            auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
             if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
             {
                 JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
             }
-            std::size_t offset = (r.ptr - s.data());
-            parser.update(s.data()+offset,s.size()-offset);
+            std::size_t offset = (r.ptr - source.data());
+            parser.update(source.data()+offset,source.size()-offset);
             parser.parse_some(decoder);
             parser.finish_parse(decoder);
             parser.check_done();
@@ -3217,20 +3217,20 @@ namespace jsoncons {
         template <class Source>
         static
         typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-        parse(const Source& s, 
+        parse(const Source& source, 
               const basic_json_decode_options<char_type>& options, 
               std::function<bool(json_errc,const ser_context&)> err_handler)
         {
             json_decoder<basic_json> decoder;
             basic_json_parser<char_type> parser(options,err_handler);
 
-            auto r = unicode_traits::detect_encoding_from_bom(s.data(), s.size());
+            auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
             if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
             {
                 JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
             }
-            std::size_t offset = (r.ptr - s.data());
-            parser.update(s.data()+offset,s.size()-offset);
+            std::size_t offset = (r.ptr - source.data());
+            parser.update(source.data()+offset,source.size()-offset);
             parser.parse_some(decoder);
             parser.finish_parse(decoder);
             parser.check_done();
@@ -3244,17 +3244,17 @@ namespace jsoncons {
         template <class Source>
         static
         typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
-        parse(const Source& s, 
+        parse(const Source& source, 
                     std::function<bool(json_errc,const ser_context&)> err_handler)
         {
-            return parse(s, basic_json_decode_options<CharT>(), err_handler);
+            return parse(source, basic_json_decode_options<CharT>(), err_handler);
         }
 
-        static basic_json parse(const char_type* s, 
+        static basic_json parse(const char_type* source, 
               const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
               const allocator_type& alloc = allocator_type())
         {
-            return parse(jsoncons::basic_string_view<char_type>(s), options, alloc);
+            return parse(jsoncons::basic_string_view<char_type>(source), options, alloc);
         }
 
         static basic_json parse(const char_type* s, 
@@ -3312,7 +3312,23 @@ namespace jsoncons {
         template <class InputIt>
         static basic_json parse(InputIt first, InputIt last, 
                                 const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                                std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+                                const allocator_type& alloc = allocator_type())
+        {
+            json_decoder<basic_json> visitor(result_allocator_arg, alloc);
+            basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), visitor, options, alloc);
+            reader.read_next();
+            reader.check_done();
+            if (!visitor.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
+            }
+            return visitor.get_result();
+        }
+
+        template <class InputIt>
+        static basic_json parse(InputIt first, InputIt last, 
+                                const basic_json_decode_options<char_type>& options, 
+                                std::function<bool(json_errc,const ser_context&)> err_handler)
         {
             json_decoder<basic_json> visitor;
             basic_json_reader<char_type,iterator_source<InputIt>> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), visitor, options, err_handler);
