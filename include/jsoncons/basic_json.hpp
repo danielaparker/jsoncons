@@ -63,7 +63,7 @@ namespace jsoncons {
 
             template <class T>
             using
-            basic_json_t = basic_json<typename T::char_type,typename T::implementation_policy,typename T::allocator_type>;
+            basic_json_t = basic_json<typename T::char_type,typename T::policy_type,typename T::allocator_type>;
 
         } // namespace detail
 
@@ -412,9 +412,9 @@ namespace jsoncons {
 
         using allocator_type = Allocator; 
 
-        using implementation_policy = Policy;
+        using policy_type = Policy;
 
-        using parse_error_handler_type = typename implementation_policy::parse_error_handler_type;
+        using parse_error_handler_type = typename policy_type::parse_error_handler_type;
 
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -424,7 +424,7 @@ namespace jsoncons {
 
         using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
 
-        using key_type = typename implementation_policy::template string<char_type,char_traits_type,char_allocator_type>;
+        using key_type = typename policy_type::template string<char_type,char_traits_type,char_allocator_type>;
 
 
         using reference = basic_json&;
@@ -441,16 +441,16 @@ namespace jsoncons {
         JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
     #endif
 
-        using array = typename implementation_policy::template array<basic_json>;
+        using array = typename policy_type::template array<basic_json>;
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
 
-        using object = typename implementation_policy::template object<key_type,basic_json>;
+        using object = typename policy_type::template object<key_type,basic_json>;
 
-        using object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::object_iterator_type;                    
-        using const_object_iterator = typename object_iterator_typedefs<implementation_policy,key_type,basic_json>::const_object_iterator_type;                    
-        using array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::array_iterator_type;                    
-        using const_array_iterator = typename array_iterator_typedefs<implementation_policy,key_type,basic_json>::const_array_iterator_type;                    
+        using object_iterator = typename object_iterator_typedefs<policy_type,key_type,basic_json>::object_iterator_type;                    
+        using const_object_iterator = typename object_iterator_typedefs<policy_type,key_type,basic_json>::const_object_iterator_type;                    
+        using array_iterator = typename array_iterator_typedefs<policy_type,key_type,basic_json>::array_iterator_type;                    
+        using const_array_iterator = typename array_iterator_typedefs<policy_type,key_type,basic_json>::const_array_iterator_type;                    
 
     private:
 
@@ -1229,7 +1229,7 @@ namespace jsoncons {
         template <class ParentType>
         class proxy 
         {
-            friend class basic_json<char_type,implementation_policy,allocator_type>;
+            friend class basic_json<char_type,policy_type,allocator_type>;
 
             ParentType& parent_;
             string_view_type key_;

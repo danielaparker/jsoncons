@@ -46,7 +46,7 @@ Type                |Definition
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|CharT
-`implementation_policy`|Policy
+`policy_type`|Policy
 `allocator_type`|Allocator
 `char_traits_type`|`std::char_traits<char_type>`
 `char_allocator_type`|`allocator_type` rebound to `char_type`
