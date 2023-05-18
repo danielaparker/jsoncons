@@ -30,6 +30,8 @@ Implementation policies for arrays and objects are provided via the `Policy` tem
 A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
 rebind to internal data structures. 
 
+A `basic_json` can support multiple readers concurrently, as long as it is not being modified. 
+
 Several aliases for common character types and policies for ordering an object's name/value pairs are provided:
 
 Type                |Definition
