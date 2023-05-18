@@ -5396,7 +5396,10 @@ namespace jsoncons {
         static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                      std::function<bool(json_errc,const ser_context&)> err_handler)
         {
-            return parse(is);
+            std::basic_ifstream<char_type> is(filename);
+            basic_json_options<char_type> options;
+            options.err_handler(err_handler);
+            return parse(is, options);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&)")
