@@ -5379,7 +5379,7 @@ namespace jsoncons {
             return parse(jsoncons::string_view(s,length));
         }
 
-        //JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&, parse_error_handler)")
+        //JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&, const basic_json_options<char_type>&)")
         //static basic_json parse(const char_type* s, std::size_t length, std::function<bool(json_errc,const ser_context&)> err_handler)
         //{
         //    return parse(string_view_type(s,length),err_handler);
@@ -5392,7 +5392,7 @@ namespace jsoncons {
             return parse(is);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&, std::function<bool(json_errc,const ser_context&)>)")
+        JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&, const basic_json_options<char_type>&)>)")
         static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                      std::function<bool(json_errc,const ser_context&)> err_handler)
         {
