@@ -1,6 +1,6 @@
 ### jsoncons::key_value 
 
-```c++
+```cpp
 template <class KeyT, class ValueT>
 class key_value
 ```

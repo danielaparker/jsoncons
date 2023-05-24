@@ -2,7 +2,7 @@
 
 Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ data structure.
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson.hpp>
 
 template<class T>
@@ -45,7 +45,7 @@ Throws a [ser_error](../ser_error.md) if parsing fails, and a [conv_error](conv_
 
 #### Binary example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <iostream>

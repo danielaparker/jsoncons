@@ -1,6 +1,6 @@
 ### jsoncons::basic_json
 
-```c++
+```cpp
 #include <jsoncons/basic_json.hpp>
 
 template< 

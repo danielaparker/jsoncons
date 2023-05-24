@@ -39,7 +39,7 @@ The examples below are from the [JMESPath front page](https://jmespath.org/) and
 and a JMESPath expression string, and returns a `basic_json` result. This is the simplest way to
 compile and evaluate a JMESPath expression.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
@@ -83,7 +83,7 @@ represents the compiled form of a JMESPath string. It allows you to
 evaluate a single compiled expression on multiple JSON documents.
 A `jmespath_expression` is immutable and thread-safe. 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 

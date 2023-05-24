@@ -1,6 +1,6 @@
 ### jsoncons::mergepatch::from_diff
 
-```c++
+```cpp
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 template <class Json>
@@ -19,7 +19,7 @@ Returns a JSON Merge Patch.
 
 This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#section-3).
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 

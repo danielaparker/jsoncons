@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_filter
 
-```c++
+```cpp
 #include <jsoncons/json_filter.hpp>
 
 template <
@@ -522,7 +522,7 @@ The overloads that take a `std::error_code&` parameter set it to the error code 
 
 #### Rename object member names with the built in filter [rename_object_key_filter](rename_object_key_filter.md)
 
-```c++
+```cpp
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -584,7 +584,7 @@ Input JSON file `address-book.json`:
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
 You can achieve the desired result by subclassing the [basic_json_filter](basic_json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_visitor](basic_json_visitor.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
-```c++
+```cpp
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -648,13 +648,13 @@ private:
 };
 ```
 Configure a [rename_object_key_filter](rename_object_key_filter.md) to emit json events to a [basic_json_encoder](basic_json_encoder.md). 
-```c++
+```cpp
 std::ofstream os("output/new-address-book.json");
 json_stream_encoder encoder(os);
 name_fixup_filter filter(encoder);
 ```
 Parse the input and send the json events through the filter ...
-```c++
+```cpp
 std::cout << "(1) ";
 std::ifstream is("input/address-book.json");
 //json_reader reader(is, filter);          // (until 0.164.0)
@@ -663,7 +663,7 @@ reader.read();
 std:: << "\n";
 ```
 or read into a json value and write to the filter
-```c++
+```cpp
 std::cout << "(2) ";
 json j;
 is >> j;

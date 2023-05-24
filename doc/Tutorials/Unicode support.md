@@ -3,16 +3,16 @@
 In the Linux and web worlds, `UTF-8` is the dominant character encoding.
 
 Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard 
-```c++
+```cpp
 std::fstream fs(const char* filename)
 ```
 Instead you need to use the non standard Microsoft extension
-```c++
+```cpp
 std::fstream fs(const wchar_t* filename)
 ```
 
 #### Unicode escaping
-```c++
+```cpp
 string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
 std::cout << "Input:    " << inputStr << std::endl;
 
@@ -45,7 +45,7 @@ Output:   ["@@\u0000\u0011"]
 Note that just the two control characters are escaped on output.
 
 #### Reading escaped unicode into utf8 encodings and writing back escaped unicode
-```c++
+```cpp
 string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
 std::cout << "Input:    " << inputStr << std::endl;
 
@@ -92,7 +92,7 @@ Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 Since the escaped unicode consists of a control character (0x7f) and non-ascii, we get back the same text as what we started with.
 
 #### Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)
-```c++
+```cpp
 string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
 json value = json::parse(input);
 json_options options;
@@ -131,7 +131,7 @@ Instead you need to use the non standard Microsoft extension
     std::wfstream fs(const wchar_t* filename)
 
 #### Constructing a wjson value
-```c++
+```cpp
 using jsoncons::wjson;
 
 wjson j;
@@ -145,7 +145,7 @@ Output:
 {"field1":"test","field2":3.9,"field3":true}
 ```
 #### Escaped unicode
-```c++
+```cpp
 wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
 std::wistringstream is(input);
 

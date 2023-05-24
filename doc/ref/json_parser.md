@@ -1,6 +1,6 @@
 ### jsoncons::json_parser
 
-```c++
+```cpp
 #include <jsoncons/json_parser.hpp>
 
 typedef basic_json_parser<char> json_parser
@@ -124,7 +124,7 @@ to continue.
 
 #### Incremental parsing
 
-```c++
+```cpp
 int main()
 {
     json_parser parser;
@@ -172,7 +172,7 @@ Output:
 
 #### Incremental parsing with unconsumed non-whitespace characters
 
-```c++
+```cpp
 int main()
 {
     json_parser parser;
@@ -215,7 +215,7 @@ Output:
 
 #### nan, inf, and -inf substitition
 
-```c++
+```cpp
 int main()
 {
     std::string s = R"(

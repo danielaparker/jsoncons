@@ -1,6 +1,6 @@
 ### jsoncons::cbor::basic_cbor_encoder
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 template<
@@ -418,7 +418,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 #### Encode to CBOR buffer
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iomanip>
@@ -463,7 +463,7 @@ Output:
 
 #### Encode to CBOR stream
 
-```c++
+```cpp
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -507,7 +507,7 @@ Output:
 
 #### Encode Typed Array tags - array of half precision floating-point
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iomanip>
@@ -562,7 +562,7 @@ true 3555 0.333252
 
 #### Encode Typed Array tags - multi-dimensional column major tag 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 

@@ -1,6 +1,6 @@
 ### jsoncons::jsonschema::schema_error
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 ```
 

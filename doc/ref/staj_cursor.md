@@ -1,6 +1,6 @@
 ### jsoncons::staj_cursor
 
-```c++
+```cpp
 #include <jsoncons/staj_cursor.hpp>
 
 typedef basic_staj_cursor<char> staj_cursor

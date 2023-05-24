@@ -1,6 +1,6 @@
 ### jsoncons::jsonpath::flatten
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/filter.hpp>
 
 template<class Json>
@@ -23,7 +23,7 @@ The values are primitive (string, number, boolean, or null), empty object (`{}`)
 
 #### Flatten and unflatten
 
-```c++
+```cpp
 #include <iostream>
 #include <cassert>
 #include <jsoncons/json.hpp>

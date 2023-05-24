@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::basic_msgpack_encoder
 
-```c++
+```cpp
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 
 template<

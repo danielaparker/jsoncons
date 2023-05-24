@@ -4,7 +4,7 @@ The examples below illustrate the use of the [json](../ref/basic_json.md) class 
 
 ### json construction
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 // For convenience
@@ -130,7 +130,7 @@ book["ratings"]["*"] = 2;
 book["ratings"].erase("*");
 
 ```
-```c++  
+```cpp  
     // Serialize the booklist to a file
     std::ofstream os("store.json");
     os << pretty_print(booklist);
@@ -179,7 +179,7 @@ The JSON output `store.json`
 ```
 ### json query
 
-```c++
+```cpp
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
@@ -252,7 +252,7 @@ Result:
 
 ### wjson construction
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 // For convenience
@@ -377,14 +377,14 @@ book[L"ratings"][L"*"] = 2;
 book[L"ratings"].erase(L"*");
 
 ```
-```c++
+```cpp
 // Serialize the booklist to a file
 std::wofstream os("booklist2.json");
 os << pretty_print(booklist);
 ```
 ### wjson query
 
-```c++
+```cpp
 // Deserialize the booklist
 std::wifstream is("booklist2.json");
 wjson booklist;

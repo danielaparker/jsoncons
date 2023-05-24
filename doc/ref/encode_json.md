@@ -3,7 +3,7 @@
 Encode a C++ data structure to a JSON formatted string or stream. `encode_json` will work for all types that
 have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
-```c++
+```cpp
 #include <jsoncons/encode_json.hpp>
 
 template <class T, class Container>
@@ -104,7 +104,7 @@ None
 
 #### Map with string-tuple pairs
 
-```c++
+```cpp
 #include <iostream>
 #include <map>
 #include <tuple>
@@ -146,7 +146,7 @@ Output:
     
 #### Contain JSON output in an object (prettified output)
 
-```c++
+```cpp
 #include <iostream>
 #include <map>
 #include <tuple>
@@ -183,7 +183,7 @@ Output:
     
 #### Contain JSON output in an object (compressed output)
 
-```c++
+```cpp
 #include <iostream>
 #include <map>
 #include <tuple>

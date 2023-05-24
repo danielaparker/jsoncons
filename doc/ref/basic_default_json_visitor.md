@@ -1,6 +1,6 @@
 ### jsoncons::basic_default_json_visitor
 
-```c++
+```cpp
 #include <jsoncons/json_visitor.hpp>
 
 template <

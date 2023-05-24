@@ -1,6 +1,6 @@
 ### jsoncons::json_object_arg_t 
 
-```c++
+```cpp
 #include <jsoncons/tag_type.hpp>
 
 struct json_object_arg_t {explicit json_object_arg_t() = default;};

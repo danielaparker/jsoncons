@@ -1,6 +1,6 @@
 ### jsoncons::byte_string_arg
 
-```c++
+```cpp
 #include <jsoncons/tag_type.hpp>
 
 constexpr byte_string_arg_t byte_string_arg{};

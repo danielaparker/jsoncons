@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::as
 
-```c++
+```cpp
 template <class T>
 T as() const; (1)
 
@@ -26,7 +26,7 @@ If the json type is a string, converts string according to its `semantic_tag`, o
 
 #### Accessing integral, floating point, and boolean values
 
-```c++
+```cpp
 json j = json::parse(R"(
 {
     "k1" : 2147483647,
@@ -64,7 +64,7 @@ Output:
 ```
 
 #### Accessing a `json` array value as a `std::vector`
-```c++
+```cpp
 std::string s = "{\"my-array\" : [1,2,3,4]}";
 json val = json::parse(s);
 std::vector<int> v = val["my-array"].as<std::vector<int>>();
@@ -86,7 +86,7 @@ Output:
 #### Use string_view to access the actual memory that's being used to hold a string
 
 You can use `j.as<jsoncons::string_view>()`, e.g.
-```c++
+```cpp
 json j = json::parse("\"Hello World\"");
 auto sv = j.as<jsoncons::string_view>();
 ```
@@ -95,7 +95,7 @@ auto sv = j.as<jsoncons::string_view>();
 If your compiler supports `std::string_view`, you can also use `j.as<std::string_view>()`.
 
 #### Accessing a `json` byte string as a byte string
-```c++
+```cpp
 std::vector<uint8_t> u = {'H','e','l','l','o'};
 
 json j(byte_string_arg, u, semantic_tag::base64);

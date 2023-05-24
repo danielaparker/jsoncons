@@ -1,6 +1,6 @@
 ### jsoncons::csv::quote_style_kind
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv_options.hpp>
 
 enum class quote_style_kind

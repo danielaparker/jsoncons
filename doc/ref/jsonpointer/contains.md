@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::contains
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
@@ -33,7 +33,7 @@ Returns `true` if the json doc contains the given JSON Pointer, otherwise `false
 
 #### Examples from [RFC6901](https://tools.ietf.org/html/rfc6901)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

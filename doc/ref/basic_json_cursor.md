@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_cursor
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 
 template<
@@ -148,7 +148,7 @@ Input JSON file `book_catalog.json`:
 
 #### Read JSON parse events
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 #include <string>
 #include <fstream>
@@ -244,7 +244,7 @@ end_array
 
 #### Filter the event stream
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 #include <string>
 #include <fstream>
@@ -295,7 +295,7 @@ Graham Greene
 
 #### Pull nested objects into a basic_json
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json.hpp> // json_decoder and json
 #include <fstream>

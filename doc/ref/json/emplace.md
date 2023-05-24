@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::emplace
 
-```c++
+```cpp
 template <class... Args>
 array_iterator emplace(Args&&... args);
 
@@ -28,7 +28,7 @@ Throws `std::domain_error` if not a json array.
 
 ### Example
 
-```c++
+```cpp
 json a(json_array_arg);
 a.emplace_back("Toronto");
 a.emplace_back("Vancouver");

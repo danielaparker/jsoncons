@@ -12,33 +12,6 @@
 
 using namespace jsoncons;
 
-void comment_example()
-{
-    std::string s = R"(
-    {
-        // Single line comments
-        /*
-            Multi line comments 
-        */
-    }
-    )";
-
-    // Default
-    {
-        json j = json::parse(s);
-        std::cout << "(1) " << j << std::endl;
-    }
-    // Strict
-    try
-    {
-        json j = json::parse(s, strict_json_parsing());
-    }
-    catch (const ser_error& e)
-    {
-        std::cout << "(2) " << e.what() << std::endl;
-    }
-}
-
 void first_example_a()
 {
     std::string path = "./input/books.json"; 
@@ -228,21 +201,6 @@ void object_range_based_for_loop()
     }
 }
 
-void parse_error_example()
-{
-    std::string s = "[1,2,3,4,]";
-    try 
-    {
-        jsoncons::json val = jsoncons::json::parse(s);
-    } 
-    catch(const jsoncons::ser_error& e) 
-    {
-        std::cout << "Caught ser_error with category " << e.code().category().name() 
-                  << ", code " << e.code().value() 
-                  << " and message " << e.what() << std::endl;
-    }
-}
-
 void validation_example()
 {
     std::string s = R"(
@@ -263,21 +221,6 @@ void validation_example()
                   << " on line " << reader.line()
                   << " and column " << reader.column()
                   << std::endl;
-    }
-}
-
-void max_nesting_path_example()
-{
-    std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
-    try
-    {
-        json_options options;
-        options.max_nesting_depth(20);
-        json::parse(s, options);
-    }
-    catch (const ser_error& e)
-    {
-         std::cout << e.what() << std::endl;
     }
 }
 
@@ -326,8 +269,6 @@ int main()
     {
         std::cout << "jsoncons version: " << version() << std::endl;
 
-        object_range_based_for_loop();
-
         first_example_a();
         first_example_b();
         first_example_c();
@@ -335,13 +276,9 @@ int main()
 
         second_example_a();
 
-        parse_error_example();
+        object_range_based_for_loop();
 
         validation_example();
-
-        comment_example();
-
-        max_nesting_path_example();
 
         get_example();
     }

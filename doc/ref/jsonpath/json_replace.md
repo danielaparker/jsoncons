@@ -1,9 +1,9 @@
 ### jsoncons::jsonpath::json_replace
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 ```
-```c++
+```cpp
 template<class Json, class T>
 void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value, 
     result_options options = result_options::nodups);                                            (until 0.164.0)
@@ -14,7 +14,7 @@ void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value,
     const custom_functions<Json>& funcs = custom_functions<Json>());                             (since 0.164.0)
 ```
 
-```c++
+```cpp
 template<class Json, class BinaryCallback>
 void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
     result_options options = result_options::nodups);                                            (until 0.164.0)
@@ -24,7 +24,7 @@ void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback
     result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());                              (since 0.164.0)
 ```
-```c++
+```cpp
 template<class Json, class T, class Alloc>
 void json_replace(std::allocator_arg_t, const Alloc& alloc, 
     Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.170.0)
@@ -32,7 +32,7 @@ void json_replace(std::allocator_arg_t, const Alloc& alloc,
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
-```c++
+```cpp
 template<class Json, class BinaryCallback>                                                   
 void json_replace(std::allocator_arg_t, const Alloc& alloc, 
     Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.170.0)
@@ -122,7 +122,7 @@ The examples use the sample data file `books.json`,
 
 #### Change the price of A Wild Sheep Chase
 
-```c++
+```cpp
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
@@ -172,7 +172,7 @@ Output:
 
 #### Make a discount on all books
 
-```c++
+```cpp
 #include <cmath>
 #include <fstream>
 #include <jsoncons/json.hpp>
@@ -229,7 +229,7 @@ Output:
 
 #### Add a missing price
 
-```c++
+```cpp
 #include <cmath>
 #include <fstream>
 #include <jsoncons/json.hpp>

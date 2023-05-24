@@ -116,7 +116,7 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 
 For the examples below you need to include some header files and initialize a buffer of CBOR data:
 
-```c++
+```cpp
 #include <iomanip>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -163,7 +163,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the CBOR data into a json value
@@ -215,7 +215,7 @@ Output:
 
 #### As a strongly typed C++ data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
@@ -249,7 +249,7 @@ that the variant like data structure preserved with a tag, so serializing back t
 
 #### With cursor-level access
 
-```c++
+```cpp
 int main()
 {
     cbor::cbor_bytes_cursor cursor(data);
@@ -322,7 +322,7 @@ end_array (n/a)
 
 You can apply a filter to a cursor using the pipe syntax, for example,
 
-```c++
+```cpp
 int main()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
@@ -359,7 +359,7 @@ string_value: 1.23456789012345678901234567890 (bigdec)
 
 ### Encode and decode of a large typed array
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iomanip>
 #include <cassert>
@@ -405,7 +405,7 @@ d8,55,5a,03,93,87,00,00,00,00,00,00,00,80,3f,00,00,00,40
 
 ### CBOR and basic_json
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -484,7 +484,7 @@ Marilyn C, 0.9
 
 ### Byte string with unknown CBOR tag (unknown to jsoncons)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -537,7 +537,7 @@ d9,01,12,46,66,6f,6f,62,61,72
 <div id="A5"/> 
 
 ### Query CBOR with JSONPath
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

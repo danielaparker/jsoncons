@@ -3,7 +3,7 @@
 Adds a value to an object or inserts it into an array at the target location.
 If a value already exists at the target location, that value is replaced.
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
@@ -95,7 +95,7 @@ None
 
 #### Insert or assign an object member at a location_str that already exists
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -127,7 +127,7 @@ Output:
 
 #### Add a value to a location_str after creating objects when missing object keys
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

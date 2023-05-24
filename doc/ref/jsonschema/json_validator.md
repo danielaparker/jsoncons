@@ -1,6 +1,6 @@
 ### jsoncons::jsonschema::json_validator
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
 template <class Json>

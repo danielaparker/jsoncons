@@ -1,6 +1,6 @@
 ### jsoncons::wojson
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 typedef basic_json<wchar_t,

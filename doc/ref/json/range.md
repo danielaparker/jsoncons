@@ -1,6 +1,6 @@
 ### jsoncons::range
 
-```c++
+```cpp
 #include <jsoncons/basic_json.hpp>
 
 template <class IteratorT, class ConstIteratorT>

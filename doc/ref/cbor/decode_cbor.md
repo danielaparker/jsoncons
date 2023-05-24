@@ -1,6 +1,6 @@
 ### jsoncons::cbor::decode_cbor
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
 ```
 
@@ -8,7 +8,7 @@
 
 Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
-```c++
+```cpp
 template<class T>
 T decode_cbor(const std::vector<uint8_t>& source,
               const cbor_decode_options& options = cbor_decode_options()); (1) (until 0.152.0)
@@ -49,7 +49,7 @@ Throws a [ser_error](../ser_error.md) if parsing fails, and a [conv_error](conv_
 
 #### Round trip (JSON to CBOR bytes back to JSON)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -95,7 +95,7 @@ Output:
 
 #### Round trip (JSON to CBOR file back to JSON)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -147,7 +147,7 @@ Output:
 
 #### Decode CBOR byte string
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -177,7 +177,7 @@ Output:
 
 #### Decode CBOR byte string with base64 encoding hint
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -211,7 +211,7 @@ Output:
 This example taken from [CBOR stringref extension](http://cbor.schmorp.de/stringref) shows three stringref-namespace tags, 
 with two nested inside another:
 
-```c++
+```cpp
 int main()
 {
     std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
@@ -259,7 +259,7 @@ Output:
 jsoncons implements [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 Tags 64-82 and Tags 84-86 are automatically decoded when detected.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iomanip>
@@ -323,7 +323,7 @@ d8 56 50 ff ff ff ff ff ff ef ff ff ff ff ff ff ff ef 7f
 
 jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 

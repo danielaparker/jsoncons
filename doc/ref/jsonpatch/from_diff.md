@@ -1,6 +1,6 @@
 ### jsoncons::jsonpatch::from_diff
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
@@ -17,7 +17,7 @@ Returns a JSON Patch.
 
 #### Create a JSON Patch
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 

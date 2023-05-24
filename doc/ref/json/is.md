@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::is
 
-```c++
+```cpp
 template <class T, class... Args>
 bool is(Args&&... args) const noexcept; (1)
 
@@ -65,7 +65,7 @@ otherwise `false`.
 
 ### Examples
 
-```c++
+```cpp
 json j = json::parse(R"(
 {
     "k1" : 2147483647,

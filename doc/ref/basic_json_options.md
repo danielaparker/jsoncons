@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_options
 
-```c++
+```cpp
 #include <jsoncons/json_options.hpp>
 
 template< 
@@ -173,7 +173,7 @@ For an array whose parent is an array, set whether that array is split on a new 
 ### Examples
 
 #### Default NaN and inf replacement
-```c++
+```cpp
 json obj;
 obj["field1"] = std::sqrt(-1.0);
 obj["field2"] = 1.79e308*1000;
@@ -186,7 +186,7 @@ Output:
 ```
 #### User specified `Nan` and `Inf` replacement
 
-```c++
+```cpp
 json obj;
 obj["field1"] = std::sqrt(-1.0);
 obj["field2"] = 1.79e308*1000;
@@ -216,7 +216,7 @@ keep the number as a string with semantic tagging `bigdec`,
 using the `lossless_number` option. You can then put it into a `float`, 
 `double`, a boost multiprecision number, or whatever type you want. 
 
-```c++
+```cpp
 int main()
 {
     std::string s = R"(
@@ -258,7 +258,7 @@ Output:
 
 #### Object-array block formatting
 
-```c++
+```cpp
 json j;
 
 j["verts"] = json(json_array_arg, {1, 2, 3});
@@ -330,7 +330,7 @@ Multi line
 
 #### Array-array block formatting
 
-```c++
+```cpp
     json j;
     j["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
     j["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),

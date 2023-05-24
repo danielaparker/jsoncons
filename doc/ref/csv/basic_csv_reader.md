@@ -1,6 +1,6 @@
 ### jsoncons::csv::basic_csv_reader
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 template<
@@ -110,7 +110,7 @@ Note
 - The third record has a field value that contains an embedded comma, so it must be quoted.
 
 #### Code
-```c++
+```cpp
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
@@ -149,7 +149,7 @@ Note
 - The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
 
 #### Code
-```c++
+```cpp
 std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
@@ -207,7 +207,7 @@ Note
 - The first record contains a header line, but we're going to ignore that and use our own names for the fields.
 
 #### Code
-```c++
+```cpp
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
@@ -260,7 +260,7 @@ Date,1Y,2Y,3Y,5Y
 
 #### Code
 
-```c++
+```cpp
 json_decoder<ojson> decoder;
 csv_options options;
 options.assume_header(true)
@@ -336,7 +336,7 @@ std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
 
 #### Convert CSV to json when last column repeats
 
-```c++
+```cpp
 int main()
 {
     const std::string bond_yields = R"(Date,Yield
@@ -398,7 +398,7 @@ Output:
 
 #### Convert CSV to json when last two columns repeat
 
-```c++
+```cpp
 const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
 38719,2-Jan-2006,40179,1-Jan-2010,38719,2-Jan-2006,38719,2-Jan-2006,39448,1-Jan-2008
 38733,16-Jan-2006,40270,2-Apr-2010,38733,16-Jan-2006,38733,16-Jan-2006,39468,21-Jan-2008

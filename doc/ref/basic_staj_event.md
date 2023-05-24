@@ -1,6 +1,6 @@
 ### jsoncons::basic_staj_event
 
-```c++
+```cpp
 #include <jsoncons/staj_cursor.hpp>
 
 template<class CharT>

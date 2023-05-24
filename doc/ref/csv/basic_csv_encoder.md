@@ -1,6 +1,6 @@
 ### jsoncons::csv::basic_csv_encoder
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
 template<
@@ -323,7 +323,7 @@ Note
 - The third array element has a value that contains a comma, in the CSV file this value will be quoted.
 
 #### Serializing the comma delimited file with csv_stream_encoder
-```c++
+```cpp
 std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
 
@@ -385,7 +385,7 @@ Note
 - The fourth object has a `note` member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.
 
 #### Dump json value to a tab delimited file
-```c++
+```cpp
 std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
 
@@ -413,7 +413,7 @@ Dependable, trustworthy 75,000.00
 
 #### Dump json value to csv file
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 

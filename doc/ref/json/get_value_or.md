@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::get_value_or
 
-```c++
+```cpp
 template <class T,class U>
 T get_value_or(const string_view_type& name, U&& default_value) const; 
 ```
@@ -19,7 +19,7 @@ Throws `std::domain_error` if not an object or null value.
 
 #### Return a value if available, a default value if not 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 int main()

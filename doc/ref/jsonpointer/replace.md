@@ -2,7 +2,7 @@
 
 Replace a `json` element or member.
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
@@ -88,7 +88,7 @@ None
 
 #### Replace an object value
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -126,7 +126,7 @@ Output:
 
 #### Replace an array value
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -160,7 +160,7 @@ Output:
 
 #### Replace a value at a location after creating objects when missing object keys
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

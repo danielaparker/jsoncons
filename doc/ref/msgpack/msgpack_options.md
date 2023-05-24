@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::msgpack_options
 
-```c++
+```cpp
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 
 class msgpack_options;

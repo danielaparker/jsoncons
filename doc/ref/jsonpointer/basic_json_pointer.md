@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::basic_json_pointer
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template <class CharT>
@@ -117,7 +117,7 @@ Performs stream output
 
 #### Iterate over the tokens in a JSON Pointer
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -152,7 +152,7 @@ author
 
 #### Append tokens to a JSON Pointer
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -189,7 +189,7 @@ m~n
 
 #### Concatentate two JSONPointers
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

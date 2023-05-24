@@ -1,5 +1,5 @@
 ### jsoncons::basic_json::emplace_back
-```c++
+```cpp
 template<class... Args>
 json& emplace_back(Args&&... args);
 ```
@@ -19,7 +19,7 @@ Throws `std::domain_error` if not a json array.
 
 ### Example
 
-```c++
+```cpp
 json arr(json_array_arg);
 arr.emplace_back(10);
 arr.emplace_back(20);

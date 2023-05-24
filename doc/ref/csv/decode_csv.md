@@ -2,7 +2,7 @@
 
 Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ data structure.
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
 template <class T,class Source>
@@ -51,7 +51,7 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 "John Smith",FALSE,NULL,22313-1450,0.15,300.70
 ```
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <fstream>
@@ -139,7 +139,7 @@ Output:
 
 #### Decode a CSV string without type inference
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 
@@ -180,7 +180,7 @@ Output:
 
 #### Decode a CSV string with specified types
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 
@@ -260,7 +260,7 @@ Output:
 ```
 #### Decode a CSV string with multi-valued fields separated by subfield delimiters
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 
@@ -347,7 +347,7 @@ Output:
 
 #### Convert a CSV source to a C++ data structure that satisfies [json_type_traits](../json_type_traits.md) requirements, and back
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <iostream>

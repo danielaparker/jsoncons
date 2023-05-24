@@ -36,7 +36,7 @@ MessagePack data item                              |ext type | jsoncons data ite
 
 #### ext format code example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <cassert>
@@ -110,7 +110,7 @@ Input JSON file `book.json`
     }
 ]
 ```
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 

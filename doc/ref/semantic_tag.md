@@ -1,6 +1,6 @@
 ### jsoncons::semantic_tag
 
-```c++
+```cpp
 #include <jsoncons/tag_type.hpp>
 
 enum class semantic_tag : uint8_t 

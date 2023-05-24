@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::push_back
 
-```c++
+```cpp
 template <class T>
 void push_back(T&& val)
 ```
@@ -10,7 +10,7 @@ Throws `std::domain_error` if not an array.
 ### Examples
 
 #### Creating an array of elements 
-```c++
+```cpp
 json cities(json_array_arg);       // an empty array
 std::cout << cities << std::endl;  // output is "[]"
 
@@ -27,7 +27,7 @@ Output:
 ["Montreal","Toronto","Vancouver"]
 ```
 #### Creating an array of elements with reserved storage 
-```c++
+```cpp
 json cities(json_array_arg);  
 cities.reserve(10);  // storage is reserved
 std::cout << "capacity=" << cities.capacity() 

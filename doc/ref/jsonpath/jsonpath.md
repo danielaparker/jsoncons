@@ -285,7 +285,7 @@ Output:
 
 #### Custom functions
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 

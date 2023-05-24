@@ -1,6 +1,6 @@
 ### JSON Parsing Error Handling
 
-```c++
+```cpp
 #include <jsoncons/json_parser.hpp>     // (until 0.171.0)
 #include <jsoncons/json_options.hpp>    // (since 0.171.0)
 

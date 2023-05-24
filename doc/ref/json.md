@@ -1,6 +1,6 @@
 ### jsoncons::json
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 typedef basic_json<char,
@@ -23,7 +23,7 @@ If you want to preserve the original insertion order, use [ojson](ojson.md) inst
 ### Examples
   
 #### Accessors and defaults
-```c++
+```cpp
 json j;
 
 j["field1"] = 1;
@@ -41,14 +41,14 @@ std::cout << "x3=" << x3 << '\n';
 std::cout << "x4=" << x4 << '\n';
 ```
 Output:
-```c++
+```cpp
 x1=1
 x2=20
 x3=Toronto
 x4=San Francisco
 ```
 #### Nulls
-```c++
+```cpp
 json j;
 j["field1"] = json::null();
 std::cout << j << std::endl;
@@ -58,7 +58,7 @@ Output:
 {"field1":null}
 ```
 #### Constructing json structures
-```c++
+```cpp
 json doc;
 
 doc["persons"] = json(json_array_arg);
@@ -79,7 +79,7 @@ doc["persons"].push_back(std::move(person));
 std::cout << pretty_print(doc) << std::endl;
 ```
 Output:
-```c++
+```cpp
 {
     "persons":
     [

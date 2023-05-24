@@ -60,7 +60,7 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 
 #### Select author from second book
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -118,7 +118,7 @@ Output:
 
 #### Using jsonpointer::json_pointer with jsonpointer::get 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -167,7 +167,7 @@ m~n
 
 #### Add a value to a location after creating objects when missing object keys (since 0.162.0)
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

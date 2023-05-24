@@ -17,7 +17,7 @@ The mergepatch extension implements the IETF standard [JSON Merge Patch](https:/
 
 This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#section-3).
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 

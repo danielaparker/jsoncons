@@ -75,7 +75,7 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 
 #### json value to CBOR item
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -148,7 +148,7 @@ Output
 
 #### CBOR item to json value
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 

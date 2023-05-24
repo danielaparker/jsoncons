@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::make_array
 
-```c++
+```cpp
 template <class T>
 static basic_json make_array(size_ n, const T& val)
 
@@ -23,7 +23,7 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 ### Examples
 
 #### Make an array of size 10 initialized with zeros
-```c++
+```cpp
 json a = json::make_array(10,0); // angle brackets can be omitted when N = 1
 a[1] = 1;
 a[2] = 2;
@@ -34,7 +34,7 @@ Output:
 [0,1,2,0,0,0,0,0,0,0]
 ```
 #### Make a two dimensional array of size 3x4 initialized with zeros
-```c++
+```cpp
 json a = json::make_array<2>(3,4,0);
 a[0][0] = "Tenor";
 a[0][1] = "ATM vol";
@@ -60,7 +60,7 @@ Output:
 ]
 ```
 #### Make a three dimensional array of size 4x3x2 initialized with zeros
-```c++
+```cpp
 json a = json::make_array<3>(4,3,2,0);
 a[0][2][0] = 2;
 a[0][2][1] = 3;

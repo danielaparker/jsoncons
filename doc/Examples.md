@@ -5,12 +5,13 @@
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
 [Read JSON Lines](#A10)  
-[Parse JSON from an iterator range](#A10)  
+[Parse JSON from an iterator range](#A11)  
 [Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
+[Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)](#A12)  
 [Decode a JSON text using stateful result and work allocators](#A9)  
 
 ### Encode
@@ -103,7 +104,7 @@ json j = json::parse(s);
 
 or
 
-```c++
+```cpp
 using namespace jsoncons::literals;
 
 json j = R"(
@@ -143,7 +144,7 @@ Data:
 ["Deloise", "2012A", 19, true] 
 ```
 
-```c++
+```cpp
 std::ifstream is("path_to_data");
 json_decoder<json> decoder;
 json_stream_reader reader(is, decoder);
@@ -168,11 +169,11 @@ Ouput:
 
 See [JSON Lines](https://jsonlines.org/). 
 
-<div id="A10"/> 
+<div id="A11"/> 
 
 #### Parse JSON from an iterator range
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 class MyIterator
@@ -250,7 +251,7 @@ keep the number as a string with semantic tagging `bigdec`,
 using the `lossless_number` option. You can then put it into a `float`, 
 `double`, a boost multiprecision number, or whatever other type you want. 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 int main()
@@ -295,7 +296,7 @@ Output:
 <div id="A3"/> 
 
 #### Validate JSON without incurring parse exceptions
-```c++
+```cpp
 std::string s = R"(
 {
     "StartDate" : "2017-03-01",
@@ -333,7 +334,7 @@ Expected name separator ':' on line 4 and column 20
 
 jsoncons, by default, accepts and ignores C-style comments
 
-```c++
+```cpp
 std::string s = R"(
 {
     // Single line comments
@@ -350,7 +351,13 @@ std::cout << "(1) " << j << std::endl;
 // Strict
 try
 {
-    json j = json::parse(s, strict_json_parsing());
+    // until 0.170.0
+    auto j = jsoncons::json::parse(s, jsoncons::strict_json_parsing());
+
+    // since 0.171.0
+    jsoncons::json_options options;
+    options.err_handler(jsoncons::strict_json_parsing());
+    auto j = jsoncons::json::parse(s, options);
 }
 catch (const ser_error& e)
 {
@@ -368,7 +375,7 @@ Output:
 #### Set a maximum nesting depth
 
 Like this,
-```c++
+```cpp
 std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
 try
 {
@@ -392,7 +399,7 @@ Maximum JSON depth exceeded at line 1 and column 21
 
 Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
 
-```c++
+```cpp
 ojson j = ojson::parse(R"(
 {
     "street_number" : "100",
@@ -444,13 +451,15 @@ Output:
 
 ### Decode a JSON text using stateful result and work allocators
 
-```c++
+```cpp
 // Given allocator my_alloc with a single-argument constructor my_alloc(int),
 // use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
 // working memory used by json_decoder, and my_alloc(3) to allocate
 // working memory used by basic_json_reader. 
 
-using my_json = basic_json<char,sorted_policy,my_alloc>;
+using my_json = basic_json<char,sorted_policy,my_alloc>; // until 0.171.0
+
+using my_json = basic_json<char,sorted_policy,std::scoped_allocator_adaptor<my_alloc>>; // since 0.171.0
 
 std::ifstream is("book_catalog.json");
 json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
@@ -460,6 +469,30 @@ reader.read();
 
 my_json j = decoder.get_result();
 std::cout << pretty_print(j) << "\n";
+```
+
+<div id="A12"/> 
+
+### Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)
+
+```cpp
+using pmr_json = jsoncons::pmr::json;
+
+char buffer[1024] = {}; // a small buffer on the stack
+std::pmr::monotonic_buffer_resource pool{std::data(buffer), std::size(buffer)};
+std::pmr::polymorphic_allocator<char> alloc(&pool);
+
+std::string json_text = R"(
+{
+    "street_number" : "100",
+    "street_name" : "Queen St W",
+    "city" : "Toronto",
+    "country" : "Canada"
+}
+)";
+
+auto doc = pmr_json::parse(json_text, json_options{}, alloc);
+std::cout << pretty_print(doc) << "\n\n";
 ```
 
 ### Encode
@@ -517,7 +550,7 @@ std::cout << pretty_print(j, options) << std::endl; // pretty print
 
 Set the serializing options for `nan` and `inf` to distinct string values.
 
-```c++
+```cpp
 json j;
 j["field1"] = std::sqrt(-1.0);
 j["field2"] = 1.79e308 * 1000;
@@ -568,7 +601,7 @@ Output:
 
 #### Write some JSON (push)
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <fstream>
@@ -640,7 +673,7 @@ A typical pull parsing application will repeatedly process the `current()`
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-```c++
+```cpp
 #include <jsoncons/json_cursor.hpp>
 #include <fstream>
 
@@ -726,7 +759,7 @@ end_array
 
 You can apply a filter to a cursor using the pipe syntax (e.g., `cursor | filter1 | filter2 | ...`)
 
-```c++
+```cpp
 
 #include <jsoncons/json_cursor.hpp>
 #include <fstream>
@@ -788,7 +821,7 @@ the events from `begin_object` to `end_object`,
 and when positioned on a `begin_array` event, a complete array
 representing the events from `begin_array` ro `end_array`.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp> // json_decoder and json
 #include <fstream>
 
@@ -855,7 +888,7 @@ See [basic_json_cursor](ref/basic_json_cursor.md)
 
 #### Iterate over basic_json items
 
-```c++
+```cpp
 #include <jsoncons/json.hpp> 
 #include <fstream>
 
@@ -892,7 +925,7 @@ See [staj_array_iterator](ref/staj_array_iterator.md)
 
 #### Iterate over strongly typed items
 
-```c++
+```cpp
 #include <jsoncons/json.hpp> 
 #include <fstream>
 
@@ -938,7 +971,7 @@ See [staj_array_iterator](ref/staj_array_iterator.md)
 
 #### Serialize with the C++ member names of the class
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace ns {
@@ -1185,7 +1218,7 @@ The output for (2), (3) and (4) is the same.
 
 #### Serialize with provided names using the `_NAME_` macros
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace ns {
@@ -1404,7 +1437,7 @@ does not require all member names to be present in the JSON data, while `JSONCON
 More generaly, the qualifier _N_ in the macro name indicates that only a specified number of members
 must be present in the JSON.
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <vector>
@@ -1486,7 +1519,7 @@ and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <vector>
@@ -1537,13 +1570,13 @@ namespace jsoncons {
 To save typing and enhance readability, the jsoncons library defines macros, 
 so you could also write
 
-```c++
+```cpp
 JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 ```
 
 which expands to the code above.
 
-```c++
+```cpp
 using namespace jsoncons; // for convenience
 
 int main()
@@ -1615,7 +1648,7 @@ Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated t
 members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
 traits `to_json` function will exclude altogether empty values for `std::optional`.
 
-```c++
+```cpp
 #include <cassert>
 #include <jsoncons/json.hpp>
 
@@ -1718,7 +1751,7 @@ The convenience macros whose names include the qualifier `_N_` do not require al
 For these, the generated traits `to_json` function will exclude altogether empty values 
 for `std::shared_ptr` and `std::unique_ptr`.
 
-```c++
+```cpp
 namespace ns {
 
     struct smart_pointer_test
@@ -1783,7 +1816,7 @@ Output:
 
 #### Serialize a templated class with the `_TPL_` macros
 
-```c++
+```cpp
 #include <cassert>
 #include <jsoncons/json.hpp>
 
@@ -1840,7 +1873,7 @@ the enum values, and the macro `JSONCONS_ALL_CTOR_GETTER_TRAITS`
 generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-```c++
+```cpp
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -1966,7 +1999,7 @@ on the presence of mandatory members, in particular, to the `firstName`, `lastNa
 `HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` members of a `CommissionedEmployee`.
 Non-mandatory members are not considered for the purpose of type selection.
 
-```c++
+```cpp
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -2149,7 +2182,7 @@ macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
-```c++
+```cpp
 namespace ns {
 
 class Foo
@@ -2217,7 +2250,7 @@ A baz
 
 #### Decode to a polymorphic type based on a type marker (since 0.157.0)
 
-```c++
+```cpp
 namespace ns {
 
     class Shape
@@ -2402,7 +2435,7 @@ Compare with the very similar example [decode to a std::variant based on a type 
 
 This example assumes C++17 language support and jsoncons v0.154.0 or later.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace ns {
@@ -2579,7 +2612,7 @@ function, checking each type in the variant from left to right, and stopping whe
 
 Now consider 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace ns {
@@ -2650,7 +2683,7 @@ it is stored in the variant as a `std::string`.
 
 But if we switch the order of `ns::Color` and `std::string` in the variant definition, viz.
 
-```c++
+```cpp
  using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
 ```
 strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to be `ns::Color`, and the others `std::string`.  
@@ -2686,7 +2719,7 @@ But here we add a wrinkle by omitting the `type()` function in the `Rectangle`, 
 `Circle` classes. More generally, we show how to augment the JSON output with name/value pairs 
 that are not present in the class definitions, and to perform type selection with them.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace ns {
@@ -2858,7 +2891,7 @@ circle area: 3.1415927
 
 Note the mapping to the "type" member, in particular, for the rectangle,
 
-```c++
+```cpp
 (height,"type",JSONCONS_RDONLY,
  [](const std::string& type) noexcept{return type == "rectangle";},
  ns::rectangle_marker),
@@ -2945,7 +2978,7 @@ Output:
 
 Start with an empty json object and insert some name-value pairs,
 
-```c++
+```cpp
 json image_sizing;
 image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
 image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
@@ -2956,7 +2989,7 @@ image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 
 or use an object initializer-list,
 
-```c++
+```cpp
 json file_settings( json_object_arg,{
         {"Image Format", "JPEG"},
         {"Color Space", "sRGB"},
@@ -2972,7 +3005,7 @@ json file_settings( json_object_arg,{
 
 Suppose you have
 
-```c++
+```cpp
 json j; // empty object
 
 std::vector<std::string> keys = {"foo","bar","baz"}; // vector of keys
@@ -2984,7 +3017,7 @@ and wish to construct:
 
 You can accomplish this in a loop as follows:
 
-```c++
+```cpp
 json* ptr = &j;
 
 for (const auto& item : keys)
@@ -2997,7 +3030,7 @@ for (const auto& item : keys)
 
 Since 0.162.0, you can also accomplish this with [jsonpointer::add](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonpointer/add.md):
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -3026,7 +3059,7 @@ int main()
 
 #### Construct a json array
 
-```c++
+```cpp
 json color_spaces(json_array_arg); // an empty array
 color_spaces.push_back("sRGB");
 color_spaces.push_back("AdobeRGB");
@@ -3034,7 +3067,7 @@ color_spaces.push_back("ProPhoto RGB");
 ```
 
 or use an array initializer-list,
-```c++
+```cpp
 json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
@@ -3042,7 +3075,7 @@ json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 
 #### Construct a json byte string
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace jc=jsoncons;
@@ -3079,7 +3112,7 @@ Output:
 
 Construct a 3-dimensional 4 x 3 x 2 json array with all elements initialized to 0.0:
 
-```c++
+```cpp
 json j = json::make_array<3>(4, 3, 2, 0.0);
 double val = 1.0;
 for (std::size_t i = 0; i < a.size(); ++i)
@@ -3124,7 +3157,7 @@ Output:
 
 #### Construct a json array that contains non-owning references to other json values (since 0.156.0)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <iostream>
 
@@ -3209,7 +3242,7 @@ json type: object, storage kind: object
 #### Use string_view to access the actual memory that's being used to hold a string
 
 You can use `j.as<jsoncons::string_view>()`, e.g.
-```c++
+```cpp
 json j = json::parse("\"Hello World\"");
 auto sv = j.as<jsoncons::string_view>();
 ```
@@ -3221,7 +3254,7 @@ If your compiler supports `std::string_view`, you can also use `j.as<std::string
 
 #### Given a string in a json object that represents a decimal number, assign it to a double
 
-```c++
+```cpp
 json j(json_objectarg, {
     {"price", "25.17"}
 });
@@ -3236,7 +3269,7 @@ double price = j["price"].as<double>();
 If an integer exceeds the range of an `int64_t` or `uint64_t`, jsoncons parses it as a string 
 with semantic tagging `bigint`.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <iostream>
 #include <iomanip>
@@ -3281,7 +3314,7 @@ Output:
 
 #### Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
  
-```c++
+```cpp
 json j(json_object_arg, {{"price", "25.17"}});
 
 double price = j.get_value_or<double>("price", 25.00); // returns 25.17
@@ -3293,7 +3326,7 @@ double sale_price = j.get_value_or<double>("sale_price", 22.0); // returns 22.0
  
 #### Retrieve a value in a hierarchy of JSON objects
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
@@ -3342,7 +3375,7 @@ int main()
  
 #### Retrieve a json value as a byte string
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 namespace jc=jsoncons;
@@ -3399,7 +3432,7 @@ Output:
 
 #### Iterate over a json array
 
-```c++
+```cpp
 json j(json_array_arg, {1,2,3,4});
 
 for (auto val : j.array_range())
@@ -3412,7 +3445,7 @@ for (auto val : j.array_range())
 
 #### Iterate over a json object
 
-```c++
+```cpp
 json j(json_object_arg, {
     {"author", "Haruki Murakami"},
     {"title", "Kafka on the Shore"},
@@ -3432,7 +3465,7 @@ for (const auto& member : j.object_range())
 
 #### Insert a new value in an array at a specific position
 
-```c++
+```cpp
 json cities(json_array_arg); // an empty array
 cities.push_back("Toronto");  
 cities.push_back("Vancouver");
@@ -3459,7 +3492,7 @@ into a json object, or assigns them if they already exist.
 The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
 not a deep merge of nested objects.
 
-```c++
+```cpp
 json another = json::parse(R"(
 {
     "a" : "2",
@@ -3490,7 +3523,7 @@ Output:
 
 #### Erase an object with a specified key from an array
 
-```c++
+```cpp
 int main()
 {
     std::string input = R"(
@@ -3561,7 +3594,7 @@ Output:
 
 #### Iterating an array and erasing elements (since 0.168.6)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using jsoncons::json;
@@ -3598,7 +3631,7 @@ Output:
 
 #### Iterating an object and erasing members (since 0.168.6)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using jsoncons::json;
@@ -3639,7 +3672,7 @@ Output:
 
 You can rename object members with the built in filter [rename_object_key_filter](ref/rename_object_key_filter.md)
 
-```c++
+```cpp
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -3683,7 +3716,7 @@ Output:
 
 You can use [json_replace](ref/jsonpath/json_replace.md) in the `jsonpath` extension
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
@@ -3763,7 +3796,7 @@ Suppose you have a JSON text, and need to replace one or more strings
 found at a relative location path,  
 but are not allowed to modify anything else in the original text.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
@@ -3885,7 +3918,7 @@ Output:
 
 #### Flatten a json object with numberish keys to JSON Pointer/value pairs
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -3965,7 +3998,7 @@ array index or it could be an object key.
 
 #### Flatten a json object to JSONPath/value pairs
 
-```c++
+```cpp
 #include <iostream>
 #include <cassert>
 #include <jsoncons/json.hpp>

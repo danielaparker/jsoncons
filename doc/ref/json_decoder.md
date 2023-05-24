@@ -1,6 +1,6 @@
 ### jsoncons::json_decoder
 
-```c++
+```cpp
 #include <jsoncons/json_decoder.hpp>
 
 template <class Json,class TempAllocator>
@@ -70,7 +70,7 @@ Input JSON file `book_catalog.json`:
 ]
 ```
 
-```c++
+```cpp
 int main()
 {
     // Given allocator my_alloc with a single-argument constructor my_alloc(int),
@@ -122,7 +122,7 @@ Date,1Y,2Y,3Y,5Y
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 ```
 
-```c++
+```cpp
 int main()
 {
     // Given allocator my_alloc with a single-argument constructor my_alloc(int),

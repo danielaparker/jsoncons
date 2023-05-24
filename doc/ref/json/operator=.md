@@ -1,6 +1,6 @@
 ### `jsoncons::basic_json::operator=`
 
-```c++
+```cpp
 basic_json& operator=(const basic_json& rhs);
 basic_json& operator=(basic_json&& rhs) noexcept; (1)
 

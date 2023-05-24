@@ -10,7 +10,7 @@ It is a type error if the provided argument is not a number.
 
 ### Examples
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

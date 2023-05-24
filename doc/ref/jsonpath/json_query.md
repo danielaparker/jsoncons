@@ -1,10 +1,10 @@
 ### jsoncons::jsonpath::json_query
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 ```
 
-```c++
+```cpp
 template<class Json>
 Json json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (until 0.164.0)
@@ -16,7 +16,7 @@ Json json_query(const Json& root value,
     result_options options = result_options(),
     const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
-```c++
+```cpp
 template<class Json, class BinaryCallback>
 void json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (until 0.164.0)
@@ -31,14 +31,14 @@ void json_query(const Json& root value,
     const custom_functions<Json>& funcs = custom_functions<Json>());        
 ```
 
-```c++
+```cpp
 template<class Json>                                              
 Json json_query(std::allocator_arg_t, const Alloc& alloc, 
     const Json& root value, const Json::string_view_type& expr,        (3) (since 0.170.0)
     result_options options = result_options(),
     const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
-```c++
+```cpp
 template<class Json, class BinaryCallback>                        
 void json_query(std::allocator_arg_t, const Alloc& alloc, 
     const Json& root value, const Json::string_view_type& expr,        (4) (since 0.170.0)
@@ -132,7 +132,7 @@ The examples below use the sample data file `store.json`.
 }
 ```
 
-```c++    
+```cpp    
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
@@ -271,7 +271,7 @@ Output:
 
 #### Result options
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
@@ -391,7 +391,7 @@ The examples use the sample data file `books.json`,
 }
 ```
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
@@ -420,7 +420,7 @@ $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,
 
 #### Custom functions
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 

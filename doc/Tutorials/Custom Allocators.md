@@ -1,7 +1,7 @@
 ## Examples
 
 ### Using `json` with boost stateless `fast_pool_allocator`
-```c++
+```cpp
 #include <boost/pool/pool_alloc.hpp>
 #include "jsoncons/json.hpp"
 
@@ -15,7 +15,7 @@ j.insert_or_assign("LastName","Smith");
 
 ### Using `json` with stateful Boost.Interprocess allocators
 
-```c++
+```cpp
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>

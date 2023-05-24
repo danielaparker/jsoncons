@@ -1,6 +1,6 @@
 ### jsoncons::json_type_traits
 
-```c++
+```cpp
 #include <jsoncons/json_type_traits.hpp>
 ```
 
@@ -9,7 +9,7 @@
 `json_type_traits` defines a compile time template based interface for conversion between a `basic_json` value
 and a value of some other type. `json_type_traits` implementations must specialize this traits class:
 
-```c++
+```cpp
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {

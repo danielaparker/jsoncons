@@ -809,7 +809,7 @@ void make_expression_with_stateful_allocator()
     using my_alloc = ScopedTestAllocator<char>; // an allocator with a single-argument constructor
     using custom_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
-    std::string json_string = R"(
+    std::string json_text = R"(
 {
     "books":
     [
@@ -844,7 +844,7 @@ void make_expression_with_stateful_allocator()
 
     jsoncons::json_decoder<custom_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
 
-    jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_string, decoder, alloc);
+    jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_text, decoder, alloc);
     reader.read();
 
     custom_json doc = decoder.get_result();

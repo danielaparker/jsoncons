@@ -1,6 +1,6 @@
 ### jsoncons::csv::csv_mapping_kind
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv_options.hpp>
 
 enum class csv_mapping_kind

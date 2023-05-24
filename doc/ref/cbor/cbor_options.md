@@ -1,6 +1,6 @@
 ### jsoncons::cbor::cbor_options
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 
 class cbor_options;

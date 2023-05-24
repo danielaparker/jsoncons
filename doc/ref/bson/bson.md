@@ -50,7 +50,7 @@ BSON data item                   | jsoncons data item |jsoncons semantic_tag
 
 #### Document with string and binary
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>
@@ -125,7 +125,7 @@ Output:
 
 #### Decode a BSON 128-bit decimal floating point (since 0.165.0)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>
@@ -167,7 +167,7 @@ Output:
 
 #### Encode a BSON 128-bit decimal floating point (since 0.165.0)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>
@@ -213,7 +213,7 @@ Output:
 
 #### Regular expression data (since 0.165.0)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>
@@ -253,7 +253,7 @@ Output:
 
 #### ObjectId data (since 0.165.0)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>

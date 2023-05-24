@@ -1,6 +1,6 @@
 ### `jsoncons::basic_json::basic_json`
 
-```c++
+```cpp
 basic_json(); (1)
 
 basic_json(const basic_json& other); (2)
@@ -185,7 +185,7 @@ Helper                |Definition
 
 #### Basic examples
 
-```c++
+```cpp
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -251,7 +251,7 @@ Output:
 
 #### A json array that contains non-owning references to other json values
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <iostream>
 

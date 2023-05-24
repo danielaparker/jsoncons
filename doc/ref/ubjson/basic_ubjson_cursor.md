@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::basic_ubjson_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 
 template<

@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_reader
 
-```c++
+```cpp
 #include <jsoncons/json_reader.hpp>
 
 template<
@@ -214,7 +214,7 @@ Expected value at line 1 and column 11
 {"a":7,"b":8,"c":9}
 ```
 This is the code that reads them: 
-```c++
+```cpp
 std::ifstream is("json-texts.json");
 if (!is.is_open())
 {

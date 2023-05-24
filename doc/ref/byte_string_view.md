@@ -1,6 +1,6 @@
 ### jsoncons::byte_string_view
 
-```c++
+```cpp
 #include <jsoncons/byte_string.hpp>
 
 class byte_string_view;
@@ -78,7 +78,7 @@ Member type                         |Definition
 
 #### Display bytes
 
-```c++
+```cpp
 std::vector<uint8_t> v = {'H','e','l','l','o',' ','W','o','r','l','d'};
 
 std::cout << "(1) " << byte_string_view(v) << "\n\n";
@@ -95,7 +95,7 @@ Output:
 
 #### Display bytes from std::string
 
-```c++
+```cpp
 std::string s = {'H','e','l','l','o',' ','W','o','r','l','d'};
 
 std::cout << "(1) " << byte_string_view(s) << "\n\n";

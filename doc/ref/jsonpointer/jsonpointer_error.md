@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::jsonpointer_error
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 ```
 
@@ -28,7 +28,7 @@ Returns an error code for this exception
 
 ### Example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
