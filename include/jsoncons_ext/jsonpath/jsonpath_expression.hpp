@@ -41,7 +41,7 @@ namespace detail {
         json_text_or_function_name,
         json_text_string,
         json_value,
-        json_string,
+        json_text,
         identifier_or_function_expr,
         name_or_lbracket,
         unquoted_string,
@@ -277,7 +277,7 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case path_state::json_string:
+                    case path_state::json_text:
                     {
                         //std::cout << "literal: " << buffer << "\n";
                         push_token(resources, token_type(literal_arg, Json(buffer,semantic_tag::none,alloc_)), ec);
@@ -310,13 +310,13 @@ namespace detail {
                                 break;
                             }
                             case '\'':
-                                state_stack_.back() = path_state::json_string;
+                                state_stack_.back() = path_state::json_text;
                                 state_stack_.emplace_back(path_state::single_quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::json_string;
+                                state_stack_.back() = path_state::json_text;
                                 state_stack_.emplace_back(path_state::double_quoted_string);
                                 ++p_;
                                 ++column_;

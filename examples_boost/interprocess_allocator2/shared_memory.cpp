@@ -4,13 +4,16 @@
 #include <boost/interprocess/containers/string.hpp>
 #include <cstdlib> //std::system
 #include <jsoncons/json.hpp>
+#include <scoped_allocator>
 
 using namespace jsoncons;
 
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
-struct boost_sorted_policy : public sorted_policy
+using ScopedTestAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
+
+struct boost_sorted_policy 
 {
     template <class KeyT,class Json>
     using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
@@ -19,10 +22,10 @@ struct boost_sorted_policy : public sorted_policy
     using array = json_array<Json,boost::interprocess::vector>;
 
     template <class CharT, class CharTraits, class Allocator>
-    using string = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+    using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
+using shm_json = basic_json<char,boost_sorted_policy, ScopedTestAllocator>;
 
 int main(int argc, char *argv[])
 {
@@ -41,26 +44,22 @@ int main(int argc, char *argv[])
                                                          "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
-      const shmem_allocator allocator(segment.get_segment_manager());
+      const shmem_allocator alloc(segment.get_segment_manager());
 
       // Create json value with all dynamic allocations in shared memory
 
-      shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
+      shm_json* j = segment.construct<shm_json>("my json")(json_array_arg, alloc);
       j->push_back(10);
 
-      shm_json o(json_object_arg, semantic_tag::none, allocator);
-      //o.try_emplace("category", "reference",allocator);
-      //o.try_emplace("author", "Nigel Rees",allocator);
-      //o.try_emplace("title", "Sayings of the Century",allocator);
-      //o.try_emplace("price", 8.95, allocator);
-      o.insert_or_assign("category", "reference");
-      o.insert_or_assign("author", "Nigel Rees");
+      shm_json o(json_object_arg, alloc);
+      o.try_emplace("category", "reference");
+      o.try_emplace("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
       o.insert_or_assign("price", 8.95);
 
       j->push_back(o);
 
-      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
+      shm_json a = shm_json::array(2,shm_json::object(alloc),alloc);
       a[0]["first"] = 1;
 
       j->push_back(a);

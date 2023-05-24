@@ -1,6 +1,6 @@
 ### jsoncons::jsonpath::jsonpath_expression
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template <class Json,class JsonReference>
@@ -8,10 +8,10 @@ class jsonpath_expression
 ```
 
 #### Member functions
-```c++
+```cpp
 Json evaluate(reference root_value, result_options options = result_options()); (1)
 ```
-```c++
+```cpp
 template <class BinaryCallback>
 void evaluate(reference root_value, BinaryCallback callback, 
               result_options options = result_options());  (2)

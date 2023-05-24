@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_reader
 
-```c++
+```cpp
 #include <jsoncons/json_reader.hpp>
 
 template<
@@ -84,41 +84,41 @@ string_view_type           |
 
 Constructors (1)-(4) use a default [basic_json_visitor](basic_json_visitor.md) that discards the JSON parse events, and are for validation only.
 
-(1) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, uses default [options](basic_json_options.md) and a default [parse_error_handler](parse_error_handler.md).
+(1) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, uses default [options](basic_json_options.md) and a default [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (2) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
 uses the specified [options](basic_json_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+and a default [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (3) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
 uses default [options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (4) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, 
 uses the specified [options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 Constructors (5)-(8) take a user supplied [basic_json_visitor](basic_json_visitor.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
 (5) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified 
 [basic_json_visitor](basic_json_visitor.md), and uses default [options](basic_json_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+and a default [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (6) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) 
 and uses the specified [options](basic_json_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+and a default [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (7) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) 
 and uses default [options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 (8) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified [basic_json_visitor](basic_json_visitor.md) and
 uses the specified [options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [JSON parsing error handling](JSONParsingErrorHandling.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_json_reader` does not outlive any source or 
 visitor passed in the constuctor, as `basic_json_reader` holds pointers to but does not own these resources.
@@ -214,7 +214,7 @@ Expected value at line 1 and column 11
 {"a":7,"b":8,"c":9}
 ```
 This is the code that reads them: 
-```c++
+```cpp
 std::ifstream is("json-texts.json");
 if (!is.is_open())
 {

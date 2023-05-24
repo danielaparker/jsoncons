@@ -12,8 +12,6 @@ using jsoncons::json;
 namespace jsonpointer = jsoncons::jsonpointer; 
 namespace jsonpath = jsoncons::jsonpath;
 
-namespace {
-
     std::string input = R"(
 [
     {
@@ -40,75 +38,73 @@ namespace {
     )";
 
 
-    void erase1()
+void erase1()
+{
+    try
     {
-        try
+        // Read from input
+        std::istringstream is(input);
+        json instance = json::parse(is);
+ 
+        // Locate the item to be erased
+        auto it = std::find_if(instance.array_range().begin(), instance.array_range().end(), 
+                               [](const json& item){return item.at("id") == std::string("756746783");});
+ 
+        // If found, erase it
+        if (it != instance.array_range().end())
         {
-            // Read from input
-            std::istringstream is(input);
-            json instance = json::parse(is);
-     
-            // Locate the item to be erased
-            auto it = std::find_if(instance.array_range().begin(), instance.array_range().end(), 
-                                   [](const json& item){return item.at("id") == std::string("756746783");});
-     
-            // If found, erase it
-            if (it != instance.array_range().end())
-            {
-                instance.erase(it);
-            }
+            instance.erase(it);
+        }
 
-            // Write to output file
-            std::ostringstream os;
-            instance.dump_pretty(os);
-            std::cout << os.str() << "\n\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << std::endl;    
-        }
+        // Write to output file
+        std::ostringstream os;
+        instance.dump_pretty(os);
+        std::cout << os.str() << "\n\n";
     }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;    
+    }
+}
 
-    void erase2()
+void erase2()
+{
+    // Read from input file
+    std::istringstream is(input);
+    json instance = json::parse(is);
+
+    // Select all records except ones with id '756746783' 
+    auto result = jsonpath::json_query(instance, "$.*[?(@.id != '756746783')]");
+
+    // Write to output file
+    std::ostringstream os;
+    result.dump_pretty(os);
+    std::cout << os.str() << "\n\n";
+}
+
+void erase3()
+{
+    try
     {
         // Read from input file
         std::istringstream is(input);
         json instance = json::parse(is);
 
-        // Select all records except ones with id '756746783' 
-        auto result = jsonpath::json_query(instance, "$.*[?(@.id != '756746783')]");
+        // Remove first record identified by JSONPointer
+        jsonpointer::remove(instance, "/0");
 
         // Write to output file
         std::ostringstream os;
-        result.dump_pretty(os);
+        instance.dump_pretty(os);
         std::cout << os.str() << "\n\n";
     }
-
-    void erase3()
+    catch (const std::exception& e)
     {
-        try
-        {
-            // Read from input file
-            std::istringstream is(input);
-            json instance = json::parse(is);
-
-            // Remove first record identified by JSONPointer
-            jsonpointer::remove(instance, "/0");
-
-            // Write to output file
-            std::ostringstream os;
-            instance.dump_pretty(os);
-            std::cout << os.str() << "\n\n";
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << std::endl;    
-        }
+        std::cout << e.what() << std::endl;    
     }
+}
 
-} // namespace
-
-void erase_examples()
+int main()
 {
     std::cout << "\nErase\n\n";
     erase1();

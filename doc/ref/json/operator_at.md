@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::operator[]
 
-```c++
+```cpp
 proxy_type operator[](const string_view_type& key); (1)
 
 const_reference operator[](const string_view_type& key) const; (2)
@@ -41,7 +41,7 @@ when this operator is used for reading but the key does not exist.
 
 #### Assigning to a proxy when the key does not exist
 
-```c++
+```cpp
 int main()
 {
     json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});

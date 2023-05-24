@@ -1,6 +1,6 @@
 ### jsoncons::json_parser
 
-```c++
+```cpp
 #include <jsoncons/json_parser.hpp>
 
 typedef basic_json_parser<char> json_parser
@@ -45,18 +45,18 @@ and by the pull parser [basic_json_cursor](basic_json_cursor.md).
                 std::function<bool(json_errc,const ser_context&)> err_handler); (4)
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+and a default [err_handler](JSONParsingErrorHandling.md).
 
 (2) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+and a default [err_handler](JSONParsingErrorHandling.md).
 
 (3) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [err_handler](JSONParsingErrorHandling.md).
 
 (4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+and a specified [err_handler](JSONParsingErrorHandling.md).
 
-Note: It is the programmer's responsibility to ensure that `json_string_reader` does not outlive any string or `error visitor` passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that a `basic_json_parser` does not outlive any string passed in the constuctor.
 
 #### Member functions
 
@@ -124,7 +124,7 @@ to continue.
 
 #### Incremental parsing
 
-```c++
+```cpp
 int main()
 {
     json_parser parser;
@@ -172,7 +172,7 @@ Output:
 
 #### Incremental parsing with unconsumed non-whitespace characters
 
-```c++
+```cpp
 int main()
 {
     json_parser parser;
@@ -215,7 +215,7 @@ Output:
 
 #### nan, inf, and -inf substitition
 
-```c++
+```cpp
 int main()
 {
     std::string s = R"(

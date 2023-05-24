@@ -443,7 +443,7 @@ void decimal_precision_examples()
     std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
 }
 
-void serialization_examples()
+int main()
 {
     std::cout << "\nSerialization examples\n\n";
     serialization_example1();

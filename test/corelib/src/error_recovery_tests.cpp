@@ -13,7 +13,7 @@
 
 using namespace jsoncons;
 
-class relaxed_error_handler
+class relaxed_err_handler
 {
 public:
 
@@ -30,17 +30,20 @@ public:
 
 TEST_CASE("test_array_extra_comma")
 {
-    relaxed_error_handler err_handler;
+    relaxed_err_handler err_handler;
 
     json expected = json::parse("[1,2,3]");
-    json val = json::parse("[1,2,3,]", err_handler);
+
+    json_options options;
+    options.err_handler(err_handler);
+    json val = json::parse("[1,2,3,]", options);
 
     CHECK(val == expected);
 }
 
 TEST_CASE("test_object_extra_comma")
 {
-    relaxed_error_handler err_handler;
+    relaxed_err_handler err_handler;
 
     json expected = json::parse(R"(
     {
@@ -63,7 +66,7 @@ TEST_CASE("test_object_extra_comma")
 
 TEST_CASE("test_name_without_quotes")
 {
-    //relaxed_error_handler err_handler;
+    //relaxed_err_handler err_handler;
 
     /*json val = json::parse(R"(
     {

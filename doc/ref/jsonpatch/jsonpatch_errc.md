@@ -1,6 +1,6 @@
 ### jsoncons::jsonpatch::jsonpatch_errc
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 ```
 

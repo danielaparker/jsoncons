@@ -18,7 +18,7 @@ The csv extension implements decode from and encode to the [CSV format](https://
 
 For the examples below you need to include some header files and initialize a string of CSV data:
 
-```c++
+```cpp
 #include <iomanip>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -41,7 +41,7 @@ jsoncons allows you to work with the CSV data similarly to JSON data:
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 int main()
 {
     csv::csv_options options;
@@ -99,7 +99,7 @@ jsoncons supports transforming CSV data into C++ data structures. The functions 
 CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../json_type_traits.md) defined. 
 jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../json_type_traits.md) 
 in the jsoncons namespace.
-```c++
+```cpp
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace ns {
@@ -195,7 +195,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
 #### With cursor-level access
 
-```c++
+```cpp
 int main()
 {
     csv::csv_options options;
@@ -280,7 +280,7 @@ end_array
 ```
 
 You can use a [staj_array_iterator](../staj_array_iterator.md) to group the CSV parse events into [basic_json](../basic_json.md) records:
-```c++
+```cpp
 int main()
 {
     csv::csv_options options;
@@ -318,7 +318,7 @@ Output:
 ```
 
 Or into strongly typed records:
-```c++
+```cpp
 
 int main()
 {

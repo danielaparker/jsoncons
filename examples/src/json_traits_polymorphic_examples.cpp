@@ -160,7 +160,7 @@ namespace
     }
 }
 
-void json_traits_polymorphic_examples()
+int main()
 {
     std::cout << "\njson traits polymorphic examples\n\n";
 

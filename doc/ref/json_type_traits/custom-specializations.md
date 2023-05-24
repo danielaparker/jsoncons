@@ -5,7 +5,7 @@ specialized in the jsoncons library, for example, a custom container
 type that satisfies the conditions for a sequence container, you 
 may see a compile error "more than one partial specialization matches the template argument list".
 For these situations `jsoncons` provides the traits class
-```c++
+```cpp
 template <class T>
 struct is_json_type_traits_declared : public std::false_type {};
 ```
@@ -24,7 +24,7 @@ to inform the `jsoncons` library that the type is already specialized.
 
 #### Extend json_type_traits to support `boost::gregorian` dates.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include "boost/datetime/gregorian/gregorian.hpp"
 
@@ -64,7 +64,7 @@ namespace jsoncons
     };
 }
 ```
-```c++
+```cpp
 namespace ns
 {
     using jsoncons::json;
@@ -106,7 +106,7 @@ Observation dates:
 
 #### Specialize json_type_traits to support a book class.
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <vector>
@@ -157,13 +157,13 @@ namespace jsoncons {
 To save typing and enhance readability, the jsoncons library defines macros, 
 so you could also write
 
-```c++
+```cpp
 JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 ```
 
 which expands to the code above.
 
-```c++
+```cpp
 using namespace jsoncons; // for convenience
 
 int main()
@@ -223,7 +223,7 @@ Charles Bukowski, Pulp, 22.48
 
 #### Specialize json_type_traits for a container type that the jsoncons library also supports
 
-```c++
+```cpp
 #include <cassert>
 #include <string>
 #include <vector>
@@ -253,12 +253,12 @@ struct json_type_traits<Json, own_vector>
         return v;
     }
     static Json to_json(const own_vector& val){
-		Json j;
-		for(std::size_t i=0;i<val.size();i+=2){
-			j[std::to_string(val[i])] = val[i + 1];
-		}
-		return j;
-	}
+                Json j;
+                for(std::size_t i=0;i<val.size();i+=2){
+                        j[std::to_string(val[i])] = val[i + 1];
+                }
+                return j;
+        }
 };
 
 template <> 
@@ -287,7 +287,7 @@ Output:
 
 #### Convert JSON to/from boost matrix
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 

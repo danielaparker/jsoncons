@@ -1,6 +1,6 @@
 ### jsoncons::jsonpatch::jsonpatch_error
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 ```
 
@@ -28,7 +28,7 @@ Returns an error code for this exception
 
 ### Example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 

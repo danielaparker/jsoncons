@@ -83,7 +83,7 @@ void staj_object_iterator_example()
     std::cout << "\n\n";
 }
 
-void staj_iterator_examples()
+int main()
 {
     std::cout << "\nstaj_iterator examples\n\n";
 

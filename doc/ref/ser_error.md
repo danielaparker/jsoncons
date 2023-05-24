@@ -1,6 +1,6 @@
 ### jsoncons::ser_error
 
-```c++
+```cpp
 #include <jsoncons/json_exception.hpp>
 ```
 
@@ -44,7 +44,7 @@ Returns an error code for this exception
 
 ### Example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using jsoncons::json;

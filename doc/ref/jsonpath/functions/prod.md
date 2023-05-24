@@ -1,6 +1,6 @@
 ### prod
 
-```c++
+```cpp
 number|null avg(array[number] value)
 ```
 

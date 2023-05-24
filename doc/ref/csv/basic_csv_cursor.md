@@ -1,6 +1,6 @@
 ### jsoncons::csv::basic_csv_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv_cursor.hpp>
 
 template<
@@ -20,7 +20,7 @@ representing the events from `begin_array` ro `end_array`.
 
 `basic_csv_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

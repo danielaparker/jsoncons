@@ -1,6 +1,6 @@
 ### jsoncons::ser_context
 
-```c++
+```cpp
 #include <jsoncons/ser_context.hpp>
 
 class ser_context;

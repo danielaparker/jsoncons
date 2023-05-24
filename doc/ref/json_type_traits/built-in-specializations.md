@@ -40,7 +40,7 @@ jsoncons encodes integer types with size greater than 64 bit to strings if JSON,
 
 #### JSON example assuming gcc or clang
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <iostream>
 #include <cassert>
@@ -68,7 +68,7 @@ Output:
 
 #### CBOR example assuming gcc or clang
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
@@ -105,7 +105,7 @@ Output:
 
 #### MessagePack example assuming gcc or clang
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <iostream>
@@ -147,7 +147,7 @@ for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 
 #### CBOR example (integer)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
@@ -185,7 +185,7 @@ Time since epoch (seconds): 1596139800
 
 #### CBOR example (double)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
@@ -227,7 +227,7 @@ Time since epoch (milliseconds): 1596139800438
 
 #### MessagePack example (timestamp 32)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <iostream>
@@ -252,7 +252,7 @@ Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
 
 #### MessagePack example (timestamp 64)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <iostream>
@@ -295,7 +295,7 @@ seconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821
 
 #### MessagePack example (timestamp 96)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <iostream>
@@ -326,7 +326,7 @@ seconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801
 
 #### BSON example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <iostream>
@@ -381,7 +381,7 @@ The tuple specialization encodes an `std::tuple` as a fixed size JSON array.
 
 #### Example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
@@ -462,7 +462,7 @@ jsoncons provides specializations for `std::shared_ptr<T>` and `std::unique_ptr<
 
 #### Example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <vector>
 #include <string>
@@ -545,7 +545,7 @@ path: baz, x: 7, y: 8, z: 9
 
 #### Example
 
-```c++
+```cpp
 int main()
 {
     using variant_type = std::variant<std::nullptr_t, int, double, bool, std::string>;
@@ -602,7 +602,7 @@ std::string Hello World
 
 #### Example
 
-```c++
+```cpp
 std::vector<int> v{1, 2, 3, 4};
 json j(v);
 std::cout << "(1) "<< j << std::endl;
@@ -617,7 +617,7 @@ Output:
 
 #### From std::map, to std::unordered_map
 
-```c++
+```cpp
 std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
 json j(m);
 std::cout << j << std::endl;
@@ -629,7 +629,7 @@ Output:
 ```
 #### std::map with integer key
 
-```c++
+```cpp
 std::map<short, std::string> m{ {1,"foo",},{2,"baz"} };
 
 json j{m};
@@ -648,7 +648,7 @@ std::cout << "\n\n";
 ```
 Output:
 
-```c++
+```cpp
 (1)
 {
     "1": "foo",
@@ -668,7 +668,7 @@ from integers, `base16` encoded strings and byte strings.
 
 #### JSON example
 
-```c++
+```cpp
 #include <cassert>
 #include <string>
 #include <climits>
@@ -695,7 +695,7 @@ Output:
 
 #### CBOR example
 
-```c++
+```cpp
 #include <cassert>
 #include <string>
 #include <climits>

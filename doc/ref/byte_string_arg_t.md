@@ -1,6 +1,6 @@
 ### jsoncons::byte_string_arg_t 
 
-```c++
+```cpp
 #include <jsoncons/tag_type.hpp>
 
 struct byte_string_arg_t {explicit byte_string_arg_t() = default;};

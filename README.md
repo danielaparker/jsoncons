@@ -112,7 +112,7 @@ If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS`
 
 For the examples below you need to include some header files and initialize a string of JSON data:
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <iostream>
@@ -145,7 +145,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the string of data into a json value
@@ -213,7 +213,7 @@ defined. jsoncons already supports many types in the standard library,
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
-```c++
+```cpp
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -347,7 +347,7 @@ A typical pull parsing application will repeatedly process the `current()`
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-```c++
+```cpp
 int main()
 {
     json_string_cursor cursor(data);
@@ -423,7 +423,7 @@ end_object
 
 You can apply a filter to a cursor using the pipe syntax (e.g., `cursor | filter1 | filter2 | ...`)
 
-```c++
+```cpp
 int main()
 {
     std::string name;
@@ -472,7 +472,7 @@ Marilyn C
 
 For the examples below you need to include some header files and initialize a buffer of CBOR data:
 
-```c++
+```cpp
 #include <iomanip>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -519,7 +519,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the CBOR data into a json value
@@ -571,7 +571,7 @@ Output:
 
 #### As a strongly typed C++ data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
@@ -609,7 +609,7 @@ A typical pull parsing application will repeatedly process the `current()`
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-```c++
+```cpp
 int main()
 {
     cbor::cbor_bytes_cursor cursor(data);
@@ -682,7 +682,7 @@ end_array (n/a)
 
 You can apply a filter to a cursor using the pipe syntax, 
 
-```c++
+```cpp
 int main()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool

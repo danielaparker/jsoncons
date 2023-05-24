@@ -42,7 +42,7 @@ namespace jsonpath {
         json_location_node(string_type&& name)
             : parent_(nullptr), 
               node_kind_(json_location_node_kind::root), 
-              name_(std::forward<string_type>(name)), index_(0)
+              name_(std::move(name)), index_(0)
         {
         }
 

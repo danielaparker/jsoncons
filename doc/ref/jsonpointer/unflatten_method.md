@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::unflatten_options
 
-```c++
+```cpp
 #include <jsoncons/jsonpointer/jsonpointer.hpp>
 
 enum class unflatten_options{preserve_arrays,object};

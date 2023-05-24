@@ -87,7 +87,7 @@ void create_json_merge_patch()
     std::cout << "(2)\n" << pretty_print(source) << std::endl;
 }
 
-void json_merge_patch_examples()
+int main()
 {
     std::cout << "\njson_merge_patch examples\n\n";
     create_json_merge_patch();

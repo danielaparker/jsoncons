@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::basic_msgpack_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 
 template<
@@ -20,7 +20,7 @@ representing the events from `begin_array` ro `end_array`.
 
 `basic_msgpack_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common sources are provided:
+Aliases for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------

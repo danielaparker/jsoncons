@@ -2,7 +2,7 @@
 
 Encodes a C++ data structure to the [Binary JSON (BSON)](http://bsonspec.org/) data format.
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson.hpp>
 
 template<class T>
@@ -32,7 +32,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### null
 
-```c++
+```cpp
 void null_example()
 {
     json j;
@@ -50,7 +50,7 @@ Output:
 
 #### bool
 
-```c++
+```cpp
 int main()
 {
     std::map<std::string, bool> m{ {"a", true} };
@@ -67,7 +67,7 @@ Output:
 
 #### int32
 
-```c++
+```cpp
 int main()
 {
     ojson j(json_object_arg);
@@ -87,7 +87,7 @@ Output:
 
 #### int64
 
-```c++
+```cpp
 int main()
 {
     std::map<std::string, int64_t> m{ {"a", 100000000000000ULL} };
@@ -104,7 +104,7 @@ Output:
 
 #### double
 
-```c++
+```cpp
  int main()
  {
      std::map<std::string, double> m{ {"a", 123.4567} };
@@ -121,7 +121,7 @@ Output:
 
 #### utf8 string
 
-```c++
+```cpp
 int main()
 {
     json j;
@@ -139,7 +139,7 @@ Output:
 
 #### binary
 
-```c++
+```cpp
 int main()
 {
     json j;
@@ -159,7 +159,7 @@ Output:
 
 #### array
 
-```c++
+```cpp
 int main()
 {
     json a(json_array_arg);
@@ -182,7 +182,7 @@ Output:
 
 #### UTC datetime
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <iostream>

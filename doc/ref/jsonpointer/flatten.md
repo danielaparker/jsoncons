@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::flatten
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
@@ -33,7 +33,7 @@ provides additonal options.
 
 #### Flatten and unflatten a json object with non-numeric keys
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -89,7 +89,7 @@ Output:
 
 #### Flatten and unflatten a json object with numberlike keys
 
-```c++
+```cpp
 int main()
 {
     json input = json::parse(R"(

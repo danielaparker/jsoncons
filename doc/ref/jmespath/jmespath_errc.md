@@ -1,6 +1,6 @@
 ### jsoncons::jmespath::jmespath_errc
 
-```c++
+```cpp
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 ```
 

@@ -118,7 +118,7 @@ void change_member_name_example()
     std::cout << std::endl;
 }
 
-void json_filter_examples()
+int main()
 {
     std::cout << "\njson_filter examples\n\n";
     name_fixup_example1();

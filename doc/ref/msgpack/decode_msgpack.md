@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::decode_msgpack
 
-```c++
+```cpp
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class T>

@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::basic_ubjson_encoder
 
-```c++
+```cpp
 #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 
 template<

@@ -1,6 +1,6 @@
 ### `jsoncons::basic_json::erase`
 
-```c++
+```cpp
 void erase(const_array_iterator pos);           (1)   (until 0.168.6)
 array_iterator erase(const_array_iterator pos); (1)   (since 0.168.6)
 
@@ -35,7 +35,7 @@ Throws `std::domain_error` if not an object.
 
 #### Iterating an array and erasing elements (since 0.168.6)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using jsoncons::json;
@@ -70,7 +70,7 @@ Output:
 
 #### Iterating an object and erasing members (since 0.168.6)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using jsoncons::json;

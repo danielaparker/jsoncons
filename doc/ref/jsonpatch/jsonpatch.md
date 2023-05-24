@@ -18,7 +18,7 @@ The patch function implements this requirement by generating the inverse command
 
 ### Examples
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 

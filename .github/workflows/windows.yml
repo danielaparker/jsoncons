@@ -106,8 +106,8 @@ jobs:
       run: cmake $GITHUB_WORKSPACE -G "Visual Studio 16 2019" -T ClangCL  -DJSONCONS_BUILD_TESTS=On 
 
     - working-directory: build/
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: cmake --build . --config "${{ matrix.build_type }}"
 
     - working-directory: build/
-      run: ctest -C ${{ matrix.build_type }} --output-on-failure
+      run: ctest --build-config "${{ matrix.build_type }}" --progress --verbose
 

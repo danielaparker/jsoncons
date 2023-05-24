@@ -1,6 +1,6 @@
 ### jsoncons::json_errc
 
-```c++
+```cpp
 #include <jsoncons/json_error.hpp>
 ```
 

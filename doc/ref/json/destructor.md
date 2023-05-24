@@ -1,6 +1,6 @@
 ### `jsoncons::basic_json::basic_json`
 
-```c++
+```cpp
 ~basic_json() noexcept;
 ```
 

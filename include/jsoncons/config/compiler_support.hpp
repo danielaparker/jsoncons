@@ -146,6 +146,13 @@
     #define JSONCONS_IF_CONSTEXPR if 
 #endif
 
+
+#if defined(JSONCONS_HAS_2017)
+#      if __has_include(<memory_resource>)
+#        define JSONCONS_HAS_POLYMORPHIC_ALLOCATOR 1
+#     endif // __has_include(<string_view>)
+#endif
+
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #  if (defined JSONCONS_HAS_2017)
 #    if defined(__clang__)

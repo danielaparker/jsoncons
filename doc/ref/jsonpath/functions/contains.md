@@ -18,7 +18,7 @@ It is a type error if
 
 ### Examples
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

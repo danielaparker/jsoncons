@@ -2,7 +2,7 @@
 
 Selects a value.
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
@@ -102,7 +102,7 @@ Json& get(Json& root,
 
 #### Select author from second book
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -159,7 +159,7 @@ Output:
 
 #### Using jsonpointer::json_pointer with jsonpointer::get 
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -205,7 +205,7 @@ m~n
 
 #### Examples from [RFC6901](https://tools.ietf.org/html/rfc6901)
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -280,7 +280,7 @@ Output:
 
 #### Get a value at a location after creating objects when missing object keys
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

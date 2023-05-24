@@ -2041,7 +2041,7 @@ namespace jmespath {
 
             token(token&& other) noexcept
             {
-                construct(std::forward<token>(other));
+                construct(std::move(other));
             }
 
             token& operator=(token&& other)
@@ -2077,7 +2077,7 @@ namespace jmespath {
                     else
                     {
                         destroy();
-                        construct(std::forward<token>(other));
+                        construct(std::move(other));
                     }
                 }
                 return *this;

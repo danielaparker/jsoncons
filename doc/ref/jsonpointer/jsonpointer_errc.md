@@ -1,6 +1,6 @@
 ### jsoncons::jsonpointer::jsonpointer_errc
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 ```
 

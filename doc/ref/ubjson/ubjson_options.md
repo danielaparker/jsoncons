@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::ubjson_options
 
-```c++
+```cpp
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
 class ubjson_options;

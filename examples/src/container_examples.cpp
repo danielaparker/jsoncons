@@ -99,7 +99,7 @@ void map_with_integer_key_example()
     std::cout << "\n\n";
 }
 
-void container_examples()
+int main()
 {
     std::cout << "\nContainer examples\n\n";
     container_example1();

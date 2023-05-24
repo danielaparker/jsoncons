@@ -2,7 +2,7 @@
 
 #include <jsoncons/tag_type.hpp`__
 
-```c++
+```cpp
 struct json_array_arg_t {explicit json_array_arg_t() = default;};
 ```
 

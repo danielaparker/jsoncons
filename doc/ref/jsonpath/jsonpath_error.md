@@ -1,6 +1,6 @@
 ### jsoncons::jsonpath::jsonpath_error
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 ```
 
@@ -11,7 +11,7 @@
 ![jsonpath_error](./diagrams/jsonpath_error.png)
 
 #### Constructors
-```c++
+```cpp
 jsonpath_error(std::error_code ec);
 
 jsonpath_error(std::error_code ec, std::size_t line, std::size_t column);

@@ -1,6 +1,6 @@
 ### jsoncons::json_object_arg
 
-```c++
+```cpp
 #include <jsoncons/tag_type.hpp>
 
 constexpr json_object_arg_t json_object_arg{};

@@ -12,74 +12,6 @@
 
 using namespace jsoncons;
 
-void array_examples();
-void basics_examples();
-void basics_wexamples();
-void bson_examples();
-void byte_string_examples();
-void container_examples();
-void data_model_examples();
-void jmespath_examples();
-void json_accessor_examples();
-void json_constructor_examples();
-void json_cursor_examples();
-void json_filter_examples();
-void json_parser_examples();
-void json_reader_examples();
-void json_traits_macros_examples();
-void json_traits_name_macro_examples();
-void jsonpatch_examples();
-void json_merge_patch_examples();
-void jsonpath_examples();
-void jsonpointer_examples();
-void msgpack_examples();
-void ojson_examples();
-void readme_examples();
-void cbor_examples();
-void run_cbor_typed_array_examples();
-void csv_examples();
-void run_ubjson_examples();
-void serialization_examples();
-void staj_iterator_examples();
-void type_extensibility_examples();
-void unicode_examples();
-void wjson_examples();
-void json_traits_variant_examples();
-void update_json_in_place_examples();
-void json_traits_tuple_examples();
-void json_traits_bitset_examples();
-void json_traits_integer_examples();
-void json_traits_polymorphic_examples();
-void jsonschema_examples();
-void erase_examples();
-
-void comment_example()
-{
-    std::string s = R"(
-    {
-        // Single line comments
-        /*
-            Multi line comments 
-        */
-    }
-    )";
-
-    // Default
-    {
-        json j = json::parse(s);
-        std::cout << "(1) " << j << std::endl;
-    }
-    // Strict
-    try
-    {
-        json j = json::parse(s, strict_json_parsing());
-    }
-    catch (const ser_error& e)
-    {
-        std::cout << "(2) " << e.what() << std::endl;
-    }
-}
-
 void first_example_a()
 {
     std::string path = "./input/books.json"; 
@@ -269,21 +201,6 @@ void object_range_based_for_loop()
     }
 }
 
-void parse_error_example()
-{
-    std::string s = "[1,2,3,4,]";
-    try 
-    {
-        jsoncons::json val = jsoncons::json::parse(s);
-    } 
-    catch(const jsoncons::ser_error& e) 
-    {
-        std::cout << "Caught ser_error with category " << e.code().category().name() 
-                  << ", code " << e.code().value() 
-                  << " and message " << e.what() << std::endl;
-    }
-}
-
 void validation_example()
 {
     std::string s = R"(
@@ -304,21 +221,6 @@ void validation_example()
                   << " on line " << reader.line()
                   << " and column " << reader.column()
                   << std::endl;
-    }
-}
-
-void max_nesting_path_example()
-{
-    std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
-    try
-    {
-        json_options options;
-        options.max_nesting_depth(20);
-        json::parse(s, options);
-    }
-    catch (const ser_error& e)
-    {
-         std::cout << e.what() << std::endl;
     }
 }
 
@@ -367,12 +269,6 @@ int main()
     {
         std::cout << "jsoncons version: " << version() << std::endl;
 
-        object_range_based_for_loop();
-
-        basics_examples();
-        basics_wexamples();
-        ojson_examples();
-
         first_example_a();
         first_example_b();
         first_example_c();
@@ -380,95 +276,11 @@ int main()
 
         second_example_a();
 
-        wjson_examples();
-
-        unicode_examples();
-
-        parse_error_example();
-
-        json_filter_examples();
+        object_range_based_for_loop();
 
         validation_example();
 
-        comment_example();
-
-        max_nesting_path_example();
-
         get_example();
-
-        json_parser_examples();
-
-        staj_iterator_examples();
-
-        serialization_examples();
-
-        run_ubjson_examples();
-
-        type_extensibility_examples();
-
-        byte_string_examples();
-
-        container_examples();
-
-        json_accessor_examples();
-
-        jsonpatch_examples();
-
-        json_traits_macros_examples();
-
-        run_cbor_typed_array_examples();
-
-        data_model_examples();
-
-        json_cursor_examples();
-
-        json_accessor_examples();
-
-        array_examples();
-
-        run_cbor_typed_array_examples();
-
-        jmespath_examples();
-
-        bson_examples();
-
-        msgpack_examples();
-
-        cbor_examples();
-
-        readme_examples();
-
-        update_json_in_place_examples();
-
-        csv_examples();
-
-        json_traits_tuple_examples();
-
-        json_constructor_examples();
-
-        json_traits_bitset_examples();
-
-        json_traits_integer_examples();
-
-        json_traits_name_macro_examples();
-
-        json_traits_polymorphic_examples();
-
-        json_traits_variant_examples();
-
-        erase_examples();
-
-        jsonschema_examples();
-
-        jsonpointer_examples();
-
-        bson_examples();
-
-        json_merge_patch_examples();
-
-        json_reader_examples();
-
-        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

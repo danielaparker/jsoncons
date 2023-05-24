@@ -1,6 +1,6 @@
 ### jsoncons::jsonpatch::apply_patch
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
@@ -26,7 +26,7 @@ None
 
 #### Apply a JSON Patch with two add operations
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
@@ -62,7 +62,7 @@ Output:
 
 #### Apply a JSON Patch with three add operations, the last one fails
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 

@@ -1,6 +1,6 @@
 ### jsoncons::json_type
 
-```c++
+```cpp
 #include <jsoncons/json_type.hpp>
 
 enum class json_type : uint8_t 

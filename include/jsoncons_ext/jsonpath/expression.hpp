@@ -1368,7 +1368,7 @@ namespace detail {
             while (rit != rend) 
             {
                 auto s = rit->str();
-                j.emplace_back(s.c_str(), semantic_tag::none, alloc_);
+                j.emplace_back(s.c_str(), semantic_tag::none);
                 ++rit;
             }
             return j;
@@ -1971,7 +1971,7 @@ namespace detail {
             for (auto& item : arg0.object_range())
             {
                 auto s = item.key();
-                result.emplace_back(s.c_str(), semantic_tag::none, alloc_);
+                result.emplace_back(s.c_str(), semantic_tag::none);
             }
             return result;
         }
@@ -2757,7 +2757,7 @@ namespace detail {
 
         token(token&& other) noexcept
         {
-            construct(std::forward<token>(other));
+            construct(std::move(other));
         }
 
         const Json& get_value(const_reference_arg_t, dynamic_resources<Json,JsonReference>&) const
@@ -2803,7 +2803,7 @@ namespace detail {
                 else
                 {
                     destroy();
-                    construct(std::forward<token>(other));
+                    construct(std::move(other));
                 }
             }
             return *this;

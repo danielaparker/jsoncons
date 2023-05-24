@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::array_range
 
-```c++
+```cpp
 range<array_iterator,const_array_iterator> array_range();
 range<const_array_iterator,const_array_iterator> array_range() const;
 ```
@@ -11,7 +11,7 @@ Throws `std::domain_error` if not an array.
 
 #### Range-based for loop
 
-```c++
+```cpp
 json j(json_array_arg);
 j.push_back("Montreal");
 j.push_back("Toronto");
@@ -30,7 +30,7 @@ Vancouver
 ```
 
 #### Array iterator
-```c++
+```cpp
 json j(json_array_arg, {"Montreal", "Toronto", "Vancouver"});
 
 for (auto it = j.array_range().begin(); it != j.array_range().end(); ++it)
@@ -46,7 +46,7 @@ Vancouver
 ```
 
 #### Reverse array iterator
-```c++
+```cpp
 json j(json_array_arg, {"Montreal", "Toronto", "Vancouver"});
 
 for (auto it = j.array_range().rbegin(); it != j.array_range().rend(); ++it)

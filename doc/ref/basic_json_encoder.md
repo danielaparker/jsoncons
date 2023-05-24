@@ -1,6 +1,6 @@
 ### jsoncons::basic_json_encoder
 
-```c++
+```cpp
 #include <jsoncons/json_encoder.hpp>
 
 template<
@@ -316,7 +316,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 ### Examples
 
 ### Feeding json events directly to a `json_stream_encoder`
-```c++
+```cpp
 #include <iostream>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json_encoder.hpp>

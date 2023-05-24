@@ -1,6 +1,6 @@
 ### `jsoncons::basic_json::dump`
 
-```c++
+```cpp
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options 
@@ -58,7 +58,7 @@ Throws [ser_error](ser_error.md) if there is a serialization error.
 
 #### Dump json value to csv file
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 
@@ -105,7 +105,7 @@ Ivan Passer,Cutter's Way,
 
 #### Dump json content into a larger document
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;

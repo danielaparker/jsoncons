@@ -12,7 +12,7 @@ It is a type error if any item in the array is not a number.
 
 ### Examples
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

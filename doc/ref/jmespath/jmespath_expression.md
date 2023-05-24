@@ -1,6 +1,6 @@
 ### jsoncons::jmespath::jmespath_expression
 
-```c++
+```cpp
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template <class Json>

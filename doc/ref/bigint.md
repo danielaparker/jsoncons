@@ -1,6 +1,6 @@
 ### jsoncons::bigint
 
-```c++
+```cpp
 #include <jsoncons/bigint.hpp>
 
 typedef basic_bigint<Allocator = std::allocator<uint8_t>> bigint;
@@ -190,7 +190,7 @@ An empty list means a zero value.
 
 #### Initializing with bigint
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
@@ -237,7 +237,7 @@ Output:
 
 #### Integer overflow during parsing
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;

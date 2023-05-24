@@ -60,7 +60,7 @@ the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test
 
 #### Arrays of things
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
@@ -194,7 +194,7 @@ second schema, defined in an external file `name.json`,
 jsoncons needs to know how to turn a URI reference to `name.json` into a JSON Schema document,
 and for that it needs you to provide a `URIResolver`.
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <fstream>
@@ -278,7 +278,7 @@ Error count: 1
 This example illustrates decoding data that validates against "oneOf"
 into a `std::variant`.
 
-```c++
+```cpp
 #include <variant> // This example requires C++17
 #include <iostream>
 #include <cassert>
@@ -443,7 +443,7 @@ Output:
 
 #### Default values
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>

@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::try_emplace
 
-```c++
+```cpp
 template <class T>
 pair<object_iterator, bool> try_emplace(const string_view_type& key, 
                                         Args&&... args); (1)
@@ -38,7 +38,7 @@ Throws `std::domain_error` if not a json object.
 
 ### Example
 
-```c++
+```cpp
 json a;
 
 a.try_emplace("object1",json());

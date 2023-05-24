@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::insert
 
-```c++
+```cpp
 template <class T>
 array_iterator insert(const_array_iterator pos, T&& val); (1)
 
@@ -28,7 +28,7 @@ void insert(InputIt first, InputIt last); (3)
 ### Examples
 
 #### Creating an array of elements 
-```c++
+```cpp
 json cities(json_array_arg);       // an empty array
 std::cout << cities << std::endl;  // output is "[]"
 
@@ -45,7 +45,7 @@ Output:
 ["Montreal","Toronto","Vancouver"]
 ```
 #### Creating an array of elements with reserved storage 
-```c++
+```cpp
 json cities(json_array_arg);  
 cities.reserve(10);  // storage is reserved
 std::cout << "capacity=" << cities.capacity() 
@@ -68,7 +68,7 @@ capacity=10, size=3
 
 ### Copy two std::map's into a json 
 
-```c++
+```cpp
 std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
 std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
 
@@ -85,7 +85,7 @@ Output:
 
 ### Copy two std::map's into an ojson 
 
-```c++
+```cpp
 std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
 std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
 
@@ -102,7 +102,7 @@ Output:
 
 ### Move two std::map's into a json 
 
-```c++
+```cpp
 std::map<std::string,double> m1 = {{"a",1},{"b",2},{"c",3}};
 std::map<std::string,double> m2 = {{"d",4},{"e",5},{"f",6}};
 

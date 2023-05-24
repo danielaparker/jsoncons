@@ -3,7 +3,7 @@
 Adds a value to an object or inserts it into an array at the target location,
 if a value does not already exist at that location.
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
@@ -93,7 +93,7 @@ None
 
 #### Add a member to a target location that does not already exist
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -126,7 +126,7 @@ Output:
 
 #### Add an element to the second position in an array
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -158,7 +158,7 @@ Output:
 
 #### Add a value at the end of an array
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -190,7 +190,7 @@ Output:
 
 #### Try to add an object member at a location that already exists
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -222,7 +222,7 @@ Key already exists
 
 #### Try to add a value to a location in an array that exceeds the size of the array
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -254,7 +254,7 @@ Index exceeds array size
 
 #### Add a value to a location after creating objects when missing object keys
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

@@ -1,6 +1,6 @@
 ### jsoncons::cbor::encode_cbor
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class T>
@@ -32,7 +32,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### cbor example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -106,7 +106,7 @@ Output:
 
 #### Encode CBOR byte string
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -136,7 +136,7 @@ Output:
 
 #### Encode byte string with encoding hint
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
@@ -169,7 +169,7 @@ Output:
 This example taken from [CBOR stringref extension](http://cbor.schmorp.de/stringref) shows how to encode a
 data structure that contains many repeated strings more efficiently.
 
-```c++
+```cpp
 #include <iomanip>
 #include <cassert>
 #include <jsoncons/json.hpp>

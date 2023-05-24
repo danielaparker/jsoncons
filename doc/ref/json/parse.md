@@ -1,53 +1,73 @@
 ### jsoncons::basic_json::parse
 
-```c++
+```cpp
 template <class Source>
-static parse(const Source& s, 
-             const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (1)
+static basic_json parse(const Source& source, 
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(),    (1) (since 0.171.0)
+    const allocator_type& alloc = allocator_type());                                                 
 
 template <class Source>
-static basic_json parse(const Source& s, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); (2)
+static basic_json parse(const Source& source, 
+    const basic_json_decode_options<char_type>& options,                                         (2) (deprecated since 0.171.0)
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              
 
-static basic_json parse(const char_type* s, 
-                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (3)
+template <class Source>
+static basic_json parse(const Source& source, 
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              (3) (deprecated since 0.171.0)
 
-static basic_json parse(const char_type* s, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); (4)
+static basic_json parse(const char_type* str, 
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+    const allocator_type& alloc = allocator_type());                                             (4) (since 0.171.0)
+
+static basic_json parse(const char_type* str, 
+    const basic_json_decode_options<char_type>& options,                                         (5) (deprecated since 0.171.0)
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              
+
+static basic_json parse(const char_type* str, 
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              (6) (deprecated since 0.171.0)
 
 static basic_json parse(std::basic_istream<char_type>& is, 
-                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (5)
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(),    (7) (since 0.171.0)
+    const allocator_type& alloc = allocator_type()); (5)
+
+static basic_json parse(std::basic_istream<char_type>& is, 
+    const basic_json_decode_options<char_type>& options,                                         (8) (deprecated since 0.171.0)
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              
               
 static basic_json parse(std::istream& is, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); (6)
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              (9) (deprecated since 0.171.0)
 
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 
-                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (7) (since 0.153.0)
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(),    (10) (since 0.171.0)
+    const allocator_type& alloc = allocator_type());           
+
+template <class InputIt>
+static basic_json parse(InputIt first, InputIt last, 
+    const basic_json_decode_options<char_type>& options,                                         (11) (deprecated since 0.171.0)
+    std::function<bool(json_errc,const ser_context&)> err_handler);           
               
 template <class InputIt>
-static basic_json parse(InputIt first, InputIt last, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); (8)
+static basic_json parse(InputIt first, InputIt last,                                             (12) (deprecated since 0.171.0)
+    std::function<bool(json_errc,const ser_context&)> err_handler);                              
 ```
-(1) - (2) Parses JSON data from a contiguous character sequence provided by `s` and returns a `basic_json` value. 
+(1) - (3) Parses JSON data from a contiguous character sequence provided by `source` and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(3) - (4) Parses JSON data from a null-terminated string and returns a `basic_json` value. 
+(4) - (6) Parses JSON data from a null-terminated character string and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(4) - (5) Parses JSON data from an input stream and returns a `basic_json` value. 
+(7) - (9) Parses JSON data from an input stream and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(6) - (7) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
+(10) - (12) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
 #### Parameters
 
-`s` - s string view  
+`source` = a contigugous character source, such as a `std::string` or `std::string_view`
+
+`str` - a null terminated character string  
 
 `is` - an input stream  
 
@@ -55,13 +75,13 @@ Throws a [ser_error](../ser_error.md) if parsing fails.
 
 `options` - a [basic_json_options](../basic_json_options.md)  
 
-`err_handler` - an error handler  
+`err_handler` - an error handler. Since 0.171.0, an error handler may be provided as a member of a [basic_json_options](../basic_json_options.md).  
 
 ### Examples
 
 #### Parse from string
 
-```c++
+```cpp
 try 
 {
     json val = json::parse("[1,2,3,4,]");
@@ -78,7 +98,7 @@ Extra comma at line 1 and column 10
 
 #### Parse from string with options
 
-```c++
+```cpp
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
 
 json_options options;
@@ -117,7 +137,7 @@ Input JSON file `example.json`:
 {"File Format Options":{"Color Spaces":["sRGB","AdobeRGB","ProPhoto RGB"]}}
 ```
 
-```c++
+```cpp
 std::ifstream is("example.json");
 json j = json::parse(is);
 
@@ -136,7 +156,7 @@ Output:
 
 #### Parse from pair of input iterators
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 class MyIterator
@@ -201,5 +221,49 @@ Output:
 ["foo","bar"]
 ```
 
+#### Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)
 
+```cpp
+#include <jsoncons/json.hpp>
 
+using namespace jsoncons; // for convenience
+
+using pmr_json = jsoncons::pmr::json;
+
+int main()
+{
+    char buffer[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool{std::data(buffer), std::size(buffer)};
+    std::pmr::polymorphic_allocator<char> alloc(&pool);
+
+    std::string json_text = R"(
+    {
+        "street_number" : "100",
+        "street_name" : "Queen St W",
+        "city" : "Toronto",
+        "country" : "Canada"
+    }
+    )";
+
+    try
+    {
+        auto doc = pmr_json::parse(json_text, json_options{}, alloc);
+        std::cout << pretty_print(doc) << "\n\n";
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+    }
+}
+```
+
+Output:
+
+```json
+{
+    "city": "Toronto",
+    "country": "Canada",
+    "street_name": "Queen St W",
+    "street_number": "100"
+}
+```

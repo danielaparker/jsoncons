@@ -160,7 +160,7 @@ void basics_wjson_example2()
     std::wcout << L"(5) " << result << std::endl;
 }
 
-void basics_wexamples()
+int main()
 {
     std::cout << "\nBasics\n\n";
     basics_wjson_example1();

@@ -1,6 +1,6 @@
 ### jsoncons::cbor::basic_cbor_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 
 template<
@@ -20,7 +20,7 @@ representing the events from `begin_array` ro `end_array`.
 
 `basic_cbor_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common sources are provided:
+Aliases for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
@@ -133,7 +133,7 @@ Input JSON file `book_catalog.json`:
 
 #### Read CBOR parse events 
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
@@ -230,7 +230,7 @@ end_array
 
 #### Filter CBOR parse events
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
@@ -283,7 +283,7 @@ Graham Greene
 
 #### Read a typed array
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
@@ -355,7 +355,7 @@ d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 
 int main()
@@ -424,7 +424,7 @@ end_array (n/a)
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
-```c++
+```cpp
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 
 int main()

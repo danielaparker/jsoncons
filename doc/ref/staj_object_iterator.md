@@ -1,6 +1,6 @@
 ### jsoncons::staj_object_iterator
 
-```c++
+```cpp
 #include <jsoncons/staj_iterator.hpp>
 
 template<
@@ -72,7 +72,7 @@ Advances the iterator to the next object member.
 
 #### Iterate over a JSON object, returning key-json value pairs
 
-```c++
+```cpp
 const std::string example = R"(
 {
    "application": "hiking",

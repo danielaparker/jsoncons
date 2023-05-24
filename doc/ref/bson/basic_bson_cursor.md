@@ -1,6 +1,6 @@
 ### jsoncons::bson::basic_bson_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 
 template<
@@ -20,7 +20,7 @@ representing the events from `begin_array` ro `end_array`.
 
 `basic_bson_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common sources are provided:
+Aliases for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
@@ -134,7 +134,7 @@ Input JSON file `book_catalog.json`:
 
 #### Read BSON parse events
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <string>
 #include <fstream>
@@ -230,7 +230,7 @@ end_array
 
 #### Filter BSON parse events
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <string>
 #include <fstream>

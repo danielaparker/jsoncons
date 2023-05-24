@@ -1,6 +1,6 @@
 ### jsoncons::jmespath::search
 
-```c++
+```cpp
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template<Json>

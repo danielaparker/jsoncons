@@ -1,6 +1,6 @@
 ### jsoncons::bson::basic_bson_encoder
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 
 template<
@@ -299,7 +299,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 #### Encode to BSON
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <iomanip>

@@ -1,6 +1,6 @@
 ### jsoncons::spaces_option
 
-```c++
+```cpp
 enum class spaces_option : uint8_t 
 {
     no_spaces=0,

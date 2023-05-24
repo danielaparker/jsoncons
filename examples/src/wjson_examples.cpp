@@ -75,7 +75,7 @@ void wjson_surrogate_pair()
 #endif
 }
 
-void wjson_examples()
+int main()
 {
     std::cout << "\nwjson examples\n\n";
     wjson_object();

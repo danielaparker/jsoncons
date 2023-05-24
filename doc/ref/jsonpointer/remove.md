@@ -2,7 +2,7 @@
 
 Removes a `json` element.
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
@@ -60,7 +60,7 @@ None
 
 #### Remove an object member
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
@@ -91,7 +91,7 @@ Output:
 
 #### Remove an array element
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

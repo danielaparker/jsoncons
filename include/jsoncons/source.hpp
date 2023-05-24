@@ -333,9 +333,9 @@ namespace jsoncons {
         {
         }
 
-        string_source(string_source&& val) = default;
+        string_source(string_source&& other) = default;
 
-        string_source& operator=(string_source&& val) = default;
+        string_source& operator=(string_source&& other) = default;
 
         bool eof() const
         {

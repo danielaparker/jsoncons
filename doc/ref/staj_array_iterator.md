@@ -1,6 +1,6 @@
 ### jsoncons::staj_array_iterator
 
-```c++
+```cpp
 #include <jsoncons/staj_iterator.hpp>
 
 template<
@@ -71,7 +71,7 @@ Advances the iterator to the next array element.
 
 #### Iterate over a JSON array, returning json values  
 
-```c++
+```cpp
 const std::string example = R"(
 [ 
   { 
@@ -118,7 +118,7 @@ Output:
 
 #### Iterate over the JSON array, returning employee values 
 
-```c++
+```cpp
 namespace ns {
 
     struct employee

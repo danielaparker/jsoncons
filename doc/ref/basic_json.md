@@ -1,13 +1,22 @@
 ### jsoncons::basic_json
 
-```c++
+```cpp
 #include <jsoncons/basic_json.hpp>
 
 template< 
     class CharT,
-    class ImplementationPolicy = sorted_policy,
+    class Policy = sorted_policy,
     class Allocator = std::allocator<char>
 > class basic_json;
+
+namespace pmr {
+    template<class CharT, class Policy>
+    using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
+    using json = basic_json<char,sorted_policy>;                                                     (since 0.171.0)
+    using wjson = basic_json<wchar_t,sorted_policy>;
+    using ojson = basic_json<char, order_preserving_policy>;
+    using wojson = basic_json<wchar_t, order_preserving_policy>;
+}
 ```
 
 The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:
@@ -17,24 +26,37 @@ null, `bool`, `int64_t`, `uint64_t`, `double`, text string, byte string, array, 
 When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
 
 The definition of the character type of text strings is supplied via the `CharT` template parameter.
-Implementation policies for arrays and objects are provided via the `ImplementationPolicy` template parameter.
+Implementation policies for arrays and objects are provided via the `Policy` template parameter.
 A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
 rebind to internal data structures. 
 
-Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
+A `basic_json` can support multiple readers concurrently, as long as it is not being modified.
+If it is being modified, it must be by one writer with no concurrent readers.
+
+Since 0.171.0, `basic_json` supports [std::uses_allocator](https://en.cppreference.com/w/cpp/memory/uses_allocator) construction.
+The allocator template parameter may be a stateless allocator, a [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator), or a [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor).
+Non-propagating stateful allocators, such as the [Boost.Interprocess allocators](https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction),
+must be wrapped by a `std::scoped_allocator_adaptor`.
+
+Several aliases for common character types and policies for ordering an object's name/value pairs are provided:
 
 Type                |Definition
 --------------------|------------------------------
-[json](json.md)     |`basic_json<char,sorted_policy,std::allocator<char>>`
-[ojson](ojson.md)   |`basic_json<char, order_preserving_policy, std::allocator<char>>`
-[wjson](wjson.md)   |`basic_json<wchar_t,sorted_policy,std::allocator<char>>`
-[wojson](wojson.md) |`basic_json<wchar_t, order_preserving_policy, std::allocator<char>>`
+[jsoncons::json](json.md)     |`jsoncons::basic_json<char,jsoncons::sorted_policy,std::allocator<char>>`
+[jsoncons::ojson](ojson.md)   |`jsoncons::basic_json<char,jsoncons::order_preserving_policy,std::allocator<char>>`
+[jsoncons::wjson](wjson.md)   |`jsoncons::basic_json<wchar_t,jsoncons::jsoncons::sorted_policy,std::allocator<char>>`
+[jsoncons::wojson](wojson.md) |`jsoncons::basic_json<wchar_t,jsoncons::order_preserving_policy,std::allocator<char>>`
+`jsoncons::pmr::json` (0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::sorted_policy>`
+`jsoncons::pmr::ojson` (0.171.0) |`jsoncons::pmr::basic_json<char,jsoncons::order_preserving_policy>`
+`jsoncons::pmr::wjson` (0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::sorted_policy>`
+`jsoncons::pmr::wojson` (0.171.0) |`jsoncons::pmr::basic_json<wchar_t,jsoncons::order_preserving_policy>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|CharT
-`implementation_policy`|ImplementationPolicy
-`allocator_type`|Allocator
+`policy_type`|Policy
+`allocator_type` (until 0.171.0)|A stateless allocator, or a non-propagating stateful allocator
+`allocator_type` (after 0.171.0)|A stateless allocator, [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator), or [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
 `char_traits_type`|`std::char_traits<char_type>`
 `char_allocator_type`|`allocator_type` rebound to `char_type`
 `reference`|`basic_json&`

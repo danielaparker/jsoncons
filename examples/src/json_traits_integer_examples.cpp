@@ -15,8 +15,6 @@
 
 using namespace jsoncons;
 
-namespace {
-
 #if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
     void int128_example()
     {
@@ -31,9 +29,7 @@ namespace {
     }
 #endif
 
-} // namespace
-
-void json_traits_integer_examples()
+int main()
 {
     std::cout << "\njson traits integer examples\n\n";
 

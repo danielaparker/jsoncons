@@ -1,6 +1,6 @@
 ### jsoncons::jmespath::jmespath_error
 
-```c++
+```cpp
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 ```
 
@@ -11,7 +11,7 @@
 ![jmespath_error](./diagrams/jmespath_error.png)
 
 #### Constructors
-```c++
+```cpp
 jmespath_error(std::error_code ec);
 
 jmespath_error(std::error_code ec, std::size_t line, std::size_t column);

@@ -12,8 +12,6 @@
 
 using namespace jsoncons;
 
-namespace {
-
 void decode_float64_big_endian_array()
 {
     const std::vector<uint8_t> input = {
@@ -297,9 +295,7 @@ void read_to_cbor_visitor()
     std::cout << "\n";
 }
 
-} // namespace
-
-void run_cbor_typed_array_examples()
+int main()
 {
     std::cout << "\ncbor typed array examples\n\n";
     decode_float64_big_endian_array();

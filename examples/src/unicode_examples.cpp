@@ -23,7 +23,7 @@ void read_and_write_escaped_unicode()
     std::cout << output << std::endl;
 }
 
-void unicode_examples()
+int main()
 {
     std::cout << "\nUnicode examples\n\n";
     read_and_write_escaped_unicode();

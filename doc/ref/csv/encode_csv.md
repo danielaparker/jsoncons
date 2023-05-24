@@ -2,7 +2,7 @@
 
 Encodes a C++ data structure into the CSV data format.
 
-```c++
+```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
 template <class T,class Container>
@@ -29,7 +29,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### Encode a json array of objects (n_objects format)
 
-```c++
+```cpp
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -101,7 +101,7 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 
 #### Encode a json array of arrays (n_rows format)
 
-```c++
+```cpp
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -148,7 +148,7 @@ Output:
 
 #### Encode a json object of name-array members (m_columns format)
 
-```c++
+```cpp
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>

@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::basic_ubjson_cursor
 
-```c++
+```cpp
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 
 template<
@@ -20,7 +20,7 @@ representing the events from `begin_array` ro `end_array`.
 
 `basic_ubjson_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common sources are provided:
+Aliases for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------

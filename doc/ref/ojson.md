@@ -1,10 +1,10 @@
 ### jsoncons::ojson
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 
 typedef basic_json<char,
-                   ImplementationPolicy = order_preserving_policy,
+                   Policy = order_preserving_policy,
                    Allocator = std::allocator<char>> ojson
 ```
 The `ojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 
@@ -17,7 +17,7 @@ The `ojson` class is an instantiation of the [basic_json](basic_json.md) class t
 - In `ojson`, the `insert_or_assign` members that just take a name and a value always insert the member at the end.
 
 ### Examples
-```c++
+```cpp
 ojson o = ojson::parse(R"(
 {
     "street_number" : "100",
@@ -39,7 +39,7 @@ Output:
 }
 ```
 Insert "postal_code" at end
-```c++
+```cpp
 o.insert_or_assign("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
@@ -55,7 +55,7 @@ Output:
 }
 ```
 Insert "province" before "country"
-```c++
+```cpp
 auto it = o.find("country");
 o.insert_or_assign(it,"province","Ontario");
 

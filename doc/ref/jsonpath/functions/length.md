@@ -13,7 +13,7 @@ Otherwise, returns null.
 
 ### Examples
 
-```c++
+```cpp
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

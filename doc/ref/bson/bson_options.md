@@ -1,6 +1,6 @@
 ### jsoncons::bson::bson_options
 
-```c++
+```cpp
 #include <jsoncons_ext/bson/bson_options.hpp>
 
 class bson_options;

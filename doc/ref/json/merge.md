@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::merge
 
-```c++
+```cpp
 void merge(const basic_json& source); (1)
 void merge(basic_json&& source); (2)
 void merge(object_iterator hint, const basic_json& source); (3)
@@ -33,7 +33,7 @@ Throws `std::domain_error` if source or *this are not json objects.
 
 #### Merge `json`
 
-```c++
+```cpp
 json j = json::parse(R"(
 {
     "a" : 1,

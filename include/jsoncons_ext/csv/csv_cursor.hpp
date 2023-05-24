@@ -35,7 +35,7 @@ public:
 private:
     static constexpr size_t default_max_buffer_size = 16384;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
 
     text_source_adaptor<Source> source_;
     basic_csv_parser<CharT,Allocator> parser_;

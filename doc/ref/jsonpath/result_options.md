@@ -1,6 +1,6 @@
 ### jsoncons::jsonpath::result_options
 
-```c++
+```cpp
 enum class result_options {
    value = 1,
    path = 2,

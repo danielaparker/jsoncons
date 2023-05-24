@@ -78,7 +78,7 @@ void serialize_json_byte_string()
     std::cout << "(4) "<< print(j, options4) << "\n\n";
 }
 
-void byte_string_examples()
+int main()
 {
     std::cout << "byte_string examples" << "\n\n";
     construct_json_byte_string();

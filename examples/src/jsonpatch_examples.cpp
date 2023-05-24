@@ -105,7 +105,7 @@ void create_a_json_patch()
     std::cout << "(2)\n" << pretty_print(source) << std::endl;
 }
 
-void jsonpatch_examples()
+int main()
 {
     std::cout << "\njsonpatch examples\n\n";
     create_a_json_patch();

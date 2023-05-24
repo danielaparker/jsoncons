@@ -1,6 +1,6 @@
 ### jsoncons::basic_staj_event
 
-```c++
+```cpp
 #include <jsoncons/staj_cursor.hpp>
 
 template<class CharT>
@@ -9,7 +9,7 @@ class basic_staj_event
 
 A JSON-like parse event.
 
-Typedefs for common character types are provided:
+Aliases for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------

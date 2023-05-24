@@ -3,7 +3,7 @@
 Decodes a JSON data format to a C++ data structure. `decode_json` will 
 work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
-```c++
+```cpp
 #include <jsoncons/decode_json.hpp>
 
 template <class T, class Source>
@@ -43,7 +43,7 @@ Throws a [ser_error](ser_error.md) if parsing fails, and a [conv_error](conv_err
 
 #### Map with string-tuple pairs
 
-```c++
+```cpp
 #include <iostream>
 #include <map>
 #include <tuple>

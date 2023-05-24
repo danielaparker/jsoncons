@@ -2,7 +2,7 @@
 
 Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.html) data format.
 
-```c++
+```cpp
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class T>
@@ -33,7 +33,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### MessagePack example
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 

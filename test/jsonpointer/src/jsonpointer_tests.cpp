@@ -14,20 +14,13 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <scoped_allocator>
 
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-void check_get_with_const_ref(const json& example, const std::string& pointer, const json& expected)
-{
-
-    std::error_code ec;
-    const json& result = jsonpointer::get(example,pointer,ec);
-    CHECK_FALSE(ec);
-    CHECK(result == expected);
-}
-
-void check_contains(const json& example, const std::string& pointer, bool expected)
+template <class CharT, class Policy, class Allocator>
+void check_contains(const basic_json<CharT,Policy,Allocator>& example, const std::string& pointer, bool expected)
 {
     bool result = jsonpointer::contains(example,pointer);
     if (result != expected)
@@ -36,6 +29,21 @@ void check_contains(const json& example, const std::string& pointer, bool expect
         std::cout << "    given: " << example << "\n";
         std::cout << "    pointer: " << pointer << "\n";
     }
+    CHECK(result == expected);
+}
+
+template <class CharT, class Policy, class Allocator>
+void check_get(const basic_json<CharT,Policy,Allocator>& example, const std::string& pointer, const basic_json<CharT,Policy,Allocator>& expected)
+{
+    std::error_code ec;
+    const auto& result = jsonpointer::get(example,pointer,ec);
+    if (result != expected)
+    {
+        std::cout << "    given: " << example << "\n";
+        std::cout << "    expected: " << expected << "\n";
+        std::cout << "    pointer: " << pointer << "\n";
+    }
+    CHECK_FALSE(ec);
     CHECK(result == expected);
 }
 
@@ -94,18 +102,18 @@ const json example = json::parse(R"(
     check_contains(example,"/ ",true);
     check_contains(example,"/m~0n",true);
 
-    check_get_with_const_ref(example,"",example);
-    check_get_with_const_ref(example,"/foo",json::parse("[\"bar\", \"baz\"]"));
-    check_get_with_const_ref(example,"/foo/0",json("bar"));
-    check_get_with_const_ref(example,"/",json(0));
-    check_get_with_const_ref(example,"/a~1b",json(1));
-    check_get_with_const_ref(example,"/c%d",json(2));
-    check_get_with_const_ref(example,"/e^f",json(3));
-    check_get_with_const_ref(example,"/g|h",json(4));
-    check_get_with_const_ref(example,"/i\\j",json(5));
-    check_get_with_const_ref(example,"/k\"l",json(6));
-    check_get_with_const_ref(example,"/ ",json(7));
-    check_get_with_const_ref(example,"/m~0n",json(8));
+    check_get(example,"",example);
+    check_get(example,"/foo",json::parse("[\"bar\", \"baz\"]"));
+    check_get(example,"/foo/0",json("bar"));
+    check_get(example,"/",json(0));
+    check_get(example,"/a~1b",json(1));
+    check_get(example,"/c%d",json(2));
+    check_get(example,"/e^f",json(3));
+    check_get(example,"/g|h",json(4));
+    check_get(example,"/i\\j",json(5));
+    check_get(example,"/k\"l",json(6));
+    check_get(example,"/ ",json(7));
+    check_get(example,"/m~0n",json(8));
 }
 
 TEST_CASE("get_with_ref_test")
@@ -655,3 +663,60 @@ TEST_CASE("to_uri_fragment test")
     }
 }
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+#include <common/FreeListAllocator.hpp>
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+
+TEST_CASE("jsonpointer get with stateful allocator")
+{
+    ScopedTestAllocator<char> alloc(1);
+
+    // Example from RFC 6901
+    const custom_json example = custom_json::parse(R"(
+       {
+          "foo": ["bar", "baz"],
+          "": 0,
+          "a/b": 1,
+          "c%d": 2,
+          "e^f": 3,
+          "g|h": 4,
+          "i\\j": 5,
+          "k\"l": 6,
+          " ": 7,
+          "m~n": 8
+       }
+    )", json_options{}, alloc);
+
+    check_contains(example,"",true);
+    check_contains(example,"/foo",true);
+    check_contains(example,"/foo/0",true);
+    check_contains(example,"/",true);
+    check_contains(example,"/a~1b",true);
+    check_contains(example,"/c%d",true);
+    check_contains(example,"/e^f",true);
+    check_contains(example,"/g|h",true);
+    check_contains(example,"/i\\j",true);
+    check_contains(example,"/k\"l",true);
+    check_contains(example,"/ ",true);
+    check_contains(example,"/m~0n",true);
+
+    check_get(example,"",example);
+    check_get(example,"/foo", custom_json::parse(jsoncons::string_view("[\"bar\", \"baz\"]"), json_options(), alloc));
+    check_get(example,"/foo/0", custom_json("bar", semantic_tag::none, alloc));
+    check_get(example,"/", custom_json(0));
+    check_get(example,"/a~1b", custom_json(1));
+    check_get(example,"/c%d", custom_json(2));
+    check_get(example,"/e^f", custom_json(3));
+    check_get(example,"/g|h", custom_json(4));
+    check_get(example,"/i\\j", custom_json(5));
+    check_get(example,"/k\"l", custom_json(6));
+    check_get(example,"/ ", custom_json(7));
+    check_get(example,"/m~0n", custom_json(8));
+}
+
+#endif

@@ -36,7 +36,7 @@ UBJSON data item           | jsoncons data item|jsoncons tag
 
 For the examples below you need to include some header files and initialize a buffer of UBJSON data:
 
-```c++
+```cpp
 #include <iomanip>
 #include <iostream>
 #include <jsoncons/json.hpp>
@@ -70,7 +70,7 @@ jsoncons allows you to work with the UBJSON data similarly to JSON data:
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 int main()
 {
     std::cout << std::dec;
@@ -124,7 +124,7 @@ Output:
 
 #### As a strongly typed C++ data structure
 
-```c++
+```cpp
 int main()
 {
     // Parse the UBJSON data into a std::vector<double> value
@@ -147,7 +147,7 @@ Output:
 
 #### With cursor-level access
 
-```c++
+```cpp
 int main()
 {
     ubjson::ubjson_bytes_cursor cursor(data);
@@ -211,7 +211,7 @@ end_array (n/a)
 
 You can apply a filter to a cursor using the pipe syntax, for example,
 
-```c++
+```cpp
 int main()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
@@ -246,7 +246,7 @@ double_value: 23.8889 (n/a)
 
 ### encode/decode UBJSON from/to basic_json
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -323,7 +323,7 @@ Marilyn C, 0.9
 
 ### encode/decode UBJSON from/to your own data structures
 
-```c++
+```cpp
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>

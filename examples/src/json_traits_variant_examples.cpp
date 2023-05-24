@@ -192,197 +192,193 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
     (radius, "radius")
 )
 
-namespace {
-
-    void variant_example()
+void variant_example()
+{
+    std::string input = R"(
+{
+  "owner": "Rodrigo",
+  "items": [
     {
-        std::string input = R"(
+      "name": "banana",
+      "color": "YELLOW"
+    },
     {
-      "owner": "Rodrigo",
-      "items": [
-        {
-          "name": "banana",
-          "color": "YELLOW"
-        },
-        {
-          "size": 40,
-          "material": "wool"
-        },
-        {
-          "name": "apple",
-          "color": "RED"
-        },
-        {
-          "size": 40,
-          "material": "cotton"
-        }
-      ]
+      "size": 40,
+      "material": "wool"
+    },
+    {
+      "name": "apple",
+      "color": "RED"
+    },
+    {
+      "size": 40,
+      "material": "cotton"
     }
-        )";
+  ]
+}
+    )";
 
-        ns::Basket basket = jsoncons::decode_json<ns::Basket>(input);
-        std::cout << basket.owner() << "\n\n";
+    ns::Basket basket = jsoncons::decode_json<ns::Basket>(input);
+    std::cout << basket.owner() << "\n\n";
 
-        std::cout << "(1)\n";
-        for (const auto& var : basket.items()) 
-        {
-            std::visit([](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-                if constexpr (std::is_same_v<T, ns::Fruit>)
-                    std::cout << "Fruit " << arg << '\n';
-                else if constexpr (std::is_same_v<T, ns::Fabric>)
-                    std::cout << "Fabric " << arg << '\n';
-            }, var);
-        }
-
-        std::string output;
-        jsoncons::encode_json_pretty(basket, output);
-        std::cout << "(2)\n" << output << "\n\n";
+    std::cout << "(1)\n";
+    for (const auto& var : basket.items()) 
+    {
+        std::visit([](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, ns::Fruit>)
+                std::cout << "Fruit " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Fabric>)
+                std::cout << "Fabric " << arg << '\n';
+        }, var);
     }
 
-    void variant_example2()
-    {
-        using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
+    std::string output;
+    jsoncons::encode_json_pretty(basket, output);
+    std::cout << "(2)\n" << output << "\n\n";
+}
 
-        std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
+void variant_example2()
+{
+    using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-        std::string buffer;
-        jsoncons::encode_json_pretty(vars, buffer);
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
-        std::cout << "(1)\n" << buffer << "\n\n";
+    std::string buffer;
+    jsoncons::encode_json_pretty(vars, buffer);
 
-        auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+    std::cout << "(1)\n" << buffer << "\n\n";
 
-        auto visitor = [](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-                if constexpr (std::is_same_v<T, int>)
-                    std::cout << "int " << arg << '\n';
-                else if constexpr (std::is_same_v<T, double>)
-                    std::cout << "double " << arg << '\n';
-                else if constexpr (std::is_same_v<T, bool>)
-                    std::cout << "bool " << arg << '\n';
-                else if constexpr (std::is_same_v<T, std::string>)
-                    std::cout << "std::string " << arg << '\n';
-                else if constexpr (std::is_same_v<T, ns::Color>)
-                    std::cout << "ns::Color " << arg << '\n';
-            };
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
 
-        std::cout << "(2)\n";
-        for (const auto& item : vars2)
-        {
-            std::visit(visitor, item);
-        }
-        std::cout << "\n";
-    }
-
-    void variant_example3()
-    {
-        using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
-
-        std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
-
-        std::string buffer;
-        jsoncons::encode_json_pretty(vars, buffer);
-
-        std::cout << "(1)\n" << buffer << "\n\n";
-
-        auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
-
-        auto visitor = [](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-                if constexpr (std::is_same_v<T, int>)
-                    std::cout << "int " << arg << '\n';
-                else if constexpr (std::is_same_v<T, double>)
-                    std::cout << "double " << arg << '\n';
-                else if constexpr (std::is_same_v<T, bool>)
-                    std::cout << "bool " << arg << '\n';
-                else if constexpr (std::is_same_v<T, std::string>)
-                    std::cout << "std::string " << arg << '\n';
-                else if constexpr (std::is_same_v<T, ns::Color>)
-                    std::cout << "ns::Color " << arg << '\n';
-            };
-
-        std::cout << "(2)\n";
-        for (const auto& item : vars2)
-        {
-            std::visit(visitor, item);
-        }
-        std::cout << "\n";
-    }
-
-    void variant_example4()
-    {
-        using variant_type = std::variant<std::nullptr_t, int, double, bool, std::string>;
-        
-        std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
-
-        std::string buffer;
-        jsoncons::encode_json_pretty(v, buffer);
-        std::cout << "(1)\n" << buffer << "\n\n";
-
-        auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
-
-        auto visitor = [](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-                if constexpr (std::is_same_v<T, std::nullptr_t>)
-                    std::cout << "nullptr " << arg << '\n';
-                else if constexpr (std::is_same_v<T, int>)
-                    std::cout << "int " << arg << '\n';
-                else if constexpr (std::is_same_v<T, double>)
-                    std::cout << "double " << arg << '\n';
-                else if constexpr (std::is_same_v<T, bool>)
-                    std::cout << "bool " << arg << '\n';
-                else if constexpr (std::is_same_v<T, std::string>)
-                    std::cout << "std::string " << arg << '\n';
-            };
-
-        std::cout << "(2)\n";
-        for (const auto& item : v2)
-        {
-            std::visit(visitor, item);
-        }
-    }
-
-    void distinguish_by_type()
-    {
-        using shapes_t = std::variant<ns::Rectangle,ns::Triangle,ns::Circle>;
-
-        std::string input = R"(
-    [
-        {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
-        {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
-        {"type" : "circle", "radius" : 1.0 }
-    ]
-        )";
-
-        auto shapes = jsoncons::decode_json<std::vector<shapes_t>>(input);
-
-        auto visitor = [](auto&& shape) {
-            using T = std::decay_t<decltype(shape)>;
-            if constexpr (std::is_same_v<T, ns::Rectangle>)
-                std::cout << "rectangle area: " << shape.area() << '\n';
-            else if constexpr (std::is_same_v<T, ns::Triangle>)
-                std::cout << "triangle area: " << shape.area() << '\n';
-            else if constexpr (std::is_same_v<T, ns::Circle>)
-                std::cout << "circle area: " << shape.area() << '\n';
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
         };
 
-        std::cout << "(1)\n";
-        for (const auto& shape : shapes)
-        {
-            std::visit(visitor, shape);
-        }
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
+    std::cout << "\n";
+}
 
-        std::string output;
-        jsoncons::encode_json_pretty(shapes, output);
-        std::cout << "\n(2)\n" << output << "\n";
+void variant_example3()
+{
+    using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
+
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
+
+    std::string buffer;
+    jsoncons::encode_json_pretty(vars, buffer);
+
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
+        };
+
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
+    std::cout << "\n";
+}
+
+void variant_example4()
+{
+    using variant_type = std::variant<std::nullptr_t, int, double, bool, std::string>;
+    
+    std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
+
+    std::string buffer;
+    jsoncons::encode_json_pretty(v, buffer);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, std::nullptr_t>)
+                std::cout << "nullptr " << arg << '\n';
+            else if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+        };
+
+    std::cout << "(2)\n";
+    for (const auto& item : v2)
+    {
+        std::visit(visitor, item);
+    }
+}
+
+void distinguish_by_type()
+{
+    using shapes_t = std::variant<ns::Rectangle,ns::Triangle,ns::Circle>;
+
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<shapes_t>>(input);
+
+    auto visitor = [](auto&& shape) {
+        using T = std::decay_t<decltype(shape)>;
+        if constexpr (std::is_same_v<T, ns::Rectangle>)
+            std::cout << "rectangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Triangle>)
+            std::cout << "triangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Circle>)
+            std::cout << "circle area: " << shape.area() << '\n';
+    };
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::visit(visitor, shape);
     }
 
-} // namespace
+    std::string output;
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
 
 #endif // defined(JSONCONS_HAS_STD_VARIANT)
 
-void json_traits_variant_examples()
+int main()
 {
     std::cout << "\njson traits variant examples\n\n";
 

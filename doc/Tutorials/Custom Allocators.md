@@ -1,7 +1,7 @@
 ## Examples
 
 ### Using `json` with boost stateless `fast_pool_allocator`
-```c++
+```cpp
 #include <boost/pool/pool_alloc.hpp>
 #include "jsoncons/json.hpp"
 
@@ -15,7 +15,7 @@ j.insert_or_assign("LastName","Smith");
 
 ### Using `json` with stateful Boost.Interprocess allocators
 
-```c++
+```cpp
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -28,7 +28,7 @@ using namespace jsoncons;
 typedef boost::interprocess::allocator<char,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
-struct boost_sorted_policy : public sorted_policy
+struct boost_sorted_policy 
 {
     template <class KeyT,class Json>
     using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
@@ -37,7 +37,7 @@ struct boost_sorted_policy : public sorted_policy
     using array = json_array<Json,boost::interprocess::vector>;
 
     template <class CharT, class CharTraits, class Allocator>
-    using string = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+    using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
 using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;

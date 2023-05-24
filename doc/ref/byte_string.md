@@ -1,6 +1,6 @@
 ### jsoncons::byte_string
 
-```c++
+```cpp
 #include <jsoncons/byte_string.hpp>
 
 typedef basic_byte_string<Allocator = std::allocator<uint8_t>> byte_string;
@@ -72,7 +72,7 @@ Member type                         |Definition
 
 #### Byte string from initializer list
 
-```c++
+```cpp
 json j(byte_string{'H','e','l','l','o'});
 byte_string bytes = j.as<byte_string>();
 
@@ -99,7 +99,7 @@ Output:
 
 #### Byte string from char array
 
-```c++
+```cpp
 json j(byte_string{'H','e','l','l','o'});
 byte_string bytes = j.as<byte_string>();
 

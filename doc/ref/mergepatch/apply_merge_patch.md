@@ -1,6 +1,6 @@
 ### jsoncons::mergepatch::apply_merge_patch
 
-```c++
+```cpp
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
 template <class Json>
@@ -23,7 +23,7 @@ None expected.
 
 This example is from [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386#section-3).
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 

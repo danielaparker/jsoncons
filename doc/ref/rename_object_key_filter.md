@@ -1,6 +1,6 @@
 ### jsoncons::rename_object_key_filter
 
-```c++
+```cpp
 #include <jsoncons/json_filter.hpp>
 
 using rename_object_key_filter = basic_rename_object_key_filter<char>;
@@ -25,7 +25,7 @@ Renames object member names.
 
 #### Rename object member names
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
 

@@ -1,40 +1,40 @@
 ### jsoncons::jsonpath::make_expression
 
-```c++
+```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 ```
 
-```c++
+```cpp
 template <class Json>
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr);      (until 0.164.0)
 ```
-```c++
+```cpp
 template <class Json>                                                           (1)
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
     const custom_functions<Json>& funcs = custom_functions<Json>());                (since 0.164.0)
 ```
-```c++
+```cpp
 template <class Json>
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
     std::error_code& ec);                                                       (2)
 ```
-```c++
+```cpp
 template <class Json>                                                           
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
     const custom_functions<Json>& funcs, std::error_code& ec);                  (3) (since 0.164.0)
 ```
-```c++
+```cpp
 template <class Json, class Alloc>                                              (4) (since 0.170.0)
 jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
     Json::string_view_type& expr,
     const custom_functions<Json>& funcs = custom_functions<Json>());                
 ```
-```c++
+```cpp
 template <class Json, class Alloc>                                              (5) (since 0.170.0)
 jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
     Json::string_view_type& expr, std::error_code& ec);                
 ```
-```c++
+```cpp
 template <class Json, class Alloc>                                              (6) (since 0.170.0)
 jsonpath_expression<Json> make_expression(std::allocator_arg_t, Alloc alloc, 
     Json::string_view_type& expr,
@@ -107,7 +107,7 @@ The examples below uses the sample data file `books.json`,
 
 #### Return copies
 
-```c++
+```cpp
 int main()
 {
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
@@ -128,7 +128,7 @@ Output:
 
 #### Access path and reference to original value
 
-```c++
+```cpp
 int main()
 {
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
@@ -151,7 +151,7 @@ $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,
 
 #### Custom functions
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
@@ -201,7 +201,7 @@ Output:
 
 #### make_expression with stateful allocator
 
-```c++
+```cpp
 #include <string_view> // Assuming C++ 17
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>

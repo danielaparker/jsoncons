@@ -85,34 +85,6 @@ enum class json_parse_state : uint8_t
     done
 };
 
-struct default_json_parsing
-{
-    bool operator()(json_errc ec, const ser_context&) noexcept 
-    {
-        if (ec == json_errc::illegal_comment)
-        {
-            return true; // Recover, allow comments
-        }
-        else
-        {
-            return false;
-        }
-    }
-};
-
-struct strict_json_parsing
-{
-    bool operator()(json_errc, const ser_context&) noexcept
-    {
-        return false;
-    }
-};
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use default_json_parsing") typedef default_json_parsing default_parse_error_handler;
-JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing strict_parse_error_handler;
-#endif
-
 template <class CharT, class TempAllocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
@@ -179,7 +151,7 @@ public:
 
     basic_json_parser(const basic_json_decode_options<char_type>& options, 
                       const TempAllocator& alloc = TempAllocator())
-        : basic_json_parser(options, default_json_parsing(), alloc)
+        : basic_json_parser(options, options.err_handler(), alloc)
     {
     }
 

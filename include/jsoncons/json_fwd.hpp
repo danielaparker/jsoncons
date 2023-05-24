@@ -14,7 +14,7 @@ namespace jsoncons {
 struct sorted_policy;
                         
 template <class CharT, 
-          class ImplementationPolicy = sorted_policy, 
+          class Policy = sorted_policy, 
           class Allocator = std::allocator<CharT>>
 class basic_json;
 
