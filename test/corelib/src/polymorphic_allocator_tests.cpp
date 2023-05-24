@@ -9,8 +9,8 @@
 #include <memory_resource> 
 using namespace jsoncons;
 
-using custom_json = jsoncons::pmr::json;
-using custom_ojson = jsoncons::pmr::ojson;
+using pmr_json = jsoncons::pmr::json;
+using pmr_ojson = jsoncons::pmr::ojson;
 
 TEST_CASE("string polymorhic allocator tests")
 {
