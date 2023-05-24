@@ -418,7 +418,7 @@ namespace jsoncons {
 
         using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
 
-        using key_type = typename policy_type::template string<char_type,char_traits_type,char_allocator_type>;
+        using key_type = typename policy_type::template member_key<char_type,char_traits_type,char_allocator_type>;
 
 
         using reference = basic_json&;
