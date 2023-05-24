@@ -11,7 +11,7 @@
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
-[Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)](#A12)  
+[Parse a JSON text using a polymorphic_allocator (since 0.171.0)](#A12)  
 [Decode a JSON text using stateful result and work allocators](#A9)
 
 ### Encode
@@ -449,7 +449,7 @@ Output:
 
 <div id="A12"/> 
 
-### Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)
+### Parse a JSON text using a polymorphic_allocator (since 0.171.0)
 
 ```cpp
 using pmr_json = jsoncons::pmr::json;
