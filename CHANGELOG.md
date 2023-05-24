@@ -27,6 +27,9 @@ namespace jsoncons { namespace pmr {
 
 Changes:
 
+- For anyone that has created a custom `basic_json` with a user provided `Policy`, the name
+`string` in `Policy` has been changed to `member_key`.
+
 - Non-propagating stateful allocators are no longer supported.
 Attempting to use a regular stateful allocator will produce a compile error.
 Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
@@ -36,7 +39,7 @@ and one was required when using stateful allocators. Since 0.171.0, `try_emplace
 must not be passed an allocator argument, because both `std::pmr::polymorphic_allocator` and `std::scoped_allocator_adaptor`
 use uses-allocator construction.   
 
-Note: Non-stateful allocators are supported as before.
+Note: Non-stateful custom allocators are supported as before.
 
 0.170.2
 -------

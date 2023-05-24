@@ -28,7 +28,7 @@ using namespace jsoncons;
 typedef boost::interprocess::allocator<char,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
-struct boost_sorted_policy : public sorted_policy
+struct boost_sorted_policy 
 {
     template <class KeyT,class Json>
     using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
@@ -37,7 +37,7 @@ struct boost_sorted_policy : public sorted_policy
     using array = json_array<Json,boost::interprocess::vector>;
 
     template <class CharT, class CharTraits, class Allocator>
-    member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+    using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
 using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
