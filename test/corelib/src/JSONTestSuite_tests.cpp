@@ -61,8 +61,8 @@ TEST_CASE("JSON Parsing Test Suite")
                 {
                     std::cout << p.path().filename().string() << " succeeded, expected failure\n";
                 }
-                // TODo revisit
-                //CHECK(ec);                        
+                // TODO: revisit
+                // CHECK(ec); 
             }
         }
     }

@@ -10,8 +10,11 @@
 #include <string>
 #include <limits> // std::numeric_limits
 #include <cwchar>
+#include <functional>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_error.hpp>
 #include <jsoncons/extension_traits.hpp>
+#include <jsoncons/ser_context.hpp>
 
 namespace jsoncons {
 
@@ -39,6 +42,35 @@ JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
 enum class spaces_option : uint8_t {no_spaces=0,space_after,space_before,space_before_and_after};
+
+
+struct default_json_parsing
+{
+    bool operator()(json_errc ec, const ser_context&) noexcept 
+    {
+        if (ec == json_errc::illegal_comment)
+        {
+            return true; // Recover, allow comments
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
+struct strict_json_parsing
+{
+    bool operator()(json_errc, const ser_context&) noexcept
+    {
+        return false;
+    }
+};
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use default_json_parsing") typedef default_json_parsing default_parse_error_handler;
+JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing strict_parse_error_handler;
+#endif
 
 template <class CharT>
 class basic_json_options;
@@ -324,18 +356,18 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 private:
-    bool lossless_number_:1;
+    bool lossless_number_;
+    std::function<bool(json_errc,const ser_context&)> err_handler_;
 public:
     basic_json_decode_options()
-        : lossless_number_(false)
+        : lossless_number_(false), err_handler_(default_json_parsing())
     {
     }
 
     basic_json_decode_options(const basic_json_decode_options&) = default;
 
     basic_json_decode_options(basic_json_decode_options&& other)
-        : super_type(std::forward<basic_json_decode_options>(other)),
-                     lossless_number_(other.lossless_number_)
+        : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(other.default_json_parsing())
     {
     }
 
@@ -344,6 +376,11 @@ public:
     bool lossless_number() const 
     {
         return lossless_number_;
+    }
+
+    const std::function<bool(json_errc,const ser_context&)>& err_handler() const 
+    {
+        return err_handler_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -409,7 +446,7 @@ public:
     basic_json_encode_options(const basic_json_encode_options&) = default;
 
     basic_json_encode_options(basic_json_encode_options&& other)
-        : super_type(std::forward<basic_json_encode_options>(other)),
+        : super_type(std::move(other)),
           escape_all_non_ascii_(other.escape_all_non_ascii_),
           escape_solidus_(other.escape_solidus_),
           pad_inside_object_braces_(other.pad_inside_object_braces_),
@@ -544,6 +581,7 @@ public:
     using basic_json_decode_options<CharT>::neginf_to_num;
 
     using basic_json_decode_options<CharT>::lossless_number;
+    using basic_json_decode_options<CharT>::err_handler;
 
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bigint_format;
@@ -722,6 +760,12 @@ public:
     basic_json_options& lossless_number(bool value) 
     {
         this->lossless_number_ = value;
+        return *this;
+    }
+
+    basic_json_options& err_handler(const std::function<bool(json_errc,const ser_context&)>& value) 
+    {
+        this->err_handler_ = value;
         return *this;
     }
 

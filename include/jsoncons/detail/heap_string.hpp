@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_STRING_WRAPPER_HPP
-#define JSONCONS_DETAIL_STRING_WRAPPER_HPP
+#ifndef JSONCONS_DETAIL_HEAP_STRING_BOX_HPP
+#define JSONCONS_DETAIL_HEAP_STRING_BOX_HPP
 
 #include <stdexcept>
 #include <string>
@@ -17,6 +17,58 @@
 
 namespace jsoncons { 
 namespace detail {
+
+    template <class Extra,class Allocator>
+    struct heap_string_base
+    {
+        Extra extra_;
+        Allocator alloc_;
+    
+        Allocator& get_allocator() 
+        {
+            return alloc_;
+        }
+
+        const Allocator& get_allocator() const
+        {
+            return alloc_;
+        }
+
+        heap_string_base(const Extra& extra, const Allocator& alloc)
+            : extra_(extra), alloc_(alloc)
+        {
+        }
+
+        ~heap_string_base() noexcept = default;
+    };
+
+    template <class CharT, class Extra, class Allocator>
+    struct heap_string : public heap_string_base<Extra,Allocator>
+    {
+        using char_type = CharT;
+        using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<CharT>;  
+        using allocator_traits_type = std::allocator_traits<allocator_type>;
+        using pointer = typename allocator_traits_type::pointer;
+
+        pointer p_;
+        std::size_t length_;
+
+        ~heap_string() noexcept = default; 
+
+        const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
+        const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
+        std::size_t length() const { return length_; }
+        Extra extra() const { return this->extra_; }
+
+        heap_string(Extra extra, const Allocator& alloc)
+            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0)
+        {
+        }
+
+        heap_string(const heap_string&) = delete;
+        heap_string& operator=(const heap_string&) = delete;
+
+    };
 
     template<std::size_t Len, std::size_t Align>
     struct jsoncons_aligned_storage
@@ -40,138 +92,38 @@ namespace detail {
     #endif
     }
 
-    // string_wrapper
+    // heap_string_factory
 
-    template <class CharT,class Allocator>
-    class string_wrapper
+    template <class CharT,class Extra,class Allocator>
+    class heap_string_factory
     {
     public:
         using char_type = CharT;
+        using heap_string_type = heap_string<CharT,Extra,Allocator>;
     private:
-        struct str_base_t
-        {
-            Allocator alloc_;
-        
-            Allocator& get_allocator() 
-            {
-                return alloc_;
-            }
 
-            const Allocator& get_allocator() const
-            {
-                return alloc_;
-            }
-
-            str_base_t(const Allocator& alloc)
-                : alloc_(alloc)
-            {
-            }
-
-            ~str_base_t() noexcept = default;
-        };
-
-        struct str_t : public str_base_t
-        {
-            typedef typename std::allocator_traits<Allocator>::template rebind_alloc<CharT> allocator_type;  
-            using allocator_traits_type = std::allocator_traits<allocator_type>;
-            using pointer = typename allocator_traits_type::pointer;
-
-            pointer p_;
-            std::size_t length_;
-
-            ~str_t() noexcept = default; 
-
-            const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
-            const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
-            std::size_t length() const { return length_; }
-        
-            str_t(const Allocator& alloc)
-                : str_base_t(alloc), p_(nullptr), length_(0)
-            {
-
-            }
-
-            str_t(const str_t&) = delete;
-            str_t& operator=(const str_t&) = delete;
-
-        };
-
-        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
+        using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;  
         using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
-        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<str_t> string_allocator_type;  
-        using string_pointer = typename std::allocator_traits<string_allocator_type>::pointer;
+        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
+    public:
+        using pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
 
         struct storage_t
         {
-            str_t data;
+            heap_string_type data;
             char_type c[1];
         };
         typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
 
-        string_pointer ptr_;
-    public:
-        string_wrapper() = default;
-
-        string_wrapper(string_pointer ptr)
-            : ptr_(ptr)
-        {
-        }
-
-        string_wrapper(const char_type* data, std::size_t length, const Allocator& a) 
-        {
-            ptr_ = create(data,length,a);
-        }
-
-        string_wrapper(const string_wrapper& val) 
-        {
-            ptr_ = create(val.data(),val.length(),val.get_allocator());
-        }
-
-        string_wrapper(const string_wrapper& val, const Allocator& a) 
-        {
-            ptr_ = create(val.data(),val.length(),a);
-        }
-
-        ~string_wrapper() noexcept
-        {
-            if (ptr_ != nullptr)
-            {
-                destroy(ptr_);
-            }
-        }
-
-        void swap(string_wrapper& other) noexcept
-        {
-            std::swap(ptr_,other.ptr_);
-        }
-
-        const char_type* data() const
-        {
-            return ptr_->data();
-        }
-
-        const char_type* c_str() const
-        {
-            return ptr_->c_str();
-        }
-
-        std::size_t length() const
-        {
-            return ptr_->length();
-        }
-
-        Allocator get_allocator() const
-        {
-            return ptr_->get_allocator();
-        }
-    private:
         static size_t aligned_size(std::size_t n)
         {
             return sizeof(json_storage_kind) + n;
         }
 
-        static string_pointer create(const char_type* s, std::size_t length, const Allocator& alloc)
+    public:
+
+        static pointer create(const char_type* s, std::size_t length, Extra extra, const Allocator& alloc)
         {
             std::size_t mem_size = aligned_size(length*sizeof(char_type));
 
@@ -179,197 +131,30 @@ namespace detail {
             byte_pointer ptr = byte_alloc.allocate(mem_size);
 
             char* storage = extension_traits::to_plain_pointer(ptr);
-            str_t* ps = new(storage)str_t(byte_alloc);
+            heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
 
             CharT* p = new(&psa->c)char_type[length + 1];
             std::memcpy(p, s, length*sizeof(char_type));
             p[length] = 0;
-            ps->p_ = std::pointer_traits<typename str_t::pointer>::pointer_to(*p);
+            ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
-            return std::pointer_traits<string_pointer>::pointer_to(*ps);
+            return std::pointer_traits<pointer>::pointer_to(*ps);
         }
 
-        static void destroy(string_pointer ptr)
+        static void destroy(pointer ptr)
         {
-            str_t* rawp = extension_traits::to_plain_pointer(ptr);
-
-            char* p = launder_cast<char*>(rawp);
-
-            std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
-            byte_allocator_type byte_alloc(ptr->get_allocator());
-            byte_alloc.deallocate(p,mem_size);
-        }
-    };
-
-    // tagged_string_wrapper
-
-    template <class CharT,class Allocator>
-    class tagged_string_wrapper
-    {
-    public:
-        using char_type = CharT;
-    private:
-        struct str_base_t
-        {
-            Allocator alloc_;
-
-            Allocator& get_allocator() 
+            if (ptr != nullptr)
             {
-                return alloc_;
+                heap_string_type* rawp = extension_traits::to_plain_pointer(ptr);
+
+                char* p = launder_cast<char*>(rawp);
+
+                std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
+                byte_allocator_type byte_alloc(ptr->get_allocator());
+                byte_alloc.deallocate(p,mem_size);
             }
-
-            const Allocator& get_allocator() const
-            {
-                return alloc_;
-            }
-
-            str_base_t(const Allocator& alloc)
-                : alloc_(alloc)
-            {
-            }
-
-            ~str_base_t() noexcept = default;
-        };
-
-        struct str_t : public str_base_t
-        {
-            typedef typename std::allocator_traits<Allocator>::template rebind_alloc<CharT> allocator_type;  
-            using allocator_traits_type = std::allocator_traits<allocator_type>;
-            using pointer = typename allocator_traits_type::pointer;
-
-            pointer p_;
-            std::size_t length_;
-            uint64_t tag_;
-
-            ~str_t() noexcept = default; 
-
-            const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
-            const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
-            std::size_t length() const { return length_; }
-            uint64_t tag() const { return tag_; }
-
-            str_t(uint64_t tag, const Allocator& alloc)
-                : str_base_t(alloc), p_(nullptr), length_(0), tag_(tag)
-            {
-
-            }
-
-            str_t(const str_t&) = delete;
-            str_t& operator=(const str_t&) = delete;
-
-        };
-
-        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
-        using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
-
-        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<str_t> string_allocator_type;  
-        using string_pointer = typename std::allocator_traits<string_allocator_type>::pointer;
-
-        struct storage_t
-        {
-            str_t data;
-            char_type c[1];
-        };
-        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
-
-        string_pointer ptr_;
-    public:
-        tagged_string_wrapper() = default;
-
-        tagged_string_wrapper(string_pointer ptr)
-            : ptr_(ptr)
-        {
-        }
-
-        tagged_string_wrapper(const char_type* data, std::size_t length, uint64_t tag, const Allocator& alloc) 
-        {
-            ptr_ = create(data, length, tag, alloc);
-        }
-
-        tagged_string_wrapper(const tagged_string_wrapper& val) 
-        {
-            ptr_ = create(val.data(), val.length(), val.tag(), val.get_allocator());
-        }
-
-        tagged_string_wrapper(const tagged_string_wrapper& val, const Allocator& alloc) 
-        {
-            ptr_ = create(val.data(), val.length(), val.tag(), alloc);
-        }
-
-        ~tagged_string_wrapper() noexcept
-        {
-            if (ptr_ != nullptr)
-            {
-                destroy(ptr_);
-            }
-        }
-
-        void swap(tagged_string_wrapper& other) noexcept
-        {
-            std::swap(ptr_,other.ptr_);
-        }
-
-        const char_type* data() const
-        {
-            return ptr_->data();
-        }
-
-        const char_type* c_str() const
-        {
-            return ptr_->c_str();
-        }
-
-        std::size_t length() const
-        {
-            return ptr_->length();
-        }
-
-        uint64_t tag() const
-        {
-            return ptr_->tag();
-        }
-
-        Allocator get_allocator() const
-        {
-            return ptr_->get_allocator();
-        }
-    private:
-        static size_t aligned_size(std::size_t n)
-        {
-            return sizeof(json_storage_kind) + n;
-        }
-
-        static string_pointer create(const char_type* s, std::size_t length, uint64_t tag, const Allocator& alloc)
-        {
-            std::size_t mem_size = aligned_size(length*sizeof(char_type));
-
-            byte_allocator_type byte_alloc(alloc);
-            byte_pointer ptr = byte_alloc.allocate(mem_size);
-
-            char* storage = extension_traits::to_plain_pointer(ptr);
-            str_t* ps = new(storage)str_t(tag, byte_alloc);
-
-            auto psa = launder_cast<storage_t*>(storage); 
-
-            CharT* p = new(&psa->c)char_type[length + 1];
-            std::memcpy(p, s, length*sizeof(char_type));
-            p[length] = 0;
-            ps->p_ = std::pointer_traits<typename str_t::pointer>::pointer_to(*p);
-            ps->length_ = length;
-            return std::pointer_traits<string_pointer>::pointer_to(*ps);
-        }
-
-        static void destroy(string_pointer ptr)
-        {
-            str_t* rawp = extension_traits::to_plain_pointer(ptr);
-
-            char* p = launder_cast<char*>(rawp);
-
-            std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
-            byte_allocator_type byte_alloc(ptr->get_allocator());
-            byte_alloc.deallocate(p,mem_size);
         }
     };
 

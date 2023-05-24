@@ -1,10 +1,52 @@
+0.171.0 preview
+-------
+
+Enhancements:
+
+- `basic_json` supports allocators that automatically propagate,  
+
+    - `std::pmr::polymorphic_allocator`
+
+    - `std::scoped_allocator_adaptor`
+
+- Defines aliases and alias templates for `basic_json` using polymorphic allocators
+in the `jsoncons::pmr` namespace.
+
+```
+namespace jsoncons { namespace pmr {
+    template<class CharT, class Policy>
+    using basic_json = jsoncons::basic_json<CharT, Policy, std::pmr::polymorphic_allocator<char>>;
+
+    using json = basic_json<char,sorted_policy>;
+    using wjson = basic_json<wchar_t,sorted_policy>;
+    using ojson = basic_json<char, order_preserving_policy>;
+    using wojson = basic_json<wchar_t, order_preserving_policy>;
+}}
+
+```
+
+Changes:
+
+- For anyone that has created a custom `basic_json` with a user provided `Policy`, the name
+`string` in `Policy` has been changed to `member_key`.
+
+- Non-propagating stateful allocators are no longer supported.
+Attempting to use a regular stateful allocator will produce a compile error.
+Regular stateful allocators must be wrapped with [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
+
+- Until 0.171.0, the `basic_json` functions `try_emplace`, `emplace`, and `emplace_back` allowed an allocator argument,
+and one was required when using stateful allocators. Since 0.171.0, `try_emplace`, `emplace`, and `emplace_back`
+must not be passed an allocator argument, because both `std::pmr::polymorphic_allocator` and `std::scoped_allocator_adaptor`
+use uses-allocator construction.   
+
+Note: Non-stateful custom allocators are supported as before.
+
 0.170.2
 -------
 
 Defect fixes
 
 - Fixed issue with jsonschema default values (introduced in 0.170.0)
-
 
 0.170.1
 -------

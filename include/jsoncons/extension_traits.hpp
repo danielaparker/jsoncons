@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_TRAITS_EXTENSION_HPP
-#define JSONCONS_TRAITS_EXTENSION_HPP
+#ifndef JSONCONS_EXTENSION_TRAITS_HPP
+#define JSONCONS_EXTENSION_TRAITS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -19,6 +19,10 @@
 #include <utility> // std::declval
 #include <climits> // CHAR_BIT
 #include <jsoncons/config/compiler_support.hpp>
+
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#include <memory_resource> 
+#endif
 
 namespace jsoncons {
 namespace extension_traits {
@@ -877,6 +881,38 @@ namespace impl {
     
 
     #endif
+
+    // is_propagating_allocator
+
+    template <class Allocator>
+    using 
+    allocator_outer_allocator_type_t = typename Allocator::outer_allocator_type;
+
+    template <class Allocator>
+    using 
+    allocator_inner_allocator_type_t = typename Allocator::inner_allocator_type;
+
+    template <class T, class Enable=void>
+    struct is_propagating_allocator : std::false_type {};
+
+    template <class T, class Enable=void>
+    struct is_polymorphic_allocator : std::false_type {};
+
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+    template<class T>
+    struct is_polymorphic_allocator
+    <
+        T, 
+        typename std::enable_if<(std::is_same<T,std::pmr::polymorphic_allocator<char>>::value) >::type
+    > : std::true_type{};
+#endif
+    template<class T>
+    struct is_propagating_allocator
+    <
+        T, 
+        typename std::enable_if<(is_polymorphic_allocator<T>::value) || 
+            (is_detected<allocator_outer_allocator_type_t,T>::value && is_detected<allocator_inner_allocator_type_t,T>::value)>::type
+    > : std::true_type{};
 
 } // extension_traits
 } // jsoncons

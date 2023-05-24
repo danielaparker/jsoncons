@@ -75,25 +75,26 @@ namespace jsoncons {
               elements_(begin,end,value_allocator_type(alloc))
         {
         }
-        json_array(const json_array& val)
-            : allocator_holder<allocator_type>(val.get_allocator()),
-              elements_(val.elements_)
+
+        json_array(const json_array& other)
+            : allocator_holder<allocator_type>(other.get_allocator()),
+              elements_(other.elements_)
         {
         }
-        json_array(const json_array& val, const allocator_type& alloc)
+        json_array(const json_array& other, const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              elements_(val.elements_,value_allocator_type(alloc))
+              elements_(other.elements_,value_allocator_type(alloc))
         {
         }
 
-        json_array(json_array&& val) noexcept
-            : allocator_holder<allocator_type>(val.get_allocator()), 
-              elements_(std::move(val.elements_))
+        json_array(json_array&& other) noexcept
+            : allocator_holder<allocator_type>(other.get_allocator()), 
+              elements_(std::move(other.elements_))
         {
         }
-        json_array(json_array&& val, const allocator_type& alloc)
+        json_array(json_array&& other, const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              elements_(std::move(val.elements_),value_allocator_type(alloc))
+              elements_(std::move(other.elements_),value_allocator_type(alloc))
         {
         }
 
@@ -128,9 +129,9 @@ namespace jsoncons {
             return elements_.empty();
         }
 
-        void swap(json_array& val) noexcept
+        void swap(json_array& other) noexcept
         {
-            elements_.swap(val.elements_);
+            elements_.swap(other.elements_);
         }
 
         std::size_t size() const {return elements_.size();}
@@ -202,7 +203,7 @@ namespace jsoncons {
         typename std::enable_if<!extension_traits::is_stateless<A>::value,void>::type 
         push_back(T&& value)
         {
-            elements_.emplace_back(std::forward<T>(value),get_allocator());
+            elements_.emplace_back(std::forward<T>(value));
         }
 
         template <class T, class A=allocator_type>
@@ -222,9 +223,9 @@ namespace jsoncons {
         {
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
             iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.emplace(it, std::forward<T>(value), get_allocator());
+            return elements_.emplace(it, std::forward<T>(value));
     #else
-            return elements_.emplace(pos, std::forward<T>(value), get_allocator());
+            return elements_.emplace(pos, std::forward<T>(value));
     #endif
         }
 
