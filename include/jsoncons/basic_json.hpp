@@ -263,7 +263,7 @@ namespace jsoncons {
         using array = json_array<Json,std::vector>;
         
         template <class CharT, class CharTraits, class Allocator>
-        using string = std::basic_string<CharT, CharTraits, Allocator>;
+        member_key = std::basic_string<CharT, CharTraits, Allocator>;
     };
 
     struct order_preserving_policy
@@ -275,7 +275,7 @@ namespace jsoncons {
         using array = json_array<Json,std::vector>;
         
         template <class CharT, class CharTraits, class Allocator>
-        using string = std::basic_string<CharT, CharTraits, Allocator>;
+        member_key = std::basic_string<CharT, CharTraits, Allocator>;
     };
 
     template<class Policy, class KeyT,class Json, class Enable=void>

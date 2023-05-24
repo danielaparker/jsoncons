@@ -37,7 +37,7 @@ struct boost_sorted_policy : public sorted_policy
     using array = json_array<Json,boost::interprocess::vector>;
 
     template <class CharT, class CharTraits, class Allocator>
-    using string = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+    member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
 using shm_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
