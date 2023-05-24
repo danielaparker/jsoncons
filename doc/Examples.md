@@ -12,7 +12,7 @@
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)](#A12)  
-[Decode a JSON text using stateful result and work allocators](#A9)  
+[Decode a JSON text using stateful result and work allocators](#A9)
 
 ### Encode
 
@@ -447,30 +447,6 @@ Output:
 }
 ```
 
-<div id="A9"/> 
-
-### Decode a JSON text using stateful result and work allocators
-
-```cpp
-// Given allocator my_alloc with a single-argument constructor my_alloc(int),
-// use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
-// working memory used by json_decoder, and my_alloc(3) to allocate
-// working memory used by basic_json_reader. 
-
-using my_json = basic_json<char,sorted_policy,my_alloc>; // until 0.171.0
-
-using my_json = basic_json<char,sorted_policy,std::scoped_allocator_adaptor<my_alloc>>; // since 0.171.0
-
-std::ifstream is("book_catalog.json");
-json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
-
-basic_json_reader<char,stream_source<char>,my_alloc> reader(is, decoder, my_alloc(3));
-reader.read();
-
-my_json j = decoder.get_result();
-std::cout << pretty_print(j) << "\n";
-```
-
 <div id="A12"/> 
 
 ### Parse a JSON text using a `std::pmr::polymorphic_allocator` allocator (since 0.171.0)
@@ -493,6 +469,30 @@ std::string json_text = R"(
 
 auto doc = pmr_json::parse(json_text, json_options{}, alloc);
 std::cout << pretty_print(doc) << "\n\n";
+```
+
+<div id="A9"/> 
+
+### Decode a JSON text using stateful result and work allocators
+
+```cpp
+// Given allocator my_alloc with a single-argument constructor my_alloc(int),
+// use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
+// working memory used by json_decoder, and my_alloc(3) to allocate
+// working memory used by basic_json_reader. 
+
+using my_json = basic_json<char,sorted_policy,my_alloc>; // until 0.171.0
+
+using my_json = basic_json<char,sorted_policy,std::scoped_allocator_adaptor<my_alloc>>; // since 0.171.0
+
+std::ifstream is("book_catalog.json");
+json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
+
+basic_json_reader<char,stream_source<char>,my_alloc> reader(is, decoder, my_alloc(3));
+reader.read();
+
+my_json j = decoder.get_result();
+std::cout << pretty_print(j) << "\n";
 ```
 
 ### Encode
