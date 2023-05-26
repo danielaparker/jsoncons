@@ -41,17 +41,17 @@ public:
 };
 
 template <class ResultAllocator,class WorkAllocator>
-wrapped_allocators<ResultAllocator,WorkAllocator> allocator_strategy(const ResultAllocator& result_alloc = std::allocator<char>(), 
+wrapped_allocators<ResultAllocator,WorkAllocator> wrap_allocators(const ResultAllocator& result_alloc = std::allocator<char>(), 
     const WorkAllocator& work_alloc = std::allocator<char>())
 {
-    return wrapped_allocators(result_alloc, work_alloc);
+    return wrapped_allocators<ResultAllocator,WorkAllocator>(result_alloc, work_alloc);
 }
 
 template <class WorkAllocator>
-wrapped_allocators<std::allocator<char>,WorkAllocator> allocator_strategy(work_allocator_arg_t, 
+wrapped_allocators<std::allocator<char>,WorkAllocator> wrap_allocators(work_allocator_arg_t, 
     const WorkAllocator& work_alloc)
 {
-    return wrapped_allocators(std::allocator<char>(), work_alloc);
+    return wrapped_allocators<std::allocator<char>,WorkAllocator>(std::allocator<char>(), work_alloc);
 }
 
 } // namespace jsoncons

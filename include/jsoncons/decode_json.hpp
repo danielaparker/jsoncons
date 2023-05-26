@@ -14,7 +14,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
-#include <jsoncons/allocator_strategy.hpp>
+#include <jsoncons/wrapped_allocators.hpp>
 
 namespace jsoncons {
 
@@ -204,7 +204,7 @@ namespace jsoncons {
         return val;
     }
 
-    // With allocator_strategy
+    // With wrapped_allocators
 
     template <class T,class Source,class ResultAllocator,class WorkAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
