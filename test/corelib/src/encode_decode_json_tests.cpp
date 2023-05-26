@@ -12,46 +12,6 @@
 
 namespace 
 {
-    template <class T>
-    struct MyAlloc
-    {
-        using value_type = T;
-        using size_type = std::size_t;
-        using propagate_on_container_move_assignment = std::true_type;
-
-        #if _GLIBCXX_FULLY_DYNAMIC_STRING == 0
-        MyAlloc() = default;
-        #endif
-        MyAlloc(int) {}
-
-        template< class U >
-        MyAlloc(const MyAlloc<U>&) noexcept {}
-
-        T* allocate(size_type n)
-        {
-            return static_cast<T*>(::operator new(n * sizeof(T)));
-        }
-
-        void deallocate(T* ptr, size_type) noexcept
-        {
-            ::operator delete(ptr);
-        }
-
-        bool operator==(const MyAlloc&) const { return true; }
-        bool operator!=(const MyAlloc&) const { return false; }
-
-        template<typename U>
-        struct rebind
-        {
-            using other = MyAlloc<U>;
-        };
-        using pointer = T*;
-        using const_pointer = const T*;
-        using reference = T&;
-        using const_reference = const T&;
-        using difference_type = std::ptrdiff_t;
-    };
-
     class MyIterator
     {
         const char* p_;
@@ -186,23 +146,6 @@ TEST_CASE("convert_vector_test")
     }
 }
 
-TEST_CASE("convert_vector_test, temp_allocator")
-{
-    std::vector<double> v = {1,2,3,4,5,6};
-
-    std::string s;
-    jsoncons::encode_json(v,s);
-
-    auto result = jsoncons::decode_json<std::vector<double>>(
-        temp_allocator_arg, MyAlloc<char>(1), s);
-
-    REQUIRE(v.size() == result.size());
-    for (std::size_t i = 0; i < result.size(); ++i)
-    {
-        CHECK(v[i] == result[i]);
-    }
-}
-
 TEST_CASE("convert_map_test")
 {
     std::map<std::string,double> m = {{"a",1},{"b",2}};
@@ -211,19 +154,6 @@ TEST_CASE("convert_map_test")
     jsoncons::encode_json(m,s);
     auto result = jsoncons::decode_json<std::map<std::string,double>>(s);
 
-    REQUIRE(result.size() == m.size());
-    CHECK(m["a"] == result["a"]);
-    CHECK(m["b"] == result["b"]);
-}
-
-TEST_CASE("convert_map_test, temp_allocator")
-{
-    std::map<std::string,double> m = {{"a",1},{"b",2}};
-
-    std::string s;
-    jsoncons::encode_json(m,s);
-    auto result = jsoncons::decode_json<std::map<std::string,double>>(
-        temp_allocator_arg, MyAlloc<char>(1), s);
     REQUIRE(result.size() == m.size());
     CHECK(m["a"] == result["a"]);
     CHECK(m["b"] == result["b"]);
@@ -261,25 +191,6 @@ TEST_CASE("convert vector of vector test")
         CHECK(item[3] == 4);
     }
 }
-TEST_CASE("convert vector of vector test, temp_allocator")
-{
-    std::vector<double> u{1,2,3,4};
-    std::vector<std::vector<double>> v{u,u};
-
-    std::string s;
-    jsoncons::encode_json(v,s);
-    auto result = jsoncons::decode_json<std::vector<std::vector<double>>>(
-        temp_allocator_arg, MyAlloc<char>(1), s);
-    REQUIRE(result.size() == v.size());
-    for (const auto& item : result)
-    {
-        REQUIRE(item.size() == u.size());
-        CHECK(item[0] == 1);
-        CHECK(item[1] == 2);
-        CHECK(item[2] == 3);
-        CHECK(item[3] == 4);
-    }
-}
 
 #if !(defined(__GNUC__) && __GNUC__ <= 5)
 TEST_CASE("convert_tuple_test")
@@ -307,23 +218,6 @@ TEST_CASE("convert_tuple_test")
 
 }
 
-TEST_CASE("convert_tuple_test, temp_allocator")
-{
-    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
-
-    employee_collection employees = 
-    { 
-        {"John Smith",{"Hourly","Software Engineer",10000}},
-        {"Jane Doe",{"Commission","Sales",20000}}
-    };
-
-    std::string s;
-    jsoncons::encode_json_pretty(employees, s);
-    auto employees2 = jsoncons::decode_json<employee_collection>(
-        temp_allocator_arg, MyAlloc<char>(1), s);
-    REQUIRE(employees2.size() == employees.size());
-    CHECK(employees2 == employees);
-}
 #endif
 
 TEST_CASE("encode/decode map with integer key")

@@ -121,6 +121,7 @@ add_executable(unit_tests
                corelib/src/double_to_string_tests.cpp
                corelib/src/dtoa_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
+               corelib/src/decode_json_with_allocator_strategy_tests.cpp
                corelib/src/encode_traits_tests.cpp
                corelib/src/error_recovery_tests.cpp
                corelib/src/json_array_tests.cpp
