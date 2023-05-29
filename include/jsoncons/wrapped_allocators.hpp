@@ -25,6 +25,9 @@ class wrapped_allocators
     ResultAllocator result_alloc_;
     WorkAllocator work_alloc_;
 public:
+    using result_allocator_type = ResultAllocator;
+    using work_allocator_type = WorkAllocator;
+
     wrapped_allocators(const ResultAllocator& result_alloc, const WorkAllocator& work_alloc)
         : result_alloc_(result_alloc), work_alloc_(work_alloc)
     {

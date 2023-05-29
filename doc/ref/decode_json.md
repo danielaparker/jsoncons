@@ -8,16 +8,25 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 
 template <class T, class Source>
 T decode_json(const Source& s,
-              const basic_json_decode_options<Source::value_type>& options 
-                  = basic_json_decode_options<Source::value_type>()); (1)
+    const basic_json_decode_options<Source::value_type>& options = basic_json_decode_options<Source::value_type>()); (1)
 
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); (2)
+    const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (2)
 
 template <class T, class Iterator>
 T decode_json(Iterator first, Iterator last,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); (3)
+    const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (3)
+
+template <class T, class Source>
+T decode_json(wrapped_allocators<ResultAllocator,WorkAllocator> allocators,
+    const Source& s,
+    const basic_json_decode_options<Source::value_type>& options = basic_json_decode_options<Source::value_type>()); (4)
+
+template <class T, class CharT>
+T decode_json(wrapped_allocators<ResultAllocator,WorkAllocator> allocators,
+    std::basic_istream<CharT>& is,
+    const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (5)
 ```
 
 (1) Reads JSON from a contiguous character sequence provided by `s` into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
@@ -75,6 +84,8 @@ John Smith: Software Engineer
 ```
 
 ### See also
+
+[wrapped_allocators](wrapped_allocators.md)
 
 [encode_json](encode_json.md)
 
