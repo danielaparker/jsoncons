@@ -44,7 +44,7 @@ Move constructor.
         const WorkAllocator& work_alloc)
 
     Creates a `wrapped_allocators` object, defaulting the result allocator type to `std::allocator<char>`
-    and deducing the work allocator type from the type of the `work_allocator` argument.
+    and deducing the work allocator type from the type of the `work_alloc` argument.
 
 #### Helper classes
 
