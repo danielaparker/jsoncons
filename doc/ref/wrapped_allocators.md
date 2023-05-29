@@ -33,7 +33,8 @@ Move constructor.
 #### Non member functions
 
     template <class ResultAllocator,class WorkAllocator>
-    wrapped_allocators<ResultAllocator,WorkAllocator> wrap_allocators(const ResultAllocator& result_alloc = std::allocator<char>(), 
+    wrapped_allocators<ResultAllocator,WorkAllocator> wrap_allocators(
+        const ResultAllocator& result_alloc = std::allocator<char>(), 
         const WorkAllocator& work_alloc = std::allocator<char>());
 
     Creates a `wrapped_allocators` object, deducing the allocator types from the types of arguments.
