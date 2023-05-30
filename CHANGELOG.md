@@ -27,8 +27,8 @@ namespace jsoncons { namespace pmr {
 
 Changes:
 
-- For anyone that has created a custom `basic_json` with a user provided `Policy`, the name
-`string` in `Policy` has been changed to `member_key`.
+- For users creating a custom `basic_json` with a user provided `Policy`, the name
+`string` in `Policy` must be changed to `member_key`.
 
 - Non-propagating stateful allocators are no longer supported.
 Attempting to use a regular stateful allocator will produce a compile error.
@@ -40,6 +40,8 @@ must not be passed an allocator argument, because both `std::pmr::polymorphic_al
 use uses-allocator construction.   
 
 Note: Non-stateful custom allocators are supported as before.
+
+- The tag type `result_allocator_arg_t` and constant `result_allocator_arg` have been deprecated.
 
 0.170.2
 -------
