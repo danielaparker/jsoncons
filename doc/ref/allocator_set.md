@@ -15,9 +15,13 @@ Member type                         |Definition
 
 #### Constructors
 
-    allocator_set(const Allocator& alloc=Allocator(), 
-        const TempAllocator& temp_alloc=TempAllocator())
-Constructs a `allocator_set` with a result and a work allocator. 
+    allocator_set(const Allocator& alloc)
+Constructs an `allocator_set` with the provided allocator for persistent data and
+defaulting to a `std::allocator<char>` for temporary allocations. 
+
+    allocator_set(const Allocator& alloc, const TempAllocator& temp_alloc)
+Constructs an `allocator_set` with an allocator for persistent data and a
+second allocator for temporary allocations. 
 
     allocator_set(const allocator_set&)
 Copy constructor. 
