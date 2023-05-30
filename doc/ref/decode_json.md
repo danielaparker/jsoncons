@@ -19,12 +19,12 @@ T decode_json(Iterator first, Iterator last,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (3)
 
 template <class T, class Source>
-T decode_json(wrapped_allocators<Allocator,TempAllocator> allocators,
+T decode_json(allocator_set<Allocator,TempAllocator> allocators,
     const Source& s,
     const basic_json_decode_options<Source::value_type>& options = basic_json_decode_options<Source::value_type>()); (4)
 
 template <class T, class CharT>
-T decode_json(wrapped_allocators<Allocator,TempAllocator> allocators,
+T decode_json(allocator_set<Allocator,TempAllocator> allocators,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (5)
 ```
@@ -85,7 +85,7 @@ John Smith: Software Engineer
 
 ### See also
 
-[wrapped_allocators](wrapped_allocators.md)
+[allocator_set](wrapped_allocators.md)
 
 [encode_json](encode_json.md)
 

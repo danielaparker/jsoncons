@@ -1,11 +1,11 @@
-### jsoncons::wrapped_allocators
+### jsoncons::allocator_set
 
 ```cpp
 #include <jsoncons/wrapped_allocators.hpp>
 
 template< 
     class Allocator,class TempAllocator
-> wrapped_allocators;
+> allocator_set;
 ```
 
 Member type                         |Definition
@@ -15,13 +15,13 @@ Member type                         |Definition
 
 #### Constructors
 
-    wrapped_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
-Constructs a `wrapped_allocators` with a result and a work allocator. 
+    allocator_set(const Allocator& alloc, const TempAllocator& temp_alloc)
+Constructs a `allocator_set` with a result and a work allocator. 
 
-    wrapped_allocators(const wrapped_allocators&)
+    allocator_set(const allocator_set&)
 Copy constructor. 
 
-    wrapped_allocators(wrapped_allocators&&)
+    allocator_set(allocator_set&&)
 Move constructor. 
 
 #### Accessors
@@ -35,17 +35,17 @@ An allocator object for for temporary allocations
 #### Non member functions
 
     template <class Allocator,class TempAllocator>
-    wrapped_allocators<Allocator,TempAllocator> wrap_allocators(
+    allocator_set<Allocator,TempAllocator> make_allocator_set(
         const Allocator& alloc = std::allocator<char>(), 
         const TempAllocator& temp_alloc = std::allocator<char>());
 
-    Creates a `wrapped_allocators` object, deducing the allocator types from the types of arguments.
+    Creates a `allocator_set` object, deducing the allocator types from the types of arguments.
 
     template <class TempAllocator>
-    wrapped_allocators<std::allocator<char>,TempAllocator> wrap_allocators(temp_allocator_arg_t, 
+    allocator_set<std::allocator<char>,TempAllocator> make_allocator_set(temp_allocator_arg_t, 
         const TempAllocator& temp_alloc)
 
-    Creates a `wrapped_allocators` object, defaulting the result allocator type to `std::allocator<char>`
+    Creates a `allocator_set` object, defaulting the result allocator type to `std::allocator<char>`
     and deducing the work allocator type from the type of the `temp_alloc` argument.
 
 

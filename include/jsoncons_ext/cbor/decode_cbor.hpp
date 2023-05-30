@@ -15,7 +15,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/decode_traits.hpp>
-#include <jsoncons/wrapped_allocators.hpp>
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -124,12 +124,12 @@ namespace cbor {
         return val;
     }
 
-    // With leading wrapped_allocators parameter
+    // With leading allocator_set parameter
 
     template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_cbor(const wrapped_allocators<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -147,7 +147,7 @@ namespace cbor {
     template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_cbor(const wrapped_allocators<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -165,7 +165,7 @@ namespace cbor {
 
     template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_cbor(const wrapped_allocators<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -182,7 +182,7 @@ namespace cbor {
 
     template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_cbor(const wrapped_allocators<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {

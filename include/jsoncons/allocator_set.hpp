@@ -13,7 +13,7 @@
 namespace jsoncons {
 
 template <class Allocator,class TempAllocator>
-class wrapped_allocators
+class allocator_set
 {
     Allocator result_alloc_;
     TempAllocator temp_alloc_;
@@ -21,33 +21,33 @@ public:
     using allocator_type = Allocator;
     using temp_allocator_type = TempAllocator;
 
-    wrapped_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
+    allocator_set(const Allocator& alloc, const TempAllocator& temp_alloc)
         : result_alloc_(alloc), temp_alloc_(temp_alloc)
     {
     }
 
-    wrapped_allocators(const wrapped_allocators&)  = default;
-    wrapped_allocators(wrapped_allocators&&)  = default;
-    wrapped_allocators& operator=(const wrapped_allocators&)  = delete;
-    wrapped_allocators& operator=(wrapped_allocators&&)  = delete;
-    ~wrapped_allocators() = default;
+    allocator_set(const allocator_set&)  = default;
+    allocator_set(allocator_set&&)  = default;
+    allocator_set& operator=(const allocator_set&)  = delete;
+    allocator_set& operator=(allocator_set&&)  = delete;
+    ~allocator_set() = default;
 
     Allocator get_allocator() const {return result_alloc_;}
     TempAllocator get_temp_allocator() const {return temp_alloc_;}
 };
 
 template <class Allocator,class TempAllocator>
-wrapped_allocators<Allocator,TempAllocator> wrap_allocators(const Allocator& alloc = std::allocator<char>(), 
+allocator_set<Allocator,TempAllocator> make_allocator_set(const Allocator& alloc = std::allocator<char>(), 
     const TempAllocator& temp_alloc = std::allocator<char>())
 {
-    return wrapped_allocators<Allocator,TempAllocator>(alloc, temp_alloc);
+    return allocator_set<Allocator,TempAllocator>(alloc, temp_alloc);
 }
 
 template <class TempAllocator>
-wrapped_allocators<std::allocator<char>,TempAllocator> wrap_allocators(temp_allocator_arg_t, 
+allocator_set<std::allocator<char>,TempAllocator> make_allocator_set(temp_allocator_arg_t, 
     const TempAllocator& temp_alloc)
 {
-    return wrapped_allocators<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);
+    return allocator_set<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);
 }
 
 } // namespace jsoncons
