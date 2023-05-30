@@ -21,7 +21,8 @@ public:
     using allocator_type = Allocator;
     using temp_allocator_type = TempAllocator;
 
-    allocator_set(const Allocator& alloc, const TempAllocator& temp_alloc)
+    allocator_set(const Allocator& alloc=Allocator(), 
+        const TempAllocator& temp_alloc=TempAllocator())
         : result_alloc_(alloc), temp_alloc_(temp_alloc)
     {
     }
