@@ -12,17 +12,17 @@
 
 namespace jsoncons {
 
-template <class ResultAllocator,class WorkAllocator>
+template <class ResultAllocator,class TempAllocator>
 class wrapped_allocators
 {
     ResultAllocator result_alloc_;
-    WorkAllocator work_alloc_;
+    TempAllocator temp_alloc_;
 public:
     using result_allocator_type = ResultAllocator;
-    using work_allocator_type = WorkAllocator;
+    using temp_allocator_type = TempAllocator;
 
-    wrapped_allocators(const ResultAllocator& result_alloc, const WorkAllocator& work_alloc)
-        : result_alloc_(result_alloc), work_alloc_(work_alloc)
+    wrapped_allocators(const ResultAllocator& result_alloc, const TempAllocator& temp_alloc)
+        : result_alloc_(result_alloc), temp_alloc_(temp_alloc)
     {
     }
 
@@ -33,21 +33,21 @@ public:
     ~wrapped_allocators() = default;
 
     ResultAllocator get_result_allocator() const {return result_alloc_;}
-    WorkAllocator get_work_allocator() const {return work_alloc_;}
+    TempAllocator get_temp_allocator() const {return temp_alloc_;}
 };
 
-template <class ResultAllocator,class WorkAllocator>
-wrapped_allocators<ResultAllocator,WorkAllocator> wrap_allocators(const ResultAllocator& result_alloc = std::allocator<char>(), 
-    const WorkAllocator& work_alloc = std::allocator<char>())
+template <class ResultAllocator,class TempAllocator>
+wrapped_allocators<ResultAllocator,TempAllocator> wrap_allocators(const ResultAllocator& result_alloc = std::allocator<char>(), 
+    const TempAllocator& temp_alloc = std::allocator<char>())
 {
-    return wrapped_allocators<ResultAllocator,WorkAllocator>(result_alloc, work_alloc);
+    return wrapped_allocators<ResultAllocator,TempAllocator>(result_alloc, temp_alloc);
 }
 
-template <class WorkAllocator>
-wrapped_allocators<std::allocator<char>,WorkAllocator> wrap_allocators(temp_allocator_arg_t, 
-    const WorkAllocator& work_alloc)
+template <class TempAllocator>
+wrapped_allocators<std::allocator<char>,TempAllocator> wrap_allocators(temp_allocator_arg_t, 
+    const TempAllocator& temp_alloc)
 {
-    return wrapped_allocators<std::allocator<char>,WorkAllocator>(std::allocator<char>(), work_alloc);
+    return wrapped_allocators<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);
 }
 
 } // namespace jsoncons

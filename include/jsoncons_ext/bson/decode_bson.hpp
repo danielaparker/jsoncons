@@ -124,16 +124,16 @@ namespace bson {
 
     // With leading wrapped_allocators parameter
 
-    template<class T,class Source,class ResultAllocator,class WorkAllocator>
+    template<class T,class Source,class ResultAllocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 const Source& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        json_decoder<T,WorkAllocator> decoder(allocators.get_work_allocator());
+        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<jsoncons::bytes_source,WorkAllocator> reader(v, adaptor, options, allocators.get_work_allocator());
+        basic_bson_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, allocators.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -142,15 +142,15 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T, class Source,class ResultAllocator,class WorkAllocator>
+    template<class T, class Source,class ResultAllocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 const Source& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<bytes_source,WorkAllocator> cursor(v, options, allocators.get_work_allocator());
-        json_decoder<basic_json<char,sorted_policy,WorkAllocator>,WorkAllocator> decoder(allocators.get_work_allocator(), allocators.get_work_allocator());
+        basic_bson_cursor<bytes_source,TempAllocator> cursor(v, options, allocators.get_temp_allocator());
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(), allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
@@ -161,15 +161,15 @@ namespace bson {
         return val;
     }
 
-    template<class T,class ResultAllocator,class WorkAllocator>
+    template<class T,class ResultAllocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        json_decoder<T,WorkAllocator> decoder(allocators.get_work_allocator());
+        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<jsoncons::binary_stream_source,WorkAllocator> reader(is, adaptor, options, allocators.get_work_allocator());
+        basic_bson_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, allocators.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -178,14 +178,14 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T,class ResultAllocator,class WorkAllocator>
+    template<class T,class ResultAllocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<binary_stream_source,WorkAllocator> cursor(is, options, allocators.get_work_allocator());
-        json_decoder<basic_json<char,sorted_policy,WorkAllocator>,WorkAllocator> decoder(allocators.get_work_allocator(), allocators.get_work_allocator());
+        basic_bson_cursor<binary_stream_source,TempAllocator> cursor(is, options, allocators.get_temp_allocator());
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(), allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);

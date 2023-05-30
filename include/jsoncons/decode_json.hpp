@@ -128,18 +128,18 @@ namespace jsoncons {
 
     // With leading wrapped_allocators parameter
 
-    template <class T,class Source,class ResultAllocator,class WorkAllocator>
+    template <class T,class Source,class ResultAllocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
-    decode_json(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_json(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
         const Source& s,
         const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
         using char_type = typename Source::value_type;
 
-        json_decoder<T,WorkAllocator> decoder(allocators.get_work_allocator());
+        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
 
-        basic_json_reader<char_type, string_source<char_type>,WorkAllocator> reader(s, decoder, options, allocators.get_work_allocator());
+        basic_json_reader<char_type, string_source<char_type>,TempAllocator> reader(s, decoder, options, allocators.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -148,17 +148,17 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T,class Source,class ResultAllocator,class WorkAllocator>
+    template <class T,class Source,class ResultAllocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_char_sequence<Source>::value,T>::type
-    decode_json(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_json(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
         const Source& s,
         const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
         using char_type = typename Source::value_type;
 
-        basic_json_cursor<char_type,string_source<char_type>,WorkAllocator> cursor(s, options, default_json_parsing(), allocators.get_work_allocator());
-        json_decoder<basic_json<char_type,sorted_policy,WorkAllocator>,WorkAllocator> decoder(result_allocator_arg, allocators.get_work_allocator(), allocators.get_work_allocator());
+        basic_json_cursor<char_type,string_source<char_type>,TempAllocator> cursor(s, options, default_json_parsing(), allocators.get_temp_allocator());
+        json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, allocators.get_temp_allocator(), allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
@@ -169,15 +169,15 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T,class CharT,class ResultAllocator,class WorkAllocator>
+    template <class T,class CharT,class ResultAllocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
-    decode_json(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_json(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        json_decoder<T,WorkAllocator> decoder(allocators.get_work_allocator());
+        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
 
-        basic_json_reader<CharT, stream_source<CharT>,WorkAllocator> reader(is, decoder, options, allocators.get_work_allocator());
+        basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, allocators.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -186,14 +186,14 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T,class CharT,class ResultAllocator,class WorkAllocator>
+    template <class T,class CharT,class ResultAllocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
-    decode_json(const wrapped_allocators<ResultAllocator,WorkAllocator>& allocators,
+    decode_json(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT,stream_source<CharT>,WorkAllocator> cursor(is, options, default_json_parsing(), allocators.get_work_allocator());
-        json_decoder<basic_json<CharT,sorted_policy,WorkAllocator>,WorkAllocator> decoder(result_allocator_arg, allocators.get_work_allocator(),allocators.get_work_allocator());
+        basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(is, options, default_json_parsing(), allocators.get_temp_allocator());
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, allocators.get_temp_allocator(),allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
