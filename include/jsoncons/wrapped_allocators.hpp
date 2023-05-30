@@ -8,16 +8,9 @@
 #define JSONCONS_ALLOCATOR_STRATEGY_HPP
 
 #include <memory>
+#include <jsoncons/tag_type.hpp>
 
 namespace jsoncons {
-
-
-struct work_allocator_arg_t
-{
-    explicit work_allocator_arg_t() = default; 
-};
-
-constexpr work_allocator_arg_t work_allocator_arg{};
 
 template <class ResultAllocator,class WorkAllocator>
 class wrapped_allocators
@@ -51,7 +44,7 @@ wrapped_allocators<ResultAllocator,WorkAllocator> wrap_allocators(const ResultAl
 }
 
 template <class WorkAllocator>
-wrapped_allocators<std::allocator<char>,WorkAllocator> wrap_allocators(work_allocator_arg_t, 
+wrapped_allocators<std::allocator<char>,WorkAllocator> wrap_allocators(temp_allocator_arg_t, 
     const WorkAllocator& work_alloc)
 {
     return wrapped_allocators<std::allocator<char>,WorkAllocator>(std::allocator<char>(), work_alloc);

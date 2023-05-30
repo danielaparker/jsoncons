@@ -55,7 +55,6 @@ private:
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  
     result_allocator_type result_allocator_;
-    temp_allocator_type temp_allocator_;
 
     Json result_;
 
@@ -68,12 +67,11 @@ private:
 public:
     json_decoder(const temp_allocator_type& temp_alloc = temp_allocator_type())
         : result_allocator_(result_allocator_type()),
-          temp_allocator_(temp_alloc),
           result_(),
           index_(0),
           name_(result_allocator_),
           item_stack_(result_allocator_type()),
-          structure_stack_(temp_allocator_),
+          structure_stack_(temp_alloc),
           is_valid_(false) 
     {
         item_stack_.reserve(1000);
@@ -84,7 +82,6 @@ public:
     json_decoder(result_allocator_arg_t,
                  const result_allocator_type& result_alloc)
         : result_allocator_(result_alloc),
-          temp_allocator_(),
           result_(),
           index_(0),
           name_(result_allocator_),
@@ -101,12 +98,11 @@ public:
                  const result_allocator_type& result_alloc, 
                  const temp_allocator_type& temp_alloc)
         : result_allocator_(result_alloc),
-          temp_allocator_(temp_alloc),
           result_(),
           index_(0),
           name_(result_allocator_),
           item_stack_(result_alloc),
-          structure_stack_(temp_allocator_),
+          structure_stack_(temp_alloc),
           is_valid_(false)
     {
         item_stack_.reserve(1000);
