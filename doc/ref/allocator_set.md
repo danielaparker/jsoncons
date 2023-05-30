@@ -1,7 +1,7 @@
 ### jsoncons::allocator_set
 
 ```cpp
-#include <jsoncons/wrapped_allocators.hpp>
+#include <jsoncons/allocator_set.hpp>
 
 template< 
     class Allocator,class TempAllocator

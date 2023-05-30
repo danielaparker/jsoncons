@@ -37,6 +37,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/detail/heap_string.hpp>
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator
@@ -3185,10 +3186,9 @@ namespace jsoncons {
         static
          typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
             parse(const Source& source, 
-              const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
-              const allocator_type& alloc = allocator_type())
+              const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
         {
-            json_decoder<basic_json> decoder(alloc);
+            json_decoder<basic_json> decoder;
             basic_json_parser<char_type> parser(options);
 
             auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
@@ -3204,6 +3204,160 @@ namespace jsoncons {
             if (!decoder.is_valid())
             {
                 JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json string"));
+            }
+            return decoder.get_result();
+        }
+
+        template <class Source, class TempAllocator>
+        static
+         typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
+            parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const Source& source, 
+              const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+        {
+            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+            basic_json_parser<char_type,TempAllocator> parser(options, alloc_set.get_temp_allocator());
+
+            auto r = unicode_traits::detect_encoding_from_bom(source.data(), source.size());
+            if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
+            {
+                JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
+            }
+            std::size_t offset = (r.ptr - source.data());
+            parser.update(source.data()+offset,source.size()-offset);
+            parser.parse_some(decoder);
+            parser.finish_parse(decoder);
+            parser.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json string"));
+            }
+            return decoder.get_result();
+        }
+
+        static basic_json parse(const char_type* source, 
+            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+        {
+            return parse(jsoncons::basic_string_view<char_type>(source), options);
+        }
+
+        template <class TempAllocator>
+        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const char_type* source, 
+            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+        {
+            return parse(alloc_set, jsoncons::basic_string_view<char_type>(source), options);
+        }
+
+        static basic_json parse(const char_type* s, 
+            const basic_json_decode_options<char_type>& options, 
+            std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            return parse(jsoncons::basic_string_view<char_type>(s), options, err_handler);
+        }
+
+        static basic_json parse(const char_type* s, 
+                                std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            return parse(jsoncons::basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
+        }
+
+        // from stream
+
+        static basic_json parse(std::basic_istream<char_type>& is, 
+            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+        {
+            json_decoder<basic_json> decoder;
+            basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options);
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
+            }
+            return decoder.get_result();
+        }
+
+        template <class TempAllocator>
+        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, std::basic_istream<char_type>& is, 
+            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+        {
+            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+            basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
+            }
+            return decoder.get_result();
+        }
+
+        // from iterator
+
+        template <class InputIt>
+        static basic_json parse(InputIt first, InputIt last, 
+                                const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+        {
+            json_decoder<basic_json> decoder;
+            basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),
+                std::forward<InputIt>(last)), decoder, options);
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
+            }
+            return decoder.get_result();
+        }
+
+        template <class InputIt, class TempAllocator>
+        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, InputIt first, InputIt last, 
+                                const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+        {
+            json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
+            basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),
+                std::forward<InputIt>(last)), 
+                decoder, options, alloc_set.get_temp_allocator());
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
+            }
+            return decoder.get_result();
+        }
+
+        static basic_json parse(std::basic_istream<char_type>& is, 
+            const basic_json_decode_options<char_type>& options, 
+            std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            json_decoder<basic_json> decoder;
+            basic_json_reader<char_type,stream_source<char_type>> reader(is, decoder, options, err_handler);
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
+            }
+            return decoder.get_result();
+        }
+
+        static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            return parse(is, basic_json_decode_options<CharT>(), err_handler);
+        }
+
+        template <class InputIt>
+        static basic_json parse(InputIt first, InputIt last, 
+                                const basic_json_decode_options<char_type>& options, 
+                                std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            json_decoder<basic_json> decoder;
+            basic_json_reader<char_type,iterator_source<InputIt>> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), decoder, options, err_handler);
+            reader.read_next();
+            reader.check_done();
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
             }
             return decoder.get_result();
         }
@@ -3242,97 +3396,6 @@ namespace jsoncons {
             std::function<bool(json_errc,const ser_context&)> err_handler)
         {
             return parse(source, basic_json_decode_options<CharT>(), err_handler);
-        }
-
-        static basic_json parse(const char_type* source, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
-            const allocator_type& alloc = allocator_type())
-        {
-            return parse(jsoncons::basic_string_view<char_type>(source), options, alloc);
-        }
-
-        static basic_json parse(const char_type* s, 
-            const basic_json_decode_options<char_type>& options, 
-            std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            return parse(jsoncons::basic_string_view<char_type>(s), options, err_handler);
-        }
-
-        static basic_json parse(const char_type* s, 
-                                std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            return parse(jsoncons::basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
-        }
-
-        // from stream
-
-        static basic_json parse(std::basic_istream<char_type>& is, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-            const allocator_type& alloc = allocator_type())
-        {
-            json_decoder<basic_json> decoder(alloc);
-            basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options, alloc);
-            reader.read_next();
-            reader.check_done();
-            if (!decoder.is_valid())
-            {
-                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
-            }
-            return decoder.get_result();
-        }
-
-        static basic_json parse(std::basic_istream<char_type>& is, 
-            const basic_json_decode_options<char_type>& options, 
-            std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            json_decoder<basic_json> decoder;
-            basic_json_reader<char_type,stream_source<char_type>> reader(is, decoder, options, err_handler);
-            reader.read_next();
-            reader.check_done();
-            if (!decoder.is_valid())
-            {
-                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json stream"));
-            }
-            return decoder.get_result();
-        }
-
-        static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            return parse(is, basic_json_decode_options<CharT>(), err_handler);
-        }
-
-        // from iterator
-
-        template <class InputIt>
-        static basic_json parse(InputIt first, InputIt last, 
-                                const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                                const allocator_type& alloc = allocator_type())
-        {
-            json_decoder<basic_json> decoder(alloc);
-            basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), decoder, options, alloc);
-            reader.read_next();
-            reader.check_done();
-            if (!decoder.is_valid())
-            {
-                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
-            }
-            return decoder.get_result();
-        }
-
-        template <class InputIt>
-        static basic_json parse(InputIt first, InputIt last, 
-                                const basic_json_decode_options<char_type>& options, 
-                                std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            json_decoder<basic_json> decoder;
-            basic_json_reader<char_type,iterator_source<InputIt>> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), decoder, options, err_handler);
-            reader.read_next();
-            reader.check_done();
-            if (!decoder.is_valid())
-            {
-                JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
-            }
-            return decoder.get_result();
         }
 
         template <class InputIt>

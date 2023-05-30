@@ -85,7 +85,7 @@ John Smith: Software Engineer
 
 ### See also
 
-[allocator_set](wrapped_allocators.md)
+[allocator_set](allocator_set.md)
 
 [encode_json](encode_json.md)
 
