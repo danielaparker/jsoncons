@@ -173,7 +173,7 @@ TEST_CASE("Test polymorhic allocator")
         std::string s = a_long_string;
         std::string input = "\"" + s + "\"";
 
-        json_decoder<pmr_json> decoder(result_allocator_arg, alloc1);
+        json_decoder<pmr_json> decoder(alloc1);
         JSONCONS_TRY
         {
             json_string_reader reader(input,decoder);

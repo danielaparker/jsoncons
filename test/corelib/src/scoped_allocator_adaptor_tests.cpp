@@ -126,7 +126,7 @@ TEST_CASE("scoped allocator adaptor parse tests")
 
     SECTION("parse")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, alloc1, alloc2);
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(alloc1, alloc2);
         JSONCONS_TRY
         {
             json_string_reader reader(data,decoder);

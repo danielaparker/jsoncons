@@ -842,7 +842,11 @@ void make_expression_with_stateful_allocator()
 
     auto alloc = my_alloc(1);        
 
-    jsoncons::json_decoder<custom_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+    // until 0.171.0
+    // jsoncons::json_decoder<custom_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+
+    // since 0.171.0
+    jsoncons::json_decoder<custom_json,my_alloc> decoder(alloc, alloc);
 
     jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_text, decoder, alloc);
     reader.read();

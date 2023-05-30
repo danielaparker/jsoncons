@@ -13,18 +13,27 @@ json_decoder
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`allocator_type`|Json::allocator_type
+`result_allocator_type`|Json::allocator_type (until 0.171.0)
+`allocator_type`|Json::allocator_type (since 0.171.0)
 `temp_allocator_type`|TempAllocator
 
 #### Constructors
 
-    json_decoder(const temp_allocator_type& temp_alloc); (1)
+    json_decoder(result_allocator_arg_t, 
+        const result_allocator_type& alloc);                            (1)   (until 0.171.0)
 
-    json_decoder(result_allocator_arg_t, const allocator_type& alloc, 
-                 const temp_allocator_type& temp_alloc); (2)
+    json_decoder(result_allocator_arg_t, 
+        const result_allocator_type& alloc, 
+        const temp_allocator_type& temp_alloc);                         (1)   (until 0.171.0)
 
-    json_decoder(result_allocator_arg_t, const allocator_type& alloc, 
-                 const temp_allocator_type& temp_alloc); (3)
+    json_decoder(const allocator_type& alloc = allocator_type(),         
+        const temp_allocator_type& temp_alloc = temp_allocator_type()); (1)   (since 0.171.0)
+
+    json_decoder(const temp_allocator_type& temp_alloc = 
+        temp_allocator_type());                                         (2)   (until 0.171.0)
+
+    json_decoder(temp_allocator_arg_t, 
+        const temp_allocator_type& temp_alloc);                         (2)   (since 0.171.0)
 
 #### Member functions
 

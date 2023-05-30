@@ -48,7 +48,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<custom_json> decoder(result_allocator_arg, ScopedTestAllocator<char>(1));
+        json_decoder<custom_json> decoder(ScopedTestAllocator<char>(1));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
 
@@ -67,7 +67,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 1")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
                                                               ScopedTestAllocator<char>(2));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
@@ -86,7 +86,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 2")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
                                                               ScopedTestAllocator<char>(2));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
@@ -107,7 +107,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 1")
     {
-        json_decoder<custom_json> decoder(result_allocator_arg, ScopedTestAllocator<char>(1));
+        json_decoder<custom_json> decoder(ScopedTestAllocator<char>(1));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        
 
@@ -130,7 +130,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 2")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
                                                               ScopedTestAllocator<char>(2));
 
         auto myAlloc = ScopedTestAllocator<char>(3);        

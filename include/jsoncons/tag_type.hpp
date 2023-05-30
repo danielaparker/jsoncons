@@ -24,12 +24,15 @@ struct temp_allocator_arg_t
 
 constexpr temp_allocator_arg_t temp_allocator_arg{};
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 struct result_allocator_arg_t
 {
     explicit result_allocator_arg_t() = default; 
 };
 
 constexpr result_allocator_arg_t result_allocator_arg{};
+#endif
 
 struct half_arg_t
 {

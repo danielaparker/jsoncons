@@ -1520,7 +1520,7 @@ TEST_CASE("csv_reader constructors")
         options.assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_objects);
 
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(result_allocator_arg, my_allocator,
+        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
         csv::basic_csv_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();

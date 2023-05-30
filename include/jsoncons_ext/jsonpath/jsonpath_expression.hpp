@@ -375,7 +375,7 @@ namespace detail {
                             }
                             default:
                             {
-                                json_decoder<Json> decoder(result_allocator_arg, alloc_);
+                                json_decoder<Json> decoder(alloc_);
                                 basic_json_parser<char_type> parser;
                                 parser.update(buffer.data(),buffer.size());
                                 parser.parse_some(decoder, ec);
@@ -399,7 +399,7 @@ namespace detail {
                     }
                     case path_state::json_value:
                     {
-                        json_decoder<Json> decoder(result_allocator_arg, alloc_);
+                        json_decoder<Json> decoder(alloc_);
                         basic_json_parser<char_type> parser;
                         parser.update(buffer.data(),buffer.size());
                         parser.parse_some(decoder, ec);
@@ -427,7 +427,7 @@ namespace detail {
                             case '{':
                             case '[':
                             {
-                                json_decoder<Json> decoder(result_allocator_arg, alloc_);
+                                json_decoder<Json> decoder(alloc_);
                                 basic_json_parser<char_type> parser;
                                 parser.update(p_,end_input_ - p_);
                                 parser.parse_some(decoder, ec);

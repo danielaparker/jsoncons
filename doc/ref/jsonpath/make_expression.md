@@ -214,7 +214,12 @@ int main()
 {
     auto alloc = my_alloc(1);        
 
-    jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+    // until 0.171.0    
+    // jsoncons::json_decoder<my_json,my_alloc> decoder(jsoncons::result_allocator_arg, 
+    //    alloc, alloc); 
+
+    // since 0.170.1
+    jsoncons::json_decoder<my_json,my_alloc> decoder(alloc, alloc); 
 
     std::ifstream is("./input/books.json");
 

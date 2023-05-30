@@ -143,7 +143,12 @@ void read_with_stateful_allocator()
 ]
 )";
 
-    json_decoder<custom_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+    // Until 0.171.0
+    //json_decoder<custom_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
+    //    ScopedTestAllocator<char>(2));
+
+    // Since 0.171.0
+    json_decoder<custom_json, ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
         ScopedTestAllocator<char>(2));
 
     auto myAlloc = ScopedTestAllocator<char>(3);

@@ -158,7 +158,7 @@ namespace jsoncons {
         using char_type = typename Source::value_type;
 
         basic_json_cursor<char_type,string_source<char_type>,TempAllocator> cursor(s, options, default_json_parsing(), allocators.get_temp_allocator());
-        json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, allocators.get_temp_allocator(), allocators.get_temp_allocator());
+        json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(), allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
@@ -193,7 +193,7 @@ namespace jsoncons {
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
         basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(is, options, default_json_parsing(), allocators.get_temp_allocator());
-        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, allocators.get_temp_allocator(),allocators.get_temp_allocator());
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(),allocators.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
