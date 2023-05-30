@@ -706,7 +706,8 @@ TEST_CASE("jsonpointer get with stateful allocator")
     check_contains(example,"/m~0n",true);
 
     check_get(example,"",example);
-    check_get(example,"/foo", custom_json::parse(jsoncons::string_view("[\"bar\", \"baz\"]"), json_options(), alloc));
+    check_get(example,"/foo", custom_json::parse(make_allocator_set(alloc),
+        jsoncons::string_view("[\"bar\", \"baz\"]"), json_options()));
     check_get(example,"/foo/0", custom_json("bar", semantic_tag::none, alloc));
     check_get(example,"/", custom_json(0));
     check_get(example,"/a~1b", custom_json(1));
