@@ -29,11 +29,11 @@ public:
     using key_type = typename Json::key_type;
     using array = typename Json::array;
     using object = typename Json::object;
-    using result_allocator_type = typename Json::allocator_type;
+    using allocator_type = typename Json::allocator_type;
     using json_string_allocator = typename key_type::allocator_type;
     using json_array_allocator = typename array::allocator_type;
     using json_object_allocator = typename object::allocator_type;
-    using json_byte_allocator_type = typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t>;
+    using json_byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;
 private:
 
     enum class structure_type {root_t, array_t, object_t};
@@ -51,10 +51,10 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    using stack_item_allocator_type = typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<key_index_value<Json>>;
+    using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_index_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  
-    result_allocator_type result_allocator_;
+    allocator_type result_allocator_;
 
     Json result_;
 
@@ -66,11 +66,11 @@ private:
 
 public:
     json_decoder(const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : result_allocator_(result_allocator_type()),
+        : result_allocator_(allocator_type()),
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(result_allocator_type()),
+          item_stack_(allocator_type()),
           structure_stack_(temp_alloc),
           is_valid_(false) 
     {
@@ -80,12 +80,12 @@ public:
     }
 
     json_decoder(result_allocator_arg_t,
-                 const result_allocator_type& result_alloc)
-        : result_allocator_(result_alloc),
+                 const allocator_type& alloc)
+        : result_allocator_(alloc),
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(result_alloc),
+          item_stack_(alloc),
           structure_stack_(),
           is_valid_(false)
     {
@@ -95,13 +95,13 @@ public:
     }
 
     json_decoder(result_allocator_arg_t,
-                 const result_allocator_type& result_alloc, 
+                 const allocator_type& alloc, 
                  const temp_allocator_type& temp_alloc)
-        : result_allocator_(result_alloc),
+        : result_allocator_(alloc),
           result_(),
           index_(0),
           name_(result_allocator_),
-          item_stack_(result_alloc),
+          item_stack_(alloc),
           structure_stack_(temp_alloc),
           is_valid_(false)
     {

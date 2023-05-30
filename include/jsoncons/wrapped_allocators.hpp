@@ -12,17 +12,17 @@
 
 namespace jsoncons {
 
-template <class ResultAllocator,class TempAllocator>
+template <class Allocator,class TempAllocator>
 class wrapped_allocators
 {
-    ResultAllocator result_alloc_;
+    Allocator result_alloc_;
     TempAllocator temp_alloc_;
 public:
-    using result_allocator_type = ResultAllocator;
+    using allocator_type = Allocator;
     using temp_allocator_type = TempAllocator;
 
-    wrapped_allocators(const ResultAllocator& result_alloc, const TempAllocator& temp_alloc)
-        : result_alloc_(result_alloc), temp_alloc_(temp_alloc)
+    wrapped_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
+        : result_alloc_(alloc), temp_alloc_(temp_alloc)
     {
     }
 
@@ -32,15 +32,15 @@ public:
     wrapped_allocators& operator=(wrapped_allocators&&)  = delete;
     ~wrapped_allocators() = default;
 
-    ResultAllocator get_result_allocator() const {return result_alloc_;}
+    Allocator get_allocator() const {return result_alloc_;}
     TempAllocator get_temp_allocator() const {return temp_alloc_;}
 };
 
-template <class ResultAllocator,class TempAllocator>
-wrapped_allocators<ResultAllocator,TempAllocator> wrap_allocators(const ResultAllocator& result_alloc = std::allocator<char>(), 
+template <class Allocator,class TempAllocator>
+wrapped_allocators<Allocator,TempAllocator> wrap_allocators(const Allocator& alloc = std::allocator<char>(), 
     const TempAllocator& temp_alloc = std::allocator<char>())
 {
-    return wrapped_allocators<ResultAllocator,TempAllocator>(result_alloc, temp_alloc);
+    return wrapped_allocators<Allocator,TempAllocator>(alloc, temp_alloc);
 }
 
 template <class TempAllocator>

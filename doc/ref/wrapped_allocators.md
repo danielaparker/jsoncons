@@ -4,18 +4,18 @@
 #include <jsoncons/wrapped_allocators.hpp>
 
 template< 
-    class ResultAllocator,class TempAllocator
+    class Allocator,class TempAllocator
 > wrapped_allocators;
 ```
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`result_allocator_type`|`ResultAllocator`
+`allocator_type`|`Allocator`
 `temp_allocator_type`|`TempAllocator`
 
 #### Constructors
 
-    wrapped_allocators(const ResultAllocator& result_alloc, const TempAllocator& temp_alloc)
+    wrapped_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
 Constructs a `wrapped_allocators` with a result and a work allocator. 
 
     wrapped_allocators(const wrapped_allocators&)
@@ -26,15 +26,17 @@ Move constructor.
 
 #### Accessors
 
-    ResultAllocator get_result_allocator() const;
+    Allocator get_allocator() const;
+An allocator object for persistent data
 
     TempAllocator get_temp_allocator() const;
+An allocator object for for temporary allocations
 
 #### Non member functions
 
-    template <class ResultAllocator,class TempAllocator>
-    wrapped_allocators<ResultAllocator,TempAllocator> wrap_allocators(
-        const ResultAllocator& result_alloc = std::allocator<char>(), 
+    template <class Allocator,class TempAllocator>
+    wrapped_allocators<Allocator,TempAllocator> wrap_allocators(
+        const Allocator& alloc = std::allocator<char>(), 
         const TempAllocator& temp_alloc = std::allocator<char>());
 
     Creates a `wrapped_allocators` object, deducing the allocator types from the types of arguments.

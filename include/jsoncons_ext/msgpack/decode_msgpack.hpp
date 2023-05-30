@@ -125,10 +125,10 @@ namespace msgpack {
 
     // With leading wrapped_allocators parameter
 
-    template <class T,class Source,class ResultAllocator,class TempAllocator>
+    template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_msgpack(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                    const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -143,10 +143,10 @@ namespace msgpack {
         return decoder.get_result();
     }
 
-    template <class T,class Source,class ResultAllocator,class TempAllocator>
+    template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_msgpack(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_msgpack(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                    const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -162,9 +162,9 @@ namespace msgpack {
         return val;
     }
 
-    template<class T,class ResultAllocator,class TempAllocator>
+    template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_msgpack(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                    std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -179,9 +179,9 @@ namespace msgpack {
         return decoder.get_result();
     }
 
-    template<class T,class ResultAllocator,class TempAllocator>
+    template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_msgpack(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_msgpack(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                    std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {

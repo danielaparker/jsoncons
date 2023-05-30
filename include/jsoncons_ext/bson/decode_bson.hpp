@@ -124,10 +124,10 @@ namespace bson {
 
     // With leading wrapped_allocators parameter
 
-    template<class T,class Source,class ResultAllocator,class TempAllocator>
+    template<class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_bson(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                 const Source& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -142,10 +142,10 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T, class Source,class ResultAllocator,class TempAllocator>
+    template<class T, class Source,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_bson(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                 const Source& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -161,9 +161,9 @@ namespace bson {
         return val;
     }
 
-    template<class T,class ResultAllocator,class TempAllocator>
+    template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_bson(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -178,9 +178,9 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T,class ResultAllocator,class TempAllocator>
+    template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_bson(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_bson(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {

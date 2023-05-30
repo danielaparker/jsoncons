@@ -125,10 +125,10 @@ namespace csv {
 
     // With leading wrapped_allocators parameter
 
-    template<class T,class Source,class ResultAllocator,class TempAllocator>
+    template<class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type 
-    decode_csv(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_csv(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                const Source& s, 
                const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
@@ -145,10 +145,10 @@ namespace csv {
         return decoder.get_result();
     }
 
-    template<class T,class Source,class ResultAllocator,class TempAllocator>
+    template<class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_char_sequence<Source>::value,T>::type 
-    decode_csv(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_csv(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                const Source& s, 
                const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
@@ -166,9 +166,9 @@ namespace csv {
         return val;
     }
 
-    template<class T,class CharT,class ResultAllocator,class TempAllocator>
+    template<class T,class CharT,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_csv(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_csv(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                std::basic_istream<CharT>& is, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
@@ -185,9 +185,9 @@ namespace csv {
         return decoder.get_result();
     }
 
-    template<class T,class CharT,class ResultAllocator,class TempAllocator>
+    template<class T,class CharT,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_csv(const wrapped_allocators<ResultAllocator,TempAllocator>& allocators,
+    decode_csv(const wrapped_allocators<Allocator,TempAllocator>& allocators,
                std::basic_istream<CharT>& is, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
