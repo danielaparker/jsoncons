@@ -220,9 +220,9 @@
 
 #if !defined(JSONCONS_NO_EXCEPTIONS)
 
-#if defined(__GNUC__) && !__EXCEPTIONS
+#if defined(__GNUC__) && !defined(__EXCEPTIONS)
 # define JSONCONS_NO_EXCEPTIONS 1
-#elif _MSC_VER
+#elif defined(_MSC_VER)
 #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
 # define JSONCONS_NO_EXCEPTIONS 1
 #elif !defined(_CPPUNWIND)
