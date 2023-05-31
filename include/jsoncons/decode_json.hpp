@@ -137,7 +137,7 @@ namespace jsoncons {
     {
         using char_type = typename Source::value_type;
 
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
         basic_json_reader<char_type, string_source<char_type>,TempAllocator> reader(s, decoder, options, alloc_set.get_temp_allocator());
         reader.read();
@@ -175,7 +175,7 @@ namespace jsoncons {
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
         basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
         reader.read();

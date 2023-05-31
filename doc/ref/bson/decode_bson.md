@@ -7,19 +7,29 @@ Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ data
 
 template<class T>
 T decode_bson(const std::vector<uint8_t>& source,
-              const bson_decode_options& options = bson_decode_options()); (1) (until 0.152.0)
+    const bson_decode_options& options = bson_decode_options());        (1) (until 0.152.0)
 
 template<class T, class Source>
 T decode_bson(const Source& source, 
-              const bson_decode_options& options = bson_decode_options()); (1) (since 0.152.0)
+    const bson_decode_options& options = bson_decode_options());        (1) (since 0.152.0)
 
 template<class T>
 T decode_bson(std::istream& is,
-              const bson_decode_options& options = bson_decode_options()); (2)
+    const bson_decode_options& options = bson_decode_options());        (2)
 
 template<class T, class InputIt>
 T decode_bson(InputIt first, InputIt last,
-              const bson_decode_options& options = bson_decode_options()); (3) (since 0.153.0)
+    const bson_decode_options& options = bson_decode_options());        (3) (since 0.153.0)
+
+template<class T, class Source,class Allocator,class TempAllocator>
+T decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const Source& source,
+    const bson_decode_options& options = bson_decode_options());        (4) (since 0.171.0)
+
+template<class T,class Allocator,class TempAllocator>
+T decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    std::istream& is,
+    const bson_decode_options& options = bson_decode_options());        (5) (since 0.171.0)
 ```
 
 (1) Reads BSON data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](bson_options.md). 
@@ -36,6 +46,9 @@ or support [json_type_traits](../json_type_traits.md).
 (3) Reads BSON data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](bson_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
+
+Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument and
+provides allocators for result data and temporary allocations.
 
 #### Exceptions
 

@@ -677,7 +677,7 @@ TEST_CASE("jsonpointer get with stateful allocator")
     ScopedTestAllocator<char> alloc(1);
 
     // Example from RFC 6901
-    const custom_json example = custom_json::parse(make_allocator_set(alloc), R"(
+    const custom_json example = custom_json::parse(combine_allocators(alloc), R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -706,7 +706,7 @@ TEST_CASE("jsonpointer get with stateful allocator")
     check_contains(example,"/m~0n",true);
 
     check_get(example,"",example);
-    check_get(example,"/foo", custom_json::parse(make_allocator_set(alloc),
+    check_get(example,"/foo", custom_json::parse(combine_allocators(alloc),
         jsoncons::string_view("[\"bar\", \"baz\"]"), json_options()));
     check_get(example,"/foo/0", custom_json("bar", semantic_tag::none, alloc));
     check_get(example,"/", custom_json(0));

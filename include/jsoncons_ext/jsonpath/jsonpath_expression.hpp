@@ -2573,13 +2573,13 @@ namespace detail {
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, 
                                               const custom_functions<Json>& functions = custom_functions<Json>())
     {
-        return make_expression(make_allocator_set(), expr, functions);
+        return make_expression(combine_allocators(), expr, functions);
     }
 
     template <class Json>
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, std::error_code& ec)
     {
-        return make_expression(make_allocator_set(), expr, custom_functions<Json>(), ec);
+        return make_expression(combine_allocators(), expr, custom_functions<Json>(), ec);
     }
 
     template <class Json>
@@ -2587,7 +2587,7 @@ namespace detail {
                                               const custom_functions<Json>& functions, 
                                               std::error_code& ec)
     {
-        return make_expression(make_allocator_set(), expr, functions, ec);
+        return make_expression(combine_allocators(), expr, functions, ec);
     }
 
     template <class Json, class TempAllocator>

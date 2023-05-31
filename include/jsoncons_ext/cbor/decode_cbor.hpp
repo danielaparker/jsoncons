@@ -133,7 +133,7 @@ namespace cbor {
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
@@ -169,7 +169,7 @@ namespace cbor {
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();

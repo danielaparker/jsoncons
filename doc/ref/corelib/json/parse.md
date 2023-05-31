@@ -265,7 +265,7 @@ int main()
 
     try
     {
-        auto doc = pmr_json::parse(make_allocator_set(alloc), json_text);
+        auto doc = pmr_json::parse(combine_allocators(alloc), json_text);
         std::cout << pretty_print(doc) << "\n\n";
     }
     catch (const std::exception& ex)

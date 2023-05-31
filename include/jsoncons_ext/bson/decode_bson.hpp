@@ -131,7 +131,7 @@ namespace bson {
                 const Source& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_bson_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
@@ -167,7 +167,7 @@ namespace bson {
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_bson_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();

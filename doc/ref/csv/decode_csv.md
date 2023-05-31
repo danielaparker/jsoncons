@@ -7,15 +7,25 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 
 template <class T,class Source>
 T decode_csv(const Source& s, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (1)
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (1)
 
 template <class T,class CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (2)
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (2)
 
 template <class T,class InputIt>
 T decode_csv(InputIt first, InputIt last,
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (3) (since 0.153.0)
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (3) (since 0.153.0)
+
+template <class T, class Source, class Allocator, class TempAllocator>
+T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
+    const Source& s,
+    const basic_csv_decode_options<Source::value_type>& options = basic_csv_decode_options<Source::value_type>()); (4)
+
+template <class T, class CharT, class Allocator, class TempAllocator>
+T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
+    std::basic_istream<CharT>& is,
+    const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());                           (5)
 ```
 
 (1) Reads CSV data from a contiguous character sequence into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
@@ -29,6 +39,9 @@ or support [json_type_traits](../json_type_traits.md).
 (3) Reads CSV data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
+
+Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument and
+provides allocators for result data and temporary allocations.
 
 #### Return value
 

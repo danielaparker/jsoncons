@@ -5,19 +5,29 @@
 
 template<class T>
 T decode_msgpack(const std::vector<uint8_t>& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (until 0.152.0)
+    const msgpack_decode_options& options = msgpack_decode_options());       (1) (until 0.152.0)
 
 template<class T, class Source>
 T decode_msgpack(const Source& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (since 0.152.0)
+    const msgpack_decode_options& options = msgpack_decode_options());       (1) (since 0.152.0)
 
 template<class T>
 T decode_msgpack(std::istream& is,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (2)
+    const msgpack_decode_options& options = msgpack_decode_options());       (2)
 
 template<class T, class InputIt>
 T decode_msgpack(InputIt first, InputIt last,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (3) (since 0.153.0)
+    const msgpack_decode_options& options = msgpack_decode_options());       (3) (since 0.153.0)
+
+template<class T, class Source,class Allocator,class TempAllocator>
+T decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const Source& source,
+    const msgpack_decode_options& options = msgpack_decode_options());       (4) (since 0.171.0)
+
+template<class T,class Allocator,class TempAllocator>
+T decode_msgpack(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    std::istream& is,
+    const msgpack_decode_options& options = msgpack_decode_options());       (5) (since 0.171.0)
 ```
 
 Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ data structure.
@@ -36,6 +46,9 @@ or support [json_type_traits](../json_type_traits.md).
 (3) Reads MessagePack data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
+
+Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument and
+provides allocators for result data and temporary allocations.
 
 #### Exceptions
 

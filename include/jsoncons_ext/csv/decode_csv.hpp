@@ -134,7 +134,7 @@ namespace csv {
     {
         using char_type = typename Source::value_type;
 
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(s,decoder,options,alloc_set.get_temp_allocator());
         reader.read();
@@ -174,7 +174,7 @@ namespace csv {
     {
         using char_type = CharT;
 
-        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(is,decoder,options,alloc_set.get_temp_allocator());
         reader.read();

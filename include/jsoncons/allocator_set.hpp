@@ -38,25 +38,25 @@ public:
 };
 
 inline
-allocator_set<std::allocator<char>,std::allocator<char>> make_allocator_set()
+allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()
 {
     return allocator_set<std::allocator<char>,std::allocator<char>>(std::allocator<char>(), std::allocator<char>());
 }
 
 template <class Allocator>
-allocator_set<Allocator,std::allocator<char>> make_allocator_set(const Allocator& alloc)
+allocator_set<Allocator,std::allocator<char>> combine_allocators(const Allocator& alloc)
 {
     return allocator_set<Allocator,std::allocator<char>>(alloc, std::allocator<char>());
 }
 
 template <class Allocator,class TempAllocator>
-allocator_set<Allocator,TempAllocator> make_allocator_set(const Allocator& alloc, const TempAllocator& temp_alloc)
+allocator_set<Allocator,TempAllocator> combine_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
 {
     return allocator_set<Allocator,TempAllocator>(alloc, temp_alloc);
 }
 
 template <class TempAllocator>
-allocator_set<std::allocator<char>,TempAllocator> make_allocator_set(temp_allocator_arg_t, 
+allocator_set<std::allocator<char>,TempAllocator> combine_allocators(temp_allocator_arg_t, 
     const TempAllocator& temp_alloc)
 {
     return allocator_set<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);
