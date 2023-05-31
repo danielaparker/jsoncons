@@ -25,6 +25,10 @@ namespace jsoncons { namespace pmr {
 
 ```
 
+- Added the ability to pass both an allocator for persistent data and an
+allocator for temporary allocations to functions like `basic_json::parse`, `decode_json` 
+and `decode_cbor`, in a `allocator_set` object.
+
 Changes:
 
 - For users creating a custom `basic_json` with a user provided `Policy`, the name
