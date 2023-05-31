@@ -25,17 +25,17 @@ void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback
     const custom_functions<Json>& funcs = custom_functions<Json>());                              (since 0.164.0)
 ```
 ```cpp
-template<class Json, class T, class Alloc>
-void json_replace(std::allocator_arg_t, const Alloc& alloc, 
-    Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.170.0)
+template<class Json, class T, class TempAllocator>
+void json_replace(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
+    Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.171.0)
     result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
 ```cpp
-template<class Json, class BinaryCallback>                                                   
-void json_replace(std::allocator_arg_t, const Alloc& alloc, 
-    Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.170.0)
+template<class Json, class BinaryCallback, class TempAllocator>                                                   
+void json_replace(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
+    Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.171.0)
     result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```

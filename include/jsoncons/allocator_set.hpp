@@ -37,6 +37,7 @@ public:
     TempAllocator get_temp_allocator() const {return temp_alloc_;}
 };
 
+inline
 allocator_set<std::allocator<char>,std::allocator<char>> make_allocator_set()
 {
     return allocator_set<std::allocator<char>,std::allocator<char>>(std::allocator<char>(), std::allocator<char>());

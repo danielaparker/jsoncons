@@ -24,14 +24,14 @@ jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
     const custom_functions<Json>& funcs, std::error_code& ec);                  (3) (since 0.164.0)
 ```
 ```cpp
-template <class Json, class Allocator, class TempAllocator>                                              (4) (since 0.170.0)
-jsonpath_expression<Json> make_expression(const allocator_set<Allocator,TempAllocator>& alloc_set, 
+template <class Json, class TempAllocator>                                              (4) (since 0.170.0)
+jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     Json::string_view_type& expr,
     const custom_functions<Json>& funcs = custom_functions<Json>());                
 ```
 ```cpp
-template <class Json, class Allocator, class TempAllocator>                                              (5) (since 0.170.0)
-jsonpath_expression<Json> make_expression(const allocator_set<Allocator,TempAllocator>& alloc_set, 
+template <class Json, class TempAllocator>                                              (5) (since 0.170.0)
+jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     Json::string_view_type& expr, std::error_code& ec);                
 ```
 ```cpp
