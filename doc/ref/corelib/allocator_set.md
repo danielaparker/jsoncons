@@ -15,7 +15,7 @@ Member type                         |Definition
 
 #### Constructors
 
-    allocator_set(const Allocator& alloc=Allocator(), const TempAllocator& temp_alloc)
+    allocator_set(const Allocator& alloc=Allocator(), const TempAllocator& temp_alloc=TempAllocator())
 Constructs an `allocator_set` with an allocator for result data and a
 second allocator for temporary allocations. 
 
