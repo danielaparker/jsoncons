@@ -16,7 +16,7 @@ Type                |Definition
 staj_event     |`basic_staj_event<char>`
 wstaj_event    |`basic_staj_event<wchar_t>`
 
-The `event_type()` function returns the [event type](doc/ref/staj_event_type.md).
+The `event_type()` function returns the [event type](doc/ref/corelib/staj_event_type.md).
 You can use the `get<T>()` function to access a string, number, or boolean value.
 
 | Event type        | Sample data | Valid accessors |

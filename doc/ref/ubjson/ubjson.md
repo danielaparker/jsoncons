@@ -62,7 +62,7 @@ const std::vector<uint8_t> data =
 
 jsoncons allows you to work with the UBJSON data similarly to JSON data:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
 - As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
 

@@ -4,9 +4,9 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
 to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
 
 - With cursor-level access to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -15,9 +15,9 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
 But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
 And it supports incremental parsing into a user's preferred form, using
-information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
+information about user types provided by specializations of [json_type_traits](doc/ref/corelib/json_type_traits.md).
 
-The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
+The [jsoncons data model](doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
 supports semantic tagging of datetimes, epoch times, big integers, 
 big decimals, big floats and binary encodings. This allows it to preserve these type semantics when parsing 
@@ -85,7 +85,7 @@ The library requires a C++ Compiler with C++11 support. In addition the library 
 their standard library equivalents if detected. Otherwise they will be typedefed to internal, C++11 compatible, implementations.
 
 The library uses exceptions and in some cases [std::error_code](https://en.cppreference.com/w/cpp/error/error_code)'s to report errors. Apart from `jsoncons::assertion_error`,
-all jsoncons exception classes implement the [jsoncons::json_error](doc/ref/json_error.md) interface.
+all jsoncons exception classes implement the [jsoncons::json_error](doc/ref/corelib/json_error.md) interface.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
 
 ## Benchmarks
@@ -137,11 +137,11 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
 
-- With [cursor-level access](doc/ref/basic_json_cursor.md) to a stream of parse events
+- With [cursor-level access](doc/ref/corelib/basic_json_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -205,10 +205,10 @@ Marilyn C, 0.9
 #### As a strongly typed C++ data structure
 
 jsoncons supports transforming JSON texts into C++ data structures. 
-The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
+The functions [decode_json](doc/ref/corelib/decode_json.md) and [encode_json](doc/ref/corelib/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](doc/ref/json_type_traits.md) 
+[json_type_traits](doc/ref/corelib/json_type_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
@@ -330,7 +330,7 @@ Marilyn C, 0.9, 1514862245
 ```
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`,
 `JSONCONS_N_CTOR_GETTER_TRAITS`, and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+[json_type_traits](doc/ref/corelib/json_type_traits.md) for the enum type
 `ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
 `ns::hiking_reputation` (with all mandatory members.)
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -511,9 +511,9 @@ const std::vector<uint8_t> data = {
 
 jsoncons allows you to work with the CBOR data similarly to JSON data:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/corelib/json_type_traits.md)
 
 - With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 

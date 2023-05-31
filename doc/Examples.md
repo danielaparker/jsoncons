@@ -467,7 +467,7 @@ std::string json_text = R"(
 }
 )";
 
-auto doc = pmr_json::parse(json_text, json_options{}, alloc);
+auto doc = pmr_json::parse(make_allocator_set(alloc), json_text, json_options{});
 std::cout << pretty_print(doc) << "\n\n";
 ```
 
