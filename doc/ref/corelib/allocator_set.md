@@ -37,7 +37,8 @@ An allocator object for for temporary allocations
 #### Non member functions
 
     allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()
-Creates a `allocator_set<std::allocator<char>,std::allocator<char>>` object.
+Creates an `allocator_set<std::allocator<char>,std::allocator<char>>` object with default allocators for result data
+and temporary allocations.
 
     template <class Allocator>
     allocator_set<Allocator,std::allocator<char>> combine_allocators(
@@ -48,10 +49,10 @@ defaulting to a `std::allocator<char>` for temporary allocations.
 
     template <class Allocator,class TempAllocator>
     allocator_set<Allocator,TempAllocator> combine_allocators(
-        const Allocator& alloc = std::allocator<char>(), 
-        const TempAllocator& temp_alloc = std::allocator<char>());
+        const Allocator& alloc, const TempAllocator& temp_alloc);
 
-Creates an `allocator_set` object, deducing the allocator types from the types of the arguments.
+Combines an allocator for result data and an allocator for temporary allocations into an `allocator_set` object,
+deducing the allocator types from the types of the arguments.
 
     template <class TempAllocator>
     allocator_set<std::allocator<char>,TempAllocator> combine_allocators(temp_allocator_arg_t, 
