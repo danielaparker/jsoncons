@@ -129,13 +129,13 @@ namespace cbor {
     template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_cbor_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, allocators.get_temp_allocator());
+        basic_cbor_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -147,12 +147,12 @@ namespace cbor {
     template <class T,class Source,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
-    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        basic_cbor_cursor<bytes_source,TempAllocator> cursor(v, options, allocators.get_temp_allocator());
-        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(), allocators.get_temp_allocator());
+        basic_cbor_cursor<bytes_source,TempAllocator> cursor(v, options, alloc_set.get_temp_allocator());
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
@@ -165,13 +165,13 @@ namespace cbor {
 
     template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
-    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        json_decoder<T,TempAllocator> decoder(allocators.get_temp_allocator());
+        json_decoder<T,TempAllocator> decoder(alloc_set.get_temp_allocator());
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_cbor_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, allocators.get_temp_allocator());
+        basic_cbor_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, alloc_set.get_temp_allocator());
         reader.read();
         if (!decoder.is_valid())
         {
@@ -182,12 +182,12 @@ namespace cbor {
 
     template<class T,class Allocator,class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
-    decode_cbor(const allocator_set<Allocator,TempAllocator>& allocators,
+    decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
-        basic_cbor_cursor<binary_stream_source,TempAllocator> cursor(is, options, allocators.get_temp_allocator());
-        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(allocators.get_temp_allocator(), allocators.get_temp_allocator());
+        basic_cbor_cursor<binary_stream_source,TempAllocator> cursor(is, options, alloc_set.get_temp_allocator());
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(alloc_set.get_temp_allocator(), alloc_set.get_temp_allocator());
 
         std::error_code ec;
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);

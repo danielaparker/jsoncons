@@ -37,6 +37,11 @@ public:
     TempAllocator get_temp_allocator() const {return temp_alloc_;}
 };
 
+allocator_set<std::allocator<char>,std::allocator<char>> make_allocator_set()
+{
+    return allocator_set<std::allocator<char>,std::allocator<char>>(std::allocator<char>(), std::allocator<char>());
+}
+
 template <class Allocator>
 allocator_set<Allocator,std::allocator<char>> make_allocator_set(const Allocator& alloc)
 {
