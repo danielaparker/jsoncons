@@ -27,20 +27,20 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
 to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
 
-- With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+- With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/corelib/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
 But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
 And it supports incremental parsing into a user's preferred form, using
-information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
+information about user types provided by specializations of [json_type_traits](doc/ref/corelib/json_type_traits.md).
 
-The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
+The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
 supports semantic tagging of datetimes, epoch times, big integers, 
 big decimals, big floats and binary encodings. This allows it to preserve these type semantics when parsing 
@@ -48,7 +48,7 @@ JSON-like data formats such as CBOR that have them.
 
 For the examples below you need to include some header files and initialize a string of JSON data:
 
-```c++
+```cpp
 #include <jsoncons/json.hpp>
 #include <iostream>
 #include <cassert>
@@ -73,15 +73,15 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
 
 - As a stream of parse events
 
 #### As a variant-like data structure
 
-```c++
+```cpp
 
 int main()
 {
@@ -142,15 +142,15 @@ Marilyn C, 0.9
 #### As a strongly typed C++ data structure
 
 jsoncons supports transforming JSON texts into C++ data structures. 
-The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) 
+The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
-```c++
+```cpp
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -266,7 +266,7 @@ Marilyn C, 0.9, 1514862245
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
-[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+[json_type_traits](doc/ref/corelib/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -278,10 +278,10 @@ See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Example
 
 #### With cursor-level access
 
-```c++
+```cpp
 int main()
 {
-    json_cursor cursor(data);
+    json_string_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
         const auto& event = cursor.current();
@@ -358,7 +358,7 @@ end_object
 
 Input JSON file `books.json`:
 
-```c++
+```cpp
 [
     {
         "title" : "Kafka on the Shore",
@@ -379,12 +379,12 @@ Input JSON file `books.json`:
 It consists of an array of book elements, each element is an object with members title, author, and price.
 
 Read the JSON text into a `json` value,
-```c++
+```cpp
 std::ifstream is("books.json");
 json books = json::parse(is);
 ```
 Loop through the book array elements, using a range-based for loop
-```c++
+```cpp
 for (const auto& book : books.array_range())
 {
     std::string author = book["author"].as<std::string>();
@@ -393,7 +393,7 @@ for (const auto& book : books.array_range())
 }
 ```
 or begin-end iterators
-```c++
+```cpp
 for (auto it = books.array_range().begin(); 
      it != books.array_range().end();
      ++it)
@@ -404,7 +404,7 @@ for (auto it = books.array_range().begin();
 } 
 ```
 or a traditional for loop
-```c++
+```cpp
 for (std::size_t i = 0; i < books.size(); ++i)
 {
     json& book = books[i];
@@ -422,7 +422,7 @@ Ivan Passer, Cutter's Way
 
 Loop through the members of the third book element, using a range-based for loop
 
-```c++
+```cpp
 for (const auto& member : books[2].object_range())
 {
     std::cout << member.key() << "=" 
@@ -432,7 +432,7 @@ for (const auto& member : books[2].object_range())
 
 or begin-end iterators:
 
-```c++
+```cpp
 for (auto it = books[2].object_range().begin(); 
      it != books[2].object_range().end();
      ++it)
@@ -458,7 +458,7 @@ You have a choice of object member accessors:
 `"n/a"`.
 
 Or, you can check if book has a member "price" with the member function `contains`, 
-```c++
+```cpp
 if (book.contains("price"))
 {
     double price = book["price"].as<double>();
@@ -473,7 +473,7 @@ else
 ### Constructing json values in C++
 
 The default `json` constructor produces an empty json object. For example 
-```c++
+```cpp
 json image_sizing;
 std::cout << image_sizing << std::endl;
 ```
@@ -482,7 +482,7 @@ produces
 {}
 ```
 To construct a json object with members, take an empty json object and set some name-value pairs
-```c++
+```cpp
 image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
 image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
 image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
@@ -491,7 +491,7 @@ image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 ```
 
 Or, use an object initializer-list:
-```c++
+```cpp
 json file_settings(json::object_arg, {
     {"Image Format", "JPEG"},
     {"Color Space", "sRGB"},
@@ -501,23 +501,23 @@ json file_settings(json::object_arg, {
 ```
 
 To construct a json array, initialize with the array type 
-```c++
+```cpp
 json color_spaces(json_array_arg);
 ```
 and add some elements
-```c++
+```cpp
 color_spaces.push_back("sRGB");
 color_spaces.push_back("AdobeRGB");
 color_spaces.push_back("ProPhoto RGB");
 ```
 
 Or, use an array initializer-list:
-```c++
+```cpp
 json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
 The `operator[]` provides another way for setting name-value pairs.
-```c++
+```cpp
 json file_export;
 file_export["File Format Options"]["Color Spaces"] = 
     std::move(color_spaces);
@@ -533,7 +533,7 @@ file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces)
 creates `"File Format Options"` as an object and puts `"Color Spaces"` in it.
 
 Serializing
-```c++
+```cpp
 std::cout << pretty_print(file_export) << std::endl;
 ```
 produces
@@ -575,7 +575,7 @@ project_id, task_name, task_start, task_finish
 
 You can read the `CSV` file into a `json` value with the `decode_csv` function.
 
-```c++
+```cpp
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
@@ -645,7 +645,7 @@ There are a few things to note about the effect of the parameter settings.
 
 The `pretty_print` function applies stylistic formatting to JSON text. For example
 
-```c++
+```cpp
 json j;
 
 j["verts"] = json(json_array_arg, {1, 2, 3});
@@ -665,9 +665,9 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
-```c++
+```cpp
 json_options options;
 format.object_array_line_splits(line_split_kind::new_line);
 std::cout << pretty_print(val,options) << std::endl;
@@ -687,7 +687,7 @@ produces
 }
 ```
 To display the elements of array values on multiple lines, set the `object_array_line_splits` property to `line_split_kind::multi_line`. The code
-```c++
+```cpp
 json_options options;
 format.object_array_line_splits(line_split_kind::multi_line);
 std::cout << pretty_print(val,options) << std::endl;
@@ -716,9 +716,9 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_object_key_filter.md)
+You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/rename_object_key_filter.md)
 
-```c++
+```cpp
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -755,7 +755,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_filter.md) for details.
+Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_filter.md) for details.
 <div id="A8"/>
 ### JSONPath
 
@@ -792,7 +792,7 @@ Example JSON file (store.json):
 }
 ```
 JSONPath examples:
-```c++    
+```cpp    
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using jsoncons::jsonpath::json_query;
@@ -863,25 +863,25 @@ Output:
 <div id="A9"/>
 ### About jsoncons::json
 
-The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
-```c++
+```cpp
 typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<char>> json;
 ```
-If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) instead.
+If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/ojson.md) instead.
 
 The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/ref/doc/wjson.md)
-```c++
+```cpp
 typedef basic_json<wchar_t,
-                   ImplementationPolicy = sorted_policy,
+                   Policy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md) instead.
+If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/wojson.md) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
-```c++
+```cpp
 #include <boost/pool/pool_alloc.hpp>
 #include <jsoncons/json.hpp>
 
@@ -900,7 +900,7 @@ Note that the underlying memory pool used by the `boost::fast_pool_allocator` is
 ### Wide character support
 
 jsoncons supports wide character strings `wjson`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
-```c++
+```cpp
 using jsoncons::wjson;
 
 wjson j;
@@ -911,14 +911,14 @@ j[L"field3"] = true;
 std::wcout << j << L"\n";
 ```
 which prints
-```c++
+```cpp
 {"field1":"test","field2":3.9,"field3":true}
 ```
 <div id="A11"/>
 ### ojson and wojson
 
-The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
-```c++
+The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+```cpp
 ojson o = ojson::parse(R"(
 {
     "street_number" : "100",
@@ -940,7 +940,7 @@ Output:
 }
 ```
 Insert "postal_code" at end
-```c++
+```cpp
 o.insert_or_assign("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
@@ -956,7 +956,7 @@ Output:
 }
 ```
 Insert "province" before "country"
-```c++
+```cpp
 auto it = o.find("country");
 o.insert_or_assign(it,"province","Ontario");
 
