@@ -156,8 +156,6 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
-            using char_type = typename Json::char_type;
-
             if (!done())
             {
                 view_->cursor_->next(ec);
@@ -321,8 +319,6 @@ namespace jsoncons {
 
         void next(std::error_code& ec)
         {
-            using char_type = typename Json::char_type;
-
             view_->cursor_->next(ec);
             if (ec)
             {
