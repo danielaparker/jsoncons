@@ -29,10 +29,10 @@ Move constructor.
 #### Accessors
 
     Allocator get_allocator() const;
-An allocator object for result data
+Returns an allocator object for result data
 
     TempAllocator get_temp_allocator() const;
-An allocator object for for temporary allocations
+Returns an allocator object for for temporary allocations
 
 #### Non member functions
 
