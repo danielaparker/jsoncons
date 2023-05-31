@@ -19,10 +19,10 @@ Member type                         |Definition
 Constructs an `allocator_set` with an allocator for result data and a
 second allocator for temporary allocations. 
 
-    allocator_set(const allocator_set&)
+    allocator_set(const allocator_set& other)
 Copy constructor. 
 
-    allocator_set(allocator_set&&)
+    allocator_set(allocator_set&& other)
 
 Move constructor. 
 
