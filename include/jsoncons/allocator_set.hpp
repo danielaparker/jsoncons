@@ -56,8 +56,7 @@ allocator_set<Allocator,TempAllocator> combine_allocators(const Allocator& alloc
 }
 
 template <class TempAllocator>
-allocator_set<std::allocator<char>,TempAllocator> combine_allocators(temp_allocator_arg_t, 
-    const TempAllocator& temp_alloc)
+allocator_set<std::allocator<char>,TempAllocator> temp_allocator_only(const TempAllocator& temp_alloc)
 {
     return allocator_set<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);
 }
