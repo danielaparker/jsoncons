@@ -3,11 +3,9 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
-#include <sstream>
+#include <common/FreeListAllocator.hpp>
+#include <scoped_allocator>
 #include <vector>
-#include <utility>
-#include <ctime>
-#include <limits>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
