@@ -281,17 +281,17 @@ using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("decode_json with work allocator")
 {
-    ScopedTestAllocator<char> alloc(1);
+    ScopedTestAllocator<char> temp_alloc(1);
 
     SECTION("convert_vector_test")
     {
         std::vector<double> v = {1,2,3,4,5,6};
 
         std::string json_text;
-        jsoncons::encode_json(temp_allocator_only(alloc), v,json_text);
+        jsoncons::encode_json(temp_allocator_only(temp_alloc), v,json_text);
 
         auto result = jsoncons::decode_json<std::vector<double>>(
-            temp_allocator_only(alloc), 
+            temp_allocator_only(temp_alloc), 
             json_text);
 
         REQUIRE(v.size() == result.size());
@@ -306,9 +306,9 @@ TEST_CASE("decode_json with work allocator")
         std::map<std::string,double> m = {{"a",1},{"b",2}};
 
         std::string json_text;
-        jsoncons::encode_json(temp_allocator_only(alloc), m,json_text);
+        jsoncons::encode_json(temp_allocator_only(temp_alloc), m,json_text);
         auto result = jsoncons::decode_json<std::map<std::string,double>>(
-            temp_allocator_only(alloc), 
+            temp_allocator_only(temp_alloc), 
             json_text);
         REQUIRE(result.size() == m.size());
         CHECK(m["a"] == result["a"]);
@@ -321,9 +321,9 @@ TEST_CASE("decode_json with work allocator")
         std::vector<std::vector<double>> v{u,u};
 
         std::string json_text;
-        jsoncons::encode_json(temp_allocator_only(alloc), v,json_text);
+        jsoncons::encode_json(temp_allocator_only(temp_alloc), v,json_text);
         auto result = jsoncons::decode_json<std::vector<std::vector<double>>>(
-            temp_allocator_only(alloc), 
+            temp_allocator_only(temp_alloc), 
             json_text);
         REQUIRE(result.size() == v.size());
         for (const auto& item : result)
@@ -349,9 +349,9 @@ TEST_CASE("decode_json with work allocator")
         };
 
         std::string json_text;
-        jsoncons::encode_json(temp_allocator_only(alloc), employees, json_text, json_options(), json_indent_kind::indent);
+        jsoncons::encode_json(temp_allocator_only(temp_alloc), employees, json_text, json_options(), json_indent_kind::indent);
         auto employees2 = jsoncons::decode_json<employee_collection>(
-            temp_allocator_only(alloc), 
+            temp_allocator_only(temp_alloc), 
             json_text);
         REQUIRE(employees2.size() == employees.size());
         CHECK(employees2 == employees);

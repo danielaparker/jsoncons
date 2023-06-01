@@ -137,8 +137,9 @@ namespace cbor {
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
+        basic_cbor_encoder<binary_stream_sink,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
         std::error_code ec;
-        encode_cbor(temp_allocator_arg, alloc_set.get_temp_allocator(), val, os, options, ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
