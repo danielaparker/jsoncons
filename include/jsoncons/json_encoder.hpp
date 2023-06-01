@@ -1109,14 +1109,14 @@ namespace detail {
         basic_compact_json_encoder& operator=(const basic_compact_json_encoder&) = delete;
     public:
         basic_compact_json_encoder(Sink&& sink, 
-                                      const Allocator& alloc = Allocator())
+            const Allocator& alloc = Allocator())
             : basic_compact_json_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
         {
         }
 
         basic_compact_json_encoder(Sink&& sink, 
-                                      const basic_json_encode_options<CharT>& options, 
-                                      const Allocator& alloc = Allocator())
+            const basic_json_encode_options<CharT>& options, 
+            const Allocator& alloc = Allocator())
            : sink_(std::forward<Sink>(sink)),
              options_(options),
              fp_(options.float_format(), options.precision()),

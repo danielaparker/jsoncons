@@ -19,12 +19,12 @@ T decode_json(Iterator first, Iterator last,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (3)
 
 template <class T, class Source, class Allocator, class TempAllocator>
-T decode_json(allocator_set<Allocator,TempAllocator> alloc_set,
+T decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<Source::value_type>& options = basic_json_decode_options<Source::value_type>()); (4)
 
 template <class T, class CharT, class Allocator, class TempAllocator>
-T decode_json(allocator_set<Allocator,TempAllocator> alloc_set,
+T decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());                           (5)
 ```
