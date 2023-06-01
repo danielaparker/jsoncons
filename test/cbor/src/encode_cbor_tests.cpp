@@ -199,7 +199,7 @@ TEST_CASE("encode_cbor allocator_set overloads")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
+        cbor::encode_cbor(person, ss);
         json other = cbor::decode_cbor<json>(ss);
         CHECK(other == person);
     }
@@ -209,7 +209,7 @@ TEST_CASE("encode_cbor allocator_set overloads")
 
         std::string s;
         std::stringstream ss(s);
-        cbor::encode_cbor(alloc_set, person, ss);
+        cbor::encode_cbor(person, ss);
         ns::Person other = cbor::decode_cbor<ns::Person>(ss);
         CHECK(other.name == person.name);
     }
