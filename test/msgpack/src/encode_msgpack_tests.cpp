@@ -153,7 +153,7 @@ TEST_CASE("encode_msgpack allocator_set overloads")
         std::string s;
         std::stringstream ss(s);
         msgpack::encode_msgpack(alloc_set, person, ss);
-        json other = msgpack::decode_msgpack<json>(ss);
+        json other = msgpack::decode_msgpack<json>(alloc_set, ss);
         CHECK(other == person);
     }
     SECTION("custom, stream")
@@ -163,7 +163,7 @@ TEST_CASE("encode_msgpack allocator_set overloads")
         std::string s;
         std::stringstream ss(s);
         msgpack::encode_msgpack(alloc_set, person, ss);
-        ns::Person other = msgpack::decode_msgpack<ns::Person>(ss);
+        ns::Person other = msgpack::decode_msgpack<ns::Person>(alloc_set, ss);
         CHECK(other.name == person.name);
     }
 }
