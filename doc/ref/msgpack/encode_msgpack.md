@@ -6,11 +6,11 @@ Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.htm
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class T>
-void encode_msgpack(const T& jval, std::vector<uint8_t>& v,
+void encode_msgpack(const T& jval, std::vector<uint8_t>& cont,
                  const msgpack_decode_options& options = msgpack_decode_options()); (1) (until 0.152.0)
 
-template<class T, class Container>
-void encode_msgpack(const T& jval, Container& v,
+template<class T, class ByteContainer>
+void encode_msgpack(const T& jval, ByteContainer& cont,
                  const msgpack_decode_options& options = msgpack_decode_options()); (1) (since 0.152.0)
 
 template<class T>
@@ -22,7 +22,7 @@ void encode_msgpack(const T& jval,
 (1) Writes a value of type T into a byte container in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
-Type `Container` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
+Type `ByteContainer` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 
@@ -68,10 +68,10 @@ int main()
     j1["min float"] = (std::numeric_limits<float>::lowest)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v;
-    encode_msgpack(j1, v);
+    std::vector<uint8_t> cont;
+    encode_msgpack(j1, cont);
 
-    ojson j2 = decode_msgpack<ojson>(v);
+    ojson j2 = decode_msgpack<ojson>(cont);
 
     std::cout << pretty_print(j2) << std::endl;
 }

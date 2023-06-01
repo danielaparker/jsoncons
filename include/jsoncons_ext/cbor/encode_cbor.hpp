@@ -23,26 +23,26 @@ namespace cbor {
 
     // to bytes 
 
-    template<class T, class Container>
+    template<class T, class ByteContainer>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
+                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(const T& j, 
-                Container& v, 
+                ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_cbor_encoder<jsoncons::bytes_sink<Container>> encoder(v, options);
+        basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
-    template<class T, class Container>
+    template<class T, class ByteContainer>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
-    encode_cbor(const T& val, Container& v, 
+                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
+    encode_cbor(const T& val, ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        basic_cbor_encoder<jsoncons::bytes_sink<Container>> encoder(v, options);
+        basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>> encoder(cont, options);
         std::error_code ec;
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
@@ -84,29 +84,29 @@ namespace cbor {
 
     // to bytes 
 
-    template<class T, class Container, class TempAllocator>
+    template<class T, class ByteContainer, class TempAllocator>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
+                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
-                Container& v, 
+                ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_cbor_encoder<bytes_sink<Container>,TempAllocator> encoder(v, options, temp_alloc);
+        basic_cbor_encoder<bytes_sink<ByteContainer>,TempAllocator> encoder(cont, options, temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
-    template<class T, class Container, class TempAllocator>
+    template<class T, class ByteContainer, class TempAllocator>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
-                            extension_traits::is_back_insertable_byte_container<Container>::value,void>::type 
+                            extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
-                Container& v, 
+                ByteContainer& cont, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
-        basic_cbor_encoder<jsoncons::bytes_sink<Container>,TempAllocator> encoder(v, options, temp_alloc);
+        basic_cbor_encoder<jsoncons::bytes_sink<ByteContainer>,TempAllocator> encoder(cont, options, temp_alloc);
         std::error_code ec;
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
