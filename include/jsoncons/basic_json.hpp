@@ -3895,11 +3895,11 @@ namespace jsoncons {
         template <class Container>
         typename std::enable_if<extension_traits::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s, 
-                  indenting line_indent) const
+                  json_indent_kind indent_kind) const
         {
             std::error_code ec;
 
-            dump(s, line_indent, ec);
+            dump(s, indent_kind, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -3910,11 +3910,11 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s,
                   const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent) const
+                  json_indent_kind indent_kind) const
         {
             std::error_code ec;
 
-            dump(s, options, line_indent, ec);
+            dump(s, options, indent_kind, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -3922,11 +3922,11 @@ namespace jsoncons {
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent) const
+                  json_indent_kind indent_kind) const
         {
             std::error_code ec;
 
-            dump(os, line_indent, ec);
+            dump(os, indent_kind, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -3935,11 +3935,11 @@ namespace jsoncons {
 
         void dump(std::basic_ostream<char_type>& os, 
                   const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent) const
+                  json_indent_kind indent_kind) const
         {
             std::error_code ec;
 
-            dump(os, options, line_indent, ec);
+            dump(os, options, indent_kind, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -4032,10 +4032,10 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s,
                   const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent,
+                  json_indent_kind indent_kind,
                   std::error_code& ec) const
         {
-            if (line_indent == indenting::indent)
+            if (indent_kind == json_indent_kind::indent)
             {
                 dump_pretty(s, options, ec);
             }
@@ -4048,10 +4048,10 @@ namespace jsoncons {
         template <class Container>
         typename std::enable_if<extension_traits::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s, 
-                  indenting line_indent,
+                  json_indent_kind indent_kind,
                   std::error_code& ec) const
         {
-            if (line_indent == indenting::indent)
+            if (indent_kind == json_indent_kind::indent)
             {
                 dump_pretty(s, ec);
             }
@@ -4063,10 +4063,10 @@ namespace jsoncons {
 
         void dump(std::basic_ostream<char_type>& os, 
                   const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent,
+                  json_indent_kind indent_kind,
                   std::error_code& ec) const
         {
-            if (line_indent == indenting::indent)
+            if (indent_kind == json_indent_kind::indent)
             {
                 dump_pretty(os, options, ec);
             }
@@ -4077,10 +4077,10 @@ namespace jsoncons {
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent,
+                  json_indent_kind indent_kind,
                   std::error_code& ec) const
         {
-            if (line_indent == indenting::indent)
+            if (indent_kind == json_indent_kind::indent)
             {
                 dump_pretty(os, ec);
             }
@@ -5511,7 +5511,7 @@ namespace jsoncons {
             dump(visitor);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, json_indent_kind)")
         void dump(std::basic_ostream<char_type>& os, bool pprint) const
         {
             if (pprint)
@@ -5526,7 +5526,7 @@ namespace jsoncons {
             }
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, json_indent_kind)")
         void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
             if (pprint)
@@ -5565,7 +5565,7 @@ namespace jsoncons {
             dump(os,options);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, json_indent_kind)")
         void write(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
             dump(os,options,pprint);
@@ -5589,10 +5589,10 @@ namespace jsoncons {
             dump(os,options);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, json_indent_kind)")
         void to_stream(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
-            dump(os,options,pprint ? indenting::indent : indenting::no_indent);
+            dump(os,options,pprint ? json_indent_kind::indent : json_indent_kind::no_indent);
         }
 
         JSONCONS_DEPRECATED_MSG("No replacement")

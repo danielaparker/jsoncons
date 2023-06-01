@@ -240,7 +240,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json_pretty(v, s);
+    encode_json(v, s, json_indent_kind::indent);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }

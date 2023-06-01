@@ -37,24 +37,24 @@ void encode_json(const T& val,
 template <class T, class Container>
 void encode_json(const T& val, 
                  Container& s, 
-                 indenting line_indent); (6)
+                 json_indent_kind indent_kind); (6)
 
 template <class T, class Container>
 void encode_json(const T& val,
                  Container& s, 
                  const basic_json_encode_options<Container::value_type>& options, 
-                 indenting line_indent); (7)
+                 json_indent_kind indent_kind); (7)
 
 template <class T, class CharT>
 void encode_json(const T& val, 
                  std::basic_ostream<CharT>& os, 
-                 indenting line_indent); (8)
+                 json_indent_kind indent_kind); (8)
 
 template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
                  const basic_json_encode_options<CharT>& options, 
-                 indenting line_indent); (9)
+                 json_indent_kind indent_kind); (9)
 ```
 
 (1) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md).
@@ -69,7 +69,7 @@ and prettified with spaces and line breaks.
 
 (5) Convert `val` to json events and stream through encoder.
 
-(6-9) Legacy overloads that indicate prettified output with [line_indent](indenting.md) parameter.
+(6-9) Legacy overloads that indicate prettified output with [indent_kind](json_indent_kind.md) parameter.
 
 #### Parameters
 
@@ -91,8 +91,8 @@ and prettified with spaces and line breaks.
     <td>Output stream</td> 
   </tr>
   <tr>
-    <td>indenting</td>
-    <td><code>indenting::indent</code> to pretty print, <code>indenting::no_indent</code> for compact output</td> 
+    <td>json_indent_kind</td>
+    <td><code>json_indent_kind::indent</code> to pretty print, <code>json_indent_kind::no_indent</code> for compact output</td> 
   </tr>
 </table>
 
