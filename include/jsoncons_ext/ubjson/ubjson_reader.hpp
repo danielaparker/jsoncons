@@ -29,7 +29,7 @@ public:
     template <class Sourceable>
     basic_ubjson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
-                      const Allocator alloc)
+                      const Allocator& alloc)
        : basic_ubjson_reader(std::forward<Sourceable>(source),
                            visitor,
                            ubjson_decode_options(),
@@ -41,7 +41,7 @@ public:
     basic_ubjson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const ubjson_decode_options& options = ubjson_decode_options(),
-                      const Allocator alloc=Allocator())
+                      const Allocator& alloc=Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc),
          visitor_(visitor)
     {

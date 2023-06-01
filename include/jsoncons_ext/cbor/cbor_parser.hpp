@@ -153,7 +153,7 @@ public:
     template <class Sourceable>
     basic_cbor_parser(Sourceable&& source,
                       const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator alloc = Allocator())
+                      const Allocator& alloc = Allocator())
        : alloc_(alloc),
          source_(std::forward<Sourceable>(source)),
          options_(options),

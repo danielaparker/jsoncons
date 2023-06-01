@@ -44,12 +44,12 @@ struct parse_state
     parse_state& operator=(parse_state&&) = default;
 };
 
-template <class Source,class Allocator=std::allocator<char>>
+template <class Source,class TempAllocator=std::allocator<char>>
 class basic_bson_parser : public ser_context
 {
     using char_type = char;
     using char_traits_type = std::char_traits<char>;
-    using temp_allocator_type = Allocator;
+    using temp_allocator_type = TempAllocator;
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
@@ -65,13 +65,14 @@ public:
     template <class Sourceable>
     basic_bson_parser(Sourceable&& source,
                       const bson_decode_options& options = bson_decode_options(),
-                      const Allocator alloc = Allocator())
+                      const TempAllocator& temp_alloc = TempAllocator())
        : source_(std::forward<Sourceable>(source)), 
          options_(options),
          more_(true), 
          done_(false),
-         text_buffer_(alloc),
-         state_stack_(alloc)
+         bytes_buffer_(temp_alloc),
+         text_buffer_(temp_alloc),
+         state_stack_(temp_alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0,0);
     }

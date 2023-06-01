@@ -21,20 +21,20 @@
 
 namespace jsoncons { namespace bson {
 
-template <class Source,class Allocator=std::allocator<char>>
+template <class Source,class TempAllocator=std::allocator<char>>
 class basic_bson_reader 
 {
-    basic_bson_parser<Source,Allocator> parser_;
+    basic_bson_parser<Source,TempAllocator> parser_;
     json_visitor& visitor_;
 public:
     template <class Sourceable>
     basic_bson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
-                      const Allocator alloc)
+                      const TempAllocator& temp_alloc)
        : basic_bson_reader(std::forward<Sourceable>(source),
                            visitor,
                            bson_decode_options(),
-                           alloc)
+                           temp_alloc)
     {
     }
 
@@ -42,8 +42,8 @@ public:
     basic_bson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const bson_decode_options& options = bson_decode_options(),
-                      const Allocator alloc=Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc),
+                      const TempAllocator& temp_alloc=TempAllocator())
+       : parser_(std::forward<Sourceable>(source), options, temp_alloc),
          visitor_(visitor)
     {
     }
