@@ -5,11 +5,11 @@ Encodes a C++ data structure into the CSV data format.
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <class T,class Container>
+template <class T,class CharContainer>
 void encode_csv(const T& val, 
-                Container& s, 
-                const basic_csv_encode_options<Container::value_type>& options = 
-                    basic_csv_encode_options<Container::value_type>()); (1)
+                CharContainer& cont, 
+                const basic_csv_encode_options<CharContainer::value_type>& options = 
+                    basic_csv_encode_options<CharContainer::value_type>()); (1)
 
 template <class T, class CharT>
 void encode_csv(const T& val, 
