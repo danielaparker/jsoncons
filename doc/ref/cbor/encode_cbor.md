@@ -3,17 +3,23 @@
 ```cpp
 #include <jsoncons_ext/cbor/cbor.hpp>
 
-template<class T>
-void encode_cbor(const T& jval, std::vector<uint8_t>& cont,
-                 const cbor_decode_options& options = cbor_decode_options()); (1) (until 0.152.0)
-
 template<class T, class ByteContainer>
 void encode_cbor(const T& jval, ByteContainer& cont,
-                 const cbor_decode_options& options = cbor_decode_options()); (1) (since 0.152.0)
+    const cbor_decode_options& options = cbor_decode_options());            (1)
 
 template<class T>
 void encode_cbor(const T& val, std::ostream& os, 
-                 const cbor_encode_options& options = cbor_encode_options()); (2)
+    const cbor_encode_options& options = cbor_encode_options());            (2)
+
+template<class T, class ByteContainer>
+void encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const T& jval, ByteContainer& cont,
+    const cbor_decode_options& options = cbor_decode_options());            (3) (since 0.171.0)
+
+template<class T>
+void encode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const T& val, std::ostream& os, 
+    const cbor_encode_options& options = cbor_encode_options());            (4) (since 0.171.0)
 ```
 
 Encodes a C++ data structure to the [Concise Binary Object Representation](http://cbor.io/) data format.
@@ -27,6 +33,8 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 (2) Writes a value of type T into a binary stream in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
+
+Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../allocator_set.md) is passed as an additional argument.
 
 ### Examples
 

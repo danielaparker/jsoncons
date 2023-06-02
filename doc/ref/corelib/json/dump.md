@@ -1,39 +1,32 @@
 ### `jsoncons::basic_json::dump`
 
 ```cpp
-template <Container>
-void dump(Container& s,
-          const basic_json_encode_options<char_type>& options 
-              = basic_json_encode_options<char_type>()) const; (1)
+template <CharContainer>
+void dump(CharContainer& cont,
+    const basic_json_encode_options<char_type>& options 
+        = basic_json_encode_options<char_type>(),
+    indenting = indenting::no_indent) const;                            (1)
+
+template <CharContainer>
+void dump(CharContainer& cont, indenting indent) const;                 
 
 void dump(std::basic_ostream<char_type>& os, 
-          const basic_json_encode_options<char_type>& options 
-              = basic_json_encode_options<char_type>()) const; (2)
+    const basic_json_encode_options<char_type>& options 
+        = basic_json_encode_options<char_type>(),
+    indenting = indenting::no_indent) const;                            (2)
 
-template <Container>
-void dump_pretty(Container& s,
-                 const basic_json_encode_options<char_type>& options 
-                     = basic_json_encode_options<char_type>()) const; (3)
+void dump(std::basic_ostream<char_type>& os, indenting indent) const;   
+
+template <CharContainer>
+void dump_pretty(CharContainer& cont,
+    const basic_json_encode_options<char_type>& options 
+        = basic_json_encode_options<char_type>()) const;                (3)
 
 void dump_pretty(std::basic_ostream<char_type>& os, 
-                 const basic_json_encode_options<char_type>& options 
-                     = basic_json_encode_options<char_type>()) const; (4)
+    const basic_json_encode_options<char_type>& options 
+        = basic_json_encode_options<char_type>()) const;                (4)
 
-void dump(basic_json_visitor<char_type>& visitor) const; (5)
-
-template <Container>
-void dump(Container& s, indenting indent) const; (6)
-
-template <Container>
-void dump(Container& s,
-          const basic_json_encode_options<char_type>& options, 
-          indenting indent) const; (7)
-
-void dump(std::basic_ostream<char_type>& os, indenting indent) const; (13)
-
-void dump(std::basic_ostream<char_type>& os, 
-          const basic_json_encode_options<char_type>& options, 
-          indenting indent) const; (8)
+void dump(basic_json_visitor<char_type>& visitor) const;                (5)
 )
 ```
 
@@ -41,13 +34,9 @@ void dump(std::basic_ostream<char_type>& os,
 
 (2) Dumps a json value to an output stream with "minified" output.
 
-(3) Dumps a json value to a character container with prettified output including spaces and line breaks.
-
-(4) Dumps a json value to an output stream with prettified output including spaces and line breaks.
+Functions (3)-(4) are identical to (1)-(2) except indenting is on.
 
 (5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
-
-(6) - (8) support `dump` overloads with the `jsoncons::indenting` parameter.
 
 #### Exceptions
 
