@@ -506,7 +506,7 @@ std::string s;
 
 j.dump(s); // compressed
 
-j.dump_pretty(s); // pretty print
+j.dump(s, indenting::indent); // pretty print
 ```
 
 <div id="B2"/>
@@ -516,7 +516,7 @@ j.dump_pretty(s); // pretty print
 ```
 j.dump(std::cout); // compressed
 
-j.dump_pretty(std::cout); // pretty print
+j.dump(std::cout, indenting::indent); // pretty print
 ```
 or
 ```
@@ -533,9 +533,9 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 json_options options;
 options.escape_all_non_ascii(true);
 
-j.dump(std::cout, options); // compressed
+j.dump(std::cout, options); // compact
 
-j.dump_pretty(std::cout, options); // pretty print
+j.dump(std::cout, options, indenting::indent); // pretty print
 ```
 or
 ```

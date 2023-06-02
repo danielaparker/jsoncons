@@ -47,8 +47,7 @@ void dump(std::basic_ostream<char_type>& os,
 
 (5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
 
-(6) - (8) support the pre 0.155.0 `dump` overloads with the `jsoncons::indenting` parameter.
-New code should use the `dump_pretty` overloads instead.
+(6) - (8) support `dump` overloads with the `jsoncons::indenting` parameter.
 
 #### Exceptions
 
