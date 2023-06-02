@@ -27,7 +27,6 @@ void dump_pretty(std::basic_ostream<char_type>& os,
         = basic_json_encode_options<char_type>()) const;                (4)
 
 void dump(basic_json_visitor<char_type>& visitor) const;                (5)
-)
 ```
 
 (1) Dumps a json value to a character container with "minified" output.
