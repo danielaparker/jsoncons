@@ -3846,10 +3846,10 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_back_insertable_char_container<CharContainer>::value>::type
         dump(CharContainer& cont,
              const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>(),
-             indenting = indenting::no_indent) const
+             indenting indent = indenting::no_indent) const
         {
             std::error_code ec;
-            dump(cont, options, ec);
+            dump(cont, options, indent, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -3860,10 +3860,10 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_back_insertable_char_container<CharContainer>::value>::type
         dump_pretty(CharContainer& cont,
             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>(),
-            indenting = indenting::no_indent) const
+            indenting indent = indenting::no_indent) const
         {
             std::error_code ec;
-            dump_pretty(cont, options, ec);
+            dump_pretty(cont, options, indent, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));
@@ -3872,10 +3872,10 @@ namespace jsoncons {
 
         void dump(std::basic_ostream<char_type>& os, 
             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>(),
-            indenting = indenting::no_indent) const
+            indenting indent = indenting::no_indent) const
         {
             std::error_code ec;
-            dump(os, options, ec);
+            dump(os, options, indent, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec));

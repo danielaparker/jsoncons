@@ -4,16 +4,14 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-//#include <jsoncons_ext/csv/csv_options.hpp>
-#include <jsoncons_ext/csv/csv.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <iostream>
-#include <fstream>
 #include <catch/catch.hpp>
+#include <common/FreeListAllocator.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+#include <map>
+#include <scoped_allocator>
+#include <vector>
 
 using namespace jsoncons;
 
@@ -235,3 +233,60 @@ TEMPLATE_TEST_CASE("test_csv_encoder_reset", "",
     f.encoder.flush();
     CHECK(f.string2() == "h5,h6\n5,6\n");
 }
+
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+TEST_CASE("encode_csv allocator_set overloads")
+{
+    ScopedTestAllocator<char> temp_alloc(1);
+
+    auto alloc_set = temp_allocator_only(temp_alloc);
+
+    json persons(json_array_arg);
+
+    json person(json_object_arg);
+    person.try_emplace("name", "John Smith");
+
+    persons.emplace_back(std::move(person));
+
+    SECTION("json, stream")
+    {
+        std::string s;
+        std::stringstream ss(s);
+
+        jsoncons::csv::csv_options options;
+        options.assume_header(true);
+        options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
+        csv::encode_csv(/*alloc_set,*/ persons, ss, options);
+        json other = csv::decode_csv<json>(/*alloc_set,*/ ss, options);
+        CHECK(other == persons);
+    }
+    SECTION("custom, stream")
+    {
+        std::string s;
+        std::stringstream ss(s);
+        jsoncons::csv::csv_options options;
+        options.assume_header(true);
+        options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
+        csv::encode_csv(/*alloc_set,*/ persons, ss, options);
+        auto other = csv::decode_csv<std::vector<ns::Person>>(/*alloc_set,*/ ss, options);
+        REQUIRE(other.size() == 1);
+        CHECK(other[0].name == persons[0].at("name").as_string());
+    }
+}
+
+#endif
