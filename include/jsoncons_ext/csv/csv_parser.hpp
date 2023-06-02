@@ -1809,8 +1809,8 @@ private:
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
-        int precision = 0;
-        uint8_t decimal_places = 0;
+        //int precision = 0;
+        //uint8_t decimal_places = 0;
 
         auto last = buffer_.end();
 
@@ -1859,12 +1859,12 @@ private:
                         state = numeric_check_state::minus;
                         break;
                     case '0':
-                        ++precision;
+                        //++precision;
                         buffer.push_back(*p);
                         state = numeric_check_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
+                        //++precision;
                         buffer.push_back(*p);
                         state = numeric_check_state::integer;
                         break;
@@ -1897,7 +1897,7 @@ private:
                     switch (*p)
                     {
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
+                        //++precision;
                         buffer.push_back(*p);
                         break;
                     case '.':
@@ -1919,12 +1919,12 @@ private:
                     switch (*p)
                     {
                     case '0':
-                        ++precision;
+                        //++precision;
                         buffer.push_back(*p);
                         state = numeric_check_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
+                        //++precision;
                         buffer.push_back(*p);
                         state = numeric_check_state::integer;
                         break;
@@ -1939,8 +1939,8 @@ private:
                     switch (*p)
                     {
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
-                        ++decimal_places;
+                        //++precision;
+                        //++decimal_places;
                         buffer.push_back(*p);
                         state = numeric_check_state::fraction;
                         break;
@@ -1955,8 +1955,8 @@ private:
                     switch (*p)
                     {
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
-                        ++decimal_places;
+                        //++precision;
+                        //++decimal_places;
                         buffer.push_back(*p);
                         break;
                     case 'e':case 'E':

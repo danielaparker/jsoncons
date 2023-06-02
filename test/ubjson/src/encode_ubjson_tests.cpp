@@ -8,9 +8,8 @@
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <sstream>
 #include <vector>
-#include <utility>
-#include <ctime>
-#include <limits>
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -211,3 +210,38 @@ TEST_CASE("encode_ubjson overloads")
     }
 }
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+TEST_CASE("encode_ubjson allocator_set overloads")
+{
+    ScopedTestAllocator<char> temp_alloc(1);
+
+    auto alloc_set = temp_allocator_only(temp_alloc);
+
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        ubjson::encode_ubjson(alloc_set, person, ss);
+        json other = ubjson::decode_ubjson<json>(alloc_set, ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        ubjson::encode_ubjson(alloc_set, person, ss);
+        ns::Person other = ubjson::decode_ubjson<ns::Person>(alloc_set, ss);
+        CHECK(other.name == person.name);
+    }
+}
+
+#endif

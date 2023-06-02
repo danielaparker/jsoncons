@@ -33,7 +33,7 @@ public:
     template <class Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
                       json_visitor& visitor, 
-                      const Allocator alloc)
+                      const Allocator& alloc)
        : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
                            msgpack_decode_options(),
@@ -45,7 +45,7 @@ public:
     basic_msgpack_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
-                      const Allocator alloc=Allocator())
+                      const Allocator& alloc=Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc),
          adaptor_(visitor, alloc), visitor_(adaptor_)
     {
@@ -53,7 +53,7 @@ public:
     template <class Sourceable>
     basic_msgpack_reader(Sourceable&& source, 
                       item_event_visitor& visitor, 
-                      const Allocator alloc)
+                      const Allocator& alloc)
        : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
                            msgpack_decode_options(),
@@ -65,7 +65,7 @@ public:
     basic_msgpack_reader(Sourceable&& source, 
                       item_event_visitor& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
-                      const Allocator alloc=Allocator())
+                      const Allocator& alloc=Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc),
          visitor_(visitor)
     {

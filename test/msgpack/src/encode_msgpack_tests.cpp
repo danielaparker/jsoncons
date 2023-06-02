@@ -6,11 +6,9 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
-#include <sstream>
 #include <vector>
-#include <utility>
-#include <ctime>
-#include <limits>
+#include <common/FreeListAllocator.hpp>
+#include <scoped_allocator>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -125,3 +123,49 @@ TEST_CASE("encode_msgpack_arrays_and_maps")
     check_encode_msgpack({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
 
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+TEST_CASE("encode_msgpack allocator_set overloads")
+{
+    ScopedTestAllocator<char> temp_alloc(1);
+
+    auto alloc_set = temp_allocator_only(temp_alloc);
+
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        msgpack::encode_msgpack(alloc_set, person, ss);
+        json other = msgpack::decode_msgpack<json>(alloc_set, ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        msgpack::encode_msgpack(alloc_set, person, ss);
+        ns::Person other = msgpack::decode_msgpack<ns::Person>(alloc_set, ss);
+        CHECK(other.name == person.name);
+    }
+}
+
+#endif

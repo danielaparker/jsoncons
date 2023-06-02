@@ -59,7 +59,7 @@ public:
     template <class Sourceable>
         basic_ubjson_parser(Sourceable&& source,
                           const ubjson_decode_options& options = ubjson_decode_options(),
-                          const Allocator alloc = Allocator())
+                          const Allocator& alloc = Allocator())
        : source_(std::forward<Sourceable>(source)), 
          options_(options),
          more_(true), 

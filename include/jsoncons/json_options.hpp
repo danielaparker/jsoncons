@@ -26,6 +26,9 @@ JSONCONS_DEPRECATED_MSG("Instead, use float_chars_format") typedef float_chars_f
 
 enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
+// legacy
+using indenting = indenting;
+
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
 enum class bigint_chars_format : uint8_t {number, base10, base64, base64url

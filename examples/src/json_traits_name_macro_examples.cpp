@@ -280,7 +280,7 @@ void json_type_traits_book_examples()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books1, std::cout);
+    encode_json(books1, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -293,7 +293,7 @@ void json_type_traits_book_examples()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books2, std::cout);
+    encode_json(books2, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -306,7 +306,7 @@ void json_type_traits_book_examples()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books3, std::cout);
+    encode_json(books3, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -319,7 +319,7 @@ void json_type_traits_book_examples()
                   << item.getPrice() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books4, std::cout);
+    encode_json(books4, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 
@@ -351,7 +351,7 @@ void translate_ids_from_to_employees()
     std::cout << "\n";
 
     std::string output;
-    encode_json_pretty(company, output);
+    encode_json(company, output, indenting::indent);
     std::cout << "(2)\n" << output << "\n\n";
 }
 
@@ -381,7 +381,7 @@ void tidy_member()
     std::cout << "\n";
 
     std::string output;
-    encode_json_pretty(persons, output);
+    encode_json(persons, output, indenting::indent);
     std::cout << "(2)\n" << output << "\n";
 
 }

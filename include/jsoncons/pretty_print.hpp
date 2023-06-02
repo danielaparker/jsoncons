@@ -28,15 +28,15 @@ class json_printable
 public:
     using char_type = typename Json::char_type;
 
-    json_printable(const Json& j, indenting line_indent)
-       : j_(&j), indenting_(line_indent)
+    json_printable(const Json& j, indenting indent)
+       : j_(&j), indenting_(indent)
     {
     }
 
     json_printable(const Json& j,
                    const basic_json_encode_options<char_type>& options,
-                   indenting line_indent)
-       : j_(&j), options_(options), indenting_(line_indent)
+                   indenting indent)
+       : j_(&j), options_(options), indenting_(indent)
     {
     }
 

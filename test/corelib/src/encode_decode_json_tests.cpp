@@ -1,14 +1,12 @@
 // Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
-#include <sstream>
-#include <vector>
+#include <common/FreeListAllocator.hpp>
+#include <jsoncons/json.hpp>
 #include <map>
-#include <utility>
-#include <ctime>
-#include <cstdint>
+#include <scoped_allocator>
+#include <vector>
 
 namespace 
 {
@@ -204,7 +202,7 @@ TEST_CASE("convert_tuple_test")
     };
 
     std::string s;
-    jsoncons::encode_json_pretty(input, s);
+    jsoncons::encode_json(input, s, indenting::indent);
 
     json j = json::parse(s);
     REQUIRE(j.is_object());
@@ -276,3 +274,84 @@ TEST_CASE("encode/decode map with integer key")
     }
 }
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+TEST_CASE("decode_json with work allocator")
+{
+    ScopedTestAllocator<char> temp_alloc(1);
+
+    auto alloc_set = temp_allocator_only(temp_alloc);
+
+    SECTION("convert_vector_test")
+    {
+        std::vector<double> v = {1,2,3,4,5,6};
+
+        std::string json_text;
+        jsoncons::encode_json(alloc_set, v,json_text);
+
+        auto result = jsoncons::decode_json<std::vector<double>>(alloc_set, json_text);
+
+        REQUIRE(v.size() == result.size());
+        for (std::size_t i = 0; i < result.size(); ++i)
+        {
+            CHECK(v[i] == result[i]);
+        }
+    }
+
+    SECTION("convert_map_test")
+    {
+        std::map<std::string,double> m = {{"a",1},{"b",2}};
+
+        std::string json_text;
+        jsoncons::encode_json(alloc_set, m,json_text);
+        auto result = jsoncons::decode_json<std::map<std::string,double>>(alloc_set, json_text);
+        REQUIRE(result.size() == m.size());
+        CHECK(m["a"] == result["a"]);
+        CHECK(m["b"] == result["b"]);
+    }
+
+    SECTION("convert vector of vector test")
+    {
+        std::vector<double> u{1,2,3,4};
+        std::vector<std::vector<double>> v{u,u};
+
+        std::string json_text;
+        jsoncons::encode_json(alloc_set, v,json_text);
+        auto result = jsoncons::decode_json<std::vector<std::vector<double>>>(alloc_set, json_text);
+        REQUIRE(result.size() == v.size());
+        for (const auto& item : result)
+        {
+            REQUIRE(item.size() == u.size());
+            CHECK(item[0] == 1);
+            CHECK(item[1] == 2);
+            CHECK(item[2] == 3);
+            CHECK(item[3] == 4);
+        }
+    }
+
+    #if !(defined(__GNUC__) && __GNUC__ <= 5)
+
+    SECTION("convert_tuple_test")
+    {
+        using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
+
+        employee_collection employees = 
+        { 
+            {"John Smith",{"Hourly","Software Engineer",10000}},
+            {"Jane Doe",{"Commission","Sales",20000}}
+        };
+
+        std::string json_text;
+        jsoncons::encode_json(alloc_set, employees, json_text, json_options(), indenting::indent);
+        auto employees2 = jsoncons::decode_json<employee_collection>(alloc_set, json_text);
+        REQUIRE(employees2.size() == employees.size());
+        CHECK(employees2 == employees);
+    }
+
+    #endif
+}
+
+#endif

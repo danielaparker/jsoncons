@@ -6,11 +6,9 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
-#include <sstream>
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 #include <vector>
-#include <utility>
-#include <ctime>
-#include <limits>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -183,3 +181,38 @@ TEST_CASE("encode_cbor overloads")
     }
 }
 
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+
+template<typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
+TEST_CASE("encode_cbor allocator_set overloads")
+{
+    ScopedTestAllocator<char> temp_alloc(1);
+
+    auto alloc_set = temp_allocator_only(temp_alloc);
+
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(person, ss);
+        json other = cbor::decode_cbor<json>(ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(person, ss);
+        ns::Person other = cbor::decode_cbor<ns::Person>(ss);
+        CHECK(other.name == person.name);
+    }
+}
+
+#endif

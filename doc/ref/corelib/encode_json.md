@@ -6,70 +6,55 @@ have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/do
 ```cpp
 #include <jsoncons/encode_json.hpp>
 
-template <class T, class Container>
-void encode_json(const T& val,
-                 Container& s, 
-                 const basic_json_encode_options<Container::value_type>& options = 
-                     basic_json_encode_options<Container::value_type>()); (1)
+template <class T, class CharContainer>
+void encode_json(const T& val, CharContainer& cont, 
+    const basic_json_encode_options<CharContainer::value_type>& options  
+        = basic_json_encode_options<CharContainer::value_type>(),
+    indenting indent = indenting::no_indent);                                   (1)
+
+template <class T, class CharT>                                             
+void encode_json(const T& val, std::basic_ostream<CharT>& os, 
+    const basic_json_encode_options<CharT>& options  
+        = basic_json_encode_options<CharT>(),
+    indenting indent = indenting::no_indent);                                   (2) 
+
+template <class T, class CharContainer>
+void encode_json_pretty(const T& val, CharContainer& cont, 
+    const basic_json_encode_options<CharContainer::value_type>& options  
+        = basic_json_encode_options<CharContainer::value_type>());              (3) (since 0.155.0)
 
 template <class T, class CharT>
-void encode_json(const T& val,
-                 std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options = 
-                     basic_json_encode_options<CharT>()); (2)
-
-template <class T, class Container>
-void encode_json_pretty(const T& val,
-                        Container& s, 
-                        const basic_json_encode_options<Container::value_type>& options = 
-                            basic_json_encode_options<Container::value_type>()); (3) (since 0.155.0)
+void encode_json_pretty(const T& val, std::basic_ostream<CharT>& os, 
+    const basic_json_encode_options<CharT>& options 
+        = basic_json_encode_options<CharT>());                                  (4) (since 0.155.0)        
 
 template <class T, class CharT>
-void encode_json_pretty(const T& val,
-                        std::basic_ostream<CharT>& os, 
-                        const basic_json_encode_options<CharT>& options = 
-                            basic_json_encode_options<CharT>()); (4) (since 0.155.0)
+void encode_json(const T& val, basic_json_visitor<CharT>& encoder);             (5)
 
-template <class T, class CharT>
-void encode_json(const T& val, 
-                 basic_json_visitor<CharT>& encoder); (5)
+template <class T, class CharContainer, class Allocator, class TempAllocator>
+void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const T& val, CharContainer& cont, 
+    const basic_json_encode_options<CharContainer::value_type>& options  
+        = basic_json_encode_options<CharContainer::value_type>(),
+    indenting indent = indenting::no_indent);                                   (6) (since 0.171.0)
 
-template <class T, class Container>
-void encode_json(const T& val, 
-                 Container& s, 
-                 indenting line_indent); (6)
-
-template <class T, class Container>
-void encode_json(const T& val,
-                 Container& s, 
-                 const basic_json_encode_options<Container::value_type>& options, 
-                 indenting line_indent); (7)
-
-template <class T, class CharT>
-void encode_json(const T& val, 
-                 std::basic_ostream<CharT>& os, 
-                 indenting line_indent); (8)
-
-template <class T, class CharT>
-void encode_json(const T& val,
-                 std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options, 
-                 indenting line_indent); (9)
+template <class T, class CharT, class Allocator, class TempAllocator>                                             
+void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
+    const T& val, std::basic_ostream<CharT>& os, 
+    const basic_json_encode_options<CharT>& options  
+        = basic_json_encode_options<CharT>(),
+    indenting indent = indenting::no_indent);                                   (7) (since 0.171.0)
 ```
 
-(1) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md).
+(1) Encode `val` into a character container with the specified (or defaulted) [options](basic_json_options.md).
 
-(2) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md).
+(2) Encode `val` to an output stream with the specified (or defaulted) [options](basic_json_options.md).
 
-(3) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md)
-and prettified with spaces and line breaks.
+Functions (3)-(4) are identical to (1)-(2) except indenting is on.
 
-(4) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md)
-and prettified with spaces and line breaks.
+(5) Transform `val` into json events and stream through an encoder.
 
-(5) Convert `val` to json events and stream through encoder.
-
-(6-9) Legacy overloads that indicate prettified output with [line_indent](indenting.md) parameter.
+Functions (6)-(7) are identical to (1)-(2) except an [allocator_set](allocator_set.md) is passed as an additional argument.
 
 #### Parameters
 
@@ -127,7 +112,8 @@ int main()
     std::cout << "\n\n";
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
-    encode_json_pretty(employees, std::cout);
+
+    encode_json(employees, std::cout, indenting::indent);
 }
 ```
 Output:
