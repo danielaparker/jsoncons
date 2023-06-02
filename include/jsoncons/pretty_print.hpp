@@ -28,15 +28,15 @@ class json_printable
 public:
     using char_type = typename Json::char_type;
 
-    json_printable(const Json& j, json_indent_kind indent_kind)
-       : j_(&j), indenting_(indent_kind)
+    json_printable(const Json& j, indenting indent)
+       : j_(&j), indenting_(indent)
     {
     }
 
     json_printable(const Json& j,
                    const basic_json_encode_options<char_type>& options,
-                   json_indent_kind indent_kind)
-       : j_(&j), options_(options), indenting_(indent_kind)
+                   indenting indent)
+       : j_(&j), options_(options), indenting_(indent)
     {
     }
 
@@ -53,7 +53,7 @@ public:
 
     const Json *j_;
     basic_json_encode_options<char_type> options_;
-    json_indent_kind indenting_;
+    indenting indenting_;
 private:
     json_printable();
 };
@@ -61,27 +61,27 @@ private:
 template<class Json>
 json_printable<Json> print(const Json& j)
 {
-    return json_printable<Json>(j, json_indent_kind::no_indent);
+    return json_printable<Json>(j, indenting::no_indent);
 }
 
 template<class Json>
 json_printable<Json> print(const Json& j,
                            const basic_json_encode_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(j, options, json_indent_kind::no_indent);
+    return json_printable<Json>(j, options, indenting::no_indent);
 }
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& j)
 {
-    return json_printable<Json>(j, json_indent_kind::indent);
+    return json_printable<Json>(j, indenting::indent);
 }
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& j,
                                   const basic_json_encode_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(j, options, json_indent_kind::indent);
+    return json_printable<Json>(j, options, indenting::indent);
 }
 
 }

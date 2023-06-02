@@ -24,10 +24,10 @@ enum class float_chars_format : uint8_t {general,fixed,scientific,hex};
 JSONCONS_DEPRECATED_MSG("Instead, use float_chars_format") typedef float_chars_format chars_format;
 #endif
 
-enum class json_indent_kind : uint8_t {no_indent = 0, indent = 1};
+enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 // legacy
-using indenting = json_indent_kind;
+using indenting = indenting;
 
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 

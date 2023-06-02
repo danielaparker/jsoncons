@@ -20,7 +20,7 @@ template <class T, class CharContainer>
 void encode_json(const T& val, CharContainer& cont, 
     const basic_json_encode_options<CharContainer::value_type>& options  
         = basic_json_encode_options<CharContainer::value_type>(),
-    json_indent_kind indent_kind = json_indent_kind::no_indent);                (1) (since 0.171.0)
+    indenting indent = indenting::no_indent);                (1) (since 0.171.0)
 
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os, 
@@ -36,7 +36,7 @@ template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os, 
     const basic_json_encode_options<CharT>& options  
         = basic_json_encode_options<CharT>(),
-    json_indent_kind indent_kind = json_indent_kind::no_indent);                (2) (since 0.171.0)
+    indenting indent = indenting::no_indent);                (2) (since 0.171.0)
 
 template <class T, class CharT>
 void encode_json(const T& val, basic_json_visitor<CharT>& encoder);             (3)
@@ -46,14 +46,14 @@ void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const T& val, CharContainer& cont, 
     const basic_json_encode_options<CharContainer::value_type>& options  
         = basic_json_encode_options<CharContainer::value_type>(),
-    json_indent_kind indent_kind = json_indent_kind::no_indent);                (4) (since 0.171.0)
+    indenting indent = indenting::no_indent);                (4) (since 0.171.0)
 
 template <class T, class CharT, class Allocator, class TempAllocator>                                             
 void encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const T& val, std::basic_ostream<CharT>& os, 
     const basic_json_encode_options<CharT>& options  
         = basic_json_encode_options<CharT>(),
-    json_indent_kind indent_kind = json_indent_kind::no_indent);                (5) (since 0.171.0)
+    indenting indent = indenting::no_indent);                (5) (since 0.171.0)
 ```
 
 (1) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md).
@@ -84,8 +84,8 @@ Functions (4)-(5) are identical to (1)-(2) except an [allocator_set](allocator_s
     <td>Output stream</td> 
   </tr>
   <tr>
-    <td>json_indent_kind</td>
-    <td><code>json_indent_kind::indent</code> to pretty print, <code>json_indent_kind::no_indent</code> for compact output</td> 
+    <td>indenting</td>
+    <td><code>indenting::indent</code> to pretty print, <code>indenting::no_indent</code> for compact output</td> 
   </tr>
 </table>
 
@@ -125,7 +125,7 @@ int main()
     encode_json_pretty(employees, std::cout);
 
     // since 0.171.0    
-    encode_json(employees, std::cout, json_options(), json_indent_kind::indent);
+    encode_json(employees, std::cout, json_options(), indenting::indent);
 }
 ```
 Output:

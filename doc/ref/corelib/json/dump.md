@@ -22,18 +22,18 @@ void dump_pretty(std::basic_ostream<char_type>& os,
 void dump(basic_json_visitor<char_type>& visitor) const; (5)
 
 template <Container>
-void dump(Container& s, json_indent_kind indent_kind) const; (6)
+void dump(Container& s, indenting indent) const; (6)
 
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options, 
-          json_indent_kind indent_kind) const; (7)
+          indenting indent) const; (7)
 
-void dump(std::basic_ostream<char_type>& os, json_indent_kind indent_kind) const; (13)
+void dump(std::basic_ostream<char_type>& os, indenting indent) const; (13)
 
 void dump(std::basic_ostream<char_type>& os, 
           const basic_json_encode_options<char_type>& options, 
-          json_indent_kind indent_kind) const; (8)
+          indenting indent) const; (8)
 )
 ```
 
@@ -47,7 +47,7 @@ void dump(std::basic_ostream<char_type>& os,
 
 (5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
 
-(6) - (8) support the pre 0.155.0 `dump` overloads with the `jsoncons::json_indent_kind` parameter.
+(6) - (8) support the pre 0.155.0 `dump` overloads with the `jsoncons::indenting` parameter.
 New code should use the `dump_pretty` overloads instead.
 
 #### Exceptions

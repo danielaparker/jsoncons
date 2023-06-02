@@ -349,7 +349,7 @@ TEST_CASE("decode_json with work allocator")
         };
 
         std::string json_text;
-        jsoncons::encode_json(temp_allocator_only(temp_alloc), employees, json_text, json_options(), json_indent_kind::indent);
+        jsoncons::encode_json(temp_allocator_only(temp_alloc), employees, json_text, json_options(), indenting::indent);
         auto employees2 = jsoncons::decode_json<employee_collection>(
             temp_allocator_only(temp_alloc), 
             json_text);

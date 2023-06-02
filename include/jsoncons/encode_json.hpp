@@ -25,11 +25,11 @@ namespace jsoncons {
     encode_json(const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
         using char_type = typename CharContainer::value_type;
 
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>> encoder(cont, options);
             val.dump(encoder);
@@ -47,11 +47,11 @@ namespace jsoncons {
     encode_json(const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
         using char_type = typename CharContainer::value_type;
 
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>> encoder(cont, options);
             encode_json(val, encoder);
@@ -69,9 +69,9 @@ namespace jsoncons {
     typename std::enable_if<extension_traits::is_basic_json<T>::value>::type
     encode_json(const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<CharT> encoder(os, options);
             val.dump(encoder);
@@ -87,9 +87,9 @@ namespace jsoncons {
     typename std::enable_if<!extension_traits::is_basic_json<T>::value>::type
     encode_json(const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<CharT> encoder(os, options);
             encode_json(val, encoder);
@@ -110,11 +110,11 @@ namespace jsoncons {
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
         using char_type = typename CharContainer::value_type;
 
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAllocator> encoder(cont, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
@@ -133,11 +133,11 @@ namespace jsoncons {
         const T& val, CharContainer& cont, 
         const basic_json_encode_options<typename CharContainer::value_type>& options = 
             basic_json_encode_options<typename CharContainer::value_type>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
         using char_type = typename CharContainer::value_type;
 
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<char_type, jsoncons::string_sink<CharContainer>,TempAllocator> encoder(cont, options,
                 alloc_set.get_temp_allocator());
@@ -158,9 +158,9 @@ namespace jsoncons {
     encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
             val.dump(encoder);
@@ -177,9 +177,9 @@ namespace jsoncons {
     encode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
         const T& val, std::basic_ostream<CharT>& os, 
         const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(),
-        json_indent_kind indent_kind = json_indent_kind::no_indent)
+        indenting indent = indenting::no_indent)
     {
-        if (indent_kind == json_indent_kind::no_indent)
+        if (indent == indenting::no_indent)
         {
             basic_compact_json_encoder<CharT,TempAllocator> encoder(os, options, alloc_set.get_temp_allocator());
             encode_json(val, encoder);
@@ -255,9 +255,9 @@ namespace jsoncons {
 // legacy
 
     template <class T, class CharContainer>
-    void encode_json(const T& val, CharContainer& cont, json_indent_kind indent_kind)
+    void encode_json(const T& val, CharContainer& cont, indenting indent)
     {
-        if (indent_kind == json_indent_kind::indent)
+        if (indent == indenting::indent)
         {
             encode_json_pretty(val,cont);
         }
@@ -270,9 +270,9 @@ namespace jsoncons {
     template <class T, class CharT>
     void encode_json(const T& val,
                      std::basic_ostream<CharT>& os, 
-                     json_indent_kind indent_kind)
+                     indenting indent)
     {
-        if (indent_kind == json_indent_kind::indent)
+        if (indent == indenting::indent)
         {
             encode_json_pretty(val, os);
         }
