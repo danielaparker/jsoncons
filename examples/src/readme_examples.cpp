@@ -93,7 +93,7 @@ void as_a_strongly_typed_cpp_structure()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json_pretty(v, s);
+    encode_json(v, s, indenting::indent);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }

@@ -402,7 +402,7 @@ int main()
     };
 
     std::string json_data;
-    encode_json_pretty(results, json_data);
+    encode_json(results, json_data, indenting::indent);
     std::cout << json_data << "\n\n";
     auto results1 = decode_json<std::vector<qualifying_results_type>>(json_data);
     assert(results1 == results);
@@ -507,7 +507,7 @@ int main()
     }
 
     std::cout << "\n";
-    jsoncons::encode_json_pretty(models, std::cout);
+    jsoncons::encode_json(models, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -553,7 +553,7 @@ int main()
     std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
 
     std::string buffer;
-    jsoncons::encode_json_pretty(v, buffer);
+    jsoncons::encode_json(v, buffer, indenting::indent);
     std::cout << "(1)\n" << buffer << "\n\n";
 
     auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);

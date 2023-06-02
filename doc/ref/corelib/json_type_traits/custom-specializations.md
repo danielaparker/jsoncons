@@ -194,7 +194,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json_pretty(book_list, std::cout);
+    encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```

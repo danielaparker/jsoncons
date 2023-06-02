@@ -411,7 +411,7 @@ int main()
             const ns::job_properties v = data.as<ns::job_properties>(); 
 
             std::string output;
-            jsoncons::encode_json_pretty(v, output);
+            jsoncons::encode_json(v, output, indenting::indent);
             std::cout << output << std::endl;
 
             // Verify that output is valid

@@ -121,11 +121,7 @@ int main()
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
 
-    // until 0.171.0    
-    encode_json_pretty(employees, std::cout);
-
-    // since 0.171.0    
-    encode_json(employees, std::cout, json_options(), indenting::indent);
+    encode_json(employees, std::cout, indenting::indent);
 }
 ```
 Output:

@@ -388,7 +388,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS tests")
         CHECK(person.surname.empty());
 
         std::string s;
-        jsoncons::encode_json_pretty(person, s);
+        jsoncons::encode_json(person, s, indenting::indent);
 
         auto other = jsoncons::decode_json<ns::Person1>(s);
         CHECK(other.name == person.name);
@@ -407,7 +407,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
         val.someString = "A string";
 
         std::string s;
-        encode_json_pretty(val, s);
+        encode_json(val, s, indenting::indent);
 
         json j = decode_json<json>(s);
         CHECK(j["some-string"].as<std::string>() == val.someString);
@@ -432,7 +432,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
         val.aT2 = 2;
 
         std::string s;
-        encode_json_pretty(val, s);
+        encode_json(val, s, indenting::indent);
 
         json j = decode_json<json>(s);
         CHECK(j["a-t1"].as<int>() == 1);

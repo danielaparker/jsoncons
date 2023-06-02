@@ -202,7 +202,7 @@ TEST_CASE("convert_tuple_test")
     };
 
     std::string s;
-    jsoncons::encode_json_pretty(input, s);
+    jsoncons::encode_json(input, s, indenting::indent);
 
     json j = json::parse(s);
     REQUIRE(j.is_object());

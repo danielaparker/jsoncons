@@ -1158,10 +1158,10 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS transform tests")
         std::vector<ns::Employee_NCGN> employees = {ns::Employee_NCGN("John", "Smith"), ns::Employee_NCGN("Jane", "Doe")};    
 
         std::string output1;
-        encode_json_pretty(employees, output1);
+        encode_json(employees, output1, indenting::indent);
         auto employees2 = decode_json<std::vector<ns::Employee_NCGN>>(output1);
         std::string output2;
-        encode_json_pretty(employees2, output2);
+        encode_json(employees2, output2, indenting::indent);
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
@@ -1261,10 +1261,10 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS validation tests")
         std::vector<ns::Person_NCGN> persons = {ns::Person_NCGN("John Smith", "123456789"), ns::Person_NCGN("Jane Doe", "234567890")};    
 
         std::string output1;
-        encode_json_pretty(persons, output1);
+        encode_json(persons, output1, indenting::indent);
         auto persons2 = decode_json<std::vector<ns::Person_NCGN>>(output1);
         std::string output2;
-        encode_json_pretty(persons2, output2);
+        encode_json(persons2, output2, indenting::indent);
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
@@ -1279,10 +1279,10 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         std::vector<ns::Person_ACGN> persons = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "123456789")};    
 
         std::string output1;
-        encode_json_pretty(persons, output1);
+        encode_json(persons, output1, indenting::indent);
         auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
         std::string output2;
-        encode_json_pretty(persons2, output2);
+        encode_json(persons2, output2, indenting::indent);
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
@@ -1293,7 +1293,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         std::vector<ns::Person_ACGN> persons1 = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "12345678")};    
 
         std::string output1;
-        encode_json_pretty(persons1, output1);
+        encode_json(persons1, output1, indenting::indent);
         CHECK_THROWS(decode_json<std::vector<ns::Person_ACGN>>(output1));
     }
 } 
@@ -1315,7 +1315,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         REQUIRE(shapes.size() == 3);
         std::string output;
 
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1355,7 +1355,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         }*/
 
         std::string output;
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
         //std::cout << output << "\n";
 
     }
@@ -1378,7 +1378,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         REQUIRE(shapes.size() == 3);
         std::string output;
 
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1418,7 +1418,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         }*/
 
         std::string output;
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
         //std::cout << output << "\n";
 
     }
@@ -1441,7 +1441,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         REQUIRE(shapes.size() == 3);
         std::string output;
 
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1481,7 +1481,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         }*/
 
         std::string output;
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
         //std::cout << output << "\n";
 
     }
@@ -1504,7 +1504,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         REQUIRE(shapes.size() == 3);
         std::string output;
 
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1544,7 +1544,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         }*/
 
         std::string output;
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
         //std::cout << output << "\n";
 
     }
@@ -1567,7 +1567,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         REQUIRE(shapes.size() == 3);
         std::string output;
 
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1607,7 +1607,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         }*/
 
         std::string output;
-        encode_json_pretty(shapes, output);
+        encode_json(shapes, output, indenting::indent);
         //std::cout << output << "\n";
 
     }

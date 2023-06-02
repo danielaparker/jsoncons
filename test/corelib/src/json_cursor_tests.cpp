@@ -534,7 +534,7 @@ TEST_CASE("staj event as object")
                        12.0);
 
     std::string buffer;
-    encode_json_pretty(books, buffer);
+    encode_json(books, buffer, indenting::indent);
 
     SECTION("test 1")
     {

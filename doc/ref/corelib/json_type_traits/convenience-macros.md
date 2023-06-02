@@ -383,7 +383,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json_pretty(book_list, std::cout);
+    encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -509,7 +509,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json_pretty(v, s);
+    encode_json(v, s, indenting::indent);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -588,7 +588,7 @@ int main()
     val.field12 = std::optional<std::string>();
 
     std::string buf;
-    encode_json_pretty(val, buf);
+    encode_json(val, buf, indenting::indent);
     std::cout << buf << "\n";
 
     auto other = decode_json<ns::smart_pointer_and_optional_test>(buf);
@@ -752,7 +752,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json_pretty(v, std::cout);
+    encode_json(v, std::cout, indenting::indent);
 
     std::cout << "\n\n(3)\n";
     json j(v);
@@ -1029,7 +1029,7 @@ int main()
 
     std::string output;
 
-    jsoncons::encode_json_pretty(shapes, output);
+    jsoncons::encode_json(shapes, output, indenting::indent);
     std::cout << "\n(2)\n" << output << "\n";
 }
 ```
@@ -1193,7 +1193,7 @@ int main()
     }
 
     std::string output;
-    jsoncons::encode_json_pretty(basket, output);
+    jsoncons::encode_json(basket, output, indenting::indent);
     std::cout << "(2)\n" << output << "\n\n";
 }
 ```
@@ -1265,7 +1265,7 @@ int main()
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
-    jsoncons::encode_json_pretty(vars, buffer);
+    jsoncons::encode_json(vars, buffer, indenting::indent);
 
     std::cout << "(1)\n" << buffer << "\n\n";
 
@@ -1494,7 +1494,7 @@ int main()
     }
 
     std::string output;
-    jsoncons::encode_json_pretty(shapes, output);
+    jsoncons::encode_json(shapes, output, indenting::indent);
     std::cout << "\n(2)\n" << output << "\n";
 }
 ```
@@ -1676,7 +1676,7 @@ int main()
     std::cout << "\n";
 
     std::string output;
-    encode_json_pretty(company, output);
+    encode_json(company, output, indenting::indent);
     std::cout << "(2)\n" << output << "\n\n";
 }
 ```
@@ -1780,7 +1780,7 @@ int main()
     std::cout << "\n";
 
     std::string output;
-    jsoncons::encode_json_pretty(persons, output);
+    jsoncons::encode_json(persons, output, indenting::indent);
     std::cout << "(2)\n" << output << "\n";
 }
 ```
