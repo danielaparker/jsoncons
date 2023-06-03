@@ -39,6 +39,36 @@ void parse_with_comment()
     }
 }
 
+void parse_with_trailing_commas()
+{
+    std::string s = R"(
+    {
+        "first" : 1,
+        "second" : 2,
+    }
+    )";
+
+    // Default
+    try
+    {
+        auto j = json::parse(s);
+        std::cout << "(1) " << j << std::endl;
+    }
+    catch (const ser_error& e)
+    {
+        std::cout << "(1) " << e.what() << std::endl;
+    }
+
+    // Allow trailing commas
+
+    // until 0.170.0
+    auto j1 = json::parse(s, allow_trailing_commas());
+
+    // since 0.171.0
+    json_options options;
+    options.err_handler(allow_trailing_commas());
+    auto j2 = json::parse(s, options);
+}
 
 void parse_error_example()
 {
@@ -118,6 +148,8 @@ int main()
         max_nesting_path_example();
 
         using_polymorphic_allocator();
+
+        parse_with_trailing_commas();
     }
     catch (const std::exception& e)
     {

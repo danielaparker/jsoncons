@@ -13,24 +13,9 @@
 
 using namespace jsoncons;
 
-class relaxed_err_handler
-{
-public:
-
-    bool operator()(const std::error_code& ec,
-                    const ser_context&) noexcept 
-    {
-        if (ec == jsoncons::json_errc::extra_comma)
-        {
-            return true;
-        }
-        return false;
-    }
-};
-
 TEST_CASE("test_array_extra_comma")
 {
-    relaxed_err_handler err_handler;
+    allow_trailing_commas err_handler;
 
     json expected = json::parse("[1,2,3]");
 
@@ -43,7 +28,7 @@ TEST_CASE("test_array_extra_comma")
 
 TEST_CASE("test_object_extra_comma")
 {
-    relaxed_err_handler err_handler;
+    allow_trailing_commas err_handler;
 
     json expected = json::parse(R"(
     {
@@ -66,7 +51,7 @@ TEST_CASE("test_object_extra_comma")
 
 TEST_CASE("test_name_without_quotes")
 {
-    //relaxed_err_handler err_handler;
+    //allow_trailing_commas err_handler;
 
     /*json val = json::parse(R"(
     {

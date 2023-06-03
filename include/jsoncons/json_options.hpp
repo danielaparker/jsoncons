@@ -70,6 +70,20 @@ struct strict_json_parsing
     }
 };
 
+class allow_trailing_commas
+{
+public:
+
+    bool operator()(const std::error_code& ec, const ser_context&) noexcept 
+    {
+        if (ec == jsoncons::json_errc::extra_comma)
+        {
+            return true;
+        }
+        return false;
+    }
+};
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use default_json_parsing") typedef default_json_parsing default_parse_error_handler;
 JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing strict_parse_error_handler;

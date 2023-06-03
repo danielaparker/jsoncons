@@ -67,12 +67,12 @@ JSON events. Uses default [basic_csv_options](basic_csv_options.md).
 JSON events, and [basic_csv_options](basic_csv_options.md).
 
 (3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../basic_json_visitor.md) that receives
-JSON events and the specified [JSON parsing error handling](../JSONParsingErrorHandling.md).
+JSON events and the specified [JSON parsing error handling](../err_handler.md).
 Uses default [basic_csv_options](basic_csv_options.md).
 
 (4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_visitor](../basic_json_visitor.md) that receives
 JSON events, [basic_csv_options](basic_csv_options.md),
-and the specified [JSON parsing error handling](../JSONParsingErrorHandling.md).
+and the specified [JSON parsing error handling](../err_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source or 
 visitor passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.

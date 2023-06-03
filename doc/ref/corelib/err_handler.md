@@ -21,6 +21,8 @@ The jsoncons library comes with two built-in function objects for JSON parsing e
 
 - `strict_json_parsing`, which always returns `false`
 
+- `allow_trailing_commas`, , which returns `true` if the error code indicates an extra comma, otherwise `false`
+
 
 
     
