@@ -25,9 +25,17 @@ namespace jsoncons { namespace pmr {
 
 ```
 
-- Added the ability to pass both an allocator for persistent data and an
-allocator for temporary allocations to functions like `basic_json::parse`, `decode_json` 
-and `decode_cbor`, in a `allocator_set` object.
+- Added a class `allocator_set` for holding an allocator for persistent data and an
+allocator for temporary allocations.
+
+- Added the ability to pass an `allocator_set` object to functions `basic_json::parse`, 
+`decode_json`, `decode_csv`, `decode_bson`, `decode_cbor`, `decode_msgpack`, `decode_ubjson`, 
+`encode_json`, `encode_csv`, `encode_bson`, `encode_cbor`, `encode_msgpack`, `encode_ubjson`.
+
+- Added the ability to set a JSON parse error handler through options (rather than
+as a separate parameter.)
+
+- Added an error handler `allow_trailing_commas`
 
 Changes:
 
