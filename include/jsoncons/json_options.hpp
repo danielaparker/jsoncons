@@ -51,14 +51,7 @@ struct default_json_parsing
 {
     bool operator()(json_errc ec, const ser_context&) noexcept 
     {
-        if (ec == json_errc::illegal_comment)
-        {
-            return true; // Recover, allow comments
-        }
-        else
-        {
-            return false;
-        }
+        return ec == json_errc::illegal_comment;
     }
 };
 
@@ -70,17 +63,11 @@ struct strict_json_parsing
     }
 };
 
-class allow_trailing_commas
+struct allow_trailing_commas
 {
-public:
-
     bool operator()(const std::error_code& ec, const ser_context&) noexcept 
     {
-        if (ec == jsoncons::json_errc::extra_comma)
-        {
-            return true;
-        }
-        return false;
+        return ec == json_errc::illegal_comment || ec == jsoncons::json_errc::extra_comma;
     }
 };
 
