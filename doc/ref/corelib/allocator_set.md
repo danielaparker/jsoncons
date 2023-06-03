@@ -34,7 +34,7 @@ Returns an allocator object for result data
     TempAllocator get_temp_allocator() const;
 Returns an allocator object for for temporary allocations
 
-#### Non member functions
+#### Helper functions
 
     template <class Allocator,class TempAllocator>
     allocator_set<Allocator,TempAllocator> combine_allocators(
