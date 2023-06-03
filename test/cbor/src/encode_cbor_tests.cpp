@@ -184,11 +184,11 @@ TEST_CASE("encode_cbor overloads")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("encode_cbor allocator_set overloads")
 {
-    ScopedTestAllocator<char> temp_alloc(1);
+    MyScopedAllocator<char> temp_alloc(1);
 
     auto alloc_set = temp_allocator_only(temp_alloc);
 

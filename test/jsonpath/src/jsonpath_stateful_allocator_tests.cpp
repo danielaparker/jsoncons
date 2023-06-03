@@ -16,9 +16,9 @@ using namespace jsoncons;
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpath stateful allocator test")
 {
@@ -48,11 +48,11 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<custom_json> decoder(ScopedTestAllocator<char>(1));
+        json_decoder<custom_json> decoder(MyScopedAllocator<char>(1));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);        
+        auto myAlloc = MyScopedAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         custom_json j = decoder.get_result();
@@ -67,12 +67,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 1")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
-                                                              ScopedTestAllocator<char>(2));
+        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+                                                              MyScopedAllocator<char>(2));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);        
+        auto myAlloc = MyScopedAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         custom_json j = decoder.get_result();
@@ -86,12 +86,12 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 2")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
-                                                              ScopedTestAllocator<char>(2));
+        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+                                                              MyScopedAllocator<char>(2));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);        
+        auto myAlloc = MyScopedAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         custom_json j = decoder.get_result();
@@ -107,11 +107,11 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 1")
     {
-        json_decoder<custom_json> decoder(ScopedTestAllocator<char>(1));
+        json_decoder<custom_json> decoder(MyScopedAllocator<char>(1));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);        
+        auto myAlloc = MyScopedAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         custom_json j = decoder.get_result();
@@ -130,12 +130,12 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 2")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
-                                                              ScopedTestAllocator<char>(2));
+        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+                                                              MyScopedAllocator<char>(2));
 
-        auto myAlloc = ScopedTestAllocator<char>(3);        
+        auto myAlloc = MyScopedAllocator<char>(3);        
 
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
         custom_json j = decoder.get_result();

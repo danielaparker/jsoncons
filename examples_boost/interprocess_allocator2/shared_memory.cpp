@@ -8,10 +8,10 @@
 
 using namespace jsoncons;
 
-typedef boost::interprocess::allocator<int,
-        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
+using shmem_allocator = boost::interprocess::allocator<int,
+    boost::interprocess::managed_shared_memory::segment_manager>;
 
-using ScopedTestAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
 
 struct boost_sorted_policy 
 {
@@ -25,7 +25,7 @@ struct boost_sorted_policy
     using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using shm_json = basic_json<char,boost_sorted_policy, ScopedTestAllocator>;
+using shm_json = basic_json<char,boost_sorted_policy, MyScopedAllocator>;
 
 int main(int argc, char *argv[])
 {
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
    else{
       //Open managed shared memory
       boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
-                                                         "MySharedMemory");
+          "MySharedMemory");
 
       std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");

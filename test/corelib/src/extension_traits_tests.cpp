@@ -16,7 +16,7 @@
 #include <catch/catch.hpp>
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("extension_traits tests")
 {
@@ -24,7 +24,7 @@ TEST_CASE("extension_traits tests")
     {
         CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<std::allocator<char>>::value);
         CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<FreeListAllocator<char>>::value);
-        CHECK(jsoncons::extension_traits::is_propagating_allocator<ScopedTestAllocator<char>>::value);
+        CHECK(jsoncons::extension_traits::is_propagating_allocator<MyScopedAllocator<char>>::value);
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
         CHECK(jsoncons::extension_traits::is_propagating_allocator<std::pmr::polymorphic_allocator<char>>::value);
 #endif

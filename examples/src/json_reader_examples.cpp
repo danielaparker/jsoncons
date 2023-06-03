@@ -13,7 +13,7 @@
 using namespace jsoncons;
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 class MyIterator
 {
@@ -121,7 +121,7 @@ void read_json_lines()
 
 void read_with_stateful_allocator()
 {
-    using custom_json = basic_json<char,sorted_policy, ScopedTestAllocator<char>>;
+    using custom_json = basic_json<char,sorted_policy, MyScopedAllocator<char>>;
     std::string input = R"(
 [ 
   { 
@@ -144,16 +144,16 @@ void read_with_stateful_allocator()
 )";
 
     // Until 0.171.0
-    //json_decoder<custom_json, ScopedTestAllocator<char>> decoder(result_allocator_arg, ScopedTestAllocator<char>(1),
-    //    ScopedTestAllocator<char>(2));
+    //json_decoder<custom_json, MyScopedAllocator<char>> decoder(result_allocator_arg, MyScopedAllocator<char>(1),
+    //    MyScopedAllocator<char>(2));
 
     // Since 0.171.0
-    json_decoder<custom_json, ScopedTestAllocator<char>> decoder(ScopedTestAllocator<char>(1),
-        ScopedTestAllocator<char>(2));
+    json_decoder<custom_json, MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        MyScopedAllocator<char>(2));
 
-    auto myAlloc = ScopedTestAllocator<char>(3);
+    auto myAlloc = MyScopedAllocator<char>(3);
 
-    basic_json_reader<char,string_source<char>, ScopedTestAllocator<char>> reader(input, decoder, myAlloc);
+    basic_json_reader<char,string_source<char>, MyScopedAllocator<char>> reader(input, decoder, myAlloc);
     reader.read();
 
     custom_json j = decoder.get_result();

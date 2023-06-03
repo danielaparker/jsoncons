@@ -17,22 +17,22 @@
 using namespace jsoncons;
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-using custom_json = jsoncons::basic_json<char, jsoncons::sorted_policy, ScopedTestAllocator<char>>;
-using custom_string = std::basic_string<char, std::char_traits<char>, ScopedTestAllocator<char>>;
+using custom_json = jsoncons::basic_json<char, jsoncons::sorted_policy, MyScopedAllocator<char>>;
+using custom_string = std::basic_string<char, std::char_traits<char>, MyScopedAllocator<char>>;
 
 TEST_CASE("scoped allocator adaptor basic_json tests")
 {
 
-    ScopedTestAllocator<char> alloc1(1);
+    MyScopedAllocator<char> alloc1(1);
 
-    using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
-    using custom_string = std::basic_string<char,std::char_traits<char>,ScopedTestAllocator<char>>;
+    using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+    using custom_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
 
     const char* long_string = "String too long for short string";
 
-    CHECK_FALSE(extension_traits::is_stateless<ScopedTestAllocator<char>>::value);
+    CHECK_FALSE(extension_traits::is_stateless<MyScopedAllocator<char>>::value);
 
     SECTION("construct from string")
     {
@@ -104,13 +104,13 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
 TEST_CASE("scoped allocator adaptor parse tests")
 {
-    using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
-    using custom_string = std::basic_string<char,std::char_traits<char>,ScopedTestAllocator<char>>;
+    using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+    using custom_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
 
-    CHECK_FALSE(extension_traits::is_stateless<ScopedTestAllocator<char>>::value);
+    CHECK_FALSE(extension_traits::is_stateless<MyScopedAllocator<char>>::value);
 
-    ScopedTestAllocator<char> alloc1(1); 
-    ScopedTestAllocator<char> alloc2(2); 
+    MyScopedAllocator<char> alloc1(1); 
+    MyScopedAllocator<char> alloc2(2); 
 
     custom_string data = custom_string(R"(
 
@@ -126,7 +126,7 @@ TEST_CASE("scoped allocator adaptor parse tests")
 
     SECTION("parse")
     {
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(alloc1, alloc2);
+        json_decoder<custom_json,MyScopedAllocator<char>> decoder(alloc1, alloc2);
         JSONCONS_TRY
         {
             json_string_reader reader(data,decoder);

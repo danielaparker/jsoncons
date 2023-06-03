@@ -15,7 +15,7 @@
 using namespace jsoncons;
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
 {
@@ -286,13 +286,13 @@ TEST_CASE("json_reader stateful allocator tests")
 
     SECTION("stateful allocator")
     {
-        using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+        using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
-        ScopedTestAllocator<char> my_allocator{1}; 
+        MyScopedAllocator<char> my_allocator{1}; 
 
-        json_decoder<custom_json,ScopedTestAllocator<char>> decoder(my_allocator,
+        json_decoder<custom_json,MyScopedAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
-        basic_json_reader<char,string_source<char>,ScopedTestAllocator<char>> reader(input, decoder, my_allocator);
+        basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, my_allocator);
         reader.read();
 
         custom_json j = decoder.get_result();

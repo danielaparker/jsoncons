@@ -668,13 +668,13 @@ TEST_CASE("to_uri_fragment test")
 #include <common/FreeListAllocator.hpp>
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpointer get with stateful allocator")
 {
-    ScopedTestAllocator<char> alloc(1);
+    MyScopedAllocator<char> alloc(1);
 
     // Example from RFC 6901
     const custom_json example = custom_json::parse(combine_allocators(alloc), R"(

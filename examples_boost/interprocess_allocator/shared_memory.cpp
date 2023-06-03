@@ -11,7 +11,7 @@ using namespace jsoncons;
 typedef boost::interprocess::allocator<char,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
-using ScopedTestAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
 
 struct boost_sorted_policy 
 {
@@ -25,7 +25,7 @@ struct boost_sorted_policy
     using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using custom_json = basic_json<char,boost_sorted_policy,ScopedTestAllocator>;
+using custom_json = basic_json<char,boost_sorted_policy,MyScopedAllocator>;
 
 int f1(int argc, char *argv[])
 {
@@ -120,7 +120,7 @@ int f2(int argc, char *argv[])
                                                          "MySharedMemory", 100000);
 
       //Initialize shared memory STL-compatible allocator
-      const ScopedTestAllocator alloc(segment.get_segment_manager());
+      const MyScopedAllocator alloc(segment.get_segment_manager());
 
       // Create json value with all dynamic allocations in shared memory
 

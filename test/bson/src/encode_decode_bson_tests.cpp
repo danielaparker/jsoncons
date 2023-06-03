@@ -183,8 +183,8 @@ TEST_CASE("bson encode array")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 
 template<typename T>
-using ScopedTestAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
-using custom_json = basic_json<char,sorted_policy,ScopedTestAllocator<char>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("encode decode bson source with temp_allocator")
 {
@@ -203,7 +203,7 @@ TEST_CASE("encode decode bson source with temp_allocator")
                 0x66,0x6f,0x6f,0x62,0x61,0x72,
             0x00};
 
-    ScopedTestAllocator<char> temp_alloc(2);
+    MyScopedAllocator<char> temp_alloc(2);
     auto alloc_set = temp_allocator_only(temp_alloc);    
 
     SECTION("from bytes")
