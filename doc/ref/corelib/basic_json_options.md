@@ -435,3 +435,45 @@ Multi line
 }
 ```
 
+#### Allow trailing commas
+
+```cpp
+int main()
+{
+    std::string s = R"(
+    {
+        "first" : 1,
+        "second" : 2,
+    }
+    )";
+
+    // Default
+    try
+    {
+        auto j = json::parse(s);
+    }
+    catch (const ser_error& e)
+    {
+        std::cout << "(1) " << e.what() << "\n\n";
+    }
+
+    // Allow trailing commas
+
+    // until 0.170.0
+    // auto j = json::parse(s, allow_trailing_commas());
+
+    // since 0.171.0
+    json_options options;
+    options.err_handler(allow_trailing_commas());
+    auto j = json::parse(s, options);
+    std::cout << "(2) " << j << "\n\n";
+}
+```
+Output:
+```
+(1) Extra comma at line 5 and column 5
+
+(2) {"first":1,"second":2}
+```
+
+
