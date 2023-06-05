@@ -732,7 +732,7 @@ private:
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
             str.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
         {
-            stringref_map_stack_.back().emplace_back(str);
+            stringref_map_stack_.back().emplace_back(mapped_string(str,alloc_));
         }
 
     }
@@ -803,10 +803,11 @@ private:
                 if (!stringref_map_stack_.empty() &&
                     v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
                 {
-                    stringref_map_stack_.back().emplace_back(v);
+                    stringref_map_stack_.back().emplace_back(mapped_string(v, alloc_));
                 }
                 break;
             }
+
         }
         return more;
     }
