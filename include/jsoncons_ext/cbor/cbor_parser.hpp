@@ -86,14 +86,25 @@ class basic_cbor_parser : public ser_context
 
         mapped_string(const mapped_string&) = default;
 
-        mapped_string(mapped_string&&) = default;
+        mapped_string(mapped_string&&) noexcept = default;
+
+        mapped_string(const mapped_string& other, const allocator_type& alloc) 
+            :  type(other.type), str(other.str,alloc), bytes(other.bytes,alloc)
+        {
+        }
+
+        mapped_string(mapped_string&& other, const allocator_type& alloc) noexcept
+            : type(other.type), str(std::move(other.str), alloc), bytes(std::move(other.bytes), alloc)
+        {
+        }
 
         mapped_string& operator=(const mapped_string&) = delete;
 
         mapped_string& operator=(mapped_string&&) = delete;
     };
 
-    using stringref_map = std::vector<mapped_string>;
+    using mapped_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mapped_string>;                           
+    using stringref_map = std::vector<mapped_string, mapped_string_allocator_type>;
     using stringref_map_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map>;                           
 
     enum {stringref_tag, // 25
@@ -148,9 +159,9 @@ class basic_cbor_parser : public ser_context
         {
         }
         template <class Container>
-        void operator()(Container& c, std::error_code& ec)
+        void operator()(Container& cont, std::error_code& ec)
         {
-            source->read_byte_string(c,ec);
+            source->read_byte_string(cont,ec);
         }
     };
 
@@ -456,6 +467,7 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
                 text_buffer_.clear();
+
                 read_text_string(text_buffer_, ec);
                 if (ec)
                 {
@@ -715,12 +727,14 @@ private:
             return true;
         };
         iterate_string_chunks(func, major_type, ec);
+
         if (!stringref_map_stack_.empty() && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
             str.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
         {
             stringref_map_stack_.back().emplace_back(str);
         }
+
     }
 
     std::size_t get_size(std::error_code& ec)
@@ -1128,7 +1142,7 @@ private:
             }
         }
 
-        string_type str;
+        string_type str(alloc_);
 
         c = source_.peek();
         if (c.eof)
