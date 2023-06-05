@@ -98,9 +98,9 @@ class basic_cbor_parser : public ser_context
         {
         }
 
-        mapped_string& operator=(const mapped_string&) = delete;
+        mapped_string& operator=(const mapped_string&) = default;
 
-        mapped_string& operator=(mapped_string&&) = delete;
+        mapped_string& operator=(mapped_string&&) = default;
     };
 
     using mapped_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mapped_string>;                           
