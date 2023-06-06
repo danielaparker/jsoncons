@@ -25,7 +25,7 @@
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
 #if defined(__clang__) 
-#elif defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#elif defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9)
 #define JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR 1
 #define JSONCONS_NO_MAP_CONS_TAKES_ALLOCATOR 1
 #endif
