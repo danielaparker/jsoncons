@@ -2229,9 +2229,10 @@ namespace detail {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<json_location_node_type>> temp_path_node_values_;
         std::unordered_map<std::size_t,pointer> cache_;
+        string_type length_label_;
     public:
         dynamic_resources(const allocator_type& alloc = allocator_type())
-            : alloc_(alloc)
+            : alloc_(alloc), length_label_{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc}
         {
         }
 
@@ -2278,6 +2279,11 @@ namespace detail {
         {
             static json_location_node_type root(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "@"), alloc_});
             return root;
+        }
+
+        const string_type& length_label() const
+        {
+            return length_label_;
         }
 
         template <typename... Args>
@@ -3159,14 +3165,37 @@ namespace detail {
             }
             else
             {
-                path_value_receiver<Json, JsonReference> receiver{ alloc_ };
-                selector_->select(resources, root, path, current, receiver, options);
-                for (auto& node : receiver.nodes)
-                {
-                    callback(node.path(), node.value());
-                }
-                //callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
-                //selector_->select(resources, root, path, current, receiver, options);
+                f(resources, root, path, current, callback, options);
+            }
+        }
+
+        template <class Callback>
+        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
+        f(dynamic_resources<Json,JsonReference>& resources, 
+            const Json& root,
+            const json_location_node_type& path, 
+            reference current, 
+            Callback callback,
+            result_options options) const
+        {
+            callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
+            selector_->select(resources, root, path, current, receiver, options);
+        }
+
+        template <class Callback>
+        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
+        f(dynamic_resources<Json,JsonReference>& resources, 
+            Json& root,
+            const json_location_node_type& path, 
+            reference current, 
+            Callback callback,
+            result_options options) const
+        {
+            path_value_receiver<Json, JsonReference> receiver{ alloc_ };
+            selector_->select(resources, root, path, current, receiver, options);
+            for (auto& node : receiver.nodes)
+            {
+                callback(node.path(), node.value());
             }
         }
 

@@ -290,8 +290,6 @@ namespace detail {
                     node_receiver_type& receiver,
                     result_options options) const override
         {
-            string_type length_name = string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), resources.get_allocator()};
-
             if (current.is_object())
             {
                 auto it = current.find(identifier_);
@@ -316,7 +314,7 @@ namespace detail {
                                             current[index], receiver, options);
                     }
                 }
-                else if (identifier_ == length_name && current.size() >= 0)
+                else if (identifier_ == resources.length_label() && current.size() >= 0)
                 {
                     pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
                     this->tail_select(resources, root, 
@@ -325,7 +323,7 @@ namespace detail {
                                         receiver, options);
                 }
             }
-            else if (current.is_string() && identifier_ == length_name)
+            else if (current.is_string() && identifier_ == resources.length_label())
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -344,8 +342,6 @@ namespace detail {
                            result_options options,
                            std::error_code& ec) const override
         {
-            string_type length_name = string_type{JSONCONS_CSTRING_CONSTANT(char_type, "length"), resources.get_allocator()};
-
             if (current.is_object())
             {
                 auto it = current.find(identifier_);
@@ -378,7 +374,7 @@ namespace detail {
                         return resources.null_value();
                     }
                 }
-                else if (identifier_ == length_name && current.size() > 0)
+                else if (identifier_ == resources.length_label() && current.size() > 0)
                 {
                     pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
                     return this->evaluate_tail(resources, root, 
@@ -391,7 +387,7 @@ namespace detail {
                     return resources.null_value();
                 }
             }
-            else if (current.is_string() && identifier_ == length_name)
+            else if (current.is_string() && identifier_ == resources.length_label())
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
