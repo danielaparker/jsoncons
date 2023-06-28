@@ -3165,7 +3165,13 @@ namespace detail {
             }
             else
             {
-                f(resources, root, path, current, callback, options);
+                path_value_receiver<Json, JsonReference> receiver{ alloc_ };
+                selector_->select(resources, root, path, current, receiver, options);
+                for (auto& node : receiver.nodes)
+                {
+                    callback(node.path(), node.value());
+                }
+                //f(resources, root, path, current, callback, options);
             }
         }
 
