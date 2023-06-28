@@ -89,8 +89,6 @@ TEST_CASE("test replace tests")
 
 TEST_CASE("replace with binary callback tests")
 {
-
-
     SECTION("test 1")
     {
         jsoncons::ojson doc = jsoncons::ojson::parse(R"({"value":"str"})");
@@ -103,6 +101,18 @@ TEST_CASE("replace with binary callback tests")
             [rep](const std::string, jsoncons::ojson& match) {
                 match = rep;
         }, jsoncons::jsonpath::result_options::value);
+
+        CHECK(expected == doc);
+    }
+    SECTION("test 2")
+    {
+        jsoncons::ojson doc = jsoncons::ojson::parse(R"({"value":{"value":"long______________enough"}})");
+        jsoncons::ojson expected = jsoncons::ojson::parse(R"({"value":"XXX"})");
+
+        jsoncons::jsonpath::json_replace(doc, "$..value",
+            [](const jsoncons::ojson&) {
+                return jsoncons::ojson{ "XXX" };
+            });
 
         CHECK(expected == doc);
     }
