@@ -3165,43 +3165,39 @@ namespace detail {
             }
             else
             {
-                path_value_receiver<Json, JsonReference> receiver{ alloc_ };
+                callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
                 selector_->select(resources, root, path, current, receiver, options);
-                for (auto& node : receiver.nodes)
-                {
-                    callback(node.path(), node.value());
-                }
-                //f(resources, root, path, current, callback, options);
             }
         }
 
         template <class Callback>
         typename std::enable_if<extension_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
-        f(dynamic_resources<Json,JsonReference>& resources, 
-            const Json& root,
-            const json_location_node_type& path, 
-            reference current, 
-            Callback callback,
-            result_options options) const
+        evaluate_with_replacement(dynamic_resources<Json,JsonReference>& resources, 
+                 reference root,
+                 const json_location_node_type& path, 
+                 reference current, 
+                 Callback callback) const
         {
-            callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
-            selector_->select(resources, root, path, current, receiver, options);
-        }
+            std::error_code ec;
 
-        template <class Callback>
-        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const json_location_type&,reference>::value,void>::type
-        f(dynamic_resources<Json,JsonReference>& resources, 
-            Json& root,
-            const json_location_node_type& path, 
-            reference current, 
-            Callback callback,
-            result_options options) const
-        {
-            path_value_receiver<Json, JsonReference> receiver{ alloc_ };
+            result_options options = result_options::path | result_options::nodups | result_options::sort;
+
+            path_value_receiver<Json,JsonReference> receiver{alloc_};
             selector_->select(resources, root, path, current, receiver, options);
-            for (auto& node : receiver.nodes)
+
+            if (!receiver.nodes.empty())
             {
-                callback(node.path(), node.value());
+                if (receiver.nodes.size() > 1)
+                {
+                    std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_less_type());
+                    auto last = std::unique(receiver.nodes.begin(),receiver.nodes.end(),path_value_pair_equal_type());
+                    receiver.nodes.erase(last,receiver.nodes.end());
+                }
+                for (std::size_t i = receiver.nodes.size(); i-- > 0;)
+                {
+                    auto& node = receiver.nodes[i];
+                    callback(node.path(), node.value());
+                }
             }
         }
 
