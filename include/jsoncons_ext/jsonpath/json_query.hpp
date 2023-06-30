@@ -187,7 +187,7 @@ namespace jsonpath {
         {
             v = callback(v);
         };
-        expr.evaluate(resources, instance, resources.root_path_node(), instance, f, result_options::nodups);
+        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
     }
 
 } // namespace jsonpath
