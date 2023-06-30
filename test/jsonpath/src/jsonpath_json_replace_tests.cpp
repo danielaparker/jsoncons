@@ -98,7 +98,7 @@ TEST_CASE("replace with binary callback tests")
         jsoncons::jsonpath::json_replace(doc, "$..value",
             [rep](const std::string&, jsoncons::ojson& match) {
                 match = rep;
-        }, jsoncons::jsonpath::result_options::value);
+        });
 
         CHECK(expected == doc);
     }

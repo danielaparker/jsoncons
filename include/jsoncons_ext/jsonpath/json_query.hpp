@@ -60,7 +60,6 @@ namespace jsonpath {
     template<class Json, class T>
     typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
         json_replace(Json& instance, const typename Json::string_view_type& path, T&& new_value,
-                     result_options = result_options::nodups,
                      const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
@@ -87,7 +86,6 @@ namespace jsonpath {
     typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
         json_replace(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
             Json& instance, const typename Json::string_view_type& path, T&& new_value,
-            result_options options = result_options::nodups,
             const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
@@ -113,7 +111,6 @@ namespace jsonpath {
     template<class Json, class BinaryCallback>
     typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
-                 result_options = result_options::nodups,
                  const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
@@ -141,7 +138,6 @@ namespace jsonpath {
     typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
     json_replace(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
         Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
-        result_options options = result_options::nodups,
         const custom_functions<Json>& funcs = custom_functions<Json>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;

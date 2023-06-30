@@ -12,6 +12,10 @@ template<class Json, class T>
 void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value,             (1)
     result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());                             (since 0.164.0)
+
+template<class Json, class T>
+void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value,             
+    const custom_functions<Json>& funcs = custom_functions<Json>());                             (since 0.171.0)
 ```
 
 ```cpp
@@ -23,12 +27,15 @@ template<class Json, class BinaryCallback>                                      
 void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
     result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());                              (since 0.164.0)
+
+template<class Json, class BinaryCallback>                                                   
+void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
+    const custom_functions<Json>& funcs = custom_functions<Json>());                              (since 0.171.0)
 ```
 ```cpp
 template<class Json, class T, class TempAllocator>
 void json_replace(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     Json& root, const Json::string_view_type& expr, T&& new_value,                           (3)  (since 0.171.0)
-    result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
@@ -36,7 +43,6 @@ void json_replace(const allocator_set<Json::allocator_type,TempAllocator>& alloc
 template<class Json, class BinaryCallback, class TempAllocator>                                                   
 void json_replace(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     Json& root, const Json::string_view_type& expr, BinaryCallback callback,                 (4)  (since 0.171.0)
-    result_options options = result_options::nodups,
     const custom_functions<Json>& funcs = custom_functions<Json>());               
 ```
 
