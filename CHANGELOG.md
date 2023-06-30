@@ -55,6 +55,12 @@ Note: Non-stateful custom allocators are supported as before.
 
 - The tag type `result_allocator_arg_t` and constant `result_allocator_arg` have been deprecated.
 
+- The `jsonpath::json_replace` function no longer supports an optional `result_options` parameter,
+
+Defect fixes
+
+- Fixed issue danielaparker/jsoncons/#430 with `jsonpath::json_replace` 
+
 0.170.2
 -------
 
