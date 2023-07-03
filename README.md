@@ -61,6 +61,8 @@ _"the JSONPath feature of this library, it's great"_
 
 _"We use JMESPath implementation quite extensively"_ 
 
+_"We love your JSON Schema validator. We are using it in our data modelling tool to parse JSON Schema files"_
+
 _"the serialization lib of choice with its beautiful mappings and ease of use"_
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team loves it"_ _"Your repo rocks!!!!!"_
