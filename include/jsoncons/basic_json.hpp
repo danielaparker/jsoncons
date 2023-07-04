@@ -5051,65 +5051,101 @@ namespace jsoncons {
 
         void merge(const basic_json& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge(source.cast<object_storage>().value());
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge(source.cast<object_storage>().value());
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
-            }
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge(source.cast<object_storage>().value());
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge(source.cast<object_storage>().value());
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+                        }
+                    break;
+               default:
+                   JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+           }
         }
 
         void merge(basic_json&& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
                 case json_storage_kind::empty_object_value:
-                    create_object_implicitly();
-                    cast<object_storage>().value().merge(std::move(source.cast<object_storage>().value()));
                     break;
                 case json_storage_kind::object_value:
-                    cast<object_storage>().value().merge(std::move(source.cast<object_storage>().value()));
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge(std::move(source.cast<object_storage>().value()));
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge(std::move(source.cast<object_storage>().value()));
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+                    }
                     break;
+               default:
+                   JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+           }
+        }
+
+        void merge(object_iterator hint, const basic_json& source)
+        {
+            switch (source.storage_kind())
+            {
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge(hint, source.cast<object_storage>().value());
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge(hint, source.cast<object_storage>().value());
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+                    }
+                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 
-        void merge(object_iterator hint, const basic_json& source)
-        {
-            switch (storage_kind())
-            {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge(hint, source.cast<object_storage>().value());
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge(hint, source.cast<object_storage>().value());
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
-            }
-        }
-
         void merge(object_iterator hint, basic_json&& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge(hint, std::move(source.cast<object_storage>().value()));
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge(hint, std::move(source.cast<object_storage>().value()));
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge(hint, std::move(source.cast<object_storage>().value()));
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge(hint, std::move(source.cast<object_storage>().value()));
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
+                    }
+                    break;
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 
@@ -5117,65 +5153,101 @@ namespace jsoncons {
 
         void merge_or_update(const basic_json& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge_or_update(source.cast<object_storage>().value());
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge_or_update(source.cast<object_storage>().value());
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge_or_update(source.cast<object_storage>().value());
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge_or_update(source.cast<object_storage>().value());
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                    }
+                    break;
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 
         void merge_or_update(basic_json&& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge_or_update(std::move(source.cast<object_storage>().value()));
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge_or_update(std::move(source.cast<object_storage>().value()));
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                    case json_storage_kind::empty_object_value:
+                        create_object_implicitly();
+                        cast<object_storage>().value().merge_or_update(std::move(source.cast<object_storage>().value()));
+                        break;
+                    case json_storage_kind::object_value:
+                        cast<object_storage>().value().merge_or_update(std::move(source.cast<object_storage>().value()));
+                        break;
+                    default:
+                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                    }
+                    break;
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 
         void merge_or_update(object_iterator hint, const basic_json& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge_or_update(hint, source.cast<object_storage>().value());
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge_or_update(hint, source.cast<object_storage>().value());
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge_or_update(hint, source.cast<object_storage>().value());
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge_or_update(hint, source.cast<object_storage>().value());
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                    }
+                    break;
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 
         void merge_or_update(object_iterator hint, basic_json&& source)
         {
-            switch (storage_kind())
+            switch (source.storage_kind())
             {
-            case json_storage_kind::empty_object_value:
-                create_object_implicitly();
-                cast<object_storage>().value().merge_or_update(hint, std::move(source.cast<object_storage>().value()));
-                break;
-            case json_storage_kind::object_value:
-                cast<object_storage>().value().merge_or_update(hint, std::move(source.cast<object_storage>().value()));
-                break;
-            default:
-                JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                case json_storage_kind::empty_object_value:
+                    break;
+                case json_storage_kind::object_value:
+                    switch (storage_kind())
+                    {
+                        case json_storage_kind::empty_object_value:
+                            create_object_implicitly();
+                            cast<object_storage>().value().merge_or_update(hint, std::move(source.cast<object_storage>().value()));
+                            break;
+                        case json_storage_kind::object_value:
+                            cast<object_storage>().value().merge_or_update(hint, std::move(source.cast<object_storage>().value()));
+                            break;
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
+                    }
+                    break;
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
         }
 

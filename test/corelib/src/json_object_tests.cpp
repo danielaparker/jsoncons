@@ -13,7 +13,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("json(json_object_arg, first, last)")
 {
     SECTION("copy map into json")
@@ -1432,7 +1431,6 @@ TEST_CASE("test json_object erase with iterator")
         CHECK(j["a"] == 3);
     }
 }
-#endif
 
 TEST_CASE("test empty json_object iterator")
 {
