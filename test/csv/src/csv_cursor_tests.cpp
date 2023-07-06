@@ -895,7 +895,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     REQUIRE(decoder.is_valid());
     json j = decoder.get_result();
     json expected = json::parse(R"([{"h1":3,"h2":4}])");
-    CHECK(j == expected);
+    CHECK(expected == j);
 
     parser.reinitialize();
     input = "h7,h8\n"
@@ -912,7 +912,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     REQUIRE(decoder.is_valid());
     j = decoder.get_result();
     expected = json::parse(R"([{"h7":9,"h8":10}])");
-    CHECK(j == expected);
+    CHECK(expected == j);
 }
 
 template <class CursorType>

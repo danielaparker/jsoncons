@@ -952,7 +952,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
         jsoncons::json j(v);
 
         json expected = json::parse(input);
-        CHECK(j == expected);
+        CHECK(expected == j);
     }
     SECTION("encode vector of unique_ptr test")
     {
@@ -964,7 +964,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
         jsoncons::json j(v);
 
         json expected = json::parse(input);
-        CHECK(j == expected);
+        CHECK(expected == j);
     }
 }
 

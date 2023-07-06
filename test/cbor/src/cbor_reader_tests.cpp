@@ -435,7 +435,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
 
     json j = cbor::decode_cbor<json>(bytes);
 
-    REQUIRE(j == expected);
+    REQUIRE(expected == j);
     for (std::size_t i = 0; i < j.size(); ++i)
     {
         CHECK(j[i].tag() == expected[i].tag()); 
@@ -732,5 +732,5 @@ TEST_CASE("CBOR stringref tag 3")
         ["aaa","aaa",["bbb","aaa","aaa"],["ccc","ccc"],"aaa"]
     )");
 
-    CHECK(j == expected);
+    CHECK(expected == j);
 }

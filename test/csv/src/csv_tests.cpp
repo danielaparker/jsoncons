@@ -1381,7 +1381,7 @@ TEST_CASE("test_type_inference")
         options.mapping_kind(csv::csv_mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
-        REQUIRE(j == expected); //-V521
+        REQUIRE(expected == j); //-V521
     }
 
     SECTION("n_objects")
@@ -1428,7 +1428,7 @@ TEST_CASE("test_type_inference")
                .mapping_kind(csv::csv_mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
-        REQUIRE(j == expected); //-V521
+        REQUIRE(expected == j); //-V521
     }
     
     SECTION("m_columns")
@@ -1449,7 +1449,7 @@ TEST_CASE("test_type_inference")
                .mapping_kind(csv::csv_mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
-        REQUIRE(j == expected); //-V521
+        REQUIRE(expected == j); //-V521
     }
 }
 

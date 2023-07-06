@@ -124,7 +124,7 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
 
     json j = msgpack::decode_msgpack<json>(bytes);
 
-    REQUIRE(j == expected);
+    REQUIRE(expected == j);
 }
 
 TEST_CASE("decode msgpack from source")

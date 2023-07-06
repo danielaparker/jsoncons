@@ -916,7 +916,7 @@ TEST_CASE("try_emplace tests")
     {
         j.try_emplace("c",3);
 
-        CHECK(j == expected);
+        CHECK(expected == j);
     }
 
     SECTION("try_emplace(iterator hint, const string_view_type& name, Args&&... args)")
@@ -925,7 +925,7 @@ TEST_CASE("try_emplace tests")
 
         j.try_emplace(it,"c",3);
 
-        CHECK(j == expected);
+        CHECK(expected == j);
     }
 }
 
@@ -1032,7 +1032,7 @@ const json expected = json::parse(R"(
     SECTION("test 1")
     {
         j.merge(source);
-        CHECK(j == expected);
+        CHECK(expected == j);
 
         j2.merge(j2.object_range().begin()+1,source);
         CHECK(j2 == expected);
@@ -1084,7 +1084,7 @@ json expected = json::parse(R"(
         json source2 = source;
 
         j.merge(std::move(source));
-        CHECK(j == expected);
+        CHECK(expected == j);
 
         j2.merge(std::move(source2));
         CHECK(j2 == expected);
@@ -1121,7 +1121,7 @@ const json expected = json::parse(R"(
     SECTION("test 1")
     {
         j.merge_or_update(source);
-        CHECK(j == expected);
+        CHECK(expected == j);
 
         j2.merge_or_update(j2.object_range().begin()+1,source);
         CHECK(j2 == expected);
@@ -1159,7 +1159,7 @@ json expected = json::parse(R"(
         json source2 = source;
 
         j.merge_or_update(std::move(source));
-        CHECK(j == expected);
+        CHECK(expected == j);
 
         j2.merge_or_update(std::move(source2));
         CHECK(j2 == expected);
