@@ -1001,3 +1001,168 @@ TEST_CASE("test empty json_object iterator")
         CHECK ((bool)(it == j.object_range().end()));
     }
 }
+
+// merge tests
+
+TEST_CASE("test_json_merge")
+{
+json j = json::parse(R"(
+{
+    "a" : 1,
+    "b" : 2
+}
+)");
+json j2 = j;
+
+const json source = json::parse(R"(
+{
+    "a" : 2,
+    "c" : 3
+}
+)");
+
+const json expected = json::parse(R"(
+{
+    "a" : 1,
+    "b" : 2,
+    "c" : 3
+}
+)");
+
+    SECTION("test 1")
+    {
+        j.merge(source);
+        CHECK(j == expected);
+
+        j2.merge(j2.object_range().begin()+1,source);
+        CHECK(j2 == expected);
+    }
+
+    SECTION("test 2")
+    {
+        json empty_object;
+        json original = j;
+
+        j.merge(empty_object);
+
+        CHECK(j == original);
+
+        j2.merge(j2.object_range().begin()+1,empty_object);
+        CHECK(j2 == original);
+    }
+
+    //std::cout << j << std::endl;
+}
+
+TEST_CASE("test_json_merge_move")
+{
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+    json j2 = j;
+
+json source = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+json expected = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3],
+    "c" : [4,5,6]
+}
+)");
+
+    SECTION("test 1")
+    {
+        json source2 = source;
+
+        j.merge(std::move(source));
+        CHECK(j == expected);
+
+        j2.merge(std::move(source2));
+        CHECK(j2 == expected);
+    }
+}
+
+// merge_or_update tests
+
+TEST_CASE("test_json_merge_or_update")
+{
+json j = json::parse(R"(
+{
+    "a" : 1,
+    "b" : 2
+}
+)");
+json j2 = j;
+
+const json source = json::parse(R"(
+{
+    "a" : 2,
+    "c" : 3
+}
+)");
+
+const json expected = json::parse(R"(
+{
+    "a" : 2,
+    "b" : 2,
+    "c" : 3
+}
+)");
+
+    SECTION("test 1")
+    {
+        j.merge_or_update(source);
+        CHECK(j == expected);
+
+        j2.merge_or_update(j2.object_range().begin()+1,source);
+        CHECK(j2 == expected);
+    }
+}
+
+TEST_CASE("test_json_merge_or_update_move")
+{
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+    json j2 = j;
+
+json source = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+json expected = json::parse(R"(
+{
+    "a" : "2",
+    "b" : [1,2,3],
+    "c" : [4,5,6]
+}
+)");
+
+
+    SECTION("test 1")
+    {
+        json source2 = source;
+
+        j.merge_or_update(std::move(source));
+        CHECK(j == expected);
+
+        j2.merge_or_update(std::move(source2));
+        CHECK(j2 == expected);
+    }
+}
+

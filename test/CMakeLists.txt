@@ -141,7 +141,6 @@ add_executable(unit_tests
                corelib/src/json_literal_operator_tests.cpp
                corelib/src/json_object_tests.cpp
                corelib/src/ojson_object_tests.cpp
-               corelib/src/json_object_merge_tests.cpp
                corelib/src/json_options_tests.cpp
                corelib/src/json_parse_error_tests.cpp
                corelib/src/json_parser_position_tests.cpp

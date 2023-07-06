@@ -1408,9 +1408,18 @@ namespace jsoncons {
             }
             else
             {
-                auto it = find(key);
-                auto result = insert_or_assign(key, std::forward<T>(value));
-                return result.first;
+                auto it = find(hint, key);
+                if (it == members_.end())
+                {
+                    members_.emplace_back(key_type(key.begin(), key.end()), std::forward<T>(value));
+                    auto pos = members_.begin() + (members_.size() - 1);
+                    return pos;
+                }
+                else
+                {
+                    it->value(Json(std::forward<T>(value)));
+                    return it;
+                }
             }
         }
 
@@ -1425,9 +1434,18 @@ namespace jsoncons {
             }
             else
             {
-                auto it = find(key);
-                auto result = insert_or_assign(key, std::forward<T>(value));
-                return result.first;
+                auto it = find(hint, key);
+                if (it == members_.end())
+                {
+                    members_.emplace_back(key_type(key.begin(),key.end(),get_allocator()), std::forward<T>(value));
+                    auto pos = members_.begin() + (members_.size()-1);
+                    return pos;
+                }
+                else
+                {
+                    it->value(Json(std::forward<T>(value),get_allocator()));
+                    return it;
+                }
             }
         }
 
@@ -1612,8 +1630,18 @@ namespace jsoncons {
             }
             else
             {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return result.first;
+                auto it = find(hint, key);
+                if (it == members_.end())
+                {
+                    members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
+                        std::forward<Args>(args)...);
+                    auto pos = members_.begin() + members_.size();
+                    return pos;
+                }
+                else
+                {
+                    return it;
+                }
             }
         }
 
@@ -1628,8 +1656,18 @@ namespace jsoncons {
             }
             else
             {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return result.first;
+                auto it = find(hint, key);
+                if (it == members_.end())
+                {
+                    members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
+                        std::forward<Args>(args)...);
+                    auto pos = members_.begin() + members_.size();
+                    return pos;
+                }
+                else
+                {
+                    return it;
+                }
             }
         }
 
@@ -1643,6 +1681,24 @@ namespace jsoncons {
             return members_ < rhs.members_;
         }
     private:
+
+        iterator find(iterator hint, const string_view_type& name) noexcept
+        {
+            bool found = false;
+            auto it = hint;
+            while (!found && it != members_.end())
+            {
+                if (it->key() == name)
+                {
+                    found = true;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            return found ? it : find(name);
+        }
 
         void flatten_and_destroy() noexcept
         {
