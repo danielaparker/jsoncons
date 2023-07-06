@@ -33,11 +33,11 @@ namespace jsoncons {
         using allocator_type = typename Json::allocator_type;
 
         key_type name;
-        std::size_t index;
+        int64_t index;
         Json value;
 
         template <class... Args>
-        key_index_value(key_type&& name, std::size_t index, Args&& ... args) 
+        key_index_value(key_type&& name, int64_t index, Args&& ... args) 
             : name(std::move(name)), index(index), value(std::forward<Args>(args)...)
         {
         }
@@ -1043,11 +1043,8 @@ namespace jsoncons {
 
         using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
-        using index_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t>;
-        using index_container_type = SequenceContainer<std::size_t,index_allocator_type>;
 
         key_value_container_type members_;
-        index_container_type index_;
 
         struct Comp
         {
@@ -1072,118 +1069,61 @@ namespace jsoncons {
         }
         order_preserving_json_object(const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc)), 
-              index_(index_allocator_type(alloc))
+              members_(key_value_allocator_type(alloc))
         {
         }
 
         order_preserving_json_object(const order_preserving_json_object& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
-              members_(val.members_),
-              index_(val.index_)
+              members_(val.members_)
         {
         }
 
         order_preserving_json_object(order_preserving_json_object&& val,const allocator_type& alloc) 
             : allocator_holder<allocator_type>(alloc), 
-              members_(std::move(val.members_),key_value_allocator_type(alloc)),
-              index_(std::move(val.index_),index_allocator_type(alloc))
+              members_(std::move(val.members_),key_value_allocator_type(alloc))
         {
         }
 
         order_preserving_json_object(order_preserving_json_object&& val) noexcept
             : allocator_holder<allocator_type>(val.get_allocator()), 
-              members_(std::move(val.members_)),
-              index_(std::move(val.index_))
+              members_(std::move(val.members_))
         {
         }
 
         order_preserving_json_object(const order_preserving_json_object& val, const allocator_type& alloc) 
             : allocator_holder<allocator_type>(alloc), 
-              members_(val.members_,key_value_allocator_type(alloc)),
-              index_(val.index_,index_allocator_type(alloc))
+              members_(val.members_,key_value_allocator_type(alloc))
         {
         }
 
         template<class InputIt>
         order_preserving_json_object(InputIt first, InputIt last)
         {
-            std::size_t count = std::distance(first,last);
-            members_.reserve(count);
-            for (auto s = first; s != last; ++s)
+            for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(get_key_value<KeyT,Json>()(*s));
+                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
             }
-
-            build_index();
-            auto last_unique = std::unique(index_.begin(), index_.end(),
-                [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
-
-            if (last_unique != index_.end())
-            {
-                index_.erase(last_unique, index_.end());
-                std::sort(index_.begin(), index_.end());
-
-                auto result = index_.rbegin();
-                if (*result != members_.size())
-                {
-                    members_.erase(members_.begin() + (*result + 1), members_.end());
-                }
-                for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
-                {
-                    if (*result - *it > 1)
-                    {
-                        members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
-                    }
-                }
-            }
-            build_index();
+            remove_duplicates(members_);
         }
 
         template<class InputIt>
         order_preserving_json_object(InputIt first, InputIt last, 
                     const allocator_type& alloc)
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc)), 
-              index_(index_allocator_type(alloc))
+              members_(key_value_allocator_type(alloc))
         {
-            std::size_t count = std::distance(first,last);
-            members_.reserve(count);
-            for (auto s = first; s != last; ++s)
+            for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(get_key_value<KeyT,Json>()(*s));
+                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
             }
-
-            build_index();
-            auto last_unique = std::unique(index_.begin(), index_.end(),
-                [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
-
-            if (last_unique != index_.end())
-            {
-                index_.erase(last_unique, index_.end());
-                std::sort(index_.begin(), index_.end());
-
-                auto result = index_.rbegin();
-                if (*result != members_.size())
-                {
-                    members_.erase(members_.begin() + (*result + 1), members_.end());
-                }
-                for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
-                {
-                    if (*result - *it > 1)
-                    {
-                        members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
-                    }
-                }
-            }
-            build_index();
+            remove_duplicates(members_);
         }
 
         order_preserving_json_object(std::initializer_list<std::pair<std::basic_string<char_type>,Json>> init, 
                     const allocator_type& alloc = allocator_type())
             : allocator_holder<allocator_type>(alloc), 
-              members_(key_value_allocator_type(alloc)), 
-              index_(index_allocator_type(alloc))
+              members_(key_value_allocator_type(alloc))
         {
             members_.reserve(init.size());
             for (auto& item : init)
@@ -1207,7 +1147,6 @@ namespace jsoncons {
         {
             allocator_holder<allocator_type>::operator=(val.get_allocator());
             members_ = val.members_;
-            index_ = val.index_;
             return *this;
         }
 
@@ -1248,7 +1187,6 @@ namespace jsoncons {
         void clear() 
         {
             members_.clear();
-            index_.clear();
         }
 
         void shrink_to_fit() 
@@ -1258,7 +1196,6 @@ namespace jsoncons {
                 members_[i].shrink_to_fit();
             }
             members_.shrink_to_fit();
-            index_.shrink_to_fit();
         }
 
         void reserve(std::size_t n) {members_.reserve(n);}
@@ -1283,26 +1220,44 @@ namespace jsoncons {
 
         iterator find(const string_view_type& name) noexcept
         {
-            auto p = std::equal_range(index_.begin(),index_.end(), name, 
-                                        Comp(members_));        
-            return p.first == p.second ? members_.end() : members_.begin() + *p.first;
+            bool found = false;
+            auto it = members_.begin();
+            while (!found && it != members_.end())
+            {
+                if (it->key() == name)
+                {
+                    found = true;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            return it;
         }
 
         const_iterator find(const string_view_type& name) const noexcept
         {
-            auto p = std::equal_range(index_.begin(),index_.end(), name, 
-                                        Comp(members_));        
-            return p.first == p.second ? members_.end() : members_.begin() + *p.first;
+            bool found = false;
+            auto it = members_.begin();
+            while (!found && it != members_.end())
+            {
+                if (it->key() == name)
+                {
+                    found = true;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            return it;
         }
 
         iterator erase(const_iterator pos) 
         {
             if (pos != members_.end())
             {
-                std::size_t pos1 = pos - members_.begin();
-                std::size_t pos2 = pos1 + 1;
-
-                erase_index_entries(pos1, pos2);
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it = members_.begin() + (pos - members_.begin());
                 return members_.erase(it);
@@ -1323,7 +1278,6 @@ namespace jsoncons {
 
             if (pos1 < members_.size() && pos2 <= members_.size())
             {
-                erase_index_entries(pos1,pos2);
 
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it1 = members_.begin() + (first - members_.begin());
@@ -1347,7 +1301,6 @@ namespace jsoncons {
                 std::size_t pos1 = pos - members_.begin();
                 std::size_t pos2 = pos1 + 1;
 
-                erase_index_entries(pos1, pos2);
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it = members_.begin() + (pos - members_.begin());
                 members_.erase(it);
@@ -1357,38 +1310,34 @@ namespace jsoncons {
             }
         }
 
-        void uninitialized_init(key_index_value<Json>* items, std::size_t count)
+        void uninitialized_init(key_index_value<Json>* items, std::size_t length)
         {
-            if (count > 0)
+            for (std::size_t i = 0; i < length; ++i)
             {
-                index_.reserve(count);
-                for (std::size_t i = 0; i < count; ++i)
+                if (items[i].index != -1)
                 {
-                    index_.push_back(i);
-                }
-                std::sort(index_.begin(),index_.end(),
-                    [&](std::size_t i, std::size_t j) -> bool 
+                    for (std::size_t j = i+1; j < length; ++j)
                     {
-                        int comp = items[i].name.compare(items[j].name); 
-                        if (comp < 0) return true;
-                        if (comp == 0) return items[i].index < items[j].index;
-
-                        return false;
+                        if (items[i].name == items[j].name)
+                        {
+                            items[j].index = -1;
+                        }
                     }
-                );
-                auto last_unique = std::unique(index_.begin(), index_.end(),
-                    [&](std::size_t i, std::size_t j) { 
-                        return items[i].name.compare(items[j].name) == 0; 
-                    });
-                if (last_unique != index_.end())
-                {
-                    index_.erase(last_unique, index_.end());
+                    members_.emplace_back(std::move(items[i].name), std::move(items[i].value));
                 }
+            }
+        }
 
-                members_.resize(index_.size());
-                for (auto i : index_)
+        void remove_duplicates(key_value_container_type& members)
+        {
+            for (std::size_t i = 0; i < members.size(); ++i)
+            {
+                for (std::size_t j = i+1; j < members.size(); ++j)
                 {
-                    members_[i] = key_value_type(std::move(items[i].name), std::move(items[i].value));
+                    if (members[i].key() == members[j].key())
+                    {
+                        members.erase(members.begin()+j);
+                    }
                 }
             }
         }
@@ -1396,66 +1345,35 @@ namespace jsoncons {
         template<class InputIt, class Convert>
         void insert(InputIt first, InputIt last, Convert convert)
         {
-            std::size_t count = std::distance(first,last);
-            members_.reserve(members_.size() + count);
-            for (auto s = first; s != last; ++s)
+            for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(convert(*s));
+                members_.emplace_back(convert(*it));
             }
-
-            build_index();
-            auto last_unique = std::unique(index_.begin(), index_.end(),
-                [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
-
-            if (last_unique != index_.end())
-            {
-                index_.erase(last_unique, index_.end());
-                std::sort(index_.begin(), index_.end());
-
-                auto result = index_.rbegin();
-                if (*result != members_.size())
-                {
-                    members_.erase(members_.begin() + (*result + 1), members_.end());
-                }
-                for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
-                {
-                    if (*result - *it > 1)
-                    {
-                        members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
-                    }
-                }
-            }
-            build_index();
+            remove_duplicates(members_);
         }
 
         template<class InputIt, class Convert>
         void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
         {
-            std::size_t count = std::distance(first,last);
-
-            members_.reserve(members_.size() + count);
-            for (auto s = first; s != last; ++s)
+            for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(convert(*s));
+                members_.emplace_back(convert(*it));
             }
-
-            build_index();
         }
-
+   
         template <class T, class A=allocator_type>
         typename std::enable_if<extension_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
-            auto result = insert_index_entry(name,members_.size());
-            if (result.second)
+            auto it = find(name);
+            if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(), name.end()), std::forward<T>(value));
-                auto it = members_.begin() + result.first;
-                return std::make_pair(it,true);
+                auto pos = members_.begin() + (members_.size() - 1);
+                return std::make_pair(pos, true);
             }
             else
             {
-                auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value)));
                 return std::make_pair(it,false);
             }
@@ -1465,16 +1383,15 @@ namespace jsoncons {
         typename std::enable_if<!extension_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
-            auto result = insert_index_entry(name,members_.size());
-            if (result.second)
+            auto it = find(name);
+            if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), std::forward<T>(value));
-                auto it = members_.begin() + result.first;
-                return std::make_pair(it,true);
+                auto pos = members_.begin() + (members_.size()-1);
+                return std::make_pair(pos,true);
             }
             else
             {
-                auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value),get_allocator()));
                 return std::make_pair(it,false);
             }
@@ -1491,20 +1408,9 @@ namespace jsoncons {
             }
             else
             {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key,pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<T>(value));
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    it->value(Json(std::forward<T>(value)));
-                    return it;
-                }
+                auto it = find(key);
+                auto result = insert_or_assign(key, std::forward<T>(value));
+                return result.first;
             }
         }
 
@@ -1519,21 +1425,9 @@ namespace jsoncons {
             }
             else
             {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key,pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, 
-                        key_type(key.begin(),key.end(),get_allocator()), std::forward<T>(value));
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    it->value(Json(std::forward<T>(value),get_allocator()));
-                    return it;
-                }
+                auto it = find(key);
+                auto result = insert_or_assign(key, std::forward<T>(value));
+                return result.first;
             }
         }
 
@@ -1676,16 +1570,15 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
-            auto result = insert_index_entry(name,members_.size());
-            if (result.second)
+            auto it = find(name);
+            if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(), name.end()), std::forward<Args>(args)...);
-                auto it = members_.begin() + result.first;
-                return std::make_pair(it,true);
+                auto pos = members_.begin() + (members_.size()-1);
+                return std::make_pair(pos,true);
             }
             else
             {
-                auto it = members_.begin() + result.first;
                 return std::make_pair(it,false);
             }
         }
@@ -1694,17 +1587,16 @@ namespace jsoncons {
         typename std::enable_if<!extension_traits::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& key, Args&&... args)
         {
-            auto result = insert_index_entry(key,members_.size());
-            if (result.second)
+            auto it = find(key);
+            if (it == members_.end())
             {
                 members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
                     std::forward<Args>(args)...);
-                auto it = members_.begin() + result.first;
-                return std::make_pair(it,true);
+                auto pos = members_.begin() + members_.size();
+                return std::make_pair(pos,true);
             }
             else
             {
-                auto it = members_.begin() + result.first;
                 return std::make_pair(it,false);
             }
         }
@@ -1720,19 +1612,8 @@ namespace jsoncons {
             }
             else
             {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
+                auto result = try_emplace(key, std::forward<Args>(args)...);
+                return result.first;
             }
         }
 
@@ -1747,21 +1628,8 @@ namespace jsoncons {
             }
             else
             {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, 
-                                               key_type(key.begin(),key.end(), get_allocator()), 
-                                               std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
+                auto result = try_emplace(key, std::forward<Args>(args)...);
+                return result.first;
             }
         }
 
@@ -1790,84 +1658,6 @@ namespace jsoncons {
                     }
                 }
             }
-        }
-
-        std::pair<std::size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
-        {
-            JSONCONS_ASSERT(pos <= index_.size());
-
-            auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                        Comp(members_));        
-
-            if (it == index_.end())
-            {
-                std::size_t count = index_.size() - pos;
-                for (std::size_t i = 0; count > 0 && i < index_.size(); ++i)
-                {
-                    if (index_[i] >= pos)
-                    {
-                        ++index_[i];
-                        --count;
-                    }
-                }
-                index_.push_back(pos);
-                return std::make_pair(pos,true);
-            }
-            else if (members_.at(*it).key() != key)
-            {
-                std::size_t count = index_.size() - pos;
-                for (std::size_t i = 0; count > 0 && i < index_.size(); ++i)
-                {
-                    if (index_[i] >= pos)
-                    {
-                        ++index_[i];
-                        --count;
-                    }
-                }
-                auto it2 = index_.insert(it, pos);
-                return std::make_pair(*it2,true);
-            }
-            else
-            {
-                return std::make_pair(*it,false);
-            }
-        }
-
-        void erase_index_entries(std::size_t pos1, std::size_t pos2)
-        {
-            JSONCONS_ASSERT(pos1 <= pos2);
-            JSONCONS_ASSERT(pos2 <= index_.size());
-
-            const size_t offset = pos2 - pos1;
-            const size_t n = index_.size() - offset;
-            for (std::size_t i = 0; i < index_.size(); ++i)
-            {
-                if (index_[i] >= pos1 && index_[i] < pos2)
-                {
-                    index_.erase(index_.begin()+i);
-                    --i;
-                }
-            }
-            for (std::size_t i = 0; i < index_.size(); ++i)
-            {
-                if (index_[i] >= pos2)
-                {
-                    index_[i] -= offset;
-                }
-            }
-            JSONCONS_ASSERT(index_.size() == n);
-        }
-
-        void build_index()
-        {
-            index_.clear();
-            index_.reserve(members_.size());
-            for (std::size_t i = 0; i < members_.size(); ++i)
-            {
-                index_.push_back(i);
-            }
-            std::stable_sort(index_.begin(),index_.end(),
-                             [&](std::size_t a, std::size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
         }
     };
 
