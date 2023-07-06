@@ -316,23 +316,106 @@ TEST_CASE("test_ojson_merge_or_update_move")
     }
 }
 
-#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 
-#include <memory_resource> 
-using namespace jsoncons;
+#include <common/FreeListAllocator.hpp>
+#include <scoped_allocator>
 
-using pmr_json = jsoncons::pmr::json;
-using pmr_ojson = jsoncons::pmr::ojson;
+template<typename T>
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-TEST_CASE("ojson.merge test with stateful allocator")
+using custom_json = jsoncons::basic_json<char, jsoncons::order_preserving_policy, MyScopedAllocator<char>>;
+
+TEST_CASE("custom_json.merge test with order_preserving_policy and statefule allocator")
 {
-    char buffer1[1024] = {}; // a small buffer on the stack
-    std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
-    std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+    MyScopedAllocator<char> alloc(1);
 
-    char buffer2[1024] = {}; // a small buffer on the stack
-    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
-    std::pmr::polymorphic_allocator<char> alloc2(&pool2);
+    custom_json doc = custom_json::parse(combine_allocators(alloc), R"(
+    {
+        "a" : 1,
+        "b" : 2
+    }
+    )");
+
+    const custom_json source = custom_json::parse(combine_allocators(alloc), R"(
+    {
+        "a" : 2,
+        "c" : 3,
+        "d" : 4,
+        "b" : 5,
+        "e" : 6
+    }
+    )");
+
+    SECTION("merge doc with source")
+    {
+        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        {
+            "a" : 1,
+            "b" : 2,
+            "c" : 3,
+            "d" : 4,
+            "e" : 6
+        }
+        )");
+        doc.merge(source);
+        CHECK(expected == doc);
+    }
+
+    SECTION("merge doc")
+    {
+        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+{"a":1,"b":2,"c":3,"d":4,"e":6}
+        )");
+        doc.merge(doc.object_range().begin()+1,source);
+        CHECK(expected == doc);
+    }
+
+}
+
+TEST_CASE("custom_json merge_or_update test")
+{
+    MyScopedAllocator<char> alloc(1);
+
+    custom_json doc = custom_json::parse(combine_allocators(alloc), R"(
+    {
+        "a" : 1,
+        "b" : 2
+    }
+    )");
+
+    const custom_json source = custom_json::parse(combine_allocators(alloc), R"(
+    {
+        "a" : 2,
+        "c" : 3
+    }
+    )");
+
+    SECTION("merge_or_update source into doc")
+    {
+        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        {
+            "a" : 2,
+            "b" : 2,
+            "c" : 3
+        }
+        )");
+        doc.merge_or_update(source);
+        CHECK(expected == doc);
+    }
+
+    SECTION("merge_or_update source into doc at pos 1")
+    {
+        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        {
+            "a" : 2,
+            "b" : 2,
+            "c" : 3
+        }
+        )");
+        doc.merge_or_update(doc.object_range().begin()+1,source);
+        CHECK(expected == doc);
+    }
 }
 
 #endif
