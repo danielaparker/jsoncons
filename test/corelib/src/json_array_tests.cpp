@@ -14,25 +14,25 @@ using namespace jsoncons;
 
 TEST_CASE("test_initializer_list_of_integers")
 {
-    json j(json_array_arg, {0,1,2,3});
-    CHECK(j.is_array());
-    CHECK(j.size() == 4);
-    for (std::size_t i = 0; i < j.size(); ++i)
+    json doc(json_array_arg, {0,1,2,3});
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 4);
+    for (std::size_t i = 0; i < doc.size(); ++i)
     {
-        CHECK(i == j[i].as<std::size_t>());
+        CHECK(i == doc[i].as<std::size_t>());
     }
 }
 
 TEST_CASE("test_assignment_to_initializer_list")
 {
-    json j;
+    json doc;
 
-    j = json(json_array_arg, {0,1,2,3});
-    CHECK(j.is_array());
-    CHECK(j.size() == 4);
-    for (std::size_t i = 0; i < j.size(); ++i)
+    doc = json(json_array_arg, {0,1,2,3});
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 4);
+    for (std::size_t i = 0; i < doc.size(); ++i)
     {
-        CHECK(i == j[i].as<std::size_t>());
+        CHECK(i == doc[i].as<std::size_t>());
     }
 }
 
@@ -80,15 +80,15 @@ TEST_CASE("test_assignment_to_initializer_list3")
 
 TEST_CASE("test_assign_initializer_list_of_object")
 {
-    json j(json_array_arg);
+    json doc(json_array_arg);
 
     json transaction;
     transaction["Debit"] = 10000;
 
-    j = json(json_array_arg, {transaction});
-    CHECK(j.is_array());
-    CHECK(j.size() == 1);
-    CHECK(j[0] == transaction);
+    doc = json(json_array_arg, {transaction});
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 1);
+    CHECK(doc[0] == transaction);
 }
 
 TEST_CASE("test_initializer_list_of_objects")
@@ -101,48 +101,48 @@ TEST_CASE("test_initializer_list_of_objects")
     book2["author"] = "Jones";
     book2["title"] = "New Things";
 
-    json j(json_array_arg, {book1, book2});
-    CHECK(j.is_array());
-    CHECK(j.size() == 2);
+    json doc(json_array_arg, {book1, book2});
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 2);
 
-    CHECK(book1 == j[0]);
-    CHECK(book2 == j[1]);
+    CHECK(book1 == doc[0]);
+    CHECK(book2 == doc[1]);
 }
 
 TEST_CASE("test_array_constructor")
 {
-    json j(json_array_arg);
-    j.resize(10,10.0);
-    CHECK(j.is_array());
-    CHECK(j.size() == 10);
-    CHECK(j[0].as<double>() == Approx(10.0).epsilon(0.0000001));
+    json doc(json_array_arg);
+    doc.resize(10,10.0);
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 10);
+    CHECK(doc[0].as<double>() == Approx(10.0).epsilon(0.0000001));
 }
 
 TEST_CASE("test_make_array")
 {
-    json j(json_array_arg);
-    CHECK(j.size() == 0);
-    j.resize(10,10.0);
-    CHECK(j.is_array());
-    CHECK(j.size() == 10);
-    CHECK(j[0].as<double>() == Approx(10.0).epsilon(0.0000001));
+    json doc(json_array_arg);
+    CHECK(doc.size() == 0);
+    doc.resize(10,10.0);
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 10);
+    CHECK(doc[0].as<double>() == Approx(10.0).epsilon(0.0000001));
 
 }
 
 TEST_CASE("test_add_element_to_array")
 {
-    json j(json_array_arg);
-    CHECK(j.is_array());
-    CHECK(j.is_array());
-    j.push_back("Toronto");
-    j.push_back("Vancouver");
-    j.insert(j.array_range().begin(),"Montreal");
+    json doc(json_array_arg);
+    CHECK(doc.is_array());
+    CHECK(doc.is_array());
+    doc.push_back("Toronto");
+    doc.push_back("Vancouver");
+    doc.insert(doc.array_range().begin(),"Montreal");
 
-    CHECK(j.size() == 3);
+    CHECK(doc.size() == 3);
 
-    CHECK(j[0].as<std::string>() == std::string("Montreal"));
-    CHECK(j[1].as<std::string>() == std::string("Toronto"));
-    CHECK(j[2].as<std::string>() == std::string("Vancouver"));
+    CHECK(doc[0].as<std::string>() == std::string("Montreal"));
+    CHECK(doc[1].as<std::string>() == std::string("Toronto"));
+    CHECK(doc[2].as<std::string>() == std::string("Vancouver"));
 }
 
 TEST_CASE("test_emplace_element_to_array")
@@ -216,15 +216,15 @@ TEST_CASE("test_reserve_array_capacity")
 
 TEST_CASE("test make_array()")
 {
-    json j = json::make_array();
-    CHECK(j.is_array());
-    CHECK(j.size() == 0);
-    j.emplace_back("Toronto");
-    j.emplace_back("Vancouver");
-    j.emplace(j.array_range().begin(),"Montreal");
-    CHECK(j[0].as<std::string>() == std::string("Montreal"));
-    CHECK(j[1].as<std::string>() == std::string("Toronto"));
-    CHECK(j[2].as<std::string>() == std::string("Vancouver"));
+    json doc = json::make_array();
+    CHECK(doc.is_array());
+    CHECK(doc.size() == 0);
+    doc.emplace_back("Toronto");
+    doc.emplace_back("Vancouver");
+    doc.emplace(doc.array_range().begin(),"Montreal");
+    CHECK(doc[0].as<std::string>() == std::string("Montreal"));
+    CHECK(doc[1].as<std::string>() == std::string("Toronto"));
+    CHECK(doc[2].as<std::string>() == std::string("Vancouver"));
 }
 
 TEST_CASE("test_one_dim_array")
@@ -464,18 +464,18 @@ TEST_CASE("test json_array erase with iterator")
 {
     SECTION("json erase with iterator")
     {
-        json j(jsoncons::json_array_arg);
+        json doc(jsoncons::json_array_arg);
 
-        j.push_back("a");
-        j.push_back("b");
-        j.push_back("c");
+        doc.push_back("a");
+        doc.push_back("b");
+        doc.push_back("c");
 
-        auto it = j.array_range().begin();
-        while (it != j.array_range().end())
+        auto it = doc.array_range().begin();
+        while (it != doc.array_range().end())
         {
             if (*it == "a" || *it == "c")
             {
-                it = j.erase(it);
+                it = doc.erase(it);
             }
             else
             {
@@ -483,24 +483,24 @@ TEST_CASE("test json_array erase with iterator")
             }
         }
 
-        CHECK(j.size() == 1);
-        CHECK(j[0] == "b");
+        CHECK(doc.size() == 1);
+        CHECK(doc[0] == "b");
     }
 
     SECTION("json erase with iterator 2")
     {
-        json j(jsoncons::json_array_arg);
+        json doc(jsoncons::json_array_arg);
 
-        j.push_back("a");
-        j.push_back("b");
-        j.push_back("c");
+        doc.push_back("a");
+        doc.push_back("b");
+        doc.push_back("c");
 
-        auto it = j.array_range().begin();
-        while (it != j.array_range().end())
+        auto it = doc.array_range().begin();
+        while (it != doc.array_range().end())
         {
             if (*it == "a")
             {
-                it = j.erase(it,it+2);
+                it = doc.erase(it,it+2);
             }
             else
             {
@@ -508,7 +508,7 @@ TEST_CASE("test json_array erase with iterator")
             }
         }
 
-        CHECK(j.size() == 1);
-        CHECK(j[0] == "c");
+        CHECK(doc.size() == 1);
+        CHECK(doc[0] == "c");
     }
 }

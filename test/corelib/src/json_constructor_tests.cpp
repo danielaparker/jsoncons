@@ -19,14 +19,14 @@ TEST_CASE("json constructor byte_string_arg tests")
     SECTION("byte_string_arg std::vector<uint8_t>")
     {
         std::vector<uint8_t> bytes = {'f','o','o','b','a','r'};
-        json j(byte_string_arg, bytes, semantic_tag::base64url);
-        CHECK(j.as<std::string>() == expected_base64url);
+        json doc(byte_string_arg, bytes, semantic_tag::base64url);
+        CHECK(doc.as<std::string>() == expected_base64url);
     }
     SECTION("byte_string_arg std::string")
     {
         std::string bytes = {'f','o','o','b','a','r'};
-        json j(byte_string_arg, bytes, semantic_tag::base64url);
-        CHECK(j.as<std::string>() == expected_base64url);
+        json doc(byte_string_arg, bytes, semantic_tag::base64url);
+        CHECK(doc.as<std::string>() == expected_base64url);
     }
 }
 
@@ -89,20 +89,20 @@ TEST_CASE("json(string_view)")
 {
     json::string_view_type sv("Hello world.");
 
-    json j(sv);
+    json doc(sv);
 
-    CHECK(j.as<json::string_view_type>() == sv);
-    CHECK(j.as_string_view() == sv);
+    CHECK(doc.as<json::string_view_type>() == sv);
+    CHECK(doc.as_string_view() == sv);
 }
 
 TEST_CASE("json(string, semantic_tag::datetime)")
 {
     std::string s("2015-05-07 12:41:07-07:00");
 
-    json j(s, semantic_tag::datetime);
+    json doc(s, semantic_tag::datetime);
 
-    CHECK(j.tag() == semantic_tag::datetime);
-    CHECK(j.as<std::string>() == s);
+    CHECK(doc.tag() == semantic_tag::datetime);
+    CHECK(doc.as<std::string>() == s);
 }
 
 
@@ -111,26 +111,26 @@ TEST_CASE("json(string, semantic_tag::epoch_second)")
     SECTION("positive integer")
     {
         int t = 10000;
-        json j(t, semantic_tag::epoch_second);
+        json doc(t, semantic_tag::epoch_second);
 
-        CHECK(j.tag() == semantic_tag::epoch_second);
-        CHECK(j.as<int>() == t);
+        CHECK(doc.tag() == semantic_tag::epoch_second);
+        CHECK(doc.as<int>() == t);
     }
     SECTION("negative integer")
     {
         int t = -10000;
-        json j(t, semantic_tag::epoch_second);
+        json doc(t, semantic_tag::epoch_second);
 
-        CHECK(j.tag() == semantic_tag::epoch_second);
-        CHECK(j.as<int>() == t);
+        CHECK(doc.tag() == semantic_tag::epoch_second);
+        CHECK(doc.as<int>() == t);
     }
     SECTION("floating point")
     {
         double t = 10000.1;
-        json j(t, semantic_tag::epoch_second);
+        json doc(t, semantic_tag::epoch_second);
 
-        CHECK(j.tag() == semantic_tag::epoch_second);
-        CHECK(j.as<double>() == t);
+        CHECK(doc.tag() == semantic_tag::epoch_second);
+        CHECK(doc.as<double>() == t);
     }
 
 }
@@ -139,39 +139,39 @@ TEST_CASE("json get_allocator() tests")
 {
     SECTION("short string")
     {
-        json j("short");
+        json doc("short");
 
-        CHECK(j.get_allocator() == json::allocator_type());
+        CHECK(doc.get_allocator() == json::allocator_type());
     }
     SECTION("long string")
     {
         json::allocator_type alloc;
-        json j("string too long for short string", alloc);
+        json doc("string too long for short string", alloc);
 
-        CHECK(j.get_allocator() == alloc);
+        CHECK(doc.get_allocator() == alloc);
     }
     SECTION("byte string")
     {
         json::allocator_type alloc;
-        json j(byte_string({'H','e','l','l','o'}),alloc);
+        json doc(byte_string({'H','e','l','l','o'}),alloc);
 
-        CHECK(j.get_allocator() == alloc);
+        CHECK(doc.get_allocator() == alloc);
     }
     SECTION("array")
     {
         json::allocator_type alloc;
-        json j(json_array_arg, semantic_tag::none, alloc);
+        json doc(json_array_arg, semantic_tag::none, alloc);
 
-        REQUIRE(j.is_array());
-        CHECK(j.get_allocator() == alloc);
+        REQUIRE(doc.is_array());
+        CHECK(doc.get_allocator() == alloc);
     }
     SECTION("object")
     {
         json::allocator_type alloc;
-        json j(json_object_arg, semantic_tag::none, alloc);
+        json doc(json_object_arg, semantic_tag::none, alloc);
 
-        REQUIRE(j.is_object());
-        CHECK(j.get_allocator() == alloc);
+        REQUIRE(doc.is_object());
+        CHECK(doc.get_allocator() == alloc);
     }
 }
 

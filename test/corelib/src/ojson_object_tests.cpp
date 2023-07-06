@@ -181,19 +181,20 @@ TEST_CASE("test_ojson_merge")
 
 TEST_CASE("test_ojson_merge_move")
 {
-ojson doc = ojson::parse(R"(
-{
-    "a" : "1",
-    "d" : [1,2,3]
-}
-)");
+    ojson doc = ojson::parse(R"(
+    {
+        "a" : "1",
+        "d" : [1,2,3]
+    }
+    )");
 
-ojson source = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+    ojson source = ojson::parse(R"(
+    {
+        "a" : "2",
+        "c" : [4,5,6]
+    }
+    )");
+
     SECTION("merge source into doc")
     {
         ojson expected = ojson::parse(R"(
@@ -273,19 +274,19 @@ TEST_CASE("ojson merge_or_update test")
 
 TEST_CASE("test_ojson_merge_or_update_move")
 {
-ojson doc = ojson::parse(R"(
-{
-    "a" : "1",
-    "d" : [1,2,3]
-}
-)");
+    ojson doc = ojson::parse(R"(
+    {
+        "a" : "1",
+        "d" : [1,2,3]
+    }
+    )");
 
-ojson source = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+    ojson source = ojson::parse(R"(
+    {
+        "a" : "2",
+        "c" : [4,5,6]
+    }
+    )");
 
     SECTION("merge or update doc from source")
     {

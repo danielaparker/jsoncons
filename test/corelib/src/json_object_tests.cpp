@@ -1006,28 +1006,28 @@ TEST_CASE("test empty json_object iterator")
 
 TEST_CASE("test_json_merge")
 {
-json j = json::parse(R"(
-{
-    "a" : 1,
-    "b" : 2
-}
-)");
-json j2 = j;
+    json j = json::parse(R"(
+    {
+        "a" : 1,
+        "b" : 2
+    }
+    )");
+    json j2 = j;
 
-const json source = json::parse(R"(
-{
-    "a" : 2,
-    "c" : 3
-}
-)");
+    const json source = json::parse(R"(
+    {
+        "a" : 2,
+        "c" : 3
+    }
+    )");
 
-const json expected = json::parse(R"(
-{
-    "a" : 1,
-    "b" : 2,
-    "c" : 3
-}
-)");
+    const json expected = json::parse(R"(
+    {
+        "a" : 1,
+        "b" : 2,
+        "c" : 3
+    }
+    )");
 
     SECTION("test 1")
     {
@@ -1056,28 +1056,28 @@ const json expected = json::parse(R"(
 
 TEST_CASE("test_json_merge_move")
 {
-json j = json::parse(R"(
-{
-    "a" : "1",
-    "b" : [1,2,3]
-}
-)");
-    json j2 = j;
+    json j = json::parse(R"(
+    {
+        "a" : "1",
+        "b" : [1,2,3]
+    }
+    )");
+        json j2 = j;
 
-json source = json::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+    json source = json::parse(R"(
+    {
+        "a" : "2",
+        "c" : [4,5,6]
+    }
+    )");
 
-json expected = json::parse(R"(
-{
-    "a" : "1",
-    "b" : [1,2,3],
-    "c" : [4,5,6]
-}
-)");
+    json expected = json::parse(R"(
+    {
+        "a" : "1",
+        "b" : [1,2,3],
+        "c" : [4,5,6]
+    }
+    )");
 
     SECTION("test 1")
     {
@@ -1095,28 +1095,28 @@ json expected = json::parse(R"(
 
 TEST_CASE("test_json_merge_or_update")
 {
-json j = json::parse(R"(
-{
-    "a" : 1,
-    "b" : 2
-}
-)");
-json j2 = j;
+    json j = json::parse(R"(
+    {
+        "a" : 1,
+        "b" : 2
+    }
+    )");
+    json j2 = j;
 
-const json source = json::parse(R"(
-{
-    "a" : 2,
-    "c" : 3
-}
-)");
+    const json source = json::parse(R"(
+    {
+        "a" : 2,
+        "c" : 3
+    }
+    )");
 
-const json expected = json::parse(R"(
-{
-    "a" : 2,
-    "b" : 2,
-    "c" : 3
-}
-)");
+    const json expected = json::parse(R"(
+    {
+        "a" : 2,
+        "b" : 2,
+        "c" : 3
+    }
+    )");
 
     SECTION("test 1")
     {
@@ -1130,29 +1130,28 @@ const json expected = json::parse(R"(
 
 TEST_CASE("test_json_merge_or_update_move")
 {
-json j = json::parse(R"(
-{
-    "a" : "1",
-    "b" : [1,2,3]
-}
-)");
-    json j2 = j;
+    json j = json::parse(R"(
+    {
+        "a" : "1",
+        "b" : [1,2,3]
+    }
+    )");
+        json j2 = j;
 
-json source = json::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+    json source = json::parse(R"(
+    {
+        "a" : "2",
+        "c" : [4,5,6]
+    }
+    )");
 
-json expected = json::parse(R"(
-{
-    "a" : "2",
-    "b" : [1,2,3],
-    "c" : [4,5,6]
-}
-)");
-
+    json expected = json::parse(R"(
+    {
+        "a" : "2",
+        "b" : [1,2,3],
+        "c" : [4,5,6]
+    }
+    )");
 
     SECTION("test 1")
     {
