@@ -312,13 +312,27 @@ TEST_CASE("test_ojson_merge_or_update_move")
         )");
 
         doc.merge_or_update(doc.object_range().begin(),std::move(source));
-        CHECK(doc.size() == 3);
         CHECK(expected == doc);
     }
-
-    //std::cout << "(1)\n" << doc << std::endl;
-    //std::cout << "(2)\n" << source << std::endl;
 }
 
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 
+#include <memory_resource> 
+using namespace jsoncons;
 
+using pmr_json = jsoncons::pmr::json;
+using pmr_ojson = jsoncons::pmr::ojson;
+
+TEST_CASE("ojson.merge test with stateful allocator")
+{
+    char buffer1[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
+    std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+
+    char buffer2[1024] = {}; // a small buffer on the stack
+    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
+    std::pmr::polymorphic_allocator<char> alloc2(&pool2);
+}
+
+#endif

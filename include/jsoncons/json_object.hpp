@@ -1298,8 +1298,6 @@ namespace jsoncons {
             auto pos = find(name);
             if (pos != members_.end())
             {
-                std::size_t pos1 = pos - members_.begin();
-
     #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
                 iterator it = members_.begin() + (pos - members_.begin());
                 members_.erase(it);
