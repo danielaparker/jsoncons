@@ -55,7 +55,12 @@ Note: Non-stateful custom allocators are supported as before.
 
 - The tag type `result_allocator_arg_t` and constant `result_allocator_arg` have been deprecated.
 
-- The `jsonpath::json_replace` function no longer supports an optional `result_options` parameter,
+- The `jsonpath::json_replace` function no longer supports an optional `result_options` parameter.
+
+- The order preserving versions of `basic_json`, `ojson` and `wojson`, no longer use indexes to
+support search, but rely on sequential search instead. The feedback from users was that the additional 
+allocations and overhead wasn't worth any gains, particularly as the number of members in JSON 
+objects is typically not large.
 
 Defect fixes
 
