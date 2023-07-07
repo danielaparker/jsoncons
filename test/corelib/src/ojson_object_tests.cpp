@@ -404,7 +404,7 @@ TEST_CASE("custom_json object erase with iterator")
         auto it = doc.object_range().begin();
         while (it != doc.object_range().end())
         {
-            if (it->key() == "a" || it->key() == "c")
+            if (it->key() == jsoncons::string_view("a") || it->key() == jsoncons::string_view("c"))
             {
                 it = doc.erase(it);
             }
@@ -430,7 +430,7 @@ TEST_CASE("custom_json object erase with iterator")
         auto it = doc.object_range().begin();
         while (it != doc.object_range().end())
         {
-            if (it->key() == "a")
+            if (it->key() == jsoncons::string_view("a"))
             {
                 it = doc.erase(it, it+2);
             }
@@ -456,7 +456,7 @@ TEST_CASE("custom_json object erase with iterator")
         auto it = doc.object_range().begin();
         while (it != doc.object_range().end())
         {
-            if (it->key() == "c")
+            if (it->key() == jsoncons::string_view("c"))
             {
                 it = doc.erase(it, it+2);
             }
