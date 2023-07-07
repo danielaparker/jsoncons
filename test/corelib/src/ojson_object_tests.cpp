@@ -389,6 +389,89 @@ TEST_CASE("custom_json.merge test with order_preserving_policy and statefule all
 
 }
 
+TEST_CASE("custom_json object erase with iterator")
+{
+    MyScopedAllocator<char> alloc(1);
+
+    SECTION("custom_json erase with iterator")
+    {
+        custom_json doc(jsoncons::json_object_arg, alloc);
+
+        doc.try_emplace("a", 1);
+        doc.try_emplace("b", 2);
+        doc.try_emplace("c", 3);
+
+        auto it = doc.object_range().begin();
+        while (it != doc.object_range().end())
+        {
+            if (it->key() == "a" || it->key() == "c")
+            {
+                it = doc.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(doc.size() == 1);
+        CHECK(doc.at("b") == 2);
+        CHECK(doc["b"] == 2);
+    }
+
+    SECTION("custom_json erase with iterator 2")
+    {
+        custom_json doc(jsoncons::json_object_arg, alloc);
+
+        doc.try_emplace("a", 1);
+        doc.try_emplace("b", 2);
+        doc.try_emplace("c", 3);
+
+        auto it = doc.object_range().begin();
+        while (it != doc.object_range().end())
+        {
+            if (it->key() == "a")
+            {
+                it = doc.erase(it, it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(doc.size() == 1);
+        CHECK(doc.at("c") == 3);
+        CHECK(doc["c"] == 3);
+    }
+
+    SECTION("custom_json erase with iterator 3")
+    {
+        custom_json doc(jsoncons::json_object_arg, alloc);
+
+        doc.try_emplace("c", 1);
+        doc.try_emplace("b", 2);
+        doc.try_emplace("a", 3);
+
+        auto it = doc.object_range().begin();
+        while (it != doc.object_range().end())
+        {
+            if (it->key() == "c")
+            {
+                it = doc.erase(it, it+2);
+            }
+            else
+            {
+                it++;
+            }
+        }
+
+        CHECK(doc.size() == 1);
+        CHECK(doc.at("a") == 3);
+        CHECK(doc["a"] == 3);
+    }
+}
+
 TEST_CASE("custom_json merge_or_update test")
 {
     MyScopedAllocator<char> alloc(1);
