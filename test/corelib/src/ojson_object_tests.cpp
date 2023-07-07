@@ -39,16 +39,32 @@ TEST_CASE("ojson insert(first,last) test")
 
 TEST_CASE("ojson parse_duplicate_names")
 {
-    ojson oj1 = ojson::parse(R"({"first":1,"second":2,"third":3})");
-    CHECK(3 == oj1.size());
-    CHECK(1 == oj1["first"].as<int>());
-    CHECK(2 == oj1["second"].as<int>());
-    CHECK(3 == oj1["third"].as<int>());
+    SECTION("duplicates at front")
+    {
+        ojson doc = ojson::parse(R"({"first":1,"first":2,"second":2,"third":3})");
+        REQUIRE(3 == doc.size());
+        CHECK(1 == doc["first"].as<int>());
+        CHECK(2 == doc["second"].as<int>());
+        CHECK(3 == doc["third"].as<int>());
+    }
 
-    ojson oj2 = ojson::parse(R"({"first":1,"second":2,"first":3})");
-    CHECK(2 == oj2.size());
-    CHECK(1 == oj2["first"].as<int>());
-    CHECK(2 == oj2["second"].as<int>());
+    SECTION("duplicates at back")
+    {
+        ojson doc = ojson::parse(R"({"first":1,"second":2,"third":3,"third":4})");
+        REQUIRE(3 == doc.size());
+        CHECK(1 == doc["first"].as<int>());
+        CHECK(2 == doc["second"].as<int>());
+        CHECK(3 == doc["third"].as<int>());
+    }
+
+    SECTION("duplicates at endpoints")
+    {
+        ojson doc = ojson::parse(R"({"first":1,"second":2,"third":3,"first":4})");
+        REQUIRE(3 == doc.size());
+        CHECK(1 == doc["first"].as<int>());
+        CHECK(2 == doc["second"].as<int>());
+        CHECK(3 == doc["third"].as<int>());
+    }
 }
 
 TEST_CASE("ojson object erase with iterator")
