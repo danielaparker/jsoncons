@@ -1352,7 +1352,7 @@ namespace jsoncons {
                 std::size_t count = 1;
                 for (std::size_t i = 1; i < length; ++i)
                 {
-                    while (i < length && items[i-1].name.compare(items[i].name) == 0)
+                    while (i < length && items[i-1].name == items[i].name)
                     {
                         ++i;
                     }
