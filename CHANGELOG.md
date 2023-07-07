@@ -1,4 +1,4 @@
-0.171.0 preview
+0.171.0
 -------
 
 Enhancements:
