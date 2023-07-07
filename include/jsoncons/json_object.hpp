@@ -1306,25 +1306,6 @@ namespace jsoncons {
     #endif
             }
         }
-/*
-        void uninitialized_init(key_index_value<Json>* items, std::size_t length)
-        {
-            for (std::size_t i = 0; i < length; ++i)
-            {
-                if (items[i].index != -1)
-                {
-                    for (std::size_t j = i+1; j < length; ++j)
-                    {
-                        if (items[i].name == items[j].name)
-                        {
-                            items[j].index = -1;
-                        }
-                    }
-                    members_.emplace_back(std::move(items[i].name), std::move(items[i].value));
-                }
-            }
-        }
-*/
 
         static bool compare1(const key_index_value<Json>& item1, const key_index_value<Json>& item2)
         {
@@ -1373,7 +1354,6 @@ namespace jsoncons {
                 }
             }
         }
-
 
         void remove_duplicates(key_value_container_type& members)
         {
