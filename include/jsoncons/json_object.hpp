@@ -573,14 +573,12 @@ namespace jsoncons {
             }
         }
 
-        template<class InputIt, class Convert>
-        void insert(InputIt first, InputIt last, Convert convert)
+        template<class InputIt>
+        void insert(InputIt first, InputIt last)
         {
-            std::size_t count = std::distance(first,last);
-            members_.reserve(members_.size() + count);
             for (auto s = first; s != last; ++s)
             {
-                members_.emplace_back(convert(*s));
+                members_.emplace_back(get_key_value<KeyT,Json>()(*s));
             }
             std::stable_sort(members_.begin(),members_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
@@ -589,20 +587,17 @@ namespace jsoncons {
             members_.erase(it, members_.end());
         }
 
-        template<class InputIt, class Convert>
-        void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
+        template<class InputIt>
+        void insert(sorted_unique_range_tag, InputIt first, InputIt last)
         {
             if (first != last)
             {
-                std::size_t count = std::distance(first,last);
-                members_.reserve(members_.size() + count);
-
                 auto it = find(convert(*first).key());
                 if (it != members_.end())
                 {
                     for (auto s = first; s != last; ++s)
                     {
-                        it = members_.emplace(it, convert(*s));
+                        it = members_.emplace(it, get_key_value<KeyT,Json>()(*s));
                     }
                 }
                 else
@@ -1381,13 +1376,13 @@ namespace jsoncons {
             }
         }
 
-        template<class InputIt, class Convert>
-        void insert(InputIt first, InputIt last, Convert convert)
+        template<class InputIt>
+        void insert(InputIt first, InputIt last)
         {
             std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                auto kv = convert(*it);
+                auto kv = get_key_value<KeyT,Json>()(*it);
                 if (keys.find(kv.key()) == keys.end())
                 {
                     keys.emplace(kv.key());
@@ -1396,12 +1391,12 @@ namespace jsoncons {
             }
         }
 
-        template<class InputIt, class Convert>
-        void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
+        template<class InputIt>
+        void insert(sorted_unique_range_tag, InputIt first, InputIt last)
         {
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(convert(*it));
+                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
             }
         }
    

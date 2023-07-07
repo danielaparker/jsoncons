@@ -5314,10 +5314,10 @@ namespace jsoncons {
             {
             case json_storage_kind::empty_object_value:
                 create_object_implicitly();
-                cast<object_storage>().value().insert(first, last, get_key_value<key_type,basic_json>());
+                cast<object_storage>().value().insert(first, last);
                 break;
             case json_storage_kind::object_value:
-                cast<object_storage>().value().insert(first, last, get_key_value<key_type,basic_json>());
+                cast<object_storage>().value().insert(first, last);
                 break;
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to insert into a value that is not an object"));
@@ -5331,10 +5331,10 @@ namespace jsoncons {
             {
             case json_storage_kind::empty_object_value:
                 create_object_implicitly();
-                cast<object_storage>().value().insert(tag, first, last, get_key_value<key_type,basic_json>());
+                cast<object_storage>().value().insert(tag, first, last);
                 break;
             case json_storage_kind::object_value:
-                cast<object_storage>().value().insert(tag, first, last, get_key_value<key_type,basic_json>());
+                cast<object_storage>().value().insert(tag, first, last);
                 break;
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to insert into a value that is not an object"));
