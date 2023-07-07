@@ -19,6 +19,7 @@
 #include <memory> // std::allocator
 #include <utility> // std::move
 #include <cassert> // assert
+#include <unordered_set>
 #include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/allocator_holder.hpp>
@@ -27,7 +28,7 @@
 namespace jsoncons {
 
     template <class Json>
-    struct key_index_value
+    struct index_key_value
     {
         using key_type = typename Json::key_type;
         using allocator_type = typename Json::allocator_type;
@@ -37,25 +38,25 @@ namespace jsoncons {
         Json value;
 
         template <class... Args>
-        key_index_value(key_type&& name, int64_t index, Args&& ... args) 
+        index_key_value(key_type&& name, int64_t index, Args&& ... args) 
             : name(std::move(name)), index(index), value(std::forward<Args>(args)...)
         {
         }
 
-        key_index_value() = default;
-        key_index_value(const key_index_value&) = default;
-        key_index_value(key_index_value&&) = default;
-        key_index_value(const key_index_value& other, const allocator_type& alloc) 
+        index_key_value() = default;
+        index_key_value(const index_key_value&) = default;
+        index_key_value(index_key_value&&) = default;
+        index_key_value(const index_key_value& other, const allocator_type& alloc) 
             : name(other.name, alloc), index(0), value(other.value, alloc) 
         {
         }
-        key_index_value(key_index_value&& other, const allocator_type& alloc)
+        index_key_value(index_key_value&& other, const allocator_type& alloc)
             : name(std::move(other.name), alloc), index(0), value(std::move(other.value), alloc) 
         {
 
         }
-        key_index_value& operator=(const key_index_value&) = default;
-        key_index_value& operator=(key_index_value&&) = default;
+        index_key_value& operator=(const index_key_value&) = default;
+        index_key_value& operator=(index_key_value&&) = default;
     };
 
     struct sorted_unique_range_tag
@@ -540,7 +541,7 @@ namespace jsoncons {
             }
         }
 
-        static bool compare(const key_index_value<Json>& item1, const key_index_value<Json>& item2)
+        static bool compare(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
         {
             int comp = item1.name.compare(item2.name); 
             if (comp < 0) return true;
@@ -549,7 +550,7 @@ namespace jsoncons {
             return false;
         }
 
-        void uninitialized_init(key_index_value<Json>* items, std::size_t count)
+        void uninitialized_init(index_key_value<Json>* items, std::size_t count)
         {
             auto first = items;
             if (count > 0)
@@ -563,7 +564,7 @@ namespace jsoncons {
                 auto prev_it = first;
                 for (auto it = first+1; it != last; ++it)
                 {
-                    if (it->name.compare(prev_it->name) != 0)
+                    if (it->name != prev_it->name)
                     {
                         members_.emplace_back(it->name, std::move(it->value));
                     }
@@ -1040,8 +1041,23 @@ namespace jsoncons {
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
     private:
+        struct MyHash
+        {
+            std::uintmax_t operator()(const key_type& s) const noexcept
+            {
+                const int p = 31;
+                const int m = static_cast<int>(1e9) + 9;
+                std::uintmax_t hash_value = 0;
+                std::uintmax_t p_pow = 1;
+                for (char_type c : s) {
+                    hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
+                    p_pow = (p_pow * p) % m;
+                }
+                return hash_value;   
+            }
+        };
 
-        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
+        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;
         using key_value_container_type = SequenceContainer<key_value_type,key_value_allocator_type>;
 
         key_value_container_type members_;
@@ -1100,11 +1116,16 @@ namespace jsoncons {
         template<class InputIt>
         order_preserving_json_object(InputIt first, InputIt last)
         {
+            std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
+                auto kv = get_key_value<KeyT,Json>()(*it);
+                if (keys.find(kv.key()) == keys.end())
+                {
+                    keys.emplace(kv.key());
+                    members_.emplace_back(std::move(kv));
+                }
             }
-            remove_duplicates(members_);
         }
 
         template<class InputIt>
@@ -1113,11 +1134,16 @@ namespace jsoncons {
             : allocator_holder<allocator_type>(alloc), 
               members_(key_value_allocator_type(alloc))
         {
+            std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(get_key_value<KeyT,Json>()(*it));
+                auto kv = get_key_value<KeyT,Json>()(*it);
+                if (keys.find(kv.key()) == keys.end())
+                {
+                    keys.emplace(kv.key());
+                    members_.emplace_back(std::move(kv));
+                }
             }
-            remove_duplicates(members_);
         }
 
         order_preserving_json_object(std::initializer_list<std::pair<std::basic_string<char_type>,Json>> init, 
@@ -1307,7 +1333,7 @@ namespace jsoncons {
             }
         }
 
-        static bool compare1(const key_index_value<Json>& item1, const key_index_value<Json>& item2)
+        static bool compare1(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
         {
             int comp = item1.name.compare(item2.name); 
             if (comp < 0) return true;
@@ -1316,12 +1342,12 @@ namespace jsoncons {
             return false;
         }
 
-        static bool compare2(const key_index_value<Json>& item1, const key_index_value<Json>& item2)
+        static bool compare2(const index_key_value<Json>& item1, const index_key_value<Json>& item2)
         {
             return item1.index < item2.index;
         }
 
-        void uninitialized_init(key_index_value<Json>* items, std::size_t length)
+        void uninitialized_init(index_key_value<Json>* items, std::size_t length)
         {
             if (length > 0)
             {
@@ -1355,28 +1381,19 @@ namespace jsoncons {
             }
         }
 
-        void remove_duplicates(key_value_container_type& members)
-        {
-            for (std::size_t i = 0; i < members.size(); ++i)
-            {
-                for (std::size_t j = i+1; j < members.size(); ++j)
-                {
-                    if (members[i].key() == members[j].key())
-                    {
-                        members.erase(members.begin()+j);
-                    }
-                }
-            }
-        }
-
         template<class InputIt, class Convert>
         void insert(InputIt first, InputIt last, Convert convert)
         {
+            std::unordered_set<key_type,MyHash> keys;
             for (auto it = first; it != last; ++it)
             {
-                members_.emplace_back(convert(*it));
+                auto kv = convert(*it);
+                if (keys.find(kv.key()) == keys.end())
+                {
+                    keys.emplace(kv.key());
+                    members_.emplace_back(std::move(kv));
+                }
             }
-            remove_duplicates(members_);
         }
 
         template<class InputIt, class Convert>

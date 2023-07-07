@@ -51,7 +51,7 @@ private:
     };
 
     using temp_allocator_type = TempAllocator;
-    using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_index_value<Json>>;
+    using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<index_key_value<Json>>;
     using structure_info_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info>;
  
     allocator_type allocator_;
@@ -60,7 +60,7 @@ private:
 
     std::size_t index_;
     key_type name_;
-    std::vector<key_index_value<Json>,stack_item_allocator_type> item_stack_;
+    std::vector<index_key_value<Json>,stack_item_allocator_type> item_stack_;
     std::vector<structure_info,structure_info_allocator_type> structure_stack_;
     bool is_valid_;
 
