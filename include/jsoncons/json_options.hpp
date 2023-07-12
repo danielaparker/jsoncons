@@ -371,7 +371,7 @@ public:
     basic_json_decode_options(const basic_json_decode_options&) = default;
 
     basic_json_decode_options(basic_json_decode_options&& other)
-        : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(other.default_json_parsing())
+        : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(std::move(other.err_handler_))
     {
     }
 
