@@ -509,9 +509,11 @@ public:
         size_type len_old = common_stor_.length_;
         reserve(n);
         common_stor_.length_ = n;
-        if ( common_stor_.length_ > len_old )
+
+        uint64_t* a = data();
+        for (size_type i = len_old; i < common_stor_.length_; ++i)
         {
-            memset( data()+len_old, 0, (common_stor_.length_ - len_old)*sizeof(uint64_t) );
+            a[i] = 0;
         }
     }
 
