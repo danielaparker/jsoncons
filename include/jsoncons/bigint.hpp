@@ -511,7 +511,7 @@ public:
         common_stor_.length_ = n;
 
         uint64_t* a = data();
-        for (size_type i = len_old; i < common_stor_.length_; ++i)
+        for (size_type i = len_old; i < n; ++i)
         {
             a[i] = 0;
         }
