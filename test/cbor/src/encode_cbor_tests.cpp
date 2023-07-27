@@ -186,7 +186,39 @@ TEST_CASE("encode_cbor overloads")
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
-TEST_CASE("encode_cbor allocator_set overloads")
+using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+
+TEST_CASE("encode_cbor allocator_set")
+{
+    MyScopedAllocator<char> result_alloc(1);
+    MyScopedAllocator<char> temp_alloc(2);
+
+    auto alloc_set = combine_allocators(result_alloc, temp_alloc);
+
+    SECTION("json, stream")
+    {
+        custom_json person(json_object_arg, result_alloc);
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(alloc_set, person, ss);
+        custom_json other = cbor::decode_cbor<custom_json>(alloc_set,ss);
+        CHECK(other == person);
+    }
+    /* SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(alloc_set, person, ss);
+        ns::Person other = cbor::decode_cbor<ns::Person>(alloc_set,ss);
+        CHECK(other.name == person.name);
+    }*/
+}
+
+TEST_CASE("encode_cbor allocator_set for temp only")
 {
     MyScopedAllocator<char> temp_alloc(1);
 
