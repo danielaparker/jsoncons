@@ -127,9 +127,9 @@ namespace jsonpath {
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
-        auto f = [&callback](const json_location_type& path, reference val)
+        auto f = [&callback](const json_location_type& pathp, reference val)
         {
-            callback(path.to_string(), val);
+            callback(pathp.to_string(), val);
         };
         expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
     }
@@ -154,9 +154,9 @@ namespace jsonpath {
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_set.get_allocator()};
 
-        auto f = [&callback](const json_location_type& path, reference val)
+        auto f = [&callback](const json_location_type& pathp, reference val)
         {
-            callback(path.to_string(), val);
+            callback(pathp.to_string(), val);
         };
         expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
     }
