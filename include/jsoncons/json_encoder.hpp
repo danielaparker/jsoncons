@@ -679,9 +679,10 @@ namespace detail {
                 	if (options_.bigint_format() == bigint_chars_format::number)
                 	{
 	                	write_bigint_value(sv);
-						break;
-					}
-				}	// fall through
+				break;
+			}
+			JSONCONS_FALLTHROUGH;
+		}
                 default:
                 {
                     sink_.push_back('\"');
@@ -1340,8 +1341,9 @@ namespace detail {
                 	{
 	                	write_bigint_value(sv);
                 		break;
-					}
-				}	// fall through
+			}
+			JSONCONS_FALLTHROUGH;
+		}
                 default:
                 {
                     sink_.push_back('\"');
