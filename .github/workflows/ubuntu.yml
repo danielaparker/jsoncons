@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install_gcc
       run: |
            sudo apt update
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install_gcc
       run: |
            sudo apt update
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install_gcc
       run: |
            sudo apt update
@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install_gcc
       run: |
            sudo apt update
@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install_gcc
       run: |
            sudo apt update
@@ -121,7 +121,7 @@ jobs:
 #    runs-on: ubuntu-18.04
 #
 #    steps:
-#    - uses: actions/checkout@v3
+#    - uses: actions/checkout@v4
 #      with:
 #        fetch-depth: 0
 #    - name: Install

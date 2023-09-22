@@ -673,6 +673,16 @@ namespace detail {
                 case semantic_tag::bigint:
                     write_bigint_value(sv);
                     break;
+                case semantic_tag::bigdec:
+                {
+                	// output lossless number
+                	if (options_.bigint_format() == bigint_chars_format::number)
+                	{
+	                	write_bigint_value(sv);
+				break;
+			}
+			JSONCONS_FALLTHROUGH;
+		}
                 default:
                 {
                     sink_.push_back('\"');
@@ -1324,6 +1334,16 @@ namespace detail {
                 case semantic_tag::bigint:
                     write_bigint_value(sv);
                     break;
+                case semantic_tag::bigdec:
+                {
+                	// output lossless number
+                	if (options_.bigint_format() == bigint_chars_format::number)
+                	{
+	                	write_bigint_value(sv);
+                		break;
+			}
+			JSONCONS_FALLTHROUGH;
+		}
                 default:
                 {
                     sink_.push_back('\"');

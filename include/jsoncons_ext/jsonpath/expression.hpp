@@ -3077,9 +3077,9 @@ namespace detail {
 
             if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](const json_location_type& path, reference)
+                auto callback = [&result](const json_location_type& pathp, reference)
                 {
-                    result.emplace_back(path.to_string()); 
+                    result.emplace_back(pathp.to_string()); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
             }
