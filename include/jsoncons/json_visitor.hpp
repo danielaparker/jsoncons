@@ -1515,6 +1515,9 @@ namespace jsoncons {
         }
     };
 
+#if __cplusplus >= 201703L
+// not needed for C++17
+#else
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
@@ -1528,6 +1531,7 @@ namespace jsoncons {
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
     template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
+#endif // C++17 check
 
     using json_visitor = basic_json_visitor<char>;
     using wjson_visitor = basic_json_visitor<wchar_t>;
