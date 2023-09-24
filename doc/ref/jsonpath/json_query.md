@@ -174,11 +174,11 @@ int main()
     std::cout << "(7)\n" << pretty_print(result7) << "\n";
 
     // Union of a subset of book titles identified by index
-    json result8 = jsonpath::json_query(root_value, "$.store[book[0].title,book[1].title,book[3].title]");
+    json result8 = jsonpath::json_query(root_value, "$.store[@.book[0].title,@.book[1].title,@.book[3].title]");
     std::cout << "(8)\n" << pretty_print(result8) << "\n";
 
     // Union of third book title and all book titles with price > 10
-    json result9 = jsonpath::json_query(root_value, "$.store[book[3].title,book[?(@.price > 10)].title]");
+    json result9 = jsonpath::json_query(root_value, "$.store[@.book[3].title,@.book[?(@.price > 10)].title]");
     std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
     // Intersection of book titles with category fiction and price < 15
