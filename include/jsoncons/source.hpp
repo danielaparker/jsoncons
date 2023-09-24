@@ -781,8 +781,12 @@ namespace jsoncons {
             return length - unread;
         }
     };
+#if __cplusplus >= 201703L
+// not needed for C++17
+#else
     template <class Source>
     constexpr std::size_t source_reader<Source>::max_buffer_length;
+#endif
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     using bin_stream_source = binary_stream_source;
