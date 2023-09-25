@@ -3088,17 +3088,42 @@ namespace jsoncons {
                     break;
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::long_string_value:
-                    switch (rhs.storage_kind())
-                    {
-                        case json_storage_kind::short_string_value:
-                            return as_string_view().compare(rhs.as_string_view());
-                        case json_storage_kind::long_string_value:
-                            return as_string_view().compare(rhs.as_string_view());
-                        case json_storage_kind::json_const_pointer:
-                            return compare(*(rhs.cast<json_const_pointer_storage>().value()));
-                        default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
-                    }
+					switch (tag())
+					{
+						case semantic_tag::bigint:
+						case semantic_tag::bigdec:
+						case semantic_tag::bigfloat:
+						{
+							// same text -> equal
+							if (rhs.storage_kind() == json_storage_kind::short_string_value || rhs.storage_kind() == json_storage_kind::long_string_value)
+							{
+								int compareString = as_string_view().compare(rhs.as_string_view());
+								if (compareString == 0)
+								{
+									return 0;
+								}
+							}
+							
+							// compare big numbers as double
+							auto r = as<double>() - rhs.as<double>();
+							return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+						}
+						default:
+						{
+							// compare regular text
+							switch (rhs.storage_kind())
+							{
+								case json_storage_kind::short_string_value:
+									return as_string_view().compare(rhs.as_string_view());
+								case json_storage_kind::long_string_value:
+									return as_string_view().compare(rhs.as_string_view());
+								case json_storage_kind::json_const_pointer:
+									return compare(*(rhs.cast<json_const_pointer_storage>().value()));
+								default:
+									return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+							}
+						}
+					}
                     break;
                 case json_storage_kind::byte_string_value:
                     switch (rhs.storage_kind())
