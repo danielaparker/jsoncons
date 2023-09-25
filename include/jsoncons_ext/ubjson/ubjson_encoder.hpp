@@ -334,8 +334,9 @@ private:
 
         const size_t length = b.size();
         sink_.push_back(jsoncons::ubjson::ubjson_type::start_array_marker);
-        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::type_marker), std::back_inserter(sink_));
-        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::uint8_type), std::back_inserter(sink_));
+        sink_.push_back(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::type_marker));
+        sink_.push_back(static_cast<uint8_t>(jsoncons::ubjson::ubjson_type::uint8_type));
+        sink_.push_back(jsoncons::ubjson::ubjson_type::count_marker);
         put_length(length);
 
         for (auto c : b)
