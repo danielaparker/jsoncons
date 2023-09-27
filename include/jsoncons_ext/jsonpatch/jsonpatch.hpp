@@ -134,8 +134,8 @@ namespace detail {
             json_pointer_type path;
             Json value;
 
-            entry(op_type op, const json_pointer_type& path, const Json& value)
-                : op(op), path(path), value(value)
+            entry(op_type Op, const json_pointer_type& Path, const Json& Value)
+                : op(Op), path(Path), value(Value)
             {
             }
 
