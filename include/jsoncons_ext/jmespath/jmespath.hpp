@@ -3112,8 +3112,8 @@ namespace jmespath {
             string_type key;
             std::vector<token> tokens;
 
-            key_tokens(string_type&& key, std::vector<token>&& tokens) noexcept
-                : key(std::move(key)), tokens(std::move(tokens))
+            key_tokens(string_type&& Key, std::vector<token>&& Tokens) noexcept
+                : key(std::move(Key)), tokens(std::move(Tokens))
             {
             }
         };
