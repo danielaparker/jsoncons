@@ -38,8 +38,8 @@ namespace jsoncons {
         Json value;
 
         template <class... Args>
-        index_key_value(key_type&& name, int64_t index, Args&& ... args) 
-            : name(std::move(name)), index(index), value(std::forward<Args>(args)...)
+        index_key_value(key_type&& Name, int64_t Index, Args&& ... args) 
+            : name(std::move(Name)), index(Index), value(std::forward<Args>(args)...)
         {
         }
 
