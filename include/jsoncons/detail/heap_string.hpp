@@ -18,6 +18,13 @@
 namespace jsoncons { 
 namespace detail {
 
+    inline void*
+    align_up(void* ptr, std::size_t alignment) noexcept
+    {
+        return reinterpret_cast<void*>(~(alignment - 1) &
+            (reinterpret_cast<uintptr_t>(ptr) + alignment - 1));
+    }
+
     template <class Extra,class Allocator>
     struct heap_string_base
     {
@@ -52,6 +59,7 @@ namespace detail {
 
         pointer p_;
         std::size_t length_;
+        uint16_t offset_;
 
         ~heap_string() noexcept = default; 
 
@@ -114,23 +122,29 @@ namespace detail {
             heap_string_type data;
             char_type c[1];
         };
-        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type json_storage_kind;
+        typedef typename jsoncons_aligned_storage<sizeof(storage_t), alignof(storage_t)>::type storage_type;
 
         static size_t aligned_size(std::size_t n)
         {
-            return sizeof(json_storage_kind) + n;
+            return sizeof(storage_type) + n;
         }
 
     public:
 
         static pointer create(const char_type* s, std::size_t length, Extra extra, const Allocator& alloc)
         {
-            std::size_t mem_size = aligned_size(length*sizeof(char_type));
+            std::size_t len = aligned_size(length*sizeof(char_type));
+
+            std::size_t align = alignof(storage_type);
+            std::size_t mem_len = align-1+len;
 
             byte_allocator_type byte_alloc(alloc);
-            byte_pointer ptr = byte_alloc.allocate(mem_size);
+            byte_pointer ptr = byte_alloc.allocate(mem_len);
 
-            char* storage = extension_traits::to_plain_pointer(ptr);
+            char* q = extension_traits::to_plain_pointer(ptr);
+
+            void* storage = align_up(q, align);
+
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
@@ -149,7 +163,9 @@ namespace detail {
             {
                 heap_string_type* rawp = extension_traits::to_plain_pointer(ptr);
 
-                char* p = launder_cast<char*>(rawp);
+                char* q = launder_cast<char*>(rawp);
+
+                char* p = q - ptr->offset_;
 
                 std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
                 byte_allocator_type byte_alloc(ptr->get_allocator());
