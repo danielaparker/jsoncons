@@ -18,10 +18,10 @@
 namespace jsoncons { 
 namespace detail {
 
-    inline void*
-    align_up(void* ptr, std::size_t alignment) noexcept
+    inline char*
+    align_up(char* ptr, std::size_t alignment) noexcept
     {
-        return reinterpret_cast<void*>(~(alignment - 1) &
+        return reinterpret_cast<char*>(~(alignment - 1) &
             (reinterpret_cast<uintptr_t>(ptr) + alignment - 1));
     }
 
@@ -143,7 +143,7 @@ namespace detail {
 
             char* q = extension_traits::to_plain_pointer(ptr);
 
-            void* storage = align_up(q, align);
+            char* storage = align_up(q, align);
 
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
@@ -154,6 +154,7 @@ namespace detail {
             p[length] = 0;
             ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
+            ps->offset_ = (uint16_t)(q - storage);
             return std::pointer_traits<pointer>::pointer_to(*ps);
         }
 
