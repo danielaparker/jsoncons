@@ -172,7 +172,7 @@ namespace detail {
 
                 std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
                 byte_allocator_type byte_alloc(ptr->get_allocator());
-                byte_alloc.deallocate(p,mem_size);
+                byte_alloc.deallocate(p,mem_size + ptr->offset_);
             }
         }
     };
