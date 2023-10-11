@@ -69,7 +69,7 @@ namespace detail {
         Extra extra() const { return this->extra_; }
 
         heap_string(Extra extra, const Allocator& alloc)
-            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0)
+            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0), offset_(0)
         {
         }
 
@@ -145,6 +145,8 @@ namespace detail {
 
             char* storage = align_up(q, align);
 
+            JSONCONS_ASSERT(storage >= q);
+
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
             auto psa = launder_cast<storage_t*>(storage); 
@@ -154,7 +156,7 @@ namespace detail {
             p[length] = 0;
             ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
-            ps->offset_ = (uint16_t)(q - storage);
+            ps->offset_ = (uint16_t)(storage - q);
             return std::pointer_traits<pointer>::pointer_to(*ps);
         }
 
