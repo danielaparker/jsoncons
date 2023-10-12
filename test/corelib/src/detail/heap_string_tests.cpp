@@ -11,17 +11,20 @@
 
 using namespace jsoncons;
 
-/* TEST_CASE("heap_string test")
+TEST_CASE("heap_string test")
 {
     using heap_string_factory_type = jsoncons::detail::heap_string_factory<char, null_type, std::allocator<char>>;
     using pointer = typename heap_string_factory_type::pointer;
 
-    std::string s("String too long for short string");
+    std::string s("Hello World");
 
     pointer ptr = heap_string_factory_type::create(s.data(), s.length(), null_type(), std::allocator<char>());
+ 
+    CHECK(s == ptr->c_str());
+    CHECK(s.length() == ptr->length_);
 
     heap_string_factory_type::destroy(ptr);
-}*/
+}
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> 
@@ -37,9 +40,13 @@ TEST_CASE("heap_string with polymorphic allocator test")
 
     std::string s1("Hello World 1");
     pointer ptr1 = heap_string_factory_type::create(s1.data(), s1.length(), null_type(), alloc);
+    CHECK(s1 == ptr1->c_str());
+    CHECK(s1.length() == ptr1->length_);
 
-    std::string s2("Hello World 2");
+    std::string s2("Hello 2");
     pointer ptr2 = heap_string_factory_type::create(s2.data(), s2.length(), null_type(), alloc);
+    CHECK(s2 == ptr2->c_str());
+    CHECK(s2.length() == ptr2->length_);
 
     heap_string_factory_type::destroy(ptr1);
     heap_string_factory_type::destroy(ptr2);
