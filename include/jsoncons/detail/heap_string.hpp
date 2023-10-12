@@ -59,7 +59,7 @@ namespace detail {
 
         pointer p_;
         std::size_t length_;
-        uint16_t offset_;
+        uint8_t offset_;
 
         ~heap_string() noexcept = default; 
 
@@ -156,7 +156,7 @@ namespace detail {
             p[length] = 0;
             ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
-            ps->offset_ = (uint16_t)(storage - q);
+            ps->offset_ = (uint8_t)(storage - q);
             return std::pointer_traits<pointer>::pointer_to(*ps);
         }
 
