@@ -299,19 +299,20 @@ namespace jsoncons { namespace unicode_traits {
     {
         uint8_t a;
         const CharT* srcptr = first+length;
-        switch (length) {
+        switch (length) 
+        {
         default:
             return conv_errc::over_long_utf8_sequence;
         case 4:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = static_cast<uint8_t>(*--srcptr)) < 0x80) || a > 0xBF)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 3:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = static_cast<uint8_t>(*--srcptr)) < 0x80) || a > 0xBF)
                 return conv_errc::expected_continuation_byte;
             JSONCONS_FALLTHROUGH;
         case 2:
-            if (((a = (*--srcptr))& 0xC0) != 0x80)
+            if (((a = static_cast<uint8_t>(*--srcptr)) > 0xBF))
                 return conv_errc::expected_continuation_byte;
 
             switch (static_cast<uint8_t>(*first)) 
@@ -321,7 +322,7 @@ namespace jsoncons { namespace unicode_traits {
                 case 0xED: if (a > 0x9F) return conv_errc::source_illegal; break;
                 case 0xF0: if (a < 0x90) return conv_errc::source_illegal; break;
                 case 0xF4: if (a > 0x8F) return conv_errc::source_illegal; break;
-                default:   if (a < 0x80) return conv_errc::source_illegal;
+                default:   if (a < 0x80) return conv_errc::source_illegal; break;
             }
 
             JSONCONS_FALLTHROUGH;
