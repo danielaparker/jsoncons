@@ -1,4 +1,4 @@
-# Examples
+﻿# Examples
 
 ### Parse and decode
 
@@ -17,6 +17,7 @@
 ### Encode
 
 [Encode a json value to a string](#B1)  
+[Encode Chinese characters](#B5)  
 [Encode a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
@@ -507,6 +508,21 @@ std::string s;
 j.dump(s); // compressed
 
 j.dump(s, indenting::indent); // pretty print
+```
+
+<div id="B5"/>
+
+#### Encode Chinese characters
+
+```
+jsoncons::json j;
+
+std::string s = (const char*)u8"你好";
+j.try_emplace("hello", s);
+assert(j["hello"].as<std::string>() == s);
+
+std::string json_string;
+j.dump(json_string);
 ```
 
 <div id="B2"/>

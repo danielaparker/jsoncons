@@ -1,9 +1,10 @@
-// Copyright 2013-2023 Daniel Parker
+﻿// Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
 #include <string>
 #include <jsoncons/json.hpp>
 #include <iomanip>
+#include <assert.h>
 
 using namespace jsoncons;
 
@@ -443,6 +444,18 @@ void decimal_precision_examples()
     std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
 }
 
+void chinese_characters()
+{
+    jsoncons::json j;
+
+    std::string s = (const char*)u8"你好";
+    j.try_emplace("hello", s);
+    assert(j["hello"].as<std::string>() == s);
+
+    std::string json_string;
+    j.dump(json_string);
+}
+
 int main()
 {
     std::cout << "\nSerialization examples\n\n";
@@ -455,7 +468,8 @@ int main()
     bignum_serialization_examples2();
     bignum_serialization_examples1();
     decimal_precision_examples();
-    bignum_access_examples();
+    bignum_access_examples(); 
+    chinese_characters();
     std::cout << std::endl;
 }
 
