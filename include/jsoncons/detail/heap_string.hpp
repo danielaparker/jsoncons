@@ -136,7 +136,7 @@ namespace detail {
             std::size_t len = aligned_size(length*sizeof(char_type));
 
             std::size_t align = alignof(storage_type);
-            std::size_t mem_len = align-1+len;
+            std::size_t mem_len = (align-1)+len;
 
             byte_allocator_type byte_alloc(alloc);
             byte_pointer ptr = byte_alloc.allocate(mem_len);
@@ -170,7 +170,7 @@ namespace detail {
 
                 char* p = q - ptr->offset_;
 
-                std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
+                std::size_t mem_size = (alignof(storage_type)-1)+ aligned_size(ptr->length_*sizeof(char_type));
                 byte_allocator_type byte_alloc(ptr->get_allocator());
                 byte_alloc.deallocate(p,mem_size + ptr->offset_);
             }
