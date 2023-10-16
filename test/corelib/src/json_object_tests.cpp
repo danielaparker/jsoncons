@@ -1,4 +1,4 @@
-// Copyright 2013-2023 Daniel Parker
+﻿// Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -98,6 +98,16 @@ TEST_CASE("json as<T>")
             CHECK(e.what() == std::string("Key not found: 'empty'"));
         }
     }
+#ifdef __cpp_char8_t
+    SECTION("Chinese characters as u8string")
+    {
+            jsoncons::json j;
+
+            std::u8string s = u8"你好";
+            j.try_emplace("hello", s);
+            CHECK(j["hello"].as<std::u8string>() == s);
+    }
+#endif
 }
 
 TEST_CASE("parse_duplicate_names")

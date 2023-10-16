@@ -444,7 +444,7 @@ void decimal_precision_examples()
     std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
 }
 
-void chinese_characters()
+void chinese_char()
 {
     jsoncons::json j;
 
@@ -455,6 +455,22 @@ void chinese_characters()
     std::string json_string;
     j.dump(json_string);
 }
+
+#ifdef __cpp_char8_t
+
+void chinese_uchar8_t()
+{
+    jsoncons::json j;
+
+    std::u8string s = u8"你好";
+    j.try_emplace("hello", s);
+    assert(j["hello"].as<std::u8string>() == s);
+
+    std::string json_string;
+    j.dump(json_string);
+}
+
+#endif
 
 int main()
 {
@@ -469,7 +485,8 @@ int main()
     bignum_serialization_examples1();
     decimal_precision_examples();
     bignum_access_examples(); 
-    chinese_characters();
+    chinese_char();
+    chinese_uchar8_t();
     std::cout << std::endl;
 }
 

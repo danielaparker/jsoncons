@@ -270,6 +270,9 @@ namespace extension_traits {
     template <class T>
     struct is_character<T, 
            typename std::enable_if<std::is_same<T,char>::value ||
+#ifdef __cpp_char8_t
+                                   std::is_same<T,char8_t>::value ||
+#endif
                                    std::is_same<T,wchar_t>::value
     >::type> : std::true_type {};
 
@@ -307,6 +310,11 @@ namespace extension_traits {
 
     template<>
     struct is_cstring_impl<char*> : public std::true_type {};
+
+#ifdef __cpp_char8_t
+    template<>
+    struct is_cstring_impl<char8_t*> : public std::true_type {};
+#endif
 
     template<>
     struct is_cstring_impl<wchar_t*> : public std::true_type {};
