@@ -1,3 +1,16 @@
+0.171.1
+-------
+
+Defect fixes:
+
+- Fixed issue danielaparker/jsoncons/#441 concerning misaligned allocation for string data. 
+
+- Fixed issue danielaparker/jsoncons/#436 concerning overflow warning. 
+
+Enhancements:
+
+- Improved error messages (with field names) for invalid type mappings when using the `json_type_traits` convenience macros.
+
 0.171.0
 -------
 
