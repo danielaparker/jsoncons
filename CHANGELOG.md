@@ -1,4 +1,4 @@
-0.171.1
+0.171.1 (master)
 -------
 
 Defect fixes:
@@ -10,6 +10,8 @@ Defect fixes:
 Enhancements:
 
 - Improved error messages (with field names) for invalid type mappings when using the `json_type_traits` convenience macros.
+
+- Support uchar8_t and u8string for C++ 20
 
 0.171.0
 -------
