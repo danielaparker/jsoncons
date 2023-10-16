@@ -180,9 +180,9 @@ namespace jsoncons {
         }
 
         template <class T>
-        void value(T&& value)
+        void value(T&& newValue)
         {
-            value_ = std::forward<T>(value);
+            value_ = std::forward<T>(newValue);
         }
 
         void swap(key_value& member) noexcept
