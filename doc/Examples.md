@@ -514,12 +514,27 @@ j.dump(s, indenting::indent); // pretty print
 
 #### Encode Chinese characters
 
+For all versions of jsoncons:
+
 ```
 jsoncons::json j;
 
 std::string s = (const char*)u8"你好";
 j.try_emplace("hello", s);
 assert(j["hello"].as<std::string>() == s);
+
+std::string json_string;
+j.dump(json_string);
+```
+
+Since 0.171.0, and assuming C++ 20:
+
+```
+jsoncons::json j;
+
+std::u8string s = u8"你好";
+j.try_emplace("hello", s);
+assert(j["hello"].as<std::u8string>() == s);
 
 std::string json_string;
 j.dump(json_string);
