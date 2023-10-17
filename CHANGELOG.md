@@ -7,11 +7,17 @@ Defect fixes:
 
 - Fixed issue danielaparker/jsoncons/#436 concerning overflow warning. 
 
+- Changed internal variable names to avoid shadow warnings
+
 Enhancements:
 
-- Improved error messages (with field names) for invalid type mappings when using the `json_type_traits` convenience macros.
+- Improved error messages (with field names) for invalid type mappings when using the
+`json_type_traits` convenience macros.
 
 - Support char8_t and u8string for C++ 20
+
+- Added compare for bigint/bigdec/bigfloat as double or exact text match. This makes 
+JSON Query work if you use options.lossless_number(true); for parsing JSON.
 
 0.171.0
 -------
