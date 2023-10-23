@@ -2620,7 +2620,6 @@ namespace detail {
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
-        using const_reference = typename jsonpath_traits_type::const_reference;
         using evaluator_type = typename jsonpath_traits_type::evaluator_type;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
 
@@ -2662,8 +2661,6 @@ namespace detail {
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
         using evaluator_type = typename jsonpath_traits_type::evaluator_type;
-        using path_expression_type = typename jsonpath_traits_type::path_expression_type;
-        using json_location_type = typename jsonpath_traits_type::json_location_type;
 
         auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
         evaluator_type evaluator;
