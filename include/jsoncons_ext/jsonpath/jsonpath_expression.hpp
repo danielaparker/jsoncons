@@ -2489,6 +2489,7 @@ namespace detail {
         using string_view_type = typename Json::string_view_type;
         using value_type = Json;
         using reference = JsonReference;
+        using const_reference = const Json&;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
         using allocator_type = typename Json::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, JsonReference>;
@@ -2513,6 +2514,7 @@ namespace detail {
         using string_view_type = typename jsonpath_traits_type::string_view_type;
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
+        using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using json_location_type = typename jsonpath_traits_type::json_location_type;
     private:
@@ -2537,7 +2539,7 @@ namespace detail {
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
-        evaluate(reference instance, BinaryCallback callback, result_options options = result_options()) const
+        evaluate(const_reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
             auto f = [&callback](const json_location_type& path, reference val)
@@ -2547,7 +2549,7 @@ namespace detail {
             expr_.evaluate(resources, instance, resources.root_path_node(), instance, f, options);
         }
 
-        Json evaluate(reference instance, result_options options = result_options()) const
+        Json evaluate(const_reference instance, result_options options = result_options()) const
         {
             if ((options & result_options::path) == result_options::path)
             {
@@ -2606,6 +2608,7 @@ namespace detail {
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
+        using const_reference = typename jsonpath_traits_type::const_reference;
         using evaluator_type = typename jsonpath_traits_type::evaluator_type;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
 
