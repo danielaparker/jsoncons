@@ -2487,15 +2487,15 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using string_view_type = typename Json::string_view_type;
-        using value_type = Json;
+        using value_type = typename std::remove_volatile<typename std::remove_const<Json>::type>::type;
         using reference = JsonReference;
-        using const_reference = const Json&;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
-        using allocator_type = typename Json::allocator_type;
-        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, JsonReference>;
+        using const_reference = const value_type&;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
+        using allocator_type = typename value_type::allocator_type;
+        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using json_location_node_type = json_location_node<string_type>;
         using json_location_type = json_location<string_type>;
-        using path_expression_type = path_expression<Json,JsonReference>;
+        using path_expression_type = path_expression<value_type,reference>;
         using path_pointer = const json_location_node_type*;
     };
 
