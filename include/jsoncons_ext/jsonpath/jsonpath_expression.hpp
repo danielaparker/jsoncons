@@ -2652,11 +2652,11 @@ namespace detail {
         return jsonpath_expression<Json>(alloc_set, std::move(resources), std::move(expr));
     }
 
-    template <class Json,class JsonReference=const Json&>
+    template <class Json>
     auto make_expression_for_update(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<Json>& funcs = jsoncons::jsonpath::custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, JsonReference>;
+        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
