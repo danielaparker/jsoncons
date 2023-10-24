@@ -111,8 +111,8 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using json_location_type = json_location<string_type>;
-        using json_location_node_type = json_location_node<string_type>;
+        using value_location_type = value_location<string_type>;
+        using jsonpath_node_type = jsonpath_node<string_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
     private:
@@ -2493,10 +2493,10 @@ namespace detail {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
-        using json_location_node_type = json_location_node<string_type>;
-        using json_location_type = json_location<string_type>;
+        using jsonpath_node_type = jsonpath_node<string_type>;
+        using value_location_type = value_location<string_type>;
         using path_expression_type = path_expression<value_type,reference>;
-        using path_pointer = const json_location_node_type*;
+        using path_pointer = const jsonpath_node_type*;
     };
 
     } // namespace detail
@@ -2516,7 +2516,7 @@ namespace detail {
         using reference = typename jsonpath_traits_type::reference;
         using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
-        using json_location_type = typename jsonpath_traits_type::json_location_type;
+        using value_location_type = typename jsonpath_traits_type::value_location_type;
     private:
         allocator_type alloc_;
         std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
@@ -2542,7 +2542,7 @@ namespace detail {
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            auto f = [&callback](const json_location_type& path, reference val)
+            auto f = [&callback](const value_location_type& path, reference val)
             {
                 callback(path.to_string(), val);
             };
@@ -2554,7 +2554,7 @@ namespace detail {
         evaluate_and_update(reference instance, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            auto f = [&callback](const json_location_type& path, reference val)
+            auto f = [&callback](const value_location_type& path, reference val)
             {
                 callback(path.to_string(), val);
             };
@@ -2568,7 +2568,7 @@ namespace detail {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
 
                 Json result(json_array_arg, semantic_tag::none, alloc_);
-                auto callback = [&result](const json_location_type& p, reference)
+                auto callback = [&result](const value_location_type& p, reference)
                 {
                     result.emplace_back(p.to_string());
                 };

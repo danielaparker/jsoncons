@@ -87,6 +87,7 @@ add_executable(unit_tests
                jsonpatch/src/jsonpatch_test_suite.cpp
                jsonpatch/src/jsonpatch_tests.cpp
                jsonpath/src/jsonpath_flatten_tests.cpp
+               jsonpath/src/value_location_tests.cpp
                jsonpath/src/jsonpath_custom_function_tests.cpp
                jsonpath/src/jsonpath_json_query_tests.cpp
                jsonpath/src/jsonpath_make_expression_tests.cpp
