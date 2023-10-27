@@ -58,7 +58,7 @@ TEST_CASE("jsonpath make_expression test")
 
         const json doc = json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression_for_update<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_update_expression<json>("$.books[*]");
 
         auto callback = [&](const std::string& /*path*/, const json& book)
         {
@@ -80,7 +80,7 @@ TEST_CASE("jsonpath make_expression test")
 
         json doc = json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression_for_update<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_update_expression<json>("$.books[*]");
 
         auto callback1 = [&](const std::string& /*path*/, const json& book)
         {

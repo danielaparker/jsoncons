@@ -2653,7 +2653,7 @@ namespace detail {
     }
 
     template <class Json>
-    auto make_expression_for_update(const typename Json::string_view_type& path,
+    auto make_update_expression(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<Json>& funcs = jsoncons::jsonpath::custom_functions<Json>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
@@ -2667,6 +2667,25 @@ namespace detail {
         auto expr = evaluator.compile(*static_resources, path);
 
         return jsoncons::jsonpath::jsonpath_expression<value_type,reference>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
+    }
+
+    template <class Json, class TempAllocator>
+    auto make_update_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
+        const typename Json::string_view_type& path,
+        const jsoncons::jsonpath::custom_functions<Json>& funcs, std::error_code& ec)
+    {
+        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+
+        using value_type = typename jsonpath_traits_type::value_type;
+        using reference = typename jsonpath_traits_type::reference;
+        using evaluator_type = typename jsonpath_traits_type::evaluator_type;
+
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, 
+            alloc_set.get_allocator());
+        evaluator_type evaluator{alloc_set.get_allocator()};
+        auto expr = evaluator.compile(*static_resources, path, ec);
+
+        return jsoncons::jsonpath::jsonpath_expression<value_type,reference>(alloc_set, std::move(static_resources), std::move(expr));
     }
 
 } // namespace jsonpath
