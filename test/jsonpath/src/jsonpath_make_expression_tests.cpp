@@ -51,14 +51,14 @@ TEST_CASE("jsonpath make_expression test")
         ]
     }
     )";
-#if 0
+
     SECTION("test 1")
     {
         int count = 0;
 
         const json doc = json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_update_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_update_expression<const json>("$.books[*]");
 
         auto callback = [&](const jsonpath::json_location<std::string>& /*location*/, const json& book)
         {
@@ -73,7 +73,7 @@ TEST_CASE("jsonpath make_expression test")
         CHECK(count == 1);
         CHECK_FALSE(doc["books"][3].contains("price"));
     }
-#endif
+
     SECTION("test 2")
     {
         int count = 0;

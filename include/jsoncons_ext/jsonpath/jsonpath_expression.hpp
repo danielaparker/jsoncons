@@ -2748,7 +2748,7 @@ namespace detail {
 
     template <class Json>
     auto make_update_expression(const typename Json::string_view_type& path,
-        const jsoncons::jsonpath::custom_functions<Json>& funcs = jsoncons::jsonpath::custom_functions<Json>())
+        const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
 
@@ -2766,7 +2766,7 @@ namespace detail {
     template <class Json, class TempAllocator>
     auto make_update_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
         const typename Json::string_view_type& path,
-        const jsoncons::jsonpath::custom_functions<Json>& funcs, std::error_code& ec)
+        const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
 
