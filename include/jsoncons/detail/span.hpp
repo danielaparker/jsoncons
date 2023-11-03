@@ -31,7 +31,7 @@ namespace detail
     {
     public:
         using element_type = T;
-        using value_type = typename std::remove_volatile<typename std::remove_const<T>::type>::type;
+        using value_type = typename std::remove_const<T>::type;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
         using pointer = T*;
