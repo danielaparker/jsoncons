@@ -2070,7 +2070,7 @@ namespace detail {
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<Json>;
-        using json_location_type = json_location<value_type>;
+        using json_location_type = json_location<Json>;
         using path_pointer = const path_node_type*;
 
         json_location_type path_;
@@ -2131,7 +2131,7 @@ namespace detail {
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<Json>;
-        using json_location_type = json_location<value_type>;
+        using json_location_type = json_location<Json>;
         using path_pointer = const path_node_type*;
     private:
         const path_node_type* last_ptr_;
