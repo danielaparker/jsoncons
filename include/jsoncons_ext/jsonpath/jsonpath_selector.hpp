@@ -114,7 +114,7 @@ namespace detail {
         using reference = JsonReference;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
-        using path_node_type = path_node<string_type>;
+        using path_node_type = path_node<Json>;
 
         Json* val;
 
@@ -135,7 +135,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
         using string_type = typename Json::string_type;
-        using path_node_type = path_node<string_type>;
+        using path_node_type = path_node<Json>;
 
         static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
                                                        const path_node_type& last, 

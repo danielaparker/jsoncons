@@ -4,12 +4,13 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
+#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_node = jsoncons::jsonpath::path_node<std::string>;
-using json_location = jsoncons::jsonpath::json_location<std::string>;
+using path_node = jsoncons::jsonpath::path_node<jsoncons::json>;
+using json_location = jsoncons::jsonpath::json_location<jsoncons::json>;
 
 TEST_CASE("test json_location equals")
 {
@@ -26,7 +27,7 @@ TEST_CASE("test json_location equals")
     json_location path1(component4);
     json_location path2(component14);
 
-    CHECK(path1 == path2);
+    CHECK((path1 == path2));
 }
 
 TEST_CASE("test json_location to_string")

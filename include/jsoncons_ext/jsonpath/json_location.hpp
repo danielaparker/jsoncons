@@ -20,18 +20,18 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    template <class StringT>
+    template <class Json>
     class json_location; 
 
     enum class path_node_kind { root, index, name };
 
-    template <class StringT>
+    template <class Json>
     class path_node 
     {
-        friend class json_location<StringT>;
+        friend class json_location<Json>;
     public:
-        using string_type = StringT;
-        using char_type = typename StringT::value_type;
+        using string_type = typename Json::string_type;
+        using char_type = typename string_type::value_type;
     private:
 
         const path_node* parent_;
@@ -265,13 +265,13 @@ namespace jsonpath {
 
     } // namespace detail
 
-    template <class StringT>
+    template <class Json>
     class json_location
     {
     public:
-        using allocator_type = typename StringT::allocator_type;
-        using string_type = StringT;
-        using path_node_type = path_node<StringT>;
+        using allocator_type = typename Json::allocator_type;
+        using string_type = typename Json::string_type;
+        using path_node_type = path_node<Json>;
     private:
         allocator_type alloc_;
         std::vector<const path_node_type*> nodes_;
@@ -402,7 +402,7 @@ namespace jsonpath {
     };
 
     template <class Json>
-    Json* select(Json& root, const json_location<typename Json::string_type>& path)
+    Json* select(Json& root, const json_location<typename std::remove_cv<Json>::type>& path)
     {
         Json* current = std::addressof(root);
         for (const auto& path_node : path)
