@@ -373,7 +373,7 @@ void json_replace_example3()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto f = [](const std::string& /*path*/, json& price) 
+    auto f = [](const std::string& /*location*/, json& price) 
     {
         price = std::round(price.as<double>() - 1.0);
     };
@@ -388,7 +388,7 @@ void json_replace_example4()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto f = [](const std::string& /*path*/, json& book) 
+    auto f = [](const std::string& /*location*/, json& book) 
     {
         if (book.at("category") == "memoir" && !book.contains("price"))
         {
@@ -701,7 +701,7 @@ void search_for_and_replace_a_value()
     jsonpath::json_replace(j,"$.books[?(@.isbn == '0553213113')].price",10.0);
 
     // Increase the price of "Sayings of the Century" by $1
-    auto f = [](const std::string& /*path*/, json& value) 
+    auto f = [](const std::string& /*location*/, json& value) 
     {
         value = value.as<double>() + 1.0;
     };

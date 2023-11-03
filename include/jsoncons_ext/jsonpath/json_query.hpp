@@ -62,7 +62,7 @@ namespace jsonpath {
         json_replace(Json& instance, const typename Json::string_view_type& path, T&& new_value,
                      const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
@@ -88,7 +88,7 @@ namespace jsonpath {
             Json& instance, const typename Json::string_view_type& path, T&& new_value,
             const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
@@ -113,7 +113,7 @@ namespace jsonpath {
     json_replace(Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
                  const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
@@ -140,7 +140,7 @@ namespace jsonpath {
         Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
         const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
@@ -166,7 +166,7 @@ namespace jsonpath {
     typename std::enable_if<extension_traits::is_unary_function_object<UnaryCallback,Json>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , UnaryCallback callback)
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::detail::jsonpath_traits<Json, Json&>;
+        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json, Json&>;
 
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;

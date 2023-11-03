@@ -192,7 +192,7 @@ int main()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto f = [](const std::string& /*path*/, json& price) 
+    auto f = [](const std::string& /*location*/, json& price) 
     {
         price = std::round(price.as<double>() - 1.0);
     };
@@ -249,7 +249,7 @@ int main()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto f = [](const std::string& /*path*/, json& book) 
+    auto f = [](const std::string& /*location*/, json& book) 
     {
         if (book.at("category") == "memoir" && !book.contains("price"))
         {

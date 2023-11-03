@@ -3784,7 +3784,7 @@ int main()
     jsonpath::json_replace(j,"$.books[?(@.isbn == '0553213113')].price",10.0);
 
     // Increase the price of "Sayings of the Century" by $1
-    auto f = [](const std::string& /*path*/, json& value) 
+    auto f = [](const std::string& /*location*/, json& value) 
     {
         value = value.as<double>() + 1.0;
     };
