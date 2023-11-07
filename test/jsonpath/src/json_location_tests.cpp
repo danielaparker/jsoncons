@@ -9,7 +9,7 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_node = jsoncons::jsonpath::path_node<jsoncons::json>;
+using path_node = jsoncons::jsonpath::path_node<char>;
 using json_location = jsoncons::jsonpath::json_location<jsoncons::json>;
 
 TEST_CASE("test json_location equals")

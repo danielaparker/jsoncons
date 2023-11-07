@@ -25,13 +25,14 @@ namespace jsonpath {
 
     enum class path_node_kind { root, index, name };
 
-    template <class Json>
+    template <class CharT>
     class path_node 
     {
-        friend class json_location<Json>;
+        template<class Json> friend class json_location;
+        //friend class json_location<Json>;
     public:
-        using string_view_type = typename Json::string_view_type;
-        using char_type = typename string_view_type::value_type;
+        using string_view_type = jsoncons::basic_string_view<CharT>;
+        using char_type = CharT;
     private:
 
         char_type root_;
@@ -311,7 +312,7 @@ namespace jsonpath {
     public:
         using allocator_type = typename Json::allocator_type;
         using string_type = typename Json::string_type;
-        using path_node_type = path_node<Json>;
+        using path_node_type = path_node<typename Json::char_type>;
     private:
         allocator_type alloc_;
         std::vector<const path_node_type*> nodes_;
