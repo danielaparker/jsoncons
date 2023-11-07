@@ -68,7 +68,7 @@ TEST_CASE("jsonpath make_expression test")
             }
         };
 
-        expr.evaluate(doc, callback);
+        expr.select_nodes(doc, callback);
 
         CHECK(count == 1);
         CHECK_FALSE(doc["books"][3].contains("price"));
@@ -103,7 +103,7 @@ TEST_CASE("jsonpath make_expression test")
         CHECK(count == 1);
 
         CHECK_FALSE(doc["books"][3].contains("price"));
-        expr.evaluate_and_update(doc, callback2);
+        expr.update_nodes(doc, callback2);
         CHECK(doc["books"][3].contains("price"));
         CHECK(doc["books"][3].at("price") == 140);
     }
