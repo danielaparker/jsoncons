@@ -98,7 +98,7 @@ TEST_CASE("jsonpath make_expression test")
             }
         };
 
-        expr.evaluate(doc, callback1);
+        expr.select_nodes(doc, callback1);
 
         CHECK(count == 1);
 

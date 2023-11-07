@@ -30,30 +30,70 @@ namespace jsonpath {
     {
         friend class json_location<Json>;
     public:
-        using string_type = typename Json::string_type;
-        using char_type = typename string_type::value_type;
+        using string_view_type = typename Json::string_view_type;
+        using char_type = typename string_view_type::value_type;
     private:
 
+        char_type root_;
         const path_node* parent_;
         path_node_kind node_kind_;
-        jsoncons::optional<string_type> name_;
+        string_view_type name_;
         std::size_t index_;
+
     public:
-        path_node(string_type&& name)
-            : parent_(nullptr), 
+        path_node(char_type root)
+            : root_{root}, parent_(nullptr), 
               node_kind_(path_node_kind::root), 
-              name_(std::move(name)), index_(0)
+              name_(&root_,1), index_(0)
         {
         }
 
-        path_node(const path_node* parent, const string_type& name)
-            : parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
+        path_node(const path_node* parent, const string_view_type& name)
+            : root_(0), parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
         {
         }
 
         path_node(const path_node* parent, std::size_t index)
-            : parent_(parent), node_kind_(path_node_kind::index), index_(index)
+            : root_(0), parent_(parent), node_kind_(path_node_kind::index), index_(index)
         {
+        }
+
+        path_node(const path_node& other)
+            : root_(other.root_),
+              parent_(other.parent_),
+              node_kind_(other.node_kind_),
+              name_(other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_),
+              index_(other.index_)
+        {
+        }
+
+        path_node(path_node&& other)
+            : root_(other.root_),
+              parent_(other.parent_),
+              node_kind_(other.node_kind_),
+              name_(other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_),
+              index_(other.index_)
+        {
+        }
+
+        path_node& operator=(const path_node& other)
+        {
+            root_ = other.root_;
+            parent_ = other.parent_;
+            node_kind_ = other.node_kind_;
+            index_ = other.index_;
+            name_ = other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_;
+            return *this;
+        }
+
+        path_node& operator=(path_node&& other)
+        {
+            root_ = other.root_;
+            parent_ = other.parent_;
+            node_kind_ = other.node_kind_;
+            index_ = other.index_;
+            name_ = other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_;
+            return *this;
         }
 
         const path_node* parent() const { return parent_;}
@@ -63,9 +103,9 @@ namespace jsonpath {
             return node_kind_;
         }
 
-        const string_type& name() const
+        const string_view_type& name() const
         {
-            return *name_;
+            return name_;
         }
 
         std::size_t index() const 
@@ -85,7 +125,7 @@ namespace jsonpath {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(*name_);
+            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_view_type>{}(name_);
 
             return h;
         }
@@ -103,7 +143,7 @@ namespace jsonpath {
                 {
                     case path_node_kind::root:
                     case path_node_kind::name:
-                        diff = (*name_).compare(*(other.name_));
+                        diff = name_.compare(other.name_);
                         break;
                     case path_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;

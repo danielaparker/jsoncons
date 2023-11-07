@@ -138,9 +138,9 @@ namespace detail {
         using path_node_type = path_node<Json>;
 
         static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                                       const path_node_type& last, 
-                                                       std::size_t index, 
-                                                       result_options options) 
+            const path_node_type& last, 
+            std::size_t index, 
+            result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
@@ -154,9 +154,9 @@ namespace detail {
         }
 
         static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                                       const path_node_type& last, 
-                                                       const string_type& identifier, 
-                                                       result_options options) 
+            const path_node_type& last, 
+            const string_view_type& identifier, 
+            result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
@@ -1101,7 +1101,7 @@ namespace detail {
                 {
                     auto sv = j.as_string_view();
                     this->tail_select(resources, root, 
-                                      path_generator_type::generate(resources, last, string_type(sv.begin(),sv.end(), resources.get_allocator()), options),
+                                      path_generator_type::generate(resources, last, sv, options),
                                       current.at(j.as_string_view()), receiver, options);
                 }
             }

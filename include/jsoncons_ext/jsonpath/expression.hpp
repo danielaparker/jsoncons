@@ -2271,13 +2271,13 @@ namespace detail {
 
         const path_node_type& root_path_node() const
         {
-            static path_node_type root(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "$"), alloc_});
+            static path_node_type root('$');
             return root;
         }
 
         const path_node_type& current_path_node() const
         {
-            static path_node_type root(string_type{JSONCONS_CSTRING_CONSTANT(char_type, "@"), alloc_});
+            static path_node_type root('@');
             return root;
         }
 
