@@ -20,7 +20,7 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    template <class Json>
+    template <class CharT,class Allocator>
     class basic_json_location; 
 
     enum class path_node_kind { root, index, name };
@@ -28,7 +28,7 @@ namespace jsonpath {
     template <class CharT>
     class path_node 
     {
-        template<class Json> friend class basic_json_location;
+        template <class Ch,class Allocator> friend class basic_json_location;
     public:
         using string_view_type = jsoncons::basic_string_view<CharT>;
         using char_type = CharT;
@@ -316,13 +316,15 @@ namespace jsonpath {
 
     } // namespace detail
 
-    template <class Json>
+    template <class CharT, class Allocator = std::allocator<char>>
     class basic_json_location
     {
     public:
-        using allocator_type = typename Json::allocator_type;
-        using string_type = typename Json::string_type;
-        using path_node_type = path_node<typename Json::char_type>;
+        using char_type = CharT;
+        using allocator_type = Allocator;
+        using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
+        using path_node_type = path_node<char_type>;
     private:
         allocator_type alloc_;
         std::vector<const path_node_type*> nodes_;
@@ -454,7 +456,7 @@ namespace jsonpath {
     };
 
     template <class Json>
-    Json* select(Json& root, const basic_json_location<typename std::remove_cv<Json>::type>& path)
+    Json* select(Json& root, const basic_json_location<typename Json::char_type,typename Json::allocator_type>& path)
     {
         Json* current = std::addressof(root);
         for (const auto& path_node : path)
@@ -484,8 +486,8 @@ namespace jsonpath {
         return current;
     }
 
-    using json_location = basic_json_location<json>;
-    using wjson_location = basic_json_location<wjson>;
+    using json_location = basic_json_location<char>;
+    using wjson_location = basic_json_location<wchar_t>;
 
 } // namespace jsonpath
 } // namespace jsoncons

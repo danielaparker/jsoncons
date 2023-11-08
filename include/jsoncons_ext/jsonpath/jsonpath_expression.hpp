@@ -111,7 +111,7 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using json_location_type = basic_json_location<Json>;
+        using json_location_type = basic_json_location<char_type,allocator_type>;
         using path_node_type = path_node<typename Json::char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
@@ -2497,7 +2497,7 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<Json>;
+        using json_location_type = basic_json_location<typename Json::char_type,typename Json::allocator_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
@@ -2516,7 +2516,7 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<Json>;
+        using json_location_type = basic_json_location<typename Json::char_type,typename Json::allocator_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
