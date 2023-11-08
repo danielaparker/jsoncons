@@ -108,6 +108,17 @@ namespace jsonpath {
             return name_;
         }
 
+        std::size_t size() const
+        {
+            std::size_t len = 1;
+            
+            for (auto p = parent_; p != nullptr; p = p->parent_)
+            {
+                ++len;
+            }
+            return len;
+        }
+
         std::size_t index() const 
         {
             return index_;
@@ -322,15 +333,16 @@ namespace jsonpath {
         json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
         {
+            std::size_t len = node.size();
+            nodes_.resize(len);
+
             const path_node_type* p = std::addressof(node);
             do
             {
-                nodes_.push_back(p);
+                nodes_[--len] = p;
                 p = p->parent_;
             }
             while (p != nullptr);
-
-            std::reverse(nodes_.begin(), nodes_.end());
         }
 
         iterator begin()

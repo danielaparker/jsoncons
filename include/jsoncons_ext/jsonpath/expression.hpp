@@ -2196,16 +2196,16 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class path_stem_value_receiver : public node_receiver<Json,JsonReference>
+    class path_component_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
         using reference = JsonReference;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using path_node_type = path_node<typename Json::char_type>;
-        using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
+        using path_component_value_pair_type = path_component_value_pair<Json,JsonReference>;
 
-        std::vector<path_stem_value_pair_type> nodes;
+        std::vector<path_component_value_pair_type> nodes;
 
         void add(const path_node_type& tail_nodes, 
                  reference value) override
@@ -2223,7 +2223,7 @@ namespace detail {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<typename Json::char_type>;
-        using path_stem_value_pair_type = path_component_value_pair<Json,JsonReference>;
+        using path_component_value_pair_type = path_component_value_pair<Json,JsonReference>;
 
         allocator_type alloc_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
