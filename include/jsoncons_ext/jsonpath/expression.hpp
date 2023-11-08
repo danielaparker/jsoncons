@@ -2070,7 +2070,7 @@ namespace detail {
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
         using path_pointer = const path_node_type*;
 
         json_location_type path_;
@@ -2131,7 +2131,7 @@ namespace detail {
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
         using path_pointer = const path_node_type*;
     private:
         const path_node_type* last_ptr_;
@@ -2177,7 +2177,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
 
         allocator_type alloc_;
@@ -2320,7 +2320,7 @@ namespace detail {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
         using node_receiver_type = node_receiver<Json,JsonReference>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
@@ -3005,7 +3005,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
     private:
         allocator_type alloc_;
         Callback& callback_;
@@ -3041,7 +3041,7 @@ namespace detail {
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
         using path_node_type = path_node<typename Json::char_type>;
-        using json_location_type = json_location<Json>;
+        using json_location_type = basic_json_location<Json>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
         allocator_type alloc_;

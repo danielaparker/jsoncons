@@ -21,14 +21,14 @@ namespace jsoncons {
 namespace jsonpath {
 
     template <class Json>
-    class json_location; 
+    class basic_json_location; 
 
     enum class path_node_kind { root, index, name };
 
     template <class CharT>
     class path_node 
     {
-        template<class Json> friend class json_location;
+        template<class Json> friend class basic_json_location;
     public:
         using string_view_type = jsoncons::basic_string_view<CharT>;
         using char_type = CharT;
@@ -317,7 +317,7 @@ namespace jsonpath {
     } // namespace detail
 
     template <class Json>
-    class json_location
+    class basic_json_location
     {
     public:
         using allocator_type = typename Json::allocator_type;
@@ -330,7 +330,7 @@ namespace jsonpath {
         using iterator = typename detail::json_location_iterator<typename std::vector<const path_node_type*>::iterator>;
         using const_iterator = typename detail::json_location_iterator<typename std::vector<const path_node_type*>::const_iterator>;
 
-        json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
+        basic_json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
         {
             std::size_t len = node.size();
@@ -399,7 +399,7 @@ namespace jsonpath {
             return buffer;
         }
 
-        int compare(const json_location& other) const
+        int compare(const basic_json_location& other) const
         {
             if (this == &other)
             {
@@ -437,24 +437,24 @@ namespace jsonpath {
             return hash;
         }
 
-        friend bool operator==(const json_location& lhs, const json_location& rhs) 
+        friend bool operator==(const basic_json_location& lhs, const basic_json_location& rhs) 
         {
             return lhs.compare(rhs) == 0;
         }
 
-        friend bool operator!=(const json_location& lhs, const json_location& rhs)
+        friend bool operator!=(const basic_json_location& lhs, const basic_json_location& rhs)
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator<(const json_location& lhs, const json_location& rhs) 
+        friend bool operator<(const basic_json_location& lhs, const basic_json_location& rhs) 
         {
             return lhs.compare(rhs) < 0;
         }
     };
 
     template <class Json>
-    Json* select(Json& root, const json_location<typename std::remove_cv<Json>::type>& path)
+    Json* select(Json& root, const basic_json_location<typename std::remove_cv<Json>::type>& path)
     {
         Json* current = std::addressof(root);
         for (const auto& path_node : path)
@@ -483,6 +483,9 @@ namespace jsonpath {
         }
         return current;
     }
+
+    using json_location = basic_json_location<json>;
+    using wjson_location = basic_json_location<wjson>;
 
 } // namespace jsonpath
 } // namespace jsoncons
