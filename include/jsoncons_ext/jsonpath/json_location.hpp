@@ -29,7 +29,6 @@ namespace jsonpath {
     class path_node 
     {
         template<class Json> friend class json_location;
-        //friend class json_location<Json>;
     public:
         using string_view_type = jsoncons::basic_string_view<CharT>;
         using char_type = CharT;
@@ -368,7 +367,7 @@ namespace jsonpath {
                 switch (node->node_kind())
                 {
                     case path_node_kind::root:
-                        buffer.append(node->name());
+                        buffer.append(node->name().data(), node->name().size());
                         break;
                     case path_node_kind::name:
                         buffer.push_back('[');
