@@ -2608,7 +2608,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference = const Json&, class TempAllocator=std::allocator<char>>
-    class update_expression
+    class jsonpath_expr
     {
     public:
         using jsonpath_traits_type = jsoncons::jsonpath::legacy_jsonpath_traits<Json, JsonReference>;
@@ -2628,7 +2628,7 @@ namespace detail {
         std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
         path_expression_type expr_;
     public:
-        update_expression(const allocator_set<allocator_type,TempAllocator>& alloc_set,
+        jsonpath_expr(const allocator_set<allocator_type,TempAllocator>& alloc_set,
             std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>>&& resources,
             path_expression_type&& expr)
             : alloc_(alloc_set.get_allocator()),
@@ -2637,11 +2637,11 @@ namespace detail {
         {
         }
 
-        update_expression(const update_expression&) = delete;
-        update_expression(update_expression&&) = default;
+        jsonpath_expr(const jsonpath_expr&) = delete;
+        jsonpath_expr(jsonpath_expr&&) = default;
 
-        update_expression& operator=(const update_expression&) = delete;
-        update_expression& operator=(update_expression&&) = default;
+        jsonpath_expr& operator=(const jsonpath_expr&) = delete;
+        jsonpath_expr& operator=(jsonpath_expr&&) = default;
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const json_location_type&,const_reference>::value,void>::type
@@ -2751,7 +2751,7 @@ namespace detail {
     }
 
     template <class Json>
-    auto make_update_expression(const typename Json::string_view_type& path,
+    auto make_jsonpath_expr(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
@@ -2764,11 +2764,11 @@ namespace detail {
         evaluator_type evaluator;
         auto expr = evaluator.compile(*static_resources, path);
 
-        return jsoncons::jsonpath::update_expression<value_type,reference>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
+        return jsoncons::jsonpath::jsonpath_expr<value_type,reference>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
     }
 
     template <class Json, class TempAllocator>
-    auto make_update_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
+    auto make_jsonpath_expr(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
         const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {
@@ -2783,7 +2783,7 @@ namespace detail {
         evaluator_type evaluator{alloc_set.get_allocator()};
         auto expr = evaluator.compile(*static_resources, path, ec);
 
-        return jsoncons::jsonpath::update_expression<value_type,reference>(alloc_set, std::move(static_resources), std::move(expr));
+        return jsoncons::jsonpath::jsonpath_expr<value_type,reference>(alloc_set, std::move(static_resources), std::move(expr));
     }
 
 } // namespace jsonpath
