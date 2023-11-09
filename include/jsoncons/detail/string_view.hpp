@@ -531,6 +531,9 @@ namespace detail {
         return rhs.compare(lhs) < 0;
     }
 
+    using string_view = basic_string_view<char>;
+    using wstring_view = basic_string_view<wchar_t>;
+
 } // namespace detail
 } // namespace jsoncons
 
@@ -541,7 +544,7 @@ namespace std {
         std::size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept
         {
             const int p = 53;
-            const int m = 1e9 + 9;
+            const int m = 1000000009;
             std::size_t hash_value = 0;
             std::size_t p_pow = 1;
             for (char c : s) {

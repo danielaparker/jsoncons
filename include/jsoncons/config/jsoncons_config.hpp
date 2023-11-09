@@ -16,8 +16,8 @@
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
 using jsoncons::detail::basic_string_view;
-using string_view = basic_string_view<char, std::char_traits<char>>;
-using wstring_view = basic_string_view<wchar_t, std::char_traits<wchar_t>>;
+using string_view = jsoncons::detail::string_view;
+using wstring_view = jsoncons::detail::wstring_view;
 }
 #else 
 #include <string_view>
