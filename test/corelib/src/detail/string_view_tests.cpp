@@ -14,8 +14,8 @@ TEST_CASE("string_view tests")
         std::string key1{"Foo"};
         std::string key2{"Bar"};
 
-        map.try_emplace(key1, 1);
-        map.try_emplace(key2, 2);
+        map.emplace(key1, 1);
+        map.emplace(key2, 2);
 
         CHECK(map.find(key1) != map.end());
         CHECK(map[key1] == 1);
