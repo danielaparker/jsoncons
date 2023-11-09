@@ -547,7 +547,7 @@ namespace std {
             const int m = 1000000009;
             size_t hash_value = 0;
             size_t p_pow = 1;
-            for (char c : s) {
+            for (CharT c : s) {
                 hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
                 p_pow = (p_pow * p) % m;
             }
