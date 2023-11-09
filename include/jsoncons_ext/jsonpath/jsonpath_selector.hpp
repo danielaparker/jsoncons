@@ -587,7 +587,7 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    this->tail_select(resources, root, path.last(), *ptr, receiver, options);        
+                    this->tail_select(resources, root, *ancestor, *ptr, receiver, options);
                 }
             }
         }
@@ -613,7 +613,7 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    return this->evaluate_tail(resources, root, path.last(), *ptr, options, ec);        
+                    return this->evaluate_tail(resources, root, /*path.last()*/ *ancestor, *ptr, options, ec);
                 }
                 else
                 {
