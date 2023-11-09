@@ -249,23 +249,24 @@ namespace jsonpath {
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
         using path_node_type = path_node<char_type>;
+        using path_element_type = basic_path_element<CharT>;
+        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
     private:
         allocator_type alloc_;
-        std::vector<basic_path_element<CharT>> elements_;
+        std::vector<path_element_type> elements_;
     public:
-        using iterator = typename std::vector<basic_path_element<CharT>>::iterator;
-        using const_iterator = typename std::vector<basic_path_element<CharT>>::const_iterator;
+        using iterator = typename std::vector<path_element_type>::iterator;
+        using const_iterator = typename std::vector<path_element_type>::const_iterator;
 
         basic_json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
-            : alloc_(alloc)
+            : alloc_(alloc), elements_(node.size(), path_element_type{}, alloc)
         {
             std::size_t len = node.size();
-            elements_.resize(len);
 
             const path_node_type* p = std::addressof(node);
             do
             {
-                elements_[--len] = basic_path_element<CharT>(p->node_kind(), p->name(), p->index());
+                elements_[--len] = path_element_type(p->node_kind(), p->name(), p->index());
                 p = p->parent_;
             }
             while (p != nullptr);
