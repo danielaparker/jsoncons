@@ -240,155 +240,6 @@ namespace jsonpath {
         }
     };
 
-    namespace detail {
-
-        template <class Iterator>
-        class json_location_iterator
-        { 
-            Iterator it_; 
-
-        public:
-            using iterator_category = std::random_access_iterator_tag;
-
-            using value_type = typename std::remove_pointer<typename std::iterator_traits<Iterator>::value_type>::type;
-            using difference_type = typename std::iterator_traits<Iterator>::difference_type;
-            using pointer = const value_type*;
-            using reference = const value_type&;
-
-            json_location_iterator() : it_()
-            { 
-            }
-
-            explicit json_location_iterator(Iterator ptr) : it_(ptr)
-            {
-            }
-
-            json_location_iterator(const json_location_iterator&) = default;
-            json_location_iterator(json_location_iterator&&) = default;
-            json_location_iterator& operator=(const json_location_iterator&) = default;
-            json_location_iterator& operator=(json_location_iterator&&) = default;
-
-            template <class Iter,
-                      class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
-            json_location_iterator(const json_location_iterator<Iter>& other)
-                : it_(other.it_)
-            {
-            }
-
-            operator Iterator() const
-            { 
-                return it_; 
-            }
-
-            reference operator*() const 
-            {
-                return *(*it_);
-            }
-
-            pointer operator->() const 
-            {
-                return (*it_);
-            }
-
-            json_location_iterator& operator++() 
-            {
-                ++it_;
-                return *this;
-            }
-
-            json_location_iterator operator++(int) 
-            {
-                json_location_iterator temp = *this;
-                ++*this;
-                return temp;
-            }
-
-            json_location_iterator& operator--() 
-            {
-                --it_;
-                return *this;
-            }
-
-            json_location_iterator operator--(int) 
-            {
-                json_location_iterator temp = *this;
-                --*this;
-                return temp;
-            }
-
-            json_location_iterator& operator+=(const difference_type offset) 
-            {
-                it_ += offset;
-                return *this;
-            }
-
-            json_location_iterator operator+(const difference_type offset) const 
-            {
-                json_location_iterator temp = *this;
-                return temp += offset;
-            }
-
-            json_location_iterator& operator-=(const difference_type offset) 
-            {
-                return *this += -offset;
-            }
-
-            json_location_iterator operator-(const difference_type offset) const 
-            {
-                json_location_iterator temp = *this;
-                return temp -= offset;
-            }
-
-            difference_type operator-(const json_location_iterator& rhs) const noexcept
-            {
-                return it_ - rhs.it_;
-            }
-
-            reference operator[](const difference_type offset) const noexcept
-            {
-                return *(*(*this + offset));
-            }
-
-            bool operator==(const json_location_iterator& rhs) const noexcept
-            {
-                return it_ == rhs.it_;
-            }
-
-            bool operator!=(const json_location_iterator& rhs) const noexcept
-            {
-                return !(*this == rhs);
-            }
-
-            bool operator<(const json_location_iterator& rhs) const noexcept
-            {
-                return it_ < rhs.it_;
-            }
-
-            bool operator>(const json_location_iterator& rhs) const noexcept
-            {
-                return rhs < *this;
-            }
-
-            bool operator<=(const json_location_iterator& rhs) const noexcept
-            {
-                return !(rhs < *this);
-            }
-
-            bool operator>=(const json_location_iterator& rhs) const noexcept
-            {
-                return !(*this < rhs);
-            }
-
-            inline 
-            friend json_location_iterator<Iterator> operator+(
-                difference_type offset, json_location_iterator<Iterator> next) 
-            {
-                return next += offset;
-            }
-        };
-
-    } // namespace detail
-
     template <class CharT, class Allocator = std::allocator<char>>
     class basic_json_location
     {
@@ -400,7 +251,7 @@ namespace jsonpath {
         using path_node_type = path_node<char_type>;
     private:
         allocator_type alloc_;
-        std::vector<basic_path_element<CharT>> nodes_;
+        std::vector<basic_path_element<CharT>> elements_;
     public:
         using iterator = typename std::vector<basic_path_element<CharT>>::iterator;
         using const_iterator = typename std::vector<basic_path_element<CharT>>::const_iterator;
@@ -409,12 +260,12 @@ namespace jsonpath {
             : alloc_(alloc)
         {
             std::size_t len = node.size();
-            nodes_.resize(len);
+            elements_.resize(len);
 
             const path_node_type* p = std::addressof(node);
             do
             {
-                nodes_[--len] = basic_path_element<CharT>(p->node_kind(), p->name(), p->index());
+                elements_[--len] = basic_path_element<CharT>(p->node_kind(), p->name(), p->index());
                 p = p->parent_;
             }
             while (p != nullptr);
@@ -422,29 +273,34 @@ namespace jsonpath {
 
         iterator begin()
         {
-            return nodes_.begin();
+            return elements_.begin();
         }
 
         iterator end()
         {
-            return nodes_.end();
+            return elements_.end();
         }
 
         const_iterator begin() const
         {
-            return nodes_.begin();
+            return elements_.begin();
         }
 
         const_iterator end() const
         {
-            return nodes_.end();
+            return elements_.end();
+        }
+
+        const basic_path_element<char_type>& base_element() const
+        {
+            return elements_.back();
         }
 
         string_type to_string() const
         {
             string_type buffer(alloc_);
 
-            for (const auto& node : nodes_)
+            for (const auto& node : elements_)
             {
                 switch (node.node_kind())
                 {
@@ -476,9 +332,9 @@ namespace jsonpath {
                return 0;
             }
 
-            auto it1 = nodes_.begin();
-            auto it2 = other.nodes_.begin();
-            while (it1 != nodes_.end() && it2 != other.nodes_.end())
+            auto it1 = elements_.begin();
+            auto it2 = other.elements_.begin();
+            while (it1 != elements_.end() && it2 != other.elements_.end())
             {
                 int diff = it1->compare_node(*it2);
                 if (diff != 0)
@@ -488,17 +344,17 @@ namespace jsonpath {
                 ++it1;
                 ++it2;
             }
-            return (nodes_.size() < other.nodes_.size()) ? -1 : (nodes_.size() == other.nodes_.size()) ? 0 : 1;
+            return (elements_.size() < other.elements_.size()) ? -1 : (elements_.size() == other.elements_.size()) ? 0 : 1;
         }
 
         std::size_t hash() const
         {
 
-            auto it = nodes_.begin();
+            auto it = elements_.begin();
             std::size_t hash = (*it).hash();
             ++it;
 
-            while (it != nodes_.end())
+            while (it != elements_.end())
             {
                 hash += 17*(*it)->node_hash();
                 ++it;
