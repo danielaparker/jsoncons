@@ -259,7 +259,7 @@ namespace jsonpath {
         using const_iterator = typename std::vector<path_element_type>::const_iterator;
 
         basic_json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), elements_(node.size(), path_element_type{}, alloc)
+            : alloc_(alloc), elements_(node.size(), path_element_type{})
         {
             std::size_t len = node.size();
 
