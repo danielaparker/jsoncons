@@ -26,7 +26,7 @@ namespace jsonpath {
     enum class path_node_kind { root, index, name };
 
     template <class CharT>
-    class path_node 
+    class basic_path_node 
     {
         template <class Ch,class Allocator> friend class basic_json_location;
     public:
@@ -35,30 +35,30 @@ namespace jsonpath {
     private:
 
         char_type root_;
-        const path_node* parent_;
+        const basic_path_node* parent_;
         path_node_kind node_kind_;
         string_view_type name_;
         std::size_t index_;
 
     public:
-        path_node(char_type root)
+        basic_path_node(char_type root)
             : root_{root}, parent_(nullptr), 
               node_kind_(path_node_kind::root), 
               name_(&root_,1), index_(0)
         {
         }
 
-        path_node(const path_node* parent, const string_view_type& name)
+        basic_path_node(const basic_path_node* parent, const string_view_type& name)
             : root_(0), parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
         {
         }
 
-        path_node(const path_node* parent, std::size_t index)
+        basic_path_node(const basic_path_node* parent, std::size_t index)
             : root_(0), parent_(parent), node_kind_(path_node_kind::index), index_(index)
         {
         }
 
-        path_node(const path_node& other)
+        basic_path_node(const basic_path_node& other)
             : root_(other.root_),
               parent_(other.parent_),
               node_kind_(other.node_kind_),
@@ -67,7 +67,7 @@ namespace jsonpath {
         {
         }
 
-        path_node(path_node&& other)
+        basic_path_node(basic_path_node&& other)
             : root_(other.root_),
               parent_(other.parent_),
               node_kind_(other.node_kind_),
@@ -76,7 +76,7 @@ namespace jsonpath {
         {
         }
 
-        path_node& operator=(const path_node& other)
+        basic_path_node& operator=(const basic_path_node& other)
         {
             root_ = other.root_;
             parent_ = other.parent_;
@@ -86,7 +86,7 @@ namespace jsonpath {
             return *this;
         }
 
-        path_node& operator=(path_node&& other)
+        basic_path_node& operator=(basic_path_node&& other)
         {
             root_ = other.root_;
             parent_ = other.parent_;
@@ -96,7 +96,7 @@ namespace jsonpath {
             return *this;
         }
 
-        const path_node* parent() const { return parent_;}
+        const basic_path_node* parent() const { return parent_;}
 
         path_node_kind node_kind() const
         {
@@ -124,7 +124,7 @@ namespace jsonpath {
             return index_;
         }
 
-        void swap(path_node& node)
+        void swap(basic_path_node& node)
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
@@ -141,7 +141,7 @@ namespace jsonpath {
             return h;
         }
 
-        int compare_node(const path_node& other) const
+        int compare_node(const basic_path_node& other) const
         {
             int diff = 0;
             if (node_kind_ != other.node_kind_)
@@ -248,7 +248,7 @@ namespace jsonpath {
         using allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
-        using path_node_type = path_node<char_type>;
+        using path_node_type = basic_path_node<char_type>;
         using path_element_type = basic_path_element<CharT>;
         using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
     private:
@@ -384,23 +384,23 @@ namespace jsonpath {
     Json* select(Json& root, const basic_json_location<typename Json::char_type,typename Json::allocator_type>& path)
     {
         Json* current = std::addressof(root);
-        for (const auto& path_node : path)
+        for (const auto& basic_path_node : path)
         {
-            if (path_node.node_kind() == path_node_kind::index)
+            if (basic_path_node.node_kind() == path_node_kind::index)
             {
-                if (current->type() != json_type::array_value || path_node.index() >= current->size())
+                if (current->type() != json_type::array_value || basic_path_node.index() >= current->size())
                 {
                     return nullptr; 
                 }
-                current = std::addressof(current->at(path_node.index()));
+                current = std::addressof(current->at(basic_path_node.index()));
             }
-            else if (path_node.node_kind() == path_node_kind::name)
+            else if (basic_path_node.node_kind() == path_node_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
                     return nullptr;
                 }
-                auto it = current->find(path_node.name());
+                auto it = current->find(basic_path_node.name());
                 if (it == current->object_range().end())
                 {
                     return nullptr;
@@ -415,6 +415,8 @@ namespace jsonpath {
     using wjson_location = basic_json_location<wchar_t>;
     using path_element = basic_path_element<char>;
     using wpath_element = basic_path_element<wchar_t>;
+    using path_node = basic_path_node<char>;
+    using wpath_node = basic_path_node<wchar_t>;
 
 } // namespace jsonpath
 } // namespace jsoncons

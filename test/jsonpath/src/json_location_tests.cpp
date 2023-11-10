@@ -9,20 +9,20 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_node = jsoncons::jsonpath::path_node<char>;
+using basic_path_node = jsoncons::jsonpath::basic_path_node<char>;
 using jsoncons::jsonpath::json_location;
 
 TEST_CASE("test json_location equals")
 {
-    path_node component1('$');
-    path_node component2(&component1,"foo");
-    path_node component3(&component2,"bar");
-    path_node component4(&component3,0);
+    basic_path_node component1('$');
+    basic_path_node component2(&component1,"foo");
+    basic_path_node component3(&component2,"bar");
+    basic_path_node component4(&component3,0);
 
-    path_node component11('$');
-    path_node component12(&component11,"foo");
-    path_node component13(&component12,"bar");
-    path_node component14(&component13,0);
+    basic_path_node component11('$');
+    basic_path_node component12(&component11,"foo");
+    basic_path_node component13(&component12,"bar");
+    basic_path_node component14(&component13,0);
 
     json_location path1(component4);
     json_location path2(component14);
@@ -32,10 +32,10 @@ TEST_CASE("test json_location equals")
 
 TEST_CASE("test json_location to_string")
 {
-    path_node component1('$');
-    path_node component2(&component1,"foo");
-    path_node component3(&component2,"bar");
-    path_node component4(&component3,0);
+    basic_path_node component1('$');
+    basic_path_node component2(&component1,"foo");
+    basic_path_node component3(&component2,"bar");
+    basic_path_node component4(&component3,0);
 
     json_location path1(component4);
 
@@ -44,10 +44,10 @@ TEST_CASE("test json_location to_string")
 
 TEST_CASE("test json_location with solidus to_string")
 {
-    path_node component1('$');
-    path_node component2(&component1,"foo's");
-    path_node component3(&component2,"bar");
-    path_node component4(&component3,0);
+    basic_path_node component1('$');
+    basic_path_node component2(&component1,"foo's");
+    basic_path_node component3(&component2,"bar");
+    basic_path_node component4(&component3,0);
 
     json_location path1(component4);
 
