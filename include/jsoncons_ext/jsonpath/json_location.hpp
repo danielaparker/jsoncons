@@ -300,7 +300,7 @@ namespace jsonpath {
 
         const basic_path_node<char_type>& base_node() const
         {
-            return base_node_;
+            return *base_node_;
         }
 
         string_type to_string() const
