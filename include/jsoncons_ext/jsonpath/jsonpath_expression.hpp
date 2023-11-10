@@ -111,7 +111,7 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using json_location_type = basic_json_location<char_type,allocator_type>;
+        using json_location_type = basic_json_location<char_type>;
         using path_node_type = basic_path_node<typename Json::char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
@@ -2497,7 +2497,7 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<typename Json::char_type,typename Json::allocator_type>;
+        using json_location_type = basic_json_location<typename Json::char_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
@@ -2516,7 +2516,7 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<typename Json::char_type,typename Json::allocator_type>;
+        using json_location_type = basic_json_location<typename Json::char_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
@@ -2537,6 +2537,7 @@ namespace detail {
         using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using json_location_type = typename jsonpath_traits_type::json_location_type;
+        using path_node_type = typename jsonpath_traits_type::path_node_type;
     private:
         allocator_type alloc_;
         std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
@@ -2562,27 +2563,12 @@ namespace detail {
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            auto f = [&callback](const json_location_type& path, reference val)
+            auto f = [&callback](const path_node_type& path, reference val)
             {
-                callback(path.to_string(), val);
+                basic_json_location<char_type> loc(path);
+                callback(loc.to_string(), val);
             };
             expr_.evaluate(resources, instance, resources.root_path_node(), instance, f, options);
-        }
-
-        template <class BinaryCallback>
-        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const json_location_type&,const_reference>::value,void>::type
-        select_nodes(reference instance, BinaryCallback callback, result_options options = result_options()) const
-        {
-            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
-        }
-
-        template <class BinaryCallback>
-        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const json_location_type&,Json&>::value,void>::type
-        update_nodes(reference instance, BinaryCallback callback) const
-        {
-            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            expr_.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, callback);
         }
 
         Json evaluate(reference instance, result_options options = result_options()) const
@@ -2592,9 +2578,10 @@ namespace detail {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
 
                 Json result(json_array_arg, semantic_tag::none, alloc_);
-                auto callback = [&result](const json_location_type& p, reference)
+                auto callback = [&result](const path_node_type& path, reference)
                 {
-                    result.emplace_back(p.to_string());
+                    basic_json_location<char_type> loc(path);
+                    result.emplace_back(loc.to_string());
                 };
                 expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
                 return result;
@@ -2623,6 +2610,7 @@ namespace detail {
         using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using json_location_type = typename jsonpath_traits_type::json_location_type;
+        using path_node_type = typename jsonpath_traits_type::path_node_type;
     private:
         allocator_type alloc_;
         std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
@@ -2644,7 +2632,7 @@ namespace detail {
         jsonpath_expr& operator=(jsonpath_expr&&) = default;
 
         template <class BinaryCallback>
-        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const json_location_type&,const_reference>::value,void>::type
+        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
         select_nodes(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
@@ -2673,7 +2661,7 @@ namespace detail {
         }
 
         template <class BinaryCallback>
-        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const json_location_type&,value_type&>::value,void>::type
+        typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,value_type&>::value,void>::type
         update_nodes(reference instance, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};

@@ -583,7 +583,7 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor, resources.get_allocator());
+                json_location_type path(*ancestor);
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
@@ -609,11 +609,11 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor, resources.get_allocator());
+                json_location_type path(*ancestor);
                 pointer ptr = jsoncons::jsonpath::select(root,path);
                 if (ptr != nullptr)
                 {
-                    return this->evaluate_tail(resources, root, /*path.last()*/ *ancestor, *ptr, options, ec);
+                    return this->evaluate_tail(resources, root, *ancestor, *ptr, options, ec);
                 }
                 else
                 {

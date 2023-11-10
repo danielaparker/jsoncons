@@ -60,7 +60,7 @@ TEST_CASE("jsonpath make_expression test")
 
         auto expr = jsoncons::jsonpath::make_jsonpath_expr<const json>("$.books[*]");
 
-        auto callback = [&](const jsonpath::json_location& /*location*/, const json& book)
+        auto callback = [&](const jsonpath::path_node& /*location*/, const json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -82,7 +82,7 @@ TEST_CASE("jsonpath make_expression test")
 
         auto expr = jsoncons::jsonpath::make_jsonpath_expr<json>("$.books[*]");
 
-        auto callback1 = [&](const jsonpath::json_location& /*location*/, const json& book)
+        auto callback1 = [&](const jsonpath::path_node& /*location*/, const json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -90,7 +90,7 @@ TEST_CASE("jsonpath make_expression test")
             }
         };
 
-        auto callback2 = [](const jsonpath::json_location& /*location*/, json& book)
+        auto callback2 = [](const jsonpath::path_node& /*location*/, json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {

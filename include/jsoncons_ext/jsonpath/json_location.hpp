@@ -387,7 +387,7 @@ namespace jsonpath {
     };
 
     template <class Json>
-    Json* select(Json& root, const basic_json_location<typename Json::char_type,typename Json::allocator_type>& path)
+    Json* select(Json& root, const basic_json_location<typename Json::char_type>& path)
     {
         Json* current = std::addressof(root);
         for (const auto& basic_path_node : path)
