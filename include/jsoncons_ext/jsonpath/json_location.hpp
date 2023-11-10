@@ -254,12 +254,13 @@ namespace jsonpath {
     private:
         allocator_type alloc_;
         std::vector<path_element_type> elements_;
+        const path_node_type* base_node_;
     public:
         using iterator = typename std::vector<path_element_type>::iterator;
         using const_iterator = typename std::vector<path_element_type>::const_iterator;
 
         basic_json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
-            : alloc_(alloc), elements_(node.size(), path_element_type{})
+            : alloc_(alloc), elements_(node.size(), path_element_type{}), base_node_(std::addressof(node))
         {
             std::size_t len = node.size();
 
@@ -295,6 +296,11 @@ namespace jsonpath {
         const basic_path_element<char_type>& base_element() const
         {
             return elements_.back();
+        }
+
+        const basic_path_node<char_type>& base_node() const
+        {
+            return base_node_;
         }
 
         string_type to_string() const
