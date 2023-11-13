@@ -140,7 +140,6 @@ namespace jsonpath {
 
             return h;
         }
-
         int compare_node(const basic_path_node& other) const
         {
             int diff = 0;
@@ -164,6 +163,101 @@ namespace jsonpath {
                 }
             }
             return diff;
+        }
+
+        friend bool operator<(const basic_path_node& lhs, const basic_path_node& rhs)
+        {
+            std::size_t len = (std::min)(lhs.size(),rhs.size());
+
+            const basic_path_node* p_lhs = std::addressof(lhs);
+            const basic_path_node* p_rhs = std::addressof(rhs);
+
+            bool is_less = false;
+            while (p_lhs->size() > len)
+            {
+                p_lhs = p_lhs->parent_;
+                is_less = false;
+            }
+            while (p_rhs->size() > len)
+            {
+                p_rhs = p_rhs->parent_;
+                is_less = true;
+            }
+            while (p_lhs != nullptr)
+            {
+                int diff = 0;
+                if (p_lhs->node_kind_ != p_rhs->node_kind_)
+                {
+                    diff = static_cast<int>(p_lhs->node_kind_) - static_cast<int>(p_rhs->node_kind_);
+                }
+                else
+                {
+                    switch (p_lhs->node_kind_)
+                    {
+                        case path_node_kind::root:
+                        case path_node_kind::name:
+                            diff = p_lhs->name_.compare(p_rhs->name_);
+                            break;
+                        case path_node_kind::index:
+                            diff = static_cast<int>(p_lhs->index_) - static_cast<int>(p_rhs->index_);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (diff < 0)
+                {
+                    is_less = true;
+                }
+                else if (diff > 0)
+                {
+                    is_less = false;
+                }
+
+                p_lhs = p_lhs->parent_;
+                p_rhs = p_rhs->parent_;
+            }
+
+            return is_less;
+        }
+
+        friend bool operator==(const basic_path_node& lhs, const basic_path_node& rhs)
+        {
+            if (lhs.size() != rhs.size())
+            {
+                return false;
+            }
+
+            const basic_path_node* p_lhs = std::addressof(lhs);
+            const basic_path_node* p_rhs = std::addressof(rhs);
+
+            bool is_equal = true;
+            while (p_lhs != nullptr && is_equal)
+            {
+                if (p_lhs->node_kind_ != p_rhs->node_kind_)
+                {
+                    is_equal = false;
+                }
+                else
+                {
+                    switch (p_lhs->node_kind_)
+                    {
+                        case path_node_kind::root:
+                        case path_node_kind::name:
+                            is_equal = p_lhs->name_ == p_rhs->name_;
+                            break;
+                        case path_node_kind::index:
+                            is_equal = p_lhs->index_ == p_rhs->index_;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                p_lhs = p_lhs->parent_;
+                p_rhs = p_rhs->parent_;
+            }
+
+            return is_equal;
         }
     };
 
