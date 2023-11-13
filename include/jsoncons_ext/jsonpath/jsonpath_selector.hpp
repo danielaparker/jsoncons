@@ -177,13 +177,14 @@ namespace detail {
 
         supertype* tail_;
     public:
+        using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using value_type = typename supertype::value_type;
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using json_location_type = typename supertype::json_location_type;
+        using json_location_type = typename basic_json_location<char_type>;
         using node_receiver_type = typename supertype::node_receiver_type;
         using selector_type = typename supertype::selector_type;
 
@@ -552,12 +553,13 @@ namespace detail {
         int ancestor_depth_;
 
     public:
+        using char_type = typename Json::char_type;
         using value_type = typename supertype::value_type;
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using json_location_type = typename supertype::json_location_type;
+        using json_location_type = basic_json_location<char_type>;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;
 
@@ -887,12 +889,13 @@ namespace detail {
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
     public:
+        using char_type = typename Json::char_type;
         using value_type = typename supertype::value_type;
         using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using json_location_type = typename supertype::json_location_type;
+        using json_location_type = basic_json_location<char_type>;
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;

@@ -67,26 +67,7 @@ namespace jsonpath {
         {
         }
 
-        basic_path_node(basic_path_node&& other)
-            : root_(other.root_),
-              parent_(other.parent_),
-              node_kind_(other.node_kind_),
-              name_(other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_),
-              index_(other.index_)
-        {
-        }
-
         basic_path_node& operator=(const basic_path_node& other)
-        {
-            root_ = other.root_;
-            parent_ = other.parent_;
-            node_kind_ = other.node_kind_;
-            index_ = other.index_;
-            name_ = other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_;
-            return *this;
-        }
-
-        basic_path_node& operator=(basic_path_node&& other)
         {
             root_ = other.root_;
             parent_ = other.parent_;
@@ -348,10 +329,11 @@ namespace jsonpath {
     private:
         allocator_type alloc_;
         std::vector<path_element_type> elements_;
-        const path_node_type* base_node_;
     public:
         using iterator = typename std::vector<path_element_type>::iterator;
         using const_iterator = typename std::vector<path_element_type>::const_iterator;
+
+        const path_node_type* base_node_;
 
         basic_json_location(const path_node_type& node, const allocator_type& alloc = allocator_type())
             : alloc_(alloc), elements_(node.size(), path_element_type{}), base_node_(std::addressof(node))
