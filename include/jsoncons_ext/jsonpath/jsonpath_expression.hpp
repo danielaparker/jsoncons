@@ -2626,7 +2626,7 @@ namespace detail {
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
-        select_nodes(reference instance, BinaryCallback callback, result_options options = result_options()) const
+        select(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
             expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
@@ -2655,7 +2655,7 @@ namespace detail {
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,value_type&>::value,void>::type
-        update_nodes(reference instance, BinaryCallback callback) const
+        update(reference instance, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
             expr_.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, callback);
