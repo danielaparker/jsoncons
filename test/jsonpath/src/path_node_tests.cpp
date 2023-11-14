@@ -120,3 +120,21 @@ TEST_CASE("test path_node less")
 
 }
 
+TEST_CASE("test to_json_location")
+{
+    SECTION("test 1")
+    {
+        jsonpath::path_node a1{};
+        jsonpath::path_node a2(&a1,"foo");
+        jsonpath::path_node a3(&a2,"bar");
+        jsonpath::path_node a4(&a3,7);
+
+        jsoncons::json_location location;
+        location /= "foo";
+        location /= "bar";
+        location /= 7;
+
+        CHECK((jsonpath::to_json_location(a4) == location));
+    }
+}
+

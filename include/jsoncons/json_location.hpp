@@ -14,13 +14,14 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons { 
 
-    enum class location_element_kind { root, name, index };
+    enum class path_element_kind { name, index };
 
     template <class CharT,class Allocator>
-    class basic_location_element 
+    class basic_path_element 
     {
     public:
         using char_type = CharT;
@@ -28,30 +29,33 @@ namespace jsoncons {
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     private:
-        location_element_kind node_kind_;
+        path_element_kind element_kind_;
         string_type name_;
         std::size_t index_;
 
     public:
-        basic_location_element(location_element_kind node_kind, 
-            const string_type& name, std::size_t index)
-            : node_kind_(node_kind), name_(name), index_(index)
+        basic_path_element(const string_type& name)
+            : element_kind_(path_element_kind::name), name_(name), index_(0)
         {
         }
 
-        basic_location_element(location_element_kind node_kind, 
-            string_type&& name, std::size_t index)
-            : node_kind_(node_kind), name_(std::move(name)), index_(index)
+        basic_path_element(string_type&& name)
+            : element_kind_(path_element_kind::name), name_(std::move(name)), index_(0)
         {
         }
 
-        basic_location_element(const basic_location_element& other) = default;
-
-        basic_location_element& operator=(const basic_location_element& other) = default;
-
-        location_element_kind node_kind() const
+        basic_path_element(std::size_t index)
+            : element_kind_(path_element_kind::index), index_(index)
         {
-            return node_kind_;
+        }
+
+        basic_path_element(const basic_path_element& other) = default;
+
+        basic_path_element& operator=(const basic_path_element& other) = default;
+
+        path_element_kind element_kind() const
+        {
+            return element_kind_;
         }
 
         const string_type& name() const
@@ -64,31 +68,28 @@ namespace jsoncons {
             return index_;
         }
 
-    private:
-
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == location_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
+            std::size_t h = element_kind_ == path_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
 
-        int compare(const basic_location_element& other) const
+        int compare(const basic_path_element& other) const
         {
             int diff = 0;
-            if (node_kind_ != other.node_kind_)
+            if (element_kind_ != other.element_kind_)
             {
-                diff = static_cast<int>(node_kind_) - static_cast<int>(other.node_kind_);
+                diff = static_cast<int>(element_kind_) - static_cast<int>(other.element_kind_);
             }
             else
             {
-                switch (node_kind_)
+                switch (element_kind_)
                 {
-                    case location_element_kind::root:
-                    case location_element_kind::name:
+                    case path_element_kind::name:
                         diff = name_.compare(other.name_);
                         break;
-                    case location_element_kind::index:
+                    case path_element_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
                     default:
@@ -107,14 +108,20 @@ namespace jsoncons {
         using allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
-        using location_element_type = basic_location_element<CharT,Allocator>;
-        using location_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<location_element_type>;
+        using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
+        using path_element_type = basic_path_element<CharT,Allocator>;
+        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
     private:
         allocator_type alloc_;
-        std::vector<location_element_type> elements_;
+        std::vector<path_element_type> elements_;
     public:
-        using iterator = typename std::vector<location_element_type>::iterator;
-        using const_iterator = typename std::vector<location_element_type>::const_iterator;
+        using iterator = typename std::vector<path_element_type>::iterator;
+        using const_iterator = typename std::vector<path_element_type>::const_iterator;
+
+        basic_json_location(const allocator_type& alloc=Allocator())
+            : alloc_(alloc), elements_(alloc)
+        {
+        }
 
         iterator begin()
         {
@@ -134,6 +141,16 @@ namespace jsoncons {
         const_iterator end() const
         {
             return elements_.end();
+        }
+
+        std::size_t size() const
+        {
+            return elements_.size();
+        }
+
+        const basic_path_element<char_type,allocator_type>& operator[](std::size_t index) const
+        {
+            return elements_[index];
         }
 
         int compare(const basic_json_location& other) const
@@ -174,6 +191,40 @@ namespace jsoncons {
             return hash;
         }
 
+        // Modifiers
+
+        void clear()
+        {
+            elements_.clear();
+        }
+
+        basic_json_location& operator/=(const string_view_type& s)
+        {
+            elements_.emplace_back(string_type(s.data(), s.size(), alloc_));
+            return *this;
+        }
+
+        basic_json_location& operator/=(const string_type& s)
+        {
+            elements_.emplace_back(s);
+            return *this;
+        }
+
+        basic_json_location& operator/=(string_type&& s)
+        {
+            elements_.emplace_back(std::move(s));
+            return *this;
+        }
+
+        template <class IntegerType>
+        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
+            operator/=(IntegerType val)
+        {
+            elements_.emplace_back(static_cast<std::size_t>(val));
+
+            return *this;
+        }
+
         friend bool operator==(const basic_json_location& lhs, const basic_json_location& rhs) 
         {
             return lhs.compare(rhs) == 0;
@@ -192,8 +243,8 @@ namespace jsoncons {
 
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
-    using location_element = basic_location_element<char,std::allocator<char>>;
-    using wlocation_element = basic_location_element<wchar_t,std::allocator<char>>;
+    using path_element = basic_path_element<char,std::allocator<char>>;
+    using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
 
 } // namespace jsoncons
 

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
-#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#ifndef JSONCONS_JSONPATH_PATH_NODE_HPP
+#define JSONCONS_JSONPATH_PATH_NODE_HPP
 
 #include <string>
 #include <vector>
@@ -21,6 +21,8 @@
 namespace jsoncons { 
 namespace jsonpath {
 
+    enum class path_node_kind { root, name, index };
+
     template <class CharT>
     class basic_path_node 
     {
@@ -31,27 +33,27 @@ namespace jsonpath {
 
         const basic_path_node* parent_;
         std::size_t size_;
-        location_element_kind node_kind_;
+        path_node_kind node_kind_;
         string_view_type name_;
         std::size_t index_;
 
     public:
         basic_path_node()
             : parent_(nullptr), size_(1),
-              node_kind_(location_element_kind::root), 
+              node_kind_(path_node_kind::root), 
               index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, const string_view_type& name)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(location_element_kind::name), name_(name), index_(0)
+              node_kind_(path_node_kind::name), name_(name), index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, std::size_t index)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(location_element_kind::index), index_(index)
+              node_kind_(path_node_kind::index), index_(index)
         {
         }
 
@@ -75,7 +77,7 @@ namespace jsonpath {
 
         const basic_path_node* parent() const { return parent_;}
 
-        location_element_kind node_kind() const
+        path_node_kind node_kind() const
         {
             return node_kind_;
         }
@@ -107,7 +109,7 @@ namespace jsonpath {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == location_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_view_type>{}(name_);
+            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_view_type>{}(name_);
 
             return h;
         }
@@ -122,11 +124,11 @@ namespace jsonpath {
             {
                 switch (node_kind_)
                 {
-                    case location_element_kind::root:
-                    case location_element_kind::name:
+                    case path_node_kind::root:
+                    case path_node_kind::name:
                         diff = name_.compare(other.name_);
                         break;
-                    case location_element_kind::index:
+                    case path_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
                     default:
@@ -165,11 +167,11 @@ namespace jsonpath {
                 {
                     switch (p_lhs->node_kind_)
                     {
-                        case location_element_kind::root:
-                        case location_element_kind::name:
+                        case path_node_kind::root:
+                        case path_node_kind::name:
                             diff = p_lhs->name_.compare(p_rhs->name_);
                             break;
-                        case location_element_kind::index:
+                        case path_node_kind::index:
                             diff = static_cast<int>(p_lhs->index_) - static_cast<int>(p_rhs->index_);
                             break;
                         default:
@@ -213,11 +215,11 @@ namespace jsonpath {
                 {
                     switch (p_lhs->node_kind_)
                     {
-                        case location_element_kind::root:
-                        case location_element_kind::name:
+                        case path_node_kind::root:
+                        case path_node_kind::name:
                             is_equal = p_lhs->name_ == p_rhs->name_;
                             break;
-                        case location_element_kind::index:
+                        case path_node_kind::index:
                             is_equal = p_lhs->index_ == p_rhs->index_;
                             break;
                         default:
@@ -250,7 +252,7 @@ namespace jsonpath {
         Json* current = std::addressof(root);
         for (auto node : nodes)
         {
-            if (node->node_kind() == location_element_kind::index)
+            if (node->node_kind() == path_node_kind::index)
             {
                 if (current->type() != json_type::array_value || node->index() >= current->size())
                 {
@@ -258,7 +260,7 @@ namespace jsonpath {
                 }
                 current = std::addressof(current->at(node->index()));
             }
-            else if (node->node_kind() == location_element_kind::name)
+            else if (node->node_kind() == path_node_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
@@ -296,17 +298,17 @@ namespace jsonpath {
         {
             switch (node->node_kind())
             {
-                case location_element_kind::root:
+                case path_node_kind::root:
                     buffer.push_back('$');
                     break;
-                case location_element_kind::name:
+                case path_node_kind::name:
                     buffer.push_back('[');
                     buffer.push_back('\'');
                     jsoncons::jsonpath::escape_string(node->name().data(), node->name().size(), buffer);
                     buffer.push_back('\'');
                     buffer.push_back(']');
                     break;
-                case location_element_kind::index:
+                case path_node_kind::index:
                     buffer.push_back('[');
                     jsoncons::detail::from_integer(node->index(), buffer);
                     buffer.push_back(']');
@@ -315,6 +317,70 @@ namespace jsonpath {
         }
 
         return buffer;
+    }
+
+    template <class CharT, class Allocator = std::allocator<CharT>>
+    std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_jsonpath(const basic_json_location<CharT,Allocator>& location, 
+        const Allocator& alloc = Allocator())
+    {
+        std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer(alloc);
+
+        buffer.push_back('$');
+        for (auto element : location)
+        {
+            switch (element->element_kind())
+            {
+            case path_node_kind::name:
+                buffer.push_back('[');
+                buffer.push_back('\'');
+                jsoncons::jsonpath::escape_string(element->name().data(), element->name().size(), buffer);
+                buffer.push_back('\'');
+                buffer.push_back(']');
+                break;
+            case path_node_kind::index:
+                buffer.push_back('[');
+                jsoncons::detail::from_integer(element->index(), buffer);
+                buffer.push_back(']');
+                break;
+            }
+        }
+
+        return buffer;
+    }
+
+    template <class CharT, class Allocator=std::allocator<char>>
+    basic_json_location<CharT,Allocator> to_json_location(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
+    {
+        basic_json_location<CharT,Allocator> location{alloc};
+
+        using path_node_type = basic_path_node<CharT>;
+
+        std::vector<const path_node_type*> nodes(path.size(), nullptr);
+        std::size_t len = nodes.size();
+        const path_node_type* p = std::addressof(path);
+        while (p != nullptr)
+        {
+            nodes[--len] = p;
+            p = p->parent();
+        }
+        while (p != nullptr);
+
+        for (auto node : nodes)
+        {
+            switch (node->node_kind())
+            {
+                case path_node_kind::root:
+                    break;
+                case path_node_kind::name:
+                    location /=(node->name());
+                    break;
+                case path_node_kind::index:
+                    location /=(node->index());
+                    break;
+            }
+        }
+
+        return location;
     }
 
     using path_node = basic_path_node<char>;
