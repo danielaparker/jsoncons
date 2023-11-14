@@ -184,7 +184,6 @@ namespace detail {
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using json_location_type = basic_json_location<char_type>;
         using node_receiver_type = typename supertype::node_receiver_type;
         using selector_type = typename supertype::selector_type;
 
@@ -559,7 +558,6 @@ namespace detail {
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using json_location_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;
 
@@ -585,8 +583,7 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor);
-                pointer ptr = jsoncons::jsonpath::select(root,path);
+                pointer ptr = jsoncons::jsonpath::select(root,*ancestor);
                 if (ptr != nullptr)
                 {
                     this->tail_select(resources, root, *ancestor, *ptr, receiver, options);
@@ -611,8 +608,7 @@ namespace detail {
 
             if (ancestor != nullptr)
             {
-                json_location_type path(*ancestor);
-                pointer ptr = jsoncons::jsonpath::select(root,path);
+                pointer ptr = jsoncons::jsonpath::select(root, *ancestor);
                 if (ptr != nullptr)
                 {
                     return this->evaluate_tail(resources, root, *ancestor, *ptr, options, ec);

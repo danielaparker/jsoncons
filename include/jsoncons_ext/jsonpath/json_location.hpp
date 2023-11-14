@@ -463,26 +463,38 @@ namespace jsonpath {
     };
 
     template <class Json>
-    Json* select(Json& root, const basic_json_location<typename Json::char_type>& path)
+    Json* select(Json& root, const basic_path_node<typename Json::char_type>& path)
     {
-        Json* current = std::addressof(root);
-        for (const auto& basic_path_node : path)
+        using path_node_type = basic_path_node<typename Json::char_type>;
+
+        std::vector<const path_node_type*> nodes(path.size(), nullptr);
+        std::size_t len = nodes.size();
+        const path_node_type* p = std::addressof(path);
+        while (p != nullptr)
         {
-            if (basic_path_node.node_kind() == path_node_kind::index)
+            nodes[--len] = p;
+            p = p->parent();
+        }
+        while (p != nullptr);
+
+        Json* current = std::addressof(root);
+        for (auto node : nodes)
+        {
+            if (node->node_kind() == path_node_kind::index)
             {
-                if (current->type() != json_type::array_value || basic_path_node.index() >= current->size())
+                if (current->type() != json_type::array_value || node->index() >= current->size())
                 {
                     return nullptr; 
                 }
-                current = std::addressof(current->at(basic_path_node.index()));
+                current = std::addressof(current->at(node->index()));
             }
-            else if (basic_path_node.node_kind() == path_node_kind::name)
+            else if (node->node_kind() == path_node_kind::name)
             {
                 if (current->type() != json_type::object_value)
                 {
                     return nullptr;
                 }
-                auto it = current->find(basic_path_node.name());
+                auto it = current->find(node->name());
                 if (it == current->object_range().end())
                 {
                     return nullptr;
