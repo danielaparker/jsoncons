@@ -134,7 +134,10 @@ TEST_CASE("test to_json_location")
         location /= "bar";
         location /= 7;
 
+        std::string jsonpath_string = "$['foo']['bar'][7]";
+
         CHECK((jsonpath::to_json_location(a4) == location));
+        CHECK((jsonpath::to_jsonpath(location) == jsonpath_string));
     }
 }
 

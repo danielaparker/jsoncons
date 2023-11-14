@@ -326,20 +326,20 @@ namespace jsonpath {
         std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer(alloc);
 
         buffer.push_back('$');
-        for (auto element : location)
+        for (const auto& element : location)
         {
-            switch (element->element_kind())
+            switch (element.element_kind())
             {
-            case path_node_kind::name:
+            case path_element_kind::name:
                 buffer.push_back('[');
                 buffer.push_back('\'');
-                jsoncons::jsonpath::escape_string(element->name().data(), element->name().size(), buffer);
+                jsoncons::jsonpath::escape_string(element.name().data(), element.name().size(), buffer);
                 buffer.push_back('\'');
                 buffer.push_back(']');
                 break;
-            case path_node_kind::index:
+            case path_element_kind::index:
                 buffer.push_back('[');
-                jsoncons::detail::from_integer(element->index(), buffer);
+                jsoncons::detail::from_integer(element.index(), buffer);
                 buffer.push_back(']');
                 break;
             }
