@@ -17,15 +17,11 @@
 
 namespace jsoncons { 
 
-    template <class CharT,class Allocator>
-    class basic_json_location; 
-
     enum class location_element_kind { root, name, index };
 
     template <class CharT,class Allocator>
     class basic_location_element 
     {
-        template <class Ch, class Allocator> friend class basic_json_location;
     public:
         using char_type = CharT;
         using allocator_type = Allocator;
