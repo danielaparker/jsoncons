@@ -2643,7 +2643,7 @@ namespace detail {
                 value_type result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const path_node_type& p, reference)
                 {
-                    result.emplace_back(to_basic_string(p));
+                    result.emplace_back(to_jsonpath(p));
                 };
                 expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
                 return result;

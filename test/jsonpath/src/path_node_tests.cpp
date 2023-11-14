@@ -24,7 +24,7 @@ TEST_CASE("test json_location equals")
     jsonpath::path_node b4(&b3,0);
 
     CHECK((a4 == b4));
-    CHECK((jsonpath::to_basic_string(a4) == std::string("$['foo']['bar'][0]")));
+    CHECK((jsonpath::to_jsonpath(a4) == std::string("$['foo']['bar'][0]")));
 }
 
 TEST_CASE("test json_location with solidus to_string")
@@ -34,7 +34,7 @@ TEST_CASE("test json_location with solidus to_string")
     jsonpath::path_node a3(&a2,"bar");
     jsonpath::path_node a4(&a3,0);
 
-    CHECK(jsonpath::to_basic_string(a4) == std::string(R"($['foo\'s']['bar'][0])"));
+    CHECK(jsonpath::to_jsonpath(a4) == std::string(R"($['foo\'s']['bar'][0])"));
 }
 
 TEST_CASE("test path_node less")

@@ -3065,7 +3065,7 @@ namespace detail {
             {
                 auto callback = [&result](const path_node_type& pathp, reference)
                 {
-                    result.emplace_back(to_basic_string(pathp)); 
+                    result.emplace_back(to_jsonpath(pathp)); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
             }

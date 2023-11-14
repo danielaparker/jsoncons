@@ -34,45 +34,48 @@ namespace jsonpath {
         using char_type = CharT;
     private:
 
-        char_type root_;
         const basic_path_node* parent_;
+        std::size_t size_;
         path_node_kind node_kind_;
+        char_type root_;
         string_view_type name_;
         std::size_t index_;
 
     public:
         basic_path_node(char_type root)
-            : root_{root}, parent_(nullptr), 
+            : parent_(nullptr), size_(1),
               node_kind_(path_node_kind::root), 
-              name_(&root_,1), index_(0)
+              root_{root}, name_(&root_,1), index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, const string_view_type& name)
-            : root_(0), parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
+            : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
+              node_kind_(path_node_kind::name), root_(0), name_(name), index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, std::size_t index)
-            : root_(0), parent_(parent), node_kind_(path_node_kind::index), index_(index)
+            : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
+              node_kind_(path_node_kind::index), root_(0), index_(index)
         {
         }
 
         basic_path_node(const basic_path_node& other)
-            : root_(other.root_),
-              parent_(other.parent_),
+            : parent_(other.parent_), size_(other.size()),
               node_kind_(other.node_kind_),
-              name_(other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_),
+              root_(other.root_), name_(other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_),
               index_(other.index_)
         {
         }
 
         basic_path_node& operator=(const basic_path_node& other)
         {
-            root_ = other.root_;
             parent_ = other.parent_;
+            size_ = other.size();
             node_kind_ = other.node_kind_;
             index_ = other.index_;
+            root_ = other.root_;
             name_ = other.node_kind_ == path_node_kind::root ? string_view_type(&root_, 1) : other.name_;
             return *this;
         }
@@ -91,13 +94,7 @@ namespace jsonpath {
 
         std::size_t size() const
         {
-            std::size_t len = 1;
-            
-            for (auto p = parent_; p != nullptr; p = p->parent_)
-            {
-                ++len;
-            }
-            return len;
+            return size_;
         }
 
         std::size_t index() const 
@@ -506,7 +503,7 @@ namespace jsonpath {
     }
 
     template <class CharT, class Allocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_basic_string(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
+    std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_jsonpath(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
     {
         std::basic_string<CharT,std::char_traits<CharT>,Allocator> buffer(alloc);
 
