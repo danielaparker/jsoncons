@@ -20,34 +20,45 @@ namespace jsoncons {
     template <class CharT,class Allocator>
     class basic_json_location; 
 
-    enum class location_element_kind { root, index, name };
+    enum class location_element_kind { root, name, index };
 
-    template <class CharT>
+    template <class CharT,class Allocator>
     class basic_location_element 
     {
         template <class Ch, class Allocator> friend class basic_json_location;
     public:
         using char_type = CharT;
-        using string_view_type = jsoncons::basic_string_view<char_type>;
+        using allocator_type = Allocator;
+        using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     private:
         location_element_kind node_kind_;
-        string_view_type name_;
+        string_type name_;
         std::size_t index_;
 
     public:
-        basic_location_element() = default;
-
-        basic_location_element(location_element_kind node_kind, string_view_type name, std::size_t index)
+        basic_location_element(location_element_kind node_kind, 
+            const string_type& name, std::size_t index)
             : node_kind_(node_kind), name_(name), index_(index)
         {
         }
+
+        basic_location_element(location_element_kind node_kind, 
+            string_type&& name, std::size_t index)
+            : node_kind_(node_kind), name_(std::move(name)), index_(index)
+        {
+        }
+
+        basic_location_element(const basic_location_element& other) = default;
+
+        basic_location_element& operator=(const basic_location_element& other) = default;
 
         location_element_kind node_kind() const
         {
             return node_kind_;
         }
 
-        const string_view_type& name() const
+        const string_type& name() const
         {
             return name_;
         }
@@ -57,19 +68,16 @@ namespace jsoncons {
             return index_;
         }
 
-        basic_location_element(const basic_location_element&) = default;
-        basic_location_element& operator=(const basic_location_element&) = default;
-
     private:
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == location_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_view_type>{}(name_);
+            std::size_t h = node_kind_ == location_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
 
-        int compare_node(const basic_location_element& other) const
+        int compare(const basic_location_element& other) const
         {
             int diff = 0;
             if (node_kind_ != other.node_kind_)
@@ -103,7 +111,7 @@ namespace jsoncons {
         using allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
-        using location_element_type = basic_location_element<CharT>;
+        using location_element_type = basic_location_element<CharT,Allocator>;
         using location_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<location_element_type>;
     private:
         allocator_type alloc_;
@@ -143,7 +151,7 @@ namespace jsoncons {
             auto it2 = other.elements_.begin();
             while (it1 != elements_.end() && it2 != other.elements_.end())
             {
-                int diff = it1->compare_node(*it2);
+                int diff = it1->compare(*it2);
                 if (diff != 0)
                 {
                     return diff;
@@ -188,8 +196,8 @@ namespace jsoncons {
 
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
-    using location_element = basic_location_element<char>;
-    using wlocation_element = basic_location_element<wchar_t>;
+    using location_element = basic_location_element<char,std::allocator<char>>;
+    using wlocation_element = basic_location_element<wchar_t,std::allocator<char>>;
 
 } // namespace jsoncons
 

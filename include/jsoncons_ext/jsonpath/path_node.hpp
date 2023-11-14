@@ -319,10 +319,6 @@ namespace jsonpath {
         return buffer;
     }
 
-    using json_location = basic_json_location<char>;
-    using wjson_location = basic_json_location<wchar_t>;
-    using location_element = basic_location_element<char>;
-    using wlocation_element = basic_location_element<wchar_t>;
     using path_node = basic_path_node<char>;
     using wpath_node = basic_path_node<wchar_t>;
 
