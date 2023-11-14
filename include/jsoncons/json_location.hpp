@@ -204,18 +204,6 @@ namespace jsoncons {
             return *this;
         }
 
-        basic_json_location& operator/=(const string_type& s)
-        {
-            elements_.emplace_back(s);
-            return *this;
-        }
-
-        basic_json_location& operator/=(string_type&& s)
-        {
-            elements_.emplace_back(std::move(s));
-            return *this;
-        }
-
         template <class IntegerType>
         typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             operator/=(IntegerType val)
