@@ -2258,18 +2258,6 @@ namespace detail {
             return ptr;
         }
 
-        const path_node_type& root_path_node() const
-        {
-            static path_node_type root('$');
-            return root;
-        }
-
-        const path_node_type& current_path_node() const
-        {
-            static path_node_type root('@');
-            return root;
-        }
-
         const string_type& length_label() const
         {
             return length_label_;
@@ -3379,7 +3367,7 @@ namespace detail {
                             //}
                             //std::cout << "selector item: " << *ptr << "\n";
 
-                            reference val = tok.selector_->evaluate(resources, root, resources.current_path_node(), item.value(), options, ec);
+                            reference val = tok.selector_->evaluate(resources, root, path_node_type{}, item.value(), options, ec);
 
                             stack.pop_back();
                             stack.emplace_back(stack_item_type(std::addressof(val)));

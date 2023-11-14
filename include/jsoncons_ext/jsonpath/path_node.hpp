@@ -32,34 +32,33 @@ namespace jsonpath {
         const basic_path_node* parent_;
         std::size_t size_;
         location_element_kind node_kind_;
-        char_type root_;
         string_view_type name_;
         std::size_t index_;
 
     public:
-        basic_path_node(char_type root)
+        basic_path_node()
             : parent_(nullptr), size_(1),
               node_kind_(location_element_kind::root), 
-              root_{root}, name_(&root_,1), index_(0)
+              index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, const string_view_type& name)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(location_element_kind::name), root_(0), name_(name), index_(0)
+              node_kind_(location_element_kind::name), name_(name), index_(0)
         {
         }
 
         basic_path_node(const basic_path_node* parent, std::size_t index)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(location_element_kind::index), root_(0), index_(index)
+              node_kind_(location_element_kind::index), index_(index)
         {
         }
 
         basic_path_node(const basic_path_node& other)
             : parent_(other.parent_), size_(other.size()),
               node_kind_(other.node_kind_),
-              root_(other.root_), name_(other.node_kind_ == location_element_kind::root ? string_view_type(&root_, 1) : other.name_),
+              name_(other.name_),
               index_(other.index_)
         {
         }
@@ -70,8 +69,7 @@ namespace jsonpath {
             size_ = other.size();
             node_kind_ = other.node_kind_;
             index_ = other.index_;
-            root_ = other.root_;
-            name_ = other.node_kind_ == location_element_kind::root ? string_view_type(&root_, 1) : other.name_;
+            name_ = other.name_;
             return *this;
         }
 
@@ -299,7 +297,7 @@ namespace jsonpath {
             switch (node->node_kind())
             {
                 case location_element_kind::root:
-                    buffer.append(node->name().data(), node->name().size());
+                    buffer.push_back('$');
                     break;
                 case location_element_kind::name:
                     buffer.push_back('[');

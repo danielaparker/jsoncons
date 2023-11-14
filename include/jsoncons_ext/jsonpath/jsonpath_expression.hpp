@@ -2563,7 +2563,7 @@ namespace detail {
             {
                 callback(to_jsonpath(path), val);
             };
-            expr_.evaluate(resources, instance, resources.root_path_node(), instance, f, options);
+            expr_.evaluate(resources, instance, path_node_type{}, instance, f, options);
         }
 
         Json evaluate(reference instance, result_options options = result_options()) const
@@ -2577,13 +2577,13 @@ namespace detail {
                 {
                     result.emplace_back(to_jsonpath(path));
                 };
-                expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
+                expr_.evaluate(resources, instance, path_node_type(), instance, callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-                return expr_.evaluate(resources, instance, resources.current_path_node(), instance, options);
+                return expr_.evaluate(resources, instance, path_node_type(), instance, options);
             }
         }
     };
@@ -2629,7 +2629,7 @@ namespace detail {
         select(reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
+            expr_.evaluate(resources, instance, path_node_type{}, instance, callback, options);
         }
 
         value_type evaluate(reference instance, result_options options = result_options()) const
@@ -2643,13 +2643,13 @@ namespace detail {
                 {
                     result.emplace_back(to_jsonpath(p));
                 };
-                expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
+                expr_.evaluate(resources, instance, path_node_type(), instance, callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-                return expr_.evaluate(resources, instance, resources.current_path_node(), instance, options);
+                return expr_.evaluate(resources, instance, path_node_type(), instance, options);
             }
         }
 
@@ -2658,7 +2658,7 @@ namespace detail {
         update(reference instance, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, callback);
+            expr_.evaluate_with_replacement(resources, instance, path_node_type{}, instance, callback);
         }
     };
 

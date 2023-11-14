@@ -79,7 +79,7 @@ namespace jsonpath {
         {
             v = std::forward<T>(new_value);
         };
-        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, callback);
+        expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, callback);
     }
 
     template<class Json, class T, class TempAllocator>
@@ -105,7 +105,7 @@ namespace jsonpath {
         {
             v = Json(std::forward<T>(new_value), semantic_tag::none);
         };
-        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, callback);
+        expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, callback);
     }
 
     template<class Json, class BinaryCallback>
@@ -131,7 +131,7 @@ namespace jsonpath {
         {
             callback(to_jsonpath(path), val);
         };
-        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
+        expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, f);
     }
 
     template<class Json, class BinaryCallback, class TempAllocator>
@@ -158,7 +158,7 @@ namespace jsonpath {
         {
             callback(to_jsonpath(path), val);
         };
-        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
+        expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, f);
     }
 
     // Legacy replace function
@@ -183,7 +183,7 @@ namespace jsonpath {
         {
             v = callback(v);
         };
-        expr.evaluate_with_replacement(resources, instance, resources.root_path_node(), instance, f);
+        expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, f);
     }
 
 } // namespace jsonpath
