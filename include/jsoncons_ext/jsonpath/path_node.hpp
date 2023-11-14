@@ -505,6 +505,48 @@ namespace jsonpath {
         return current;
     }
 
+    template <class CharT, class Allocator=std::allocator<CharT>>
+    std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_basic_string(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
+    {
+        std::basic_string<CharT,std::char_traits<CharT>,Allocator> buffer(alloc);
+
+        using path_node_type = basic_path_node<CharT>;
+
+        std::vector<const path_node_type*> nodes(path.size(), nullptr);
+        std::size_t len = nodes.size();
+        const path_node_type* p = std::addressof(path);
+        while (p != nullptr)
+        {
+            nodes[--len] = p;
+            p = p->parent();
+        }
+        while (p != nullptr);
+
+        for (auto node : nodes)
+        {
+            switch (node->node_kind())
+            {
+                case path_node_kind::root:
+                    buffer.append(node->name().data(), node->name().size());
+                    break;
+                case path_node_kind::name:
+                    buffer.push_back('[');
+                    buffer.push_back('\'');
+                    jsoncons::jsonpath::escape_string(node->name().data(), node->name().size(), buffer);
+                    buffer.push_back('\'');
+                    buffer.push_back(']');
+                    break;
+                case path_node_kind::index:
+                    buffer.push_back('[');
+                    jsoncons::detail::from_integer(node->index(), buffer);
+                    buffer.push_back(']');
+                    break;
+            }
+        }
+
+        return buffer;
+    }
+
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
     using path_element = basic_path_element<char>;

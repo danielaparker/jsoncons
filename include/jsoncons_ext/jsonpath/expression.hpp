@@ -18,7 +18,7 @@
 #include <regex>
 #endif
 #include <jsoncons/json_type.hpp>
-#include <jsoncons_ext/jsonpath/json_location.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 namespace jsoncons { 
@@ -2993,7 +2993,6 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<char_type>;
     private:
         allocator_type alloc_;
         Callback& callback_;
@@ -3029,7 +3028,6 @@ namespace detail {
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
         allocator_type alloc_;
@@ -3065,15 +3063,15 @@ namespace detail {
 
             if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](const json_location_type& pathp, reference)
+                auto callback = [&result](const path_node_type& pathp, reference)
                 {
-                    result.emplace_back(pathp.to_string()); 
+                    result.emplace_back(to_basic_string(pathp)); 
                 };
                 evaluate(resources, root, path, instance, callback, options);
             }
             else
             {
-                auto callback = [&result](const json_location_type&, reference val)
+                auto callback = [&result](const path_node_type&, reference val)
                 {
                     result.push_back(val);
                 };

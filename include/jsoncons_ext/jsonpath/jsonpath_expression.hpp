@@ -111,7 +111,6 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_type = expression<Json,JsonReference>;
-        using json_location_type = basic_json_location<char_type>;
         using path_node_type = basic_path_node<typename Json::char_type>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
@@ -2497,7 +2496,6 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<typename Json::char_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
@@ -2516,7 +2514,6 @@ namespace detail {
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using json_location_type = basic_json_location<typename Json::char_type>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using path_pointer = const path_node_type*;
     };
@@ -2536,7 +2533,6 @@ namespace detail {
         using reference = typename jsonpath_traits_type::reference;
         using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
-        using json_location_type = typename jsonpath_traits_type::json_location_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
     private:
         allocator_type alloc_;
@@ -2609,7 +2605,6 @@ namespace detail {
         using reference = typename jsonpath_traits_type::reference;
         using const_reference = typename jsonpath_traits_type::const_reference;
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
-        using json_location_type = typename jsonpath_traits_type::json_location_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
     private:
         allocator_type alloc_;
@@ -2646,9 +2641,9 @@ namespace detail {
                 jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
 
                 value_type result(json_array_arg, semantic_tag::none, alloc_);
-                auto callback = [&result](const json_location_type& p, reference)
+                auto callback = [&result](const path_node_type& p, reference)
                 {
-                    result.emplace_back(p.to_string());
+                    result.emplace_back(to_basic_string(p));
                 };
                 expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
                 return result;
