@@ -9,6 +9,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_expr.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {

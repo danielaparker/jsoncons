@@ -245,6 +245,33 @@ namespace jsonpath {
         }
     };
 
+
+    template<class Json>
+    std::size_t delete(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    {
+        std::size_t count = 0;
+
+        Json* p_current = std::addressof(instance);
+        for (const auto& element : location)
+        {
+            switch (element.element_kind())
+            {
+                case location_element_kind::name:
+                    if (current.is_object())
+                    {
+
+                    }
+                    break;
+                case location_element_kind::index:
+                    break;
+                default:
+                    break;
+            }
+        }
+        return count;
+    }
+
+
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
     using path_element = basic_path_element<char,std::allocator<char>>;
