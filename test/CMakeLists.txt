@@ -86,6 +86,7 @@ add_executable(unit_tests
                mergepatch/src/mergepatch_test_suite.cpp
                jsonpatch/src/jsonpatch_test_suite.cpp
                jsonpatch/src/jsonpatch_tests.cpp
+               jsonpath/src/json_location_tests.cpp
                jsonpath/src/jsonpath_flatten_tests.cpp
                jsonpath/src/path_node_tests.cpp
                jsonpath/src/jsonpath_custom_function_tests.cpp
@@ -141,7 +142,6 @@ add_executable(unit_tests
                corelib/src/json_less_tests.cpp
                corelib/src/json_line_split_tests.cpp
                corelib/src/json_literal_operator_tests.cpp
-               corelib/src/json_location_tests.cpp
                corelib/src/json_object_tests.cpp
                corelib/src/ojson_object_tests.cpp
                corelib/src/json_options_tests.cpp

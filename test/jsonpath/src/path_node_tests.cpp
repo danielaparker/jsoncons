@@ -129,7 +129,7 @@ TEST_CASE("test to_json_location")
         jsonpath::path_node a3(&a2,"bar");
         jsonpath::path_node a4(&a3,7);
 
-        jsoncons::json_location location;
+        jsonpath::json_location location;
         location /= "foo";
         location /= "bar";
         location /= 7;

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_LOCATION_HPP
-#define JSONCONS_JSON_LOCATION_HPP
+#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
 
 #include <string>
 #include <vector>
@@ -17,6 +17,7 @@
 #include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons { 
+namespace jsonpath {
 
     enum class path_element_kind { name, index };
 
@@ -234,6 +235,7 @@ namespace jsoncons {
     using path_element = basic_path_element<char,std::allocator<char>>;
     using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
 
+} // namespace jsonpath
 } // namespace jsoncons
 
 #endif
