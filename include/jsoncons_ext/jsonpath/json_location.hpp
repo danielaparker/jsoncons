@@ -257,7 +257,7 @@ namespace jsonpath {
             switch (element.element_kind())
             {
                 case path_element_kind::name:
-                    if (current.is_object())
+                    if (p_current->is_object())
                     {
 
                     }
