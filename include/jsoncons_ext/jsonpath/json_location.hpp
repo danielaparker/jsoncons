@@ -247,7 +247,7 @@ namespace jsonpath {
 
 
     template<class Json>
-    std::size_t delete(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    std::size_t remove(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
@@ -256,13 +256,13 @@ namespace jsonpath {
         {
             switch (element.element_kind())
             {
-                case location_element_kind::name:
+                case path_element_kind::name:
                     if (current.is_object())
                     {
 
                     }
                     break;
-                case location_element_kind::index:
+                case path_element_kind::index:
                     break;
                 default:
                     break;
