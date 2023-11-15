@@ -199,6 +199,21 @@ namespace jsonpath {
             elements_.clear();
         }
 
+        basic_json_location& append(const string_view_type& s)
+        {
+            elements_.emplace_back(string_type(s.data(), s.size(), alloc_));
+            return *this;
+        }
+
+        template <class IntegerType>
+        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
+            append(IntegerType val)
+        {
+            elements_.emplace_back(static_cast<std::size_t>(val));
+
+            return *this;
+        }
+
         basic_json_location& operator/=(const string_view_type& s)
         {
             elements_.emplace_back(string_type(s.data(), s.size(), alloc_));
