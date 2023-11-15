@@ -3462,7 +3462,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '.': 
                                 ++p_;
@@ -3523,7 +3523,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '<':
                                 ++p_;
@@ -3563,7 +3563,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '\"':
                                 state_stack_.back() = path_state::val_expr;
@@ -3649,7 +3649,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '\"':
                                 state_stack_.back() = path_state::val_expr;
@@ -3710,7 +3710,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '&':
                                 push_token(token(begin_expression_type_arg), ec);
@@ -3762,7 +3762,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ',':
                                 push_token(token(current_node_arg), ec);
@@ -3824,7 +3824,7 @@ namespace jmespath {
                         {
                             case ' ':case '\t':case '\r':case '\n':
                                 state_stack_.pop_back(); // unquoted_string
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             default:
                                 if ((*p_ >= '0' && *p_ <= '9') || (*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
@@ -4405,7 +4405,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ')':
                                 ++p_;
@@ -4424,7 +4424,7 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '\"':
                                 state_stack_.back() = path_state::expect_colon;
@@ -4541,7 +4541,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case '.':
                                 state_stack_.pop_back(); // expect_dot
@@ -4597,7 +4597,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ',':
                                 push_token(token(separator_arg), ec);
@@ -4643,7 +4643,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ']':
                             {
@@ -4665,7 +4665,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ',':
                                 push_token(token(separator_arg), ec);
@@ -4703,7 +4703,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character(ec);
+                                advance_past_space_character();
                                 break;
                             case ':':
                                 state_stack_.back() = path_state::expect_rbrace;
@@ -4780,7 +4780,7 @@ namespace jmespath {
             return jmespath_expression(std::move(resources_), std::move(output_stack_));
         }
 
-        void advance_past_space_character(std::error_code& ec)
+        void advance_past_space_character()
         {
             switch (*p_)
             {
@@ -4789,13 +4789,11 @@ namespace jmespath {
                     ++column_;
                     break;
                 case '\r':
-                    if (p_+1 >= end_input_)
+                    if (p_+1 < end_input_)
                     {
-                        ec = jmespath_errc::unexpected_end_of_input;
-                        return;
+                        if (*(p_ + 1) == '\n')
+                            ++p_;
                     }
-                    if (*(p_+1) == '\n')
-                        ++p_;
                     ++line_;
                     column_ = 1;
                     ++p_;
