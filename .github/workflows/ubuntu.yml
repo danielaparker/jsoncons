@@ -102,14 +102,13 @@ jobs:
     - name: install_gcc
       run: |
            sudo apt update
-           sudo apt install clang-13
-           sudo apt install libc++-dev
+           sudo apt install clang-14
       shell: bash
     - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_FLAGS=-stdlib=libc++
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON 
       env:
-        CC:   clang-13
-        CXX:  clang++-13
+        CC:   clang-14
+        CXX:  clang++-14
 
     - working-directory: build/
       run: cmake --build . --config ubuntu-latest
