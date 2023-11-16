@@ -223,7 +223,7 @@ namespace jsonpath {
     };
 
     template<class Json>
-    std::size_t erase(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    std::size_t remove(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
@@ -283,6 +283,57 @@ namespace jsonpath {
         return count;
     }
 
+    template<class Json>
+    Json* select(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    {
+        Json* p_current = std::addressof(instance);
+        bool found = false;
+
+        std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
+        for (std::size_t i = 0; i < location.size(); ++i)
+        {
+            const auto& element = location[i];
+            if (element.has_name())
+            {
+                if (p_current->is_object())
+                {
+                    auto it = p_current->find(element.name());
+                    if (it != p_current->object_range().end())
+                    {
+                        p_current = std::addressof(it->value());
+                        if (i == last)
+                        {
+                            found = true;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else // if (element.has_index())
+            {
+                if (p_current->is_array() && element.index() < p_current->size())
+                {
+                    p_current = std::addressof(p_current->at(element.index()));
+                    if (i == last)
+                    {
+                        found = true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        return found ? p_current : nullptr;
+    }
 
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
