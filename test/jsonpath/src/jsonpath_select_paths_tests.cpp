@@ -19,7 +19,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jsonpath json_query json test")
+TEST_CASE("jsonpath.jsonpath select_paths test")
 {
 
     std::string json_string = R"(
