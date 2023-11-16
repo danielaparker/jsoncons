@@ -9,7 +9,7 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-namespace jsonpath = jsoncons::jsonpath;
+using namespace jsoncons;
 
 TEST_CASE("test json_location equals")
 {
@@ -129,10 +129,8 @@ TEST_CASE("test to_json_location")
         jsonpath::path_node a3(&a2,"bar");
         jsonpath::path_node a4(&a3,7);
 
-        jsonpath::json_location location;
-        location /= "foo";
-        location /= "bar";
-        location /= 7;
+        json_location location;
+        location.append("foo").append("bar").append(7);
 
         std::string jsonpath_string = "$['foo']['bar'][7]";
 

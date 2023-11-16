@@ -1,7 +1,7 @@
 // Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 
@@ -12,7 +12,7 @@ TEST_CASE("json_location tests")
 
     SECTION("test 1")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("foo").append(1);
 
         CHECK(loc.size() == 2);
@@ -54,14 +54,14 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store book 1")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(1);
 
 
         CHECK(doc["store"]["book"].size() == 3);
         CHECK(doc["store"]["book"][1]["author"].as<std::string>() == "Evelyn Waugh");
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
 
         CHECK(count == 1);
         CHECK(doc["store"]["book"].size() == 2);
@@ -70,14 +70,14 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store book 2")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(2);
 
 
         CHECK(doc["store"]["book"].size() == 3);
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
 
         CHECK(count == 1);
         CHECK(doc["store"]["book"].size() == 2);
@@ -88,13 +88,13 @@ TEST_CASE("json_location remove tests")
     {
         json orig = doc;
 
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(3);
 
         CHECK(doc["store"]["book"].size() == 3);
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
 
         CHECK(count == 0);
         CHECK(doc == orig);
@@ -102,21 +102,21 @@ TEST_CASE("json_location remove tests")
 
     SECTION("store")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store");
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
         CHECK(count == 1);
         CHECK(doc.size() == 0);
     }
 
     SECTION("store book")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book");
 
         CHECK(doc["store"]["book"].size() == 3);
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
         CHECK(count == 1);
         CHECK(doc["store"]["book"].size() == 0);
     }
@@ -125,25 +125,25 @@ TEST_CASE("json_location remove tests")
     {
         json orig = doc;
 
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("lost&found");
 
         CHECK(doc["store"].size() == 1);
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
         CHECK(count == 0);
         CHECK(doc == orig);
     }
 
     SECTION("store book 2 price")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(2).append("price");
 
         CHECK(doc["store"]["book"].size() == 3);
         CHECK(doc["store"]["book"][2]["author"].as<std::string>() == "Herman Melville");
         CHECK(doc["store"]["book"][2].contains("price"));
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
 
         CHECK(count == 1);
         CHECK(doc["store"]["book"].size() == 3);
@@ -155,13 +155,13 @@ TEST_CASE("json_location remove tests")
     {
         json orig = doc;
 
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append(0);
 
         CHECK(doc["store"]["book"].size() == 3);
         CHECK(doc["store"]["book"][2].contains("price"));
 
-        std::size_t count = jsonpath::remove(doc, loc);
+        std::size_t count = json_erase(doc, loc);
 
         CHECK(count == 0);
         CHECK(doc == orig);
@@ -199,10 +199,10 @@ TEST_CASE("json_location select tests")
 
     SECTION("store book 1")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(1);
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
 
         CHECK_FALSE(p_json == nullptr);
         CHECK(*p_json == doc.at("store").at("book").at(1));
@@ -210,10 +210,10 @@ TEST_CASE("json_location select tests")
 
     SECTION("store book 2")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(2);
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
 
         CHECK_FALSE(p_json == nullptr);
         CHECK(*p_json == doc.at("store").at("book").at(2));
@@ -221,49 +221,49 @@ TEST_CASE("json_location select tests")
 
     SECTION("store book 3")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(3);
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
 
         CHECK(p_json == nullptr);
     }
 
     SECTION("store")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store");
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
         CHECK_FALSE(p_json == nullptr);
         CHECK(*p_json == doc.at("store"));
     }
 
     SECTION("store book")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book");
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
         CHECK_FALSE(p_json == nullptr);
         CHECK(*p_json == doc.at("store").at("book"));
     }
 
     SECTION("store lost&found")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("lost&found");
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
         CHECK(p_json == nullptr);
     }
 
     SECTION("store book 2 price")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append("book").append(2).append("price");
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
 
         CHECK_FALSE(p_json == nullptr);
         CHECK(*p_json == doc.at("store").at("book").at(2).at("price"));
@@ -271,10 +271,10 @@ TEST_CASE("json_location select tests")
 
     SECTION("store 0")
     {
-        jsonpath::json_location loc;
+        json_location loc;
         loc.append("store").append(0);
 
-        json* p_json = jsonpath::select(doc, loc);
+        json* p_json = json_select(doc, loc);
 
         CHECK(p_json == nullptr);
     }

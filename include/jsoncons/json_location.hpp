@@ -4,20 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
-#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#ifndef JSONCONS_JSON_LOCATION_HPP
+#define JSONCONS_JSON_LOCATION_HPP
 
 #include <string>
 #include <vector>
-#include <functional>
-#include <algorithm> // std::reverse
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json_type.hpp>
-#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons { 
-namespace jsonpath {
 
     template <class CharT,class Allocator>
     class basic_path_element 
@@ -223,7 +217,7 @@ namespace jsonpath {
     };
 
     template<class Json>
-    std::size_t remove(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    std::size_t json_erase(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
@@ -284,7 +278,7 @@ namespace jsonpath {
     }
 
     template<class Json>
-    Json* select(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    Json* json_select(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         Json* p_current = std::addressof(instance);
         bool found = false;
@@ -340,7 +334,6 @@ namespace jsonpath {
     using path_element = basic_path_element<char,std::allocator<char>>;
     using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
 
-} // namespace jsonpath
 } // namespace jsoncons
 
 #endif

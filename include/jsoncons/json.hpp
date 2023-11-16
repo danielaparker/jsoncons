@@ -13,6 +13,7 @@
 #include <jsoncons/json_traits_macros.hpp>
 #include <jsoncons/json_traits_macros_deprecated.hpp>
 #include <jsoncons/staj_iterator.hpp>
+#include <jsoncons/json_location.hpp>
 
 #endif
 

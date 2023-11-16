@@ -11,7 +11,7 @@
 #include <vector>
 #include <functional>
 #include <algorithm> // std::reverse
-#include <jsoncons_ext/jsonpath/json_location.hpp>
+#include <jsoncons/json_location.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -371,10 +371,10 @@ namespace jsonpath {
                 case path_node_kind::root:
                     break;
                 case path_node_kind::name:
-                    location /=(node->name());
+                    location.append(node->name());
                     break;
                 case path_node_kind::index:
-                    location /=(node->index());
+                    location.append(node->index());
                     break;
             }
         }
