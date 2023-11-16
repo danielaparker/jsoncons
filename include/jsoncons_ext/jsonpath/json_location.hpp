@@ -4,14 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_LOCATION_HPP
-#define JSONCONS_JSON_LOCATION_HPP
+#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
 
 #include <string>
 #include <vector>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 
+namespace jsonpath { 
 
     template <class CharT,class Allocator>
     class basic_path_element 
@@ -278,7 +279,7 @@ namespace jsoncons {
     }
 
     template<class Json>
-    Json* json_select(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    Json* json_get(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         Json* p_current = std::addressof(instance);
         bool found = false;
@@ -334,6 +335,7 @@ namespace jsoncons {
     using path_element = basic_path_element<char,std::allocator<char>>;
     using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
 
+} // namespace jsonpath
 } // namespace jsoncons
 
 #endif

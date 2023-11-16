@@ -59,10 +59,10 @@ TEST_CASE("jsonpath.jsonpath select_paths test")
             std::cout << s << std::endl;
         }
 
-        std::vector<json_location> locations;
-        json_location expected1;
+        std::vector<jsonpath::json_location> locations;
+        jsonpath::json_location expected1;
         expected1.append("store").append("book").append(1).append("title");
-        json_location expected2;
+        jsonpath::json_location expected2;
         expected2.append("store").append("book").append(2).append("title");
 
         locations.push_back(expected1);

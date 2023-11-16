@@ -11,7 +11,7 @@
 #include <vector>
 #include <functional>
 #include <algorithm> // std::reverse
-#include <jsoncons/json_location.hpp>
+#include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
