@@ -19,8 +19,6 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class path_element_kind { name, index };
-
     template <class CharT,class Allocator>
     class basic_path_element 
     {
@@ -30,23 +28,23 @@ namespace jsonpath {
         using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     private:
-        path_element_kind element_kind_;
+        bool has_name_;
         string_type name_;
         std::size_t index_;
 
     public:
         basic_path_element(const string_type& name)
-            : element_kind_(path_element_kind::name), name_(name), index_(0)
+            : has_name_(true), name_(name), index_(0)
         {
         }
 
         basic_path_element(string_type&& name)
-            : element_kind_(path_element_kind::name), name_(std::move(name)), index_(0)
+            : has_name_(true), name_(std::move(name)), index_(0)
         {
         }
 
         basic_path_element(std::size_t index)
-            : element_kind_(path_element_kind::index), index_(index)
+            : has_name_(false), index_(index)
         {
         }
 
@@ -54,9 +52,14 @@ namespace jsonpath {
 
         basic_path_element& operator=(const basic_path_element& other) = default;
 
-        path_element_kind element_kind() const
+        bool has_name() const
         {
-            return element_kind_;
+            return has_name_;
+        }
+
+        bool has_index() const
+        {
+            return !has_name_;
         }
 
         const string_type& name() const
@@ -69,32 +72,22 @@ namespace jsonpath {
             return index_;
         }
 
-        std::size_t node_hash() const
-        {
-            std::size_t h = element_kind_ == path_element_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
-
-            return h;
-        }
-
         int compare(const basic_path_element& other) const
         {
             int diff = 0;
-            if (element_kind_ != other.element_kind_)
+            if (has_name_ != other.has_name_)
             {
-                diff = static_cast<int>(element_kind_) - static_cast<int>(other.element_kind_);
+                diff = static_cast<int>(has_name_) - static_cast<int>(other.has_name_);
             }
             else
             {
-                switch (element_kind_)
+                if (has_name_)
                 {
-                    case path_element_kind::name:
-                        diff = name_.compare(other.name_);
-                        break;
-                    case path_element_kind::index:
-                        diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
-                        break;
-                    default:
-                        break;
+                    diff = name_.compare(other.name_);
+                }
+                else
+                {
+                    diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                 }
             }
             return diff;
@@ -176,22 +169,6 @@ namespace jsonpath {
             return (elements_.size() < other.elements_.size()) ? -1 : (elements_.size() == other.elements_.size()) ? 0 : 1;
         }
 
-        std::size_t hash() const
-        {
-
-            auto it = elements_.begin();
-            std::size_t hash = (*it).hash();
-            ++it;
-
-            while (it != elements_.end())
-            {
-                hash += 17*(*it)->node_hash();
-                ++it;
-            }
-
-            return hash;
-        }
-
         // Modifiers
 
         void clear()
@@ -254,18 +231,15 @@ namespace jsonpath {
         Json* p_current = std::addressof(instance);
         for (const auto& element : location)
         {
-            switch (element.element_kind())
+            if (element.has_name())
             {
-                case path_element_kind::name:
-                    if (p_current->is_object())
-                    {
+                if (p_current->is_object())
+                {
 
-                    }
-                    break;
-                case path_element_kind::index:
-                    break;
-                default:
-                    break;
+                }
+            }
+            else
+            {
             }
         }
         return count;

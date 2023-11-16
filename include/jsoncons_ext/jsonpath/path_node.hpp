@@ -328,20 +328,19 @@ namespace jsonpath {
         buffer.push_back('$');
         for (const auto& element : location)
         {
-            switch (element.element_kind())
+            if (element.has_name())
             {
-            case path_element_kind::name:
                 buffer.push_back('[');
                 buffer.push_back('\'');
                 jsoncons::jsonpath::escape_string(element.name().data(), element.name().size(), buffer);
                 buffer.push_back('\'');
                 buffer.push_back(']');
-                break;
-            case path_element_kind::index:
+            }
+            else
+            {
                 buffer.push_back('[');
                 jsoncons::detail::from_integer(element.index(), buffer);
                 buffer.push_back(']');
-                break;
             }
         }
 
