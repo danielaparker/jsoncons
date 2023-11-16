@@ -222,24 +222,62 @@ namespace jsonpath {
         }
     };
 
-
     template<class Json>
-    std::size_t remove(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    std::size_t erase(Json& instance, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
         Json* p_current = std::addressof(instance);
-        for (const auto& element : location)
+
+        std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
+        for (std::size_t i = 0; i < location.size(); ++i)
         {
+            const auto& element = location[i];
             if (element.has_name())
             {
                 if (p_current->is_object())
                 {
-
+                    auto it = p_current->find(element.name());
+                    if (it != p_current->object_range().end())
+                    {
+                        if (i < last)
+                        {
+                            p_current = std::addressof(it->value());
+                        }
+                        else
+                        {
+                            p_current->erase(it);
+                            count = 1;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
-            else
+            else // if (element.has_index())
             {
+                if (p_current->is_array() && element.index() < p_current->size())
+                {
+                    if (i < last)
+                    {
+                        p_current = std::addressof(p_current->at(element.index()));
+                    }
+                    else
+                    {
+                        p_current->erase(p_current->array_range().begin()+element.index());
+                        count = 1;
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
         }
         return count;
