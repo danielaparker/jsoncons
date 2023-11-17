@@ -2543,7 +2543,7 @@ namespace detail {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
             auto f = [&callback](const path_node_type& path, reference val)
             {
-                callback(to_jsonpath(path), val);
+                callback(to_basic_string(path), val);
             };
             expr_.evaluate(resources, instance, path_node_type{}, instance, f, options);
         }
@@ -2557,7 +2557,7 @@ namespace detail {
                 Json result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const path_node_type& path, reference)
                 {
-                    result.emplace_back(to_jsonpath(path));
+                    result.emplace_back(to_basic_string(path));
                 };
                 expr_.evaluate(resources, instance, path_node_type(), instance, callback, options);
                 return result;

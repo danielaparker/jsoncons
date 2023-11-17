@@ -50,12 +50,12 @@ TEST_CASE("jsonpath.jsonpath select_paths test")
 
     SECTION("test 1")
     {
-        auto expr = jsonpath::make_jsonpath_expr<json>("$..book[?(@.category == 'fiction')].title");
+        auto expr = jsonpath::compile_jsonpath<json>("$..book[?(@.category == 'fiction')].title");
         auto result = expr.select_paths(doc);
 
         for (const auto& loc : result)
         {
-            std::string s = jsonpath::to_jsonpath(loc);
+            std::string s = jsonpath::to_string(loc);
             std::cout << s << std::endl;
         }
 

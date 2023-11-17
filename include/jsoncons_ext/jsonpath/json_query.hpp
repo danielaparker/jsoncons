@@ -130,7 +130,7 @@ namespace jsonpath {
 
         auto f = [&callback](const path_node_type& path, reference val)
         {
-            callback(to_jsonpath(path), val);
+            callback(to_basic_string(path), val);
         };
         expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, f);
     }
@@ -157,7 +157,7 @@ namespace jsonpath {
 
         auto f = [&callback](const path_node_type& path, reference val)
         {
-            callback(to_jsonpath(path), val);
+            callback(to_basic_string(path), val);
         };
         expr.evaluate_with_replacement(resources, instance, path_node_type{}, instance, f);
     }

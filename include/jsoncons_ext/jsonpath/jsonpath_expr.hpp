@@ -94,7 +94,7 @@ namespace jsonpath {
                 value_type result(json_array_arg, semantic_tag::none, alloc_);
                 auto callback = [&result](const path_node_type& p, reference)
                 {
-                    result.emplace_back(to_jsonpath(p));
+                    result.emplace_back(to_basic_string(p));
                 };
                 expr_.evaluate(resources, instance, path_node_type(), instance, callback, options);
                 return result;
@@ -133,7 +133,7 @@ namespace jsonpath {
     };
 
     template <class Json>
-    auto make_jsonpath_expr(const typename Json::string_view_type& path,
+    auto compile_jsonpath(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
@@ -150,7 +150,7 @@ namespace jsonpath {
     }
 
     template <class Json, class TempAllocator>
-    auto make_jsonpath_expr(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
+    auto compile_jsonpath(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
         const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {

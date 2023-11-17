@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { 
 namespace jsonpath { 
@@ -89,7 +90,7 @@ namespace jsonpath {
         }
     };
 
-    template <class CharT, class Allocator = std::allocator<char>>
+    template <class CharT, class Allocator = std::allocator<CharT>>
     class basic_json_location
     {
     public:
@@ -330,10 +331,50 @@ namespace jsonpath {
         return found ? p_current : nullptr;
     }
 
+    template <class CharT, class Allocator = std::allocator<CharT>>
+    std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 
+        const Allocator& alloc = Allocator())
+    {
+        std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer(alloc);
+
+        buffer.push_back('$');
+        for (const auto& element : location)
+        {
+            if (element.has_name())
+            {
+                buffer.push_back('[');
+                buffer.push_back('\'');
+                jsoncons::jsonpath::escape_string(element.name().data(), element.name().size(), buffer);
+                buffer.push_back('\'');
+                buffer.push_back(']');
+            }
+            else
+            {
+                buffer.push_back('[');
+                jsoncons::detail::from_integer(element.index(), buffer);
+                buffer.push_back(']');
+            }
+        }
+
+        return buffer;
+    }
+
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
     using path_element = basic_path_element<char,std::allocator<char>>;
     using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
+
+    inline
+    std::string to_string(const json_location& location)
+    {
+        return to_basic_string(location);
+    }
+
+    inline
+    std::wstring to_wstring(const wjson_location& location)
+    {
+        return to_basic_string(location);
+    }
 
 } // namespace jsonpath
 } // namespace jsoncons

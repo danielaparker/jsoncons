@@ -278,7 +278,7 @@ namespace jsonpath {
     }
 
     template <class CharT, class Allocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_jsonpath(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
+    std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_basic_string(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
     {
         std::basic_string<CharT,std::char_traits<CharT>,Allocator> buffer(alloc);
 
@@ -313,34 +313,6 @@ namespace jsonpath {
                     jsoncons::detail::from_integer(node->index(), buffer);
                     buffer.push_back(']');
                     break;
-            }
-        }
-
-        return buffer;
-    }
-
-    template <class CharT, class Allocator = std::allocator<CharT>>
-    std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_jsonpath(const basic_json_location<CharT,Allocator>& location, 
-        const Allocator& alloc = Allocator())
-    {
-        std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer(alloc);
-
-        buffer.push_back('$');
-        for (const auto& element : location)
-        {
-            if (element.has_name())
-            {
-                buffer.push_back('[');
-                buffer.push_back('\'');
-                jsoncons::jsonpath::escape_string(element.name().data(), element.name().size(), buffer);
-                buffer.push_back('\'');
-                buffer.push_back(']');
-            }
-            else
-            {
-                buffer.push_back('[');
-                jsoncons::detail::from_integer(element.index(), buffer);
-                buffer.push_back(']');
             }
         }
 
@@ -382,8 +354,21 @@ namespace jsonpath {
         return location;
     }
 
+
     using path_node = basic_path_node<char>;
     using wpath_node = basic_path_node<wchar_t>;
+
+    inline
+    std::string to_string(const path_node& path)
+    {
+        return to_basic_string(path);
+    }
+
+    inline
+    std::wstring to_wstring(const wpath_node& path)
+    {
+        return to_basic_string(path);
+    }
 
 } // namespace jsonpath
 } // namespace jsoncons
