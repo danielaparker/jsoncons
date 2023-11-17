@@ -502,7 +502,7 @@ void flatten_and_unflatten2()
     std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
 }
 
-void get_and_add_if_missing()
+void get_and_create_if_missing()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
@@ -518,7 +518,7 @@ void get_and_add_if_missing()
     std::cout << pretty_print(doc) << "\n\n";
 }
 
-void add_and_add_if_missing()
+void add_and_create_if_missing()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
@@ -534,7 +534,7 @@ void add_and_add_if_missing()
     std::cout << pretty_print(doc) << "\n\n";
 }
 
-void add_if_absent_and_add_if_missing()
+void add_if_absent_and_create_if_missing()
 {
     std::vector<std::string> keys = { "foo","bar","baz" };
 
@@ -550,7 +550,7 @@ void add_if_absent_and_add_if_missing()
     std::cout << pretty_print(doc) << "\n\n";
 }
 
-void replace_and_add_if_missing()
+void replace_and_create_if_missing()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
@@ -590,9 +590,9 @@ int main()
     jsonpointer_address_concatenate();
     flatten_and_unflatten();
     flatten_and_unflatten2();
-    get_and_add_if_missing();
-    add_and_add_if_missing();
-    add_if_absent_and_add_if_missing();
-    replace_and_add_if_missing();
+    get_and_create_if_missing();
+    add_and_create_if_missing();
+    add_if_absent_and_create_if_missing();
+    replace_and_create_if_missing();
 }
 

@@ -8,7 +8,7 @@ Selects a value.
 template<class Json>
 Json& get(Json& root, 
           const basic_json_pointer<Json::char_type>& location,
-          bool add_if_missing = false);                               (1)
+          bool create_if_missing = false);                               (1)
 
 template<class Json>
 const Json& get(const Json& root, 
@@ -27,13 +27,13 @@ const Json& get(const Json& root,
 template<class Json>
 Json& get(Json& root, 
           const basic_json_pointer<Json::char_type>& location, 
-          bool add_if_missing, 
+          bool create_if_missing, 
           std::error_code& ec);                                          (5)
 
 template<class Json, class StringSource>
 Json& get(Json& root, 
           const StringSource& location_str,
-          bool add_if_missing = false);                               (6)
+          bool create_if_missing = false);                               (6)
 
 template<class Json, class StringSource>
 const Json& get(const Json& root, 
@@ -52,7 +52,7 @@ const Json& get(const Json& root,
 template<class Json, class StringSource>
 Json& get(Json& root, 
           const StringSource& location_str, 
-          bool add_if_missing, 
+          bool create_if_missing, 
           std::error_code& ec);                                          (10)
 ```
 
@@ -71,7 +71,7 @@ Json& get(Json& root,
     <td>A JSON Pointer provided as a string, string view, or C-string</td> 
   </tr>
   <tr>
-    <td><code>add_if_missing</code> (since 0.162.0)</td>
+    <td><code>create_if_missing</code> (since 0.162.0)</td>
     <td>Create key-object pairs when object key is missing</td> 
   </tr>
   <tr>
