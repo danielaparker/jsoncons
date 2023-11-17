@@ -10,85 +10,10 @@
 #include <string>
 #include <vector>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
+#include <jsoncons_ext/jsonpath/normalized_path_parser.hpp>
 
 namespace jsoncons { 
 namespace jsonpath { 
-
-    template <class CharT,class Allocator>
-    class basic_path_element 
-    {
-    public:
-        using char_type = CharT;
-        using allocator_type = Allocator;
-        using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
-    private:
-        bool has_name_;
-        string_type name_;
-        std::size_t index_;
-
-    public:
-        basic_path_element(const string_type& name)
-            : has_name_(true), name_(name), index_(0)
-        {
-        }
-
-        basic_path_element(string_type&& name)
-            : has_name_(true), name_(std::move(name)), index_(0)
-        {
-        }
-
-        basic_path_element(std::size_t index)
-            : has_name_(false), index_(index)
-        {
-        }
-
-        basic_path_element(const basic_path_element& other) = default;
-
-        basic_path_element& operator=(const basic_path_element& other) = default;
-
-        bool has_name() const
-        {
-            return has_name_;
-        }
-
-        bool has_index() const
-        {
-            return !has_name_;
-        }
-
-        const string_type& name() const
-        {
-            return name_;
-        }
-
-        std::size_t index() const 
-        {
-            return index_;
-        }
-
-        int compare(const basic_path_element& other) const
-        {
-            int diff = 0;
-            if (has_name_ != other.has_name_)
-            {
-                diff = static_cast<int>(has_name_) - static_cast<int>(other.has_name_);
-            }
-            else
-            {
-                if (has_name_)
-                {
-                    diff = name_.compare(other.name_);
-                }
-                else
-                {
-                    diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
-                }
-            }
-            return diff;
-        }
-    };
 
     template <class CharT, class Allocator = std::allocator<CharT>>
     class basic_json_location
@@ -110,6 +35,11 @@ namespace jsonpath {
 
         basic_json_location(const allocator_type& alloc=Allocator())
             : alloc_(alloc), elements_(alloc)
+        {
+        }
+
+        basic_json_location(std::vector<path_element_type>&& elements)
+            : elements_(std::move(elements))
         {
         }
 
@@ -215,6 +145,14 @@ namespace jsonpath {
         friend bool operator<(const basic_json_location& lhs, const basic_json_location& rhs) 
         {
             return lhs.compare(rhs) < 0;
+        }
+
+        static basic_json_location parse(const jsoncons::basic_string_view<char_type>& normalized_path)
+        {
+            jsonpath::detail::normalized_path_parser<char,std::allocator<char>> parser;
+
+            std::vector<jsonpath::path_element> location = parser.parse(normalized_path);
+            return basic_json_location(std::move(location));
         }
     };
 
@@ -361,8 +299,6 @@ namespace jsonpath {
 
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
-    using path_element = basic_path_element<char,std::allocator<char>>;
-    using wpath_element = basic_path_element<wchar_t,std::allocator<char>>;
 
     inline
     std::string to_string(const json_location& location)

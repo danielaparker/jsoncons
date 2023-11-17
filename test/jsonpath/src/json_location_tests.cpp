@@ -24,6 +24,18 @@ TEST_CASE("json_location tests")
     }
 }
 
+TEST_CASE("json_location parse tests")
+{
+    SECTION("test 1")
+    {
+        jsonpath::json_location loc;
+        loc.append("foo").append(1);
+
+        jsonpath::json_location loc2 = jsonpath::json_location::parse("$['foo'][1]");
+        CHECK(loc2 == loc);
+    }
+}
+
 TEST_CASE("json_location remove tests")
 {
 
