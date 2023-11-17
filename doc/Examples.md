@@ -3080,7 +3080,7 @@ int main()
     }
 
     json j;
-    jsonpointer::add(j, location, "str", true); // create_if_missing set to true
+    jsonpointer::add(j, location, "str", true); // add_if_missing set to true
 
     std::cout << pretty_print(j) << "\n\n";
 }

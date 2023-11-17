@@ -365,7 +365,7 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
     CHECK(oj.size() == 1);
 }
 
-TEST_CASE("[jsonpointer] create_if_missing")
+TEST_CASE("[jsonpointer] add_if_missing")
 {
     SECTION("get from empty")
     {

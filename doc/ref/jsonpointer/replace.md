@@ -9,7 +9,7 @@ template<class Json, class T>
 void replace(Json& target, 
              const basic_json_pointer<Json::char_type>& location, 
              T&& value, 
-             bool create_if_missing = false);                      (1)
+             bool add_if_missing = false);                      (1)
 
 template<class Json, class T>
 void replace(Json& target, 
@@ -21,14 +21,14 @@ template<class Json, class T>
 void replace(Json& target, 
              const basic_json_pointer<Json::char_type>& location, 
              T&& value, 
-             bool create_if_missing, 
+             bool add_if_missing, 
              std::error_code& ec);                                 (3)
 
 template<class Json, class StringSource, class T>
 void replace(Json& target, 
              const StringSource& location_str, 
              T&& value, 
-             bool create_if_missing = false);                      (4)
+             bool add_if_missing = false);                      (4)
 
 template<class Json, class StringSource, class T>
 void replace(Json& target, 
@@ -40,7 +40,7 @@ template<class Json, class StringSource, class T>
 void replace(Json& target, 
              const StringSource& location_str, 
              T&& value, 
-             bool create_if_missing, 
+             bool add_if_missing, 
              std::error_code& ec);                                 (6)
 ```
 
@@ -65,7 +65,7 @@ Replaces the value at the location specified by `location` with a new value.
     <td>Replacement value</td> 
   </tr>
   <tr>
-    <td><code>create_if_missing</code> (since 0.162.0)</td>
+    <td><code>add_if_missing</code> (since 0.162.0)</td>
     <td>Create key-object pairs when object key is missing</td> 
   </tr>
   <tr>
