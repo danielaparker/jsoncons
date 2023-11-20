@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/jsonpath/normalized_path_parser.hpp>
+#include <jsoncons_ext/jsonpath/json_location_parser.hpp>
 
 namespace jsoncons { 
 namespace jsonpath { 
@@ -149,7 +149,7 @@ namespace jsonpath {
 
         static basic_json_location parse(const jsoncons::basic_string_view<char_type>& normalized_path)
         {
-            jsonpath::detail::normalized_path_parser<char,std::allocator<char>> parser;
+            jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
 
             std::vector<jsonpath::path_element> location = parser.parse(normalized_path);
             return basic_json_location(std::move(location));
