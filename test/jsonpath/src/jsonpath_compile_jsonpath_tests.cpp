@@ -19,7 +19,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jsonpath make_expression test")
+TEST_CASE("jsonpath compile_jsonpath tests")
 {
     std::string input = R"(
     {
@@ -58,9 +58,9 @@ TEST_CASE("jsonpath make_expression test")
 
         const json doc = json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::compile_jsonpath<const json>("$.books[*]");
 
-        auto callback = [&](const std::string& /*location*/, const json& book)
+        auto callback = [&](const jsonpath::path_node& /*location*/, const json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -68,10 +68,44 @@ TEST_CASE("jsonpath make_expression test")
             }
         };
 
-        expr.evaluate(doc, callback);
+        expr.select(doc, callback);
 
         CHECK(count == 1);
         CHECK_FALSE(doc["books"][3].contains("price"));
+    }
+
+    SECTION("test 2")
+    {
+        int count = 0;
+
+        json doc = json::parse(input);
+
+        auto expr = jsoncons::jsonpath::compile_jsonpath<json>("$.books[*]");
+
+        auto callback1 = [&](const jsonpath::path_node& /*location*/, const json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                ++count;
+            }
+        };
+
+        auto callback2 = [](const jsonpath::path_node& /*location*/, json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                book.try_emplace("price", 140.0);
+            }
+        };
+
+        expr.select(doc, callback1);
+
+        CHECK(count == 1);
+
+        CHECK_FALSE(doc["books"][3].contains("price"));
+        expr.update(doc, callback2);
+        CHECK(doc["books"][3].contains("price"));
+        CHECK(doc["books"][3].at("price") == 140);
     }
 }
 

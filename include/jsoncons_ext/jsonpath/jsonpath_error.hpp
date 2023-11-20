@@ -16,7 +16,7 @@ namespace jsoncons { namespace jsonpath {
     {
         success = 0,
         expected_root_or_current_node,
-        expected_lbracket,
+        expected_lbracket_or_dot,
         expected_single_quote_or_digit,
         expected_root_or_function,
         expected_current_node,
@@ -70,8 +70,8 @@ namespace jsoncons { namespace jsonpath {
             {
                 case jsonpath_errc::expected_root_or_current_node:
                     return "Expected '$' or '@'";
-                case jsonpath_errc::expected_lbracket:
-                    return "Expected '['";
+                case jsonpath_errc::expected_lbracket_or_dot:
+                    return "Expected '[' or '.'";
                 case jsonpath_errc::expected_single_quote_or_digit:
                     return "Expected '\'' or digit";
                 case jsonpath_errc::expected_root_or_function:
