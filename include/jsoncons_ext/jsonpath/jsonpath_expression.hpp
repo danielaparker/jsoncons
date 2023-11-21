@@ -114,10 +114,10 @@ namespace jsonpath {
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
-        select(reference instance, BinaryCallback callback, result_options options = result_options()) const
+        select(const_reference instance, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, instance, path_node_type{}, instance, callback, options);
+            expr_.evaluate(resources, const_cast<reference>(instance), path_node_type{}, const_cast<reference>(instance), callback, options);
         }
 
         template <class BinaryCallback>
@@ -128,7 +128,7 @@ namespace jsonpath {
             expr_.evaluate_with_replacement(resources, instance, path_node_type{}, instance, callback);
         }
 
-        std::vector<basic_json_location<char_type>> select_paths(reference instance) const
+        std::vector<basic_json_location<char_type>> select_paths(const_reference instance) const
         {
             std::vector<basic_json_location<char_type>> result;
 
@@ -140,7 +140,7 @@ namespace jsonpath {
             };
 
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, instance, path_node_type(), instance, callback, options);
+            expr_.evaluate(resources, const_cast<reference>(instance), path_node_type(), const_cast<reference>(instance), callback, options);
 
             return result;
         }

@@ -58,7 +58,7 @@ TEST_CASE("jsonpath make_expression tests")
 
         const json doc = json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<const json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
         auto callback = [&](const jsonpath::path_node& /*location*/, const json& book)
         {
