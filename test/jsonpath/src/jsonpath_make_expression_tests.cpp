@@ -107,6 +107,27 @@ TEST_CASE("jsonpath make_expression tests")
         CHECK(doc["books"][3].contains("price"));
         CHECK(doc["books"][3].at("price") == 140);
     }
+
+    SECTION("update default sort order")
+    {
+        json doc = json::parse(input);
+
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+        std::vector<jsonpath::path_node> path_nodes;
+        auto callback2 = [&](const jsonpath::path_node& base_node, json&)
+        {
+            path_nodes.push_back(base_node);
+        };
+
+        expr.update(doc, callback2);
+
+        REQUIRE(path_nodes.size() == 4);
+        CHECK(path_nodes[0].index() == 3);
+        CHECK(path_nodes[1].index() == 2);
+        CHECK(path_nodes[2].index() == 1);
+        CHECK(path_nodes[3].index() == 0);
+    }
 }
 
 TEST_CASE("jsonpath legacy make_expression test")
