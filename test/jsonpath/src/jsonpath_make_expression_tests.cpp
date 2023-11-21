@@ -60,7 +60,7 @@ TEST_CASE("jsonpath make_expression tests")
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        auto callback = [&](const jsonpath::path_node& /*location*/, const json& book)
+        auto op = [&](const jsonpath::path_node& /*location*/, const json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -68,7 +68,7 @@ TEST_CASE("jsonpath make_expression tests")
             }
         };
 
-        expr.select(doc, callback);
+        expr.select(doc, op);
 
         CHECK(count == 1);
         CHECK_FALSE(doc["books"][3].contains("price"));
@@ -80,7 +80,7 @@ TEST_CASE("jsonpath make_expression tests")
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        auto callback = [](const jsonpath::path_node& /*location*/, json& book)
+        auto op = [](const jsonpath::path_node& /*location*/, json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -88,7 +88,7 @@ TEST_CASE("jsonpath make_expression tests")
             }
         };
 
-        expr.update(doc, callback);
+        expr.update(doc, op);
 
         CHECK(doc["books"][3].contains("price"));
         CHECK(doc["books"][3].at("price") == 140);
@@ -177,7 +177,7 @@ TEST_CASE("jsonpath legacy make_expression test")
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        auto callback = [&](const std::string& /*location*/, const json& book)
+        auto op = [&](const std::string& /*location*/, const json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -185,7 +185,7 @@ TEST_CASE("jsonpath legacy make_expression test")
             }
         };
 
-        expr.evaluate(doc, callback);
+        expr.evaluate(doc, op);
 
         CHECK(count == 1);
         CHECK(doc == original);
