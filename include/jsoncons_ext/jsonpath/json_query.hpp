@@ -8,11 +8,29 @@
 #define JSONCONS_JSONPATH_JSON_QUERY_HPP
 
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_expr.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
+
+    template <class Json, class JsonReference = const Json&>
+    struct legacy_jsonpath_traits
+    {
+        using char_type = typename Json::char_type;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
+        using element_type = Json;
+        using value_type = typename std::remove_cv<Json>::type;
+        using reference = JsonReference;
+        using const_reference = const value_type&;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
+        using allocator_type = typename value_type::allocator_type;
+        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
+        using path_node_type = basic_path_node<typename Json::char_type>;
+        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
+        using path_pointer = const path_node_type*;
+    };
      
     template<class Json>
     Json json_query(const Json& instance,

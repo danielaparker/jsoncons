@@ -19,7 +19,97 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jsonpath make_expression test")
+TEST_CASE("jsonpath make_expression tests")
+{
+    std::string input = R"(
+    {
+        "books":
+        [
+            {
+                "category": "fiction",
+                "title" : "A Wild Sheep Chase",
+                "author" : "Haruki Murakami",
+                "price" : 22.72
+            },
+            {
+                "category": "fiction",
+                "title" : "The Night Watch",
+                "author" : "Sergei Lukyanenko",
+                "price" : 23.58
+            },
+            {
+                "category": "fiction",
+                "title" : "The Comedians",
+                "author" : "Graham Greene",
+                "price" : 21.99
+            },
+            {
+                "category": "memoir",
+                "title" : "The Night Watch",
+                "author" : "Phillips, David Atlee"
+            }
+        ]
+    }
+    )";
+
+    SECTION("test 1")
+    {
+        int count = 0;
+
+        const json doc = json::parse(input);
+
+        auto expr = jsoncons::jsonpath::make_expression<const json>("$.books[*]");
+
+        auto callback = [&](const jsonpath::path_node& /*location*/, const json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                ++count;
+            }
+        };
+
+        expr.select(doc, callback);
+
+        CHECK(count == 1);
+        CHECK_FALSE(doc["books"][3].contains("price"));
+    }
+
+    SECTION("test 2")
+    {
+        int count = 0;
+
+        json doc = json::parse(input);
+
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+        auto callback1 = [&](const jsonpath::path_node& /*location*/, const json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                ++count;
+            }
+        };
+
+        auto callback2 = [](const jsonpath::path_node& /*location*/, json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                book.try_emplace("price", 140.0);
+            }
+        };
+
+        expr.select(doc, callback1);
+
+        CHECK(count == 1);
+
+        CHECK_FALSE(doc["books"][3].contains("price"));
+        expr.update(doc, callback2);
+        CHECK(doc["books"][3].contains("price"));
+        CHECK(doc["books"][3].at("price") == 140);
+    }
+}
+
+TEST_CASE("jsonpath legacy make_expression test")
 {
     std::string input = R"(
     {

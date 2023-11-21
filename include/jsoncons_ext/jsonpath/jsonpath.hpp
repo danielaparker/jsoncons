@@ -8,7 +8,6 @@
 #define JSONCONS_JSONPATH_JSONPATH_HPP
 
 #include <jsoncons_ext/jsonpath/json_query.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_expr.hpp>
 #include <jsoncons_ext/jsonpath/flatten.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
 
