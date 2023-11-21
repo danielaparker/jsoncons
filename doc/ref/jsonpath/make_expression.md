@@ -21,7 +21,7 @@ jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
 ```cpp
 template <class Json>                                                           
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
-    const custom_functions<Json>& funcs, std::error_code& ec);                  (3) (since 0.164.0)
+    const custom_functions<Json>& funcs, std::error_code& ec);                          (3) (since 0.164.0)
 ```
 ```cpp
 template <class Json, class TempAllocator>                                              (4) (since 0.170.0)
@@ -108,6 +108,12 @@ The examples below uses the sample data file `books.json`,
 #### Return copies
 
 ```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
 int main()
 {
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
@@ -126,9 +132,85 @@ Output:
 ]
 ```
 
+#### Return locations of selected values (since 0.172.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+    std::ifstream is("./input/books.json");
+    json doc = json::parse(is);
+
+    std::vector<jsonpath::json_location> paths = expr.select_paths(doc);
+    for (const auto& path : paths)
+    {
+        std::cout << jsonpath::to_string(path) << "\n";
+    }
+}
+```
+Output:
+```
+[
+  $['books'][0]
+  $['books'][1]
+  $['books'][2]
+  $['books'][3]
+]
+```
+
+#### Update in place (since 0.172.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+    std::ifstream is("./input/books.json");
+    json doc = json::parse(is);
+
+    auto callback = [](const jsonpath::path_node& /*location*/, json& book)
+    {
+        if (book.at("category") == "memoir" && !book.contains("price"))
+        {
+            book.try_emplace("price", 140.0);
+        }
+    };
+
+    expr.update(doc, callback);
+}
+```
+Output:
+```
+{
+    "author": "Phillips, David Atlee",
+    "category": "memoir",
+    "price": 140.0,
+    "title": "The Night Watch"
+}
+```
+
 #### Access path and reference to original value
 
 ```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
 int main()
 {
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
@@ -136,10 +218,18 @@ int main()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto callback = [](const std::string& path, const json& val)
+    // legacy (deprecated in 0.172.0)
+    // auto callback = [](const std::string& path, const json& val)
+    // {
+    //    std::cout << path << ": " << val << "\n";
+    // };
+
+    // since 0.172.0    
+    auto callback = [](const jsonpath::path_node& path, const json& val)
     {
-        std::cout << path << ": " << val << "\n";
+       std::cout << jsonpath::to_string(path) << ": " << val << "\n";
     };
+
     expr.evaluate(data, callback, jsonpath::result_options::path);
 }
 ```
@@ -210,6 +300,8 @@ Output:
 using my_alloc = FreeListAllocator<char>; // an allocator with a single-argument constructor
 using my_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
+namespace jsonpath = jsoncons::jsonpath;
+
 int main()
 {
     auto alloc = my_alloc(1);        
@@ -229,7 +321,7 @@ int main()
     my_json doc = decoder.get_result();
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsoncons::jsonpath::make_expression<my_json>(combine_allocators(alloc), p);  
+    auto expr = jsonpath::make_expression<my_json>(combine_allocators(alloc), p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";

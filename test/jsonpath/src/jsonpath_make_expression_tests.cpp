@@ -74,23 +74,13 @@ TEST_CASE("jsonpath make_expression tests")
         CHECK_FALSE(doc["books"][3].contains("price"));
     }
 
-    SECTION("test 2")
+    SECTION("Update in place")
     {
-        int count = 0;
-
         json doc = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        auto callback1 = [&](const jsonpath::path_node& /*location*/, const json& book)
-        {
-            if (book.at("category") == "memoir" && !book.contains("price"))
-            {
-                ++count;
-            }
-        };
-
-        auto callback2 = [](const jsonpath::path_node& /*location*/, json& book)
+        auto callback = [](const jsonpath::path_node& /*location*/, json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -98,14 +88,29 @@ TEST_CASE("jsonpath make_expression tests")
             }
         };
 
-        expr.select(doc, callback1);
+        expr.update(doc, callback);
 
-        CHECK(count == 1);
-
-        CHECK_FALSE(doc["books"][3].contains("price"));
-        expr.update(doc, callback2);
         CHECK(doc["books"][3].contains("price"));
         CHECK(doc["books"][3].at("price") == 140);
+    }
+
+    SECTION("Return locations of selected values")
+    {
+        json doc = json::parse(input);
+
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+        std::vector<jsonpath::json_location> paths = expr.select_paths(doc);
+
+        REQUIRE(paths.size() == 4);
+        CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
+        CHECK(jsonpath::to_string(paths[1]) == "$['books'][1]");
+        CHECK(jsonpath::to_string(paths[2]) == "$['books'][2]");
+        CHECK(jsonpath::to_string(paths[3]) == "$['books'][3]");
+        //for (const auto& path : paths)
+        //{
+        //    std::cout << jsonpath::to_string(path) << "\n";
+        //}
     }
 
     SECTION("update default sort order")
@@ -168,6 +173,7 @@ TEST_CASE("jsonpath legacy make_expression test")
         int count = 0;
 
         const json doc = json::parse(input);
+        const json original = doc;
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -182,7 +188,7 @@ TEST_CASE("jsonpath legacy make_expression test")
         expr.evaluate(doc, callback);
 
         CHECK(count == 1);
-        CHECK_FALSE(doc["books"][3].contains("price"));
+        CHECK(doc == original);
     }
 }
 
