@@ -24,7 +24,7 @@ callback repeatedly with the results.
   </tr>
   <tr>
     <td><code>op</code></td>
-    <td>A function object that accepts a path and a reference to a Json value. 
+    <td>A function object that accepts a path and a reference to a Json value.
 It must have function call signature equivalent to
 <br/><code>
 void fun(const Json::string_view_type& path, const Json& val);
