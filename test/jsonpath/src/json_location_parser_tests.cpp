@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_location_parser.hpp>
+#include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 
