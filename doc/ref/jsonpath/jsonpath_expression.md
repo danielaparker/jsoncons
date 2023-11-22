@@ -11,7 +11,7 @@ class jsonpath_expression
 
 <table border="0">
   <tr>
-    <td><a href="jsonpath_expression/evaluate.md">select</a></td>
+    <td><a href="jsonpath_expression/evaluate.md">evaluate</a></td>
     <td>Select values from a JSON document</td> 
   </tr>
   <tr>
