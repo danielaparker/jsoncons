@@ -2,7 +2,7 @@
 
 ```cpp
 template <class BinaryOp>
-void update(const_reference root_value, BinaryOp op);                                   (1) (since 0.172.0)
+void update(reference root_value, BinaryOp op);                                   (1) (since 0.172.0)
 ```
 
 (1) Evaluates the root value against the compiled JSONPath expression and calls a provided
