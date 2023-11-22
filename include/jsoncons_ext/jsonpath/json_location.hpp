@@ -27,14 +27,13 @@ namespace jsonpath {
         using path_element_type = basic_path_element<CharT,Allocator>;
         using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
     private:
-        allocator_type alloc_;
-        std::vector<path_element_type> elements_;
+        std::vector<path_element_type,path_element_allocator_type> elements_;
     public:
         using iterator = typename std::vector<path_element_type>::iterator;
         using const_iterator = typename std::vector<path_element_type>::const_iterator;
 
         basic_json_location(const allocator_type& alloc=Allocator())
-            : alloc_(alloc), elements_(alloc)
+            : elements_(alloc)
         {
         }
 
@@ -104,7 +103,7 @@ namespace jsonpath {
 
         basic_json_location& append(const string_view_type& s)
         {
-            elements_.emplace_back(string_type(s.data(), s.size(), alloc_));
+            elements_.emplace_back(s.data(), s.size());
             return *this;
         }
 
@@ -119,7 +118,7 @@ namespace jsonpath {
 
         basic_json_location& operator/=(const string_view_type& s)
         {
-            elements_.emplace_back(string_type(s.data(), s.size(), alloc_));
+            elements_.emplace_back(s.data(), s.size());
             return *this;
         }
 

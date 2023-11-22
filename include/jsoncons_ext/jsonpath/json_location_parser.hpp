@@ -36,6 +36,12 @@ namespace jsonpath {
         std::size_t index_;
 
     public:
+        basic_path_element(const char_type* name, std::size_t length, 
+            const Allocator& alloc = Allocator())
+            : has_name_(true), name_(name, length, alloc), index_(0)
+        {
+        }
+
         basic_path_element(const string_type& name)
             : has_name_(true), name_(name), index_(0)
         {
@@ -46,8 +52,9 @@ namespace jsonpath {
         {
         }
 
-        basic_path_element(std::size_t index)
-            : has_name_(false), index_(index)
+        basic_path_element(std::size_t index, 
+            const Allocator& alloc = Allocator())
+            : has_name_(false), name_(alloc), index_(index)
         {
         }
 
