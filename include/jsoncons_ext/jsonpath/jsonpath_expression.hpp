@@ -79,17 +79,17 @@ namespace jsonpath {
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const string_type&,const_reference>::value,void>::type
-        evaluate(const_reference instance, BinaryCallback callback, result_options options = result_options()) const
+        evaluate(const_reference root_value, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
             auto f = [&callback](const path_node_type& path, reference val)
             {
                 callback(to_basic_string(path), val);
             };
-            expr_.evaluate(resources, const_cast<reference>(instance), path_node_type{}, const_cast<reference>(instance), f, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), f, options);
         }
 
-        value_type evaluate(const_reference instance, result_options options = result_options()) const
+        value_type evaluate(const_reference root_value, result_options options = result_options()) const
         {
             if ((options & result_options::path) == result_options::path)
             {
@@ -100,39 +100,40 @@ namespace jsonpath {
                 {
                     result.emplace_back(to_basic_string(p));
                 };
-                expr_.evaluate(resources, const_cast<reference>(instance), 
-                    path_node_type(), const_cast<reference>(instance), callback, options);
+                expr_.evaluate(resources, const_cast<reference>(root_value), 
+                    path_node_type(), const_cast<reference>(root_value), callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
-                return expr_.evaluate(resources, const_cast<reference>(instance), 
-                    path_node_type(), const_cast<reference>(instance), options);
+                return expr_.evaluate(resources, const_cast<reference>(root_value), 
+                    path_node_type(), const_cast<reference>(root_value), options);
             }
         }
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
-        select(const_reference instance, BinaryCallback callback, result_options options = result_options()) const
+        select(const_reference root_value, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(instance), path_node_type{}, const_cast<reference>(instance), callback, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), callback, options);
         }
 
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,value_type&>::value,void>::type
-        update(reference instance, BinaryCallback callback) const
+        update(reference root_value, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate_with_replacement(resources, instance, path_node_type{}, instance, callback);
+            expr_.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, callback);
         }
 
-        std::vector<basic_json_location<char_type>> select_paths(const_reference instance) const
+        std::vector<basic_json_location<char_type>> select_paths(const_reference root_value, 
+            result_options options = result_options::nodups | result_options::sort) const
         {
             std::vector<basic_json_location<char_type>> result;
 
-            result_options options = result_options::path | result_options::nodups | result_options::sort;
+            options = options | result_options::path;
 
             auto callback = [&result](const path_node_type& path, const_reference)
             {
@@ -140,7 +141,7 @@ namespace jsonpath {
             };
 
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(instance), path_node_type(), const_cast<reference>(instance), callback, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type(), const_cast<reference>(root_value), callback, options);
 
             return result;
         }

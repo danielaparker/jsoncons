@@ -19,7 +19,11 @@ class jsonpath_expression
     <td>Select values from a JSON document</td> 
   </tr>
   <tr>
-    <td><a href="jsonpath_expression/select.md">update (since 0.172.0)</a></td>
+    <td><a href="jsonpath_expression/select_paths.md">select_paths (since 0.172.0)</a></td>
+    <td>Select paths of values selected from a JSON document</td> 
+  </tr>
+  <tr>
+    <td><a href="jsonpath_expression/update.md">update (since 0.172.0)</a></td>
     <td>Update a JSON document in place</td> 
   </tr>
 </table>
