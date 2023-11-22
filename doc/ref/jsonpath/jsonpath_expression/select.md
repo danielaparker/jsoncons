@@ -28,9 +28,37 @@ It must have function call signature equivalent to
   </tr>
 </table>
 
-#### Exceptions
+### Examples
 
-(1) Throws a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
+#### Return locations of selected values (since 0.172.0)
 
-(2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+    std::ifstream is("./input/books.json");
+    json doc = json::parse(is);
+
+    auto op = [&](const jsonpath::path_node& path, const json& value)
+    {
+        if (value.at("category") == "memoir" && !value.contains("price"))
+        {
+            std::cout << jsonpath::to_string(path) << ": " << value << "\n";
+        }
+    };
+
+    expr.select(root_value, op);
+}
+```
+Output:
+```
+$['books'][3]: {"author":"Phillips, David Atlee","category":"memoir","title":"The Night Watch"}
+```
 

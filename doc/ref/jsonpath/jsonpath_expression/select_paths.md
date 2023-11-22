@@ -21,3 +21,38 @@ locations of the selected values in the root value.
   </tr>
 </table>
 
+### Examples
+
+#### Return locations of selected values 
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+    std::ifstream is("./input/books.json");
+    json doc = json::parse(is);
+
+    std::vector<jsonpath::json_location> paths = expr.select_paths(doc);
+    for (const auto& path : paths)
+    {
+        std::cout << jsonpath::to_string(path) << "\n";
+    }
+}
+```
+Output:
+```
+[
+  $['books'][0]
+  $['books'][1]
+  $['books'][2]
+  $['books'][3]
+]
+```
+

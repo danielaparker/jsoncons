@@ -23,9 +23,42 @@ It must have function call signature equivalent to
   </tr>
 </table>
 
-#### Exceptions
+### Examples
 
-(1) Throws a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
+#### Update in place
 
-(2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+
+    std::ifstream is("./input/books.json");
+    json doc = json::parse(is);
+
+    auto callback = [](const jsonpath::path_node& /*location*/, json& book)
+    {
+        if (book.at("category") == "memoir" && !book.contains("price"))
+        {
+            book.try_emplace("price", 140.0);
+        }
+    };
+
+    expr.update(doc, callback);
+}
+```
+Output:
+```
+{
+    "author": "Phillips, David Atlee",
+    "category": "memoir",
+    "price": 140.0,
+    "title": "The Night Watch"
+}
+```
 

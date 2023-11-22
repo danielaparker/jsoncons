@@ -56,8 +56,8 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
     {
         int count = 0;
 
-        const json doc = json::parse(input);
-        const json original = doc;
+        const json root_value = json::parse(input);
+        const json original = root_value;
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -69,10 +69,10 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
             }
         };
 
-        expr.evaluate(doc, op);
+        expr.evaluate(root_value, op);
 
         CHECK(count == 1);
-        CHECK(doc == original);
+        CHECK(root_value == original);
     }
 }
 
@@ -113,22 +113,22 @@ TEST_CASE("jsonpath_expression::select tests")
     {
         int count = 0;
 
-        const json doc = json::parse(input);
+        const json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        auto op = [&](const jsonpath::path_node& /*location*/, const json& book)
+        auto op = [&](const jsonpath::path_node& /*path*/, const json& value)
         {
-            if (book.at("category") == "memoir" && !book.contains("price"))
+            if (value.at("category") == "memoir" && !value.contains("price"))
             {
                 ++count;
+                //std::cout << jsonpath::to_string(path) << ": " << value << "\n";
             }
         };
 
-        expr.select(doc, op);
+        expr.select(root_value, op);
 
         CHECK(count == 1);
-        CHECK_FALSE(doc["books"][3].contains("price"));
     }
 }
 
@@ -167,11 +167,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json doc = json::parse(input);
+        json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(doc);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value);
 
         REQUIRE(paths.size() == 4);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
@@ -182,11 +182,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json doc = json::parse(input);
+        json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(doc,jsonpath::result_options::nodups| jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value,jsonpath::result_options::nodups| jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 8);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
@@ -240,7 +240,7 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("Update in place")
     {
-        json doc = json::parse(input);
+        json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -252,19 +252,19 @@ TEST_CASE("jsonpath_expression::update tests")
             }
         };
 
-        expr.update(doc, op);
+        expr.update(root_value, op);
 
-        CHECK(doc["books"][3].contains("price"));
-        CHECK(doc["books"][3].at("price") == 140);
+        CHECK(root_value["books"][3].contains("price"));
+        CHECK(root_value["books"][3].at("price") == 140);
     }
 
     SECTION("Return locations of selected values")
     {
-        json doc = json::parse(input);
+        json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(doc);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value);
 
         REQUIRE(paths.size() == 4);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
@@ -279,7 +279,7 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("update default sort order")
     {
-        json doc = json::parse(input);
+        json root_value = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -289,7 +289,7 @@ TEST_CASE("jsonpath_expression::update tests")
             path_nodes.push_back(base_node);
         };
 
-        expr.update(doc, callback2);
+        expr.update(root_value, callback2);
 
         REQUIRE(path_nodes.size() == 4);
         CHECK(path_nodes[0].index() == 3);

@@ -86,7 +86,7 @@ namespace jsonpath {
             {
                 callback(to_basic_string(path), val);
             };
-            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), f, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), f, options | result_options::path);
         }
 
         value_type evaluate(const_reference root_value, result_options options = result_options()) const
@@ -101,14 +101,14 @@ namespace jsonpath {
                     result.emplace_back(to_basic_string(p));
                 };
                 expr_.evaluate(resources, const_cast<reference>(root_value), 
-                    path_node_type(), const_cast<reference>(root_value), callback, options);
+                    path_node_type{}, const_cast<reference>(root_value), callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
                 return expr_.evaluate(resources, const_cast<reference>(root_value), 
-                    path_node_type(), const_cast<reference>(root_value), options);
+                    path_node_type{}, const_cast<reference>(root_value), options);
             }
         }
 
@@ -117,7 +117,7 @@ namespace jsonpath {
         select(const_reference root_value, BinaryCallback callback, result_options options = result_options()) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), callback, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), callback, options | result_options::path);
         }
 
         template <class BinaryCallback>
@@ -141,7 +141,7 @@ namespace jsonpath {
             };
 
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type(), const_cast<reference>(root_value), callback, options);
+            expr_.evaluate(resources, const_cast<reference>(root_value), path_node_type{}, const_cast<reference>(root_value), callback, options);
 
             return result;
         }

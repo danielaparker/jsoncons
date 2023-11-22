@@ -40,3 +40,95 @@ It must have function call signature equivalent to
 
 (2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
+### Examples
+
+The examples below uses the sample data file `books.json`, 
+
+```json
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+```
+
+#### Select values from root value
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+
+    std::ifstream is("./input/books.json");
+    json root_value = json::parse(is);
+
+    json result = expr.evaluate(root_value);
+    std::cout << pretty_print(result) << "\n\n";
+}
+```
+Output:
+```
+[
+    "The Night Watch"
+]
+```
+
+#### Select values with locations from root value
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
+
+    std::ifstream is("./input/books.json");
+    json root_value = json::parse(is);
+
+    auto callback = [](const std::string& path, const json& val)
+    {
+       std::cout << path << ": " << val << "\n";
+    };
+
+    expr.evaluate(root_value, callback, jsonpath::result_options::path);
+}
+```
+Output:
+```
+$['books'][0]: {"author":"Haruki Murakami","category":"fiction","price":22.72,"title":"A Wild Sheep Chase"}
+$['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,"title":"The Night Watch"}
+```
+
