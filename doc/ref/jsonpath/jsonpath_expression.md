@@ -53,39 +53,12 @@ void fun(const basic_path_node<Json::char_type>& path, Json& val);
   </tr>
 </table>
 
-#### Static functions
+#### Non-member functions
 
-    static jsonpath_expression compile(const string_view_type& expr);           (1)
-
-    static jsonpath_expression compile(const string_view_type& expr,
-                                       const custom_functions<Json>& funcs);    (2) (since 0.164.0)
-
-    static jsonpath_expression compile(const string_view_type& expr,
-                                       std::error_code& ec);                    (3)
-
-    static jsonpath_expression compile(const string_view_type& expr,
-                                       const custom_functions<Json>& funcs,
-                                       std::error_code& ec);                    (4) (since 0.164.0) 
-
-Compiles the JSONPath expression for later evaluation. Returns a `jsonpath_expression` object 
-that represents the JSONPath expression.
-
-#### Parameters
-
-<table>
+<table border="0">
   <tr>
-    <td>expr</td>
-    <td>JSONPath expression</td> 
-  </tr>
-  <tr>
-    <td>ec</td>
-    <td>out-parameter for reporting errors in the non-throwing overload</td> 
+    <td><a href="make_expression.md">make_expression</a></td>
+    <td>Returns a `jsonpath_expression` for later evaluation. (since 0.161.0)</td> 
   </tr>
 </table>
-
-#### Exceptions
-
-(1) Throws a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
-
-(2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
