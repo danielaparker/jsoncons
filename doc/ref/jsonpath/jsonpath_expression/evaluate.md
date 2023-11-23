@@ -34,12 +34,6 @@ It must have function call signature equivalent to
   </tr>
 </table>
 
-#### Exceptions
-
-(1) Throws a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
-
-(2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
-
 ### Examples
 
 The examples below uses the sample data file `books.json`, 

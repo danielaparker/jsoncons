@@ -553,28 +553,28 @@ namespace jsonpath {
     private:
         std::vector<path_element_type,path_element_allocator_type> elements_;
     public:
-        using iterator = typename std::vector<path_element_type>::iterator;
         using const_iterator = typename std::vector<path_element_type>::const_iterator;
+        using iterator = const_iterator;
 
         basic_json_location(const allocator_type& alloc=Allocator())
             : elements_(alloc)
         {
         }
 
-        basic_json_location(std::vector<path_element_type>&& elements)
+        basic_json_location(const basic_json_location&) = default;
+
+        basic_json_location(basic_json_location&&) = default;
+
+        basic_json_location(std::vector<path_element_type,path_element_allocator_type>&& elements)
             : elements_(std::move(elements))
         {
         }
 
-        iterator begin()
-        {
-            return elements_.begin();
-        }
+        basic_json_location& operator=(const basic_json_location&) = default;
 
-        iterator end()
-        {
-            return elements_.end();
-        }
+        basic_json_location& operator=(basic_json_location&&) = default;
+
+        // Iterators
 
         const_iterator begin() const
         {
@@ -586,12 +586,19 @@ namespace jsonpath {
             return elements_.end();
         }
 
+        // Accessors
+
+        bool empty() const
+        {
+            return elements_.empty();
+        }
+
         std::size_t size() const
         {
             return elements_.size();
         }
 
-        const basic_path_element<char_type,allocator_type>& operator[](std::size_t index) const
+        const path_element_type& operator[](std::size_t index) const
         {
             return elements_[index];
         }
@@ -674,17 +681,30 @@ namespace jsonpath {
         {
             jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
 
-            std::vector<basic_path_element<char_type,allocator_type>> location = parser.parse(normalized_path);
+            std::vector<path_element_type> location = parser.parse(normalized_path);
+            return basic_json_location(std::move(location));
+        }
+
+        static basic_json_location parse(const jsoncons::basic_string_view<char_type>& normalized_path, 
+            std::error_code ec)
+        {
+            jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
+
+            std::vector<path_element_type> location = parser.parse(normalized_path, ec);
+            if (ec)
+            {
+                return basic_json_location();
+            }
             return basic_json_location(std::move(location));
         }
     };
 
     template<class Json>
-    std::size_t json_erase(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    std::size_t remove(Json& root_value, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
-        Json* p_current = std::addressof(instance);
+        Json* p_current = std::addressof(root_value);
 
         std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
         for (std::size_t i = 0; i < location.size(); ++i)
@@ -741,9 +761,9 @@ namespace jsonpath {
     }
 
     template<class Json>
-    Json* json_get(Json& instance, const basic_json_location<typename Json::char_type>& location)
+    Json* get(Json& root_value, const basic_json_location<typename Json::char_type>& location)
     {
-        Json* p_current = std::addressof(instance);
+        Json* p_current = std::addressof(root_value);
         bool found = false;
 
         std::size_t last = location.size() == 0 ? 0 : location.size() - 1;

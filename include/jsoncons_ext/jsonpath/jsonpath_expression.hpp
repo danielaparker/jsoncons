@@ -112,6 +112,29 @@ namespace jsonpath {
             }
         }
 
+        value_type select(const_reference root_value, result_options options = result_options()) const
+        {
+            if ((options & result_options::path) == result_options::path)
+            {
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
+
+                value_type result(json_array_arg, semantic_tag::none, alloc_);
+                auto callback = [&result](const path_node_type& p, reference)
+                {
+                    result.emplace_back(to_basic_string(p));
+                };
+                expr_.evaluate(resources, const_cast<reference>(root_value), 
+                    path_node_type{}, const_cast<reference>(root_value), callback, options);
+                return result;
+            }
+            else
+            {
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
+                return expr_.evaluate(resources, const_cast<reference>(root_value), 
+                    path_node_type{}, const_cast<reference>(root_value), options);
+            }
+        }
+
         template <class BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
         select(const_reference root_value, BinaryCallback callback, result_options options = result_options()) const
