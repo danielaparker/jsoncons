@@ -13,6 +13,10 @@ It provides functions for search and "search and replace" using JSONPath express
     <td><a href="basic_json_location.md">basic_json_location</a></td>
     <td>Represents a location of a specific value in a JSON document. (since 0.172.0)</td> 
   </tr>
+  <tr>
+    <td><a href="basic_path_node.md">basic_path_node</a></td>
+    <td>Represents a normalized path. (since 0.172.0)</td> 
+  </tr>
 </table>
 
 ### Functions
