@@ -15,7 +15,7 @@ It provides functions for search and "search and replace" using JSONPath express
   </tr>
   <tr>
     <td><a href="basic_path_node.md">basic_path_node</a></td>
-    <td>Represents a normalized path. (since 0.172.0)</td> 
+    <td>Represents a normalized path as a singly linked list where each node has a pointer to its (shared) parent node. (since 0.172.0)</td> 
   </tr>
 </table>
 

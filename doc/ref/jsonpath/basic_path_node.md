@@ -14,7 +14,9 @@ Type      |Definition
 path_node   |`basic_path_node<char>` 
 wpath_node  |`basic_path_node<wchar_t>` 
 
-Objects of type `basic_path_node` represent a normalized path.
+Objects of type `basic_path_node` represent a normalized path as a
+singly linked list where each node has a pointer to its (shared) parent
+node.
 
 #### Member types
 Type        |Definition
