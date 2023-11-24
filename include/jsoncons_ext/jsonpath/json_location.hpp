@@ -546,16 +546,14 @@ namespace jsonpath {
     public:
         using char_type = CharT;
         using allocator_type = Allocator;
-        using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
-        using path_element_type = basic_path_element<CharT,Allocator>;
+        using value_type = basic_path_element<CharT,Allocator>;
         using path_node_type = basic_path_node<CharT>;
-        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
+        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;
     private:
-        std::vector<path_element_type,path_element_allocator_type> elements_;
+        std::vector<value_type,path_element_allocator_type> elements_;
     public:
-        using const_iterator = typename std::vector<path_element_type>::const_iterator;
+        using const_iterator = typename std::vector<value_type>::const_iterator;
         using iterator = const_iterator;
 
         basic_json_location(const allocator_type& alloc=Allocator())
@@ -589,7 +587,7 @@ namespace jsonpath {
 
         basic_json_location(basic_json_location&&) = default;
 
-        explicit basic_json_location(std::vector<path_element_type,path_element_allocator_type>&& elements)
+        explicit basic_json_location(std::vector<value_type,path_element_allocator_type>&& elements)
             : elements_(std::move(elements))
         {
         }
@@ -622,7 +620,7 @@ namespace jsonpath {
             return elements_.size();
         }
 
-        const path_element_type& operator[](std::size_t index) const
+        const value_type& operator[](std::size_t index) const
         {
             return elements_[index];
         }
@@ -705,7 +703,7 @@ namespace jsonpath {
         {
             jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
 
-            std::vector<path_element_type> location = parser.parse(normalized_path);
+            std::vector<value_type> location = parser.parse(normalized_path);
             return basic_json_location(std::move(location));
         }
 
@@ -714,7 +712,7 @@ namespace jsonpath {
         {
             jsonpath::detail::json_location_parser<char,std::allocator<char>> parser;
 
-            std::vector<path_element_type> location = parser.parse(normalized_path, ec);
+            std::vector<value_type> location = parser.parse(normalized_path, ec);
             if (ec)
             {
                 return basic_json_location();

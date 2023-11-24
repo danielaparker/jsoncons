@@ -108,7 +108,7 @@ namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     auto result1 = jsonpath::json_query(data, "$.books[1,1,3].title");
@@ -176,7 +176,7 @@ namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     auto f = [](const std::string& /*location*/, json& price) 
@@ -240,7 +240,7 @@ int main()
 {
     auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
 
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     json result1 = expr.evaluate(data);

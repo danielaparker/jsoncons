@@ -146,7 +146,7 @@ int main()
     // since 0.170.1
     jsoncons::json_decoder<my_json,my_alloc> decoder(alloc, alloc); 
 
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
 
     jsoncons::basic_json_reader<char,jsoncons::stream_source<char>,my_alloc> reader(is, decoder, alloc);
     reader.read();

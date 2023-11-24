@@ -3093,7 +3093,7 @@ namespace detail {
 
             options |= required_options_;
 
-            const result_options require_more = result_options::nodups | result_options::sort;
+            const result_options require_more = result_options::nodups | result_options::sort | result_options::sort_descending;
 
             if (selector_ != nullptr && (options & require_more) != result_options())
             {

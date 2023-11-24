@@ -82,7 +82,7 @@ int main()
 {
     auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json doc = json::parse(is);
 
     auto op = [&](const jsonpath::path_node& path, const json& value)

@@ -186,7 +186,7 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value,jsonpath::result_options::nodups| jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 8);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");

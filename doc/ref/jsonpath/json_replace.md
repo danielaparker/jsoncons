@@ -138,7 +138,7 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     jsonpath::json_replace(data,"$.books[?(@.title == 'A Wild Sheep Chase')].price",20.0);
@@ -189,7 +189,7 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     auto f = [](const std::string& /*location*/, json& price) 
@@ -246,7 +246,7 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
 
     auto f = [](const std::string& /*location*/, json& book) 

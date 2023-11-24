@@ -20,8 +20,9 @@ Objects of type `basic_json_location` represent a normalized path.
 Type        |Definition
 ------------|------------------------------
 char_type   | `CharT`
-string_type | `std::basic_string<char_type>`
+allocator_type | Allocator
 string_view_type | `jsoncons::basic_string_view<char_type>`
+value_type  | basic_path_element<CharT,Allocator>
 const_iterator | A constant [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) with a `value_type` of [basic_path_element<char_type>]
 iterator    | An alias to `const_iterator`
 
@@ -140,6 +141,57 @@ The examples below uses the sample data file `books.json`,
 }
 ```
 
+#### Select the normalized paths to some books, and remove them
+ 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <fstream>
+
+using jsoncons::json; 
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    std::ifstream is(/*path_to_books_file*/);
+    json doc = json::parse(is);
+
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+
+    for (const auto& location : locations)
+    {
+        std::cout << jsonpath::to_string(location) << "\n";
+    }
+    std::cout << "\n";
+
+    for (const auto& location : locations)
+    {
+        jsonpath::remove(doc, location);
+    }
+
+    std::cout << jsoncons::pretty_print(doc) << "\n\n";
+} 
+```
+
+Output:
+
+```
+$['books'][2]
+$['books'][1]
+$['books'][0]
+
+{
+    "books": [
+        {
+            "author": "Phillips, David Atlee",
+            "category": "memoir",
+            "title": "The Night Watch"
+        }
+    ]
+}
+```
+                        
 #### Get a pointer to the book at index 1
 
 ```
@@ -157,3 +209,4 @@ loc.append("store").append("book").append(2);
 
 jsonpath::remove(doc, loc);    
 ```
+                        

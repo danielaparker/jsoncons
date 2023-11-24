@@ -59,7 +59,7 @@ void json_query_examples()
     std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
     // Intersection of book titles with category fiction and price < 15
-    json result10 = jsonpath::json_query(booklist, "$.store.book[?(@.category == 'fiction' && @.price < 15)].title"));
+    json result10 = jsonpath::json_query(booklist, "$.store.book[?(@.category == 'fiction' && @.price < 15)].title");
     std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
     // Normalized path expressions
@@ -855,10 +855,63 @@ void make_expression_with_stateful_allocator()
     std::cout << pretty_print(doc) << "\n\n";
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsoncons::jsonpath::make_expression<custom_json>(std::allocator_arg, alloc, p);  
+    auto expr = jsoncons::jsonpath::make_expression<custom_json>(jsoncons::combine_allocators(alloc), p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";
+}
+
+// since 0.172.0
+void remove_selected_books()
+{
+    std::string json_string = R"(
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+    )";
+
+    json doc = json::parse(json_string);
+
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+
+    for (const auto& location : locations)
+    {
+        std::cout << jsonpath::to_string(location) << "\n";
+    }
+    std::cout << "\n";
+
+    for (const auto& location : locations)
+    {
+        jsonpath::remove(doc, location);
+    }
+
+    std::cout << jsoncons::pretty_print(doc) << "\n\n";
 }
 
 int main()
@@ -897,6 +950,8 @@ int main()
     parent_operator_example();
 
     make_expression_with_stateful_allocator();
+
+    remove_selected_books();
     std::cout << "\n";
 }
 

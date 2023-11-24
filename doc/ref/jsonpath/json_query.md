@@ -401,7 +401,7 @@ namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/books.json");
+    std::ifstream is(/*path_to_books_file*/);
     json data = json::parse(is);
     std::string path = "$.books[?(@.price >= 22.0)]";
 
