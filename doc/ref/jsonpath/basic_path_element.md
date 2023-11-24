@@ -3,45 +3,46 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template <class CharT>
-class basic_path_element
+template <class CharT, class Allocator>
+class basic_path_element   (since 0.172.0)
 ```
 
 Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-path_element   |`basic_path_element<char>` (since 0.172.0)
-wpath_element  |`basic_path_element<wchar_t>` (since 0.172.0)
+path_element   |`basic_path_element<char>` 
+wpath_element  |`basic_path_element<wchar_t>`
 
-Objects of type `basic_path_element` represent a normalized path.
+Objects of type `basic_path_element` represent an element (name or index) of a normalized path.
 
 #### Member types
 Type        |Definition
 ------------|------------------------------
 char_type   | `CharT`
-string_type | `std::basic_string<char_type>`
-string_view_type | `jsoncons::basic_string_view<char_type>`
-const_iterator | A constant [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) with a `value_type` of `std::basic_string<char_type>`
-iterator    | An alias to `const_iterator`
+allocator_type | Allocator
+char_allocator_type | Rebind Allocator for `char_type`
+string_type | `std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>`
 
 #### Constructors
 
-    basic_path_element();                                      (1)
+    basic_path_element(const char_type* name, std::size_t length, 
+        const Allocator& alloc = Allocator());                                      (1)
 
-    explicit basic_path_element(const string_view_type& str);  
+    explicit basic_path_element(const string_type& name);                           (2)
 
-    explicit basic_path_element(const string_view_type& str, 
-                                std::error_code& ec);          (2)
+    explicit basic_path_element(string_type&& name);                                (3)
 
-    basic_path_element(const basic_path_element&);             (3)
+    basic_path_element(std::size_t index, 
+        const Allocator& alloc = Allocator());                                      (4)           
 
-    basic_path_element(basic_path_element&&) noexcept;         (4)
+    basic_path_element(const basic_path_element&);                                  (5)
 
-(1) Constructs an empty `basic_path_element`.
+    basic_path_element(basic_path_element&&) noexcept;                              (6)
 
-(2) Constructs a `basic_path_element` from a string representation or a 
-URI fragment identifier (starts with `#`).
+(1)-(3) Constructs a `basic_path_element` from a name.
+
+(4) Constructs a `basic_path_element` from an index.
 
 #### operator=
 
@@ -49,66 +50,17 @@ URI fragment identifier (starts with `#`).
 
     basic_path_element& operator=(basic_path_element&&);
 
-#### Modifiers
-
-    basic_path_element& operator/=(const string_type& s)
-Appends the token s.
-
-    template <class IntegerType>
-    basic_path_element& operator/=(IntegerType index) 
-Appends the token `index`.
-This overload only participates in overload resolution if `IntegerType` is an integer type.
-
-    basic_path_element& operator+=(const basic_path_element& ptr)
-Concatenates the current pointer and the specified pointer `ptr`. 
-
-#### Iterators
-
-    iterator begin() const;
-    iterator end() const;
-Iterator access to the tokens in the pointer.
-
 #### Accessors
 
-    bool empty() const
-Checks if the pointer is empty
+    bool has_name() const;
+Checks if the element has a name
 
-   string_type to_string() const
-Returns a normalized path represented as a string value, escaping any `/` or `~` characters.
+    bool has_index() const;
+Checks if the element has an index
 
-   string_type to_uri_fragment() const
-Returns a string representing the normalized path as a URI fragment identifier, 
-escaping any `/` or `~` characters.
+   const string_type& name() const
+Returns the name 
 
-
-#### Static member functions
-
-   static parse(const string_view_type& str);
-   static parse(const string_view_type& str, std::error_code& ec);
-Constructs a `basic_path_element` from a string representation or a 
-URI fragment identifier (starts with `#`).
-
-#### Non-member functions
-    basic_path_element<CharT> operator/(const basic_path_element<CharT>& lhs, const basic_string<CharT>& s);
-Concatenates a normalized path pointer and a string. Effectively returns basic_path_element<CharT>(lhs) /= s.
-
-    template <class CharT,class IntegerType>
-    basic_path_element<CharT> operator/(const basic_path_element<CharT>& lhs, IntegerType index);
-Concatenates a normalized path pointer and an index. Effectively returns basic_path_element<CharT>(lhs) /= index.
-This overload only participates in overload resolution if `IntegerType` is an integer type.
-
-    template <class CharT,class IntegerType>
-    basic_path_element<CharT> operator+( const basic_path_element<CharT>& lhs, const basic_path_element<CharT>& rhs );
-Concatenates two normalized paths. Effectively returns basic_path_element<CharT>(lhs) += rhs.
-
-    template <class CharT,class IntegerType>
-    bool operator==(const basic_path_element<CharT>& lhs, const basic_path_element<CharT>& rhs);
-
-    template <class CharT,class IntegerType>
-    bool operator!=(const basic_path_element<CharT>& lhs, const basic_path_element<CharT>& rhs);
-
-    template <class CharT,class IntegerType>
-    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_path_element<CharT>& ptr);
-Performs stream output
-
+   std::size_t index() const 
+Returns the index
 

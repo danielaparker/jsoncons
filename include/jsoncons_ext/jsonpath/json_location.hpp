@@ -43,12 +43,12 @@ namespace jsonpath {
         {
         }
 
-        basic_path_element(const string_type& name)
+        explicit basic_path_element(const string_type& name)
             : has_name_(true), name_(name), index_(0)
         {
         }
 
-        basic_path_element(string_type&& name)
+        explicit basic_path_element(string_type&& name)
             : has_name_(true), name_(std::move(name)), index_(0)
         {
         }
