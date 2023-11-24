@@ -58,9 +58,9 @@ Checks if the element has a name
     bool has_index() const;
 Checks if the element has an index
 
-   const string_type& name() const
+    const string_type& name() const
 Returns the name 
 
-   std::size_t index() const 
+    std::size_t index() const 
 Returns the index
 
