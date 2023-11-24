@@ -21,7 +21,7 @@ Type        |Definition
 ------------|------------------------------
 char_type   | `CharT`
 allocator_type | Allocator
-char_allocator_type | Rebind Allocator for `char_type`
+char_allocator_type | Rebound Allocator for `char_type`
 string_type | `std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>`
 
 #### Constructors
