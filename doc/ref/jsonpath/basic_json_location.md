@@ -23,7 +23,7 @@ char_type   | `CharT`
 allocator_type | Allocator
 string_view_type | `jsoncons::basic_string_view<char_type>`
 value_type  | basic_path_element<CharT,Allocator>
-const_iterator | A constant [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) with a `value_type` of [basic_path_element<char_type>]
+const_iterator | A constant [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) with a `value_type` of [basic_path_element<char_type>](basic_path_element.md)
 iterator    | An alias to `const_iterator`
 
 #### Constructors
