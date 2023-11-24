@@ -44,7 +44,7 @@ namespace jsonpath {
         {
         }
 
-        basic_path_node(const basic_path_node* parent, const string_view_type& name)
+        basic_path_node(const basic_path_node* parent, string_view_type name)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
               node_kind_(path_node_kind::name), name_(name), index_(0)
         {
@@ -81,7 +81,7 @@ namespace jsonpath {
             return node_kind_;
         }
 
-        const string_view_type& name() const
+        string_view_type name() const
         {
             return name_;
         }
