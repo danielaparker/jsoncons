@@ -14,7 +14,7 @@ Type      |Definition
 json_location   |`basic_json_location<char>`
 wjson_location  |`basic_json_location<wchar_t>`
 
-Objects of type `basic_json_location` represent a normalized path.
+Objects of type `basic_json_location` represents the location of a specific value in a JSON document.
 
 #### Member types
 Type        |Definition
