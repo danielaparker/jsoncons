@@ -15,6 +15,8 @@ normalized path expressions.
 (2) Evaluates the root value against the compiled JSONPath expression and calls a provided
 callback repeatedly with the results.
 
+Note: This function is kept for backwards compatability. New code should use the [select](select.md) function. 
+
 #### Parameters
 
 <table>

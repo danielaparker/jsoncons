@@ -23,6 +23,8 @@ It must have function call signature equivalent to
   </tr>
 </table>
 
+The callback receives nodes with duplicates removed, and paths sorted in descending order.
+
 ### Examples
 
 #### Update in place
@@ -41,7 +43,7 @@ int main()
     std::ifstream is(/*path_to_books_file*/);
     json doc = json::parse(is);
 
-    auto callback = [](const jsonpath::path_node& /*location*/, json& book)
+    auto callback = [](const jsonpath::path_node& /*path*/, json& book)
     {
         if (book.at("category") == "memoir" && !book.contains("price"))
         {
