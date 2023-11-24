@@ -149,7 +149,9 @@ namespace jsonpath {
         update(reference root_value, BinaryCallback callback) const
         {
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, callback);
+
+            result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+            expr_.evaluate(resources, root_value, path_node_type{}, root_value, callback, options);
         }
 
         std::vector<basic_json_location<char_type>> select_paths(const_reference root_value, 

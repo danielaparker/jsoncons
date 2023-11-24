@@ -3102,19 +3102,28 @@ namespace detail {
 
                 if (receiver.nodes.size() > 1) 
                 {
-                    if ((options & result_options::sort) == result_options::sort)
-                    {
-                        std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_less_type());
-                    }
-                    else if ((options & result_options::sort_descending) == result_options::sort_descending)
+                    if ((options & result_options::sort_descending) == result_options::sort_descending)
                     {
                         std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_greater_type());
                     } 
+                    else if ((options & result_options::sort) == result_options::sort)
+                    {
+                        std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_less_type());
+                    }
                 }
 
                 if (receiver.nodes.size() > 1 && (options & result_options::nodups) == result_options::nodups)
                 {
-                    if ((options & result_options::sort) == result_options::sort)
+                    if ((options & result_options::sort_descending) == result_options::sort_descending)
+                    {
+                        auto last = std::unique(receiver.nodes.rbegin(),receiver.nodes.rend(),path_value_pair_equal_type());
+                        receiver.nodes.erase(receiver.nodes.begin(), last.base());
+                        for (auto& node : receiver.nodes)
+                        {
+                            callback(node.path(), node.value());
+                        }
+                    }
+                    else if ((options & result_options::sort) == result_options::sort)
                     {
                         auto last = std::unique(receiver.nodes.begin(),receiver.nodes.end(),path_value_pair_equal_type());
                         receiver.nodes.erase(last,receiver.nodes.end());
@@ -3159,37 +3168,6 @@ namespace detail {
             {
                 callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
                 selector_->select(resources, root, path, current, receiver, options);
-            }
-        }
-
-        template <class Callback>
-        typename std::enable_if<extension_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
-        evaluate_with_replacement(dynamic_resources<Json,JsonReference>& resources, 
-                 reference root,
-                 const path_node_type& path, 
-                 reference current, 
-                 Callback callback) const
-        {
-            std::error_code ec;
-
-            result_options options = result_options::path | result_options::nodups | result_options::sort;
-
-            path_value_receiver<Json,JsonReference> receiver{alloc_};
-            selector_->select(resources, root, path, current, receiver, options);
-
-            if (!receiver.nodes.empty())
-            {
-                if (receiver.nodes.size() > 1)
-                {
-                    std::sort(receiver.nodes.begin(), receiver.nodes.end(), path_value_pair_less_type());
-                    auto last = std::unique(receiver.nodes.begin(),receiver.nodes.end(),path_value_pair_equal_type());
-                    receiver.nodes.erase(last,receiver.nodes.end());
-                }
-                for (std::size_t i = receiver.nodes.size(); i-- > 0;)
-                {
-                    auto& node = receiver.nodes[i];
-                    callback(node.path(), node.value());
-                }
             }
         }
 

@@ -548,13 +548,12 @@ namespace jsonpath {
         using allocator_type = Allocator;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using value_type = basic_path_element<CharT,Allocator>;
-        using path_node_type = basic_path_node<CharT>;
-        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;
-    private:
-        std::vector<value_type,path_element_allocator_type> elements_;
-    public:
         using const_iterator = typename std::vector<value_type>::const_iterator;
         using iterator = const_iterator;
+    private:
+        using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;
+        std::vector<value_type,path_element_allocator_type> elements_;
+    public:
 
         basic_json_location(const allocator_type& alloc=Allocator())
             : elements_(alloc)
@@ -564,7 +563,7 @@ namespace jsonpath {
         explicit basic_json_location(const basic_path_node<char_type>& path, const allocator_type& alloc=Allocator())
             : elements_(alloc)
         {
-            const path_node_type* p_node = std::addressof(path);
+            auto p_node = std::addressof(path);
             while (p_node != nullptr)
             {
                 switch (p_node->node_kind())

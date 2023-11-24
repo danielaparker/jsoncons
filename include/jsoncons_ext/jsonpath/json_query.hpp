@@ -98,7 +98,9 @@ namespace jsonpath {
         {
             v = std::forward<T>(new_value);
         };
-        expr.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, callback);
+
+        result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+        expr.evaluate(resources, root_value, path_node_type{}, root_value, callback, options);
     }
 
     template<class Json, class T, class TempAllocator>
@@ -124,7 +126,8 @@ namespace jsonpath {
         {
             v = Json(std::forward<T>(new_value), semantic_tag::none);
         };
-        expr.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, callback);
+        result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+        expr.evaluate(resources, root_value, path_node_type{}, root_value, callback, options);
     }
 
     template<class Json, class BinaryCallback>
@@ -150,7 +153,8 @@ namespace jsonpath {
         {
             callback(to_basic_string(path), val);
         };
-        expr.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, f);
+        result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+        expr.evaluate(resources, root_value, path_node_type{}, root_value, f, options);
     }
 
     template<class Json, class BinaryCallback, class TempAllocator>
@@ -177,7 +181,8 @@ namespace jsonpath {
         {
             callback(to_basic_string(path), val);
         };
-        expr.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, f);
+        result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+        expr.evaluate(resources, root_value, path_node_type{}, root_value, f, options);
     }
 
     // Legacy replace function
@@ -202,7 +207,8 @@ namespace jsonpath {
         {
             v = callback(v);
         };
-        expr.evaluate_with_replacement(resources, root_value, path_node_type{}, root_value, f);
+        result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
+        expr.evaluate(resources, root_value, path_node_type{}, root_value, f, options);
     }
 
 } // namespace jsonpath
