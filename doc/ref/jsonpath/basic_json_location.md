@@ -157,7 +157,8 @@ int main()
     json doc = json::parse(is);
 
     auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
-    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, 
+        jsonpath::result_options::sort_descending);
 
     for (const auto& location : locations)
     {
