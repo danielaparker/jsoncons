@@ -18,6 +18,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/expression.hpp>
+#include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
 
 namespace jsoncons { 
@@ -160,7 +161,7 @@ namespace jsonpath {
 
             auto callback = [&result](const path_node_type& path, const_reference)
             {
-                result.emplace_back(to_json_location(path));
+                result.emplace_back(path);
             };
 
             jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};

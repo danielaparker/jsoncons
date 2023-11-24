@@ -11,7 +11,6 @@
 #include <vector>
 #include <functional>
 #include <algorithm> // std::reverse
-#include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -318,42 +317,6 @@ namespace jsonpath {
 
         return buffer;
     }
-
-    template <class CharT, class Allocator=std::allocator<char>>
-    basic_json_location<CharT,Allocator> to_json_location(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
-    {
-        basic_json_location<CharT,Allocator> location{alloc};
-
-        using path_node_type = basic_path_node<CharT>;
-
-        std::vector<const path_node_type*> nodes(path.size(), nullptr);
-        std::size_t len = nodes.size();
-        const path_node_type* p = std::addressof(path);
-        while (p != nullptr)
-        {
-            nodes[--len] = p;
-            p = p->parent();
-        }
-        while (p != nullptr);
-
-        for (auto node : nodes)
-        {
-            switch (node->node_kind())
-            {
-                case path_node_kind::root:
-                    break;
-                case path_node_kind::name:
-                    location.append(node->name());
-                    break;
-                case path_node_kind::index:
-                    location.append(node->index());
-                    break;
-            }
-        }
-
-        return location;
-    }
-
 
     using path_node = basic_path_node<char>;
     using wpath_node = basic_path_node<wchar_t>;

@@ -29,15 +29,20 @@ iterator    | An alias to `const_iterator`
 
     basic_json_location(const allocator_type& alloc=Allocator());         (1)
 
-    basic_json_location(const basic_json_location&);                      (2)
+    basic_json_location(const basic_path_node<char_type>& path, 
+        const allocator_type& alloc=Allocator());                         (2)
 
-    basic_json_location(basic_json_location&&) noexcept;                  (3)
+    basic_json_location(const basic_json_location&);                      (3)
+
+    basic_json_location(basic_json_location&&) noexcept;                  (4)
 
 (1) Constructs an empty `basic_json_location`.
 
-(2) Copy constructor
+(2) Constructs a `basic_json_location` from a path node.
 
-(3) Move constructor
+(3) Copy constructor
+
+(4) Move constructor
 
 #### operator=
 

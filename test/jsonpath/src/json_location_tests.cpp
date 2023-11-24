@@ -293,3 +293,22 @@ TEST_CASE("json_location select tests")
     }
 }
 
+TEST_CASE("test json_location from path_node")
+{
+    SECTION("test 1")
+    {
+        jsonpath::path_node a1{};
+        jsonpath::path_node a2(&a1,"foo");
+        jsonpath::path_node a3(&a2,"bar");
+        jsonpath::path_node a4(&a3,7);
+
+        jsonpath::json_location location;
+        location.append("foo").append("bar").append(7);
+
+        std::string jsonpath_string = "$['foo']['bar'][7]";
+
+        CHECK((jsonpath::json_location{ a4 } == location));
+        CHECK((jsonpath::to_string(location) == jsonpath_string));
+    }
+}
+

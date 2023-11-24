@@ -17,6 +17,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 
@@ -549,6 +550,7 @@ namespace jsonpath {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using path_element_type = basic_path_element<CharT,Allocator>;
+        using path_node_type = basic_path_node<CharT>;
         using path_element_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<path_element_type>;
     private:
         std::vector<path_element_type,path_element_allocator_type> elements_;
@@ -561,11 +563,33 @@ namespace jsonpath {
         {
         }
 
+        explicit basic_json_location(const basic_path_node<char_type>& path, const allocator_type& alloc=Allocator())
+            : elements_(alloc)
+        {
+            const path_node_type* p_node = std::addressof(path);
+            while (p_node != nullptr)
+            {
+                switch (p_node->node_kind())
+                {
+                    case path_node_kind::root:
+                        break;
+                    case path_node_kind::name:
+                        elements_.emplace_back(p_node->name().data(), p_node->name().size());
+                        break;
+                    case path_node_kind::index:
+                        elements_.emplace_back(p_node->index());
+                        break;
+                }
+                p_node = p_node->parent();
+            }
+            std::reverse(elements_.begin(), elements_.end());
+        }
+
         basic_json_location(const basic_json_location&) = default;
 
         basic_json_location(basic_json_location&&) = default;
 
-        basic_json_location(std::vector<path_element_type,path_element_allocator_type>&& elements)
+        explicit basic_json_location(std::vector<path_element_type,path_element_allocator_type>&& elements)
             : elements_(std::move(elements))
         {
         }
