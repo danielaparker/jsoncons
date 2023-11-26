@@ -1,3 +1,20 @@
+0.172.0
+-------
+
+Defect fixes:
+
+- Fixed issue #469 affecting JSMESPath expressions with terminating CR
+
+Enhancements to jsonpath
+
+- Added new classes `basic_json_location`, `basic_path_element`, and `basic_path_node`.
+
+- Added a new function `get` for selecting a single JSON value from a JSON document at
+a location represented by a `json_location`.
+
+- Added a new function `remove` for removing a single JSON value from a JSON document at a
+location represented by a `json_location`.
+
 0.171.1
 -------
 
