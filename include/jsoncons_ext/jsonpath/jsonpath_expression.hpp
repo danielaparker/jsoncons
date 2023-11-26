@@ -237,6 +237,23 @@ namespace jsonpath {
         return jsoncons::jsonpath::jsonpath_expression<value_type>(alloc_set, std::move(static_resources), std::move(expr));
     }
 
+    template<class Json>
+    std::size_t remove(Json& root_value, const jsoncons::basic_string_view<typename Json::char_type>& path_string)
+    {
+        std::size_t count = 0;
+
+        auto expr = jsonpath::make_expression<json>(path_string);
+        std::vector<jsonpath::json_location> locations = expr.select_paths(root_value,
+            jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
+
+        for (const auto& location : locations)
+        {
+            std::size_t n = jsonpath::remove(root_value, location);
+            count += n;
+        }
+        return count;
+    }
+
 } // namespace jsonpath
 } // namespace jsoncons
 

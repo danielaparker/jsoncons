@@ -7,6 +7,8 @@ Defect fixes:
 
 Enhancements to jsonpath
 
+- Added `result_option` `sort_descending`.
+
 - Added new classes `basic_json_location`, `basic_path_element`, and `basic_path_node`.
 
 - Added a new function `get` for selecting a single JSON value from a JSON document at
@@ -14,6 +16,19 @@ a location represented by a `json_location`.
 
 - Added a new function `remove` for removing a single JSON value from a JSON document at a
 location represented by a `json_location`.
+
+- Added member function `select` to `jsonpath_expression`.
+
+- Added member function `select_paths` to `jsonpath_expression`.
+
+- Added member function `update` to `jsonpath_expression`, to support
+update-in-place for compiled JSONPath expressions.
+
+Enhancements to jsonpointer:
+
+- Added free functions `to_string` and `to_wstring`.
+
+- Added `append` function to `basic_json_pointer`.
 
 0.171.1
 -------

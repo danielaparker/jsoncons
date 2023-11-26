@@ -282,6 +282,23 @@ namespace jsoncons { namespace jsonpointer {
             tokens_.clear();
         }
 
+        basic_json_pointer& append(const string_type& s) 
+        {
+            tokens_.push_back(s);
+            return *this;
+        }
+
+        template <class IntegerType>
+        typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        append(IntegerType val)
+        {
+            string_type s;
+            jsoncons::detail::from_integer(val, s);
+            tokens_.push_back(s);
+
+            return *this;
+        }
+
         basic_json_pointer& operator/=(const string_type& s) 
         {
             tokens_.push_back(s);
@@ -440,6 +457,18 @@ namespace jsoncons { namespace jsonpointer {
 
     using json_pointer = basic_json_pointer<char>;
     using wjson_pointer = basic_json_pointer<wchar_t>;
+
+    inline
+    std::string to_string(const json_pointer& ptr)
+    {
+        return ptr.to_string();
+    }
+
+    inline
+    std::wstring to_wstring(const wjson_pointer& ptr)
+    {
+        return ptr.to_string();
+    }
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     template<class CharT>

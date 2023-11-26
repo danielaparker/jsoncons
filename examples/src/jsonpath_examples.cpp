@@ -7,6 +7,7 @@
 #include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include "FreeListAllocator.hpp"
 #include <scoped_allocator>
 
@@ -16,6 +17,7 @@ using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 // for brevity
 using jsoncons::json; 
 namespace jsonpath = jsoncons::jsonpath;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 void json_query_examples() 
 {
@@ -97,7 +99,7 @@ void json_query_examples()
 void function_tokenize_example() 
 {
     std::string data = R"(
-
+{
 "books":
 [
     {
@@ -113,7 +115,7 @@ void function_tokenize_example()
         "author" : "Graham Greene"
     }
 ]
-
+}
     )";
 
     json j = json::parse(data);
@@ -128,7 +130,8 @@ void function_tokenize_example()
 void function_sum_example() 
 {
     std::string data = R"(
-
+{
+    
 "books":
 [
     {
@@ -151,7 +154,7 @@ void function_sum_example()
         "author" : "Phillips, David Atlee"
     }
 ]
-
+}
     )";
 
     json j = json::parse(data);
@@ -166,7 +169,7 @@ void function_sum_example()
 void function_avg_example() 
 {
     std::string data = R"(
-
+{
 "books":
 [
     {
@@ -189,7 +192,7 @@ void function_avg_example()
         "author" : "Phillips, David Atlee"
     }
 ]
-
+}
     )";
 
     json j = json::parse(data);
@@ -255,7 +258,7 @@ void function_ceil_example()
 void function_keys_example() 
 {
     std::string data = R"(
-
+{
 "books":
 [
     {
@@ -278,7 +281,7 @@ void function_keys_example()
         "author" : "Phillips, David Atlee"
     }
 ]
-
+}
     )";
 
     json j = json::parse(data);
@@ -293,7 +296,7 @@ void function_keys_example()
 void function_length_example() 
 {
     std::string data = R"(
-
+{
 "books":
 [
     {
@@ -316,7 +319,7 @@ void function_length_example()
         "author" : "Phillips, David Atlee"
     }
 ]
-
+}
     )";
 
     json j = json::parse(data);
@@ -898,7 +901,8 @@ void remove_selected_books()
     json doc = json::parse(json_string);
 
     auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
-    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, 
+        jsonpath::result_options::sort_descending | jsonpath::result_options::sort_descending);
 
     for (const auto& location : locations)
     {
@@ -912,6 +916,120 @@ void remove_selected_books()
     }
 
     std::cout << jsoncons::pretty_print(doc) << "\n\n";
+}
+
+// since 0.172.0
+void remove_selected_books_in_one_step()
+{
+    std::string json_string = R"(
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+    )";
+
+    json doc = json::parse(json_string);
+
+    std::size_t n = jsonpath::remove(doc, "$.books[?(@.category == 'fiction')]");
+
+    std::cout << "Number of nodes removed: " << n << "\n\n";
+
+    std::cout << jsoncons::pretty_print(doc) << "\n\n";
+}
+
+void convert_normalized_path_to_json_pointer()
+{
+    std::string json_string = R"(
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+    )";
+
+    json doc = json::parse(json_string);
+
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+
+    for (const auto& location : locations)
+    {
+        std::cout << jsonpath::to_string(location) << "\n";
+    }
+    std::cout << "\n";
+
+    std::vector<jsoncons::jsonpointer::json_pointer> pointers;
+    for (const auto& location : locations)
+    {
+        jsonpointer::json_pointer ptr;
+        {
+            for (const jsonpath::path_element& element : location)
+            {
+                if (element.has_name())
+                {
+                    ptr.append(element.name());
+                }
+                else
+                {
+                    ptr.append(element.index());
+                }
+            }
+        }
+        pointers.push_back(ptr);
+    }
+
+    for (const auto& ptr : pointers)
+    {
+        std::cout << jsonpointer::to_string(ptr) << "\n";
+    }
+    std::cout << "\n";
 }
 
 int main()
@@ -931,7 +1049,6 @@ int main()
     json_replace_example3();
     json_replace_example1();
     json_replace_example4();
-
     function_tokenize_example();
     function_sum_example();
     function_avg_example();
@@ -952,6 +1069,11 @@ int main()
     make_expression_with_stateful_allocator();
 
     remove_selected_books();
+
+    convert_normalized_path_to_json_pointer();
+
+    remove_selected_books_in_one_step();
+
     std::cout << "\n";
 }
 

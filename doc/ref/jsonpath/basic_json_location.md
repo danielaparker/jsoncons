@@ -95,7 +95,12 @@ using the dot notation.
 Returns a pointer to a JSON value at the specified `location` in the `root_value`.
 
     template<class Json>
-    std::size_t remove(Json& root_value, const basic_json_location<Json::char_type>& location)
+    std::size_t remove(Json& root_value, const basic_json_location<Json::char_type>& location);
+Removes a single node at the specified location. Returns the number of nodes removed (0 or 1).
+
+    template<class Json>
+    std::size_t remove(Json& root_value, const jsoncons::basic_string_view<Json::char_type>& path_string);
+Removes the nodes matched by the specified JSONPath expression. Returns the number of nodes removed.
 
     template <class CharT, class Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 
@@ -141,7 +146,7 @@ The examples below uses the sample data file `books.json`,
 }
 ```
 
-#### Select the normalized paths to some books, and remove them
+#### Remove some book nodes one-by-one
  
 ```cpp
 #include <jsoncons/json.hpp>
@@ -158,7 +163,7 @@ int main()
 
     auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
     std::vector<jsonpath::json_location> locations = expr.select_paths(doc, 
-        jsonpath::result_options::sort_descending);
+        jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
     for (const auto& location : locations)
     {
@@ -192,7 +197,45 @@ $['books'][0]
     ]
 }
 ```
-                        
+
+#### Remove some book nodes in one step
+ 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <fstream>
+
+using jsoncons::json; 
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    std::ifstream is(/*path_to_books_file*/);
+    json doc = json::parse(is);
+
+    std::size_t n = jsonpath::remove(doc, "$.books[?(@.category == 'fiction')]");
+
+    std::cout << "Number of nodes removed: " << n << "\n\n";
+
+    std::cout << jsoncons::pretty_print(doc) << "\n\n";
+```
+
+Output:
+
+```
+Number of nodes removed: 3
+
+{
+    "books": [
+        {
+            "author": "Phillips, David Atlee",
+            "category": "memoir",
+            "title": "The Night Watch"
+        }
+    ]
+}
+```
+                         
 #### Get a pointer to the book at index 1
 
 ```
@@ -209,5 +252,71 @@ jsonpath::json_location loc;
 loc.append("store").append("book").append(2);
 
 jsonpath::remove(doc, loc);    
+```
+                        
+#### Convert a JSONPath normalized path into a JSONPointer                        
+ 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <fstream>
+
+using jsoncons::json; 
+namespace jsonpath = jsoncons::jsonpath;
+namespace jsonpointer = jsoncons::jsonpointer;
+#include <ifstream>
+
+int main()
+{
+    std::ifstream is(/*path_to_books_file*/);
+    json doc = json::parse(is);
+
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.category == 'fiction')]");
+    std::vector<jsonpath::json_location> locations = expr.select_paths(doc, jsonpath::result_options::sort_descending);
+
+    for (const auto& location : locations)
+    {
+        std::cout << jsonpath::to_string(location) << "\n";
+    }
+    std::cout << "\n";
+
+    std::vector<jsoncons::jsonpointer::json_pointer> pointers;
+    for (const auto& location : locations)
+    {
+        jsonpointer::json_pointer ptr;
+        {
+            for (const jsonpath::path_element& element : location)
+            {
+                if (element.has_name())
+                {
+                    ptr.append(element.name());
+                }
+                else
+                {
+                    ptr.append(element.index());
+                }
+            }
+        }
+        pointers.push_back(ptr);
+    }
+
+    for (const auto& ptr : pointers)
+    {
+        std::cout << jsonpointer::to_string(ptr) << "\n";
+    }
+    std::cout << "\n";
+} 
+```
+
+Output:
+
+```
+$['books'][2]
+$['books'][1]
+$['books'][0]
+
+/books/2
+/books/1
+/books/0
 ```
                         

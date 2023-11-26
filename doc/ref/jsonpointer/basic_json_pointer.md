@@ -53,6 +53,14 @@ URI fragment identifier (starts with `#`).
 
 #### Modifiers
 
+    basic_json_pointer& append(const string_type& s);     (since 0.172.0)
+Appends the token s.
+
+    template <class IntegerType>
+    basic_json_pointer& append(IntegerType index)         (since 0.172.0)
+Appends the token `index`.
+This overload only participates in overload resolution if `IntegerType` is an integer type.
+
     basic_json_pointer& operator/=(const string_type& s)
 Appends the token s.
 
@@ -109,7 +117,11 @@ Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lh
     template <class CharT,class IntegerType>
     bool operator!=(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
-    template <class CharT,class IntegerType>
+    std::string to_string(const json_pointer& ptr);      (since 0.172.0)
+
+    std::wstring to_wstring(const wjson_pointer& ptr);   (since 0.172.0)
+
+    template <class CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& ptr);
 Performs stream output
 
