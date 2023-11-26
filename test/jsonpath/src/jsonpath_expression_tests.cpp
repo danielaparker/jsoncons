@@ -355,4 +355,49 @@ TEST_CASE("jsonpath_expression::update tests")
     }
 }
 
+TEST_CASE("jsonpath_expression remove")
+{
+    std::string input = R"(
+    {
+        "books":
+        [
+            {
+                "category": "fiction",
+                "title" : "A Wild Sheep Chase",
+                "author" : "Haruki Murakami",
+                "price" : 22.72
+            },
+            {
+                "category": "fiction",
+                "title" : "The Night Watch",
+                "author" : "Sergei Lukyanenko",
+                "price" : 23.58
+            },
+            {
+                "category": "fiction",
+                "title" : "The Comedians",
+                "author" : "Graham Greene",
+                "price" : 21.99
+            },
+            {
+                "category": "memoir",
+                "title" : "The Night Watch",
+                "author" : "Phillips, David Atlee"
+            }
+        ]
+    }
+    )";
 
+    SECTION("test 1")
+    {
+        json doc = json::parse(input);
+
+        std::size_t n = jsoncons::jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
+
+        CHECK(n == 3);
+        REQUIRE(doc.at("books").size() == 1);
+        CHECK(doc.at("books")[0].at("title").as<std::string>() == "The Comedians");
+
+        std::cout << doc.at("books") << "\n";
+    }
+}

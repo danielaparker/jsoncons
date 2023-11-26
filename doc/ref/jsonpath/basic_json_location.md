@@ -204,6 +204,7 @@ $['books'][0]
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
+#include <cassert>
 
 using jsoncons::json; 
 namespace jsonpath = jsoncons::jsonpath;
@@ -213,9 +214,9 @@ int main()
     std::ifstream is(/*path_to_books_file*/);
     json doc = json::parse(is);
 
-    std::size_t n = jsonpath::remove(doc, "$.books[?(@.category == 'fiction')]");
+    std::size_t n = jsoncons::jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
 
-    std::cout << "Number of nodes removed: " << n << "\n\n";
+    assert(n == 3);
 
     std::cout << jsoncons::pretty_print(doc) << "\n\n";
 ```
@@ -223,8 +224,6 @@ int main()
 Output:
 
 ```
-Number of nodes removed: 3
-
 {
     "books": [
         {
@@ -243,15 +242,6 @@ jsonpath::json_location loc;
 loc.append("store").append("book").append(1);
 
 json* ptr = jsonpath::get(doc, loc);    
-```
-
-#### Remove the book at index 2
-
-```
-jsonpath::json_location loc;
-loc.append("store").append("book").append(2);
-
-jsonpath::remove(doc, loc);    
 ```
                         
 #### Convert a JSONPath normalized path into a JSONPointer                        
