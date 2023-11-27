@@ -227,9 +227,10 @@ Output:
 {
     "books": [
         {
-            "author": "Phillips, David Atlee",
-            "category": "memoir",
-            "title": "The Night Watch"
+            "author": "Graham Greene",
+            "category": "fiction",
+            "price": 21.99,
+            "title": "The Comedians"
         }
     ]
 }

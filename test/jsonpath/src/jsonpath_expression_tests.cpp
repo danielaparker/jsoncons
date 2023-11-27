@@ -398,6 +398,6 @@ TEST_CASE("jsonpath_expression remove")
         REQUIRE(doc.at("books").size() == 1);
         CHECK(doc.at("books")[0].at("title").as<std::string>() == "The Comedians");
 
-        std::cout << doc.at("books") << "\n";
+        std::cout << pretty_print(doc) << "\n";
     }
 }
