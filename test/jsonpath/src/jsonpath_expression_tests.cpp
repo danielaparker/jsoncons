@@ -74,6 +74,31 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
         CHECK(count == 1);
         CHECK(root_value == original);
     }
+
+    SECTION("evaluate with std::error_code")
+    {
+        int count = 0;
+
+        const json root_value = json::parse(input);
+        const json original = root_value;
+
+        std::error_code ec;
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]", ec);
+        CHECK_FALSE(ec);
+
+        auto op = [&](const std::string& /*location*/, const json& book)
+        {
+            if (book.at("category") == "memoir" && !book.contains("price"))
+            {
+                ++count;
+            }
+        };
+
+        expr.evaluate(root_value, op);
+
+        CHECK(count == 1);
+        CHECK(root_value == original);
+    }
 }
 
 TEST_CASE("jsonpath_expression::select tests")
@@ -392,12 +417,14 @@ TEST_CASE("jsonpath_expression remove")
     {
         json doc = json::parse(input);
 
+        json expected = doc;
+        expected["books"].erase(expected["books"].array_range().begin()+3);
+        expected["books"].erase(expected["books"].array_range().begin(),expected["books"].array_range().begin()+2);
+
         std::size_t n = jsoncons::jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
 
         CHECK(n == 3);
         REQUIRE(doc.at("books").size() == 1);
-        CHECK(doc.at("books")[0].at("title").as<std::string>() == "The Comedians");
-
-        std::cout << pretty_print(doc) << "\n";
+        CHECK(doc == expected);
     }
 }

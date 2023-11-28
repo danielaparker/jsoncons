@@ -190,11 +190,17 @@ namespace jsonpath {
         return jsoncons::jsonpath::jsonpath_expression<Json>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
     }
 
+    template <class Json>
+    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, std::error_code& ec)
+    {
+        return make_expression<Json>(jsoncons::combine_allocators(), expr, custom_functions<Json>(), ec);
+    }
+
     template <class Json, class TempAllocator>
     jsonpath_expression<Json> make_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
         const typename Json::string_view_type& expr, std::error_code& ec)
     {
-        return make_expression(alloc_set, expr, custom_functions<Json>(), ec);
+        return make_expression<Json>(alloc_set, expr, custom_functions<Json>(), ec);
     }
 
     template <class Json, class TempAllocator>
@@ -228,13 +234,14 @@ namespace jsonpath {
         using value_type = typename jsonpath_traits_type::value_type;
         using reference = typename jsonpath_traits_type::reference;
         using evaluator_type = typename jsonpath_traits_type::evaluator_type;
+        using path_expression_type = typename jsonpath_traits_type::path_expression_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, 
+        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, 
             alloc_set.get_allocator());
         evaluator_type evaluator{alloc_set.get_allocator()};
-        auto expr = evaluator.compile(*static_resources, path, ec);
+        path_expression_type expr = evaluator.compile(*resources, path, ec);
 
-        return jsoncons::jsonpath::jsonpath_expression<value_type>(alloc_set, std::move(static_resources), std::move(expr));
+        return jsonpath_expression<Json>(alloc_set, std::move(resources), std::move(expr));
     }
 
     template<class Json>
