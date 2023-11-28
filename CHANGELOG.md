@@ -1,3 +1,10 @@
+0.172.1
+-------
+
+Defect fixes:
+
+- Fixed issue #470 concerning jsonpath::make_expression with ec broken 
+
 0.172.0
 -------
 
