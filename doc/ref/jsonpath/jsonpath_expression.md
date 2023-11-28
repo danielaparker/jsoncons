@@ -48,7 +48,7 @@ callback repeatedly with the results.
     <td>A function object that accepts a path and a reference to a Json value. 
 It must have function call signature equivalent to
 <br/><br/><code>
-void fun(const basic_path_node<Json::char_type>& path, Json& val);
+void fun(const basic_path_node&lt;Json::char_type&gt;& path, Json& val);
 </code><br/><br/>
   </tr>
 </table>
