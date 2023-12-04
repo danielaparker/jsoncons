@@ -43,7 +43,7 @@ namespace draft7 {
     };
 
     template <class Json>
-    class keyword_factory : public subschema_validator_factory<Json>
+    class keyword_factory //: public subschema_validator_factory<Json>
     {
     public:
         using reference_validator_type = reference_validator<Json>;
@@ -527,7 +527,7 @@ namespace draft7 {
                 if (it->value().type() == json_type::array_value) 
                 {
                     validators.emplace_back(make_items_array_validator(schema, it->value(), 
-                        context, this));
+                        context));
                 } 
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
@@ -557,8 +557,7 @@ namespace draft7 {
         }
 
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const Json& parent, const Json& schema, 
-            const compilation_context& context, 
-            subschema_validator_factory<Json>* builder)
+            const compilation_context& context)
         {
             std::vector<validator_type> item_validators;
             validator_type additional_items_validator = nullptr;
@@ -569,12 +568,12 @@ namespace draft7 {
             {
                 size_t c = 0;
                 for (const auto& subsch : schema.array_range())
-                    item_validators.emplace_back(builder->make_subschema_validator(subsch, context, {"items", std::to_string(c++)}));
+                    item_validators.emplace_back(make_subschema_validator(subsch, context, {"items", std::to_string(c++)}));
 
                 auto it = parent.find("additionalItems");
                 if (it != parent.object_range().end()) 
                 {
-                    additional_items_validator = builder->make_subschema_validator(it->value(), context, {"additionalItems"});
+                    additional_items_validator = make_subschema_validator(it->value(), context, {"additionalItems"});
                 }
             }
 
