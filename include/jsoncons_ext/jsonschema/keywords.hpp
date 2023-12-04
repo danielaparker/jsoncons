@@ -280,18 +280,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<max_length_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("maxLength");
-            if (!schema.is_number())
-            {
-                std::string message("maxLength must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<std::size_t>();
-            return jsoncons::make_unique<max_length_validator<Json>>(schema_path, value);
-        }
-
     private:
 
         void do_validate(const Json& instance, 
@@ -326,18 +314,6 @@ namespace jsonschema {
         max_items_validator(const std::string& schema_path, std::size_t max_items)
             : keyword_validator<Json>(schema_path), max_items_(max_items)
         {
-        }
-
-        static std::unique_ptr<max_items_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("maxItems");
-            if (!schema.is_number())
-            {
-                std::string message("maxItems must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(schema_path, value);
         }
 
     private:
@@ -375,18 +351,6 @@ namespace jsonschema {
         min_items_validator(const std::string& schema_path, std::size_t min_items)
             : keyword_validator<Json>(schema_path), min_items_(min_items)
         {
-        }
-
-        static std::unique_ptr<min_items_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("minItems");
-            if (!schema.is_number())
-            {
-                std::string message("minItems must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>(schema_path, value);
         }
 
     private:
@@ -1707,59 +1671,6 @@ namespace jsonschema {
         array_validator(const std::string& schema_path, std::vector<validator_type>&& validators)
             : keyword_validator<Json>(schema_path), validators_(std::move(validators))
         {
-        }
-
-        static std::unique_ptr<array_validator> compile(const Json& schema,
-            const compilation_context& context, subschema_validator_factory<Json>* builder)
-        {
-            std::string schema_path = context.make_schema_path_with("array");
-            auto new_context = context.update_uris(schema, schema_path);
-
-            std::vector<validator_type> validators;
-
-            auto it = schema.find("maxItems");
-            if (it != schema.object_range().end()) 
-            {
-                validators.emplace_back(max_items_validator<Json>::compile(it->value(), context));
-            }
-
-            it = schema.find("minItems");
-            if (it != schema.object_range().end()) 
-            {
-                validators.emplace_back(min_items_validator<Json>::compile(it->value(), context));
-            }
-
-            it = schema.find("uniqueItems");
-            if (it != schema.object_range().end()) 
-            {
-                validators.emplace_back(unique_items_validator<Json>::compile(it->value(), context));
-            }
-
-            it = schema.find("items");
-            if (it != schema.object_range().end()) 
-            {
-
-                if (it->value().type() == json_type::array_value) 
-                {
-                    validators.emplace_back(items_array_validator<Json>::compile(schema, it->value(), 
-                        context, builder));
-                } 
-                else if (it->value().type() == json_type::object_value ||
-                           it->value().type() == json_type::bool_value)
-                {
-                    validators.emplace_back(items_object_validator<Json>::compile(schema, it->value(), 
-                        context, builder));
-                }
-            }
-            
-            it = schema.find("contains");
-            if (it != schema.object_range().end()) 
-            {
-                validators.emplace_back(contains_validator<Json>::compile(schema, it->value(), 
-                    context, builder));
-            }
-            
-            return jsoncons::make_unique<array_validator<Json>>(schema_path, std::move(validators));
         }
 
     private:
