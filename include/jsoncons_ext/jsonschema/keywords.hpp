@@ -443,16 +443,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<contains_validator> compile(const Json& /*parent*/, const Json& schema,
-            const compilation_context& context, 
-            subschema_validator_factory<Json>* builder)
-        {
-            std::string schema_path = context.make_schema_path_with("contains");
-
-            return jsoncons::make_unique<contains_validator<Json>>(schema_path, 
-                builder->make_subschema_validator(schema, context, { "contains" }));
-        }
-
     private:
 
         void do_validate(const Json& instance, 
@@ -505,16 +495,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<items_object_validator> compile(const Json& /* parent */, const Json& schema, 
-            const compilation_context& context, 
-            subschema_validator_factory<Json>* builder)
-        {
-            std::string schema_path = context.make_schema_path_with("items");
-
-            return jsoncons::make_unique<items_object_validator<Json>>(schema_path, 
-                builder->make_subschema_validator(schema, context, { "items" }));
-        }
-
     private:
 
         void do_validate(const Json& instance, 
@@ -546,13 +526,6 @@ namespace jsonschema {
         unique_items_validator(const std::string& schema_path, bool are_unique)
             : keyword_validator<Json>(schema_path), are_unique_(are_unique)
         {
-        }
-
-        static std::unique_ptr<unique_items_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("uniqueItems");
-            bool are_unique = schema.template as<bool>();
-            return jsoncons::make_unique<unique_items_validator<Json>>(schema_path, are_unique);
         }
 
     private:
@@ -602,17 +575,6 @@ namespace jsonschema {
         min_length_validator(const std::string& schema_path, std::size_t min_length)
             : keyword_validator<Json>(schema_path), min_length_(min_length)
         {
-        }
-        static std::unique_ptr<min_length_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("minLength");
-            if (!schema.is_number())
-            {
-                std::string message("minLength must be an integer value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<std::size_t>();
-            return jsoncons::make_unique<min_length_validator<Json>>(schema_path, value);
         }
 
     private:
@@ -686,14 +648,6 @@ namespace jsonschema {
             : keyword_validator<Json>(schema_path), 
               rule_(std::move(rule))
         {
-        }
-
-        static std::unique_ptr<not_validator> compile(subschema_validator_factory<Json>* builder,
-            const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("not");
-            return jsoncons::make_unique<not_validator<Json>>(schema_path, 
-                builder->make_subschema_validator(schema, context, {"not"}));
         }
 
     private:
@@ -860,18 +814,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<maximum_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("maximum");
-            if (!schema.is_number())
-            {
-                std::string message("maximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<T>();
-            return jsoncons::make_unique<maximum_validator<Json,T>>(schema_path, value);
-        }
-
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
@@ -898,18 +840,6 @@ namespace jsonschema {
         exclusive_maximum_validator(const std::string& schema_path, T value)
             : keyword_validator<Json>(schema_path), value_(value)
         {
-        }
-
-        static std::unique_ptr<exclusive_maximum_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("exclusiveMaximum");
-            if (!schema.is_number())
-            {
-                std::string message("exclusiveMaximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<T>();
-            return jsoncons::make_unique<exclusive_maximum_validator<Json,T>>(schema_path, value);
         }
 
     private:
@@ -940,18 +870,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<minimum_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("minimum");
-            if (!schema.is_number())
-            {
-                std::string message("minimum must be a number");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<T>();
-            return jsoncons::make_unique<minimum_validator<Json,T>>(schema_path, value);
-        }
-
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
@@ -980,18 +898,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<exclusive_minimum_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("exclusiveMinimum");
-            if (!schema.is_number())
-            {
-                std::string message("exclusiveMinimum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<T>();
-            return jsoncons::make_unique<exclusive_minimum_validator<Json,T>>(schema_path, value);
-        }
-
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
@@ -1009,27 +915,15 @@ namespace jsonschema {
         }
     };
 
-    template <class Json,class T>
+    template <class Json>
     class multiple_of_validator : public keyword_validator<Json>
     {
-        T value_;
+        double value_;
 
     public:
-        multiple_of_validator(const std::string& schema_path, T value)
+        multiple_of_validator(const std::string& schema_path, double value)
             : keyword_validator<Json>(schema_path), value_(value)
         {
-        }
-
-        static std::unique_ptr<multiple_of_validator> compile(const Json& schema, const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("multipleOf");
-            if (!schema.is_number())
-            {
-                std::string message("multipleOf must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = schema.template as<T>();
-            return jsoncons::make_unique<multiple_of_validator<Json,T>>(schema_path, value);
         }
 
     private:
@@ -1038,7 +932,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            T value = instance.template as<T>();
+            double value = instance.template as<double>();
             if (value != 0) // Exclude zero
             {
                 if (!is_multiple_of(value, static_cast<double>(value_)))
@@ -1051,7 +945,7 @@ namespace jsonschema {
             }
         }
 
-        static bool is_multiple_of(T x, double multiple_of) 
+        static bool is_multiple_of(double x, double multiple_of) 
         {
             double rem = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
@@ -1070,53 +964,6 @@ namespace jsonschema {
             std::vector<validator_type>&& validators)
             : keyword_validator<Json>(schema_path), validators_(std::move(validators))
         {
-        }
-
-        static std::unique_ptr<integer_validator> compile(const Json& schema,
-            const compilation_context& context, std::set<std::string>& keywords)
-        {
-            std::string schema_path = context.make_schema_path_with("integer");
-            auto new_context = context.update_uris(schema, schema_path);
-
-            std::vector<validator_type> validators;
-
-            auto it = schema.find("maximum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("maximum");
-                validators.emplace_back(maximum_validator<Json,int64_t>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("minimum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("minimum");
-                validators.emplace_back(minimum_validator<Json,int64_t>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("exclusiveMaximum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("exclusiveMaximum");
-                validators.emplace_back(exclusive_maximum_validator<Json,int64_t>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("exclusiveMinimum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("exclusiveMinimum");
-                validators.emplace_back(exclusive_minimum_validator<Json,int64_t>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("multipleOf");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("multipleOf");
-                validators.emplace_back(multiple_of_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-
-            return jsoncons::make_unique<integer_validator<Json>>(schema_path, std::move(validators));
         }
 
     private:
@@ -1160,53 +1007,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<number_validator> compile(const Json& schema,
-            const compilation_context& context, std::set<std::string>& keywords)
-        {
-            std::string schema_path = context.make_schema_path_with("number");
-            auto new_context = context.update_uris(schema, schema_path);
-
-            std::vector<validator_type> validators;
-
-            auto it = schema.find("maximum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("maximum");
-                validators.emplace_back(maximum_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("minimum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("minimum");
-                validators.emplace_back(minimum_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("exclusiveMaximum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("exclusiveMaximum");
-                validators.emplace_back(exclusive_maximum_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("exclusiveMinimum");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("exclusiveMinimum");
-                validators.emplace_back(exclusive_minimum_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-            it = schema.find("multipleOf");
-            if (it != schema.object_range().end()) 
-            {
-                keywords.insert("multipleOf");
-                validators.emplace_back(multiple_of_validator<Json,double>::compile(it->value(), new_context));
-            }
-
-
-            return jsoncons::make_unique<number_validator<Json>>(schema_path, std::move(validators));
-        }
-
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
@@ -1245,12 +1045,6 @@ namespace jsonschema {
             : keyword_validator<Json>(schema_path)
         {
         }
-
-        static std::unique_ptr<null_validator> compile(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("null");
-            return jsoncons::make_unique<null_validator<Json>>(schema_path);
-        }
     private:
         void do_validate(const Json& instance, 
                          const jsonpointer::json_pointer& instance_location, 
@@ -1275,11 +1069,6 @@ namespace jsonschema {
             : keyword_validator<Json>(schema_path)
         {
         }
-        static std::unique_ptr<boolean_validator> compile(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("boolean");
-            return jsoncons::make_unique<boolean_validator<Json>>(schema_path);
-        }
     private:
         void do_validate(const Json&, 
                          const jsonpointer::json_pointer&, 
@@ -1299,11 +1088,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<true_validator> compile(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("true");
-            return jsoncons::make_unique<true_validator<Json>>(schema_path);
-        }
     private:
         void do_validate(const Json&, 
                          const jsonpointer::json_pointer&, 
@@ -1322,12 +1106,6 @@ namespace jsonschema {
         false_validator(const std::string& schema_path)
             : keyword_validator<Json>(schema_path)
         {
-        }
-
-        static std::unique_ptr<false_validator> compile(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("false");
-            return jsoncons::make_unique<false_validator<Json>>(schema_path);
         }
     private:
         void do_validate(const Json&, 
@@ -1358,13 +1136,6 @@ namespace jsonschema {
         required_validator(required_validator&&) = default;
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
-
-        static std::unique_ptr<required_validator> compile(const compilation_context& context,
-            const std::vector<std::string>& items)
-        {
-            std::string schema_path = context.make_schema_path_with("required");
-            return jsoncons::make_unique<required_validator<Json>>(schema_path, items);
-        }
 
     private:
 
@@ -1412,94 +1183,34 @@ namespace jsonschema {
         validator_type property_name_validator_;
 
     public:
-        object_validator(subschema_validator_factory<Json>* builder,
-                    const Json& schema,
-                    const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path()), 
-              max_properties_(), min_properties_(), 
-              additional_properties_(nullptr),
-              property_name_validator_(nullptr)
+        object_validator(std::string&& schema_path,
+            jsoncons::optional<std::size_t>&& max_properties,
+            std::string&& absolute_max_properties_location,
+            jsoncons::optional<std::size_t>&& min_properties,
+            std::string&& absolute_min_properties_location,
+            jsoncons::optional<required_validator<Json>>&& required,
+            std::map<std::string, validator_type>&& properties,
+        #if defined(JSONCONS_HAS_STD_REGEX)
+            std::vector<std::pair<std::regex, validator_type>>&& pattern_properties,
+        #endif
+            validator_type&& additional_properties,
+            std::map<std::string, validator_type>&& dependencies,
+            validator_type&& property_name_validator
+        )
+            : keyword_validator<Json>(std::move(schema_path)), 
+              max_properties_(std::move(max_properties)),
+              absolute_max_properties_location_(std::move(absolute_max_properties_location)),
+              min_properties_(std::move(min_properties)),
+              absolute_min_properties_location_(std::move(absolute_min_properties_location)),
+              required_(std::move(required)),
+              properties_(std::move(properties)),
+        #if defined(JSONCONS_HAS_STD_REGEX)
+              pattern_properties_(std::move(pattern_properties)),
+        #endif
+              additional_properties_(std::move(additional_properties)),
+              dependencies_(std::move(dependencies)),
+              property_name_validator_(std::move(property_name_validator))
         {
-            auto it = schema.find("maxProperties");
-            if (it != schema.object_range().end()) 
-            {
-                max_properties_ = it->value().template as<std::size_t>();
-                absolute_max_properties_location_ = context.make_schema_path_with("maxProperties");
-            }
-
-            it = schema.find("minProperties");
-            if (it != schema.object_range().end()) 
-            {
-                min_properties_ = it->value().template as<std::size_t>();
-                absolute_min_properties_location_ = context.make_schema_path_with("minProperties");
-            }
-
-            it = schema.find("required");
-            if (it != schema.object_range().end()) 
-            {
-                auto location = context.make_schema_path_with("required");
-                required_ = required_validator<Json>(location, 
-                                                   it->value().template as<std::vector<std::string>>());
-            }
-
-            it = schema.find("properties");
-            if (it != schema.object_range().end()) 
-            {
-                for (const auto& prop : it->value().object_range())
-                    properties_.emplace(
-                        std::make_pair(
-                            prop.key(),
-                            builder->make_subschema_validator(prop.value(), context, {"properties", prop.key()})));
-            }
-
-    #if defined(JSONCONS_HAS_STD_REGEX)
-            it = schema.find("patternProperties");
-            if (it != schema.object_range().end()) 
-            {
-                for (const auto& prop : it->value().object_range())
-                    pattern_properties_.emplace_back(
-                        std::make_pair(
-                            std::regex(prop.key(), std::regex::ECMAScript),
-                            builder->make_subschema_validator(prop.value(), context, {prop.key()})));
-            }
-    #endif
-
-            it = schema.find("additionalProperties");
-            if (it != schema.object_range().end()) 
-            {
-                additional_properties_ = builder->make_subschema_validator(it->value(), context, {"additionalProperties"});
-            }
-
-            it = schema.find("dependencies");
-            if (it != schema.object_range().end()) 
-            {
-                for (const auto& dep : it->value().object_range())
-                {
-                    switch (dep.value().type()) 
-                    {
-                        case json_type::array_value:
-                        {
-                            auto location = context.make_schema_path_with("dependencies");
-                            dependencies_.emplace(dep.key(), 
-                                required_validator<Json>::compile(compilation_context(std::vector<schema_location>{{location}}),
-                                    dep.value().template as<std::vector<std::string>>()));
-                            break;
-                        }
-                        default:
-                        {
-                            dependencies_.emplace(dep.key(),
-                                                  builder->make_subschema_validator(dep.value(), context, {"dependencies", dep.key()}));
-                            break;
-                        }
-                    }
-                }
-            }
-
-            auto property_names_it = schema.find("propertyNames");
-            if (property_names_it != schema.object_range().end()) 
-            {
-                property_name_validator_ = builder->make_subschema_validator(property_names_it->value(), context, {"propertyNames"});
-            }
         }
     private:
 
