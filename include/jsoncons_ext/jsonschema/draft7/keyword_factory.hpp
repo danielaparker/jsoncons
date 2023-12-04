@@ -85,7 +85,7 @@ namespace draft7 {
 
         validator_type make_subschema_validator(const Json& schema,
             const compilation_context& context,
-            const std::vector<std::string>& keys) override
+            const std::vector<std::string>& keys) //override
         {
             auto new_context = context.update_uris(schema, keys);
 
@@ -311,7 +311,7 @@ namespace draft7 {
             it = schema.find("if");
             if (it != schema.object_range().end()) 
             {
-                conditionalvalidator = conditional_validator<Json>(this, it->value(), schema, context);
+                conditionalvalidator = make_conditional_validator(it->value(), schema, context);
                 // schema["if"] is object and has id, can be looked up
             }
 
@@ -850,6 +850,36 @@ namespace draft7 {
             return jsoncons::make_unique<required_validator<Json>>(schema_path, items);
         }
 
+        conditional_validator<Json> make_conditional_validator(const Json& sch_if, const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.get_schema_path();
+            validator_type if_validator(nullptr);
+            validator_type then_validator(nullptr);
+            validator_type else_validator(nullptr);
+
+            auto then_it = schema.find("then");
+            auto else_it = schema.find("else");
+
+            if (then_it != schema.object_range().end() || else_it != schema.object_range().end()) 
+            {
+                if_validator = make_subschema_validator(sch_if, context, {"if"});
+
+                if (then_it != schema.object_range().end()) 
+                {
+                    then_validator = make_subschema_validator(then_it->value(), context, {"then"});
+                }
+
+                if (else_it != schema.object_range().end()) 
+                {
+                    else_validator = make_subschema_validator(else_it->value(), context, {"else"});
+                }
+            }
+
+            return conditional_validator<Json>(std::move(schema_path),
+                std::move(if_validator), std::move(then_validator), std::move(else_validator));
+        }
+
         std::unique_ptr<object_validator<Json>> make_object_validator(const Json& schema,
             const compilation_context& context)
         {
@@ -981,6 +1011,8 @@ namespace draft7 {
             }
             load(sch);
         }
+
+
 
         void load(const Json& sch)
         {

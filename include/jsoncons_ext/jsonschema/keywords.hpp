@@ -1386,29 +1386,15 @@ namespace jsonschema {
         validator_type else_validator_;
 
     public:
-        conditional_validator(subschema_validator_factory<Json>* builder,
-                         const Json& sch_if,
-                         const Json& schema,
-                         const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path()), if_validator_(nullptr), then_validator_(nullptr), else_validator_(nullptr)
+        conditional_validator(const std::string&& schema_path,
+          validator_type&& if_validator,
+          validator_type&& then_validator,
+          validator_type&& else_validator
+        ) : keyword_validator<Json>(std::move(schema_path)), 
+              if_validator_(std::move(if_validator)), 
+              then_validator_(std::move(then_validator)), 
+              else_validator_(std::move(else_validator))
         {
-            auto then_it = schema.find("then");
-            auto else_it = schema.find("else");
-
-            if (then_it != schema.object_range().end() || else_it != schema.object_range().end()) 
-            {
-                if_validator_ = builder->make_subschema_validator(sch_if, context, {"if"});
-
-                if (then_it != schema.object_range().end()) 
-                {
-                    then_validator_ = builder->make_subschema_validator(then_it->value(), context, {"then"});
-                }
-
-                if (else_it != schema.object_range().end()) 
-                {
-                    else_validator_ = builder->make_subschema_validator(else_it->value(), context, {"else"});
-                }
-            }
         }
     private:
         void do_validate(const Json& instance, 
