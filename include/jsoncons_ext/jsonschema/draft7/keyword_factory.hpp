@@ -43,7 +43,7 @@ namespace draft7 {
     };
 
     template <class Json>
-    class keyword_factory //: public subschema_validator_factory<Json>
+    class keyword_factory 
     {
     public:
         using reference_validator_type = reference_validator<Json>;

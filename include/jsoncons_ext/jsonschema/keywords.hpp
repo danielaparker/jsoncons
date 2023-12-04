@@ -11,8 +11,8 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/schema.hpp>
 #include <jsoncons_ext/jsonschema/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/keyword_validator.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -25,19 +25,6 @@
 
 namespace jsoncons {
 namespace jsonschema {
-    template <class Json>
-    class subschema_validator_factory
-    {
-    public:
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
-
-        virtual ~subschema_validator_factory() = default;
-
-        virtual validator_type make_subschema_validator(const Json& schema,
-            const compilation_context& context,
-            const std::vector<std::string>& keys) = 0;
-    };
 
     struct collecting_error_reporter : public error_reporter
     {
