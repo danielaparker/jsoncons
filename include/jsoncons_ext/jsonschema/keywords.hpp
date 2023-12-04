@@ -757,18 +757,11 @@ namespace jsonschema {
         std::vector<validator_type> subschemas_;
 
     public:
-        combining_validator(subschema_validator_factory<Json>* builder,
-                            const Json& schema,
-                            const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path())
+        combining_validator(std::string&& schema_path,
+             std::vector<validator_type>&& subschemas)
+            : keyword_validator<Json>(std::move(schema_path)),
+              subschemas_(std::move(subschemas))
         {
-            size_t c = 0;
-            for (const auto& subsch : schema.array_range())
-            {
-                subschemas_.emplace_back(builder->make_subschema_validator(subsch, context, {Criterion::key(), std::to_string(c++)}));
-            }
-
-            // Validate value of allOf, anyOf, and oneOf "MUST be a non-empty array"
         }
 
     private:

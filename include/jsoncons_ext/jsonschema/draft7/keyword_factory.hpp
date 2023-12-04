@@ -293,19 +293,19 @@ namespace draft7 {
             it = schema.find("allOf");
             if (it != schema.object_range().end()) 
             {
-                combined_validators.emplace_back(jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(this, it->value(), context));
+                combined_validators.emplace_back(make_all_of_validator(it->value(), context));
             }
 
             it = schema.find("anyOf");
             if (it != schema.object_range().end()) 
             {
-                combined_validators.emplace_back(jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(this, it->value(), context));
+                combined_validators.emplace_back(make_any_of_validator(it->value(), context));
             }
 
             it = schema.find("oneOf");
             if (it != schema.object_range().end()) 
             {
-                combined_validators.emplace_back(jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(this, it->value(), context));
+                combined_validators.emplace_back(make_one_of_validator(it->value(), context));
             }
 
             it = schema.find("if");
@@ -878,6 +878,48 @@ namespace draft7 {
 
             return conditional_validator<Json>(std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
+        }
+
+        std::unique_ptr<combining_validator<Json,all_of_criterion<Json>>> make_all_of_validator(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("allOf");
+            std::vector<validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : schema.array_range())
+            {
+                subschemas.emplace_back(make_subschema_validator(subsch, context, {all_of_criterion<Json>::key(), std::to_string(c++)}));
+            }
+            return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+        }
+
+        std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("anyOf");
+            std::vector<validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : schema.array_range())
+            {
+                subschemas.emplace_back(make_subschema_validator(subsch, context, {any_of_criterion<Json>::key(), std::to_string(c++)}));
+            }
+            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+        }
+
+        std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("oneOf");
+            std::vector<validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : schema.array_range())
+            {
+                subschemas.emplace_back(make_subschema_validator(subsch, context, {one_of_criterion<Json>::key(), std::to_string(c++)}));
+            }
+            return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
 
         std::unique_ptr<object_validator<Json>> make_object_validator(const Json& schema,
