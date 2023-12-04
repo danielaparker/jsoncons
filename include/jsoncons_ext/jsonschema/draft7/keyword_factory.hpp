@@ -181,9 +181,9 @@ namespace draft7 {
             }
             else if (type == "string")
             {
-                type_mapping[(uint8_t)json_type::string_value] = string_validator<Json>::compile(schema, context);
+                type_mapping[(uint8_t)json_type::string_value] = compile_string_schema(schema, context);
                 // For binary types
-                type_mapping[(uint8_t) json_type::byte_string_value] = string_validator<Json>::compile(schema, context);
+                type_mapping[(uint8_t) json_type::byte_string_value] = compile_string_schema(schema, context);
             }
             else if (type == "boolean")
             {
@@ -206,9 +206,9 @@ namespace draft7 {
                 type_mapping[(uint8_t)json_type::null_value] = null_validator<Json>::compile(context);
                 type_mapping[(uint8_t)json_type::object_value] = jsoncons::make_unique<object_validator<Json>>(this, schema, context);
                 type_mapping[(uint8_t)json_type::array_value] = array_validator<Json>::compile(schema, context, this);
-                type_mapping[(uint8_t)json_type::string_value] = string_validator<Json>::compile(schema, context);
+                type_mapping[(uint8_t)json_type::string_value] = compile_string_schema(schema, context);
                 // For binary types
-                type_mapping[(uint8_t) json_type::byte_string_value] = string_validator<Json>::compile(schema, context);
+                type_mapping[(uint8_t) json_type::byte_string_value] = compile_string_schema(schema, context);
                 type_mapping[(uint8_t)json_type::bool_value] = boolean_validator<Json>::compile(context);
                 type_mapping[(uint8_t)json_type::int64_value] = integer_validator<Json>::compile(schema, context, keywords);
                 type_mapping[(uint8_t)json_type::uint64_value] = integer_validator<Json>::compile(schema, context, keywords);
@@ -324,6 +324,138 @@ namespace draft7 {
                 std::move(std::move(conditionalvalidator)),
                 std::move(std::move(expected_types))
                 );
+        }
+
+        std::unique_ptr<content_encoding_validator<Json>> compile_content_encoding_schema(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("contentEncoding");
+            if (!schema.is_string())
+            {
+                std::string message("contentEncoding must be a string");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<std::string>();
+            return jsoncons::make_unique<content_encoding_validator<Json>>(schema_path, value);
+        }
+
+        std::unique_ptr<string_validator<Json>> compile_string_schema(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("string");
+            auto new_context = context.update_uris(schema, schema_path);
+
+            std::vector<validator_type> validators;
+            auto it = schema.find("maxLength");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(max_length_validator<Json>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("minLength");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(min_length_validator<Json>::compile(it->value(), new_context));
+            }
+
+            it = schema.find("contentEncoding");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(compile_content_encoding_schema(it->value(), new_context));
+                // If "contentEncoding" is set to "binary", a Json value
+                // of type json_type::byte_string_value is accepted.
+            }
+
+            it = schema.find("contentMediaType");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(compile_content_media_type_schema(it->value(), new_context));
+            }
+
+#if defined(JSONCONS_HAS_STD_REGEX)
+            it = schema.find("pattern");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(compile_pattern_schema(it->value(), new_context));
+            }
+#endif
+
+            it = schema.find("format");
+            if (it != schema.object_range().end())
+            {
+                validators.emplace_back(compile_format_schema(it->value(), new_context));
+            }
+
+            return jsoncons::make_unique<string_validator<Json>>(schema_path, std::move(validators));
+        }
+
+        std::unique_ptr<content_media_type_validator<Json>> compile_content_media_type_schema(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("contentMediaType");
+            if (!schema.is_string())
+            {
+                std::string message("contentMediaType must be a string");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = schema.template as<std::string>();
+            return jsoncons::make_unique<content_media_type_validator<Json>>(schema_path, value);
+        }
+
+        std::unique_ptr<format_validator<Json>> compile_format_schema(const Json& schema, const compilation_context& context)
+        {
+            auto schema_path = context.make_schema_path_with("format");
+
+            std::string format = schema.template as<std::string>();
+
+            format_checker format_check;
+            if (format == "date-time")
+            {
+                format_check = rfc3339_date_time_check;
+            }
+            else if (format == "date") 
+            {
+                format_check = rfc3339_date_check;
+            } 
+            else if (format == "time") 
+            {
+                format_check = rfc3339_time_check;
+            } 
+            else if (format == "email") 
+            {
+                format_check = email_check;
+            } 
+            else if (format == "hostname") 
+            {
+                format_check = hostname_check;
+            } 
+            else if (format == "ipv4") 
+            {
+                format_check = ipv4_check;
+            } 
+            else if (format == "ipv6") 
+            {
+                format_check = ipv6_check;
+            } 
+            else if (format == "regex") 
+            {
+                format_check = regex_check;
+            } 
+            else
+            {
+                // Not supported - ignore
+                format_check = nullptr;
+            }       
+
+            return jsoncons::make_unique<format_validator<Json>>(schema_path, 
+                format_check);
+        }
+
+        std::unique_ptr<pattern_validator<Json>> compile_pattern_schema(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("pattern");
+            auto pattern_string = schema.template as<std::string>();
+            auto regex = std::regex(pattern_string, std::regex::ECMAScript);
+            return jsoncons::make_unique<pattern_validator<Json>>(schema_path, 
+                pattern_string, regex);
         }
 
         void load_root(const Json& sch)
