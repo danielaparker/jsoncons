@@ -75,16 +75,20 @@ namespace jsonschema {
             }
             if (schema.type() == json_type::object_value)
             {
-                auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
-                if (it != schema.object_range().end()) 
-                {
-                    std::string id = it->value().template as<std::string>(); 
-                    // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                auto it = schema.find("$ref");
+                if (it == schema.object_range().end()) // this schema is not a reference
+                { 
+                    it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
+                    if (it != schema.object_range().end()) 
                     {
-                        schema_location relative(id); 
-                        schema_location new_uri = relative.resolve(new_uris.back());
-                        new_uris.emplace_back(new_uri); 
+                        std::string id = it->value().template as<std::string>(); 
+                        // Add it to the list if it is not already there
+                        if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                        {
+                            schema_location relative(id); 
+                            schema_location new_uri = relative.resolve(new_uris.back());
+                            new_uris.emplace_back(new_uri); 
+                        }
                     }
                 }
             }
@@ -92,7 +96,7 @@ namespace jsonschema {
             return compilation_context(new_uris);
         }
 
-        schema_location resolve_back(const schema_location& relative)
+        schema_location resolve_back(const schema_location& relative) const
         {
             return relative.resolve(uris_.back());
         }

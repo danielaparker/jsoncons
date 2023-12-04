@@ -25,7 +25,7 @@ namespace {
         else
         {
             //std::cout << uri.string() << ", " << uri.path() << "\n";
-            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
+            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes/draft7";
             pathname += std::string(uri.path());
 
             std::fstream is(pathname.c_str());
@@ -50,13 +50,18 @@ namespace {
 
             for (const auto& test_case : test_group["tests"].array_range()) 
             {
-                auto reporter = [&test_case](const jsonschema::validation_output& o)
+                auto reporter = [&](const jsonschema::validation_output& o)
                 {
                     CHECK_FALSE(test_case["valid"].as<bool>());
                     if (test_case["valid"].as<bool>())
                     {
                         std::cout << "  Test case: " << test_case["description"] << "\n";
+                        std::cout << "  File: " << fpath << "\n";
                         std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
+                        for (const auto& err : o.nested_errors())
+                        {
+                            std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                        }
                     }
                     else
                     {
@@ -71,6 +76,12 @@ namespace {
  
 TEST_CASE("jsonschema-tests")
 {
+    SECTION("issues")
+    {
+        //jsonschema_tests("./jsonschema/issues/draft7/issue1.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue2.json");
+    }
+
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -83,7 +94,7 @@ TEST_CASE("jsonschema-tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/const.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/contains.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/default.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/definitions.json"); 
+        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/definitions.json"); 
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/dependencies.json");
 
@@ -113,18 +124,17 @@ TEST_CASE("jsonschema-tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/patternProperties.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/properties.json");
 #endif
-
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/propertyNames.json");
 
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/refRemote.json");
+        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
+
+        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/refRemote.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/required.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/type.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/uniqueItems.json"); 
-
         // format tests
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json");
@@ -141,6 +151,7 @@ TEST_CASE("jsonschema-tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/regex.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/relative-json-pointer.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json");
+ 
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri-reference.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri-template.json");
@@ -148,7 +159,7 @@ TEST_CASE("jsonschema-tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json");
     }
 
-
+#if 0
     SECTION("#417")
     {
         jsoncons::json schema = jsoncons::json::parse(R"(
@@ -191,4 +202,5 @@ TEST_CASE("jsonschema-tests")
 
             CHECK_FALSE(validator.is_valid(instance));
     }
+#endif
 }

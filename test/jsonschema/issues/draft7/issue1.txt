@@ -1,0 +1,76 @@
+  Test case: "$ref resolves to /definitions/base_foo, data validates"
+  Failed: #: At least one schema failed to match, but all are required to match.
+  Nested error: #: Expected string, found uint64
+
+You can set the base URI by using the $id keyword at the root of the 
+schema.  The value of $id is a URI-reference without a fragment that 
+resolves against the retrieval-uri.  The resulting URI is the base URI for 
+the schema.  
+
+In Draft 4-7, an $id in a subschema is a base URI change in a single schema document.  
+
+In Draft 4-7, When an object contains a $ref property, the object is 
+considered a reference.  Therefore, any other properties you 
+put in that object will not be treated as JSON Schema keywords and will be 
+ignored by the validator.  $ref can only be used where a schema is 
+expected.  
+
+[
+    {
+        "description": "$ref prevents a sibling $id from changing the base uri",
+        "schema": {
+            "$id": "http://localhost:1234/sibling_id/base/",
+            "definitions": {
+                "foo": {
+                    "$id": "http://localhost:1234/sibling_id/foo.json",
+                    "type": "string"
+                },
+                "base_foo": {
+                    "$comment": "this canonical uri is http://localhost:1234/sibling_id/base/foo.json",
+                    "$id": "foo.json",
+                    "type": "number"
+                }
+            },
+            "allOf": [
+                {
+                    "$comment": "$ref resolves to http://localhost:1234/sibling_id/base/foo.json, not http://localhost:1234/sibling_id/foo.json",
+                    "$id": "http://localhost:1234/sibling_id/",
+                    "$ref": "foo.json"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "$ref resolves to /definitions/base_foo, data validates",
+                "data": 1,
+                "valid": true
+            }
+        ]
+    }
+]
+
+https://json-schema.org/understanding-json-schema/structuring
+
+In Draft 4-7, $ref behaves a little differently.  When an object contains a 
+$ref property, the object is considered a reference, not a schema.  
+Therefore, any other properties you put in that object will not be treated 
+as JSON Schema keywords and will be ignored by the validator.  $ref can 
+only be used where a schema is expected.  
+
+{
+    "$id": "https://example.com/schemas/customer",
+    "type": "object",
+    "properties": {
+      "first_name": { "type": "string" },
+      "last_name": { "type": "string" },
+      "shipping_address": { "$ref": "/schemas/address" },
+      "billing_address": { "$ref": "/schemas/address" }
+    },
+    "required": ["first_name", "last_name", "shipping_address", "billing_address"]
+}
+
+The URI-references in $ref resolve against the schema's Base URI 
+(https://example.com/schemas/customer) which results in 
+https://example.com/schemas/address.  The implementation retrieves that 
+schema and uses it to evaluate the "shipping_address" and 
+"billing_address" properties.  
