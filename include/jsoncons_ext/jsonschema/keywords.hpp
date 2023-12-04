@@ -395,32 +395,6 @@ namespace jsonschema {
         {
         }
 
-        static std::unique_ptr<items_array_validator> compile(const Json& parent, const Json& schema, 
-            const compilation_context& context, 
-            subschema_validator_factory<Json>* builder)
-        {
-            std::vector<validator_type> item_validators;
-            validator_type additional_items_validator = nullptr;
-
-            std::string schema_path = context.make_schema_path_with("items");
-
-            if (schema.type() == json_type::array_value) 
-            {
-                size_t c = 0;
-                for (const auto& subsch : schema.array_range())
-                    item_validators.emplace_back(builder->make_subschema_validator(subsch, context, {"items", std::to_string(c++)}));
-
-                auto it = parent.find("additionalItems");
-                if (it != parent.object_range().end()) 
-                {
-                    additional_items_validator = builder->make_subschema_validator(it->value(), context, {"additionalItems"});
-                }
-            }
-            
-            return jsoncons::make_unique<items_array_validator<Json>>(schema_path, 
-                std::move(item_validators), std::move(additional_items_validator));
-        }
-
     private:
 
         void do_validate(const Json& instance, 
