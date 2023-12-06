@@ -54,6 +54,28 @@ namespace jsonschema {
         }
 
         template <class Json>
+        compilation_context update_base_uri(const Json& schema) const
+        {
+            if (schema.type() == json_type::object_value)
+            {
+                auto it = schema.find("$ref");
+                if (it == schema.object_range().end()) // this schema is not a reference
+                { 
+                    it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
+                    if (it != schema.object_range().end()) 
+                    {
+                        std::string id = it->value().template as<std::string>(); 
+                        schema_location relative(id); 
+                        schema_location new_uri = relative.resolve(get_schema_path());
+                        return compilation_context(new_uri); 
+                    }
+                }
+            }
+
+            return *this;
+        }
+
+        template <class Json>
         compilation_context update_uris(const Json& schema, const std::vector<std::string>& keys) const
         {
             // Exclude uri's that are not plain name identifiers

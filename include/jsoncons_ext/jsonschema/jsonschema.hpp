@@ -9,7 +9,7 @@
 
 #include <jsoncons_ext/jsonschema/keywords.hpp>
 #include <jsoncons_ext/jsonschema/json_validator.hpp>
-#include <jsoncons_ext/jsonschema/draft7/keyword_factory.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_parser.hpp>
 
 
 namespace jsoncons {
@@ -21,7 +21,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        jsoncons::jsonschema::draft7::keyword_factory<Json> kwFactory{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
+        jsoncons::jsonschema::draft7::schema_parser<Json> kwFactory{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
         kwFactory.load_root(schema);
 
         return kwFactory.get_schema();
@@ -31,7 +31,7 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
-        jsoncons::jsonschema::draft7::keyword_factory<Json> kwFactory(resolver);
+        jsoncons::jsonschema::draft7::schema_parser<Json> kwFactory(resolver);
         kwFactory.load_root(schema);
 
         return kwFactory.get_schema();

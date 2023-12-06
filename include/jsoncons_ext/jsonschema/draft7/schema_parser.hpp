@@ -43,7 +43,7 @@ namespace draft7 {
     };
 
     template <class Json>
-    class keyword_factory 
+    class schema_parser 
     {
     public:
         using reference_validator_type = reference_validator<Json>;
@@ -67,16 +67,16 @@ namespace draft7 {
         std::map<std::string, subschema_registry> subschema_registries_;
 
     public:
-        keyword_factory(uri_resolver<Json>&& resolver) noexcept
+        schema_parser(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
         {
         }
 
-        keyword_factory(const keyword_factory&) = delete;
-        keyword_factory& operator=(const keyword_factory&) = delete;
-        keyword_factory(keyword_factory&&) = default;
-        keyword_factory& operator=(keyword_factory&&) = default;
+        schema_parser(const schema_parser&) = delete;
+        schema_parser& operator=(const schema_parser&) = delete;
+        schema_parser(schema_parser&&) = default;
+        schema_parser& operator=(schema_parser&&) = default;
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {
@@ -160,13 +160,11 @@ namespace draft7 {
             return jsoncons::make_unique<reference_validator_type>(sch);
         }
 
-        std::vector<validator_type> make_type_mapping(const std::string& type,
+        void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
             const Json& schema,
             const compilation_context& context,
             std::set<std::string>& keywords)
         {
-            std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
-
             if (type == "null")
             {
                 type_mapping[(uint8_t)json_type::null_value] = make_null_validator(context);
@@ -217,7 +215,6 @@ namespace draft7 {
                 type_mapping[(uint8_t)json_type::int64_value] = make_number_validator(schema, context, keywords);
                 type_mapping[(uint8_t)json_type::uint64_value] = make_number_validator(schema, context, keywords);
             }
-            return type_mapping;
         }
 
         std::unique_ptr<type_validator<Json>> make_type_validator(const Json& schema,
@@ -237,7 +234,7 @@ namespace draft7 {
             auto it = schema.find("type");
             if (it == schema.object_range().end()) 
             {
-                type_mapping = make_type_mapping("", schema, context, known_keywords);
+                init_type_mapping(type_mapping, "", schema, context, known_keywords);
             }
             else 
             {
@@ -246,7 +243,7 @@ namespace draft7 {
                     case json_type::string_value: 
                     {
                         auto type = it->value().template as<std::string>();
-                        type_mapping = make_type_mapping(type, schema, context, known_keywords);
+                        init_type_mapping(type_mapping, type, schema, context, known_keywords);
                         expected_types.emplace_back(std::move(type));
                         break;
                     } 
@@ -256,7 +253,7 @@ namespace draft7 {
                         for (const auto& item : it->value().array_range())
                         {
                             auto type = item.template as<std::string>();
-                            type_mapping = make_type_mapping(type, schema, context, known_keywords);
+                            init_type_mapping(type_mapping, type, schema, context, known_keywords);
                             expected_types.emplace_back(std::move(type));
                         }
                         break;
@@ -313,6 +310,20 @@ namespace draft7 {
             {
                 conditionalvalidator = make_conditional_validator(it->value(), schema, context);
                 // schema["if"] is object and has id, can be looked up
+            }
+            else
+            {
+                auto then_it = schema.find("then");
+                if (then_it != schema.object_range().end()) 
+                {
+                    make_subschema_validator(then_it->value(), context, {"then"});
+                }
+
+                auto else_it = schema.find("else");
+                if (else_it != schema.object_range().end()) 
+                {
+                    make_subschema_validator(else_it->value(), context, {"else"});
+                }
             }
 
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
@@ -857,22 +868,18 @@ namespace draft7 {
             validator_type then_validator(nullptr);
             validator_type else_validator(nullptr);
 
+            if_validator = make_subschema_validator(sch_if, context, { "if" });
+
             auto then_it = schema.find("then");
-            auto else_it = schema.find("else");
-
-            if (then_it != schema.object_range().end() || else_it != schema.object_range().end()) 
+            if (then_it != schema.object_range().end()) 
             {
-                if_validator = make_subschema_validator(sch_if, context, {"if"});
+                then_validator = make_subschema_validator(then_it->value(), context, {"then"});
+            }
 
-                if (then_it != schema.object_range().end()) 
-                {
-                    then_validator = make_subschema_validator(then_it->value(), context, {"then"});
-                }
-
-                if (else_it != schema.object_range().end()) 
-                {
-                    else_validator = make_subschema_validator(else_it->value(), context, {"else"});
-                }
+            auto else_it = schema.find("else");
+            if (else_it != schema.object_range().end()) 
+            {
+                else_validator = make_subschema_validator(else_it->value(), context, {"else"});
             }
 
             return conditional_validator<Json>(std::move(schema_path),
@@ -1214,7 +1221,7 @@ namespace draft7 {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        keyword_factory<Json> kwFactory{default_uri_resolver<Json>()};
+        schema_parser<Json> kwFactory{default_uri_resolver<Json>()};
         kwFactory.load_root(schema);
 
         return kwFactory.get_schema();
@@ -1224,7 +1231,7 @@ namespace draft7 {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
-        keyword_factory<Json> kwFactory(resolver);
+        schema_parser<Json> kwFactory(resolver);
         kwFactory.load_root(schema);
 
         return kwFactory.get_schema();

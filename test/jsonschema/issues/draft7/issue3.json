@@ -1,0 +1,13 @@
+[
+    {
+        "description": "multiple types can be specified in an array",
+        "schema": {"type": ["integer", "string"]},
+        "tests": [
+            {
+                "description": "an integer is valid",
+                "data": 1,
+                "valid": true
+            }
+        ]
+    }
+]

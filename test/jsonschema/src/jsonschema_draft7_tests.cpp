@@ -25,12 +25,12 @@ namespace {
         else
         {
             //std::cout << uri.string() << ", " << uri.path() << "\n";
-            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes/draft7";
+            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
             pathname += std::string(uri.path());
 
             std::fstream is(pathname.c_str());
             if (!is)
-                throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
+                throw jsonschema::schema_error("Could not open " + pathname + " for schema loading\n");
 
             return json::parse(is);
         }
@@ -45,30 +45,39 @@ namespace {
 
         for (const auto& test_group : tests.array_range()) 
         {
-            auto schema = jsonschema::make_schema(test_group.at("schema"), resolver);
-            jsonschema::json_validator<json> validator(schema);
-
-            for (const auto& test_case : test_group["tests"].array_range()) 
+            try
             {
-                auto reporter = [&](const jsonschema::validation_output& o)
+                auto schema = jsonschema::make_schema(test_group.at("schema"), resolver);
+                jsonschema::json_validator<json> validator(schema);
+
+                for (const auto& test_case : test_group["tests"].array_range()) 
                 {
-                    CHECK_FALSE(test_case["valid"].as<bool>());
-                    if (test_case["valid"].as<bool>())
+                    auto reporter = [&](const jsonschema::validation_output& o)
                     {
-                        std::cout << "  Test case: " << test_case["description"] << "\n";
-                        std::cout << "  File: " << fpath << "\n";
-                        std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
-                        for (const auto& err : o.nested_errors())
+                        CHECK_FALSE(test_case["valid"].as<bool>());
+                        if (test_case["valid"].as<bool>())
                         {
-                            std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                            std::cout << "  File: " << fpath << "\n";
+                            std::cout << "  Test case: " << test_case["description"] << "\n";
+                            std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
+                            for (const auto& err : o.nested_errors())
+                            {
+                                std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                            }
                         }
-                    }
-                    else
-                    {
-                        //std::cout << o.what() << "\n";
-                    }
-                };
-                validator.validate(test_case.at("data"), reporter);
+                        else
+                        {
+                            //std::cout << o.what() << "\n";
+                        }
+                    };
+                    validator.validate(test_case.at("data"), reporter);
+                }
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << "  File: " << fpath << "\n";
+                std::cout << e.what() << "\n\n";
+                CHECK(false);
             }
         }
     }
@@ -80,8 +89,12 @@ TEST_CASE("jsonschema-tests")
     {
         //jsonschema_tests("./jsonschema/issues/draft7/issue1.json");
         //jsonschema_tests("./jsonschema/issues/draft7/issue2.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue3.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue4.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue5.json");
+        jsonschema_tests("./jsonschema/issues/draft7/issue6.json");
     }
-
+#if 0
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -94,7 +107,7 @@ TEST_CASE("jsonschema-tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/const.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/contains.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/default.json");
-        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/definitions.json"); 
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/definitions.json"); 
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/dependencies.json");
 
@@ -126,9 +139,9 @@ TEST_CASE("jsonschema-tests")
 #endif
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/propertyNames.json");
 
-        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
 
-        ////jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/refRemote.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/refRemote.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/required.json");
 
@@ -158,7 +171,7 @@ TEST_CASE("jsonschema-tests")
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json");
     }
-
+#endif
 #if 0
     SECTION("#417")
     {

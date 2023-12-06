@@ -1,0 +1,25 @@
+[
+    {
+        "description": "ref to then",
+        "schema": {
+            "allOf": [
+                {"$ref": "http://example.com/ref/then"},
+                {
+                    "then": {
+                        "$id": "http://example.com/ref/then",
+                        "type": "integer"
+                    }
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "a non-integer is invalid due to the $ref",
+                "data": "foo",
+                "valid": false
+            }
+        ]
+    }
+]
+
+https://json-schema.org/understanding-json-schema/reference/conditionals
