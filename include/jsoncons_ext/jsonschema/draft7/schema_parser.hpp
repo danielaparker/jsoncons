@@ -116,7 +116,6 @@ namespace draft7 {
                         schema_location relative(it->value().template as<std::string>()); 
 
                         auto id = context.resolve_back(relative);
-                        //sch = get_or_create_reference(id);
                         auto ref =  get_or_create_reference(id);
                         sch = ref.get();
                         subschemas_.emplace_back(std::move(ref));

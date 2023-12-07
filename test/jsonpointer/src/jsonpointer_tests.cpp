@@ -661,6 +661,26 @@ TEST_CASE("to_uri_fragment test")
         REQUIRE_FALSE(ec);
         CHECK(pointer.to_string() == location);
     }
+
+    SECTION("/foo/")
+    {
+        std::error_code ec;
+        std::string location = "/foo/";
+        jsonpointer::json_pointer pointer = jsonpointer::json_pointer::parse(location, ec);
+        REQUIRE_FALSE(ec);
+
+        CHECK(pointer.to_string() == location);
+    }
+
+    SECTION("/foo//bar")
+    {
+        std::error_code ec;
+        std::string location = "/foo//bar";
+        jsonpointer::json_pointer pointer = jsonpointer::json_pointer::parse(location, ec);
+        REQUIRE_FALSE(ec);
+
+        CHECK(pointer.to_string() == location);
+    }
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)

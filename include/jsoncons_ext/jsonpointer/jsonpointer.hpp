@@ -27,7 +27,8 @@ namespace jsoncons { namespace jsonpointer {
     {
         start,
         escaped,
-        delim
+        new_token,
+        part
     };
 
     } // namespace detail
@@ -140,27 +141,30 @@ namespace jsoncons { namespace jsonpointer {
 
             while (p < pend)
             {
-                bool done = false;
-                while (p < pend && !done)
-                {
                     switch (state)
                     {
                         case jsonpointer::detail::pointer_state::start: 
                             switch (*p)
                             {
                                 case '/':
-                                    state = jsonpointer::detail::pointer_state::delim;
+                                    state = jsonpointer::detail::pointer_state::new_token;
                                     break;
                                 default:
                                     ec = jsonpointer_errc::expected_slash;
                                     return basic_json_pointer();
                             };
                             break;
-                        case jsonpointer::detail::pointer_state::delim: 
+                        case jsonpointer::detail::pointer_state::part:
+                            state = jsonpointer::detail::pointer_state::new_token; 
+                            JSONCONS_FALLTHROUGH;
+
+                        case jsonpointer::detail::pointer_state::new_token: 
                             switch (*p)
                             {
                                 case '/':
-                                    done = true;
+                                    tokens.push_back(buffer);
+                                    buffer.clear();
+                                    state = jsonpointer::detail::pointer_state::part; 
                                     break;
                                 case '~':
                                     state = jsonpointer::detail::pointer_state::escaped;
@@ -175,11 +179,11 @@ namespace jsoncons { namespace jsonpointer {
                             {
                                 case '0':
                                     buffer.push_back('~');
-                                    state = jsonpointer::detail::pointer_state::delim;
+                                    state = jsonpointer::detail::pointer_state::new_token;
                                     break;
                                 case '1':
                                     buffer.push_back('/');
-                                    state = jsonpointer::detail::pointer_state::delim;
+                                    state = jsonpointer::detail::pointer_state::new_token;
                                     break;
                                 default:
                                     ec = jsonpointer_errc::expected_0_or_1;
@@ -188,11 +192,8 @@ namespace jsoncons { namespace jsonpointer {
                             break;
                     }
                     ++p;
-                }
-                tokens.push_back(buffer);
-                buffer.clear();
             }
-            if (!buffer.empty())
+            if (state == jsonpointer::detail::pointer_state::new_token || state == jsonpointer::detail::pointer_state::part)
             {
                 tokens.push_back(buffer);
             }
