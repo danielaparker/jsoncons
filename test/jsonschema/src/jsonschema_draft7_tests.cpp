@@ -92,9 +92,8 @@ TEST_CASE("jsonschema-tests")
         //jsonschema_tests("./jsonschema/issues/draft7/issue3.json");
         //jsonschema_tests("./jsonschema/issues/draft7/issue4.json");
         //jsonschema_tests("./jsonschema/issues/draft7/issue5.json");
-        jsonschema_tests("./jsonschema/issues/draft7/issue6.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue6.json");
     }
-#if 0
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -171,8 +170,7 @@ TEST_CASE("jsonschema-tests")
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json");
     }
-#endif
-#if 0
+
     SECTION("#417")
     {
         jsoncons::json schema = jsoncons::json::parse(R"(
@@ -215,5 +213,4 @@ TEST_CASE("jsonschema-tests")
 
             CHECK_FALSE(validator.is_valid(instance));
     }
-#endif
 }
