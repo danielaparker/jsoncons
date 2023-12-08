@@ -10,7 +10,7 @@
 #include <iostream>
 
 using jsoncons::json;
-//using jsoncons::ojson;
+using jsoncons::ojson;
 namespace jmespath = jsoncons::jmespath;
 
 TEST_CASE("jmespath_expression tests")
@@ -96,7 +96,7 @@ TEST_CASE("jmespath issue")
     }
     )";
 
-    auto doc = json::parse(jtext);
+    auto doc = ojson::parse(jtext);
 
     auto result = jmespath::search(doc, expr);
 
