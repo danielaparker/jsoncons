@@ -1180,19 +1180,19 @@ namespace jsoncons {
 
             object& value()
             {
-                JSONCONS_ASSERT(ptr != nullptr);
+                JSONCONS_ASSERT(ptr_ != nullptr);
                 return *ptr_;
             }
 
             const object& value() const
             {
-                JSONCONS_ASSERT(ptr != nullptr);
+                JSONCONS_ASSERT(ptr_ != nullptr);
                 return *ptr_;
             }
 
             allocator_type get_allocator() const
             {
-                JSONCONS_ASSERT(ptr != nullptr);
+                JSONCONS_ASSERT(ptr_ != nullptr);
                 return ptr_->get_allocator();
             }
         private:
