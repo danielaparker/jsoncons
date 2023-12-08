@@ -10,6 +10,7 @@
 #include <iostream>
 
 using jsoncons::json;
+using jsoncons::ojson;
 namespace jmespath = jsoncons::jmespath;
 
 TEST_CASE("jmespath_expression tests")
