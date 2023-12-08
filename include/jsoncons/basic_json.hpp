@@ -1149,6 +1149,7 @@ namespace jsoncons {
             {
                 tag_ = other.tag_;
                 destroy();
+                ptr_ = nullptr;
                 create(object_allocator(other.get_allocator()), *(other.ptr_));
             }
 
@@ -1157,6 +1158,7 @@ namespace jsoncons {
                 auto alloc = get_allocator();
                 tag_ = other.tag_;
                 destroy();
+                ptr_ = nullptr;
                 create(object_allocator(alloc), *(other.ptr_));
             }
 
@@ -1178,16 +1180,19 @@ namespace jsoncons {
 
             object& value()
             {
+                JSONCONS_ASSERT(ptr != nullptr);
                 return *ptr_;
             }
 
             const object& value() const
             {
+                JSONCONS_ASSERT(ptr != nullptr);
                 return *ptr_;
             }
 
             allocator_type get_allocator() const
             {
+                JSONCONS_ASSERT(ptr != nullptr);
                 return ptr_->get_allocator();
             }
         private:
