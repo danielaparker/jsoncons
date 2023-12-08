@@ -136,7 +136,7 @@ namespace draft7 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.uris()[0].string() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_schema_path() + ", expected: boolean or object"));
                     break;
             }
 
