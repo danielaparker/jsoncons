@@ -11,6 +11,7 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/schema.hpp>
 #include <jsoncons_ext/jsonschema/keywords.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
@@ -271,13 +272,13 @@ namespace draft7 {
             it = schema.find("enum");
             if (it != schema.object_range().end()) 
             {
-                enumvalidator = enum_validator<Json>(it->value(), context);
+                enumvalidator = enum_validator<Json>(context.get_schema_path(), it->value());
             }
 
             it = schema.find("const");
             if (it != schema.object_range().end()) 
             {
-                const_validator = const_keyword<Json>(it->value(), context);
+                const_validator = const_keyword<Json>(context.get_schema_path(), it->value());
             }
 
             it = schema.find("not");

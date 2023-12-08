@@ -21,7 +21,6 @@
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
-#include <jsoncons_ext/jsonschema/compilation_context.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -1409,9 +1408,8 @@ namespace jsonschema {
         Json enum_validator_;
 
     public:
-        enum_validator(const Json& schema,
-                  const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path()), enum_validator_(schema)
+        enum_validator(const std::string& path, const Json& schema)
+            : keyword_validator<Json>(path), enum_validator_(schema)
         {
         }
     private:
@@ -1452,8 +1450,8 @@ namespace jsonschema {
         Json const_validator_;
 
     public:
-        const_keyword(const Json& schema, const compilation_context& context)
-            : keyword_validator<Json>(context.get_schema_path()), const_validator_(schema)
+        const_keyword(const std::string& path, const Json& schema)
+            : keyword_validator<Json>(path), const_validator_(schema)
         {
         }
     private:
