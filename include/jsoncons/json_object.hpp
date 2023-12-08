@@ -1745,11 +1745,19 @@ namespace jsoncons {
             {
                 json_array<Json> temp(get_allocator());
 
-                for (auto&& kv : members_)
+                for (auto& kv : members_)
                 {
-                    if (kv.value().size() > 0)
+                    switch (kv.value().storage_kind())
                     {
-                        temp.emplace_back(std::move(kv.value()));
+                        case json_storage_kind::array_value:
+                        case json_storage_kind::object_value:
+                            if (!kv.value().empty())
+                            {
+                                temp.emplace_back(std::move(kv.value()));
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
