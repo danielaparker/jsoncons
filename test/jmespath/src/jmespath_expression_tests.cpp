@@ -75,3 +75,29 @@ TEST_CASE("jmespath_expression tests")
     }    
 }
 
+TEST_CASE("jmespath issue") 
+{
+    std::string jtext = R"(
+    {
+      "locations": [
+        {"name": "Seattle", "state": "WA"},
+        {"name": "New York", "state": "NY"},
+        {"name": "Bellevue", "state": "WA"},
+        {"name": "Olympia", "state": "WA"}
+      ]
+    }        
+    )";
+
+    std::string expr = R"(
+    {
+        name: locations[].name,
+        state: locations[].state
+    }
+    )";
+
+    ojson doc = ojson::parse(jtext);
+
+    ojson result = jmespath::search(doc, expr);
+
+    std::cout << pretty_print(result) << "\n\n";
+}
