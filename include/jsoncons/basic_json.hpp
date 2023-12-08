@@ -1075,7 +1075,7 @@ namespace jsoncons {
             }
         public:
             object_storage(const object& val, semantic_tag tag)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), tag_(tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), tag_(tag), ptr_(nullptr)
             {
                 create(val.get_allocator(), val);
             }
@@ -1087,19 +1087,19 @@ namespace jsoncons {
             }
 
             object_storage(object&& val, semantic_tag tag)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), tag_(tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object_value)), small_string_length_(0), tag_(tag), ptr_(nullptr)
             {
                 create(val.get_allocator(), std::move(val));
             }
 
             explicit object_storage(const object_storage& other)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 create(other.ptr_->get_allocator(), *(other.ptr_));
             }
 
             object_storage(const object_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 create(object_allocator(alloc), *(other.ptr_));
             }
@@ -1116,7 +1116,7 @@ namespace jsoncons {
             }
 
             object_storage(object_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 if (other.get_allocator() == alloc)
                 {
@@ -3088,42 +3088,42 @@ namespace jsoncons {
                     break;
                 case json_storage_kind::short_string_value:
                 case json_storage_kind::long_string_value:
-					switch (tag())
-					{
-						case semantic_tag::bigint:
-						case semantic_tag::bigdec:
-						case semantic_tag::bigfloat:
-						{
-							// same text -> equal
-							if (rhs.storage_kind() == json_storage_kind::short_string_value || rhs.storage_kind() == json_storage_kind::long_string_value)
-							{
-								int compareString = as_string_view().compare(rhs.as_string_view());
-								if (compareString == 0)
-								{
-									return 0;
-								}
-							}
-							
-							// compare big numbers as double
-							auto r = as<double>() - rhs.as<double>();
-							return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
-						}
-						default:
-						{
-							// compare regular text
-							switch (rhs.storage_kind())
-							{
-								case json_storage_kind::short_string_value:
-									return as_string_view().compare(rhs.as_string_view());
-								case json_storage_kind::long_string_value:
-									return as_string_view().compare(rhs.as_string_view());
-								case json_storage_kind::json_const_pointer:
-									return compare(*(rhs.cast<json_const_pointer_storage>().value()));
-								default:
-									return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
-							}
-						}
-					}
+                    switch (tag())
+                    {
+                        case semantic_tag::bigint:
+                        case semantic_tag::bigdec:
+                        case semantic_tag::bigfloat:
+                        {
+                            // same text -> equal
+                            if (rhs.storage_kind() == json_storage_kind::short_string_value || rhs.storage_kind() == json_storage_kind::long_string_value)
+                            {
+                                int compareString = as_string_view().compare(rhs.as_string_view());
+                                if (compareString == 0)
+                                {
+                                    return 0;
+                                }
+                            }
+                            
+                            // compare big numbers as double
+                            auto r = as<double>() - rhs.as<double>();
+                            return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                        }
+                        default:
+                        {
+                            // compare regular text
+                            switch (rhs.storage_kind())
+                            {
+                                case json_storage_kind::short_string_value:
+                                    return as_string_view().compare(rhs.as_string_view());
+                                case json_storage_kind::long_string_value:
+                                    return as_string_view().compare(rhs.as_string_view());
+                                case json_storage_kind::json_const_pointer:
+                                    return compare(*(rhs.cast<json_const_pointer_storage>().value()));
+                                default:
+                                    return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            }
+                        }
+                    }
                     break;
                 case json_storage_kind::byte_string_value:
                     switch (rhs.storage_kind())
