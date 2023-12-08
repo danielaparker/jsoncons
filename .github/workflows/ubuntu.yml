@@ -72,6 +72,27 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
+  gcc_build12b:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install g++-12
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On
+      env:
+        CXX:  g++-12
+
+    - working-directory: build/
+      run: cmake --build . --config ubuntu-latest
+
+    - working-directory: build/
+      run: ctest -C ubuntu-latest --output-on-failure
+
   clang_13_build:
     runs-on: ubuntu-latest
 
