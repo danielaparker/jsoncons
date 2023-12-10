@@ -69,7 +69,7 @@ namespace {
     }
 }
  
-TEST_CASE("jsonschema-tests")
+TEST_CASE("jsonschema-draft2019-tests")
 {
     SECTION("tests")
     {

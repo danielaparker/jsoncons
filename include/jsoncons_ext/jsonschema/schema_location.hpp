@@ -46,7 +46,7 @@ namespace jsonschema {
             return !identifier_.empty();
         }
 
-        bool has_identifier() const
+        bool has_plain_name_fragment() const
         {
             return !identifier_.empty() && identifier_.front() != '/';
         }
@@ -96,7 +96,7 @@ namespace jsonschema {
 
         schema_location append(const std::string& field) const
         {
-            if (has_identifier())
+            if (has_plain_name_fragment())
                 return *this;
 
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
@@ -119,7 +119,7 @@ namespace jsonschema {
 
         schema_location append(std::size_t index) const
         {
-            if (has_identifier())
+            if (has_plain_name_fragment())
                 return *this;
 
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));

@@ -78,12 +78,35 @@ namespace jsonschema {
         template <class Json>
         compilation_context update_uris(const Json& schema, const std::vector<std::string>& keys) const
         {
+            bool has_plain_name_fragment = false;
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
             {
-                if (!uri.has_identifier())
+                if (!uri.has_plain_name_fragment())
+                {
                     new_uris.push_back(uri);
+                }
+                else
+                {
+                    has_plain_name_fragment = true;
+                }
+            }
+
+            if (has_plain_name_fragment)
+            {
+                std::cout << "update_uris\n";
+                for (const auto& uri : uris_)
+                {
+                    if (!uri.has_plain_name_fragment())
+                    {
+                        std::cout << "    not has_plain_name_fragment " << uri.string() << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "    has_plain_name_fragment " << uri.string() << std::endl;
+                    }
+                }
             }
 
             // Append the keys for this sub-schema to the uri's
@@ -127,7 +150,7 @@ namespace jsonschema {
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
-                if (!it->has_identifier() && it->is_absolute())
+                if (!it->has_plain_name_fragment() && it->is_absolute())
                 {
                     return it->append(keyword).string();
                 }
