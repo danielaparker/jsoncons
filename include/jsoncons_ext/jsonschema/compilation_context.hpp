@@ -92,7 +92,7 @@ namespace jsonschema {
                     has_plain_name_fragment = true;
                 }
             }
-
+/*
             if (has_plain_name_fragment)
             {
                 std::cout << "update_uris\n";
@@ -108,7 +108,7 @@ namespace jsonschema {
                     }
                 }
             }
-
+*/
             // Append the keys for this sub-schema to the uri's
             for (const auto& key : keys)
             {

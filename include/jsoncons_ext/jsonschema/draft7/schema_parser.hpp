@@ -1041,7 +1041,7 @@ namespace draft7 {
             );
         }
 
-        void load_root(const Json& sch)
+        void parse(const Json& sch)
         {
             if (sch.is_object())
             {
@@ -1057,15 +1057,32 @@ namespace draft7 {
                     }
                 }
             }
-            load(sch);
+            load(sch, compilation_context(schema_location("#")));
         }
 
+        void parse(const Json& sch, const std::string& retrieval_uri)
+        {
+            if (sch.is_object())
+            {
+                auto it = sch.find("$schema");
+                if (it != sch.object_range().end())
+                {
+                    auto sv = it->value().as_string_view();
+                    if (!schema_version::contains(sv))
+                    {
+                        std::string message("Unsupported schema version ");
+                        message.append(sv.data(), sv.size());
+                        JSONCONS_THROW(schema_error(message));
+                    }
+                }
+            }
+            load(sch, compilation_context(schema_location(retrieval_uri)));
+        }
 
-
-        void load(const Json& sch)
+        void load(const Json& sch, const compilation_context& context)
         {
             subschema_registries_.clear();
-            root_ = make_subschema_validator(sch, compilation_context(schema_location("#")), {});
+            root_ = make_subschema_validator(sch, context, {});
 
             // load all external schemas that have not already been loaded
 
@@ -1221,20 +1238,39 @@ namespace draft7 {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        schema_parser<Json> kwFactory{default_uri_resolver<Json>()};
-        kwFactory.load_root(schema);
+        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
+        parser.parse(schema);
 
-        return kwFactory.get_schema();
+        return parser.get_schema();
+    }
+
+    template <class Json>
+    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, const std::string& retrieval_uri)
+    {
+        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
+        parser.parse(schema, retrieval_uri);
+
+        return parser.get_schema();
     }
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
-        schema_parser<Json> kwFactory(resolver);
-        kwFactory.load_root(schema);
+        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver);
+        parser.parse(schema);
 
-        return kwFactory.get_schema();
+        return parser.get_schema();
+    }
+
+    template <class Json,class URIResolver>
+    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
+    make_schema(const Json& schema, const std::string& retrieval_uri, const URIResolver& resolver)
+    {
+        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver, retrieval_uri);
+        parser.parse(schema);
+
+        return parser.get_schema();
     }
 
 } // namespace draft7
