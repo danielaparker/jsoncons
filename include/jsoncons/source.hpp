@@ -355,7 +355,7 @@ namespace jsoncons {
         void ignore(std::size_t count)
         {
             std::size_t len;
-            if ((std::size_t)(end_ - current_) < count)
+            if (std::size_t(end_ - current_) < count)
             {
                 len = end_ - current_;
             }
@@ -383,7 +383,7 @@ namespace jsoncons {
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len;
-            if ((std::size_t)(end_ - current_) < length)
+            if (std::size_t(end_ - current_) < length)
             {
                 len = end_ - current_;
             }
@@ -565,7 +565,7 @@ namespace jsoncons {
         void ignore(std::size_t count)
         {
             std::size_t len;
-            if ((std::size_t)(end_ - current_) < count)
+            if (std::size_t(end_ - current_) < count)
             {
                 len = end_ - current_;
             }
@@ -593,7 +593,7 @@ namespace jsoncons {
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len;
-            if ((std::size_t)(end_ - current_) < length)
+            if (std::size_t(end_ - current_) < length)
             {
                 len = end_ - current_;
             }
