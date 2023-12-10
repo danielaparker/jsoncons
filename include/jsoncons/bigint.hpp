@@ -770,7 +770,7 @@ public:
         if (q > 0)
         {
             memmove( data(), data()+q, (size_type)((length() - q)*sizeof(uint64_t)) );
-            resize( int(length() - q) );
+            resize( size_type(length() - q) );
             k %= basic_type_bits;
             if ( k == 0 )
             {
