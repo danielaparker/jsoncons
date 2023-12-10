@@ -16,6 +16,13 @@ using namespace jsoncons;
 
 TEST_CASE("test_positive_bignum")
 {
+    std::cout << "specified size between 18446744073441116168 and 18446744073709551615 may exceed maximum object size 9223372036854775807" << "\n\n";
+
+    std::cout << (std::numeric_limits<int>::max)() << "\n";
+    std::cout << (std::numeric_limits<std::int64_t>::max)() << "\n";
+    std::cout << (std::numeric_limits<std::size_t>::max)() << "\n";
+    std::cout << (std::numeric_limits < std::ptrdiff_t>::max)() << "\n\n";
+
     std::string expected = "18446744073709551616";
     std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
     bigint x = bigint::from_bytes_be(1, v.data(),v.size());

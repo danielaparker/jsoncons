@@ -44,7 +44,7 @@ namespace detail {
     private:
         basic_type_allocator_type alloc_;
     public:
-       using allocator_traits_type = std::allocator_traits<allocator_type>;
+       using allocator_traits_type = std::allocator_traits<basic_type_allocator_type>;
        using stored_allocator_type = allocator_type;
        using pointer = typename allocator_traits_type::pointer;
        using value_type = typename allocator_traits_type::value_type;
@@ -770,7 +770,7 @@ public:
         if (q > 0)
         {
             memmove( data(), data()+q, (size_type)((length() - q)*sizeof(uint64_t)) );
-            resize( length() - q );
+            resize( int(length() - q) );
             k %= basic_type_bits;
             if ( k == 0 )
             {
