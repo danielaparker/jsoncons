@@ -19,32 +19,55 @@ namespace jsonschema {
 
     class compilation_context
     {
+        uri base_uri_;
         std::vector<schema_location> uris_;
     public:
         compilation_context(const schema_location& location)
-            : uris_(std::vector<schema_location>{{location}})
+            : base_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+              uris_(std::vector<schema_location>{{location}})
         {
         }
 
         compilation_context(schema_location&& location)
-            : uris_(std::vector<schema_location>{{std::move(location)}})
+            : base_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+              uris_(std::vector<schema_location>{{std::move(location)}})
         {
         }
 
         explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
+            for (auto it = uris_.rbegin();
+                 it != uris_.rend();
+                 ++it)
+            {
+                if (it->uri().is_absolute())
+                {
+                    base_uri_ = it->uri();
+                    break;
+                }
+            }
         }
         explicit compilation_context(std::vector<schema_location>&& uris)
             : uris_(std::move(uris))
         {
+            for (auto it = uris_.rbegin();
+                 it != uris_.rend();
+                 ++it)
+            {
+                if (it->uri().is_absolute())
+                {
+                    base_uri_ = it->uri();
+                    break;
+                }
+            }
         }
 
         const std::vector<schema_location>& uris() const {return uris_;}
 
-        std::string get_schema_path() const
+        const uri& get_base_uri() const
         {
-            return (!uris_.empty() && uris_.back().is_absolute()) ? uris_.back().string() : "";
+            return base_uri_;
         }
 
         template <class Json>
@@ -66,7 +89,7 @@ namespace jsonschema {
                     {
                         std::string id = it->value().template as<std::string>(); 
                         schema_location relative(id); 
-                        schema_location new_uri = relative.resolve(get_schema_path());
+                        schema_location new_uri = relative.resolve(get_base_uri());
                         return compilation_context(new_uri); 
                     }
                 }

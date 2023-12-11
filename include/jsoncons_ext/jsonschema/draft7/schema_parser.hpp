@@ -136,7 +136,7 @@ namespace draft7 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_schema_path() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_base_uri().string() + ", expected: boolean or object"));
                     break;
             }
 
@@ -220,7 +220,7 @@ namespace draft7 {
         std::unique_ptr<type_validator<Json>> make_type_validator(const Json& schema,
             const compilation_context& context)
         {
-            std::string schema_path = context.get_schema_path();
+            std::string schema_path = context.get_base_uri().string();
             Json default_value{jsoncons::null_type()};
             jsoncons::optional<enum_validator<Json>> enumvalidator{};
             jsoncons::optional<const_keyword<Json>> const_validator{};
@@ -272,13 +272,13 @@ namespace draft7 {
             it = schema.find("enum");
             if (it != schema.object_range().end()) 
             {
-                enumvalidator = enum_validator<Json>(context.get_schema_path(), it->value());
+                enumvalidator = enum_validator<Json>(context.get_base_uri().string(), it->value());
             }
 
             it = schema.find("const");
             if (it != schema.object_range().end()) 
             {
-                const_validator = const_keyword<Json>(context.get_schema_path(), it->value());
+                const_validator = const_keyword<Json>(context.get_base_uri().string(), it->value());
             }
 
             it = schema.find("not");
@@ -863,7 +863,7 @@ namespace draft7 {
         conditional_validator<Json> make_conditional_validator(const Json& sch_if, const Json& schema,
             const compilation_context& context)
         {
-            std::string schema_path = context.get_schema_path();
+            std::string schema_path = context.get_base_uri().string();
             validator_type if_validator(nullptr);
             validator_type then_validator(nullptr);
             validator_type else_validator(nullptr);

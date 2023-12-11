@@ -158,7 +158,7 @@ namespace jsoncons {
 
         bool is_absolute() const noexcept
         {
-            return scheme_.first != scheme_.second;
+            return scheme_.second > scheme_.first;
         }
 
         bool is_opaque() const noexcept 
