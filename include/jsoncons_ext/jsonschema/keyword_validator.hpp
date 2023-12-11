@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/jsonschema/uri.hpp>
+#include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
@@ -99,7 +99,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    using uri_resolver = std::function<Json(const jsoncons::jsonschema::uri & /*id*/)>;
+    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
     class reference_schema : public keyword_validator<Json>

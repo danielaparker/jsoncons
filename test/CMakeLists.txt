@@ -104,7 +104,6 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_output_format_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
                jsonschema/src/schema_version_tests.cpp
-               jsonschema/src/uri_tests.cpp
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp
                msgpack/src/msgpack_bitset_traits_tests.cpp
@@ -164,6 +163,7 @@ add_executable(unit_tests
                corelib/src/json_type_traits_chrono_tests.cpp
                corelib/src/json_type_traits_container_tests.cpp
                corelib/src/json_type_traits_tests.cpp
+               corelib/src/uri_tests.cpp
                corelib/src/json_validation_tests.cpp
                corelib/src/jsoncons_tests.cpp
                corelib/src/JSONTestSuite_tests.cpp

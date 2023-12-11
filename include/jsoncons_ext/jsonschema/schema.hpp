@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_SCHEMA_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/jsonschema/uri.hpp>
+#include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>

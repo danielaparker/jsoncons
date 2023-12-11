@@ -14,7 +14,6 @@
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { 
-namespace jsonschema {
 
     class uri
     {
@@ -630,10 +629,6 @@ namespace jsonschema {
             }
         }
     };
-
-} // namespace jsonschema
-
-    using uri = jsoncons::jsonschema::uri;
 
 } // namespace jsoncons
 
