@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
+#include <jsoncons_ext/jsonschema/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/compilation_context.hpp>
@@ -32,7 +32,7 @@ namespace draft7 {
     template <class Json>
     struct default_uri_resolver
     {
-        Json operator()(const jsoncons::uri& uri)
+        Json operator()(const jsoncons::jsonschema::uri& uri)
         {
             if (uri.path() == "/draft-07/schema") 
             {

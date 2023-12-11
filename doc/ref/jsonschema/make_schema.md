@@ -24,7 +24,7 @@ Returns a `shared_ptr` to a `json_schema`.
     <td>resolver</td>
     <td>A function object with the signature of <code>resolver</code> being equivalent to 
     <pre>
-            Json fun(const jsoncons::uri& uri)</pre></td> 
+            Json fun(const jsoncons::jsonschema::uri& uri)</pre></td> 
   </tr>
 </table>
 

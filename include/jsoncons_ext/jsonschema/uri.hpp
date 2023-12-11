@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_URI_HPP
-#define JSONCONS_URI_HPP
+#ifndef JSONCONS_JSONSCHEMA_URI_HPP
+#define JSONCONS_JSONSCHEMA_URI_HPP
 
 #include <string> // std::string
 #include <algorithm> 
@@ -13,7 +13,8 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons {
+namespace jsoncons { 
+namespace jsonschema {
 
     class uri
     {
@@ -629,6 +630,10 @@ namespace jsoncons {
             }
         }
     };
+
+} // namespace jsonschema
+
+    using uri = jsoncons::jsonschema::uri;
 
 } // namespace jsoncons
 

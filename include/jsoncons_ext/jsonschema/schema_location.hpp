@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_SCHEMA_LOCATION_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
+#include <jsoncons_ext/jsonschema/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
@@ -18,7 +18,7 @@ namespace jsonschema {
 
     class schema_location
     {
-        jsoncons::uri uri_;
+        jsoncons::jsonschema::uri uri_;
         std::string identifier_;
     public:
         schema_location()
@@ -33,10 +33,10 @@ namespace jsonschema {
                 identifier_ = uri.substr(pos + 1); 
                 unescape_percent(identifier_);
             }
-            uri_ = jsoncons::uri(uri);
+            uri_ = jsoncons::jsonschema::uri(uri);
         }
 
-        jsoncons::uri uri() const
+        jsoncons::jsonschema::uri uri() const
         {
             return uri_;
         }
@@ -102,7 +102,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
             pointer /= field;
 
-            jsoncons::uri new_uri(uri_.scheme(),
+            jsoncons::jsonschema::uri new_uri(uri_.scheme(),
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),
@@ -125,7 +125,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
             pointer /= index;
 
-            jsoncons::uri new_uri(uri_.scheme(),
+            jsoncons::jsonschema::uri new_uri(uri_.scheme(),
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),

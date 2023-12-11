@@ -102,7 +102,7 @@ void reporter_example()
     }
 }
 
-json resolver(const jsoncons::uri& uri)
+json resolver(const jsonschema::uri& uri)
 {
     std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
 

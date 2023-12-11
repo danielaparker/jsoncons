@@ -203,7 +203,7 @@ and for that it needs you to provide a `URIResolver`.
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema; 
 
-json resolver(const jsoncons::uri& uri)
+json resolver(const jsonschema::uri& uri)
 {
     std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
 

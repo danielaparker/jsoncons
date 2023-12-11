@@ -16,7 +16,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 namespace {
 
-    json resolver(const jsoncons::uri& uri)
+    json resolver(const jsonschema::uri& uri)
     {
         if (uri.path() == "/draft-07/schema") 
         {

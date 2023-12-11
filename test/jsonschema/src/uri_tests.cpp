@@ -1,7 +1,7 @@
 // Copyright 2013-2023 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/uri.hpp>
+#include <jsoncons_ext/jsonschema/uri.hpp>
 #include <catch/catch.hpp>
 
 TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)")
@@ -10,7 +10,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("https"));
         CHECK(uri.authority() == jsoncons::string_view("john.doe@www.example.com:123"));
@@ -27,7 +27,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "ldap://[2001:db8::7]/c=GB?objectClass?one";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("ldap"));
         CHECK(uri.authority() == jsoncons::string_view("2001:db8::7"));
@@ -43,7 +43,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "mailto:John.Doe@example.com";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("mailto"));
         CHECK(uri.authority() == jsoncons::string_view(""));
@@ -59,7 +59,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "news:comp.infosystems.www.servers.unix";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("news"));
         CHECK(uri.authority() == jsoncons::string_view(""));
@@ -75,7 +75,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "tel:+1-816-555-1212";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("tel"));
         CHECK(uri.authority() == jsoncons::string_view(""));
@@ -91,7 +91,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "telnet://192.0.2.16:80/";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("telnet"));
         CHECK(uri.authority() == jsoncons::string_view("192.0.2.16:80"));
@@ -107,7 +107,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
     {
         std::string s = "urn:oasis:names:specification:docbook:dtd:xml:4.1.2";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("urn"));
         CHECK(uri.authority() == jsoncons::string_view(""));
@@ -127,7 +127,7 @@ TEST_CASE("uri fragment tests")
     {
         std::string s = "#/definitions/nonNegativeInteger";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme().empty());
         CHECK(uri.authority().empty());
@@ -147,7 +147,7 @@ TEST_CASE("uri base tests")
     {
         std::string s = "http://json-schema.org/draft-07/schema#";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
         CHECK(uri.authority() == jsoncons::string_view("json-schema.org"));
@@ -163,7 +163,7 @@ TEST_CASE("uri base tests")
     {
         std::string s = "folder/";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme().empty());
         CHECK(uri.authority().empty());
@@ -179,7 +179,7 @@ TEST_CASE("uri base tests")
     {
         std::string s = "name.json#/definitions/orNull";
 
-        jsoncons::uri uri(s); 
+        jsoncons::jsonschema::uri uri(s); 
 
         CHECK(uri.scheme().empty());
         CHECK(uri.authority().empty());
@@ -197,10 +197,10 @@ TEST_CASE("uri resolve tests")
 {
     SECTION("folder/")
     {
-        jsoncons::uri base_uri("http://localhost:1234/scope_change_defs2.json"); 
-        jsoncons::uri relative_uri("folder/");
+        jsoncons::jsonschema::uri base_uri("http://localhost:1234/scope_change_defs2.json"); 
+        jsoncons::jsonschema::uri relative_uri("folder/");
         
-        jsoncons::uri uri =  relative_uri.resolve(base_uri);
+        jsoncons::jsonschema::uri uri =  relative_uri.resolve(base_uri);
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
         CHECK(uri.authority() == jsoncons::string_view("localhost:1234"));
@@ -214,10 +214,10 @@ TEST_CASE("uri resolve tests")
     }
     SECTION("folderInteger.json")
     {
-        jsoncons::uri base_uri("http://localhost:1234/folder/"); 
-        jsoncons::uri relative_uri("folderInteger.json");
+        jsoncons::jsonschema::uri base_uri("http://localhost:1234/folder/"); 
+        jsoncons::jsonschema::uri relative_uri("folderInteger.json");
 
-        jsoncons::uri uri =  relative_uri.resolve(base_uri);
+        jsoncons::jsonschema::uri uri =  relative_uri.resolve(base_uri);
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
         CHECK(uri.authority() == jsoncons::string_view("localhost:1234"));
