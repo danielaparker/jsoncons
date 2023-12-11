@@ -19,7 +19,7 @@ std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
     const URIResolver& resolver);                                    (4)
 ```
 
-Returns a `shared_ptr` to a [json_schema](jsonschema.md).
+Returns a `shared_ptr` to a `json_schema<Json>`.
 
 #### Parameters
 
@@ -39,7 +39,7 @@ Returns a `shared_ptr` to a [json_schema](jsonschema.md).
 
 #### Return value
 
-Returns a `shared_ptr` to a `json_schema`.
+Returns a `shared_ptr` to a `json_schema<Json>`.
 
 #### Exceptions
 
