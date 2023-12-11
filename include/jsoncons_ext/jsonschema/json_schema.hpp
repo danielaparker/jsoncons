@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_SCHEMA_HPP
-#define JSONCONS_JSONSCHEMA_SCHEMA_HPP
+#ifndef JSONCONS_JSONSCHEMA_JSON_SCHEMA_HPP
+#define JSONCONS_JSONSCHEMA_JSON_SCHEMA_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
