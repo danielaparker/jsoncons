@@ -92,23 +92,23 @@ namespace jsonschema {
                     has_plain_name_fragment = true;
                 }
             }
-/*
+
             if (has_plain_name_fragment)
             {
-                std::cout << "update_uris\n";
+                //std::cout << "update_uris\n";
                 for (const auto& uri : uris_)
                 {
                     if (!uri.has_plain_name_fragment())
                     {
-                        std::cout << "    not has_plain_name_fragment " << uri.string() << std::endl;
+                        //std::cout << "    not has_plain_name_fragment " << uri.string() << std::endl;
                     }
                     else
                     {
-                        std::cout << "    has_plain_name_fragment " << uri.string() << std::endl;
+                        //std::cout << "    has_plain_name_fragment " << uri.string() << std::endl;
                     }
                 }
             }
-*/
+
             // Append the keys for this sub-schema to the uri's
             for (const auto& key : keys)
             {
