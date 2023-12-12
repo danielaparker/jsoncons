@@ -36,6 +36,12 @@ namespace jsonschema {
             uri_ = jsoncons::uri(uri);
         }
 
+        schema_location(const uri& uri)
+            : uri_{uri}
+        {
+            uri_ = jsoncons::uri(uri);
+        }
+
         jsoncons::uri uri() const
         {
             return uri_;
