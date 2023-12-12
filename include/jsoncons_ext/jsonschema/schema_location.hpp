@@ -56,7 +56,7 @@ namespace jsonschema {
             return !identifier_.empty() && identifier_.front() != '/';
         }
 
-        jsoncons::string_view base() const
+        jsoncons::uri base() const
         {
             return uri_.base();
         }

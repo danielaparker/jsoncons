@@ -19,17 +19,17 @@ namespace jsonschema {
 
     class compilation_context
     {
-        uri base_uri_;
+        uri absolute_uri_;
         std::vector<schema_location> uris_;
     public:
         compilation_context(const schema_location& location)
-            : base_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
               uris_(std::vector<schema_location>{{location}})
         {
         }
 
         compilation_context(schema_location&& location)
-            : base_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
               uris_(std::vector<schema_location>{{std::move(location)}})
         {
         }
@@ -43,7 +43,7 @@ namespace jsonschema {
             {
                 if (it->uri().is_absolute())
                 {
-                    base_uri_ = it->uri();
+                    absolute_uri_ = it->uri();
                     break;
                 }
             }
@@ -57,7 +57,7 @@ namespace jsonschema {
             {
                 if (it->uri().is_absolute())
                 {
-                    base_uri_ = it->uri();
+                    absolute_uri_ = it->uri();
                     break;
                 }
             }
@@ -65,9 +65,14 @@ namespace jsonschema {
 
         const std::vector<schema_location>& uris() const {return uris_;}
 
-        const uri& get_base_uri() const
+        const uri& get_absolute_uri() const
         {
-            return base_uri_;
+            return absolute_uri_;
+        }
+
+        uri get_base_uri() const
+        {
+            return absolute_uri_.base();
         }
 
         template <class Json>

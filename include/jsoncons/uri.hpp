@@ -166,7 +166,10 @@ namespace jsoncons {
           return is_absolute() && !authority().empty();
         }
 
-        string_view base() const noexcept { return string_view(uri_.data()+scheme_.first,(path_.second-scheme_.first)); }
+        uri base() const noexcept 
+        { 
+            return uri{ scheme(), userinfo(), host(), port(), path(), jsoncons::string_view(), jsoncons::string_view()};
+        }
 
         string_view scheme() const noexcept { return string_view(uri_.data()+scheme_.first,(scheme_.second-scheme_.first)); }
 

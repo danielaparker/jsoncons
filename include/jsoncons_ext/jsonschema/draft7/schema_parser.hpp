@@ -39,7 +39,7 @@ namespace draft7 {
                 return schema_draft7<Json>::get_schema();
             }
 
-            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
+            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
         }
     };
 
@@ -136,7 +136,7 @@ namespace draft7 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_base_uri().string() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_absolute_uri().string() + ", expected: boolean or object"));
                     break;
             }
 
@@ -220,7 +220,7 @@ namespace draft7 {
         std::unique_ptr<type_validator<Json>> make_type_validator(const Json& schema,
             const compilation_context& context)
         {
-            std::string schema_path = context.get_base_uri().string();
+            std::string schema_path = context.get_absolute_uri().string();
             Json default_value{jsoncons::null_type()};
             jsoncons::optional<enum_validator<Json>> enumvalidator{};
             jsoncons::optional<const_keyword<Json>> const_validator{};
@@ -272,13 +272,13 @@ namespace draft7 {
             it = schema.find("enum");
             if (it != schema.object_range().end()) 
             {
-                enumvalidator = enum_validator<Json>(context.get_base_uri().string(), it->value());
+                enumvalidator = enum_validator<Json>(context.get_absolute_uri().string(), it->value());
             }
 
             it = schema.find("const");
             if (it != schema.object_range().end()) 
             {
-                const_validator = const_keyword<Json>(context.get_base_uri().string(), it->value());
+                const_validator = const_keyword<Json>(context.get_absolute_uri().string(), it->value());
             }
 
             it = schema.find("not");
@@ -863,7 +863,7 @@ namespace draft7 {
         conditional_validator<Json> make_conditional_validator(const Json& sch_if, const Json& schema,
             const compilation_context& context)
         {
-            std::string schema_path = context.get_base_uri().string();
+            std::string schema_path = context.get_absolute_uri().string();
             validator_type if_validator(nullptr);
             validator_type then_validator(nullptr);
             validator_type else_validator(nullptr);
@@ -1129,7 +1129,7 @@ namespace draft7 {
 
         void insert_schema(const schema_location& uri, validator_pointer s)
         {
-            auto& file = get_or_create_file(std::string(uri.base()));
+            auto& file = get_or_create_file(uri.base().string());
             auto schemas_it = file.schemas.find(std::string(uri.fragment()));
             if (schemas_it != file.schemas.end()) 
             {
@@ -1152,7 +1152,7 @@ namespace draft7 {
                                     const std::string& key, 
                                     const Json& value)
         {
-            auto &file = get_or_create_file(std::string(uri.base()));
+            auto &file = get_or_create_file(uri.base().string());
             auto new_u = uri.append(key);
             schema_location new_uri(new_u);
 
@@ -1177,7 +1177,7 @@ namespace draft7 {
 
         validator_type get_or_create_reference(const schema_location& uri)
         {
-            auto &file = get_or_create_file(std::string(uri.base()));
+            auto &file = get_or_create_file(uri.base().string());
 
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
