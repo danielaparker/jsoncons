@@ -27,13 +27,12 @@ namespace jsonschema {
 
         schema_location(const std::string& uri)
         {
-            auto pos = uri.find('#');
-            if (pos != std::string::npos)
+            uri_ = jsoncons::uri(uri);
+            if (!uri_.fragment().empty())
             {
-                identifier_ = uri.substr(pos + 1); 
+                identifier_ = std::string(uri_.fragment().data(), uri_.fragment().size());
                 unescape_percent(identifier_);
             }
-            uri_ = jsoncons::uri(uri);
         }
 
         schema_location(const uri& uri)
