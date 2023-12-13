@@ -79,7 +79,7 @@ namespace draft7 {
         schema_parser_impl(schema_parser_impl&&) = default;
         schema_parser_impl& operator=(schema_parser_impl&&) = default;
 
-        std::shared_ptr<json_schema<Json>> get_schema()
+        std::shared_ptr<json_schema<Json>> get_schema() override
         {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
