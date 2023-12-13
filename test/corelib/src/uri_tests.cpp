@@ -20,7 +20,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         CHECK(uri.path() == jsoncons::string_view("/forum/questions/"));
         CHECK(uri.query() == jsoncons::string_view("tag=networking&order=newest"));
         CHECK(uri.fragment() == jsoncons::string_view("top"));
-        CHECK(uri.base() == "https://john.doe@www.example.com:123/forum/questions/");
+        CHECK(uri.base().string() == "https://john.doe@www.example.com:123/forum/questions/");
         CHECK(uri.is_absolute());
     }
     SECTION("ldap://[2001:db8::7]/c=GB?objectClass?one")
