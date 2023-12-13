@@ -1,3 +1,27 @@
+0.173.0
+-------
+
+Defect fixes:
+
+- Fixed issue #473 about `bigint` and `-Werror=stringop-overflow` 
+
+- Fixed jmespath issue #471 about `jmespath::search` and `ojson` with `AddressSanitizer` in macos environment
+ 
+- Fixed jsonpointer issue with `json_pointer::parse` for empty string keys (which had implications
+for jsonschema `definitions` keyword with empty keys.)
+
+- Fixed jsonschema issue with `definitions` keyword with empty keys
+
+- Fixed jsonschema issue #474 about JSON Schema maximum keyword error message
+
+- Fixed jsonschema issue with `multipleOf` keyword and type integer and `multipleOf` a floating point number
+
+- Fixed jsonschema issue with the behavior of `$id` for rebasing in some keywords, particularly `if`, `then`, and `else`.
+
+Enhancements:
+
+- The `jsonschema::make_schema` functions now support providing a retrieval URI, to initialize the base URI.
+
 0.172.1
 -------
 
