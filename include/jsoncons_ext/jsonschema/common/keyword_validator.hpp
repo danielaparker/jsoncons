@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_HPP
-#define JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATOR_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATOR_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>

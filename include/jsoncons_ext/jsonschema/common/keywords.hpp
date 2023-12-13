@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_KEYWORDS_HPP
-#define JSONCONS_JSONSCHEMA_KEYWORDS_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_KEYWORDS_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_KEYWORDS_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
