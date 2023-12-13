@@ -11,7 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <jsoncons_ext/jsonschema/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
 
 namespace jsonschema = jsoncons::jsonschema;
  

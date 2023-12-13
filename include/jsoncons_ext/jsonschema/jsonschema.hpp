@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_JSONSCHEMA_HPP
 #define JSONCONS_JSONSCHEMA_JSONSCHEMA_HPP
 
-#include <jsoncons_ext/jsonschema/keywords.hpp>
+#include <jsoncons_ext/jsonschema/common/keywords.hpp>
 #include <jsoncons_ext/jsonschema/json_validator.hpp>
 #include <jsoncons_ext/jsonschema/schema_factory.hpp>
 

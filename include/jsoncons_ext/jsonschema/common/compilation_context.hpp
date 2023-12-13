@@ -4,14 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/jsonschema_error.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_location.hpp>
 
 namespace jsoncons {

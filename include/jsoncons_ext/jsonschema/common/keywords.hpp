@@ -11,7 +11,7 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validator.hpp>
 #include <cassert>
 #include <set>

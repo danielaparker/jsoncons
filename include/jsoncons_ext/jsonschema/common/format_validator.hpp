@@ -4,14 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_FORMAT_VALIDATOR_HPP
-#define JSONCONS_JSONSCHEMA_FORMAT_VALIDATOR_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/json_schema.hpp>
+#include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
