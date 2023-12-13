@@ -7,16 +7,15 @@
 #ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
 #define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
 
-#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/keywords.hpp>
-#include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <jsoncons_ext/jsonschema/schema_version.hpp>
-#include <jsoncons_ext/jsonschema/schema_parser.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>

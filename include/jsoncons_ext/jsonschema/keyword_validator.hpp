@@ -12,7 +12,6 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/schema_location.hpp>
 
 namespace jsoncons {
 namespace jsonschema {

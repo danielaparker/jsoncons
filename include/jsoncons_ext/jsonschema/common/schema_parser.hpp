@@ -4,16 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_SCHEMA_PARSER_HPP
-#define JSONCONS_JSONSCHEMA_SCHEMA_PARSER_HPP
-
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/schema_location.hpp>
-#include <jsoncons_ext/jsonschema/keyword_validator.hpp>
+#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_PARSER_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_PARSER_HPP
 
 namespace jsoncons {
 namespace jsonschema {
@@ -31,4 +23,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_SCHEMA_HPP
+#endif // JSONCONS_JSONSCHEMA_COMMON_SCHEMA_HPP
