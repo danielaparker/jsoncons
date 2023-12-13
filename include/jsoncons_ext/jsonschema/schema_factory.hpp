@@ -8,6 +8,7 @@
 #define JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
 
 #include <jsoncons_ext/jsonschema/draft7/schema_parser_impl.hpp>
+#include <jsoncons_ext/jsonschema/draft201909/schema_parser_impl.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
