@@ -9,54 +9,6 @@
 
 #include <jsoncons_ext/jsonschema/keywords.hpp>
 #include <jsoncons_ext/jsonschema/json_validator.hpp>
-#include <jsoncons_ext/jsonschema/draft7/schema_parser.hpp>
-
-
-namespace jsoncons {
-namespace jsonschema {
-
-    template <class Json>
-    using schema_draft7 = jsoncons::jsonschema::draft7::schema_draft7<Json>;
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, const std::string& retrieval_uri)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
-        parser.parse(schema, retrieval_uri);
-
-        return parser.get_schema();
-    }
-
-    template <class Json,class URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& schema, const URIResolver& resolver)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver);
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
-
-    template <class Json,class URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& schema, const std::string& retrieval_uri, const URIResolver& resolver)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver, retrieval_uri);
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
-
-} // namespace jsonschema
-} // namespace jsoncons
+#include <jsoncons_ext/jsonschema/schema_factory.hpp>
 
 #endif // JSONCONS_JSONSCHEMA_JSONSCHEMA_HPP

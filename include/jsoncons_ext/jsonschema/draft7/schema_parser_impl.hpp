@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_KEYWORD_FACTORY_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,6 +16,7 @@
 #include <jsoncons_ext/jsonschema/keywords.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <jsoncons_ext/jsonschema/schema_version.hpp>
+#include <jsoncons_ext/jsonschema/schema_parser.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -44,7 +45,7 @@ namespace draft7 {
     };
 
     template <class Json>
-    class schema_parser 
+    class schema_parser_impl : public schema_parser<Json> 
     {
     public:
         using reference_validator_type = reference_validator<Json>;
@@ -68,16 +69,16 @@ namespace draft7 {
         std::map<std::string, subschema_registry> subschema_registries_;
 
     public:
-        schema_parser(uri_resolver<Json>&& resolver) noexcept
+        schema_parser_impl(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
         {
         }
 
-        schema_parser(const schema_parser&) = delete;
-        schema_parser& operator=(const schema_parser&) = delete;
-        schema_parser(schema_parser&&) = default;
-        schema_parser& operator=(schema_parser&&) = default;
+        schema_parser_impl(const schema_parser_impl&) = delete;
+        schema_parser_impl& operator=(const schema_parser_impl&) = delete;
+        schema_parser_impl(schema_parser_impl&&) = default;
+        schema_parser_impl& operator=(schema_parser_impl&&) = default;
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {
@@ -1041,26 +1042,12 @@ namespace draft7 {
             );
         }
 
-        void parse(const Json& sch)
+        void parse(const Json& sch) override
         {
-            if (sch.is_object())
-            {
-                auto it = sch.find("$schema");
-                if (it != sch.object_range().end())
-                {
-                    auto sv = it->value().as_string_view();
-                    if (!schema_version::contains(sv))
-                    {
-                        std::string message("Unsupported schema version ");
-                        message.append(sv.data(), sv.size());
-                        JSONCONS_THROW(schema_error(message));
-                    }
-                }
-            }
-            load(sch, compilation_context(schema_location("#")));
+            parse(sch, "#");
         }
 
-        void parse(const Json& sch, const std::string& retrieval_uri)
+        void parse(const Json& sch, const std::string& retrieval_uri) override
         {
             if (sch.is_object())
             {
@@ -1234,44 +1221,6 @@ namespace draft7 {
         }
 
     };
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, const std::string& retrieval_uri)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser{ jsoncons::jsonschema::draft7::default_uri_resolver<Json>()};
-        parser.parse(schema, retrieval_uri);
-
-        return parser.get_schema();
-    }
-
-    template <class Json,class URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& schema, const URIResolver& resolver)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver);
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
-
-    template <class Json,class URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& schema, const std::string& retrieval_uri, const URIResolver& resolver)
-    {
-        jsoncons::jsonschema::draft7::schema_parser<Json> parser(resolver, retrieval_uri);
-        parser.parse(schema);
-
-        return parser.get_schema();
-    }
 
 } // namespace draft7
 } // namespace jsonschema
