@@ -11,7 +11,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/json_schema.hpp>
+#include <jsoncons_ext/jsonschema/common/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/keywords.hpp>
 #include <jsoncons_ext/jsonschema/schema_version.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
