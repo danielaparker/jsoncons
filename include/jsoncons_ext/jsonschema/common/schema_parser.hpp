@@ -17,6 +17,7 @@ namespace jsonschema {
     class schema_parser
     {
     public:
+        virtual ~schema_parser() = default;
 
         virtual void parse(const Json& sch) = 0;
 

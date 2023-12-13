@@ -68,6 +68,12 @@ namespace draft7 {
         std::map<std::string, subschema_registry> subschema_registries_;
 
     public:
+        schema_parser_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
+
+            : resolver_(resolver)
+        {
+        }
+
         schema_parser_impl(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
