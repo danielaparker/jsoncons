@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT201909_COMPILATION_CONTEXT_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT201909_COMPILATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,6 +16,7 @@
 
 namespace jsoncons {
 namespace jsonschema {
+namespace draft201909 {
 
     class compilation_context
     {
@@ -165,6 +166,7 @@ namespace jsonschema {
         }
     };
 
+} // namespace draft201909
 } // namespace jsonschema
 } // namespace jsoncons
 
