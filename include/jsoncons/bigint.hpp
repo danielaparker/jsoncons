@@ -48,7 +48,7 @@ namespace detail {
        using stored_allocator_type = allocator_type;
        using pointer = typename allocator_traits_type::pointer;
        using value_type = typename allocator_traits_type::value_type;
-       using size_type = typename allocator_traits_type::size_type;
+       using size_type = std::size_t;
        using pointer_traits = std::pointer_traits<pointer>;
 
         basic_bigint_base()
@@ -210,7 +210,7 @@ private:
               data_(nullptr)
         {
             create(stor.length_, alloc);
-            std::memcpy(data_, stor.data_, stor.length_*sizeof(uint64_t));
+            std::memcpy(data_, stor.data_, size_type(stor.length_*sizeof(uint64_t)));
         }
 
         dynamic_storage(dynamic_storage&& stor) noexcept
@@ -260,7 +260,7 @@ private:
             data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_new);
             if (length_ > 0)
             {
-                std::memcpy( data_, data_old, length_*sizeof(uint64_t));
+                std::memcpy( data_, data_old, size_type(length_*sizeof(uint64_t)));
             }
             if (capacity_ > 0 && data_ != nullptr)
             {
@@ -563,7 +563,7 @@ public:
             common_stor_.is_negative_ = y.is_negative();
             if ( y.length() > 0 )
             {
-                std::memcpy( data(), y.data(), y.length()*sizeof(uint64_t) );
+                std::memcpy( data(), y.data(), size_type(y.length()*sizeof(uint64_t)) );
             }
         }
         return *this;
@@ -877,7 +877,7 @@ public:
 
         if ( old_length > length() )
         {
-            memset( data() + length(), 0, size_type(old_length - length())*sizeof(uint64_t) );
+            memset( data() + length(), 0, size_type(old_length - length()*sizeof(uint64_t)) );
         }
 
         reduce();
