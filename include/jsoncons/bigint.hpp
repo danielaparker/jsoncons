@@ -73,6 +73,7 @@ class basic_bigint : protected detail::basic_bigint_base<Allocator>
 {
     using base_t = detail::basic_bigint_base<Allocator>;
 
+    static constexpr uint64_t max_short_storage_size = 2;
 public:
 
     using size_type = typename base_t::size_type;
@@ -103,7 +104,7 @@ private:
         uint8_t is_dynamic_:1; 
         uint8_t is_negative_:1; 
         size_type length_;
-        uint64_t values_[2];
+        uint64_t values_[max_short_storage_size];
 
         short_storage()
             : is_dynamic_(false), 
@@ -146,7 +147,7 @@ private:
                                               std::is_signed<T>::value>::type* = 0)
             : is_dynamic_(false), 
               is_negative_(n < 0),
-              length_(n == 0 ? 0 : 2)
+              length_(n == 0 ? 0 : max_short_storage_size)
         {
             using unsigned_type = typename std::make_unsigned<T>::type;
 
@@ -163,7 +164,7 @@ private:
                                               !std::is_signed<T>::value>::type* = 0)
             : is_dynamic_(false), 
               is_negative_(false),
-              length_(n == 0 ? 0 : 2)
+              length_(n == 0 ? 0 : max_short_storage_size)
         {
             values_[0] = uint64_t(n & max_basic_type);;
             n >>= basic_type_bits;
@@ -346,7 +347,7 @@ public:
 
     constexpr size_type capacity() const
     {
-        return is_dynamic() ? dynamic_stor_.capacity_ : 2;
+        return is_dynamic() ? dynamic_stor_.capacity_ : max_short_storage_size;
     }
 
     bool is_negative() const
@@ -518,8 +519,8 @@ public:
             }
             else
             {
-                JSONCONS_ASSERT(new_length <= 2);
-                for (size_type i = old_length; i < 2; ++i)
+                JSONCONS_ASSERT(new_length <= max_short_storage_size);
+                for (size_type i = old_length; i < max_short_storage_size; ++i)
                 {
                     short_stor_.values_[i] = 0;
                 }
@@ -535,7 +536,7 @@ public:
            {
                size_type size = short_stor_.length_;
                size_type is_neg = short_stor_.is_negative_;
-               uint64_t values[2] = {short_stor_.values_[0], short_stor_.values_[1]};
+               uint64_t values[max_short_storage_size] = {short_stor_.values_[0], short_stor_.values_[1]};
 
                ::new (&dynamic_stor_) dynamic_storage();
                dynamic_stor_.reserve(n, get_allocator());
@@ -670,13 +671,13 @@ public:
         if ( length() == 0 || y.length() == 0 )
                     return *this = 0;
         bool difSigns = is_negative() != y.is_negative();
-        if ( length() + y.length() == 2 ) // length() = y.length() = 1
+        if ( length() + y.length() == max_short_storage_size ) // length() = y.length() = 1
         {
             uint64_t a = data()[0], b = y.data()[0];
             data()[0] = a * b;
             if ( data()[0] / a != b )
             {
-                resize( 2 );
+                resize( max_short_storage_size );
                 DDproduct( a, b, data()[1], data()[0] );
             }
             common_stor_.is_negative_ = difSigns;
@@ -894,8 +895,8 @@ public:
             }
             else
             {
-                JSONCONS_ASSERT(new_length <= 2);
-                for (size_type i = new_length; i < 2; ++i)
+                JSONCONS_ASSERT(new_length <= max_short_storage_size);
+                for (size_type i = new_length; i < max_short_storage_size; ++i)
                 {
                     short_stor_.values_[i] = 0;
                 }
