@@ -504,16 +504,26 @@ public:
     uint64_t* end() { return begin() + length(); }
     const uint64_t* end() const { return begin() + length(); }
 
-    void resize(size_type n)
+    void resize(size_type new_length)
     {
-        size_type len_old = common_stor_.length_;
-        reserve(n);
-        common_stor_.length_ = n;
+        size_type old_length = common_stor_.length_;
+        reserve(new_length);
+        common_stor_.length_ = new_length;
 
-        uint64_t* a = data();
-        for (size_type i = len_old; i < n; ++i)
+        if (old_length < new_length)
         {
-            a[i] = 0;
+            if (is_dynamic())
+            {
+                std::memset(dynamic_stor_.data_+old_length, 0, size_type((new_length-old_length)*sizeof(uint64_t)));
+            }
+            else
+            {
+                JSONCONS_ASSERT(new_length <= 2);
+                for (size_type i = old_length; i < 2; ++i)
+                {
+                    short_stor_.values_[i] = 0;
+                }
+            }
         }
     }
 
@@ -875,9 +885,21 @@ public:
             *p-- &= *q--;
         }
 
-        if ( old_length > length() )
+        const size_type new_length = length();
+        if ( old_length > new_length )
         {
-            memset( data() + length(), 0, size_type(old_length - length()*sizeof(uint64_t)) );
+            if (is_dynamic())
+            {
+                std::memset( dynamic_stor_.data_ + new_length, 0, size_type(old_length - new_length*sizeof(uint64_t)) );
+            }
+            else
+            {
+                JSONCONS_ASSERT(new_length <= 2);
+                for (size_type i = new_length; i < 2; ++i)
+                {
+                    short_stor_.values_[i] = 0;
+                }
+            }
         }
 
         reduce();
