@@ -877,7 +877,7 @@ public:
 
         if ( old_length > length() )
         {
-            memset( data() + length(), 0, old_length - length() );
+            memset( data() + length(), 0, size_type(old_length - length())*sizeof(uint64_t) );
         }
 
         reduce();
