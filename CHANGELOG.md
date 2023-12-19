@@ -1,9 +1,12 @@
+0.173.1
+-------
+
+- Fixed issue #473 about `bigint` and `-Werror=stringop-overflow` 
+
 0.173.0
 -------
 
 Defect fixes:
-
-- Fixed issue #473 about `bigint` and `-Werror=stringop-overflow` 
 
 - Fixed jmespath issue #471 about `jmespath::search` and `ojson` with `AddressSanitizer` in macos environment
  
