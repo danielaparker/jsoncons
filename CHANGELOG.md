@@ -8,6 +8,8 @@
 
 Defect fixes:
 
+- Fixed issue #473 about `bigint` and `-Werror=stringop-overflow` 
+
 - Fixed jmespath issue #471 about `jmespath::search` and `ojson` with `AddressSanitizer` in macos environment
  
 - Fixed jsonpointer issue with `json_pointer::parse` for empty string keys (which had implications
