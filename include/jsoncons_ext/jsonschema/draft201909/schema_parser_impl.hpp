@@ -12,7 +12,6 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
-#include <jsoncons_ext/jsonschema/schema_version.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
@@ -34,9 +33,9 @@ namespace draft201909 {
     {
         Json operator()(const jsoncons::uri& uri)
         {
-            if (uri.path() == "/draft-07/schema") 
+            if (uri.path() == "/draft/2019-09/schema") 
             {
-                return schema_draft201909<Json>::get_schema();
+                return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
@@ -1060,7 +1059,7 @@ namespace draft201909 {
                 if (it != sch.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
-                    if (!schema_version::contains(sv))
+                    if (sv != "https://json-schema.org/draft/2019-09/schema")
                     {
                         std::string message("Unsupported schema version ");
                         message.append(sv.data(), sv.size());

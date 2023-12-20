@@ -13,41 +13,69 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, const std::string& retrieval_uri, schema_parser<Json>& parser)
+    template <class Json,class... Args>
+    std::unique_ptr<schema_parser<Json>> make_schema_parser(const Json& schema, Args&&... args)
     {
-        parser.parse(schema, retrieval_uri);
-        return parser.get_schema();
+        std::unique_ptr<schema_parser<Json>> parser_ptr;
+
+        if (schema.is_object())
+        {
+            auto it = schema.find("$schema");
+            if (it != schema.object_range().end())
+            { 
+                if (it->value() == "https://json-schema.org/draft/2019-09/schema")
+                {
+                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_parser_impl<Json>>(std::forward<Args>(args)...);
+                }
+                else
+                {
+                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_parser_impl<Json>>(std::forward<Args>(args)...);
+                }
+            }
+            else
+            {
+                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_parser_impl<Json>>(std::forward<Args>(args)...);
+            }
+        }
+        else
+        {
+            parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_parser_impl<Json>>(std::forward<Args>(args)...);
+        }
+        return parser_ptr;
     }
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        jsoncons::jsonschema::draft7::schema_parser_impl<Json> parser{ resolver };
-        return make_schema(schema, retrieval_uri, parser);
+        auto parser_ptr = make_schema_parser(schema, resolver);
+        parser_ptr->parse(schema, retrieval_uri);
+        return parser_ptr->get_schema();
     }
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
-        jsoncons::jsonschema::draft7::schema_parser_impl<Json> parser{ resolver };
-        return make_schema(schema, "#", parser);
+        auto parser_ptr = make_schema_parser(schema, resolver);
+        parser_ptr->parse(schema, "#");
+        return parser_ptr->get_schema();
     }
 
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, const std::string& retrieval_uri)
     {
-        jsoncons::jsonschema::draft7::schema_parser_impl<Json> parser{};
-        return make_schema(schema, retrieval_uri, parser);
+        auto parser_ptr = make_schema_parser(schema);
+        parser_ptr->parse(schema, retrieval_uri);
+        return parser_ptr->get_schema();
     }
 
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        jsoncons::jsonschema::draft7::schema_parser_impl<Json> parser{};
-        return make_schema(schema, "#", parser);
+        auto parser_ptr = make_schema_parser(schema);
+        parser_ptr->parse(schema, "#");
+        return parser_ptr->get_schema();
     }
 
 } // namespace jsonschema

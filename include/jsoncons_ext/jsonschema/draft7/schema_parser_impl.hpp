@@ -13,7 +13,6 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
-#include <jsoncons_ext/jsonschema/schema_version.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <cassert>
@@ -1060,7 +1059,7 @@ namespace draft7 {
                 if (it != sch.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
-                    if (!schema_version::contains(sv))
+                    if (sv.find("json-schema.org/draft-07/schema#") != string_view::npos)
                     {
                         std::string message("Unsupported schema version ");
                         message.append(sv.data(), sv.size());
