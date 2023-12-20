@@ -1,3 +1,13 @@
+0.173.2
+-------
+
+- Removed use of deduced return types in jsonpath extension (C++ 14 feature) 
+
+0.173.1
+-------
+
+- Fixed issue #473 about `bigint` and `-Werror=stringop-overflow` 
+
 0.173.0
 -------
 
