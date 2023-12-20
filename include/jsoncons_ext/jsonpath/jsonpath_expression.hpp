@@ -174,7 +174,7 @@ namespace jsonpath {
     };
 
     template <class Json>
-    auto make_expression(const typename Json::string_view_type& path,
+    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
@@ -187,7 +187,7 @@ namespace jsonpath {
         evaluator_type evaluator;
         auto expr = evaluator.compile(*static_resources, path);
 
-        return jsoncons::jsonpath::jsonpath_expression<Json>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
+        return jsonpath_expression<Json>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
     }
 
     template <class Json>
@@ -225,7 +225,7 @@ namespace jsonpath {
     }
 
     template <class Json, class TempAllocator>
-    auto make_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
+    jsonpath_expression<Json> make_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set,
         const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {
