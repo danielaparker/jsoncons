@@ -1,3 +1,8 @@
+0.173.2
+-------
+
+- Removed use of deduced return types in jsonpath extension (C++ 14 feature) 
+
 0.173.1
 -------
 
