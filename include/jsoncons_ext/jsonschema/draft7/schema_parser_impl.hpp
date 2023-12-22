@@ -1059,7 +1059,7 @@ namespace draft7 {
                 if (it != sch.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
-                    if (sv.find("json-schema.org/draft-07/schema#") != string_view::npos)
+                    if (sv.find("json-schema.org/draft-07/schema#") == string_view::npos)
                     {
                         std::string message("Unsupported schema version ");
                         message.append(sv.data(), sv.size());
