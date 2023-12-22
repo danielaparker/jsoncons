@@ -149,7 +149,7 @@ namespace draft7 {
             {
                 for (const auto& uri : new_context.uris()) 
                 { 
-                    if (schema.type() == json_type::object_value)
+                    if (schema.is_object())
                     {
                             insert_schema(uri, sch);
                             for (const auto& item : schema.object_range())

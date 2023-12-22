@@ -124,7 +124,7 @@ namespace jsonschema {
                     uri = schema_location(new_u);
                 }
             }
-            if (schema.type() == json_type::object_value)
+            if (schema.is_object())
             {
                 auto it = schema.find("$ref");
                 if (it == schema.object_range().end()) // this schema is not a reference

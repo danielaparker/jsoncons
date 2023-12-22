@@ -95,6 +95,8 @@ namespace draft201909 {
         {
             auto new_context = context.update_uris(schema, keys);
 
+            std::cout << "make_subschema_validator:\n" << pretty_print(schema) << "\n\n";
+
             validator_pointer sch = nullptr;
 
             bool is_ref = false;
@@ -125,15 +127,26 @@ namespace draft201909 {
                         auto ref =  get_or_create_reference(id);
                         sch = ref.get();
                         subschemas_.emplace_back(std::move(ref));
+                        is_ref = true;
                     } 
-                    else 
+                    it = schema.find("$defs");
+                    if (it != schema.object_range().end()) 
                     {
-                        it = schema.find("definitions");
-                        if (it != schema.object_range().end()) 
+                        for (const auto& def : it->value().object_range())
                         {
-                            for (const auto& def : it->value().object_range())
-                                make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
+                            make_subschema_validator(def.value(), new_context, {"$defs", def.key()});
                         }
+                    }
+                    it = schema.find("definitions");
+                    if (it != schema.object_range().end()) 
+                    {
+                        for (const auto& def : it->value().object_range())
+                        {
+                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
+                        }
+                    }
+                    if (!is_ref)
+                    {
                         auto ref = make_type_validator(schema, new_context);
                         sch = ref.get();
                         subschemas_.emplace_back(std::move(ref));
@@ -147,9 +160,19 @@ namespace draft201909 {
 
             if (!is_ref)
             {
+                if (schema.is_object())
+                {
+                    auto it = schema.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
+                    if (it != schema.object_range().end()) 
+                    {
+                        std::string id = it->value().template as<std::string>(); 
+                        schema_location relative("#"+id); 
+                        insert_schema(relative, sch);
+                    }
+                }
                 for (const auto& uri : new_context.uris()) 
                 { 
-                    if (schema.type() == json_type::object_value)
+                    if (schema.is_object())
                     {
                             insert_schema(uri, sch);
                             for (const auto& item : schema.object_range())

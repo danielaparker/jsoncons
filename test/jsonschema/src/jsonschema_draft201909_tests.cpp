@@ -87,7 +87,7 @@ TEST_CASE("jsonschema-tests")
 {
     SECTION("issues")
     {
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue1.json");
+        jsonschema_tests("./jsonschema/issues/draft2019-09/anchor.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue2.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue3.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue4.json");
@@ -96,7 +96,7 @@ TEST_CASE("jsonschema-tests")
     }
     SECTION("tests")
     {
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/anchor.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/anchor.json");
 #if 0
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/additionalItems.json");
 #ifdef JSONCONS_HAS_STD_REGEX
