@@ -23,7 +23,7 @@
                 "valid": false
             }
         ]
-    }/*,
+    },
     {
         "description": "Location-independent identifier with absolute URI",
         "schema": {
@@ -231,5 +231,5 @@
                 "valid": false
             }
         ]
-    }*/
+    }
 ]
