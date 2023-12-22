@@ -83,7 +83,7 @@ namespace {
     }
 }
  
-TEST_CASE("jsonschema-tests")
+TEST_CASE("jsonschema draft7 tests")
 {
     SECTION("issues")
     {

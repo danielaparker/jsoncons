@@ -95,7 +95,7 @@ namespace draft7 {
         {
             auto new_context = context.update_uris(schema, keys);
 
-            validator_pointer sch = nullptr;
+            validator_pointer validator = nullptr;
 
             bool is_ref = false;
             switch (schema.type())
@@ -104,65 +104,60 @@ namespace draft7 {
                     if (schema.template as<bool>())
                     {
                         auto ref =  make_true_validator(new_context);
-                        sch = ref.get();
+                        validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
                     }
                     else
                     {
                         auto ref = make_false_validator(new_context);
-                        sch = ref.get();
+                        validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
                     }
+                    for (const auto& uri : new_context.uris()) 
+                    { 
+                        insert_schema(uri, validator);
+                    }          
                     break;
                 case json_type::object_value:
                 {
                     auto it = schema.find("$ref");
                     if (it != schema.object_range().end()) // this schema is a reference
                     {
+                        is_ref = true;
                         schema_location relative(it->value().template as<std::string>()); 
-
                         auto id = context.resolve_back(relative);
                         auto ref =  get_or_create_reference(id);
-                        sch = ref.get();
-                        subschemas_.emplace_back(std::move(ref));
-                    } 
-                    else 
-                    {
-                        it = schema.find("definitions");
-                        if (it != schema.object_range().end()) 
-                        {
-                            for (const auto& def : it->value().object_range())
-                                make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
-                        }
-                        auto ref = make_type_validator(schema, new_context);
-                        sch = ref.get();
+                        validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
                     }
+                    it = schema.find("definitions");
+                    if (it != schema.object_range().end()) 
+                    {
+                        for (const auto& def : it->value().object_range())
+                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
+                    }
+                    if (!is_ref)
+                    {
+                        auto ref = make_type_validator(schema, new_context);
+                        validator = ref.get();
+                        subschemas_.emplace_back(std::move(ref));
+                    }
+                    for (const auto& uri : new_context.uris()) 
+                    { 
+                        insert_schema(uri, validator);
+                        for (const auto& item : schema.object_range())
+                        {
+                            insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                        }
+                    }          
                     break;
                 }
                 default:
                     JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_absolute_uri().string() + ", expected: boolean or object"));
                     break;
             }
-
-            if (!is_ref)
-            {
-                for (const auto& uri : new_context.uris()) 
-                { 
-                    if (schema.is_object())
-                    {
-                            insert_schema(uri, sch);
-                            for (const auto& item : schema.object_range())
-                                insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
-                    }
-                    else
-                    {
-                        insert_schema(uri, sch);
-                    }
-                }
-            }
             
-            return jsoncons::make_unique<reference_validator_type>(sch);
+            return jsoncons::make_unique<reference_validator_type>(validator);
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
@@ -1046,17 +1041,17 @@ namespace draft7 {
             );
         }
 
-        void parse(const Json& sch) override
+        void parse(const Json& schema) override
         {
-            parse(sch, "#");
+            parse(schema, "#");
         }
 
-        void parse(const Json& sch, const std::string& retrieval_uri) override
+        void parse(const Json& schema, const std::string& retrieval_uri) override
         {
-            if (sch.is_object())
+            if (schema.is_object())
             {
-                auto it = sch.find("$schema");
-                if (it != sch.object_range().end())
+                auto it = schema.find("$schema");
+                if (it != schema.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
                     if (sv.find("json-schema.org/draft-07/schema#") == string_view::npos)
@@ -1067,13 +1062,13 @@ namespace draft7 {
                     }
                 }
             }
-            load(sch, compilation_context(schema_location(retrieval_uri)));
+            load(schema, compilation_context(schema_location(retrieval_uri)));
         }
 
-        void load(const Json& sch, const compilation_context& context)
+        void load(const Json& schema, const compilation_context& context)
         {
             subschema_registries_.clear();
-            root_ = make_subschema_validator(sch, context, {});
+            root_ = make_subschema_validator(schema, context, {});
 
             // load all external schemas that have not already been loaded
 
