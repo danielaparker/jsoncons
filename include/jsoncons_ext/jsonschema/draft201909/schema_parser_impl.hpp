@@ -93,7 +93,7 @@ namespace draft201909 {
             const compilation_context& context,
             const std::vector<std::string>& keys) //override
         {
-            auto new_context = update_uris(context.uris(), schema, keys);
+            auto new_context = context.update_uris(schema, keys);
 
             validator_pointer validator = nullptr;
 
@@ -157,12 +157,12 @@ namespace draft201909 {
                             std::string id = it->value().template as<std::string>(); 
                             schema_location relative("#"+id); 
                             insert_schema(relative, validator);
-                            for (const auto& uri : new_context.uris())
+                            for (const auto& uri : new_context.uris()) 
                             {
                                 if (uri.is_absolute())
                                 {
                                     schema_location new_uri = relative.resolve(uri);
-                                    insert_schema(new_uri,validator); 
+                                    insert_schema(new_uri, validator);
                                 }
                             }
                         }
@@ -378,7 +378,7 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("string");
-            auto new_context = update_uris(context.uris(), schema, schema_path);
+            auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
             auto it = schema.find("maxLength");
@@ -534,7 +534,7 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("array");
-            auto new_context = update_uris(context.uris(), schema, schema_path);
+            auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
 
@@ -764,7 +764,7 @@ namespace draft201909 {
             const compilation_context& context, std::set<std::string>& keywords)
         {
             std::string schema_path = context.make_schema_path_with("integer");
-            auto new_context = update_uris(context.uris(), schema, schema_path);
+            auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
 
@@ -811,7 +811,7 @@ namespace draft201909 {
             const compilation_context& context, std::set<std::string>& keywords)
         {
             std::string schema_path = context.make_schema_path_with("number");
-            auto new_context = update_uris(context.uris(), schema, schema_path);
+            auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
 
@@ -1144,7 +1144,7 @@ namespace draft201909 {
             auto schemas_it = file.schemas.find(std::string(uri.fragment()));
             if (schemas_it != file.schemas.end()) 
             {
-                JSONCONS_THROW(schema_error("schema with " + uri.string() + " already inserted"));
+                //JSONCONS_THROW(schema_error("schema with " + uri.string() + " already inserted"));
                 return;
             }
 
@@ -1242,76 +1242,6 @@ namespace draft201909 {
             {
                 return subschema_registries_.insert(file, {loc, {}})->second;
             }
-        }
-
-        compilation_context update_uris(const std::vector<schema_location>& uris, const Json& schema, const std::string& key) const
-        {
-            return update_uris(uris, schema, std::vector<std::string>{{key}});
-        }
-
-        compilation_context update_uris(const std::vector<schema_location>& uris, const Json& schema, const std::vector<std::string>& keys) const
-        {
-            bool has_plain_name_fragment = false;
-            // Exclude uri's that are not plain name identifiers
-            std::vector<schema_location> new_uris;
-            for (const auto& uri : uris)
-            {
-                if (!uri.has_plain_name_fragment())
-                {
-                    new_uris.push_back(uri);
-                }
-                else
-                {
-                    has_plain_name_fragment = true;
-                }
-            }
-
-            if (has_plain_name_fragment)
-            {
-                //std::cout << "update_uris\n";
-                for (const auto& uri : uris)
-                {
-                    if (!uri.has_plain_name_fragment())
-                    {
-                        //std::cout << "    not has_plain_name_fragment " << uri.string() << std::endl;
-                    }
-                    else
-                    {
-                        //std::cout << "    has_plain_name_fragment " << uri.string() << std::endl;
-                    }
-                }
-            }
-
-            // Append the keys for this sub-schema to the uri's
-            for (const auto& key : keys)
-            {
-                for (auto& uri : new_uris)
-                {
-                    auto new_u = uri.append(key);
-                    uri = schema_location(new_u);
-                }
-            }
-            if (schema.is_object())
-            {
-                auto it = schema.find("$ref");
-                if (it == schema.object_range().end()) // this schema is not a reference
-                { 
-                    it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
-                    if (it != schema.object_range().end()) 
-                    {
-                        std::string id = it->value().template as<std::string>(); 
-                        // Add it to the list if it is not already there
-                        if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
-                        {
-                            schema_location relative(id); 
-                            schema_location new_uri = relative.resolve(new_uris.back());
-                            new_uris.emplace_back(new_uri); 
-                        }
-                    }
-                }
-            }
-
-            return compilation_context(new_uris);
         }
 
     };

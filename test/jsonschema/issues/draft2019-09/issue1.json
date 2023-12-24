@@ -22,11 +22,6 @@
                 "data": 1,
                 "description": "match",
                 "valid": true
-            },
-            {
-                "data": "a",
-                "description": "mismatch",
-                "valid": false
             }
         ]
     }

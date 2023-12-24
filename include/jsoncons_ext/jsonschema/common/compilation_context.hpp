@@ -75,6 +75,70 @@ namespace jsonschema {
             return absolute_uri_.base();
         }
 
+        template <class Json>
+        compilation_context update_uris(const Json& schema, const std::string& key) const
+        {
+            return update_uris(schema, std::vector<std::string>{{key}});
+        }
+
+        template <class Json>
+        compilation_context update_uris(const Json& schema, const std::vector<std::string>& keys) const
+        {
+            bool has_plain_name_fragment = false;
+            // Exclude uri's that are not plain name identifiers
+            std::vector<schema_location> new_uris;
+            for (const auto& uri : uris_)
+            {
+                if (uri.is_absolute())
+                {
+                    new_uris.push_back(uri);
+                }
+                else
+                {
+                    has_plain_name_fragment = true;
+                }
+            }
+
+            if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
+            }
+
+            // Append the keys for this sub-schema to the uri's
+            for (const auto& key : keys)
+            {
+                for (auto& uri : new_uris)
+                {
+                    auto new_u = uri.append(key);
+                    uri = schema_location(new_u);
+                }
+            }
+            if (schema.is_object())
+            {
+                auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
+                if (it != schema.object_range().end()) 
+                {
+                    std::string id = it->value().template as<std::string>(); 
+                    // Add it to the list if it is not already there
+                    if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                    {
+                        schema_location relative(id); 
+                        schema_location new_uri = relative.resolve(new_uris.back());
+                        new_uris.emplace_back(new_uri); 
+                    }
+                }
+            }
+
+            /*std::cout << "\ncontext\n";
+            for (const auto& uri : new_uris)
+            {
+                std::cout << "    " << uri.string() << "\n";
+            }*/
+
+
+            return compilation_context(new_uris);
+        }
+
         schema_location resolve_back(const schema_location& relative) const
         {
             return relative.resolve(uris_.back());
