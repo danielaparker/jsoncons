@@ -125,7 +125,7 @@ namespace draft7 {
                     {
                         is_ref = true;
                         schema_location relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(context.get_base_uri());
+                        auto id = relative.resolve(context.get_base_uri()); // REVISIT
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));

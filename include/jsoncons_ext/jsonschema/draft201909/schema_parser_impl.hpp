@@ -125,7 +125,8 @@ namespace draft201909 {
                     {
                         schema_location relative(it->value().template as<std::string>()); 
                         is_ref = true;
-                        auto id = relative.resolve(context.get_base_uri());
+                        auto id = relative.resolve(new_context.get_base_uri());
+                        std::cout << "$ref " << relative.string() << ", " << id.string() << "\n";
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
