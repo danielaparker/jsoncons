@@ -1,12 +1,5 @@
-./jsonschema/JSON-Schema-Test-Suite/remotes/draft2019-09/nested.json
+Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/child1 for schema loading
 
-"$id": "http://localhost:1234/draft2019-09/root"
-"$ref": "http://localhost:1234/draft2019-09/nested.json#foo",
+"$id": "http://localhost:1234/draft2019-09/foobar"
 
-
-Anchor
-
-"http://localhost:1234/draft2019-09/root"
-"http://localhost:1234/draft2019-09/root/nested.json"
-"http://localhost:1234/draft2019-09/root/nested.json#foo"
-
+    "$id": "child1"

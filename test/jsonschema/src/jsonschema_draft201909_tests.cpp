@@ -87,12 +87,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
 {
     SECTION("issues")
     {
-        jsonschema_tests("./jsonschema/issues/draft2019-09/issue1.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue2.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue3.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue4.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue5.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue6.json");
+        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue1.json");
     }
     SECTION("tests")
     {

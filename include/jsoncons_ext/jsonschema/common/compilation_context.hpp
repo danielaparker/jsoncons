@@ -139,11 +139,6 @@ namespace jsonschema {
             return compilation_context(new_uris);
         }
 
-        schema_location resolve_back(const schema_location& relative) const
-        {
-            return relative.resolve(uris_.back());
-        }
-
         std::string make_schema_path_with(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
