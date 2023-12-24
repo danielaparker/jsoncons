@@ -84,7 +84,6 @@ namespace jsonschema {
         template <class Json>
         compilation_context update_uris(const Json& schema, const std::vector<std::string>& keys) const
         {
-            bool has_plain_name_fragment = false;
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
@@ -92,10 +91,6 @@ namespace jsonschema {
                 if (uri.is_absolute())
                 {
                     new_uris.push_back(uri);
-                }
-                else
-                {
-                    has_plain_name_fragment = true;
                 }
             }
 
