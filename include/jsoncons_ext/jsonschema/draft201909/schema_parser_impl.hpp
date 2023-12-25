@@ -126,7 +126,7 @@ namespace draft201909 {
                         schema_location relative(it->value().template as<std::string>()); 
                         is_ref = true;
                         auto id = relative.resolve(new_context.get_base_uri());
-                        std::cout << "$ref " << relative.string() << ", " << id.string() << "\n";
+                        //std::cout << "$ref " << relative.string() << ", " << id.string() << "\n";
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
@@ -155,16 +155,19 @@ namespace draft201909 {
                         it = schema.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                         if (it != schema.object_range().end()) 
                         {
-                            std::string id = it->value().template as<std::string>(); 
-                            schema_location relative("#"+id); 
-                            insert_schema(relative, validator);
-                            for (const auto& uri : new_context.uris()) 
+                            std::string anchor = it->value().template as<std::string>(); 
+                            if (!validate_anchor(anchor))
                             {
-                                if (uri.is_absolute())
-                                {
-                                    schema_location new_uri = relative.resolve(uri);
-                                    insert_schema(new_uri, validator);
-                                }
+                                std::string message("Invalid anchor ");
+                                message.append(anchor.data(), anchor.size());
+                                JSONCONS_THROW(schema_error(message));
+                            }
+                            schema_location relative("#"+anchor); 
+                            insert_schema(relative, validator);
+                            if (new_context.get_base_uri().is_absolute())
+                            {
+                                schema_location new_uri = relative.resolve(new_context.get_base_uri());
+                                insert_schema(new_uri, validator);
                             }
                         }
                     }
@@ -916,12 +919,21 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("allOf");
+            auto new_context2 = context.update_uris(schema, schema_path);
             std::vector<validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                subschemas.emplace_back(make_subschema_validator(subsch, context, {all_of_criterion<Json>::key(), std::to_string(c++)}));
+                auto new_context = context.update_uris(subsch, std::vector<std::string>{});
+
+                /*std::cout << "\nThe context\n";
+                for (const auto& uri : new_context.uris())
+                {
+                    std::cout << "    " << uri.string() << "\n";
+                }*/
+
+                subschemas.emplace_back(make_subschema_validator(subsch, new_context, {all_of_criterion<Json>::key(), std::to_string(c++)}));
             }
             return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
@@ -1243,6 +1255,33 @@ namespace draft201909 {
             {
                 return subschema_registries_.insert(file, {loc, {}})->second;
             }
+        }
+
+        static bool validate_anchor(const std::string& anchor)
+        {
+            bool is_valid = !anchor.empty();
+            for (std::size_t i = 0; is_valid && i < anchor.size(); ++i)
+            {
+                switch (anchor[i])
+                {
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':case 'g':case 'h':case 'i':case 'j':case 'k':case 'l':case 'm':case 'n':case 'o':case 'p':case 'q':case 'r':case 's':case 't':case 'u':case 'v':case 'w':case 'x':case 'y':case 'z':
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':case 'G':case 'H':case 'I':case 'J':case 'K':case 'L':case 'M':case 'N':case 'O':case 'P':case 'Q':case 'R':case 'S':case 'T':case 'U':case 'V':case 'W':case 'X':case 'Y':case 'Z':
+                case '_':
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                case '-':
+                case '.':
+                    if (i == 0)
+                    {
+                        is_valid = false;
+                    }
+                    break;
+                default:                    
+                    is_valid = false;
+                    break;
+                }
+            }
+            return is_valid;
         }
 
     };

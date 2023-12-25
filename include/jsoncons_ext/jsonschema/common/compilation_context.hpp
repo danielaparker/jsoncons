@@ -124,11 +124,11 @@ namespace jsonschema {
                 }
             }
 
-            std::cout << "\ncontext\n";
+            /*std::cout << "\ncontext\n";
             for (const auto& uri : new_uris)
             {
                 std::cout << "    " << uri.string() << "\n";
-            }
+            }*/
 
             return compilation_context(new_uris);
         }
