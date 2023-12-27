@@ -18,6 +18,7 @@
 #include <iostream>
 #include <cassert>
 #include <functional>
+#include <unordered_set>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -109,7 +110,8 @@ namespace jsonschema {
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
-            root_->validate(instance, instance_location, adaptor, patch);
+            std::unordered_set<std::string> evaluated_properties;
+            root_->validate(instance, instance_location, evaluated_properties, adaptor, patch);
             return patch;
         }
     };

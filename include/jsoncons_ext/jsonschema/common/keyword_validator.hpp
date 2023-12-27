@@ -12,6 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
+#include <unordered_set>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -35,19 +36,6 @@ namespace jsonschema {
             do_error(o);
         }
 
-        void evaluated_property(const std::string& name)
-        {
-            do_evaluated_property(name);
-        }
-
-        void evaluated_properties(const std::vector<std::string>& properties)
-        {
-            for (const auto& property : properties)
-            {
-                do_evaluated_property(property);
-            }
-        }
-
         std::size_t error_count() const
         {
             return error_count_;
@@ -60,9 +48,6 @@ namespace jsonschema {
 
     private:
         virtual void do_error(const validation_output& /* e */) = 0;
-        virtual void do_evaluated_property(const std::string& /*name*/)
-        {
-        }
     };
 
     template <class Json>
@@ -91,14 +76,12 @@ namespace jsonschema {
         }
 
         void validate(const Json& instance, 
-                      const jsonpointer::json_pointer& instance_location, 
-                      error_reporter& reporter, 
-                      Json& patch) const 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const 
         {
-            do_validate(instance, 
-                        instance_location,
-                        reporter,
-                        patch);
+            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
 
         virtual jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, const Json&, error_reporter&) const
@@ -108,9 +91,10 @@ namespace jsonschema {
 
     private:
         virtual void do_validate(const Json& instance, 
-                                 const jsonpointer::json_pointer& instance_location, 
-                                 error_reporter& reporter, 
-                                 Json& patch) const = 0;
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const = 0;
     };
 
     template <class Json>
@@ -133,9 +117,10 @@ namespace jsonschema {
     private:
 
         void do_validate(const Json& instance, 
-                         const jsonpointer::json_pointer& instance_location, 
-                         error_reporter& reporter, 
-                         Json& patch) const override
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const override
         {
             if (!referred_schema_)
             {
@@ -146,7 +131,7 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(instance, instance_location, reporter, patch);
+            referred_schema_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
 
         jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
