@@ -976,6 +976,7 @@ namespace draft201909 {
             std::string absolute_min_properties_location;
             jsoncons::optional<required_validator<Json>> required;
             std::map<std::string, validator_type> properties;
+            std::map<std::string, validator_type> unevaluatedProperties;
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, validator_type>> pattern_properties;
         #endif
@@ -1013,6 +1014,16 @@ namespace draft201909 {
                         std::make_pair(
                             prop.key(),
                             make_subschema_validator(prop.value(), context, {"properties", prop.key()})));
+            }
+
+            it = schema.find("unevaluatedProperties");
+            if (it != schema.object_range().end()) 
+            {
+                for (const auto& prop : it->value().object_range())
+                    unevaluatedProperties.emplace(
+                        std::make_pair(
+                            prop.key(),
+                            make_subschema_validator(prop.value(), context, {"unevaluatedProperties", prop.key()})));
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1070,6 +1081,7 @@ namespace draft201909 {
                 std::move(min_properties), std::move(absolute_min_properties_location),
                 std::move(required),
                 std::move(properties),
+                std::move(unevaluatedProperties),
 #if defined(JSONCONS_HAS_STD_REGEX)
                 std::move(pattern_properties),
 #endif

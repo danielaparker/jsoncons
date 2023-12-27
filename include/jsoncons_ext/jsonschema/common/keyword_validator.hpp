@@ -35,6 +35,19 @@ namespace jsonschema {
             do_error(o);
         }
 
+        void evaluated_property(const std::string& name)
+        {
+            do_evaluated_property(name);
+        }
+
+        void evaluated_properties(const std::vector<std::string>& properties)
+        {
+            for (const auto& property : properties)
+            {
+                do_evaluated_property(property);
+            }
+        }
+
         std::size_t error_count() const
         {
             return error_count_;
@@ -47,6 +60,9 @@ namespace jsonschema {
 
     private:
         virtual void do_error(const validation_output& /* e */) = 0;
+        virtual void do_evaluated_property(const std::string& /*name*/)
+        {
+        }
     };
 
     template <class Json>

@@ -28,11 +28,16 @@ namespace jsonschema {
     struct collecting_error_reporter : public error_reporter
     {
         std::vector<validation_output> errors;
+        std::vector<std::string> evaluated_properties;
 
     private:
         void do_error(const validation_output& o) override
         {
             errors.push_back(o);
+        }
+        void do_evaluated_property(const std::string& name) override
+        {
+            evaluated_properties.push_back(name);
         }
     };
 
@@ -451,6 +456,7 @@ namespace jsonschema {
                         break;
                     }
                 }
+                reporter.evaluated_properties(local_reporter.evaluated_properties);
                 if (!contained)
                 {
                     reporter.error(validation_output("contains", 
@@ -645,6 +651,7 @@ namespace jsonschema {
         {
             collecting_error_reporter local_reporter;
             rule_->validate(instance, instance_location, local_reporter, patch);
+            reporter.evaluated_properties(local_reporter.evaluated_properties);
 
             if (local_reporter.errors.empty())
             {
@@ -653,6 +660,7 @@ namespace jsonschema {
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance must not be valid against schema"));
             }
+            reporter.evaluated_properties(local_reporter.evaluated_properties);
         }
 
         jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
@@ -771,6 +779,7 @@ namespace jsonschema {
                     return;
             }
 
+            reporter.evaluated_properties(local_reporter.evaluated_properties);
             if (count == 0)
             {
                 reporter.error(validation_output("combined", 
@@ -1152,6 +1161,7 @@ namespace jsonschema {
         jsoncons::optional<required_validator<Json>> required_;
 
         std::map<std::string, validator_type> properties_;
+        std::map<std::string, validator_type> unevaluated_properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
         std::vector<std::pair<std::regex, validator_type>> pattern_properties_;
     #endif
@@ -1162,6 +1172,38 @@ namespace jsonschema {
         validator_type property_name_validator_;
 
     public:
+        object_validator(std::string&& schema_path,
+            jsoncons::optional<std::size_t>&& max_properties,
+            std::string&& absolute_max_properties_location,
+            jsoncons::optional<std::size_t>&& min_properties,
+            std::string&& absolute_min_properties_location,
+            jsoncons::optional<required_validator<Json>>&& required,
+            std::map<std::string, validator_type>&& properties,
+            std::map<std::string, validator_type>&& unevaluated_properties,
+        #if defined(JSONCONS_HAS_STD_REGEX)
+            std::vector<std::pair<std::regex, validator_type>>&& pattern_properties,
+        #endif
+            validator_type&& additional_properties,
+            std::map<std::string, validator_type>&& dependencies,
+            validator_type&& property_name_validator
+        )
+            : keyword_validator<Json>(std::move(schema_path)), 
+              max_properties_(std::move(max_properties)),
+              absolute_max_properties_location_(std::move(absolute_max_properties_location)),
+              min_properties_(std::move(min_properties)),
+              absolute_min_properties_location_(std::move(absolute_min_properties_location)),
+              required_(std::move(required)),
+              properties_(std::move(properties)),
+              unevaluated_properties_(std::move(unevaluated_properties)),
+        #if defined(JSONCONS_HAS_STD_REGEX)
+              pattern_properties_(std::move(pattern_properties)),
+        #endif
+              additional_properties_(std::move(additional_properties)),
+              dependencies_(std::move(dependencies)),
+              property_name_validator_(std::move(property_name_validator))
+        {
+        }
+
         object_validator(std::string&& schema_path,
             jsoncons::optional<std::size_t>&& max_properties,
             std::string&& absolute_max_properties_location,
@@ -1278,8 +1320,30 @@ namespace jsonschema {
                             return;
                         }
                     }
+                    reporter.evaluated_properties(local_reporter.evaluated_properties);
                 }
             }
+
+            collecting_error_reporter reporter2;
+            for (auto const& property : properties_) 
+            {
+                const auto properties_it = instance.find(property.first);
+                if (properties_it != instance.object_range().end())
+                {
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= property.first;
+                    property.second->validate(properties_it->value(), pointer, reporter2, patch);
+                }
+                reporter2.evaluated_property(property.first);
+            }
+            reporter.evaluated_properties(reporter2.evaluated_properties);
+
+            std::cout << "Evaluated properties\n";
+            for (const auto& s : reporter2.evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
 
             // reverse search
             for (auto const& prop : properties_) 
@@ -1396,6 +1460,7 @@ namespace jsonschema {
                     if (else_validator_)
                         else_validator_->validate(instance, instance_location, reporter, patch);
                 }
+                reporter.evaluated_properties(local_reporter.evaluated_properties);
             }
         }
     };

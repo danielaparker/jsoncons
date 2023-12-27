@@ -1,0 +1,26 @@
+[
+    {
+        "description": "unevaluatedProperties true",
+        "schema": { "type":"object", 
+        "properties":{ "street_address":{"type":"string"}, 
+                       "city":{"type":"string"}, 
+                       "state":{"type":"string"}, 
+                       "type":{"enum":["residential","business"]} }, 
+                       "required":["street_address","city","state","type"], 
+                       "if":{ "type":"object", "properties":{ "type":{"const":"business"} }, "required":["type"] }, 
+                       "then":{ "properties":{ "department":{"type":"string"} } }, 
+                       "unevaluatedProperties":false },
+        "tests": [
+            {
+                "description": "with no unevaluated properties",
+                "data": { "street_address":"1600PennsylvaniaAvenueNW", "city":"Washington", "state":"DC", "type":"business", "department":"HR" },
+                "valid": true
+            },
+            {
+                "description": "with unevaluated properties",
+                "data": { "street_address":"1600PennsylvaniaAvenueNW", "city":"Washington", "state":"DC", "type":"residential", "department":"HR" },
+                "valid": false
+            }
+        ]
+    }
+]
