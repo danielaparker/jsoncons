@@ -28,16 +28,11 @@ namespace jsonschema {
     struct collecting_error_reporter : public error_reporter
     {
         std::vector<validation_output> errors;
-        std::vector<std::string> evaluated_properties;
 
     private:
         void do_error(const validation_output& o) override
         {
             errors.push_back(o);
-        }
-        void do_evaluated_property(const std::string& name) override
-        {
-            evaluated_properties.push_back(name);
         }
     };
 
@@ -456,7 +451,6 @@ namespace jsonschema {
                         break;
                     }
                 }
-                reporter.evaluated_properties(local_reporter.evaluated_properties);
                 if (!contained)
                 {
                     reporter.error(validation_output("contains", 
@@ -651,7 +645,6 @@ namespace jsonschema {
         {
             collecting_error_reporter local_reporter;
             rule_->validate(instance, instance_location, local_reporter, patch);
-            reporter.evaluated_properties(local_reporter.evaluated_properties);
 
             if (local_reporter.errors.empty())
             {
@@ -660,7 +653,6 @@ namespace jsonschema {
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance must not be valid against schema"));
             }
-            reporter.evaluated_properties(local_reporter.evaluated_properties);
         }
 
         jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
@@ -779,7 +771,6 @@ namespace jsonschema {
                     return;
             }
 
-            reporter.evaluated_properties(local_reporter.evaluated_properties);
             if (count == 0)
             {
                 reporter.error(validation_output("combined", 
@@ -1320,11 +1311,9 @@ namespace jsonschema {
                             return;
                         }
                     }
-                    reporter.evaluated_properties(local_reporter.evaluated_properties);
                 }
             }
 
-            collecting_error_reporter reporter2;
             for (auto const& property : properties_) 
             {
                 const auto properties_it = instance.find(property.first);
@@ -1332,18 +1321,16 @@ namespace jsonschema {
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= property.first;
-                    property.second->validate(properties_it->value(), pointer, reporter2, patch);
+                    property.second->validate(properties_it->value(), pointer, reporter, patch);
                 }
-                reporter2.evaluated_property(property.first);
             }
-            reporter.evaluated_properties(reporter2.evaluated_properties);
 
-            std::cout << "Evaluated properties\n";
-            for (const auto& s : reporter2.evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "Evaluated properties\n";
+            //for (const auto& s : reporter2.evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             // reverse search
             for (auto const& prop : properties_) 
@@ -1460,7 +1447,6 @@ namespace jsonschema {
                     if (else_validator_)
                         else_validator_->validate(instance, instance_location, reporter, patch);
                 }
-                reporter.evaluated_properties(local_reporter.evaluated_properties);
             }
         }
     };
