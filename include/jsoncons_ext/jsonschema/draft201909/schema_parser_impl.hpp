@@ -1075,6 +1075,7 @@ namespace draft201909 {
                 property_name_validator = make_subschema_validator(property_names_it->value(), context, {"propertyNames"});
             }
 
+            std::vector<validator_type> more_validators;
 
             return jsoncons::make_unique<object_validator<Json>>(std::move(schema_path),
                 std::move(max_properties), std::move(absolute_max_properties_location),
@@ -1087,7 +1088,8 @@ namespace draft201909 {
 #endif
                 std::move(additional_properties),
                 std::move(dependencies),
-                std::move(property_name_validator)
+                std::move(property_name_validator),
+                std::move(more_validators)
             );
         }
 

@@ -938,6 +938,7 @@ namespace draft7 {
             std::string absolute_min_properties_location;
             jsoncons::optional<required_validator<Json>> required;
             std::map<std::string, validator_type> properties;
+            std::map<std::string, validator_type> unevaluated_properties;
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, validator_type>> pattern_properties;
         #endif
@@ -1026,18 +1027,21 @@ namespace draft7 {
                 property_name_validator = make_subschema_validator(property_names_it->value(), context, {"propertyNames"});
             }
 
+            std::vector<validator_type> more_validators;
 
             return jsoncons::make_unique<object_validator<Json>>(std::move(schema_path),
                 std::move(max_properties), std::move(absolute_max_properties_location),
                 std::move(min_properties), std::move(absolute_min_properties_location),
                 std::move(required),
                 std::move(properties),
+                std::move(unevaluated_properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
                 std::move(pattern_properties),
 #endif
                 std::move(additional_properties),
                 std::move(dependencies),
-                std::move(property_name_validator)
+                std::move(property_name_validator),
+                std::move(more_validators)
             );
         }
 

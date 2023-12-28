@@ -97,7 +97,8 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            root_->validate(instance, instance_location, reporter, patch);
+            std::unordered_set<std::string> evaluated_properties;
+            root_->validate(instance, instance_location, evaluated_properties, reporter, patch);
             return reporter.error_count() == 0;
         }
 

@@ -1192,6 +1192,8 @@ namespace jsonschema {
 
         validator_type property_name_validator_;
 
+        std::vector<validator_type> more_validators_;
+
     public:
         object_validator(std::string&& schema_path,
             jsoncons::optional<std::size_t>&& max_properties,
@@ -1206,7 +1208,8 @@ namespace jsonschema {
         #endif
             validator_type&& additional_properties,
             std::map<std::string, validator_type>&& dependencies,
-            validator_type&& property_name_validator
+            validator_type&& property_name_validator,
+            std::vector<validator_type>&& more_validators
         )
             : keyword_validator<Json>(std::move(schema_path)), 
               max_properties_(std::move(max_properties)),
@@ -1221,7 +1224,8 @@ namespace jsonschema {
         #endif
               additional_properties_(std::move(additional_properties)),
               dependencies_(std::move(dependencies)),
-              property_name_validator_(std::move(property_name_validator))
+              property_name_validator_(std::move(property_name_validator)),
+              more_validators_(std::move(more_validators  ))
         {
         }
 
@@ -1381,6 +1385,15 @@ namespace jsonschema {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
                     dep.second->validate(instance, pointer, local_evaluated_properties, reporter, patch); // validate
+                }
+            }
+
+            for (auto& validator : more_validators_)
+            {
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
                 }
             }
 
