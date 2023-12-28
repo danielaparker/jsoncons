@@ -78,11 +78,12 @@ namespace jsonschema {
         template <class Json>
         compilation_context update_uris(const Json& schema, const std::string& key) const
         {
-            return update_uris(schema, std::vector<std::string>{{key}});
+            std::string sub_keys[] = {key};
+            return update_uris(schema, sub_keys);
         }
 
         template <class Json>
-        compilation_context update_uris(const Json& schema, const std::vector<std::string>& keys) const
+        compilation_context update_uris(const Json& schema, jsoncons::span<const std::string> keys) const
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;

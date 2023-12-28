@@ -91,7 +91,7 @@ namespace draft201909 {
 
         validator_type make_subschema_validator(const Json& schema,
             const compilation_context& context,
-            const std::vector<std::string>& keys) //override
+            jsoncons::span<const std::string> keys) 
         {
             auto new_context = context.update_uris(schema, keys);
 
@@ -136,7 +136,8 @@ namespace draft201909 {
                     {
                         for (const auto& def : it->value().object_range())
                         {
-                            make_subschema_validator(def.value(), new_context, {"$defs", def.key()});
+                            std::string sub_keys[] = { "$defs", def.key() };
+                            make_subschema_validator(def.value(), new_context, sub_keys);
                         }
                     }
                     it = schema.find("definitions");
@@ -144,7 +145,8 @@ namespace draft201909 {
                     {
                         for (const auto& def : it->value().object_range())
                         {
-                            make_subschema_validator(def.value(), new_context, {"definitions", def.key()});
+                            std::string sub_keys[] = { "definitions", def.key() };
+                            make_subschema_validator(def.value(), new_context, sub_keys);
                         }
                     }
                     if (!is_ref)
@@ -345,13 +347,15 @@ namespace draft201909 {
                 auto then_it = schema.find("then");
                 if (then_it != schema.object_range().end()) 
                 {
-                    make_subschema_validator(then_it->value(), context, {"then"});
+                    std::string sub_keys[] = { "then" };
+                    make_subschema_validator(then_it->value(), context, sub_keys);
                 }
 
                 auto else_it = schema.find("else");
                 if (else_it != schema.object_range().end()) 
                 {
-                    make_subschema_validator(else_it->value(), context, {"else"});
+                    std::string sub_keys[] = { "else" };
+                    make_subschema_validator(else_it->value(), context, sub_keys);
                 }
             }
 
@@ -592,8 +596,10 @@ namespace draft201909 {
         {
             std::string schema_path = context.make_schema_path_with("contains");
 
+            std::string sub_keys[] = { "contains" };
+
             return jsoncons::make_unique<contains_validator<Json>>(schema_path, 
-                make_subschema_validator(schema, context, { "contains" }));
+                make_subschema_validator(schema, context, sub_keys));
         }
 
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const Json& parent, const Json& schema, 
@@ -608,12 +614,17 @@ namespace draft201909 {
             {
                 size_t c = 0;
                 for (const auto& subsch : schema.array_range())
-                    item_validators.emplace_back(make_subschema_validator(subsch, context, {"items", std::to_string(c++)}));
+                {
+                    std::string sub_keys[] = {"items", std::to_string(c++)};
+
+                    item_validators.emplace_back(make_subschema_validator(subsch, context, sub_keys));
+                }
 
                 auto it = parent.find("additionalItems");
                 if (it != parent.object_range().end()) 
                 {
-                    additional_items_validator = make_subschema_validator(it->value(), context, {"additionalItems"});
+                    std::string sub_keys[] = {"additionalItems"};
+                    additional_items_validator = make_subschema_validator(it->value(), context, sub_keys);
                 }
             }
 
@@ -625,9 +636,10 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("items");
+            std::string sub_keys[] = {"items"};
 
             return jsoncons::make_unique<items_object_validator<Json>>(schema_path, 
-                make_subschema_validator(schema, context, { "items" }));
+                make_subschema_validator(schema, context, sub_keys));
         }
 
         std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const Json& schema, const compilation_context& context)
@@ -652,8 +664,9 @@ namespace draft201909 {
         std::unique_ptr<not_validator<Json>> make_not_validator(const Json& schema, const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("not");
+            std::string not_key[] = { "not" };
             return jsoncons::make_unique<not_validator<Json>>(schema_path, 
-                make_subschema_validator(schema, context, {"not"}));
+                make_subschema_validator(schema, context, not_key));
         }
 
         std::unique_ptr<maximum_validator<Json,int64_t>> make_maximum_integer_validator(const Json& schema, const compilation_context& context)
@@ -909,18 +922,21 @@ namespace draft201909 {
             validator_type then_validator(nullptr);
             validator_type else_validator(nullptr);
 
-            if_validator = make_subschema_validator(sch_if, context, { "if" });
+            std::string if_key[] = { "if" };
+            if_validator = make_subschema_validator(sch_if, context, if_key);
 
             auto then_it = schema.find("then");
             if (then_it != schema.object_range().end()) 
             {
-                then_validator = make_subschema_validator(then_it->value(), context, {"then"});
+                std::string then_key[] = { "then" };
+                then_validator = make_subschema_validator(then_it->value(), context, then_key);
             }
 
             auto else_it = schema.find("else");
             if (else_it != schema.object_range().end()) 
             {
-                else_validator = make_subschema_validator(else_it->value(), context, {"else"});
+                std::string else_key[] = { "else" };
+                else_validator = make_subschema_validator(else_it->value(), context, else_key);
             }
 
             return jsoncons::make_unique<conditional_validator<Json>>(std::move(schema_path),
@@ -944,8 +960,9 @@ namespace draft201909 {
                 {
                     std::cout << "    " << uri.string() << "\n";
                 }*/
+                std::string sub_keys[] = { all_of_criterion<Json>::key(), std::to_string(c++) };
 
-                subschemas.emplace_back(make_subschema_validator(subsch, new_context, {all_of_criterion<Json>::key(), std::to_string(c++)}));
+                subschemas.emplace_back(make_subschema_validator(subsch, new_context, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
@@ -959,7 +976,8 @@ namespace draft201909 {
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                subschemas.emplace_back(make_subschema_validator(subsch, context, {any_of_criterion<Json>::key(), std::to_string(c++)}));
+                std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
+                subschemas.emplace_back(make_subschema_validator(subsch, context, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
@@ -973,7 +991,8 @@ namespace draft201909 {
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                subschemas.emplace_back(make_subschema_validator(subsch, context, {one_of_criterion<Json>::key(), std::to_string(c++)}));
+                std::string sub_keys[] = {one_of_criterion<Json>::key(), std::to_string(c++)};
+                subschemas.emplace_back(make_subschema_validator(subsch, context, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
@@ -1022,20 +1041,26 @@ namespace draft201909 {
             if (it != schema.object_range().end()) 
             {
                 for (const auto& prop : it->value().object_range())
+                {
+                    std::string sub_keys[] = {"properties", prop.key()};
                     properties.emplace(
                         std::make_pair(
                             prop.key(),
-                            make_subschema_validator(prop.value(), context, {"properties", prop.key()})));
+                            make_subschema_validator(prop.value(), context, sub_keys)));
+                }
             }
 
             it = schema.find("unevaluatedProperties");
             if (it != schema.object_range().end()) 
             {
                 for (const auto& prop : it->value().object_range())
+                {
+                    std::string sub_keys[] = {"unevaluatedProperties", prop.key()};
                     unevaluatedProperties.emplace(
                         std::make_pair(
                             prop.key(),
-                            make_subschema_validator(prop.value(), context, {"unevaluatedProperties", prop.key()})));
+                            make_subschema_validator(prop.value(), context, sub_keys)));
+                }
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1043,17 +1068,21 @@ namespace draft201909 {
             if (it != schema.object_range().end()) 
             {
                 for (const auto& prop : it->value().object_range())
+                {
+                    std::string sub_keys[] = {prop.key()};
                     pattern_properties.emplace_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
-                            make_subschema_validator(prop.value(), context, {prop.key()})));
+                            make_subschema_validator(prop.value(), context, sub_keys)));
+                }
             }
     #endif
 
             it = schema.find("additionalProperties");
             if (it != schema.object_range().end()) 
             {
-                additional_properties = make_subschema_validator(it->value(), context, {"additionalProperties"});
+                std::string sub_keys[] = {"additionalProperties"};
+                additional_properties = make_subschema_validator(it->value(), context, sub_keys);
             }
 
             it = schema.find("dependencies");
@@ -1073,8 +1102,9 @@ namespace draft201909 {
                         }
                         default:
                         {
+                            std::string sub_keys[] = {"dependencies"};
                             dependencies.emplace(dep.key(),
-                                make_subschema_validator(dep.value(), context, {"dependencies", dep.key()}));
+                                make_subschema_validator(dep.value(), context, sub_keys));
                             break;
                         }
                     }
@@ -1084,7 +1114,8 @@ namespace draft201909 {
             auto property_names_it = schema.find("propertyNames");
             if (property_names_it != schema.object_range().end()) 
             {
-                property_name_validator = make_subschema_validator(property_names_it->value(), context, {"propertyNames"});
+                std::string sub_keys[] = {"propertyNames"};
+                property_name_validator = make_subschema_validator(property_names_it->value(), context, sub_keys);
             }
 
             std::vector<validator_type> more_validators;
