@@ -1504,11 +1504,11 @@ namespace jsonschema {
     template <class Json>
     class enum_validator : public keyword_validator<Json>
     {
-        Json enum_validator_;
+        Json value_;
 
     public:
         enum_validator(const std::string& path, const Json& schema)
-            : keyword_validator<Json>(path), enum_validator_(schema)
+            : keyword_validator<Json>(path), value_(schema)
         {
         }
     private:
@@ -1519,7 +1519,7 @@ namespace jsonschema {
             Json&) const final
         {
             bool in_range = false;
-            for (const auto& item : enum_validator_.array_range())
+            for (const auto& item : value_.array_range())
             {
                 if (item == instance) 
                 {
@@ -1542,16 +1542,16 @@ namespace jsonschema {
         }
     };
 
-    // const_keyword
+    // const_validator
 
     template <class Json>
-    class const_keyword : public keyword_validator<Json>
+    class const_validator : public keyword_validator<Json>
     {
-        Json const_validator_;
+        Json value_;
 
     public:
-        const_keyword(const std::string& path, const Json& schema)
-            : keyword_validator<Json>(path), const_validator_(schema)
+        const_validator(const std::string& path, const Json& schema)
+            : keyword_validator<Json>(path), value_(schema)
         {
         }
     private:
@@ -1561,7 +1561,7 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
-            if (const_validator_ != instance)
+            if (value_ != instance)
                 reporter.error(validation_output("const", 
                                                  this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
@@ -1577,8 +1577,8 @@ namespace jsonschema {
 
         std::vector<validator_type> type_mapping_;
         Json default_value_;
-        jsoncons::optional<enum_validator<Json>> enum_validator_;
-        jsoncons::optional<const_keyword<Json>> const_validator_;
+        std::unique_ptr<enum_validator<Json>> enum_validator_;
+        std::unique_ptr<const_validator<Json>> const_validator_;
         std::vector<validator_type> combined_validators_;
         jsoncons::optional<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
@@ -1592,8 +1592,8 @@ namespace jsonschema {
         type_validator(std::string&& schema_path,
             std::vector<validator_type>&& type_mapping,
             Json&& default_value,
-            jsoncons::optional<enum_validator<Json>>&& enumvalidator,
-            jsoncons::optional<const_keyword<Json>>&& const_validator,
+            std::unique_ptr<enum_validator<Json>>&& enumvalidator,
+            std::unique_ptr<const_validator<Json>> const_validator,
             std::vector<validator_type>&& combined_validators,
             jsoncons::optional<conditional_validator<Json>>&& conditionalvalidator,
             std::vector<std::string>&& expected_types

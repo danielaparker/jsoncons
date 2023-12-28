@@ -222,8 +222,8 @@ namespace draft7 {
         {
             std::string schema_path = context.get_absolute_uri().string();
             Json default_value{jsoncons::null_type()};
-            jsoncons::optional<enum_validator<Json>> enumvalidator{};
-            jsoncons::optional<const_keyword<Json>> const_validator{};
+            std::unique_ptr<enum_validator<Json>> enumvalidator;
+            std::unique_ptr<const_validator<Json>> const_validator;
             std::vector<validator_type> combined_validators;
             jsoncons::optional<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
@@ -272,13 +272,13 @@ namespace draft7 {
             it = schema.find("enum");
             if (it != schema.object_range().end()) 
             {
-                enumvalidator = enum_validator<Json>(context.get_absolute_uri().string(), it->value());
+                enumvalidator = make_enum_validator(it->value(), context);
             }
 
             it = schema.find("const");
             if (it != schema.object_range().end()) 
             {
-                const_validator = const_keyword<Json>(context.get_absolute_uri().string(), it->value());
+                const_validator = make_const_validator(it->value(), context);
             }
 
             it = schema.find("not");
@@ -839,6 +839,18 @@ namespace draft7 {
         {
             std::string schema_path = context.make_schema_path_with("boolean");
             return jsoncons::make_unique<boolean_validator<Json>>(schema_path);
+        }
+
+        std::unique_ptr<const_validator<Json>> make_const_validator(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("const");
+            return jsoncons::make_unique<const_validator<Json>>(schema_path, schema);
+        }
+
+        std::unique_ptr<enum_validator<Json>> make_enum_validator(const Json& schema, const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("enum");
+            return jsoncons::make_unique<enum_validator<Json>>(schema_path, schema);
         }
 
         std::unique_ptr<true_validator<Json>> make_true_validator(const compilation_context& context)
