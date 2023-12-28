@@ -1397,12 +1397,12 @@ namespace jsonschema {
                 }
             }
 
-            std::cout << "Evaluated properties\n";
-            for (const auto& s : local_evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "Evaluated properties\n";
+            //for (const auto& s : local_evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             for (auto&& name : local_evaluated_properties)
             {
@@ -1580,7 +1580,7 @@ namespace jsonschema {
         std::unique_ptr<enum_validator<Json>> enum_validator_;
         std::unique_ptr<const_validator<Json>> const_validator_;
         std::vector<validator_type> combined_validators_;
-        jsoncons::optional<conditional_validator<Json>> conditional_validator_;
+        std::unique_ptr<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
 
     public:
@@ -1595,7 +1595,7 @@ namespace jsonschema {
             std::unique_ptr<enum_validator<Json>>&& enumvalidator,
             std::unique_ptr<const_validator<Json>> const_validator,
             std::vector<validator_type>&& combined_validators,
-            jsoncons::optional<conditional_validator<Json>>&& conditionalvalidator,
+            std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
             std::vector<std::string>&& expected_types
             )
             : keyword_validator<Json>(std::move(schema_path)),

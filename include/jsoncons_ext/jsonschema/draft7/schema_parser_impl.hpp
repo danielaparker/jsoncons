@@ -225,7 +225,7 @@ namespace draft7 {
             std::unique_ptr<enum_validator<Json>> enumvalidator;
             std::unique_ptr<const_validator<Json>> const_validator;
             std::vector<validator_type> combined_validators;
-            jsoncons::optional<conditional_validator<Json>> conditionalvalidator;
+            std::unique_ptr<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
 
             std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
@@ -872,7 +872,8 @@ namespace draft7 {
             return jsoncons::make_unique<required_validator<Json>>(schema_path, items);
         }
 
-        conditional_validator<Json> make_conditional_validator(const Json& sch_if, const Json& schema,
+
+        std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const Json& sch_if, const Json& schema,
             const compilation_context& context)
         {
             std::string schema_path = context.get_absolute_uri().string();
@@ -894,7 +895,7 @@ namespace draft7 {
                 else_validator = make_subschema_validator(else_it->value(), context, {"else"});
             }
 
-            return conditional_validator<Json>(std::move(schema_path),
+            return jsoncons::make_unique<conditional_validator<Json>>(std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
 
