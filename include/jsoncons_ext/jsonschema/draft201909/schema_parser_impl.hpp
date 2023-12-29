@@ -953,7 +953,7 @@ namespace draft201909 {
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                auto new_context = context.update_uris(subsch, std::vector<std::string>{});
+                auto new_context = context.update_uris(subsch, jsoncons::span<const std::string>{});
 
                 /*std::cout << "\nThe context\n";
                 for (const auto& uri : new_context.uris())
