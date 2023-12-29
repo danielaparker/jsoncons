@@ -77,11 +77,11 @@ namespace jsonschema {
 
         void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& unevaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
-            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
+            do_validate(instance, instance_location, unevaluated_properties, reporter, patch);
         }
 
         virtual jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, const Json&, error_reporter&) const
@@ -92,7 +92,7 @@ namespace jsonschema {
     private:
         virtual void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& unevaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const = 0;
     };
@@ -118,7 +118,7 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& unevaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
@@ -131,7 +131,7 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(instance, instance_location, evaluated_properties, reporter, patch);
+            referred_schema_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
         }
 
         jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
