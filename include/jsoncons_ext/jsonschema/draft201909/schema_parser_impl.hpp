@@ -1136,6 +1136,29 @@ namespace draft201909 {
             );
         }
 
+        std::unique_ptr<unevaluated_properties_validator<Json>> make_unevaluated_properties_validator(const Json& schema,
+            const compilation_context& context)
+        {
+            std::string schema_path = context.make_schema_path_with("object");
+            std::map<std::string, validator_type> unevaluated_properties;
+
+            auto it = schema.find("unevaluatedProperties");
+            if (it != schema.object_range().end()) 
+            {
+                for (const auto& prop : it->value().object_range())
+                {
+                    std::string sub_keys[] = {"unevaluatedProperties", prop.key()};
+                    unevaluated_properties.emplace(
+                        std::make_pair(
+                            prop.key(),
+                            make_subschema_validator(prop.value(), context, sub_keys)));
+                }
+            }
+
+            return jsoncons::make_unique<unevaluated_properties_validator<Json>>(std::move(schema_path),
+                std::move(unevaluated_properties));
+        }
+
         void parse(const Json& schema) override
         {
             parse(schema, "#");
