@@ -1420,6 +1420,39 @@ namespace jsonschema {
         }
     };
 
+    template <class Json>
+    class unevaluated_properties_validator : public keyword_validator<Json>
+    {
+        using validator_type = typename keyword_validator<Json>::validator_type;
+
+        std::map<std::string, validator_type> unevaluated_properties_;
+
+    public:
+        unevaluated_properties_validator(std::string&& schema_path,
+            std::map<std::string, validator_type>&& unevaluated_properties
+        )
+            : keyword_validator<Json>(std::move(schema_path)), 
+              unevaluated_properties_(std::move(unevaluated_properties))
+        {
+        }
+
+    private:
+
+        void do_validate(const Json& /*instance*/, 
+            const jsonpointer::json_pointer& /*instance_location*/,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& /*reporter*/, 
+            Json&) const override
+        {
+            std::cout << "Evaluated properties\n";
+            for (const auto& s : evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
+        }
+    };
+
     // array
 
     template <class Json>
