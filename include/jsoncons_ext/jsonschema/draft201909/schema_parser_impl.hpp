@@ -258,6 +258,7 @@ namespace draft201909 {
             std::vector<validator_type> combined_validators;
             std::unique_ptr<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
+            std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_validator_ptr;
 
             std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
             std::set<std::string> known_keywords;
@@ -359,14 +360,21 @@ namespace draft201909 {
                 }
             }
 
+            it = schema.find("unevaluatedProperties");
+            if (it != schema.object_range().end()) 
+            {
+                unevaluated_properties_validator_ptr = make_unevaluated_properties_validator(it->value(), context);
+            }
+
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
                 std::move(type_mapping),
                 std::move(default_value), 
-                std::move(std::move(enumvalidator)),
-                std::move(std::move(const_validator)),
-                std::move(std::move(combined_validators)),
-                std::move(std::move(conditionalvalidator)),
-                std::move(std::move(expected_types))
+                std::move(enumvalidator),
+                std::move(const_validator),
+                std::move(combined_validators),
+                std::move(conditionalvalidator),
+                std::move(expected_types),
+                std::move(unevaluated_properties_validator_ptr)
                 );
         }
 
@@ -1125,23 +1133,11 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("object");
-            std::map<std::string, validator_type> unevaluated_properties;
 
-            auto it = schema.find("unevaluatedProperties");
-            if (it != schema.object_range().end()) 
-            {
-                for (const auto& prop : it->value().object_range())
-                {
-                    std::string sub_keys[] = {"unevaluatedProperties", prop.key()};
-                    unevaluated_properties.emplace(
-                        std::make_pair(
-                            prop.key(),
-                            make_subschema_validator(prop.value(), context, sub_keys)));
-                }
-            }
+            std::string sub_keys[] = {"unevaluatedProperties"};
 
             return jsoncons::make_unique<unevaluated_properties_validator<Json>>(std::move(schema_path),
-                std::move(unevaluated_properties));
+                make_subschema_validator(schema, context, sub_keys));
         }
 
         void parse(const Json& schema) override

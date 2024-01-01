@@ -334,11 +334,11 @@ namespace draft7 {
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
                 std::move(type_mapping),
                 std::move(default_value), 
-                std::move(std::move(enumvalidator)),
-                std::move(std::move(const_validator)),
-                std::move(std::move(combined_validators)),
-                std::move(std::move(conditionalvalidator)),
-                std::move(std::move(expected_types))
+                std::move(enumvalidator),
+                std::move(const_validator),
+                std::move(combined_validators),
+                std::move(conditionalvalidator),
+                std::move(expected_types)
                 );
         }
 

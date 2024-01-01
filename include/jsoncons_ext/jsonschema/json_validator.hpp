@@ -86,8 +86,8 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            std::unordered_set<std::string> unevaluated_properties;
-            root_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            std::unordered_set<std::string> evaluated_properties;
+            root_->validate(instance, instance_location, evaluated_properties, reporter, patch);
             return patch;
         }
 
@@ -98,8 +98,8 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            std::unordered_set<std::string> unevaluated_properties;
-            root_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            std::unordered_set<std::string> evaluated_properties;
+            root_->validate(instance, instance_location, evaluated_properties, reporter, patch);
             return reporter.error_count() == 0;
         }
 
@@ -112,8 +112,8 @@ namespace jsonschema {
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
-            std::unordered_set<std::string> unevaluated_properties;
-            root_->validate(instance, instance_location, unevaluated_properties, adaptor, patch);
+            std::unordered_set<std::string> evaluated_properties;
+            root_->validate(instance, instance_location, evaluated_properties, adaptor, patch);
             return patch;
         }
     };

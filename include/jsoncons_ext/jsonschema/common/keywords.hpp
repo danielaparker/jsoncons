@@ -52,11 +52,11 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
-            validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
 
         jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
@@ -395,7 +395,7 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
@@ -409,13 +409,13 @@ namespace jsonschema {
                 if (validator_it != item_validators_.cend())
                 {
                     pointer /= index++;
-                    (*validator_it)->validate(item, pointer, unevaluated_properties, reporter, patch);
+                    (*validator_it)->validate(item, pointer, evaluated_properties, reporter, patch);
                     ++validator_it;
                 }
                 else if (additional_items_validator_ != nullptr)
                 {
                     pointer /= index++;
-                    additional_items_validator_->validate(item, pointer, unevaluated_properties, reporter, patch);
+                    additional_items_validator_->validate(item, pointer, evaluated_properties, reporter, patch);
                 }
                 else
                     break;
@@ -444,7 +444,7 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
@@ -456,7 +456,7 @@ namespace jsonschema {
                 for (const auto& item : instance.array_range()) 
                 {
                     std::size_t mark = local_reporter.errors.size();
-                    validator_->validate(item, instance_location, unevaluated_properties, local_reporter, patch);
+                    validator_->validate(item, instance_location, evaluated_properties, local_reporter, patch);
                     if (mark == local_reporter.errors.size()) 
                     {
                         contained = true;
@@ -497,7 +497,7 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
@@ -508,7 +508,7 @@ namespace jsonschema {
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    items_validator_->validate(i, pointer, unevaluated_properties, reporter, patch);
+                    items_validator_->validate(i, pointer, evaluated_properties, reporter, patch);
                     index++;
                 }
             }
@@ -620,13 +620,13 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance,
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties,
+            std::unordered_set<std::string>& evaluated_properties,
             error_reporter& reporter,
             Json& patch) const
         {
             for (const auto& validator : validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -656,12 +656,12 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
             collecting_error_reporter local_reporter;
-            rule_->validate(instance, instance_location, unevaluated_properties, local_reporter, patch);
+            rule_->validate(instance, instance_location, evaluated_properties, local_reporter, patch);
 
             if (local_reporter.errors.empty())
             {
@@ -771,22 +771,26 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
             size_t count = 0;
 
             collecting_error_reporter local_reporter;
+
+            bool is_complete = false;
             for (auto& s : subschemas_) 
             {
                 std::size_t mark = local_reporter.errors.size();
-                s->validate(instance, instance_location, unevaluated_properties, local_reporter, patch);
-                if (mark == local_reporter.errors.size())
-                    count++;
-
-                if (Criterion::is_complete(instance, instance_location, reporter, local_reporter, count))
-                    return;
+                s->validate(instance, instance_location, evaluated_properties, local_reporter, patch);
+                if (!is_complete)
+                {
+                    if (mark == local_reporter.errors.size())
+                        count++;
+                    if (Criterion::is_complete(instance, instance_location, reporter, local_reporter, count))
+                        is_complete = true;
+                }
             }
 
             if (count == 0)
@@ -971,7 +975,7 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
@@ -988,7 +992,7 @@ namespace jsonschema {
             }
             for (const auto& validator : validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1013,7 +1017,7 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
@@ -1030,7 +1034,7 @@ namespace jsonschema {
             }
             for (const auto& validator : validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1229,10 +1233,12 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
+            std::unordered_set<std::string> local_evaluated_properties;
+
             if (max_properties_ && instance.size() > *max_properties_)
             {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
@@ -1262,40 +1268,46 @@ namespace jsonschema {
             }
 
             if (required_)
-                required_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                required_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
 
-            for (const auto& property : instance.object_range()) 
+            for (const auto& prop : instance.object_range()) 
             {
                 if (property_name_validator_)
-                    property_name_validator_->validate(property.key(), instance_location, unevaluated_properties, reporter, patch);
+                    property_name_validator_->validate(prop.key(), instance_location, local_evaluated_properties, reporter, patch);
 
                 bool a_prop_or_pattern_matched = false;
-                auto properties_it = properties_.find(property.key());
+                auto properties_it = properties_.find(prop.key());
 
                 // check if it is in "properties"
                 if (properties_it != properties_.end()) 
                 {
                     a_prop_or_pattern_matched = true;
                     jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= property.key();
+                    pointer /= prop.key();
 
-                    properties_it->second->validate(property.value(), pointer, unevaluated_properties, reporter, patch);
-                }
-                else
-                {
-                    unevaluated_properties.insert(property.key());
+                    std::size_t error_count = reporter.error_count();
+                    properties_it->second->validate(prop.value(), pointer, local_evaluated_properties, reporter, patch);
+                    if (reporter.error_count() == error_count)
+                    {
+                        local_evaluated_properties.insert(prop.key());
+                    }
                 }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
 
                 // check all matching "patternProperties"
                 for (auto& schema_pp : pattern_properties_)
-                    if (std::regex_search(property.key(), schema_pp.first)) 
+                    if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
                         a_prop_or_pattern_matched = true;
                         jsonpointer::json_pointer pointer(instance_location);
-                        pointer /= property.key();
-                        schema_pp.second->validate(property.value(), pointer, unevaluated_properties, reporter, patch);
+                        pointer /= prop.key();
+                        std::size_t error_count = reporter.error_count();
+                        schema_pp.second->validate(prop.value(), pointer, local_evaluated_properties, reporter, patch);
+                        if (reporter.error_count() == error_count)
+                        {
+                            local_evaluated_properties.insert(prop.key());
+                        }
                     }
     #endif
 
@@ -1305,19 +1317,24 @@ namespace jsonschema {
                     collecting_error_reporter local_reporter;
 
                     jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= property.key();
-                    additional_properties_->validate(property.value(), pointer, unevaluated_properties, local_reporter, patch);
+                    pointer /= prop.key();
+                    additional_properties_->validate(prop.value(), pointer, local_evaluated_properties, local_reporter, patch);
                     if (!local_reporter.errors.empty())
                     {
                         reporter.error(validation_output("additionalProperties", 
                                                          additional_properties_->schema_path(), 
                                                          instance_location.to_uri_fragment(), 
-                                                         "Additional property \"" + property.key() + "\" found but was invalid."));
+                                                         "Additional prop \"" + prop.key() + "\" found but was invalid."));
                         if (reporter.fail_early())
                         {
                             return;
                         }
                     }
+                    else
+                    {
+                        local_evaluated_properties.insert(prop.key());
+                    }
+
                 }
             }
 
@@ -1327,7 +1344,7 @@ namespace jsonschema {
                 const auto finding = instance.find(prop.first);
                 if (finding == instance.object_range().end()) 
                 { 
-                    // If property is not in instance
+                    // If prop is not in instance
                     auto default_value = prop.second->get_default_value(instance_location, instance, reporter);
                     if (default_value) 
                     { 
@@ -1345,20 +1362,32 @@ namespace jsonschema {
                 auto prop = instance.find(dep.first);
                 if (prop != instance.object_range().end()) 
                 {
-                    // if dependency-property is present in instance
+                    // if dependency-prop is present in instance
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
-                    dep.second->validate(instance, pointer, unevaluated_properties, reporter, patch); // validate
+                    dep.second->validate(instance, pointer, local_evaluated_properties, reporter, patch); // validate
                 }
             }
 
             for (auto& validator : more_validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
                 }
+            }
+
+            //std::cout << "Evaluated properties\n";
+            //for (const auto& s : local_evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
+
+            for (auto&& name : local_evaluated_properties)
+            {
+                evaluated_properties.emplace(std::move(name));
             }
         }
 
@@ -1390,18 +1419,38 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/,
-            std::unordered_set<std::string>& unevaluated_properties, 
-            error_reporter& /*reporter*/, 
-            Json&) const override
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const override
         {
             std::cout << "Unevaluated properties\n";
-            for (const auto& s : unevaluated_properties)
+            for (const auto& s : evaluated_properties)
             {
                 std::cout << "    " << s << "\n";
             }
             std::cout << "\n";
+
+            if (validator_)
+            {
+                for (const auto& prop : instance.object_range()) 
+                {
+                    auto prop_it = evaluated_properties.find(prop.key());
+
+                    // check if it is in "evaluated_properties"
+                    if (prop_it == evaluated_properties.end()) 
+                    {
+                        
+                        std::size_t error_count = reporter.error_count();
+                        validator_->validate(prop.value(), instance_location, evaluated_properties, reporter, patch);
+                        if (reporter.error_count() == error_count)
+                        {
+                            evaluated_properties.insert(prop.key());
+                        }
+                    }
+                }
+            }
         }
     };
 
@@ -1423,13 +1472,13 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
             for (const auto& validator : validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1461,7 +1510,7 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
@@ -1469,16 +1518,16 @@ namespace jsonschema {
             {
                 collecting_error_reporter local_reporter;
 
-                if_validator_->validate(instance, instance_location, unevaluated_properties, local_reporter, patch);
+                if_validator_->validate(instance, instance_location, evaluated_properties, local_reporter, patch);
                 if (local_reporter.errors.empty()) 
                 {
                     if (then_validator_)
-                        then_validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                        then_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 } 
                 else 
                 {
                     if (else_validator_)
-                        else_validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                        else_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 }
             }
         }
@@ -1567,6 +1616,7 @@ namespace jsonschema {
         std::vector<validator_type> combined_validators_;
         std::unique_ptr<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
+        validator_type unevaluated_properties_validator_ptr_;
 
     public:
         type_validator(const type_validator&) = delete;
@@ -1581,7 +1631,8 @@ namespace jsonschema {
             std::unique_ptr<const_validator<Json>> const_validator,
             std::vector<validator_type>&& combined_validators,
             std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
-            std::vector<std::string>&& expected_types
+            std::vector<std::string>&& expected_types,
+            validator_type&& unevaluated_properties_validator_ptr = validator_type{}
             )
             : keyword_validator<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
@@ -1590,7 +1641,8 @@ namespace jsonschema {
               const_validator_(std::move(const_validator)),
               combined_validators_(std::move(combined_validators)), 
               conditional_validator_(std::move(conditionalvalidator)),
-              expected_types_(std::move(expected_types))
+              expected_types_(std::move(expected_types)),
+              unevaluated_properties_validator_ptr_(std::move(unevaluated_properties_validator_ptr))
         {
         }
 
@@ -1598,14 +1650,16 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override final
         {
+            std::unordered_set<std::string> local_evaluated_properties;
+
             auto& type = type_mapping_[(uint8_t) instance.type()];
 
             if (type)
-                type->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                type->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
             else
             {
                 std::ostringstream ss;
@@ -1636,7 +1690,7 @@ namespace jsonschema {
 
             if (enum_validator_)
             { 
-                enum_validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                enum_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1645,7 +1699,7 @@ namespace jsonschema {
 
             if (const_validator_)
             { 
-                const_validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                const_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1654,7 +1708,7 @@ namespace jsonschema {
 
             for (const auto& validator : combined_validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1663,11 +1717,25 @@ namespace jsonschema {
 
             if (conditional_validator_)
             { 
-                conditional_validator_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                conditional_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
                 }
+            }
+
+            if (unevaluated_properties_validator_ptr_)
+            { 
+                unevaluated_properties_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
+
+            for (auto&& name : local_evaluated_properties)
+            {
+                evaluated_properties.emplace(std::move(name));
             }
         }
 
