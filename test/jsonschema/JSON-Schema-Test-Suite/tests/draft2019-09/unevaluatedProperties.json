@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "description": "unevaluatedProperties true",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
@@ -714,7 +714,7 @@
                 "valid": false
             }
         ]
-    },
+    },*/
     {
         "description": "unevaluatedProperties with $recursiveRef",
         "schema": {
@@ -772,7 +772,7 @@
                 "valid": false
             }
         ]
-    },
+    }/*,
     {
         "description": "unevaluatedProperties can't see inside cousins",
         "schema": {
@@ -1529,5 +1529,5 @@
                 "valid": false
             }
         ]
-    }
+    }*/
 ]

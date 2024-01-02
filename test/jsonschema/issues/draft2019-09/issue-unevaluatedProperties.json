@@ -1,68 +1,57 @@
 [
     {
-        "description": "unevaluatedProperties with anyOf",
+        "description": "unevaluatedProperties with $recursiveRef",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "type": "object",
-            "properties": { 
-                "foo": { "type": "string" }
+            "$id": "https://example.com/extended-tree",
+
+            "$recursiveAnchor": true,
+
+            "$ref": "/tree",
+            "properties": {
+                "name": { "type": "string" }
             },
-            "anyOf": [
-                {
+
+            "$defs": {
+                "tree": {
+                    "$id": "/tree",
+                    "$recursiveAnchor": true,
+
+                    "type": "object",
                     "properties": {
-                        "bar": { "const": "bar" }
+                        "node": true,
+                        "branches": {
+                            "$comment": "unevaluatedProperties comes first so it's more likely to bugs errors with implementations that are sensitive to keyword ordering",
+                            "unevaluatedProperties": false,
+                            "$recursiveRef": "#"
+                        }
                     },
-                    "required": ["bar"]
-                },
-                {
-                    "properties": {
-                        "baz": { "const": "baz" }
-                    },
-                    "required": ["baz"]
-                },
-                {
-                    "properties": {
-                        "quux": { "const": "quux" }
-                    },
-                    "required": ["quux"]
+                    "required": ["node"]
                 }
-            ],
-            "unevaluatedProperties": false
+            }
         },
         "tests": [
-            /*{
-                "description": "when one matches and has no unevaluated properties",
-                "data": {
-                    "foo": "foo",
-                    "bar": "bar"
-                },
-                "valid": true
-            },
             {
-                "description": "when one matches and has unevaluated properties",
+                "description": "with no unevaluated properties",
                 "data": {
-                    "foo": "foo",
-                    "bar": "bar",
-                    "baz": "not-baz"
-                },
-                "valid": false
-            },*/
-            {
-                "description": "when two match and has no unevaluated properties",
-                "data": {
-                    "foo": "foo",
-                    "bar": "bar",
-                    "baz": "baz"
+                    "name": "a",
+                    "node": 1,
+                    "branches": {
+                      "name": "b",
+                      "node": 2
+                    }
                 },
                 "valid": true
             }/*,
             {
-                "description": "when two match and has unevaluated properties",
+                "description": "with unevaluated properties",
                 "data": {
-                    "foo": "foo",
-                    "bar": "bar",
-                    "baz": "baz",
-                    "quux": "not-quux"
+                    "name": "a",
+                    "node": 1,
+                    "branches": {
+                      "foo": "b",
+                      "node": 2
+                    }
                 },
                 "valid": false
             }*/

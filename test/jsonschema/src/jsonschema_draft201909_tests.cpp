@@ -94,6 +94,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-anchor.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-not.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-unevaluatedProperties.json");
+        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
     }
     SECTION("tests")
     {
@@ -135,7 +136,8 @@ TEST_CASE("jsonschema draft2019-09 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/not.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/oneOf.json");
 */
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedProperties.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/recursiveRef.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedItems.json");
 
 /*

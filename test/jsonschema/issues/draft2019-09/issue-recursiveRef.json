@@ -1,0 +1,34 @@
+[
+    {
+        "description": "$recursiveRef without $recursiveAnchor works like $ref",
+        "schema": {
+            "$schema": "https://json-schema.org/draft/2019-09/schema",
+            "properties": {
+                "foo": { "$recursiveRef": "#" }
+            },
+            "additionalProperties": false
+        },
+        "tests": [
+            {
+                "description": "match",
+                "data": {"foo": false},
+                "valid": true
+            },
+            {
+                "description": "recursive match",
+                "data": { "foo": { "foo": false } },
+                "valid": true
+            },
+            {
+                "description": "mismatch",
+                "data": { "bar": false },
+                "valid": false
+            },
+            {
+                "description": "recursive mismatch",
+                "data": { "foo": { "bar": false } },
+                "valid": false
+            }
+        ]
+    }
+]
