@@ -16,16 +16,21 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    enum class uri_anchor_flags : int {recursive_anchor=1};
+
     class schema_location
     {
         jsoncons::uri uri_;
         std::string identifier_;
+        uri_anchor_flags anchor_flags_;
     public:
         schema_location()
+            : anchor_flags_{}
         {
         }
 
-        schema_location(const std::string& uri)
+        schema_location(const std::string& uri, uri_anchor_flags flags = uri_anchor_flags{})
+            : anchor_flags_{flags}
         {
             uri_ = jsoncons::uri(uri);
             if (!uri_.fragment().empty())
@@ -35,10 +40,26 @@ namespace jsonschema {
             }
         }
 
-        schema_location(const uri& uri)
-            : uri_{uri}
+        schema_location(const uri& uri, uri_anchor_flags flags = uri_anchor_flags{})
+            : uri_{uri}, anchor_flags_{flags}
         {
             uri_ = jsoncons::uri(uri);
+        }
+
+        uri_anchor_flags anchor_flags() const
+        {
+            return anchor_flags_;
+        }
+
+        schema_location& anchor_flags(uri_anchor_flags flags) 
+        {
+            anchor_flags_ = uri_anchor_flags((int)anchor_flags_ | (int)flags);
+            return *this;
+        }
+
+        bool is_recursive_anchor() const
+        {
+            return (int)anchor_flags_ & (int)uri_anchor_flags::recursive_anchor;
         }
 
         jsoncons::uri uri() const

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT201909_COMPILATION_CONTEXT_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT201909_COMPILATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,6 +16,7 @@
 
 namespace jsoncons {
 namespace jsonschema {
+namespace draft201909 {
 
     class compilation_context
     {
@@ -70,9 +71,26 @@ namespace jsonschema {
             return absolute_uri_;
         }
 
-        uri get_base_uri() const
+        uri get_base_uri(uri_anchor_flags anchor_flags=uri_anchor_flags()) const
         {
-            return absolute_uri_.base();
+            switch (anchor_flags)
+            {
+            case uri_anchor_flags::recursive_anchor:
+            {
+                for (auto it = uris_.rbegin();
+                     it != uris_.rend();
+                     ++it)
+                {
+                    if (it->is_recursive_anchor())
+                    {
+                        return it->uri();
+                    }
+                }
+                return absolute_uri_.base();
+            }
+            default:
+                return absolute_uri_.base();
+            }
         }
 
         template <class Json>
@@ -115,21 +133,70 @@ namespace jsonschema {
                 if (it != schema.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
+                    std::cout << "$id: " << id;
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
                     {
                         schema_location relative(id); 
-                        schema_location new_uri = relative.resolve(new_uris.back());
+                        //schema_location new_uri = relative.resolve(new_uris.back());
+                        schema_location new_uri = relative.resolve(get_base_uri());
                         new_uris.emplace_back(new_uri); 
+                        std::cout << ", " << new_uri.string();
+                    }
+                    std::cout << "\n";
+                }
+                it = schema.find("$recursiveAnchor"); 
+                if (it != schema.object_range().end()) 
+                {
+                    bool is_recursive_anchor = it->value().template as<bool>();  
+                    if (is_recursive_anchor)
+                    {
+                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
                     }
                 }
             }
 
-            /*std::cout << "\ncontext\n";
-            for (const auto& uri : new_uris)
+            //std::cout << "\ncontext isRecursiveAnchor: " << (anchor_flags == uri_anchor_flags::recursive_anchor) << "\n\n";
+            //for (const auto& uri : new_uris)
+            //{
+            //    std::cout << "    " << uri.string() << "\n";
+            //}
+
+            return compilation_context(new_uris);
+        }
+
+        compilation_context update_uris(jsoncons::span<const std::string> keys) const
+        {
+            // Exclude uri's that are not plain name identifiers
+            std::vector<schema_location> new_uris;
+            for (const auto& uri : uris_)
             {
-                std::cout << "    " << uri.string() << "\n";
-            }*/
+                if (uri.is_absolute())
+                {
+                    new_uris.push_back(uri);
+                }
+            }
+
+            if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
+            }
+
+            // Append the keys for this sub-schema to the uri's
+            for (const auto& key : keys)
+            {
+                for (auto& uri : new_uris)
+                {
+                    auto new_u = uri.append(key);
+                    uri = schema_location(new_u);
+                }
+            }
+
+            //std::cout << "\ncontext isRecursiveAnchor: " << (anchor_flags == uri_anchor_flags::recursive_anchor) << "\n\n";
+            //for (const auto& uri : new_uris)
+            //{
+            //    std::cout << "    " << uri.string() << "\n";
+            //}
 
             return compilation_context(new_uris);
         }
@@ -147,6 +214,7 @@ namespace jsonschema {
         }
     };
 
+} // namespace draft201909
 } // namespace jsonschema
 } // namespace jsoncons
 

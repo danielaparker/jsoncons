@@ -1658,12 +1658,13 @@ namespace jsonschema {
 
             auto& type = type_mapping_[(uint8_t) instance.type()];
 
+            std::cout << "anyOf validate " << instance;
             if (type)
                 type->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
             else
             {
                 std::ostringstream ss;
-                ss << "Expected ";
+                ss << "Expected " << expected_types_.size();
                 for (std::size_t i = 0; i < expected_types_.size(); ++i)
                 {
                         if (i > 0)
@@ -1675,6 +1676,7 @@ namespace jsonschema {
                             }
                         }
                         ss << expected_types_[i];
+                        std::cout << ", " << i << ". expected " << expected_types_[i];
                 }
                 ss << ", found " << instance.type();
 
@@ -1687,7 +1689,8 @@ namespace jsonschema {
                     return;
                 }
             }
-
+            std::cout << "\n";
+ 
             if (enum_validator_)
             { 
                 enum_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
