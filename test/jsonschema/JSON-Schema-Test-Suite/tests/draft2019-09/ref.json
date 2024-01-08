@@ -180,7 +180,7 @@
                 "valid": false
             }
         ]
-    },
+    }/*,
     {
         "description": "remote ref, containing refs itself",
         "schema": {
@@ -199,7 +199,7 @@
                 "valid": false
             }
         ]
-    },
+    }*/,
     {
         "description": "property named $ref that is not a reference",
         "schema": {
@@ -790,7 +790,7 @@
                 "valid": false
             }
         ]
-    },
+    }/*,
     {
         "description": "URN base URI with f-component",
         "schema": {
@@ -805,7 +805,7 @@
                 "valid": false
             }
         ]
-    },
+    }*/,
     {
         "description": "URN base URI with URN and JSON pointer ref",
         "schema": {

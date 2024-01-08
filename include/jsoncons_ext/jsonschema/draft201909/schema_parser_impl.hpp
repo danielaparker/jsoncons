@@ -114,7 +114,6 @@ namespace draft201909 {
 
             validator_pointer validator = nullptr;
 
-            bool is_ref = false;
             switch (schema.type())
             {
                 case json_type::bool_value:
@@ -140,10 +139,14 @@ namespace draft201909 {
                     auto it = schema.find("$ref");
                     if (it != schema.object_range().end()) // this schema is a reference
                     {
-                        schema_location relative(it->value().template as<std::string>()); 
-                        is_ref = true;
+                        std::string ref_string = it->value().template as<std::string>();
+                        schema_location relative(ref_string); 
                         auto id = relative.resolve(new_context.get_base_uri());
-                        std::cout << "$ref " << relative.string() << ", " << id.string() << "\n";
+                        //std::cout << "$ref " << relative.string() << ", " << id.string() << ", base " << new_context.get_base_uri() << "\n";
+                        //if (!id.is_absolute())
+                        //{
+                        //    JSONCONS_THROW(jsonschema::schema_error("Relative reference " + ref_string + " not resolveable."));
+                        //}
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
@@ -151,15 +154,18 @@ namespace draft201909 {
                     it = schema.find("$recursiveRef");
                     if (it != schema.object_range().end()) // this schema is a reference
                     {
-                        schema_location relative(it->value().template as<std::string>()); 
-                        is_ref = true;
-                        auto id = relative.resolve(new_context.get_base_uri(uri_anchor_flags::recursive_anchor));
-                        //std::cout << "$recursiveRef " << relative.string() << ", " << id.string() << "\n";
+                        std::string ref_string = it->value().template as<std::string>();
+                        schema_location relative(ref_string); 
+                        auto base_uri = new_context.get_base_uri(uri_anchor_flags::recursive_anchor);
+                        auto id = relative.resolve(base_uri);
+                        std::cout << "$recursiveRef " << relative.string() << ", " << id.string() << "\n";
+                        //if (!id.is_absolute())
+                        //{
+                        //    JSONCONS_THROW(jsonschema::schema_error("Relative reference " + ref_string + " not resolveable."));
+                        //}
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
-                        
-
                     } 
                     it = schema.find("$defs");
                     if (it != schema.object_range().end()) 
@@ -179,39 +185,29 @@ namespace draft201909 {
                             make_subschema_validator(def.value(), new_context, sub_keys);
                         }
                     }
-                    it = schema.find("properties");
+
+                    auto ref = make_type_validator(schema, new_context);
+                    validator = ref.get();
+                    subschemas_.emplace_back(std::move(ref));
+                    it = schema.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                     if (it != schema.object_range().end()) 
                     {
-                        for (const auto& def : it->value().object_range())
+                        std::string anchor = it->value().template as<std::string>(); 
+                        if (!validate_anchor(anchor))
                         {
-                            std::string sub_keys[] = { "properties", def.key() };
-                            make_subschema_validator(def.value(), new_context, sub_keys);
+                            std::string message("Invalid anchor ");
+                            message.append(anchor.data(), anchor.size());
+                            JSONCONS_THROW(schema_error(message));
+                        }
+                        schema_location relative("#"+anchor); 
+                        insert_schema(relative, validator);
+                        if (new_context.get_base_uri().is_absolute())
+                        {
+                            schema_location new_uri = relative.resolve(new_context.get_base_uri());
+                            insert_schema(new_uri, validator);
                         }
                     }
-                    if (!is_ref)
-                    {
-                        auto ref = make_type_validator(schema, new_context);
-                        validator = ref.get();
-                        subschemas_.emplace_back(std::move(ref));
-                        it = schema.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
-                        if (it != schema.object_range().end()) 
-                        {
-                            std::string anchor = it->value().template as<std::string>(); 
-                            if (!validate_anchor(anchor))
-                            {
-                                std::string message("Invalid anchor ");
-                                message.append(anchor.data(), anchor.size());
-                                JSONCONS_THROW(schema_error(message));
-                            }
-                            schema_location relative("#"+anchor); 
-                            insert_schema(relative, validator);
-                            if (new_context.get_base_uri().is_absolute())
-                            {
-                                schema_location new_uri = relative.resolve(new_context.get_base_uri());
-                                insert_schema(new_uri, validator);
-                            }
-                        }
-                    }
+                    
                     for (const auto& uri : new_context.uris()) 
                     { 
                         insert_schema(uri, validator);
@@ -1141,11 +1137,60 @@ namespace draft201909 {
                                     dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
-                        default:
+                        case json_type::object_value:
                         {
                             std::string sub_keys[] = {"dependencies"};
                             dependencies.emplace(dep.key(),
                                 make_subschema_validator(dep.value(), context, sub_keys));
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            it = schema.find("dependentRequired ");
+            if (it != schema.object_range().end()) 
+            {
+                for (const auto& dep : it->value().object_range())
+                {
+                    switch (dep.value().type()) 
+                    {
+                        case json_type::array_value:
+                        {
+                            auto location = context.make_schema_path_with("dependentRequired");
+                            dependencies.emplace(dep.key(), 
+                                make_required_validator(compilation_context(std::vector<schema_location>{{location}}),
+                                    dep.value().template as<std::vector<std::string>>()));
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            it = schema.find("dependentSchemas");
+            if (it != schema.object_range().end()) 
+            {
+                for (const auto& dep : it->value().object_range())
+                {
+                    switch (dep.value().type()) 
+                    {
+                        case json_type::object_value:
+                        {
+                            std::string sub_keys[] = {"dependentSchemas"};
+                            dependencies.emplace(dep.key(),
+                                make_subschema_validator(dep.value(), context, sub_keys));
+                            break;
+                        }
+                        default:
+                        {
                             break;
                         }
                     }

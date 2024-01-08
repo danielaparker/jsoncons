@@ -1272,6 +1272,9 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
+                jsonpointer::json_pointer pointer(instance_location);
+                pointer /= prop.key();
+
                 if (property_name_validator_)
                     property_name_validator_->validate(prop.key(), instance_location, local_evaluated_properties, reporter, patch);
 
@@ -1282,8 +1285,6 @@ namespace jsonschema {
                 if (properties_it != properties_.end()) 
                 {
                     a_prop_or_pattern_matched = true;
-                    jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= prop.key();
 
                     std::size_t error_count = reporter.error_count();
                     properties_it->second->validate(prop.value(), pointer, local_evaluated_properties, reporter, patch);
@@ -1292,6 +1293,7 @@ namespace jsonschema {
                         local_evaluated_properties.insert(prop.key());
                     }
                 }
+                // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
 
     #if defined(JSONCONS_HAS_STD_REGEX)
 
@@ -1300,8 +1302,6 @@ namespace jsonschema {
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
                         a_prop_or_pattern_matched = true;
-                        jsonpointer::json_pointer pointer(instance_location);
-                        pointer /= prop.key();
                         std::size_t error_count = reporter.error_count();
                         schema_pp.second->validate(prop.value(), pointer, local_evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
@@ -1316,8 +1316,6 @@ namespace jsonschema {
                 {
                     collecting_error_reporter local_reporter;
 
-                    jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= prop.key();
                     additional_properties_->validate(prop.value(), pointer, local_evaluated_properties, local_reporter, patch);
                     if (!local_reporter.errors.empty())
                     {

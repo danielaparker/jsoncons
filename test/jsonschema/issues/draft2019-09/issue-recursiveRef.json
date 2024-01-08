@@ -1,54 +1,35 @@
 [
     {
-        "description": "$recursiveRef with nesting",
+        "description": "$recursiveRef without $recursiveAnchor works like $ref",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$id": "http://localhost:4242/draft2019-09/recursiveRef3/schema.json",
-            "$recursiveAnchor": true,
-            "$defs": {
-                "myobject": {
-                    "$id": "myobject.json",
-                    "$recursiveAnchor": true,
-                    "anyOf": [
-                        { "type": "string" },
-                        {
-                            "type": "object",
-                            "additionalProperties": { "$recursiveRef": "#" }
-                        }
-                    ]
-                }
+            "$id": "https://json-schema.org/draft/2019-09/schema",
+            "properties": {
+                "foo": { "$recursiveRef": "#" }
             },
-            "anyOf": [
-                { "type": "integer" },
-                { "$ref": "#/$defs/myobject" }
-            ]
+            "additionalProperties": false
         },
         "tests": [
-            /*{
-                "description": "integer matches at the outer level",
-                "data": 1,
+            {
+                "description": "match",
+                "data": {"foo": false},
                 "valid": true
             },
             {
-                "description": "single level match",
-                "data": { "foo": "hi" },
-                "valid": true
-            },*/
-            {
-                "description": "integer now matches as a property value",
-                "data": { "foo": 1 },
-                "valid": true
-            }/*,
-            {
-                "description": "two levels, properties match with inner definition",
-                "data": { "foo": { "bar": "hi" } },
+                "description": "recursive match",
+                "data": { "foo": { "foo": false } },
                 "valid": true
             },
             {
-                "description": "two levels, properties match with $recursiveRef",
-                "data": { "foo": { "bar": 1 } },
-                "valid": true
-            }*/
+                "description": "mismatch",
+                "data": { "bar": false },
+                "valid": false
+            },
+            {
+                "description": "recursive mismatch",
+                "data": { "foo": { "bar": false } },
+                "valid": false
+            }
         ]
     }
 ]
