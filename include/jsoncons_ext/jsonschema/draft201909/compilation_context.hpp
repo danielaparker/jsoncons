@@ -133,17 +133,14 @@ namespace draft201909 {
                 if (it != schema.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
-                    std::cout << "$id: " << id;
+                    schema_location relative(id); 
+                    schema_location new_uri = relative.resolve(get_base_uri());
+                    std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
                     {
-                        schema_location relative(id); 
-                        //schema_location new_uri = relative.resolve(new_uris.back());
-                        schema_location new_uri = relative.resolve(get_base_uri());
                         new_uris.emplace_back(new_uri); 
-                        std::cout << ", " << new_uri.string();
                     }
-                    std::cout << "\n";
                 }
                 it = schema.find("$recursiveAnchor"); 
                 if (it != schema.object_range().end()) 

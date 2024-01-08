@@ -139,6 +139,15 @@ namespace draft7 {
                             make_subschema_validator(def.value(), new_context, k);
                         }
                     }
+                    it = schema.find("properties");
+                    if (it != schema.object_range().end()) 
+                    {
+                        for (const auto& def : it->value().object_range())
+                        {
+                            std::string sub_keys[] = { "properties", def.key() };
+                            make_subschema_validator(def.value(), new_context, sub_keys);
+                        }
+                    }
                     if (!is_ref)
                     {
                         auto ref = make_type_validator(schema, new_context);

@@ -34,9 +34,10 @@ namespace draft201909 {
     {
         Json operator()(const jsoncons::uri& uri)
         {
-            if (uri.path() == "/draft/2019-09/schema") 
+            if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
             {
-                return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+                JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support") + "https://json-schema.org/draft/2019-09/schema"));
+                //return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
@@ -108,7 +109,7 @@ namespace draft201909 {
             const compilation_context& context,
             jsoncons::span<const std::string> keys) 
         {
-            std::cout << "update_uris 1 " << key_string(keys) << " " << schema << "\n";
+            std::cout << "make_subschema_validator.update_uris " << key_string(keys) << "\n" << pretty_print(schema) << "\n";
             auto new_context = context.update_uris(schema, keys);
 
             validator_pointer validator = nullptr;
@@ -153,7 +154,7 @@ namespace draft201909 {
                         schema_location relative(it->value().template as<std::string>()); 
                         is_ref = true;
                         auto id = relative.resolve(new_context.get_base_uri(uri_anchor_flags::recursive_anchor));
-                        std::cout << "$recursiveRef " << relative.string() << ", " << id.string() << "\n";
+                        //std::cout << "$recursiveRef " << relative.string() << ", " << id.string() << "\n";
                         auto ref =  get_or_create_reference(id);
                         validator = ref.get();
                         subschemas_.emplace_back(std::move(ref));
@@ -175,6 +176,15 @@ namespace draft201909 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "definitions", def.key() };
+                            make_subschema_validator(def.value(), new_context, sub_keys);
+                        }
+                    }
+                    it = schema.find("properties");
+                    if (it != schema.object_range().end()) 
+                    {
+                        for (const auto& def : it->value().object_range())
+                        {
+                            std::string sub_keys[] = { "properties", def.key() };
                             make_subschema_validator(def.value(), new_context, sub_keys);
                         }
                     }
@@ -423,7 +433,7 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("string");
-            std::cout << "update_uris 2 string " << schema << "\n";
+            //std::cout << "update_uris 2 string " << schema << "\n";
             auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
@@ -580,7 +590,7 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("array");
-            std::cout << "update_uris 3 array " << schema << "\n";
+            //std::cout << "update_uris 3 array\n" << pretty_print(schema) << "\n";
             auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
@@ -820,7 +830,7 @@ namespace draft201909 {
             const compilation_context& context, std::set<std::string>& keywords)
         {
             std::string schema_path = context.make_schema_path_with("integer");
-            std::cout << "update_uris 4 integer " << schema << "\n";
+            //std::cout << "update_uris 4 integer " << schema << "\n";
             auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
@@ -868,7 +878,7 @@ namespace draft201909 {
             const compilation_context& context, std::set<std::string>& keywords)
         {
             std::string schema_path = context.make_schema_path_with("number");
-            std::cout << "update_uris 5 number " << schema << "\n";
+            //std::cout << "update_uris 5 number " << schema << "\n";
             auto new_context = context.update_uris(schema, schema_path);
 
             std::vector<validator_type> validators;
@@ -988,14 +998,14 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("allOf");
-            std::cout << "update_uris 6 allOf " << schema << "\n";
+            //std::cout << "update_uris 6 allOf " << schema << "\n";
             auto new_context2 = context.update_uris(schema, schema_path);
             std::vector<validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : schema.array_range())
             {
-                std::cout << "update_uris 7 " << schema << "\n";
+                //std::cout << "update_uris 7 " << schema << "\n";
                 auto new_context = context.update_uris(subsch, jsoncons::span<const std::string>{});
 
                 /*std::cout << "\nThe context\n";
@@ -1082,6 +1092,7 @@ namespace draft201909 {
             it = schema.find("properties");
             if (it != schema.object_range().end()) 
             {
+                std::cout << "properties\n";
                 for (const auto& prop : it->value().object_range())
                 {
                     std::string sub_keys[] = {"properties", prop.key()};
@@ -1110,7 +1121,7 @@ namespace draft201909 {
             it = schema.find("additionalProperties");
             if (it != schema.object_range().end()) 
             {
-                std::cout << "additionalProperties\n";
+                //std::cout << "additionalProperties\n";
                 std::string sub_keys[] = {"additionalProperties"};
                 additional_properties = make_subschema_validator(it->value(), context, sub_keys);
             }

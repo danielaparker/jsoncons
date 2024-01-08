@@ -18,14 +18,15 @@ namespace {
  
     json resolver(const jsoncons::uri& uri)
     {
-        if (uri.path() == "/draft-07/schema") 
+        if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
         {
-            return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
+            JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
+            //return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
         }
         else
         {
             //std::cout << uri.string() << ", " << uri.path() << "\n";
-            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
+            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes/draft2019-09";
             pathname += std::string(uri.path());
 
             std::fstream is(pathname.c_str());
@@ -47,22 +48,26 @@ namespace {
 
         json tests = json::parse(is); 
 
+        int count = 0;
         for (const auto& test_group : tests.array_range()) 
         {
+            ++count;
             try
             {
                 auto schema = jsonschema::make_schema(test_group.at("schema"), resolver);
                 jsonschema::json_validator<json> validator(schema);
 
+                int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
                 {
+                    ++count_test;
                     auto reporter = [&](const jsonschema::validation_output& o)
                     {
                         CHECK_FALSE(test_case["valid"].as<bool>());
                         if (test_case["valid"].as<bool>())
                         {
                             std::cout << "  File: " << fpath << "\n";
-                            std::cout << "  Test case: " << test_case["description"] << "\n";
+                            std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                             std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
                             for (const auto& err : o.nested_errors())
                             {
@@ -79,7 +84,7 @@ namespace {
             }
             catch (const std::exception& e)
             {
-                std::cout << "  File: " << fpath << "\n";
+                std::cout << "  File: " << fpath << " " << count << "\n";
                 std::cout << e.what() << "\n\n";
                 CHECK(false);
             }
@@ -95,6 +100,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-not.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
+        jsonschema_tests("./jsonschema/issues/draft2019-09/issue-ref.json");
     }
     SECTION("tests")
     {
@@ -148,8 +154,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
 #endif
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/propertyNames.json");
 */
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/ref.json"); // *
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/ref.json"); // *
 /*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/refRemote.json");
 
