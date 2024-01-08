@@ -720,6 +720,7 @@ namespace jsonschema {
                                 const collecting_error_reporter&, 
                                 std::size_t count)
         {
+            std::cout << "any_of_criterion is_complete\n";
             return count == 1;
         }
     };
@@ -775,6 +776,8 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            std::cout << "combining_validator.do_validate " << instance << " " << subschemas_.size() << ", " << instance_location.to_string() << "\n";
+
             size_t count = 0;
 
             collecting_error_reporter local_reporter;
@@ -1312,8 +1315,11 @@ namespace jsonschema {
     #endif
 
                 // finally, check "additionalProperties" 
+                std::cout << "object_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
+                    std::cout << " !!!additionalProperties!!!";
+
                     collecting_error_reporter local_reporter;
 
                     additional_properties_->validate(prop.value(), pointer, local_evaluated_properties, local_reporter, patch);
@@ -1334,6 +1340,7 @@ namespace jsonschema {
                     }
 
                 }
+                std::cout << "\n";
             }
 
             // reverse search
@@ -1423,7 +1430,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
-            std::cout << "Unevaluated properties\n";
+            std::cout << "Evaluated properties\n";
             for (const auto& s : evaluated_properties)
             {
                 std::cout << "    " << s << "\n";
@@ -1614,6 +1621,8 @@ namespace jsonschema {
         std::vector<validator_type> combined_validators_;
         std::unique_ptr<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
+        validator_type ref_validator_ptr_;
+        validator_type recursive_ref_validator_ptr_;
         validator_type unevaluated_properties_validator_ptr_;
 
     public:
@@ -1630,6 +1639,8 @@ namespace jsonschema {
             std::vector<validator_type>&& combined_validators,
             std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
             std::vector<std::string>&& expected_types,
+            validator_type&& ref_validator_ptr = validator_type{},
+            validator_type&& recursive_ref_validator_ptr = validator_type{},
             validator_type&& unevaluated_properties_validator_ptr = validator_type{}
             )
             : keyword_validator<Json>(std::move(schema_path)),
@@ -1640,6 +1651,8 @@ namespace jsonschema {
               combined_validators_(std::move(combined_validators)), 
               conditional_validator_(std::move(conditionalvalidator)),
               expected_types_(std::move(expected_types)),
+              ref_validator_ptr_(std::move(ref_validator_ptr)),
+              recursive_ref_validator_ptr_(std::move(recursive_ref_validator_ptr)),
               unevaluated_properties_validator_ptr_(std::move(unevaluated_properties_validator_ptr))
         {
         }
@@ -1662,7 +1675,7 @@ namespace jsonschema {
             else
             {
                 std::ostringstream ss;
-                ss << "Expected " << expected_types_.size();
+                ss << "Expected " << expected_types_.size() << " ";
                 for (std::size_t i = 0; i < expected_types_.size(); ++i)
                 {
                         if (i > 0)
@@ -1719,6 +1732,24 @@ namespace jsonschema {
             if (conditional_validator_)
             { 
                 conditional_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
+
+            if (ref_validator_ptr_)
+            { 
+                ref_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
+
+            if (recursive_ref_validator_ptr_)
+            { 
+                recursive_ref_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;

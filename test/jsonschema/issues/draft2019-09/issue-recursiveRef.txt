@@ -1,0 +1,137 @@
+make_schema_validator.update_uris
+{
+    "$defs": {
+        "myobject": {
+            "$id": "myobject.json",
+            "$recursiveAnchor": true,
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": {
+                        "$recursiveRef": "#"
+                    },
+                    "type": "object"
+                }
+            ]
+        }
+    },
+    "$id": "http://localhost:4242/draft2019-09/recursiveRef3/schema.json",
+    "$recursiveAnchor": true,
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "anyOf": [
+        {
+            "type": "integer"
+        },
+        {
+            "$ref": "#/$defs/myobject"
+        }
+    ]
+}
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+make_schema_validator.update_uris $defs myobject
+{
+    "$id": "myobject.json",
+    "$recursiveAnchor": true,
+    "anyOf": [
+        {
+            "type": "string"
+        },
+        {
+            "additionalProperties": {
+                "$recursiveRef": "#"
+            },
+            "type": "object"
+        }
+    ]
+}
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: myobject.json, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+make_schema_validator.update_uris anyOf 0
+{
+    "type": "string"
+}
+make_schema_validator.update_uris anyOf 1
+{
+    "additionalProperties": {
+        "$recursiveRef": "#"
+    },
+    "type": "object"
+}
+make_schema_validator.update_uris additionalProperties
+{
+    "$recursiveRef": "#"
+}
+$recursiveRef #, http://localhost:4242/draft2019-09/recursiveRef3/myobject.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+$id: http://localhost:4242/draft2019-09/recursiveRef3/schema.json, http://localhost:4242/draft2019-09/recursiveRef3/schema.json
+make_schema_validator.update_uris anyOf 0
+{
+    "type": "integer"
+}
+make_schema_validator.update_uris anyOf 1
+{
+    "$ref": "#/$defs/myobject"
+}
+anyOf validate {"foo":1}object_validator a_prop_or_pattern_matched 0, 0
+
+combining_validator.do_validate {"foo":1} 2,
+anyOf validate {"foo":1}, 0. expected integer
+any_of_criterion is_complete
+anyOf validate {"foo":1}object_validator a_prop_or_pattern_matched 0, 0
+
+anyOf validate {"foo":1}object_validator a_prop_or_pattern_matched 0, 0
+
+combining_validator.do_validate {"foo":1} 2,
+anyOf validate {"foo":1}, 0. expected string
+any_of_criterion is_complete
+anyOf validate {"foo":1}object_validator a_prop_or_pattern_matched 0, 1 !!!additionalProperties!!!anyOf validate 1
+anyOf validate 1
+combining_validator.do_validate 1 2, /foo
+anyOf validate 1, 0. expected string
+any_of_criterion is_complete
+anyOf validate 1, 0. expected object
+any_of_criterion is_complete
+
+
+any_of_criterion is_complete
+any_of_criterion is_complete
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch v2.13.10 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+jsonschema draft2019-09 tests
+  issues
+-------------------------------------------------------------------------------
+C:\Users\danie\source\repos\jsoncons\test\jsonschema\src\jsonschema_draft201909_tests.cpp(97)
+...............................................................................
+
+C:\Users\danie\source\repos\jsoncons\test\jsonschema\src\jsonschema_draft201909_tests.cpp(66): FAILED:
+  CHECK_FALSE( test_case["valid"].as<bool>() )
+with expansion:
+  !true
+
+  File: ./jsonschema/issues/draft2019-09/issue-recursiveRef.json
+  Test case 1.1: "integer now matches as a property value"
+  Failed: #: No schema matched, but one of them is required to match
+  Nested error: #: Expected 1 integer, found object
+  Nested error: #: No schema matched, but one of them is required to match
+

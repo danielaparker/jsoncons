@@ -1,19 +1,32 @@
 [
     {
-        "description": "unevaluatedProperties with $ref",
+        "description": "unevaluatedProperties with $recursiveRef",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "type": "object",
-            "$ref": "#/$defs/bar",
+            "$id": "https://example.com/extended-tree",
+
+            "$recursiveAnchor": true,
+
+            "$ref": "/tree",
             "properties": {
-                "foo": { "type": "string" }
+                "name": { "type": "string" }
             },
-            "unevaluatedProperties": false,
+
             "$defs": {
-                "bar": {
+                "tree": {
+                    "$id": "/tree",
+                    "$recursiveAnchor": true,
+
+                    "type": "object",
                     "properties": {
-                        "bar": { "type": "string" }
-                    }
+                        "node": true,
+                        "branches": {
+                            "$comment": "unevaluatedProperties comes first so it's more likely to bugs errors with implementations that are sensitive to keyword ordering",
+                            "unevaluatedProperties": false,
+                            "$recursiveRef": "#"
+                        }
+                    },
+                    "required": ["node"]
                 }
             }
         },
@@ -21,17 +34,24 @@
             {
                 "description": "with no unevaluated properties",
                 "data": {
-                    "foo": "foo",
-                    "bar": "bar"
+                    "name": "a",
+                    "node": 1,
+                    "branches": {
+                      "name": "b",
+                      "node": 2
+                    }
                 },
                 "valid": true
             }/*,
             {
                 "description": "with unevaluated properties",
                 "data": {
-                    "foo": "foo",
-                    "bar": "bar",
-                    "baz": "baz"
+                    "name": "a",
+                    "node": 1,
+                    "branches": {
+                      "foo": "b",
+                      "node": 2
+                    }
                 },
                 "valid": false
             }*/
