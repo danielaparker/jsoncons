@@ -658,8 +658,8 @@ namespace draft201909 {
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const Json& parent, const Json& sch, 
             const compilation_context& context)
         {
-            std::vector<validator_type> item_validators;
-            validator_type additional_items_validator = nullptr;
+            std::vector<schema_validator_type> item_validators;
+            schema_validator_type additional_items_validator = nullptr;
 
             std::string schema_path = context.make_schema_path_with("items");
 

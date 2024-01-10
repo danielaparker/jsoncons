@@ -155,6 +155,7 @@ namespace jsonschema {
     class schema_validator : public keyword_validator<Json>
     {
     public:
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
