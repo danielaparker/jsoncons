@@ -1617,7 +1617,6 @@ namespace jsonschema {
         using validator_wrapper_type = validator_wrapper<Json>;
 
         std::vector<validator_type> type_mapping_;
-        Json default_value_;
         std::unique_ptr<enum_validator<Json>> enum_validator_;
         std::unique_ptr<const_validator<Json>> const_validator_;
         std::vector<validator_type> combined_validators_;
@@ -1635,7 +1634,6 @@ namespace jsonschema {
 
         type_validator(std::string&& schema_path,
             std::vector<validator_type>&& type_mapping,
-            Json&& default_value,
             std::unique_ptr<enum_validator<Json>>&& enumvalidator,
             std::unique_ptr<const_validator<Json>> const_validator,
             std::vector<validator_type>&& combined_validators,
@@ -1647,7 +1645,6 @@ namespace jsonschema {
             )
             : keyword_validator<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
-              default_value_(std::move(default_value)), 
               enum_validator_(std::move(enumvalidator)), 
               const_validator_(std::move(const_validator)),
               combined_validators_(std::move(combined_validators)), 
@@ -1772,14 +1769,6 @@ namespace jsonschema {
                 evaluated_properties.emplace(std::move(name));
             }
         }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
-                                                   const Json&,
-                                                   error_reporter&) const override
-        {
-            return default_value_;
-        }
-
     };
 
 } // namespace jsonschema

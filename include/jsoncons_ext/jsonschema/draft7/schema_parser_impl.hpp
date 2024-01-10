@@ -96,6 +96,7 @@ namespace draft7 {
         {
             auto new_context = context.update_uris(sch, keys);
 
+            Json default_value{jsoncons::null_type()};
             validator_pointer validator = nullptr;
 
             bool is_ref = false;
@@ -121,7 +122,12 @@ namespace draft7 {
                     break;
                 case json_type::object_value:
                 {
-                    auto it = sch.find("$ref");
+                    auto it = sch.find("default");
+                    if (it != sch.object_range().end()) 
+                    {
+                        default_value = it->value();
+                    }
+                    it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
                         is_ref = true;
@@ -161,7 +167,8 @@ namespace draft7 {
                     break;
             }
             
-            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator}});
+            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator}},
+                std::move(default_value));
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
@@ -225,7 +232,6 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.get_absolute_uri().string();
-            Json default_value{jsoncons::null_type()};
             std::unique_ptr<enum_validator<Json>> enumvalidator;
             std::unique_ptr<const_validator<Json>> const_validator;
             std::vector<validator_type> combined_validators;
@@ -265,12 +271,6 @@ namespace draft7 {
                     default:
                         break;
                 }
-            }
-
-            const auto default_it = sch.find("default");
-            if (default_it != sch.object_range().end()) 
-            {
-                default_value = default_it->value();
             }
 
             it = sch.find("enum");
@@ -334,7 +334,6 @@ namespace draft7 {
 
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
                 std::move(type_mapping),
-                std::move(default_value), 
                 std::move(enumvalidator),
                 std::move(const_validator),
                 std::move(combined_validators),

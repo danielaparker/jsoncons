@@ -160,13 +160,14 @@ namespace jsonschema {
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
         std::vector<validator_pointer> validators_;
+        Json default_value_;
 
     public:
-        schema_validator(std::vector<validator_pointer>&& validators)
-            : keyword_validator<Json>("#"), validators_(std::move(validators))
+        schema_validator(std::vector<validator_pointer>&& validators, Json&& default_value)
+            : keyword_validator<Json>("#"), validators_(std::move(validators)),
+              default_value_(std::move(default_value))
         {
         }
-
 
     private:
         void do_validate(const Json& instance, 
@@ -179,6 +180,13 @@ namespace jsonschema {
             {
                 validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
             }
+        }
+
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
+            const Json&,
+            error_reporter&) const override
+        {
+            return default_value_;
         }
     };
 

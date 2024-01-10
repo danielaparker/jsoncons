@@ -110,9 +110,10 @@ namespace draft201909 {
             const compilation_context& context,
             jsoncons::span<const std::string> keys) 
         {
-            std::cout << "make_schema_validator.update_uris " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
+            //std::cout << "make_schema_validator.update_uris " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
             auto new_context = context.update_uris(sch, keys);
 
+            Json default_value{jsoncons::null_type()};
             validator_pointer validator_ptr = nullptr;
 
             switch (sch.type())
@@ -137,7 +138,13 @@ namespace draft201909 {
                     break;
                 case json_type::object_value:
                 {
-                    auto it = sch.find("$defs");
+                    auto it = sch.find("default");
+                    if (it != sch.object_range().end()) 
+                    {
+                        default_value = it->value();
+                    }
+
+                    it = sch.find("$defs");
                     if (it != sch.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
@@ -193,7 +200,8 @@ namespace draft201909 {
                     break;
             }
             
-            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator_ptr}});
+            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator_ptr}}, 
+                std::move(default_value));
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
@@ -257,7 +265,6 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.get_absolute_uri().string();
-            Json default_value{jsoncons::null_type()};
             std::unique_ptr<enum_validator<Json>> enumvalidator{};
             std::unique_ptr<const_validator<Json>> const_validator;
             std::vector<validator_type> combined_validators;
@@ -336,12 +343,6 @@ namespace draft201909 {
                 }
             }
 
-            const auto default_it = sch.find("default");
-            if (default_it != sch.object_range().end()) 
-            {
-                default_value = default_it->value();
-            }
-
             it = sch.find("enum");
             if (it != sch.object_range().end()) 
             {
@@ -409,7 +410,6 @@ namespace draft201909 {
 
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
                 std::move(type_mapping),
-                std::move(default_value), 
                 std::move(enumvalidator),
                 std::move(const_validator),
                 std::move(combined_validators),
