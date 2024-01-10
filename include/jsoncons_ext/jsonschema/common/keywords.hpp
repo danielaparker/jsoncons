@@ -1485,16 +1485,17 @@ namespace jsonschema {
     class conditional_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        validator_type if_validator_;
-        validator_type then_validator_;
-        validator_type else_validator_;
+        schema_validator_type if_validator_;
+        schema_validator_type then_validator_;
+        schema_validator_type else_validator_;
 
     public:
         conditional_validator(const std::string&& schema_path,
-          validator_type&& if_validator,
-          validator_type&& then_validator,
-          validator_type&& else_validator
+          schema_validator_type&& if_validator,
+          schema_validator_type&& then_validator,
+          schema_validator_type&& else_validator
         ) : keyword_validator<Json>(std::move(schema_path)), 
               if_validator_(std::move(if_validator)), 
               then_validator_(std::move(then_validator)), 

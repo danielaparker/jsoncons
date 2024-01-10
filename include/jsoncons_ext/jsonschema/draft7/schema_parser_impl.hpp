@@ -892,9 +892,9 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.get_absolute_uri().string();
-            validator_type if_validator(nullptr);
-            validator_type then_validator(nullptr);
-            validator_type else_validator(nullptr);
+            schema_validator_type if_validator(nullptr);
+            schema_validator_type then_validator(nullptr);
+            schema_validator_type else_validator(nullptr);
 
             std::string if_key[] = { "if" };
             if_validator = make_schema_validator(sch_if, context, if_key);
