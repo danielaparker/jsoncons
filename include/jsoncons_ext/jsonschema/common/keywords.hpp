@@ -1183,6 +1183,7 @@ namespace jsonschema {
     class object_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         jsoncons::optional<std::size_t> max_properties_;
         std::string absolute_max_properties_location_;
@@ -1190,7 +1191,7 @@ namespace jsonschema {
         std::string absolute_min_properties_location_;
         jsoncons::optional<required_validator<Json>> required_;
 
-        std::map<std::string, validator_type> properties_;
+        std::map<std::string, schema_validator_type> properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
         std::vector<std::pair<std::regex, validator_type>> pattern_properties_;
     #endif
@@ -1209,7 +1210,7 @@ namespace jsonschema {
             jsoncons::optional<std::size_t>&& min_properties,
             std::string&& absolute_min_properties_location,
             jsoncons::optional<required_validator<Json>>&& required,
-            std::map<std::string, validator_type>&& properties,
+            std::map<std::string, schema_validator_type>&& properties,
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, validator_type>>&& pattern_properties,
         #endif

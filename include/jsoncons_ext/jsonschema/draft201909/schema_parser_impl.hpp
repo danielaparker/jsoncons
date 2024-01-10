@@ -1063,7 +1063,7 @@ namespace draft201909 {
             jsoncons::optional<std::size_t> min_properties;
             std::string absolute_min_properties_location;
             jsoncons::optional<required_validator<Json>> required;
-            std::map<std::string, validator_type> properties;
+            std::map<std::string, schema_validator_type> properties;
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, validator_type>> pattern_properties;
         #endif

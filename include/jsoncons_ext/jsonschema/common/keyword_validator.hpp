@@ -169,6 +169,13 @@ namespace jsonschema {
         {
         }
 
+        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
+            const Json&,
+            error_reporter&) const override
+        {
+            return default_value_;
+        }
+
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -180,13 +187,6 @@ namespace jsonschema {
             {
                 validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
             }
-        }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
-            const Json&,
-            error_reporter&) const override
-        {
-            return default_value_;
         }
     };
 
