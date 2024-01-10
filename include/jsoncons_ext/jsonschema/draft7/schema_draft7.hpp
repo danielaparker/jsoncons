@@ -18,7 +18,7 @@ namespace draft7 {
     {
         static Json get_schema() 
         {
-            static Json schema = Json::parse(R"(
+            static Json sch = Json::parse(R"(
     {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "http://json-schema.org/draft-07/schema#",
@@ -189,7 +189,7 @@ namespace draft7 {
     } 
             )"); 
 
-            return schema;
+            return sch;
         }
     };
 

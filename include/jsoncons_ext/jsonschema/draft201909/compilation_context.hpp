@@ -94,14 +94,14 @@ namespace draft201909 {
         }
 
         template <class Json>
-        compilation_context update_uris(const Json& schema, const std::string& key) const
+        compilation_context update_uris(const Json& sch, const std::string& key) const
         {
             std::string sub_keys[] = {key};
-            return update_uris(schema, sub_keys);
+            return update_uris(sch, sub_keys);
         }
 
         template <class Json>
-        compilation_context update_uris(const Json& schema, jsoncons::span<const std::string> keys) const
+        compilation_context update_uris(const Json& sch, jsoncons::span<const std::string> keys) const
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;
@@ -127,10 +127,10 @@ namespace draft201909 {
                     uri = schema_location(new_u);
                 }
             }
-            if (schema.is_object())
+            if (sch.is_object())
             {
-                auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
-                if (it != schema.object_range().end()) 
+                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+                if (it != sch.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_location relative(id); 
@@ -142,8 +142,8 @@ namespace draft201909 {
                         new_uris.emplace_back(new_uri); 
                     }
                 }
-                it = schema.find("$recursiveAnchor"); 
-                if (it != schema.object_range().end()) 
+                it = sch.find("$recursiveAnchor"); 
+                if (it != sch.object_range().end()) 
                 {
                     bool is_recursive_anchor = it->value().template as<bool>();  
                     if (is_recursive_anchor)

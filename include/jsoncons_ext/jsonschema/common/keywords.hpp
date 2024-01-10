@@ -1546,8 +1546,8 @@ namespace jsonschema {
         Json value_;
 
     public:
-        enum_validator(const std::string& path, const Json& schema)
-            : keyword_validator<Json>(path), value_(schema)
+        enum_validator(const std::string& path, const Json& sch)
+            : keyword_validator<Json>(path), value_(sch)
         {
         }
     private:
@@ -1589,8 +1589,8 @@ namespace jsonschema {
         Json value_;
 
     public:
-        const_validator(const std::string& path, const Json& schema)
-            : keyword_validator<Json>(path), value_(schema)
+        const_validator(const std::string& path, const Json& sch)
+            : keyword_validator<Json>(path), value_(sch)
         {
         }
     private:
