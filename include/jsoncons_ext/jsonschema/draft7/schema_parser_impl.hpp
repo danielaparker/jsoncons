@@ -49,6 +49,7 @@ namespace draft7 {
         using validator_wrapper_type = validator_wrapper<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
     private:
         struct subschema_registry
         {
@@ -89,7 +90,7 @@ namespace draft7 {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
 
-        validator_type make_schema_validator(const Json& sch,
+        schema_validator_type make_schema_validator(const Json& sch,
             const compilation_context& context,
             jsoncons::span<const std::string> keys) //override
         {
@@ -160,7 +161,7 @@ namespace draft7 {
                     break;
             }
             
-            return jsoncons::make_unique<validator_wrapper_type>(validator);
+            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator}});
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,

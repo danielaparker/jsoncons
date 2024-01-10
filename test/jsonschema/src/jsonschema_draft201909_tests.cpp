@@ -97,10 +97,10 @@ TEST_CASE("jsonschema draft2019-09 tests")
     SECTION("issues")
     {
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-anchor.json");
-        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-not.json");
+        jsonschema_tests("./jsonschema/issues/draft2019-09/issue-not.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-ref.json");
-        jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
+        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
     }
     SECTION("tests")
     {

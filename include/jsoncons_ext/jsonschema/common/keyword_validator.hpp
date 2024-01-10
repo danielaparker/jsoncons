@@ -151,6 +151,36 @@ namespace jsonschema {
         }
     };
 
+    template <class Json>
+    class schema_validator : public keyword_validator<Json>
+    {
+    public:
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+
+        std::vector<validator_pointer> validators_;
+
+    public:
+        schema_validator(std::vector<validator_pointer>&& validators)
+            : keyword_validator<Json>("#"), validators_(std::move(validators))
+        {
+        }
+
+
+    private:
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& unevaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const override
+        {
+            for (auto& validator : validators_)
+            {
+                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            }
+        }
+    };
+
 } // namespace jsonschema
 } // namespace jsoncons
 
