@@ -921,7 +921,7 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("allOf");
-            std::vector<validator_type> subschemas;
+            std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
@@ -936,7 +936,7 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("anyOf");
-            std::vector<validator_type> subschemas;
+            std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
@@ -951,7 +951,7 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("oneOf");
-            std::vector<validator_type> subschemas;
+            std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : sch.array_range())

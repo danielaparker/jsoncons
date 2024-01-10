@@ -745,12 +745,13 @@ namespace jsonschema {
     class combining_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        std::vector<validator_type> subschemas_;
+        std::vector<schema_validator_type> subschemas_;
 
     public:
         combining_validator(std::string&& schema_path,
-             std::vector<validator_type>&& subschemas)
+             std::vector<schema_validator_type>&& subschemas)
             : keyword_validator<Json>(std::move(schema_path)),
               subschemas_(std::move(subschemas))
         {
