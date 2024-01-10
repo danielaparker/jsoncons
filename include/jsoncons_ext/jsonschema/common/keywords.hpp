@@ -37,14 +37,14 @@ namespace jsonschema {
         }
     };
 
-    // reference_validator
+    // validator_wrapper
 
     template <class Json>
-    class reference_validator : public keyword_validator<Json>
+    class validator_wrapper : public keyword_validator<Json>
     {
         const keyword_validator<Json>* validator_;
     public:
-        reference_validator(const keyword_validator<Json>* validator)
+        validator_wrapper(const keyword_validator<Json>* validator)
             : keyword_validator<Json>(validator->schema_path()), 
               validator_(validator)
         {
@@ -1612,7 +1612,7 @@ namespace jsonschema {
     class type_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
-        using reference_validator_type = reference_validator<Json>;
+        using validator_wrapper_type = validator_wrapper<Json>;
 
         std::vector<validator_type> type_mapping_;
         Json default_value_;

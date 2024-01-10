@@ -101,7 +101,7 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class reference_schema : public keyword_validator<Json>
+    class ref_validator : public keyword_validator<Json>
     {
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
@@ -109,7 +109,7 @@ namespace jsonschema {
         validator_pointer referred_schema_;
 
     public:
-        reference_schema(const std::string& id)
+        ref_validator(const std::string& id)
             : keyword_validator<Json>(id), referred_schema_(nullptr) {}
 
         void set_referred_schema(validator_pointer target) { referred_schema_ = target; }

@@ -48,14 +48,14 @@ namespace draft201909 {
     class schema_parser_impl : public schema_parser<Json> 
     {
     public:
-        using reference_validator_type = reference_validator<Json>;
+        using validator_wrapper_type = validator_wrapper<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
     private:
         struct subschema_registry
         {
             std::map<std::string, validator_pointer> schemas; // schemas
-            std::map<std::string, reference_schema<Json>*> unresolved; // unresolved references
+            std::map<std::string, ref_validator<Json>*> unresolved; // unresolved references
             std::map<std::string, Json> unprocessed_keywords;
         };
 
@@ -192,7 +192,7 @@ namespace draft201909 {
                     break;
             }
             
-            return jsoncons::make_unique<reference_validator_type>(validator_ptr);
+            return jsoncons::make_unique<validator_wrapper_type>(validator_ptr);
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
@@ -280,7 +280,7 @@ namespace draft201909 {
                 auto ref =  get_or_create_reference(id);
                 auto ptr = ref.get();
                 subschemas_.emplace_back(std::move(ref));
-                ref_validator = jsoncons::make_unique<reference_validator_type>(ptr);
+                ref_validator = jsoncons::make_unique<validator_wrapper_type>(ptr);
             } 
             it = schema.find("$recursiveRef");
             if (it != schema.object_range().end()) // this schema is a reference
@@ -297,7 +297,7 @@ namespace draft201909 {
                 auto ref =  get_or_create_reference(id);
                 auto ptr = ref.get();
                 subschemas_.emplace_back(std::move(ref));
-                recursive_ref_validator = jsoncons::make_unique<reference_validator_type>(ptr);
+                recursive_ref_validator = jsoncons::make_unique<validator_wrapper_type>(ptr);
             } 
 
             std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
@@ -1366,7 +1366,7 @@ namespace draft201909 {
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
-                return jsoncons::make_unique<reference_validator_type>(sch->second);
+                return jsoncons::make_unique<validator_wrapper_type>(sch->second);
 
             // referencing an unknown keyword, turn it into schema
             //
@@ -1385,22 +1385,22 @@ namespace draft201909 {
                 }
             }
 
-            // get or create a reference_schema
+            // get or create a ref_validator
             auto ref = file.unresolved.find(std::string(uri.fragment()));
             if (ref != file.unresolved.end()) 
             {
                 //return ref->second; // unresolved, use existing reference
-                return jsoncons::make_unique<reference_validator_type>(ref->second);
+                return jsoncons::make_unique<validator_wrapper_type>(ref->second);
             }
             else 
             {
-                auto orig = jsoncons::make_unique<reference_schema<Json>>(uri.string());
+                auto orig = jsoncons::make_unique<ref_validator<Json>>(uri.string());
                 auto p = file.unresolved.insert(ref,
                                               {std::string(uri.fragment()), orig.get()})
                     ->second; // unresolved, create new reference
                 
                 subschemas_.emplace_back(std::move(orig));
-                return jsoncons::make_unique<reference_validator_type>(p);
+                return jsoncons::make_unique<validator_wrapper_type>(p);
             }
         }
 
