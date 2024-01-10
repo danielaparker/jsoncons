@@ -1186,7 +1186,7 @@ namespace jsonschema {
 
         std::map<std::string, validator_type> dependencies_;
 
-        validator_type property_name_validator_;
+        schema_validator_type property_name_validator_;
 
         std::vector<validator_type> more_validators_;
 
@@ -1203,7 +1203,7 @@ namespace jsonschema {
         #endif
             validator_type&& additional_properties,
             std::map<std::string, validator_type>&& dependencies,
-            validator_type&& property_name_validator,
+            schema_validator_type&& property_name_validator,
             std::vector<validator_type>&& more_validators
         )
             : keyword_validator<Json>(std::move(schema_path)), 

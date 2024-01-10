@@ -977,7 +977,7 @@ namespace draft7 {
         #endif
             validator_type additional_properties;
             std::map<std::string, validator_type> dependencies;
-            validator_type property_name_validator;
+            schema_validator_type property_name_validator;
 
             auto it = sch.find("maxProperties");
             if (it != sch.object_range().end()) 
