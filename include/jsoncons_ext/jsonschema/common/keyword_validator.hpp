@@ -84,11 +84,6 @@ namespace jsonschema {
             do_validate(instance, instance_location, unevaluated_properties, reporter, patch);
         }
 
-        virtual jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, const Json&, error_reporter&) const
-        {
-            return jsoncons::optional<Json>();
-        }
-
     private:
         virtual void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -133,22 +128,6 @@ namespace jsonschema {
 
             referred_schema_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
         }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
-                                                   const Json& instance, 
-                                                   error_reporter& reporter) const override
-        {
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output("", 
-                                                 this->schema_path(), 
-                                                 instance_location.to_uri_fragment(), 
-                                                 "Unresolved schema reference " + this->schema_path()));
-                return jsoncons::optional<Json>();
-            }
-
-            return referred_schema_->get_default_value(instance_location, instance, reporter);
-        }
     };
 
     template <class Json>
@@ -169,9 +148,7 @@ namespace jsonschema {
         {
         }
 
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer&, 
-            const Json&,
-            error_reporter&) const override
+        jsoncons::optional<Json> get_default_value() const
         {
             return default_value_;
         }

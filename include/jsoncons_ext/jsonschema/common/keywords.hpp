@@ -58,13 +58,6 @@ namespace jsonschema {
         {
             validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
-                                                   const Json& instance, 
-                                                   error_reporter& reporter) const override
-        {
-            return validator_->get_default_value(instance_location, instance, reporter);
-        }
     };
 
     // contentEncoding
@@ -672,13 +665,6 @@ namespace jsonschema {
                                                  instance_location.to_uri_fragment(), 
                                                  "Instance must not be valid against schema"));
             }
-        }
-
-        jsoncons::optional<Json> get_default_value(const jsonpointer::json_pointer& instance_location, 
-                                                   const Json& instance, 
-                                                   error_reporter& reporter) const override
-        {
-            return rule_->get_default_value(instance_location, instance, reporter);
         }
     };
 
@@ -1353,7 +1339,7 @@ namespace jsonschema {
                 if (finding == instance.object_range().end()) 
                 { 
                     // If prop is not in instance
-                    auto default_value = prop.second->get_default_value(instance_location, instance, reporter);
+                    auto default_value = prop.second->get_default_value();
                     if (default_value) 
                     { 
                         // If default value is available, update patch
