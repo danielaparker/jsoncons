@@ -177,11 +177,11 @@ namespace jsonschema {
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
-        std::vector<validator_pointer> validators_;
+        std::vector<validator_type> validators_;
         Json default_value_;
 
     public:
-        schema_validator_impl(std::vector<validator_pointer>&& validators, Json&& default_value)
+        schema_validator_impl(std::vector<validator_type>&& validators, Json&& default_value)
             : validators_(std::move(validators)),
               default_value_(std::move(default_value))
         {

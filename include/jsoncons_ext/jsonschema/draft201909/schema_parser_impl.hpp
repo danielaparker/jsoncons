@@ -115,26 +115,19 @@ namespace draft201909 {
 
             Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
-            validator_pointer validator_ptr = nullptr;
 
-            std::vector<validator_pointer> validators; 
+            std::vector<validator_type> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
                 {
                     if (sch.template as<bool>())
                     {
-                        auto ref =  make_true_validator(new_context);
-                        validator_ptr = ref.get();
-                        validators.push_back(validator_ptr);
-                        subschemas_.emplace_back(std::move(ref));
+                        validators.push_back(make_true_validator(new_context));
                     }
                     else
                     {
-                        auto ref = make_false_validator(new_context);
-                        validator_ptr = ref.get();
-                        validators.push_back(validator_ptr);
-                        subschemas_.emplace_back(std::move(ref));
+                        validators.push_back(make_false_validator(new_context));
                     }
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
@@ -142,7 +135,7 @@ namespace draft201909 {
                     subschemas_.emplace_back(std::move(ptr));
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, validator_ptr);
+                        insert_schema(uri, p);
                     }          
                     schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper<Json>>(p);
                     break;
@@ -174,10 +167,7 @@ namespace draft201909 {
                         }
                     }
 
-                    auto ref = make_type_validator(sch, new_context);
-                    validator_ptr = ref.get();
-                    subschemas_.emplace_back(std::move(ref));
-                    validators.push_back(validator_ptr);
+                    validators.push_back(make_type_validator(sch, new_context));
 
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
@@ -195,11 +185,11 @@ namespace draft201909 {
                             JSONCONS_THROW(schema_error(message));
                         }
                         schema_location relative("#"+anchor); 
-                        insert_schema(relative, validator_ptr);
+                        insert_schema(relative, p);
                         if (new_context.get_base_uri().is_absolute())
                         {
                             schema_location new_uri = relative.resolve(new_context.get_base_uri());
-                            insert_schema(new_uri, validator_ptr);
+                            insert_schema(new_uri, p);
                         }
                     }
                     

@@ -98,28 +98,21 @@ namespace draft7 {
 
             Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
-            validator_pointer validator_ptr = nullptr;
 
             bool is_ref = false;
 
-            std::vector<validator_pointer> validators; 
+            std::vector<validator_type> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
                 {
                     if (sch.template as<bool>())
                     {
-                        auto ref =  make_true_validator(new_context);
-                        validator_ptr = ref.get();
-                        validators.push_back(validator_ptr);
-                        subschemas_.emplace_back(std::move(ref));
+                        validators.push_back(make_true_validator(new_context));
                     }
                     else
                     {
-                        auto ref = make_false_validator(new_context);
-                        validator_ptr = ref.get();
-                        validators.push_back(validator_ptr);
-                        subschemas_.emplace_back(std::move(ref));
+                        validators.push_back(make_false_validator(new_context));
                     }
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
@@ -145,10 +138,7 @@ namespace draft7 {
                         is_ref = true;
                         schema_location relative(it->value().template as<std::string>()); 
                         auto id = relative.resolve(context.get_base_uri()); // REVISIT
-                        auto ref =  get_or_create_reference(id);
-                        validator_ptr = ref.get();
-                        subschemas_.emplace_back(std::move(ref));
-                        validators.push_back(validator_ptr);
+                        validators.push_back(get_or_create_reference(id));
                     }
                     it = sch.find("definitions");
                     if (it != sch.object_range().end()) 
@@ -161,10 +151,7 @@ namespace draft7 {
                     }
                     if (!is_ref)
                     {
-                        auto ref = make_type_validator(sch, new_context);
-                        validator_ptr = ref.get();
-                        subschemas_.emplace_back(std::move(ref));
-                        validators.push_back(validator_ptr);
+                        validators.push_back(make_type_validator(sch, new_context));
                     }
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
