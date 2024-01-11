@@ -478,11 +478,12 @@ namespace jsonschema {
     class items_object_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        validator_type items_validator_;
+        schema_validator_type items_validator_;
     public:
         items_object_validator(const std::string& schema_path, 
-            validator_type&& items_validator)
+            schema_validator_type&& items_validator)
             : keyword_validator<Json>(schema_path), 
               items_validator_(std::move(items_validator))
         {
@@ -636,12 +637,13 @@ namespace jsonschema {
     class not_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        validator_type rule_;
+        schema_validator_type rule_;
 
     public:
         not_validator(const std::string& schema_path,
-            validator_type&& rule)
+            schema_validator_type&& rule)
             : keyword_validator<Json>(schema_path), 
               rule_(std::move(rule))
         {
@@ -1387,12 +1389,13 @@ namespace jsonschema {
     class unevaluated_properties_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        validator_type validator_;
+        schema_validator_type validator_;
 
     public:
         unevaluated_properties_validator(std::string&& schema_path,
-            validator_type&& validator
+            schema_validator_type&& validator
         )
             : keyword_validator<Json>(std::move(schema_path)), 
               validator_(std::move(validator))
