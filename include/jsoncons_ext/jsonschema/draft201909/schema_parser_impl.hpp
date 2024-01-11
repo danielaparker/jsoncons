@@ -117,30 +117,36 @@ namespace draft201909 {
             schema_validator_type schema_validator_ptr;
             validator_pointer validator_ptr = nullptr;
 
+            std::vector<validator_pointer> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
+                {
                     if (sch.template as<bool>())
                     {
                         auto ref =  make_true_validator(new_context);
                         validator_ptr = ref.get();
+                        validators.push_back(validator_ptr);
                         subschemas_.emplace_back(std::move(ref));
-                        schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
-                            std::move(default_value));
                     }
                     else
                     {
                         auto ref = make_false_validator(new_context);
                         validator_ptr = ref.get();
+                        validators.push_back(validator_ptr);
                         subschemas_.emplace_back(std::move(ref));
-                        schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
-                            std::move(default_value));
                     }
+                    auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
+                        std::move(default_value));
+                    schema_validator<Json>* p = ptr.get();
+                    subschemas_.emplace_back(std::move(ptr));
                     for (const auto& uri : new_context.uris()) 
                     { 
                         insert_schema(uri, validator_ptr);
                     }          
+                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper<Json>>(p);
                     break;
+                }
                 case json_type::object_value:
                 {
                     auto it = sch.find("default");
@@ -171,8 +177,12 @@ namespace draft201909 {
                     auto ref = make_type_validator(sch, new_context);
                     validator_ptr = ref.get();
                     subschemas_.emplace_back(std::move(ref));
-                    schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
+                    validators.push_back(validator_ptr);
+
+                    auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
+                    schema_validator<Json>* p = ptr.get();
+                    subschemas_.emplace_back(std::move(ptr));
 
                     it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                     if (it != sch.object_range().end()) 
@@ -195,12 +205,13 @@ namespace draft201909 {
                     
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, validator_ptr);
+                        insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
                             insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                         }
                     }          
+                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper<Json>>(p);
                     break;
                 }
                 default:

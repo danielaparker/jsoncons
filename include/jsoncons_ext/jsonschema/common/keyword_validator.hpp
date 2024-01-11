@@ -213,7 +213,7 @@ namespace jsonschema {
     {
         const schema_validator<Json>* validator_;
     public:
-        schema_validator_wrapper(const keyword_validator<Json>* validator)
+        schema_validator_wrapper(const schema_validator<Json>* validator)
             : validator_(validator)
         {
         }
@@ -225,6 +225,11 @@ namespace jsonschema {
             Json& patch) const override
         {
             validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
+        }
+
+        jsoncons::optional<Json> get_default_value() const override
+        {
+            return validator_->get_default_value();
         }
     };
 
