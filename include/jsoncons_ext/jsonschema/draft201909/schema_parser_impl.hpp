@@ -114,6 +114,7 @@ namespace draft201909 {
             auto new_context = context.update_uris(sch, keys);
 
             Json default_value{jsoncons::null_type()};
+            schema_validator_type schema_validator_ptr;
             validator_pointer validator_ptr = nullptr;
 
             switch (sch.type())
@@ -124,12 +125,16 @@ namespace draft201909 {
                         auto ref =  make_true_validator(new_context);
                         validator_ptr = ref.get();
                         subschemas_.emplace_back(std::move(ref));
+                        schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
+                            std::move(default_value));
                     }
                     else
                     {
                         auto ref = make_false_validator(new_context);
                         validator_ptr = ref.get();
                         subschemas_.emplace_back(std::move(ref));
+                        schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
+                            std::move(default_value));
                     }
                     for (const auto& uri : new_context.uris()) 
                     { 
@@ -166,6 +171,9 @@ namespace draft201909 {
                     auto ref = make_type_validator(sch, new_context);
                     validator_ptr = ref.get();
                     subschemas_.emplace_back(std::move(ref));
+                    schema_validator_ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::vector<validator_pointer>{{validator_ptr}},
+                        std::move(default_value));
+
                     it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                     if (it != sch.object_range().end()) 
                     {
@@ -200,8 +208,7 @@ namespace draft201909 {
                     break;
             }
             
-            return jsoncons::make_unique<schema_validator<Json>>(std::vector<validator_pointer>{{validator_ptr}}, 
-                std::move(default_value));
+            return schema_validator_ptr;
         }
 
         void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,

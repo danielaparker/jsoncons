@@ -138,17 +138,56 @@ namespace jsonschema {
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
+    public:
+        schema_validator()
+            : keyword_validator<Json>("#")
+        {}
+
+        virtual jsoncons::optional<Json> get_default_value() const = 0;
+    };
+
+    // validator_wrapper
+
+    template <class Json>
+    class validator_wrapper : public keyword_validator<Json>
+    {
+        const keyword_validator<Json>* validator_;
+    public:
+        validator_wrapper(const keyword_validator<Json>* validator)
+            : keyword_validator<Json>(validator->schema_path()), 
+              validator_(validator)
+        {
+        }
+    private:
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, 
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter,
+            Json& patch) const override
+        {
+            validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
+        }
+    };
+
+    template <class Json>
+    class schema_validator_impl : public schema_validator<Json>
+    {
+    public:
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+
         std::vector<validator_pointer> validators_;
         Json default_value_;
 
     public:
-        schema_validator(std::vector<validator_pointer>&& validators, Json&& default_value)
-            : keyword_validator<Json>("#"), validators_(std::move(validators)),
+        schema_validator_impl(std::vector<validator_pointer>&& validators, Json&& default_value)
+            : validators_(std::move(validators)),
               default_value_(std::move(default_value))
         {
         }
 
-        jsoncons::optional<Json> get_default_value() const
+        jsoncons::optional<Json> get_default_value() const override
         {
             return default_value_;
         }
@@ -164,6 +203,28 @@ namespace jsonschema {
             {
                 validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
             }
+        }
+    };
+
+    // schema_validator_wrapper
+
+    template <class Json>
+    class schema_validator_wrapper : public schema_validator<Json>
+    {
+        const schema_validator<Json>* validator_;
+    public:
+        schema_validator_wrapper(const keyword_validator<Json>* validator)
+            : validator_(validator)
+        {
+        }
+    private:
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, 
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter,
+            Json& patch) const override
+        {
+            validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
