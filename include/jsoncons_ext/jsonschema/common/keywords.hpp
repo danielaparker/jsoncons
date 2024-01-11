@@ -1180,15 +1180,13 @@ namespace jsonschema {
 
         std::map<std::string, schema_validator_type> properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
-        std::vector<std::pair<std::regex, validator_type>> pattern_properties_;
+        std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties_;
     #endif
-        validator_type additional_properties_;
+        schema_validator_type additional_properties_;
 
         std::map<std::string, validator_type> dependencies_;
 
         schema_validator_type property_name_validator_;
-
-        std::vector<validator_type> more_validators_;
 
     public:
         object_validator(std::string&& schema_path,
@@ -1199,12 +1197,11 @@ namespace jsonschema {
             jsoncons::optional<required_validator<Json>>&& required,
             std::map<std::string, schema_validator_type>&& properties,
         #if defined(JSONCONS_HAS_STD_REGEX)
-            std::vector<std::pair<std::regex, validator_type>>&& pattern_properties,
+            std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties,
         #endif
-            validator_type&& additional_properties,
+            schema_validator_type&& additional_properties,
             std::map<std::string, validator_type>&& dependencies,
-            schema_validator_type&& property_name_validator,
-            std::vector<validator_type>&& more_validators
+            schema_validator_type&& property_name_validator
         )
             : keyword_validator<Json>(std::move(schema_path)), 
               max_properties_(std::move(max_properties)),
@@ -1218,8 +1215,7 @@ namespace jsonschema {
         #endif
               additional_properties_(std::move(additional_properties)),
               dependencies_(std::move(dependencies)),
-              property_name_validator_(std::move(property_name_validator)),
-              more_validators_(std::move(more_validators  ))
+              property_name_validator_(std::move(property_name_validator))
         {
         }
     private:
@@ -1361,15 +1357,6 @@ namespace jsonschema {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
                     dep.second->validate(instance, pointer, local_evaluated_properties, reporter, patch); // validate
-                }
-            }
-
-            for (auto& validator : more_validators_)
-            {
-                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
                 }
             }
 
