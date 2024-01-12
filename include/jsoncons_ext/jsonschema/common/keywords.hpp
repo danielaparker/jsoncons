@@ -1596,8 +1596,7 @@ namespace jsonschema {
             std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
             std::vector<std::string>&& expected_types,
             validator_type&& ref_validator_ptr = validator_type{},
-            validator_type&& recursive_ref_validator_ptr = validator_type{},
-            validator_type&& unevaluated_properties_validator_ptr = validator_type{}
+            validator_type&& recursive_ref_validator_ptr = validator_type{}
             )
             : keyword_validator<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
@@ -1607,8 +1606,7 @@ namespace jsonschema {
               conditional_validator_(std::move(conditionalvalidator)),
               expected_types_(std::move(expected_types)),
               ref_validator_ptr_(std::move(ref_validator_ptr)),
-              recursive_ref_validator_ptr_(std::move(recursive_ref_validator_ptr)),
-              unevaluated_properties_validator_ptr_(std::move(unevaluated_properties_validator_ptr))
+              recursive_ref_validator_ptr_(std::move(recursive_ref_validator_ptr))
         {
         }
 
@@ -1620,13 +1618,11 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override final
         {
-            std::unordered_set<std::string> local_evaluated_properties;
-
             auto& type = type_mapping_[(uint8_t) instance.type()];
 
             std::cout << "anyOf validate " << instance;
             if (type)
-                type->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                type->validate(instance, instance_location, evaluated_properties, reporter, patch);
             else
             {
                 std::ostringstream ss;
@@ -1659,7 +1655,7 @@ namespace jsonschema {
  
             if (enum_validator_)
             { 
-                enum_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                enum_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1668,7 +1664,7 @@ namespace jsonschema {
 
             if (const_validator_)
             { 
-                const_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                const_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1677,7 +1673,7 @@ namespace jsonschema {
 
             for (const auto& validator : combined_validators_)
             {
-                validator->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1686,7 +1682,7 @@ namespace jsonschema {
 
             if (conditional_validator_)
             { 
-                conditional_validator_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                conditional_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1695,7 +1691,7 @@ namespace jsonschema {
 
             if (ref_validator_ptr_)
             { 
-                ref_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                ref_validator_ptr_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -1704,25 +1700,11 @@ namespace jsonschema {
 
             if (recursive_ref_validator_ptr_)
             { 
-                recursive_ref_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                recursive_ref_validator_ptr_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
                 }
-            }
-
-            if (unevaluated_properties_validator_ptr_)
-            { 
-                unevaluated_properties_validator_ptr_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            for (auto&& name : local_evaluated_properties)
-            {
-                evaluated_properties.emplace(std::move(name));
             }
         }
     };

@@ -77,17 +77,17 @@ namespace jsonschema {
 
         void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
-            do_validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
 
     private:
         virtual void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const = 0;
     };
@@ -113,7 +113,7 @@ namespace jsonschema {
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
@@ -126,7 +126,7 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+            referred_schema_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
@@ -195,13 +195,24 @@ namespace jsonschema {
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& unevaluated_properties, 
+            std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
+            std::unordered_set<std::string> local_evaluated_properties;
+
             for (auto& validator : validators_)
             {
-                validator->validate(instance, instance_location, unevaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
+
+            for (auto&& name : local_evaluated_properties)
+            {
+                evaluated_properties.emplace(std::move(name));
             }
         }
     };

@@ -169,6 +169,12 @@ namespace draft201909 {
 
                     validators.push_back(make_type_validator(sch, new_context));
 
+                    it = sch.find("unevaluatedProperties");
+                    if (it != sch.object_range().end()) 
+                    {
+                        validators.push_back(make_unevaluated_properties_validator(it->value(), new_context));
+                    } 
+
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
                     schema_validator<Json>* p = ptr.get();
@@ -278,7 +284,6 @@ namespace draft201909 {
             std::vector<validator_type> combined_validators;
             std::unique_ptr<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
-            std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_validator_ptr;
             validator_type ref_validator;
             validator_type recursive_ref_validator;
 
@@ -410,12 +415,6 @@ namespace draft201909 {
                 }
             }
 
-            it = sch.find("unevaluatedProperties");
-            if (it != sch.object_range().end()) 
-            {
-                unevaluated_properties_validator_ptr = make_unevaluated_properties_validator(it->value(), context);
-            } 
-
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
                 std::move(type_mapping),
                 std::move(enumvalidator),
@@ -424,8 +423,7 @@ namespace draft201909 {
                 std::move(conditionalvalidator),
                 std::move(expected_types),
                 std::move(ref_validator),
-                std::move(recursive_ref_validator),
-                std::move(unevaluated_properties_validator_ptr)
+                std::move(recursive_ref_validator)
                 );
         }
 
