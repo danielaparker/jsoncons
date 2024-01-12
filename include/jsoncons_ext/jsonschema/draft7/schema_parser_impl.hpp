@@ -48,7 +48,6 @@ namespace draft7 {
     public:
         using validator_wrapper_type = schema_validator_wrapper<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
     private:
@@ -1200,7 +1199,7 @@ namespace draft7 {
             }
         }
 
-        validator_type get_or_create_reference(const schema_location& uri)
+        schema_validator_type get_or_create_reference(const schema_location& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 

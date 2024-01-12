@@ -1334,7 +1334,7 @@ namespace draft201909 {
             }
         }
 
-        validator_type get_or_create_reference(const schema_location& uri)
+        schema_validator_type get_or_create_reference(const schema_location& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 
