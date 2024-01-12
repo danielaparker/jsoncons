@@ -63,7 +63,7 @@ namespace draft7 {
         validator_type root_;
 
         // Owns all subschemas
-        std::vector<std::unique_ptr<keyword_validator<Json>>> subschemas_;
+        std::vector<schema_validator_type> subschemas_;
 
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;

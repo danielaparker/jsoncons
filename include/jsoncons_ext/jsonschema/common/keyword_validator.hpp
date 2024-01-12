@@ -96,18 +96,39 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class ref_validator : public keyword_validator<Json>
+    class schema_validator : public keyword_validator<Json>
     {
+    public:
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
 
-        validator_pointer referred_schema_;
+    public:
+        schema_validator()
+            : keyword_validator<Json>("#")
+        {}
+
+        virtual jsoncons::optional<Json> get_default_value() const = 0;
+    };
+
+    template <class Json>
+    class ref_validator : public schema_validator<Json>
+    {
+        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using schema_validator_pointer = schema_validator<Json>*;
+
+        schema_validator_pointer referred_schema_;
 
     public:
-        ref_validator(const std::string& id)
-            : keyword_validator<Json>(id), referred_schema_(nullptr) {}
+        ref_validator(const std::string& /*id*/)
+            : schema_validator<Json>(), referred_schema_(nullptr) {}
 
-        void set_referred_schema(validator_pointer target) { referred_schema_ = target; }
+        void set_referred_schema(schema_validator_pointer target) { referred_schema_ = target; }
+
+        jsoncons::optional<Json> get_default_value() const override
+        {
+            return referred_schema_ ? referred_schema_->get_default_value() : jsoncons::optional<Json>{};
+        }
 
     private:
 
@@ -128,22 +149,6 @@ namespace jsonschema {
 
             referred_schema_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
-    };
-
-    template <class Json>
-    class schema_validator : public keyword_validator<Json>
-    {
-    public:
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
-
-    public:
-        schema_validator()
-            : keyword_validator<Json>("#")
-        {}
-
-        virtual jsoncons::optional<Json> get_default_value() const = 0;
     };
 
     // validator_wrapper
