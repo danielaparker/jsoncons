@@ -151,29 +151,6 @@ namespace jsonschema {
         }
     };
 
-    // validator_wrapper
-
-    template <class Json>
-    class validator_wrapper : public keyword_validator<Json>
-    {
-        const keyword_validator<Json>* validator_;
-    public:
-        validator_wrapper(const keyword_validator<Json>* validator)
-            : keyword_validator<Json>(validator->schema_path()), 
-              validator_(validator)
-        {
-        }
-    private:
-        void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, 
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter,
-            Json& patch) const override
-        {
-            validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-        }
-    };
-
     template <class Json>
     class schema_validator_impl : public schema_validator<Json>
     {

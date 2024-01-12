@@ -1570,7 +1570,6 @@ namespace jsonschema {
     class type_validator : public keyword_validator<Json>
     {
         using validator_type = typename keyword_validator<Json>::validator_type;
-        using validator_wrapper_type = validator_wrapper<Json>;
 
         std::vector<validator_type> type_mapping_;
         std::vector<std::string> expected_types_;
