@@ -1,53 +1,29 @@
 [
     {
-        "description": "refs with relative uris and defs",
+        "description": "naive replacement of $ref with its destination is not correct",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$id": "http://example.com/schema-relative-uri-defs1.json",
-            "properties": {
-                "foo": {
-                    "$id": "schema-relative-uri-defs2.json",
-                    "$defs": {
-                        "inner": {
-                            "properties": {
-                                "bar": { "type": "string" }
-                            }
-                        }
-                    },
-                    "$ref": "#/$defs/inner"
-                }
+            "$defs": {
+                "a_string": { "type": "string" }
             },
-            "$ref": "schema-relative-uri-defs2.json"
+            "enum": [
+                { "$ref": "#/$defs/a_string" }
+            ]
         },
         "tests": [
             {
-                "description": "invalid on inner field",
-                "data": {
-                    "foo": {
-                        "bar": 1
-                    },
-                    "bar": "a"
-                },
+                "description": "do not evaluate the $ref inside the enum, matching any string",
+                "data": "this is a string",
                 "valid": false
             },
             {
-                "description": "invalid on outer field",
-                "data": {
-                    "foo": {
-                        "bar": "a"
-                    },
-                    "bar": 1
-                },
+                "description": "do not evaluate the $ref inside the enum, definition exact match",
+                "data": { "type": "string" },
                 "valid": false
             },
             {
-                "description": "valid on both fields",
-                "data": {
-                    "foo": {
-                        "bar": "a"
-                    },
-                    "bar": "a"
-                },
+                "description": "match the enum exactly",
+                "data": { "$ref": "#/$defs/a_string" },
                 "valid": true
             }
         ]

@@ -1578,9 +1578,6 @@ namespace jsonschema {
         std::vector<validator_type> combined_validators_;
         std::unique_ptr<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
-        validator_type ref_validator_ptr_;
-        validator_type recursive_ref_validator_ptr_;
-        validator_type unevaluated_properties_validator_ptr_;
 
     public:
         type_validator(const type_validator&) = delete;
@@ -1594,9 +1591,7 @@ namespace jsonschema {
             std::unique_ptr<const_validator<Json>> const_validator,
             std::vector<validator_type>&& combined_validators,
             std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
-            std::vector<std::string>&& expected_types,
-            validator_type&& ref_validator_ptr = validator_type{},
-            validator_type&& recursive_ref_validator_ptr = validator_type{}
+            std::vector<std::string>&& expected_types
             )
             : keyword_validator<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
@@ -1604,9 +1599,7 @@ namespace jsonschema {
               const_validator_(std::move(const_validator)),
               combined_validators_(std::move(combined_validators)), 
               conditional_validator_(std::move(conditionalvalidator)),
-              expected_types_(std::move(expected_types)),
-              ref_validator_ptr_(std::move(ref_validator_ptr)),
-              recursive_ref_validator_ptr_(std::move(recursive_ref_validator_ptr))
+              expected_types_(std::move(expected_types))
         {
         }
 
@@ -1683,24 +1676,6 @@ namespace jsonschema {
             if (conditional_validator_)
             { 
                 conditional_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            if (ref_validator_ptr_)
-            { 
-                ref_validator_ptr_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            if (recursive_ref_validator_ptr_)
-            { 
-                recursive_ref_validator_ptr_->validate(instance, instance_location, evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;

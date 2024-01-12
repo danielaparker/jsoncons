@@ -166,6 +166,22 @@ namespace draft201909 {
                             make_schema_validator(def.value(), new_context, sub_keys);
                         }
                     }
+                    it = sch.find("$ref");
+                    if (it != sch.object_range().end()) // this schema has a reference
+                    {
+                        schema_location relative(it->value().template as<std::string>()); 
+                        auto id = relative.resolve(new_context.get_base_uri()); 
+                        validators.push_back(get_or_create_reference(id));
+                    }
+
+                    it = sch.find("$recursiveRef");
+                    if (it != sch.object_range().end()) // this schema has a reference
+                    {
+                        schema_location relative(it->value().template as<std::string>()); 
+                        auto base_uri = new_context.get_base_uri(uri_anchor_flags::recursive_anchor);
+                        auto id = relative.resolve(base_uri); // REVISIT
+                        validators.push_back(get_or_create_reference(id));
+                    }
 
                     validators.push_back(make_type_validator(sch, new_context));
 
@@ -284,47 +300,11 @@ namespace draft201909 {
             std::vector<validator_type> combined_validators;
             std::unique_ptr<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
-            validator_type ref_validator;
-            validator_type recursive_ref_validator;
-
-            auto it = sch.find("$ref");
-            if (it != sch.object_range().end()) // this schema is a reference
-            {
-                std::string ref_string = it->value().template as<std::string>();
-                schema_location relative(ref_string); 
-                auto id = relative.resolve(context.get_base_uri());
-                //std::cout << "$ref " << relative.string() << ", " << id.string() << ", base " << new_context.get_base_uri() << "\n";
-                //if (!id.is_absolute())
-                //{
-                //    JSONCONS_THROW(jsonschema::schema_error("Relative reference " + ref_string + " not resolveable."));
-                //}
-                auto ref =  get_or_create_reference(id);
-                auto ptr = ref.get();
-                subschemas_.emplace_back(std::move(ref));
-                ref_validator = jsoncons::make_unique<validator_wrapper_type>(ptr);
-            } 
-            it = sch.find("$recursiveRef");
-            if (it != sch.object_range().end()) // this schema is a reference
-            {
-                std::string ref_string = it->value().template as<std::string>();
-                schema_location relative(ref_string); 
-                auto base_uri = context.get_base_uri(uri_anchor_flags::recursive_anchor);
-                auto id = relative.resolve(base_uri);
-                std::cout << "$recursiveRef " << relative.string() << ", " << id.string() << "\n";
-                //if (!id.is_absolute())
-                //{
-                //    JSONCONS_THROW(jsonschema::schema_error("Relative reference " + ref_string + " not resolveable."));
-                //}
-                auto ref =  get_or_create_reference(id);
-                auto ptr = ref.get();
-                subschemas_.emplace_back(std::move(ref));
-                recursive_ref_validator = jsoncons::make_unique<validator_wrapper_type>(ptr);
-            } 
 
             std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
             std::set<std::string> known_keywords;
 
-            it = sch.find("type");
+            auto it = sch.find("type");
             if (it == sch.object_range().end()) 
             {
                 init_type_mapping(type_mapping, "", sch, context, known_keywords);
@@ -421,9 +401,7 @@ namespace draft201909 {
                 std::move(const_validator),
                 std::move(combined_validators),
                 std::move(conditionalvalidator),
-                std::move(expected_types),
-                std::move(ref_validator),
-                std::move(recursive_ref_validator)
+                std::move(expected_types)
                 );
         }
 
