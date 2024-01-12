@@ -51,11 +51,12 @@ namespace draft201909 {
         using validator_wrapper_type = validator_wrapper<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using validator_pointer = typename keyword_validator<Json>::self_pointer;
+        using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
     private:
         struct subschema_registry
         {
-            std::map<std::string, validator_pointer> schemas; // schemas
+            std::map<std::string, schema_validator_pointer> schemas; // schemas
             std::map<std::string, ref_validator<Json>*> unresolved; // unresolved references
             std::map<std::string, Json> unprocessed_keywords;
         };
@@ -1285,7 +1286,7 @@ namespace draft201909 {
 
     private:
 
-        void insert_schema(const schema_location& uri, validator_pointer s)
+        void insert_schema(const schema_location& uri, schema_validator<Json>* s)
         {
             auto& file = get_or_create_file(uri.base().string());
             auto schemas_it = file.schemas.find(std::string(uri.fragment()));
