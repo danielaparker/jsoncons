@@ -152,6 +152,65 @@ namespace draft7 {
                     if (!is_ref)
                     {
                         validators.push_back(make_type_validator(sch, new_context));
+
+                        it = sch.find("enum");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_enum_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("const");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_const_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("not");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_not_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("allOf");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_all_of_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("anyOf");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_any_of_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("oneOf");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_one_of_validator(it->value(), new_context));
+                        }
+
+                        it = sch.find("if");
+                        if (it != sch.object_range().end()) 
+                        {
+                            validators.push_back(make_conditional_validator(it->value(), sch, new_context));
+                            // sch["if"] is object and has id, can be looked up
+                        }
+                        else
+                        {
+                            auto then_it = sch.find("then");
+                            if (then_it != sch.object_range().end()) 
+                            {
+                                std::string sub_keys[] = { "then" };
+                                make_schema_validator(then_it->value(), new_context, sub_keys);
+                            }
+
+                            auto else_it = sch.find("else");
+                            if (else_it != sch.object_range().end()) 
+                            {
+                                std::string sub_keys[] = { "else" };
+                                make_schema_validator(else_it->value(), new_context, sub_keys);
+                            }
+                        }
                     }
                     auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
                         std::move(default_value));
@@ -237,10 +296,6 @@ namespace draft7 {
             const compilation_context& context)
         {
             std::string schema_path = context.get_absolute_uri().string();
-            std::unique_ptr<enum_validator<Json>> enumvalidator;
-            std::unique_ptr<const_validator<Json>> const_validator;
-            std::vector<validator_type> combined_validators;
-            std::unique_ptr<conditional_validator<Json>> conditionalvalidator;
             std::vector<std::string> expected_types;
 
             std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
@@ -278,72 +333,8 @@ namespace draft7 {
                 }
             }
 
-            it = sch.find("enum");
-            if (it != sch.object_range().end()) 
-            {
-                enumvalidator = make_enum_validator(it->value(), context);
-            }
-
-            it = sch.find("const");
-            if (it != sch.object_range().end()) 
-            {
-                const_validator = make_const_validator(it->value(), context);
-            }
-
-            it = sch.find("not");
-            if (it != sch.object_range().end()) 
-            {
-                combined_validators.emplace_back(make_not_validator(it->value(), context));
-            }
-
-            it = sch.find("allOf");
-            if (it != sch.object_range().end()) 
-            {
-                combined_validators.emplace_back(make_all_of_validator(it->value(), context));
-            }
-
-            it = sch.find("anyOf");
-            if (it != sch.object_range().end()) 
-            {
-                combined_validators.emplace_back(make_any_of_validator(it->value(), context));
-            }
-
-            it = sch.find("oneOf");
-            if (it != sch.object_range().end()) 
-            {
-                combined_validators.emplace_back(make_one_of_validator(it->value(), context));
-            }
-
-            it = sch.find("if");
-            if (it != sch.object_range().end()) 
-            {
-                conditionalvalidator = make_conditional_validator(it->value(), sch, context);
-                // sch["if"] is object and has id, can be looked up
-            }
-            else
-            {
-                auto then_it = sch.find("then");
-                if (then_it != sch.object_range().end()) 
-                {
-                    std::string sub_keys[] = {"then"};
-                    make_schema_validator(then_it->value(), context, sub_keys);
-                }
-
-                auto else_it = sch.find("else");
-                if (else_it != sch.object_range().end()) 
-                {
-                    std::string sub_keys[] = { "else" };
-                    make_schema_validator(else_it->value(), context, sub_keys);
-                }
-            }
-
             return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
-                std::move(type_mapping),
-                std::move(enumvalidator),
-                std::move(const_validator),
-                std::move(combined_validators),
-                std::move(conditionalvalidator),
-                std::move(expected_types)
+                std::move(type_mapping), std::move(expected_types)
                 );
         }
 

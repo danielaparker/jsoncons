@@ -1573,10 +1573,6 @@ namespace jsonschema {
         using validator_wrapper_type = validator_wrapper<Json>;
 
         std::vector<validator_type> type_mapping_;
-        std::unique_ptr<enum_validator<Json>> enum_validator_;
-        std::unique_ptr<const_validator<Json>> const_validator_;
-        std::vector<validator_type> combined_validators_;
-        std::unique_ptr<conditional_validator<Json>> conditional_validator_;
         std::vector<std::string> expected_types_;
 
     public:
@@ -1587,18 +1583,10 @@ namespace jsonschema {
 
         type_validator(std::string&& schema_path,
             std::vector<validator_type>&& type_mapping,
-            std::unique_ptr<enum_validator<Json>>&& enumvalidator,
-            std::unique_ptr<const_validator<Json>> const_validator,
-            std::vector<validator_type>&& combined_validators,
-            std::unique_ptr<conditional_validator<Json>>&& conditionalvalidator,
             std::vector<std::string>&& expected_types
             )
             : keyword_validator<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
-              enum_validator_(std::move(enumvalidator)), 
-              const_validator_(std::move(const_validator)),
-              combined_validators_(std::move(combined_validators)), 
-              conditional_validator_(std::move(conditionalvalidator)),
               expected_types_(std::move(expected_types))
         {
         }
@@ -1645,42 +1633,6 @@ namespace jsonschema {
                 }
             }
             std::cout << "\n";
- 
-            if (enum_validator_)
-            { 
-                enum_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            if (const_validator_)
-            { 
-                const_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            for (const auto& validator : combined_validators_)
-            {
-                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            if (conditional_validator_)
-            { 
-                conditional_validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
         }
     };
 

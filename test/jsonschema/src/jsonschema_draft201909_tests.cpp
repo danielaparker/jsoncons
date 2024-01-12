@@ -110,9 +110,10 @@ TEST_CASE("jsonschema draft2019-09 tests")
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/additionalProperties.json");
 #endif
+*/
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/allOf.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/anyOf.json");
-*/
+
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/boolean_schema.json");
 /*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/const.json");
