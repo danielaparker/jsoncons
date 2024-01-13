@@ -54,8 +54,7 @@ namespace jsonschema {
     class keyword_validator 
     {
     public:
-        using validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using self_pointer = keyword_validator<Json>*;
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         virtual ~keyword_validator() = default;
 
@@ -83,8 +82,7 @@ namespace jsonschema {
     {
         std::string schema_path_;
     public:
-        using validator_type = std::unique_ptr<keyword_validator_base<Json>>;
-        using self_pointer = keyword_validator_base<Json>*;
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         keyword_validator_base(const std::string& schema_path)
             : schema_path_(schema_path)
@@ -119,8 +117,7 @@ namespace jsonschema {
     {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
     public:
         schema_validator()
@@ -180,14 +177,13 @@ namespace jsonschema {
     {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using validator_pointer = typename keyword_validator<Json>::self_pointer;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::vector<validator_type> validators_;
+        std::vector<keyword_validator_type> validators_;
         Json default_value_;
 
     public:
-        schema_validator_impl(std::vector<validator_type>&& validators, Json&& default_value)
+        schema_validator_impl(std::vector<keyword_validator_type>&& validators, Json&& default_value)
             : validators_(std::move(validators)),
               default_value_(std::move(default_value))
         {

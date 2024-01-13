@@ -309,7 +309,7 @@ namespace jsonschema {
     template <class Json>
     class min_items_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
         std::size_t min_items_;
     public:
@@ -348,7 +348,7 @@ namespace jsonschema {
     class items_array_validator : public keyword_validator_base<Json>
     {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
         std::vector<schema_validator_type> item_validators_;
         schema_validator_type additional_items_validator_;
@@ -400,7 +400,7 @@ namespace jsonschema {
     template <class Json>
     class contains_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type validator_;
@@ -454,7 +454,7 @@ namespace jsonschema {
     template <class Json>
     class items_object_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type items_validator_;
@@ -580,12 +580,12 @@ namespace jsonschema {
     template <class Json>
     class string_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::vector<validator_type> validators_;
+        std::vector<keyword_validator_type> validators_;
     public:
         string_validator(const std::string& schema_path,
-            std::vector<validator_type>&& validators)
+            std::vector<keyword_validator_type>&& validators)
             : keyword_validator_base<Json>(schema_path), validators_(std::move(validators))
         {
         }
@@ -613,7 +613,7 @@ namespace jsonschema {
     template <class Json>
     class not_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type rule_;
@@ -723,7 +723,7 @@ namespace jsonschema {
     template <class Json,class Criterion>
     class combining_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         std::vector<schema_validator_type> subschemas_;
@@ -933,12 +933,12 @@ namespace jsonschema {
     template <class Json>
     class integer_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::vector<validator_type> validators_;
+        std::vector<keyword_validator_type> validators_;
     public:
         integer_validator(const std::string& schema_path, 
-            std::vector<validator_type>&& validators)
+            std::vector<keyword_validator_type>&& validators)
             : keyword_validator_base<Json>(schema_path), validators_(std::move(validators))
         {
         }
@@ -975,12 +975,12 @@ namespace jsonschema {
     template <class Json>
     class number_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::vector<validator_type> validators_;
+        std::vector<keyword_validator_type> validators_;
     public:
         number_validator(const std::string& schema_path, 
-            std::vector<validator_type>&& validators)
+            std::vector<keyword_validator_type>&& validators)
             : keyword_validator_base<Json>(schema_path), validators_(std::move(validators))
         {
         }
@@ -1148,7 +1148,7 @@ namespace jsonschema {
     template <class Json>
     class object_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         jsoncons::optional<std::size_t> max_properties_;
@@ -1163,7 +1163,7 @@ namespace jsonschema {
     #endif
         schema_validator_type additional_properties_;
 
-        std::map<std::string, validator_type> dependencies_;
+        std::map<std::string, keyword_validator_type> dependencies_;
 
         schema_validator_type property_name_validator_;
 
@@ -1179,7 +1179,7 @@ namespace jsonschema {
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties,
         #endif
             schema_validator_type&& additional_properties,
-            std::map<std::string, validator_type>&& dependencies,
+            std::map<std::string, keyword_validator_type>&& dependencies,
             schema_validator_type&& property_name_validator
         )
             : keyword_validator_base<Json>(std::move(schema_path)), 
@@ -1365,7 +1365,7 @@ namespace jsonschema {
     template <class Json>
     class unevaluated_properties_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type validator_;
@@ -1421,11 +1421,11 @@ namespace jsonschema {
     template <class Json>
     class array_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
-        std::vector<validator_type> validators_;
+        std::vector<keyword_validator_type> validators_;
     public:
-        array_validator(const std::string& schema_path, std::vector<validator_type>&& validators)
+        array_validator(const std::string& schema_path, std::vector<keyword_validator_type>&& validators)
             : keyword_validator_base<Json>(schema_path), validators_(std::move(validators))
         {
         }
@@ -1452,7 +1452,7 @@ namespace jsonschema {
     template <class Json>
     class conditional_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type if_validator_;
@@ -1569,9 +1569,9 @@ namespace jsonschema {
     template <class Json>
     class type_validator : public keyword_validator_base<Json>
     {
-        using validator_type = typename keyword_validator<Json>::validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
-        std::vector<validator_type> type_mapping_;
+        std::vector<keyword_validator_type> type_mapping_;
         std::vector<std::string> expected_types_;
 
     public:
@@ -1581,7 +1581,7 @@ namespace jsonschema {
         type_validator& operator=(type_validator&&) = default;
 
         type_validator(std::string&& schema_path,
-            std::vector<validator_type>&& type_mapping,
+            std::vector<keyword_validator_type>&& type_mapping,
             std::vector<std::string>&& expected_types
             )
             : keyword_validator_base<Json>(std::move(schema_path)),

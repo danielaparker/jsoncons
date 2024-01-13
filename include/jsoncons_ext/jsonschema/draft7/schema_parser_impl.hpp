@@ -48,7 +48,7 @@ namespace draft7 {
     public:
         using keyword_validator_wrapper_type = keyword_validator_wrapper<Json>;
         using schema_validator_wrapper_type = schema_validator_wrapper<Json>;
-        using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
     private:
@@ -60,7 +60,7 @@ namespace draft7 {
         };
 
         uri_resolver<Json> resolver_;
-        validator_type root_;
+        keyword_validator_type root_;
 
         // Owns all subschemas
         std::vector<schema_validator_type> subschemas_;
@@ -102,7 +102,7 @@ namespace draft7 {
 
             bool is_ref = false;
 
-            std::vector<validator_type> validators; 
+            std::vector<keyword_validator_type> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
@@ -236,7 +236,7 @@ namespace draft7 {
             return schema_validator_ptr;
         }
 
-        void init_type_mapping(std::vector<validator_type>& type_mapping, const std::string& type,
+        void init_type_mapping(std::vector<keyword_validator_type>& type_mapping, const std::string& type,
             const Json& sch,
             const compilation_context& context,
             std::set<std::string>& keywords)
@@ -299,7 +299,7 @@ namespace draft7 {
             std::string schema_path = context.get_absolute_uri().string();
             std::vector<std::string> expected_types;
 
-            std::vector<validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
+            std::vector<keyword_validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
             std::set<std::string> known_keywords;
 
             auto it = sch.find("type");
@@ -357,7 +357,7 @@ namespace draft7 {
             std::string schema_path = context.make_schema_path_with("string");
             auto new_context = context.update_uris(sch, schema_path);
 
-            std::vector<validator_type> validators;
+            std::vector<keyword_validator_type> validators;
             auto it = sch.find("maxLength");
             if (it != sch.object_range().end())
             {
@@ -513,7 +513,7 @@ namespace draft7 {
             std::string schema_path = context.make_schema_path_with("array");
             auto new_context = context.update_uris(sch, schema_path);
 
-            std::vector<validator_type> validators;
+            std::vector<keyword_validator_type> validators;
 
             auto it = sch.find("maxItems");
             if (it != sch.object_range().end()) 
@@ -753,7 +753,7 @@ namespace draft7 {
             std::string schema_path = context.make_schema_path_with("integer");
             auto new_context = context.update_uris(sch, schema_path);
 
-            std::vector<validator_type> validators;
+            std::vector<keyword_validator_type> validators;
 
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
@@ -800,7 +800,7 @@ namespace draft7 {
             std::string schema_path = context.make_schema_path_with("number");
             auto new_context = context.update_uris(sch, schema_path);
 
-            std::vector<validator_type> validators;
+            std::vector<keyword_validator_type> validators;
 
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
@@ -973,7 +973,7 @@ namespace draft7 {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
         #endif
             schema_validator_type additional_properties;
-            std::map<std::string, validator_type> dependencies;
+            std::map<std::string, keyword_validator_type> dependencies;
             schema_validator_type property_name_validator;
 
             auto it = sch.find("maxProperties");
@@ -1200,7 +1200,7 @@ namespace draft7 {
             }
         }
 
-        validator_type get_or_create_reference(const schema_location& uri)
+        keyword_validator_type get_or_create_reference(const schema_location& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 
