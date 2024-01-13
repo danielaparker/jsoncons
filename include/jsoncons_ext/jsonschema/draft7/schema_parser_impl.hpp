@@ -46,7 +46,8 @@ namespace draft7 {
     class schema_parser_impl : public schema_parser<Json> 
     {
     public:
-        using validator_wrapper_type = schema_validator_wrapper<Json>;
+        using keyword_validator_wrapper_type = keyword_validator_wrapper<Json>;
+        using schema_validator_wrapper_type = schema_validator_wrapper<Json>;
         using validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -1199,14 +1200,14 @@ namespace draft7 {
             }
         }
 
-        schema_validator_type get_or_create_reference(const schema_location& uri)
+        validator_type get_or_create_reference(const schema_location& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
-                return jsoncons::make_unique<validator_wrapper_type>(sch->second);
+                return jsoncons::make_unique<keyword_validator_wrapper_type>(sch->second);
 
             // referencing an unknown keyword, turn it into schema
             //
@@ -1230,7 +1231,7 @@ namespace draft7 {
             if (ref != file.unresolved.end()) 
             {
                 //return ref->second; // unresolved, use existing reference
-                return jsoncons::make_unique<validator_wrapper_type>(ref->second);
+                return jsoncons::make_unique<schema_validator_wrapper_type>(ref->second);
             }
             else 
             {
@@ -1240,7 +1241,7 @@ namespace draft7 {
                     ->second; // unresolved, create new reference
                 
                 subschemas_.emplace_back(std::move(orig));
-                return jsoncons::make_unique<validator_wrapper_type>(p);
+                return jsoncons::make_unique<schema_validator_wrapper_type>(p);
             }
         }
 
