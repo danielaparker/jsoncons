@@ -198,7 +198,7 @@ namespace jsonschema {
             return default_value_;
         }
 
-        keyword_validator_type clone() const override
+        keyword_validator_type clone() const final
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
@@ -214,7 +214,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             std::unordered_set<std::string> local_evaluated_properties;
 
@@ -252,7 +252,7 @@ namespace jsonschema {
             return validator_->schema_path();
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -283,7 +283,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return schema_validator_type{};
         }

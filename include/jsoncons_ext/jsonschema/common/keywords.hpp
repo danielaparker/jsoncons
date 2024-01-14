@@ -31,7 +31,7 @@ namespace jsonschema {
         std::vector<validation_output> errors;
 
     private:
-        void do_error(const validation_output& o) override
+        void do_error(const validation_output& o) final
         {
             errors.push_back(o);
         }
@@ -53,7 +53,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<content_encoding_validator>(this->schema_path(), content_encoding_);
         }
@@ -64,7 +64,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (content_encoding_ == "base64")
             {
@@ -113,7 +113,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<content_media_type_validator>(this->schema_path(), content_media_type_);
         }
@@ -124,7 +124,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (content_media_type_ == "application/Json")
             {
@@ -160,7 +160,7 @@ namespace jsonschema {
 
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<format_validator>(this->schema_path(), format_check_);
         }
@@ -171,7 +171,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (format_check_ != nullptr) 
             {
@@ -205,7 +205,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<pattern_validator>(this->schema_path(), pattern_string_, regex_);
         }
@@ -216,7 +216,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             auto s = instance.template as<std::string>();
             if (!std::regex_search(s, regex_))
@@ -249,7 +249,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<pattern_validator>(this->schema_path());
         }
@@ -260,7 +260,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer&,
             std::unordered_set<std::string>&, 
             error_reporter&,
-            Json&) const override
+            Json&) const final
         {
         }
     };
@@ -280,7 +280,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<max_length_validator>(this->schema_path(), max_length_);
         }
@@ -291,7 +291,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -324,7 +324,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<max_items_validator>(this->schema_path(), max_items_);
         }
@@ -335,7 +335,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (instance.size() > max_items_)
             {
@@ -367,7 +367,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return jsoncons::make_unique<min_items_validator>(this->schema_path(), min_items_);
         }
@@ -378,7 +378,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (instance.size() < min_items_)
             {
@@ -416,7 +416,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             /*std::vector<keyword_validator_type> item_validators;
             for (auto& validator : item_validators_)
@@ -438,7 +438,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
-            Json& patch) const override
+            Json& patch) const final
         {
             size_t index = 0;
             auto validator_it = item_validators_.cbegin();
@@ -482,7 +482,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -493,7 +493,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
-            Json& patch) const override
+            Json& patch) const final
         {
 
             if (validator_) 
@@ -541,7 +541,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -552,7 +552,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
-            Json& patch) const override
+            Json& patch) const final
         {
             size_t index = 0;
             if (items_validator_)
@@ -582,7 +582,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -593,7 +593,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             if (are_unique_ && !array_has_unique_items(instance))
             {
@@ -639,7 +639,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -650,7 +650,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
-            Json&) const override
+            Json&) const final
         {
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -684,7 +684,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -694,7 +694,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties,
             error_reporter& reporter,
-            Json& patch) const
+            Json& patch) const final
         {
             for (const auto& validator : validators_)
             {
@@ -725,7 +725,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -840,7 +840,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -897,7 +897,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -907,7 +907,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const 
+            Json&) const final 
         {
             T value = instance.template as<T>(); 
             if (value > value_)
@@ -933,7 +933,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -943,7 +943,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const 
+            Json&) const final 
         {
             T value = instance.template as<T>(); 
             if (value >= value_)
@@ -969,7 +969,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -979,7 +979,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const 
+            Json&) const final 
         {
             T value = instance.template as<T>(); 
             if (value < value_)
@@ -1005,7 +1005,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1015,7 +1015,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const 
+            Json&) const final 
         {
             T value = instance.template as<T>(); 
             if (value <= value_)
@@ -1041,7 +1041,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1051,7 +1051,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const 
+            Json&) const final
         {
             double value = instance.template as<double>();
             if (value != 0) // Exclude zero
@@ -1087,7 +1087,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1097,7 +1097,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const 
+            Json& patch) const final
         {
             if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
             {
@@ -1134,7 +1134,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1144,7 +1144,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const 
+            Json& patch) const final
         {
             if (!(instance.template is_integer<int64_t>() || instance.is_double()))
             {
@@ -1181,7 +1181,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1191,7 +1191,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const override
+            Json&) const final
         {
             if (!instance.is_null())
             {
@@ -1214,7 +1214,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1223,7 +1223,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer&,
             std::unordered_set<std::string>&, 
             error_reporter&, 
-            Json&) const override
+            Json&) const final
         {
         }
 
@@ -1240,7 +1240,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1250,7 +1250,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer&,
             std::unordered_set<std::string>&, 
             error_reporter&, 
-            Json&) const override
+            Json&) const final
         {
         }
     };
@@ -1268,7 +1268,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1277,7 +1277,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const override
+            Json&) const final
         {
             reporter.error(validation_output("false", 
                                              this->schema_path(), 
@@ -1305,7 +1305,7 @@ namespace jsonschema {
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1316,7 +1316,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
-            Json&) const override final
+            Json&) const final
         {
             for (const auto& key : items_)
             {
@@ -1388,7 +1388,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1398,7 +1398,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             std::unordered_set<std::string> local_evaluated_properties;
 
@@ -1574,7 +1574,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1585,7 +1585,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             std::cout << "Evaluated properties\n";
             for (const auto& s : evaluated_properties)
@@ -1630,7 +1630,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1641,7 +1641,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             for (const auto& validator : validators_)
             {
@@ -1676,7 +1676,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1721,7 +1721,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1771,7 +1771,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1814,7 +1814,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone() const final 
         {
             return keyword_validator_type{};
         }
@@ -1825,7 +1825,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const override final
+            Json& patch) const final
         {
             auto& type = type_mapping_[(uint8_t) instance.type()];
 
