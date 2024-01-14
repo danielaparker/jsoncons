@@ -1333,7 +1333,7 @@ namespace draft201909 {
             }
         }
 
-        schema_validator_type get_or_create_reference(const schema_location& uri)
+        keyword_validator_type get_or_create_reference(const schema_location& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 
@@ -1353,9 +1353,11 @@ namespace draft201909 {
                 if (unprocessed_keywords_it != file.unprocessed_keywords.end()) 
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_schema_validator(subsch, compilation_context(uri), {});       //  A JSON Schema MUST be an object or a boolean.
+                    auto s = make_schema_validator(subsch, compilation_context(uri), {}); 
+                    auto p = s.get();
+                    subschemas_.emplace_back(std::move(s));
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return s;
+                    return jsoncons::make_unique<ref_validator<Json>>(p);
                 }
             }
 

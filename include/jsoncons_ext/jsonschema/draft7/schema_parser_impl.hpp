@@ -1220,9 +1220,11 @@ namespace draft7 {
                 if (unprocessed_keywords_it != file.unprocessed_keywords.end()) 
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_schema_validator(subsch, compilation_context(uri), {});       //  A JSON Schema MUST be an object or a boolean.
+                    auto s = make_schema_validator(subsch, compilation_context(uri), {}); 
+                    auto p = s.get();
+                    subschemas_.emplace_back(std::move(s));
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return s;
+                    return jsoncons::make_unique<ref_validator<Json>>(p);
                 }
             }
 
