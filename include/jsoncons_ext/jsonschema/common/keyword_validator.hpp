@@ -274,6 +274,7 @@ namespace jsonschema {
     class schema_validator_wrapper : public schema_validator<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         const schema_validator<Json>* validator_;
     public:
@@ -284,7 +285,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return schema_validator_type{};
         }
     private:
         void do_validate(const Json& instance, 

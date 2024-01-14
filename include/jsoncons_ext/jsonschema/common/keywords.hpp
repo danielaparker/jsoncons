@@ -418,7 +418,18 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
+            /*std::vector<keyword_validator_type> item_validators;
+            for (auto& validator : item_validators_)
+            {
+                item_validators.push_back(validator->clone());
+            }
+            keyword_validator_type additional_items_validator = additional_items_validator_->clone();
+
+            return jsoncons::make_unique<items_array_validator>(this->schema_path(), std::move(item_validators),
+                std::move(additional_items_validator));
+                */
             return keyword_validator_type{};
+
         }
 
     private:
