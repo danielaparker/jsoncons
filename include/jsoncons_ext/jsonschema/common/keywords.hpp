@@ -113,6 +113,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return jsoncons::make_unique<content_media_type_validator>(this->schema_path(), content_media_type_);
+        }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -137,11 +142,6 @@ namespace jsonschema {
                 }
             }
         }
-
-        keyword_validator_type clone() const override 
-        {
-            return keyword_validator_type{};
-        }
     };
 
     // format 
@@ -154,10 +154,15 @@ namespace jsonschema {
         format_checker format_check_;
 
     public:
-        format_validator(const std::string& schema_path, format_checker format_check)
+        format_validator(const std::string& schema_path, const format_checker& format_check)
             : keyword_validator_base<Json>(schema_path), format_check_(format_check)
         {
 
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return jsoncons::make_unique<format_validator>(this->schema_path(), format_check_);
         }
 
     private:
@@ -178,11 +183,6 @@ namespace jsonschema {
                     return;
                 }
             }
-        }
-
-        keyword_validator_type clone() const override 
-        {
-            return keyword_validator_type{};
         }
     };
 
@@ -207,7 +207,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<pattern_validator>(this->schema_path(), pattern_string_, regex_);
         }
 
     private:
@@ -251,7 +251,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<pattern_validator>(this->schema_path());
         }
 
     private:
@@ -282,7 +282,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<max_length_validator>(this->schema_path(), max_length_);
         }
 
     private:
@@ -326,7 +326,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<max_items_validator>(this->schema_path(), max_items_);
         }
 
     private:
@@ -369,7 +369,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<min_items_validator>(this->schema_path(), min_items_);
         }
 
     private:
