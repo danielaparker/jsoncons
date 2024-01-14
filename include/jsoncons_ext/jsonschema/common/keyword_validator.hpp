@@ -198,7 +198,7 @@ namespace jsonschema {
             return default_value_;
         }
 
-        virtual keyword_validator_type clone() const 
+        keyword_validator_type clone() const override
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
