@@ -42,6 +42,8 @@ namespace jsonschema {
     template <class Json>
     class content_encoding_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::string content_encoding_;
 
     public:
@@ -49,6 +51,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>(schema_path), 
               content_encoding_(content_encoding)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return jsoncons::make_unique<content_encoding_validator>(this->schema_path(), content_encoding_);
         }
 
     private:
@@ -95,6 +102,8 @@ namespace jsonschema {
     template <class Json>
     class content_media_type_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::string content_media_type_;
 
     public:
@@ -128,6 +137,11 @@ namespace jsonschema {
                 }
             }
         }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
     };
 
     // format 
@@ -135,6 +149,8 @@ namespace jsonschema {
     template <class Json>
     class format_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         format_checker format_check_;
 
     public:
@@ -163,6 +179,11 @@ namespace jsonschema {
                 }
             }
         }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
     };
 
     // pattern 
@@ -171,6 +192,8 @@ namespace jsonschema {
     template <class Json>
     class pattern_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::string pattern_string_;
         std::regex regex_;
 
@@ -180,6 +203,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>(schema_path), 
               pattern_string_(pattern_string), regex_(regex)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -213,10 +241,17 @@ namespace jsonschema {
     template <class Json>
     class pattern_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
     public:
         pattern_validator(const std::string& schema_path)
             : keyword_validator_base<Json>(schema_path)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -236,11 +271,18 @@ namespace jsonschema {
     template <class Json>
     class max_length_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::size_t max_length_;
     public:
         max_length_validator(const std::string& schema_path, std::size_t max_length)
             : keyword_validator_base<Json>(schema_path), max_length_(max_length)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -273,11 +315,18 @@ namespace jsonschema {
     template <class Json>
     class max_items_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::size_t max_items_;
     public:
         max_items_validator(const std::string& schema_path, std::size_t max_items)
             : keyword_validator_base<Json>(schema_path), max_items_(max_items)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -316,6 +365,11 @@ namespace jsonschema {
         min_items_validator(const std::string& schema_path, std::size_t min_items)
             : keyword_validator_base<Json>(schema_path), min_items_(min_items)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -360,6 +414,11 @@ namespace jsonschema {
               item_validators_(std::move(item_validators)), 
               additional_items_validator_(std::move(additional_items_validator))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -410,6 +469,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>(schema_path), 
               validator_(std::move(validator))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -466,6 +530,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -493,11 +562,18 @@ namespace jsonschema {
     template <class Json>
     class unique_items_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         bool are_unique_;
     public:
         unique_items_validator(const std::string& schema_path, bool are_unique)
             : keyword_validator_base<Json>(schema_path), are_unique_(are_unique)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -542,12 +618,19 @@ namespace jsonschema {
     template <class Json>
     class min_length_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::size_t min_length_;
 
     public:
         min_length_validator(const std::string& schema_path, std::size_t min_length)
             : keyword_validator_base<Json>(schema_path), min_length_(min_length)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -590,6 +673,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
         void do_validate(const Json& instance,
             const jsonpointer::json_pointer& instance_location,
@@ -624,6 +712,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>(schema_path), 
               rule_(std::move(rule))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -736,6 +829,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -778,12 +876,19 @@ namespace jsonschema {
     template <class Json,class T>
     class maximum_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         T value_;
 
     public:
         maximum_validator(const std::string& schema_path, T value)
             : keyword_validator_base<Json>(schema_path), value_(value)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -807,12 +912,19 @@ namespace jsonschema {
     template <class Json,class T>
     class exclusive_maximum_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         T value_;
 
     public:
         exclusive_maximum_validator(const std::string& schema_path, T value)
             : keyword_validator_base<Json>(schema_path), value_(value)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -836,12 +948,19 @@ namespace jsonschema {
     template <class Json,class T>
     class minimum_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         T value_;
 
     public:
         minimum_validator(const std::string& schema_path, T value)
             : keyword_validator_base<Json>(schema_path), value_(value)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -865,12 +984,19 @@ namespace jsonschema {
     template <class Json,class T>
     class exclusive_minimum_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         T value_;
 
     public:
         exclusive_minimum_validator(const std::string& schema_path, T value)
             : keyword_validator_base<Json>(schema_path), value_(value)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -894,12 +1020,19 @@ namespace jsonschema {
     template <class Json>
     class multiple_of_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         double value_;
 
     public:
         multiple_of_validator(const std::string& schema_path, double value)
             : keyword_validator_base<Json>(schema_path), value_(value)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -941,6 +1074,11 @@ namespace jsonschema {
             std::vector<keyword_validator_type>&& validators)
             : keyword_validator_base<Json>(schema_path), validators_(std::move(validators))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -985,6 +1123,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1019,11 +1162,19 @@ namespace jsonschema {
     template <class Json>
     class null_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
     public:
         null_validator(const std::string& schema_path)
             : keyword_validator_base<Json>(schema_path)
         {
         }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1044,10 +1195,17 @@ namespace jsonschema {
     template <class Json>
     class boolean_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
     public:
         boolean_validator(const std::string& schema_path)
             : keyword_validator_base<Json>(schema_path)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
     private:
         void do_validate(const Json&, 
@@ -1063,10 +1221,17 @@ namespace jsonschema {
     template <class Json>
     class true_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
     public:
         true_validator(const std::string& schema_path)
             : keyword_validator_base<Json>(schema_path)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
@@ -1084,10 +1249,17 @@ namespace jsonschema {
     template <class Json>
     class false_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
     public:
         false_validator(const std::string& schema_path)
             : keyword_validator_base<Json>(schema_path)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
     private:
         void do_validate(const Json&, 
@@ -1106,6 +1278,8 @@ namespace jsonschema {
     template <class Json>
     class required_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         std::vector<std::string> items_;
 
     public:
@@ -1119,6 +1293,11 @@ namespace jsonschema {
         required_validator(required_validator&&) = default;
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
 
     private:
 
@@ -1196,6 +1375,11 @@ namespace jsonschema {
               dependencies_(std::move(dependencies)),
               property_name_validator_(std::move(property_name_validator))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
     private:
 
@@ -1379,6 +1563,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -1430,6 +1619,11 @@ namespace jsonschema {
         {
         }
 
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
+
     private:
 
         void do_validate(const Json& instance, 
@@ -1470,6 +1664,11 @@ namespace jsonschema {
               else_validator_(std::move(else_validator))
         {
         }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
+        }
     private:
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1501,12 +1700,19 @@ namespace jsonschema {
     template <class Json>
     class enum_validator : public keyword_validator_base<Json>
     {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         Json value_;
 
     public:
         enum_validator(const std::string& path, const Json& sch)
             : keyword_validator_base<Json>(path), value_(sch)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
     private:
         void do_validate(const Json& instance, 
@@ -1543,13 +1749,20 @@ namespace jsonschema {
 
     template <class Json>
     class const_validator : public keyword_validator_base<Json>
-    {
+    {        
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
         Json value_;
 
     public:
         const_validator(const std::string& path, const Json& sch)
             : keyword_validator_base<Json>(path), value_(sch)
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
     private:
         void do_validate(const Json& instance, 
@@ -1588,6 +1801,11 @@ namespace jsonschema {
               type_mapping_(std::move(type_mapping)),
               expected_types_(std::move(expected_types))
         {
+        }
+
+        keyword_validator_type clone() const override 
+        {
+            return keyword_validator_type{};
         }
 
     private:
