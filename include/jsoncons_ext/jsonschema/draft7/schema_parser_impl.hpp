@@ -123,7 +123,7 @@ namespace draft7 {
                     { 
                         insert_schema(uri, p);
                     }          
-                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper<Json>>(p);
+                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper_type>(p);
                     break;
                 }
                 case json_type::object_value:
@@ -225,7 +225,7 @@ namespace draft7 {
                             insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                         }
                     }          
-                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper<Json>>(p);
+                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper_type>(p);
                     break;
                 }
                 default:
