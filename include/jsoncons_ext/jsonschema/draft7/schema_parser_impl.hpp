@@ -1243,7 +1243,7 @@ namespace draft7 {
                     ->second; // unresolved, create new reference
                 
                 subschemas_.emplace_back(std::move(orig));
-                return jsoncons::make_unique<schema_validator_wrapper_type>(p);
+                return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
             }
         }
 
