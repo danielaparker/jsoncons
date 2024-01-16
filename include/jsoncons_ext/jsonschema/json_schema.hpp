@@ -25,9 +25,9 @@ namespace jsonschema {
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
         std::vector<schema_validator_type> subschemas_;
-        keyword_validator_type root_;
+        schema_validator_type root_;
     public:
-        json_schema(std::vector<schema_validator_type>&& subschemas, keyword_validator_type&& root)
+        json_schema(std::vector<schema_validator_type>&& subschemas, schema_validator_type&& root)
             : subschemas_(std::move(subschemas)), root_(std::move(root))
         {
             if (root_ == nullptr)

@@ -61,7 +61,7 @@ namespace draft201909 {
         };
 
         uri_resolver<Json> resolver_;
-        keyword_validator_type root_;
+        schema_validator_type root_;
 
         // Owns all subschemas
         std::vector<schema_validator_type> subschemas_;
