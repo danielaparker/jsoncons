@@ -1367,7 +1367,7 @@ namespace draft201909 {
             if (ref != file.unresolved.end()) 
             {
                 //return ref->second; // unresolved, use existing reference
-                return jsoncons::make_unique<schema_validator_wrapper_type>(ref->second);
+                return jsoncons::make_unique<ref_validator2<Json>>(ref->second);
             }
             else 
             {
