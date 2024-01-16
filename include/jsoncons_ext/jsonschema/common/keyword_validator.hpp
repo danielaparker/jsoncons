@@ -132,18 +132,17 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
-        using schema_validator_pointer = schema_validator<Json>*;
 
-        schema_validator_pointer referred_schema_;
+        const schema_validator<Json>* referred_schema_;
 
     public:
         ref_validator(const std::string& /*id*/)
             : schema_validator<Json>(), referred_schema_(nullptr) {}
 
-        ref_validator(schema_validator_pointer target)
+        ref_validator(const schema_validator<Json>* target)
             : schema_validator<Json>(), referred_schema_(target) {}
 
-        void set_referred_schema(schema_validator_pointer target) { referred_schema_ = target; }
+        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
 
         jsoncons::optional<Json> get_default_value() const override
         {
