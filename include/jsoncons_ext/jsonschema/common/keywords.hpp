@@ -1647,7 +1647,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<array_validator>(std::string(this->schema_path()),
+                std::move(validators));
         }
 
     private:
@@ -1693,7 +1700,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<conditional_validator>(std::string(this->schema_path()), 
+                if_validator_->clone(), then_validator_->clone(), else_validator_->clone());
         }
     private:
         void do_validate(const Json& instance, 
@@ -1738,7 +1746,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<enum_validator>(std::string(this->schema_path()), Json(value_));
         }
     private:
         void do_validate(const Json& instance, 
@@ -1788,7 +1796,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<const_validator>(std::string(this->schema_path()), Json(value_));
         }
     private:
         void do_validate(const Json& instance, 
