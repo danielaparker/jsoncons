@@ -111,7 +111,7 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class schema_validator : public keyword_validator<Json>
+    class schema_validator : public validator_base<Json>
     {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -129,7 +129,7 @@ namespace jsonschema {
 
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
-        virtual schema_validator_type clone2() const = 0;
+        virtual schema_validator_type clone() const = 0;
     };
 
     template <class Json>
@@ -203,12 +203,7 @@ namespace jsonschema {
             return default_value_;
         }
 
-        keyword_validator_type clone() const final 
-        {
-            return keyword_validator_type{};
-        }
-
-        schema_validator_type clone2() const final
+        schema_validator_type clone() const final
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
@@ -293,12 +288,7 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone() const final 
-        {
-            return keyword_validator_type{};
-        }
-
-        schema_validator_type clone2() const final 
+        schema_validator_type clone() const final 
         {
             return schema_validator_type{};
         }
