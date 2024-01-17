@@ -70,8 +70,6 @@ namespace jsonschema {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        virtual ~keyword_validator() = default;
-
         virtual const std::string& schema_path() const = 0;
 
         void validate(const Json& instance, 
@@ -109,8 +107,6 @@ namespace jsonschema {
         keyword_validator_base(keyword_validator_base&&) = default;
         keyword_validator_base& operator=(const keyword_validator_base&) = delete;
         keyword_validator_base& operator=(keyword_validator_base&&) = default;
-
-        virtual ~keyword_validator_base() = default;
 
         const std::string& schema_path() const override
         {
