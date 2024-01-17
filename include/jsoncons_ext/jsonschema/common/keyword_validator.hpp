@@ -121,13 +121,15 @@ namespace jsonschema {
         schema_validator()
         {}
 
-        virtual jsoncons::optional<Json> get_default_value() const = 0;
-
-        const std::string& schema_path() const override
+        const std::string& schema_path() const 
         {
             static std::string s = "#";
             return s;
         }
+
+        virtual jsoncons::optional<Json> get_default_value() const = 0;
+
+        virtual schema_validator_type clone2() const = 0;
     };
 
     template <class Json>
@@ -201,7 +203,12 @@ namespace jsonschema {
             return default_value_;
         }
 
-        keyword_validator_type clone() const final
+        keyword_validator_type clone() const final 
+        {
+            return keyword_validator_type{};
+        }
+
+        schema_validator_type clone2() const final
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
@@ -287,6 +294,11 @@ namespace jsonschema {
         }
 
         keyword_validator_type clone() const final 
+        {
+            return keyword_validator_type{};
+        }
+
+        schema_validator_type clone2() const final 
         {
             return schema_validator_type{};
         }

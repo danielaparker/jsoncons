@@ -1209,7 +1209,9 @@ namespace draft7 {
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
-                return jsoncons::make_unique<keyword_validator_wrapper_type>(sch->second);
+            {
+                return jsoncons::make_unique<ref_validator_type>(sch->second);
+            }
 
             // referencing an unknown keyword, turn it into schema
             //
@@ -1231,19 +1233,17 @@ namespace draft7 {
             }
 
             // get or create a ref_validator
-            auto ref = file.unresolved.find(std::string(uri.fragment()));
-            if (ref != file.unresolved.end()) 
+            auto it = file.unresolved.find(std::string(uri.fragment()));
+            if (it != file.unresolved.end()) 
             {
-                //return ref->second; // unresolved, use existing reference
-                return jsoncons::make_unique<keyword_validator_wrapper_type>(ref->second);
+                return jsoncons::make_unique<keyword_validator_wrapper_type>(it->second);
             }
             else 
             {
                 auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
-                auto p = file.unresolved.insert(ref,
-                                              {std::string(uri.fragment()), orig.get()})
-                    ->second; // unresolved, create new reference
-                
+                auto p = orig.get();
+                file.unresolved.insert(it, {std::string(uri.fragment()), p});
+
                 subschemas_.emplace_back(std::move(orig));
                 return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
             }

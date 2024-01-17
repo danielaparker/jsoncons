@@ -1,4 +1,5 @@
 // Copyright 2013-20
+// 
 // 23 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1321,8 +1322,8 @@ namespace draft201909 {
             {
                 auto fragment = std::string(new_uri.fragment());
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
-                auto unresolved = file.unresolved.find(fragment);
-                if (unresolved != file.unresolved.end())
+                auto it = file.unresolved.find(fragment);
+                if (it != file.unresolved.end())
                     make_schema_validator(value, compilation_context(new_uri), {});
                 else // no, nothing ref'd it, keep for later
                     file.unprocessed_keywords[fragment] = value;
@@ -1343,7 +1344,9 @@ namespace draft201909 {
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
-                return jsoncons::make_unique<schema_validator_wrapper_type>(sch->second);
+            {
+                return jsoncons::make_unique<ref_validator_type>(sch->second);
+            }
 
             // referencing an unknown keyword, turn it into schema
             //
@@ -1365,18 +1368,16 @@ namespace draft201909 {
             }
 
             // get or create a ref_validator
-            auto ref = file.unresolved.find(std::string(uri.fragment()));
-            if (ref != file.unresolved.end()) 
+            auto it = file.unresolved.find(std::string(uri.fragment()));
+            if (it != file.unresolved.end()) 
             {
-                //return ref->second; // unresolved, use existing reference
-                return jsoncons::make_unique<keyword_validator_wrapper_type>(ref->second);
+                return jsoncons::make_unique<keyword_validator_wrapper_type>(it->second);
             }
             else 
             {
                 auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
-                auto p = file.unresolved.insert(ref,
-                                              {std::string(uri.fragment()), orig.get()})
-                    ->second; // unresolved, create new reference
+                auto p = orig.get();
+                file.unresolved.insert(it, {std::string(uri.fragment()), p});
                 
                 subschemas_.emplace_back(std::move(orig));
                 return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
