@@ -1831,7 +1831,15 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> type_mapping;
+            for (auto& validator : type_mapping_)
+            {
+                type_mapping.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<type_validator>(std::string(this->schema_path()),
+                std::move(type_mapping), 
+                std::vector<std::string>(expected_types_));
         }
 
     private:
