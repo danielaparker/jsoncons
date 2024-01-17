@@ -131,7 +131,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class ref_validator : public schema_validator<Json>
+    class ref_validator : public keyword_validator<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
@@ -140,57 +140,9 @@ namespace jsonschema {
 
     public:
         ref_validator(const std::string& /*id*/)
-            : schema_validator<Json>(), referred_schema_(nullptr) {}
-
-        ref_validator(const schema_validator<Json>* target)
-            : schema_validator<Json>(), referred_schema_(target) {}
-
-        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
-
-        jsoncons::optional<Json> get_default_value() const override
-        {
-            return referred_schema_ ? referred_schema_->get_default_value() : jsoncons::optional<Json>{};
-        }
-
-        keyword_validator_type clone() const override 
-        {
-            return jsoncons::make_unique<ref_validator>(referred_schema_);
-        }
-
-    private:
-
-        void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const override
-        {
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output("", 
-                                                 this->schema_path(), 
-                                                 instance_location.to_uri_fragment(), 
-                                                 "Unresolved schema reference " + this->schema_path()));
-                return;
-            }
-
-            referred_schema_->validate(instance, instance_location, evaluated_properties, reporter, patch);
-        }
-    };
-
-    template <class Json>
-    class ref_validator2 : public keyword_validator<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
-
-        const schema_validator<Json>* referred_schema_;
-
-    public:
-        ref_validator2(const std::string& /*id*/)
             : referred_schema_(nullptr) {}
 
-        ref_validator2(const schema_validator<Json>* target)
+        ref_validator(const schema_validator<Json>* target)
             : referred_schema_(target) {}
 
         void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
@@ -203,7 +155,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const override 
         {
-            return jsoncons::make_unique<ref_validator2>(referred_schema_);
+            return jsoncons::make_unique<ref_validator>(referred_schema_);
         }
 
     private:
