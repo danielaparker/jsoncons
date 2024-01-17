@@ -791,7 +791,7 @@ namespace jsonschema {
                                 const collecting_error_reporter&, 
                                 std::size_t count)
         {
-            std::cout << "any_of_criterion is_complete\n";
+            //std::cout << "any_of_criterion is_complete\n";
             return count == 1;
         }
     };
@@ -853,7 +853,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << "combining_validator.do_validate " << instance << " " << subschemas_.size() << ", " << instance_location.to_string() << "\n";
+            //std::cout << "combining_validator.do_validate " << instance << " " << subschemas_.size() << ", " << instance_location.to_string() << "\n";
 
             size_t count = 0;
 
@@ -1478,10 +1478,10 @@ namespace jsonschema {
     #endif
 
                 // finally, check "additionalProperties" 
-                std::cout << "object_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
+                //std::cout << "object_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
-                    std::cout << " !!!additionalProperties!!!";
+                    //std::cout << " !!!additionalProperties!!!";
 
                     collecting_error_reporter local_reporter;
 
@@ -1503,7 +1503,7 @@ namespace jsonschema {
                     }
 
                 }
-                std::cout << "\n";
+                //std::cout << "\n";
             }
 
             // reverse search
@@ -1602,12 +1602,12 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << "Evaluated properties\n";
-            for (const auto& s : evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "Evaluated properties\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             if (validator_)
             {
@@ -1844,7 +1844,7 @@ namespace jsonschema {
         {
             auto& type = type_mapping_[(uint8_t) instance.type()];
 
-            std::cout << "anyOf validate " << instance;
+            //std::cout << "anyOf validate " << instance;
             if (type)
                 type->validate(instance, instance_location, evaluated_properties, reporter, patch);
             else
@@ -1862,7 +1862,7 @@ namespace jsonschema {
                             }
                         }
                         ss << expected_types_[i];
-                        std::cout << ", " << i << ". expected " << expected_types_[i];
+                        //std::cout << ", " << i << ". expected " << expected_types_[i];
                 }
                 ss << ", found " << instance.type();
 
@@ -1875,7 +1875,7 @@ namespace jsonschema {
                     return;
                 }
             }
-            std::cout << "\n";
+            //std::cout << "\n";
         }
     };
 

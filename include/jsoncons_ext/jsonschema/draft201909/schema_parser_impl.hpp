@@ -1078,7 +1078,7 @@ namespace draft201909 {
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
             {
-                std::cout << "properties\n";
+                //std::cout << "properties\n";
                 for (const auto& prop : it->value().object_range())
                 {
                     std::string sub_keys[] = {"properties", prop.key()};

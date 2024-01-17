@@ -135,7 +135,7 @@ namespace draft201909 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_location relative(id); 
                     schema_location new_uri = relative.resolve(get_base_uri());
-                    std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
                     {
