@@ -1353,7 +1353,8 @@ namespace jsonschema {
     #endif
         schema_validator_type additional_properties_;
 
-        std::map<std::string, keyword_validator_type> dependencies_;
+        std::map<std::string, keyword_validator_type> dependent_required_;
+        std::map<std::string, schema_validator_type> dependent_schemas_;
 
         schema_validator_type property_name_validator_;
 
@@ -1369,7 +1370,8 @@ namespace jsonschema {
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties,
         #endif
             schema_validator_type&& additional_properties,
-            std::map<std::string, keyword_validator_type>&& dependencies,
+            std::map<std::string, keyword_validator_type>&& dependent_required,
+            std::map<std::string, schema_validator_type>&& dependent_schemas,
             schema_validator_type&& property_name_validator
         )
             : keyword_validator_base<Json>(std::move(schema_path)), 
@@ -1383,7 +1385,8 @@ namespace jsonschema {
               pattern_properties_(std::move(pattern_properties)),
         #endif
               additional_properties_(std::move(additional_properties)),
-              dependencies_(std::move(dependencies)),
+              dependent_required_(std::move(dependent_required)),
+              dependent_schemas_(std::move(dependent_schemas)),
               property_name_validator_(std::move(property_name_validator))
         {
         }
@@ -1522,7 +1525,19 @@ namespace jsonschema {
                 }
             }
 
-            for (const auto& dep : dependencies_) 
+            for (const auto& dep : dependent_required_) 
+            {
+                auto prop = instance.find(dep.first);
+                if (prop != instance.object_range().end()) 
+                {
+                    // if dependency-prop is present in instance
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= dep.first;
+                    dep.second->validate(instance, pointer, local_evaluated_properties, reporter, patch); // validate
+                }
+            }
+
+            for (const auto& dep : dependent_schemas_) 
             {
                 auto prop = instance.find(dep.first);
                 if (prop != instance.object_range().end()) 

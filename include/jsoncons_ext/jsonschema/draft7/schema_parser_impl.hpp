@@ -975,7 +975,8 @@ namespace draft7 {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
         #endif
             schema_validator_type additional_properties;
-            std::map<std::string, keyword_validator_type> dependencies;
+            std::map<std::string, keyword_validator_type> dependent_required;
+            std::map<std::string, schema_validator_type> dependent_schemas;
             schema_validator_type property_name_validator;
 
             auto it = sch.find("maxProperties");
@@ -1045,16 +1046,20 @@ namespace draft7 {
                         case json_type::array_value:
                         {
                             auto location = context.make_schema_path_with("dependencies");
-                            dependencies.emplace(dep.key(), 
+                            dependent_required.emplace(dep.key(), 
                                 make_required_validator(compilation_context(std::vector<schema_location>{{location}}),
                                     dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
-                        default:
+                        case json_type::object_value:
                         {
                             std::string sub_keys[] = {"dependencies"};
-                            dependencies.emplace(dep.key(),
+                            dependent_schemas.emplace(dep.key(),
                                 make_schema_validator(dep.value(), context, sub_keys));
+                            break;
+                        }
+                        default:
+                        {
                             break;
                         }
                     }
@@ -1077,7 +1082,8 @@ namespace draft7 {
                 std::move(pattern_properties),
 #endif
                 std::move(additional_properties),
-                std::move(dependencies),
+                std::move(dependent_required),
+                std::move(dependent_schemas),
                 std::move(property_name_validator)
             );
         }
