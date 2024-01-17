@@ -101,7 +101,7 @@ add_executable(unit_tests
                jsonpointer/src/jsonpointer_tests.cpp
                jsonschema/src/format_validator_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
-               jsonschema/src/jsonschema_output_format_tests.cpp
+               jsonschema/src/jsonschema_output_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                msgpack/src/decode_msgpack_tests.cpp

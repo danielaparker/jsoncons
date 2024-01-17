@@ -125,16 +125,17 @@ namespace draft201909 {
             {
                 case json_type::bool_value:
                 {
+                    schema_validator_type ptr;
                     if (sch.template as<bool>())
                     {
-                        validators.push_back(make_true_validator(new_context));
+                        std::string schema_path = new_context.make_schema_path_with("true");
+                        ptr =  jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, true);
                     }
                     else
                     {
-                        validators.push_back(make_false_validator(new_context));
+                        std::string schema_path = new_context.make_schema_path_with("false");
+                        ptr =  jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, false);
                     }
-                    auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
-                        std::move(default_value));
                     schema_validator<Json>* p = ptr.get();
                     subschemas_.emplace_back(std::move(ptr));
                     for (const auto& uri : new_context.uris()) 
@@ -255,8 +256,8 @@ namespace draft201909 {
                         validators.push_back(make_unevaluated_properties_validator(it->value(), new_context));
                     } 
 
-                    auto ptr = jsoncons::make_unique<schema_validator_impl<Json>>(std::move(validators),
-                        std::move(default_value));
+                    auto ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri().string(),
+                        std::move(validators), std::move(default_value));
                     schema_validator<Json>* p = ptr.get();
                     subschemas_.emplace_back(std::move(ptr));
 
