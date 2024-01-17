@@ -56,6 +56,15 @@ namespace jsonschema {
     public:
         virtual ~validator() = default;
 
+        void validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const 
+        {
+            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
+        }
+
     private:
         virtual void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -72,23 +81,7 @@ namespace jsonschema {
 
         virtual const std::string& schema_path() const = 0;
 
-        void validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const 
-        {
-            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
-        }
-
         virtual keyword_validator_type clone() const = 0;
-
-    private:
-        virtual void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const = 0;
     };
 
     template <class Json>
