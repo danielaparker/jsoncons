@@ -52,12 +52,12 @@ namespace draft7 {
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using ref_validator_type = ref_validator2<Json>;
+        using ref_validator_type = ref_validator<Json>;
     private:
         struct subschema_registry
         {
             std::map<std::string, schema_validator_pointer> schemas; // schemas
-            std::map<std::string, ref_validator<Json>*> unresolved; // unresolved references
+            std::map<std::string, ref_validator_type*> unresolved; // unresolved references
             std::map<std::string, Json> unprocessed_keywords;
         };
 
@@ -1226,7 +1226,7 @@ namespace draft7 {
                     auto p = s.get();
                     subschemas_.emplace_back(std::move(s));
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return jsoncons::make_unique<ref_validator<Json>>(p);
+                    return jsoncons::make_unique<ref_validator_type>(p);
                 }
             }
 
@@ -1239,7 +1239,7 @@ namespace draft7 {
             }
             else 
             {
-                auto orig = jsoncons::make_unique<ref_validator<Json>>(uri.string());
+                auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
                 auto p = file.unresolved.insert(ref,
                                               {std::string(uri.fragment()), orig.get()})
                     ->second; // unresolved, create new reference
