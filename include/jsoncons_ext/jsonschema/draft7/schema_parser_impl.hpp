@@ -46,11 +46,13 @@ namespace draft7 {
     class schema_parser_impl : public schema_parser<Json> 
     {
     public:
+        using validator_type = std::unique_ptr<validator<Json>>;
         using keyword_validator_wrapper_type = keyword_validator_wrapper<Json>;
         using schema_validator_wrapper_type = schema_validator_wrapper<Json>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using ref_validator_type = ref_validator2<Json>;
     private:
         struct subschema_registry
         {

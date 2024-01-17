@@ -51,7 +51,21 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class keyword_validator 
+    class validator 
+    {
+    public:
+        virtual ~validator() = default;
+
+    private:
+        virtual void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const = 0;
+    };
+
+    template <class Json>
+    class keyword_validator : public validator<Json> 
     {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
