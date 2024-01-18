@@ -1410,7 +1410,6 @@ namespace jsonschema {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         std::vector<keyword_validator_type> general_validators_;
-        jsoncons::optional<required_validator<Json>> required_;
 
         std::map<std::string, schema_validator_type> properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1426,7 +1425,6 @@ namespace jsonschema {
     public:
         object_validator(std::string&& schema_path,
             std::vector<keyword_validator_type>&& general_validators,
-            jsoncons::optional<required_validator<Json>>&& required,
             std::map<std::string, schema_validator_type>&& properties,
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties,
@@ -1438,7 +1436,6 @@ namespace jsonschema {
         )
             : keyword_validator_base<Json>(std::move(schema_path)), 
               general_validators_(std::move(general_validators)),
-              required_(std::move(required)),
               properties_(std::move(properties)),
         #if defined(JSONCONS_HAS_STD_REGEX)
               pattern_properties_(std::move(pattern_properties)),
@@ -1452,7 +1449,28 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> general_validators;
+
+            std::map<std::string, schema_validator_type> properties;
+        #if defined(JSONCONS_HAS_STD_REGEX)
+            std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
+        #endif
+            schema_validator_type additional_properties;
+
+            std::map<std::string, keyword_validator_type> dependent_required;
+            std::map<std::string, schema_validator_type> dependent_schemas;
+
+            schema_validator_type property_name_validator;
+
+            return jsoncons::make_unique<object_validator>(std::string(this->schema_path()),
+                std::move(general_validators), std::move(properties),
+        #if defined(JSONCONS_HAS_STD_REGEX)
+                std::move(pattern_properties),
+        #endif
+                std::move(additional_properties),
+                std::move(dependent_required),
+                std::move(dependent_schemas),
+                std::move(property_name_validator));
         }
     private:
 
@@ -1472,9 +1490,6 @@ namespace jsonschema {
                     return;
                 }
             }
-
-            if (required_)
-                required_->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
 
             for (const auto& prop : instance.object_range()) 
             {

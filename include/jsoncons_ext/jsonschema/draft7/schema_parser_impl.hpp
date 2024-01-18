@@ -982,9 +982,8 @@ namespace draft7 {
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                auto location = context.make_schema_path_with("required");
-                required = required_validator<Json>(location, 
-                                                   it->value().template as<std::vector<std::string>>());
+                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(context.make_schema_path_with("required"), 
+                    it->value().template as<std::vector<std::string>>()));
             }
 
             it = sch.find("properties");
@@ -1061,7 +1060,6 @@ namespace draft7 {
 
             return jsoncons::make_unique<object_validator<Json>>(std::move(schema_path),
                 std::move(general_validators),
-                std::move(required),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
                 std::move(pattern_properties),
