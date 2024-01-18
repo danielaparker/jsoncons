@@ -868,18 +868,6 @@ namespace draft7 {
             return jsoncons::make_unique<enum_validator<Json>>(schema_path, sch);
         }
 
-        std::unique_ptr<true_validator<Json>> make_true_validator(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("true");
-            return jsoncons::make_unique<true_validator<Json>>(schema_path);
-        }
-
-        std::unique_ptr<false_validator<Json>> make_false_validator(const compilation_context& context)
-        {
-            std::string schema_path = context.make_schema_path_with("false");
-            return jsoncons::make_unique<false_validator<Json>>(schema_path);
-        }
-
         std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context,
             const std::vector<std::string>& items)
         {

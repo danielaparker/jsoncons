@@ -1230,63 +1230,6 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class true_validator : public keyword_validator_base<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-
-    public:
-        true_validator(const std::string& schema_path)
-            : keyword_validator_base<Json>(schema_path)
-        {
-        }
-
-        keyword_validator_type clone() const final 
-        {
-            return keyword_validator_type{};
-        }
-
-    private:
-        void do_validate(const Json&, 
-            const jsonpointer::json_pointer&,
-            std::unordered_set<std::string>&, 
-            error_reporter&, 
-            Json&) const final
-        {
-        }
-    };
-
-    // false
-
-    template <class Json>
-    class false_validator : public keyword_validator_base<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-
-    public:
-        false_validator(const std::string& schema_path)
-            : keyword_validator_base<Json>(schema_path)
-        {
-        }
-
-        keyword_validator_type clone() const final 
-        {
-            return keyword_validator_type{};
-        }
-    private:
-        void do_validate(const Json&, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
-            error_reporter& reporter, 
-            Json&) const final
-        {
-            reporter.error(validation_output("false", 
-                                             this->schema_path(), 
-                                             instance_location.to_uri_fragment(), 
-                                             "False schema always fails"));
-        }
-    };
-
-    template <class Json>
     class required_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1307,7 +1250,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<required_validator>(std::string(this->schema_path()),
+                items_);
         }
 
     private:
