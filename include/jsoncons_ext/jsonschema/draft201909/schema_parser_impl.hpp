@@ -1030,7 +1030,6 @@ namespace draft201909 {
 
             std::vector<keyword_validator_type> general_validators;
 
-            jsoncons::optional<required_validator<Json>> required;
             std::map<std::string, schema_validator_type> properties;
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;

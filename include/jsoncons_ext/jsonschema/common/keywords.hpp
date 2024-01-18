@@ -1450,17 +1450,48 @@ namespace jsonschema {
         keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> general_validators;
+            for (auto& validator : general_validators_)
+            {
+                general_validators.emplace_back(validator->clone());
+            }
 
             std::map<std::string, schema_validator_type> properties;
+            for (auto& item : properties_)
+            {
+                properties.try_emplace(item.first, item.second->clone());
+            }
+
+
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
+            for (auto& item : pattern_properties_)
+            {
+                pattern_properties.emplace_back(item.first, item.second->clone());
+            }
         #endif
             schema_validator_type additional_properties;
+            if (additional_properties_)
+            {
+                additional_properties = additional_properties_->clone();
+            }
 
             std::map<std::string, keyword_validator_type> dependent_required;
+            for (auto& item : dependent_required_)
+            {
+                dependent_required.try_emplace(item.first, item.second->clone());
+            }
+
             std::map<std::string, schema_validator_type> dependent_schemas;
+            for (auto& item : dependent_schemas_)
+            {
+                dependent_schemas.try_emplace(item.first, item.second->clone());
+            }
 
             schema_validator_type property_name_validator;
+            if (property_name_validator_)
+            {
+                property_name_validator = property_name_validator_->clone();
+            }
 
             return jsoncons::make_unique<object_validator>(std::string(this->schema_path()),
                 std::move(general_validators), std::move(properties),

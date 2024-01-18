@@ -309,7 +309,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
         }
 
     private:
@@ -346,7 +346,7 @@ namespace jsonschema {
 
         schema_validator_type clone() const final 
         {
-            return schema_validator_type{};
+            return jsoncons::make_unique<schema_validator_wrapper>(validator_);
         }
     private:
         void do_validate(const Json& instance, 
