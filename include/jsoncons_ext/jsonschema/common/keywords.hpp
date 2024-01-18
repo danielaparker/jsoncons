@@ -1043,7 +1043,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<multiple_of_validator>(std::string(this->schema_path()),
+                value_);
         }
 
     private:
@@ -1089,7 +1090,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<integer_validator>(std::string(this->schema_path()),
+                std::move(validators));
         }
 
     private:
@@ -1136,7 +1144,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<number_validator>(std::string(this->schema_path()),
+                std::move(validators));
         }
 
     private:
@@ -1183,7 +1198,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<null_validator>(std::string(this->schema_path()));
         }
 
     private:
@@ -1216,7 +1231,7 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<boolean_validator>(std::string(this->schema_path()));
         }
     private:
         void do_validate(const Json&, 
