@@ -1317,16 +1317,99 @@ namespace jsonschema {
         }
     };
 
+    // maxProperties
+
+    template <class Json>
+    class max_properties_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
+        std::size_t max_properties_;
+    public:
+        max_properties_validator(const std::string& schema_path, std::size_t max_properties)
+            : keyword_validator_base<Json>(schema_path), max_properties_(max_properties)
+        {
+        }
+
+        keyword_validator_type clone() const final 
+        {
+            return jsoncons::make_unique<max_properties_validator>(this->schema_path(), max_properties_);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>&, 
+            error_reporter& reporter,
+            Json&) const final
+        {
+            if (instance.size() > max_properties_)
+            {
+                std::string message("Maximum properties: " + std::to_string(max_properties_));
+                message.append(", found: " + std::to_string(instance.size()));
+                reporter.error(validation_output("maxProperties", 
+                                                 this->schema_path(), 
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::move(message)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+        }
+    };
+
+    // minProperties
+
+    template <class Json>
+    class min_properties_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
+        std::size_t min_properties_;
+    public:
+        min_properties_validator(const std::string& schema_path, std::size_t min_properties)
+            : keyword_validator_base<Json>(schema_path), min_properties_(min_properties)
+        {
+        }
+
+        keyword_validator_type clone() const final 
+        {
+            return jsoncons::make_unique<min_properties_validator>(this->schema_path(), min_properties_);
+        }
+
+    private:
+
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>&, 
+            error_reporter& reporter,
+            Json&) const final
+        {
+            if (instance.size() < min_properties_)
+            {
+                std::string message("Maximum properties: " + std::to_string(min_properties_));
+                message.append(", found: " + std::to_string(instance.size()));
+                reporter.error(validation_output("minProperties", 
+                                                 this->schema_path(), 
+                                                 instance_location.to_uri_fragment(), 
+                                                 std::move(message)));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+        }
+    };
+
     template <class Json>
     class object_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        jsoncons::optional<std::size_t> max_properties_;
-        std::string absolute_max_properties_location_;
-        jsoncons::optional<std::size_t> min_properties_;
-        std::string absolute_min_properties_location_;
+        std::vector<keyword_validator_type> general_validators_;
         jsoncons::optional<required_validator<Json>> required_;
 
         std::map<std::string, schema_validator_type> properties_;
@@ -1342,10 +1425,7 @@ namespace jsonschema {
 
     public:
         object_validator(std::string&& schema_path,
-            jsoncons::optional<std::size_t>&& max_properties,
-            std::string&& absolute_max_properties_location,
-            jsoncons::optional<std::size_t>&& min_properties,
-            std::string&& absolute_min_properties_location,
+            std::vector<keyword_validator_type>&& general_validators,
             jsoncons::optional<required_validator<Json>>&& required,
             std::map<std::string, schema_validator_type>&& properties,
         #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1357,10 +1437,7 @@ namespace jsonschema {
             schema_validator_type&& property_name_validator
         )
             : keyword_validator_base<Json>(std::move(schema_path)), 
-              max_properties_(std::move(max_properties)),
-              absolute_max_properties_location_(std::move(absolute_max_properties_location)),
-              min_properties_(std::move(min_properties)),
-              absolute_min_properties_location_(std::move(absolute_min_properties_location)),
+              general_validators_(std::move(general_validators)),
               required_(std::move(required)),
               properties_(std::move(properties)),
         #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1387,29 +1464,10 @@ namespace jsonschema {
         {
             std::unordered_set<std::string> local_evaluated_properties;
 
-            if (max_properties_ && instance.size() > *max_properties_)
+            for (const auto& validator : general_validators_)
             {
-                std::string message("Maximum properties: " + std::to_string(*max_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output("maxProperties", 
-                                                 absolute_max_properties_location_, 
-                                                 instance_location.to_uri_fragment(), 
-                                                 std::move(message)));
-                if (reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
-            if (min_properties_ && instance.size() < *min_properties_)
-            {
-                std::string message("Minimum properties: " + std::to_string(*min_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output("minProperties", 
-                                                 absolute_min_properties_location_, 
-                                                 instance_location.to_uri_fragment(), 
-                                                 std::move(message)));
-                if (reporter.fail_early())
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
                 }

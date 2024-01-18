@@ -1027,10 +1027,9 @@ namespace draft201909 {
             const compilation_context& context)
         {
             std::string schema_path = context.make_schema_path_with("object");
-            jsoncons::optional<std::size_t> max_properties;
-            std::string absolute_max_properties_location;
-            jsoncons::optional<std::size_t> min_properties;
-            std::string absolute_min_properties_location;
+
+            std::vector<keyword_validator_type> general_validators;
+
             jsoncons::optional<required_validator<Json>> required;
             std::map<std::string, schema_validator_type> properties;
         #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1044,15 +1043,15 @@ namespace draft201909 {
             auto it = sch.find("maxProperties");
             if (it != sch.object_range().end()) 
             {
-                max_properties = it->value().template as<std::size_t>();
-                absolute_max_properties_location = context.make_schema_path_with("maxProperties");
+                auto max_properties = it->value().template as<std::size_t>();
+                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(context.make_schema_path_with("maxProperties"), max_properties));
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
-                min_properties = it->value().template as<std::size_t>();
-                absolute_min_properties_location = context.make_schema_path_with("minProperties");
+                auto min_properties = it->value().template as<std::size_t>();
+                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(context.make_schema_path_with("minProperties"), min_properties));
             }
 
             it = sch.find("required");
@@ -1183,8 +1182,7 @@ namespace draft201909 {
             }
 
             return jsoncons::make_unique<object_validator<Json>>(std::move(schema_path),
-                std::move(max_properties), std::move(absolute_max_properties_location),
-                std::move(min_properties), std::move(absolute_min_properties_location),
+                std::move(general_validators),
                 std::move(required),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
