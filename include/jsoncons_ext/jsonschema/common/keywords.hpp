@@ -830,19 +830,26 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        std::vector<schema_validator_type> subschemas_;
+        std::vector<schema_validator_type> validators_;
 
     public:
         combining_validator(std::string&& schema_path,
-             std::vector<schema_validator_type>&& subschemas)
+             std::vector<schema_validator_type>&& validators)
             : keyword_validator_base<Json>(std::move(schema_path)),
-              subschemas_(std::move(subschemas))
+              validators_(std::move(validators))
         {
         }
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<schema_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<combining_validator>(std::string(this->schema_path()),
+                std::move(validators));
         }
 
     private:
@@ -853,14 +860,14 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "combining_validator.do_validate " << instance << " " << subschemas_.size() << ", " << instance_location.to_string() << "\n";
+            //std::cout << "combining_validator.do_validate " << instance << " " << validators_.size() << ", " << instance_location.to_string() << "\n";
 
             size_t count = 0;
 
             collecting_error_reporter local_reporter;
 
             bool is_complete = false;
-            for (auto& s : subschemas_) 
+            for (auto& s : validators_) 
             {
                 std::size_t mark = local_reporter.errors.size();
                 s->validate(instance, instance_location, evaluated_properties, local_reporter, patch);
@@ -899,7 +906,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<maximum_validator>(std::string(this->schema_path()),
+                value_);
         }
 
     private:
@@ -935,7 +943,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<exclusive_maximum_validator>(std::string(this->schema_path()),
+                value_);
         }
 
     private:
@@ -971,7 +980,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<minimum_validator>(std::string(this->schema_path()),
+                value_);
         }
 
     private:
@@ -1007,7 +1017,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<exclusive_minimum_validator>(std::string(this->schema_path()),
+                value_);
         }
 
     private:
