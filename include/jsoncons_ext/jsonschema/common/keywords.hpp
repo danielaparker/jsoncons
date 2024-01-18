@@ -1591,7 +1591,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<unevaluated_properties_validator>(std::string(this->schema_path()),
+                validator_->clone());
         }
 
     private:
