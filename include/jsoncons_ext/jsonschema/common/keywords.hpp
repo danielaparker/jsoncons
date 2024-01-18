@@ -484,7 +484,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<contains_validator>(std::string(this->schema_path()),
+                validator_->clone());
         }
 
     private:
@@ -543,7 +544,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<items_object_validator>(std::string(this->schema_path()),
+                items_validator_->clone());
         }
 
     private:
@@ -584,7 +586,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<unique_items_validator>(std::string(this->schema_path()),
+                are_unique_);
         }
 
     private:
@@ -641,7 +644,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<min_length_validator>(std::string(this->schema_path()),
+                min_length_);
         }
 
     private:
@@ -686,7 +690,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            std::vector<keyword_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->clone());
+            }
+
+            return jsoncons::make_unique<string_validator>(std::string(this->schema_path()),
+                std::move(validators));
         }
 
     private:
@@ -727,7 +738,8 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            return keyword_validator_type{};
+            return jsoncons::make_unique<not_validator>(std::string(this->schema_path()),
+                rule_->clone());
         }
 
     private:
