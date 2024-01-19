@@ -51,7 +51,6 @@ namespace draft201909 {
     public:
         using validator_type = std::unique_ptr<validator_base<Json>>;
         using keyword_validator_wrapper_type = keyword_validator_wrapper<Json>;
-        using schema_validator_wrapper_type = schema_validator_wrapper<Json>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -125,24 +124,21 @@ namespace draft201909 {
             {
                 case json_type::bool_value:
                 {
-                    schema_validator_type ptr;
                     if (sch.template as<bool>())
                     {
                         std::string schema_path = new_context.make_schema_path_with("true");
-                        ptr =  jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, true);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, true);
                     }
                     else
                     {
                         std::string schema_path = new_context.make_schema_path_with("false");
-                        ptr =  jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, false);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, false);
                     }
-                    schema_validator<Json>* p = ptr.get();
-                    subschemas_.emplace_back(std::move(ptr));
+                    schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
                         insert_schema(uri, p);
                     }          
-                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper_type>(p);
                     break;
                 }
                 case json_type::object_value:
@@ -159,7 +155,7 @@ namespace draft201909 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "$defs", def.key() };
-                            make_schema_validator(def.value(), new_context, sub_keys);
+                            subschemas_.emplace_back(make_schema_validator(def.value(), new_context, sub_keys));
                         }
                     }
                     it = sch.find("definitions");
@@ -168,7 +164,7 @@ namespace draft201909 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "definitions", def.key() };
-                            make_schema_validator(def.value(), new_context, sub_keys);
+                            subschemas_.emplace_back(make_schema_validator(def.value(), new_context, sub_keys));
                         }
                     }
                     it = sch.find("$ref");
@@ -239,14 +235,14 @@ namespace draft201909 {
                         if (then_it != sch.object_range().end()) 
                         {
                             std::string sub_keys[] = { "then" };
-                            make_schema_validator(then_it->value(), new_context, sub_keys);
+                            subschemas_.emplace_back(make_schema_validator(then_it->value(), new_context, sub_keys));
                         }
 
                         auto else_it = sch.find("else");
                         if (else_it != sch.object_range().end()) 
                         {
                             std::string sub_keys[] = { "else" };
-                            make_schema_validator(else_it->value(), new_context, sub_keys);
+                            subschemas_.emplace_back(make_schema_validator(else_it->value(), new_context, sub_keys));
                         }
                     }
 
@@ -256,10 +252,9 @@ namespace draft201909 {
                         validators.push_back(make_unevaluated_properties_validator(it->value(), new_context));
                     } 
 
-                    auto ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri().string(),
+                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri().string(),
                         std::move(validators), std::move(default_value));
-                    schema_validator<Json>* p = ptr.get();
-                    subschemas_.emplace_back(std::move(ptr));
+                    schema_validator<Json>* p = schema_validator_ptr.get();
 
                     it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                     if (it != sch.object_range().end()) 
@@ -288,7 +283,6 @@ namespace draft201909 {
                             insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                         }
                     }          
-                    schema_validator_ptr = jsoncons::make_unique<schema_validator_wrapper_type>(p);
                     break;
                 }
                 default:
@@ -1250,7 +1244,7 @@ namespace draft201909 {
                         if (resolver_) 
                         {
                             Json external_sch = resolver_(loc);
-                            make_schema_validator(external_sch, compilation_context(schema_location(loc)), {});
+                            subschemas_.emplace_back(make_schema_validator(external_sch, compilation_context(schema_location(loc)), {}));
                             ++loaded_count;
                         } 
                         else 
@@ -1310,7 +1304,7 @@ namespace draft201909 {
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto it = file.unresolved.find(fragment);
                 if (it != file.unresolved.end())
-                    make_schema_validator(value, compilation_context(new_uri), {});
+                    subschemas_.emplace_back(make_schema_validator(value, compilation_context(new_uri), {}));
                 else // no, nothing ref'd it, keep for later
                     file.unprocessed_keywords[fragment] = value;
 
@@ -1346,10 +1340,10 @@ namespace draft201909 {
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
                     auto s = make_schema_validator(subsch, compilation_context(uri), {}); 
-                    auto p = s.get();
-                    subschemas_.emplace_back(std::move(s));
+                    //auto p = s.get();
+                    //subschemas_.emplace_back(std::move(s));
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return jsoncons::make_unique<ref_validator_type>(p->clone());
+                    return jsoncons::make_unique<ref_validator_type>(std::move(s));
                 }
             }
 
