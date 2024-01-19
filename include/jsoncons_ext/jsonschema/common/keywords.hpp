@@ -1477,7 +1477,7 @@ namespace jsonschema {
             std::map<std::string, schema_validator_type> properties;
             for (auto& item : properties_)
             {
-                properties.try_emplace(item.first, item.second->clone());
+                properties.emplace(item.first, item.second->clone());
             }
 
 
@@ -1497,13 +1497,13 @@ namespace jsonschema {
             std::map<std::string, keyword_validator_type> dependent_required;
             for (auto& item : dependent_required_)
             {
-                dependent_required.try_emplace(item.first, item.second->clone());
+                dependent_required.emplace(item.first, item.second->clone());
             }
 
             std::map<std::string, schema_validator_type> dependent_schemas;
             for (auto& item : dependent_schemas_)
             {
-                dependent_schemas.try_emplace(item.first, item.second->clone());
+                dependent_schemas.emplace(item.first, item.second->clone());
             }
 
             schema_validator_type property_name_validator;
