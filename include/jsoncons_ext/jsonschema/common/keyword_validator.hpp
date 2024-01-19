@@ -132,26 +132,32 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        const schema_validator<Json>* referred_schema_;
+        schema_validator_type referred_schema_;
 
     public:
         ref_validator(const std::string& /*id*/)
-            : referred_schema_(nullptr) {}
+        {}
 
-        ref_validator(const schema_validator<Json>* target)
-            : referred_schema_(target) {}
+        ref_validator(schema_validator_type&& target)
+            : referred_schema_(std::move(target)) {}
 
-        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
+        void set_referred_schema(schema_validator_type&& target) { referred_schema_ = std::move(target); }
 
         const std::string& schema_path() const override
         {
             static std::string s = "#";
-            return referred_schema_ != nullptr ? referred_schema_->schema_path() : s;
+            return referred_schema_ ? referred_schema_->schema_path() : s;
         }
 
         keyword_validator_type clone() const override 
         {
-            return jsoncons::make_unique<ref_validator>(referred_schema_);
+            schema_validator_type referred_schema;
+            if (referred_schema_)
+            {
+                referred_schema = referred_schema_->clone();
+            }
+
+            return jsoncons::make_unique<ref_validator>(std::move(referred_schema));
         }
 
     private:

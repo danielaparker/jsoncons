@@ -1291,7 +1291,7 @@ namespace draft201909 {
             auto unresolved_it = file.unresolved.find(std::string(uri.fragment()));
             if (unresolved_it != file.unresolved.end()) 
             {
-                unresolved_it->second->set_referred_schema(s);
+                unresolved_it->second->set_referred_schema(s->clone());
                 file.unresolved.erase(unresolved_it);
             }
         }
@@ -1331,7 +1331,7 @@ namespace draft201909 {
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(sch->second);
+                return jsoncons::make_unique<ref_validator_type>(sch->second->clone());
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -1349,7 +1349,7 @@ namespace draft201909 {
                     auto p = s.get();
                     subschemas_.emplace_back(std::move(s));
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
-                    return jsoncons::make_unique<ref_validator_type>(p);
+                    return jsoncons::make_unique<ref_validator_type>(p->clone());
                 }
             }
 

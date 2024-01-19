@@ -418,18 +418,20 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
-            /*std::vector<keyword_validator_type> item_validators;
+            std::vector<schema_validator_type> item_validators;
             for (auto& validator : item_validators_)
             {
                 item_validators.push_back(validator->clone());
             }
-            keyword_validator_type additional_items_validator = additional_items_validator_->clone();
+            schema_validator_type additional_items_validator; 
+            
+            if (additional_items_validator_)
+            {
+                additional_items_validator = additional_items_validator_->clone();
+            }
 
             return jsoncons::make_unique<items_array_validator>(this->schema_path(), std::move(item_validators),
                 std::move(additional_items_validator));
-                */
-            return keyword_validator_type{};
-
         }
 
     private:
@@ -484,8 +486,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
+            schema_validator_type validator;
+            if (validator_)
+            {
+                validator = validator_->clone();
+            }
+
             return jsoncons::make_unique<contains_validator>(std::string(this->schema_path()),
-                validator_->clone());
+                std::move(validator));
         }
 
     private:
@@ -544,8 +552,13 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
+            schema_validator_type items_validator;
+            if (items_validator_)
+            {
+                items_validator = items_validator_->clone();
+            }
             return jsoncons::make_unique<items_object_validator>(std::string(this->schema_path()),
-                items_validator_->clone());
+                std::move(items_validator));
         }
 
     private:
@@ -738,8 +751,14 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
+            schema_validator_type rule;
+            if (rule_)
+            {
+                rule = rule_->clone();
+            }
+
             return jsoncons::make_unique<not_validator>(std::string(this->schema_path()),
-                rule_->clone());
+                std::move(rule));
         }
 
     private:
@@ -1677,8 +1696,13 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
+            schema_validator_type validator;
+            if (validator_)
+            {
+                validator = validator_->clone();
+            }
             return jsoncons::make_unique<unevaluated_properties_validator>(std::string(this->schema_path()),
-                validator_->clone());
+                std::move(validator));
         }
 
     private:
@@ -1787,8 +1811,24 @@ namespace jsonschema {
 
         keyword_validator_type clone() const final 
         {
+            schema_validator_type if_validator;
+            if (if_validator_)
+            {
+                if_validator = if_validator_->clone();
+            }
+            schema_validator_type then_validator;
+            if (then_validator_)
+            {
+                then_validator = then_validator_->clone();
+            }
+            schema_validator_type else_validator;
+            if (else_validator_)
+            {
+                else_validator = else_validator_->clone();
+            }
+
             return jsoncons::make_unique<conditional_validator>(std::string(this->schema_path()), 
-                if_validator_->clone(), then_validator_->clone(), else_validator_->clone());
+                std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
     private:
         void do_validate(const Json& instance, 
@@ -1929,7 +1969,14 @@ namespace jsonschema {
             std::vector<keyword_validator_type> type_mapping;
             for (auto& validator : type_mapping_)
             {
-                type_mapping.emplace_back(validator->clone());
+                if (validator)
+                {
+                    type_mapping.emplace_back(validator->clone());
+                }
+                else
+                {
+                    type_mapping.emplace_back(keyword_validator_type{});
+                }
             }
 
             return jsoncons::make_unique<type_validator>(std::string(this->schema_path()),
