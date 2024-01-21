@@ -1,34 +1,32 @@
 [
-    {
-        "description": "root pointer ref",
-        "schema": {
+     {
+         "description": "empty tokens in $ref json-pointer",
+         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "properties": {
-                "foo": {"$ref": "#"}
-            },
-            "additionalProperties": false
-        },
-        "tests": [
-            {
-                "description": "match",
-                "data": {"foo": false},
-                "valid": true
-            },
-            {
-                "description": "recursive match",
-                "data": {"foo": {"foo": false}},
-                "valid": true
-            },
-            {
-                "description": "mismatch",
-                "data": {"bar": false},
-                "valid": false
-            },
-            {
-                "description": "recursive mismatch",
-                "data": {"foo": {"bar": false}},
-                "valid": false
-            }
-        ]
-    }
+             "$defs": {
+                 "": {
+                     "$defs": {
+                         "": { "type": "number" }
+                     }
+                 } 
+             },
+             "allOf": [
+                 {
+                     "$ref": "#/$defs//$defs/"
+                 }
+             ]
+         },
+         "tests": [
+             /*{
+                 "description": "number is valid",
+                 "data": 1,
+                 "valid": true
+             },*/
+             {
+                 "description": "non-number is invalid",
+                 "data": "a",
+                 "valid": false
+             }
+         ]
+     }
 ]

@@ -1312,6 +1312,7 @@ namespace draft201909 {
                                     const std::string& key, 
                                     const Json& value)
         {
+/*
             auto &doc = get_or_create_document(uri.base().string());
             auto new_u = uri.append(key);
             schema_location new_uri(new_u);
@@ -1333,6 +1334,7 @@ namespace draft201909 {
                         insert_unknown_keyword(new_uri, subsch.key(), subsch.value());
                     }
             }
+*/
         }
 
         keyword_validator_type get_or_create_reference(const schema_location& uri)
