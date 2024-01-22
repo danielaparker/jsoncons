@@ -25,6 +25,7 @@
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
+#include <stack>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -72,6 +73,8 @@ namespace draft201909 {
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> schema_documents_;
 
+        std::stack<bool> is_def;
+
     public:
         schema_parser_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
 
@@ -113,7 +116,8 @@ namespace draft201909 {
             const compilation_context& context,
             jsoncons::span<const std::string> keys) 
         {
-            //std::cout << "make_schema_validator.update_uris " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
+            std::cout << "make_schema_validator.update_uris "  << is_def.size() << " " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
+
             auto new_context = context.update_uris(sch, keys);
 
             Json default_value{jsoncons::null_type()};
@@ -152,10 +156,14 @@ namespace draft201909 {
                     it = sch.find("$defs");
                     if (it != sch.object_range().end()) 
                     {
+                        std::cout << "$defs\n";
                         for (const auto& def : it->value().object_range())
                         {
+                            is_def.push(true);
+                            std::cout << "$defs key:" << def.key() << ", index = " << is_def.size() << "\n";
                             std::string sub_keys[] = { "$defs", def.key() };
                             subschemas_.emplace_back(make_schema_validator(def.value(), new_context, sub_keys));
+                            is_def.pop();
                         }
                     }
                     it = sch.find("definitions");
@@ -277,6 +285,10 @@ namespace draft201909 {
                     
                     for (const auto& uri : new_context.uris()) 
                     { 
+                        if (!is_def.empty())
+                        {
+                            std::cout << "    " << uri.string() << "\n";
+                        }
                         insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
@@ -289,6 +301,8 @@ namespace draft201909 {
                     JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_absolute_uri().string() + ", expected: boolean or object"));
                     break;
             }
+
+            std::cout << "End make_schema_validator " << is_def.size() << "\n";
             
             return schema_validator_ptr;
         }
@@ -1308,9 +1322,9 @@ namespace draft201909 {
             }
         }
 
-        void insert_unknown_keyword(const schema_location& uri, 
-                                    const std::string& key, 
-                                    const Json& value)
+        void insert_unknown_keyword(const schema_location& /*uri*/, 
+                                    const std::string& /*key*/, 
+                                    const Json& /*value*/)
         {
 /*
             auto &doc = get_or_create_document(uri.base().string());

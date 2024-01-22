@@ -24,13 +24,13 @@ namespace draft201909 {
         std::vector<schema_location> uris_;
     public:
         compilation_context(const schema_location& location)
-            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+            : absolute_uri_(/*location.uri().is_absolute() ?*/ location.uri() /*: uri{}*/), 
               uris_(std::vector<schema_location>{{location}})
         {
         }
 
         compilation_context(schema_location&& location)
-            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+            : absolute_uri_(/*location.uri().is_absolute() ?*/ location.uri() /*: uri{}*/), 
               uris_(std::vector<schema_location>{{std::move(location)}})
         {
         }
@@ -38,7 +38,8 @@ namespace draft201909 {
         explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
-            for (auto it = uris_.rbegin();
+            absolute_uri_ = uris.back().uri();
+            /*for (auto it = uris_.rbegin();
                  it != uris_.rend();
                  ++it)
             {
@@ -47,12 +48,13 @@ namespace draft201909 {
                     absolute_uri_ = it->uri();
                     break;
                 }
-            }
+            }*/
         }
         explicit compilation_context(std::vector<schema_location>&& uris)
             : uris_(std::move(uris))
         {
-            for (auto it = uris_.rbegin();
+            absolute_uri_ = uris.back().uri();
+            /*for (auto it = uris_.rbegin();
                  it != uris_.rend();
                  ++it)
             {
@@ -61,7 +63,7 @@ namespace draft201909 {
                     absolute_uri_ = it->uri();
                     break;
                 }
-            }
+            }*/
         }
 
         const std::vector<schema_location>& uris() const {return uris_;}
@@ -107,7 +109,7 @@ namespace draft201909 {
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
             {
-                if (uri.is_absolute())
+                if (!uri.has_plain_name_fragment())
                 {
                     new_uris.push_back(uri);
                 }
@@ -153,11 +155,11 @@ namespace draft201909 {
                 }
             }
 
-            //std::cout << "\ncontext isRecursiveAnchor: " << (anchor_flags == uri_anchor_flags::recursive_anchor) << "\n\n";
-            //for (const auto& uri : new_uris)
-            //{
-            //    std::cout << "    " << uri.string() << "\n";
-            //}
+            std::cout << "Absolute URI: " << absolute_uri_.string() << "\n";
+            for (const auto& uri : new_uris)
+            {
+                std::cout << "    " << uri.string() << "\n";
+            }
 
             return compilation_context(new_uris);
         }
