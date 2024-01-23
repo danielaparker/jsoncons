@@ -23,14 +23,14 @@ namespace draft7 {
         uri absolute_uri_;
         std::vector<schema_location> uris_;
     public:
-        compilation_context(const schema_location& location)
-            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+        explicit compilation_context(const schema_location& location)
+            : absolute_uri_(location.uri()), 
               uris_(std::vector<schema_location>{{location}})
         {
         }
 
-        compilation_context(schema_location&& location)
-            : absolute_uri_(location.uri().is_absolute() ? location.uri() : uri{}), 
+        explicit compilation_context(schema_location&& location)
+            : absolute_uri_(location.uri()), 
               uris_(std::vector<schema_location>{{std::move(location)}})
         {
         }
@@ -38,30 +38,12 @@ namespace draft7 {
         explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
-            for (auto it = uris_.rbegin();
-                 it != uris_.rend();
-                 ++it)
-            {
-                if (it->uri().is_absolute())
-                {
-                    absolute_uri_ = it->uri();
-                    break;
-                }
-            }
+            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{"#"};
         }
         explicit compilation_context(std::vector<schema_location>&& uris)
             : uris_(std::move(uris))
         {
-            for (auto it = uris_.rbegin();
-                 it != uris_.rend();
-                 ++it)
-            {
-                if (it->uri().is_absolute())
-                {
-                    absolute_uri_ = it->uri();
-                    break;
-                }
-            }
+            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{"#"};
         }
 
         const std::vector<schema_location>& uris() const {return uris_;}
@@ -141,7 +123,7 @@ namespace draft7 {
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
             {
-                if (uri.is_absolute())
+                if (!uri.has_plain_name_fragment())
                 {
                     new_uris.push_back(uri);
                 }
