@@ -81,7 +81,7 @@ namespace jsonschema {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        virtual keyword_validator_type clone() const = 0;
+        virtual keyword_validator_type clone(const uri& base_uri) const = 0;
     };
 
     template <class Json>
@@ -123,7 +123,7 @@ namespace jsonschema {
 
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
-        virtual schema_validator_type clone() const = 0;
+        virtual schema_validator_type clone(const uri& base_uri) const = 0;
     };
 
     template <class Json>
@@ -132,16 +132,22 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
+        uri base_uri_;
         schema_validator_type referred_schema_;
 
     public:
-        ref_validator(const std::string& /*id*/)
+        ref_validator(const uri& base_uri) : base_uri_(base_uri)
         {}
 
-        ref_validator(schema_validator_type&& target)
-            : referred_schema_(std::move(target)) {}
+        ref_validator(const uri& base_uri, schema_validator_type&& target)
+            : base_uri_(base_uri), referred_schema_(std::move(target)) {}
 
         void set_referred_schema(schema_validator_type&& target) { referred_schema_ = std::move(target); }
+
+        uri get_base_uri() const
+        {
+            return base_uri_;
+        }
 
         const std::string& schema_path() const override
         {
@@ -149,15 +155,15 @@ namespace jsonschema {
             return referred_schema_ ? referred_schema_->schema_path() : s;
         }
 
-        keyword_validator_type clone() const override 
+        keyword_validator_type clone(const uri& base_uri) const override 
         {
             schema_validator_type referred_schema;
             if (referred_schema_)
             {
-                referred_schema = referred_schema_->clone();
+                referred_schema = referred_schema_->clone(base_uri);
             }
 
-            return jsoncons::make_unique<ref_validator>(std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(base_uri, std::move(referred_schema));
         }
 
     private:
@@ -207,7 +213,7 @@ namespace jsonschema {
             return schema_path_;
         }
 
-        schema_validator_type clone() const final
+        schema_validator_type clone(const uri& base_uri) const final
         {
             return jsoncons::make_unique<boolean_schema_validator>(schema_path_, value_);
         }
@@ -258,12 +264,12 @@ namespace jsonschema {
             return schema_path_;
         }
 
-        schema_validator_type clone() const final
+        schema_validator_type clone(const uri& base_uri) const final
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.push_back(validator->clone());
+                validators.push_back(validator->clone(base_uri));
             }
 
             return jsoncons::make_unique<object_schema_validator>(schema_path_, std::move(validators), Json(default_value_));
@@ -313,7 +319,7 @@ namespace jsonschema {
             return validator_ != nullptr ? validator_->schema_path() : s;
         }
 
-        keyword_validator_type clone() const final 
+        keyword_validator_type clone(const uri& base_uri) const final 
         {
             return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
         }

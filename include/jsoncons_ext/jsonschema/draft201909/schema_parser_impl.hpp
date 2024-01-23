@@ -1296,7 +1296,7 @@ namespace draft201909 {
                     {
                         JSONCONS_THROW(schema_error(doc.first + " has undefined reference " + ref.first + "."));
                     }
-                    ref.second->set_referred_schema(it->second->clone());
+                    ref.second->set_referred_schema(it->second->clone(ref.second->get_base_uri()));
                 }
             }
         }
@@ -1331,10 +1331,10 @@ namespace draft201909 {
             auto sch = doc.schemas.find(std::string(uri.fragment()));
             if (sch != doc.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(sch->second->clone());
+                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->clone(uri.base()));
             }
 
-            auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
+            auto orig = jsoncons::make_unique<ref_validator_type>(uri.base());
             auto p = orig.get();
             doc.unresolved.emplace_back(std::string(uri.fragment()), p);
             

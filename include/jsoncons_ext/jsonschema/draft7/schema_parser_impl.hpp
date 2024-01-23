@@ -1172,7 +1172,7 @@ namespace draft7 {
             auto unresolved_it = file.unresolved.find(std::string(uri.fragment()));
             if (unresolved_it != file.unresolved.end()) 
             {
-                unresolved_it->second->set_referred_schema(s->clone());
+                unresolved_it->second->set_referred_schema(s->clone(uri.base()));
                 file.unresolved.erase(unresolved_it);
             }
         }
@@ -1212,7 +1212,7 @@ namespace draft7 {
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(sch->second->clone());
+                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->clone(uri.base()));
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -1230,7 +1230,7 @@ namespace draft7 {
                     //auto p = s.get();
                     //subschemas_.emplace_back(std::move(s));
                     file.unknown_keywords.erase(unprocessed_keywords_it);
-                    return jsoncons::make_unique<ref_validator_type>(std::move(s));
+                    return jsoncons::make_unique<ref_validator_type>(uri.base(), std::move(s));
                 }
             }
 
@@ -1242,7 +1242,7 @@ namespace draft7 {
             }
             else 
             {
-                auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
+                auto orig = jsoncons::make_unique<ref_validator_type>(uri.base());
                 auto p = orig.get();
                 file.unresolved.insert(it, {std::string(uri.fragment()), p});
 
