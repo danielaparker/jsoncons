@@ -60,7 +60,7 @@ namespace draft201909 {
         struct subschema_registry
         {
             std::map<std::string, schema_validator_pointer> schemas; // schemas
-            std::map<std::string, ref_validator_type*> unresolved; // unresolved references
+            std::vector<std::pair<std::string, ref_validator_type*>> unresolved; // unresolved references
             std::map<std::string, Json> unknown_keywords;
         };
 
@@ -1268,16 +1268,6 @@ namespace draft201909 {
             while (loaded_count > 0);
 
             resolve_references();
-
-            /*for (const auto& doc : schema_documents_)
-            {
-                if (!doc.second.unresolved.empty())
-                {
-                    JSONCONS_THROW(schema_error("After all files have been parsed, '" +
-                                                (doc.first == "" ? "<root>" : doc.first) +
-                                                "' has still undefined references."));
-                }
-            }*/
         }
 
     private:
@@ -1293,14 +1283,6 @@ namespace draft201909 {
             }
 
             doc.schemas.insert({std::string(uri.fragment()), s});
-
-            // is there an unresolved reference to this newly inserted schema?
-            /*auto unresolved_it = doc.unresolved.find(std::string(uri.fragment()));
-            if (unresolved_it != doc.unresolved.end()) 
-            {
-                unresolved_it->second->set_referred_schema(s->clone());
-                doc.unresolved.erase(unresolved_it);
-            }*/
         }
 
         void resolve_references()
@@ -1319,11 +1301,10 @@ namespace draft201909 {
             }
         }
 
-        void insert_unknown_keyword(const schema_location& /*uri*/, 
-                                    const std::string& /*key*/, 
-                                    const Json& /*value*/)
+        void insert_unknown_keyword(const schema_location& uri, 
+                                    const std::string& key, 
+                                    const Json& value)
         {
-/*
             auto &doc = get_or_create_document(uri.base().string());
             auto new_u = uri.append(key);
             schema_location new_uri(new_u);
@@ -1331,12 +1312,7 @@ namespace draft201909 {
             if (new_uri.has_fragment() && !new_uri.has_plain_name_fragment()) 
             {
                 auto fragment = std::string(new_uri.fragment());
-                // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
-                auto it = doc.unresolved.find(fragment);
-                if (it != doc.unresolved.end())
-                    subschemas_.emplace_back(make_schema_validator(value, compilation_context(new_uri), {}));
-                else // no, nothing ref'd it, keep for later
-                    doc.unknown_keywords[fragment] = value;
+                doc.unknown_keywords.emplace(fragment, value);
 
                 // recursively add possible subschemas of unknown keywords
                 if (value.type() == json_type::object_value)
@@ -1345,7 +1321,6 @@ namespace draft201909 {
                         insert_unknown_keyword(new_uri, subsch.key(), subsch.value());
                     }
             }
-*/
         }
 
         keyword_validator_type get_or_create_reference(const schema_location& uri)
@@ -1359,40 +1334,12 @@ namespace draft201909 {
                 return jsoncons::make_unique<ref_validator_type>(sch->second->clone());
             }
 
-            // referencing an unknown keyword, turn it into schema
-            //
-            // an unknown keyword can only be referenced by a JSONPointer,
-            // not by a plain name identifier
-            if (uri.has_fragment() && !uri.has_plain_name_fragment()) 
-            {
-                std::string fragment = std::string(uri.fragment());
-                auto unprocessed_keywords_it = doc.unknown_keywords.find(fragment);
-                if (unprocessed_keywords_it != doc.unknown_keywords.end()) 
-                {
-                    auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
-                    //auto p = s.get();
-                    //subschemas_.emplace_back(std::move(s));
-                    doc.unknown_keywords.erase(unprocessed_keywords_it);
-                    return jsoncons::make_unique<ref_validator_type>(std::move(s));
-                }
-            }
-
-            // get or create a ref_validator
-            auto it = doc.unresolved.find(std::string(uri.fragment()));
-            if (it != doc.unresolved.end()) 
-            {
-                return jsoncons::make_unique<keyword_validator_wrapper_type>(it->second);
-            }
-            else 
-            {
-                auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
-                auto p = orig.get();
-                doc.unresolved.insert(it, {std::string(uri.fragment()), p});
-                
-                subschemas_.emplace_back(std::move(orig));
-                return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
-            }
+            auto orig = jsoncons::make_unique<ref_validator_type>(uri.string());
+            auto p = orig.get();
+            doc.unresolved.emplace_back(std::string(uri.fragment()), p);
+            
+            subschemas_.emplace_back(std::move(orig));
+            return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
         }
 
         subschema_registry& get_or_create_document(const std::string& loc)
