@@ -150,7 +150,7 @@ namespace draft201909 {
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
             {
-                if (uri.is_absolute())
+                if (!uri.has_plain_name_fragment())
                 {
                     new_uris.push_back(uri);
                 }
@@ -184,12 +184,12 @@ namespace draft201909 {
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
-                if (!it->has_plain_name_fragment() && it->is_absolute())
+                if (!it->has_plain_name_fragment())
                 {
                     return it->append(keyword).string();
                 }
             }
-            return "";
+            return "#";
         }
     };
 

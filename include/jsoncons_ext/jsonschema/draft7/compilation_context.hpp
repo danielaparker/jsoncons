@@ -156,12 +156,12 @@ namespace draft7 {
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
-                if (!it->has_plain_name_fragment() && it->is_absolute())
+                if (!it->has_plain_name_fragment())
                 {
                     return it->append(keyword).string();
                 }
             }
-            return "";
+            return "#";
         }
     };
 
