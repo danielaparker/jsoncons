@@ -354,11 +354,11 @@ namespace jsoncons {
         {
             return last_;
         }
-        const_iterator cbegin()
+        const_iterator cbegin() const
         {
             return first_;
         }
-        const_iterator cend()
+        const_iterator cend() const
         {
             return last_;
         }
@@ -370,11 +370,11 @@ namespace jsoncons {
         {
             return reverse_iterator(first_);
         }
-        const_reverse_iterator crbegin()
+        const_reverse_iterator crbegin() const
         {
             return reverse_iterator(last_);
         }
-        const_reverse_iterator crend()
+        const_reverse_iterator crend() const
         {
             return reverse_iterator(first_);
         }
