@@ -728,7 +728,7 @@ private:
             default:
                 if ((type > 0x8f && type <= 0x9f) // fixarray
                     || (type > 0x7f && type <= 0x8f) // fixmap
-                   )
+        )
                 {
                     return type & 0x0f;
                 }

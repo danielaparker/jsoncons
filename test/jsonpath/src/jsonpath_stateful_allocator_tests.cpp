@@ -102,7 +102,7 @@ TEST_CASE("jsonpath stateful allocator test")
             {
                 CHECK((title.as<jsoncons::string_view>() == "Sword of Honour")); 
             }
-        );
+ );
     }
 
     SECTION("json_replace 1")
@@ -147,7 +147,7 @@ TEST_CASE("jsonpath stateful allocator test")
             {
                 price = std::round(price.as<double>() - 1.0); 
             }
-        );
+ );
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
         CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));

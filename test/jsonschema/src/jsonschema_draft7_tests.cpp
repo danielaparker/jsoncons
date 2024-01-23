@@ -188,7 +188,7 @@ TEST_CASE("jsonschema draft7 tests")
       "minItems": 3,
       "maxItems": 1
     }
-            )");
+ )");
 
             jsoncons::json instance = jsoncons::json::parse(R"(
     [
@@ -201,7 +201,7 @@ TEST_CASE("jsonschema draft7 tests")
         "z": 6.7
       }
     ]
-            )");
+ )");
 
             auto sch = jsoncons::jsonschema::make_schema(schema);
             jsoncons::jsonschema::json_validator<jsoncons::json> validator(sch);

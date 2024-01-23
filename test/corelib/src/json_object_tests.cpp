@@ -620,7 +620,7 @@ TEST_CASE("test_count")
 
     json b = json::parse(
         "{\"key1\":\"a value\",\"key1\":\"another value\"}"
-        );
+ );
     CHECK(1 == b.count("key1"));
 }
 

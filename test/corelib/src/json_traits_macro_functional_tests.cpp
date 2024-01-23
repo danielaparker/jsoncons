@@ -1015,7 +1015,7 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
                                       (getName, setName, "employee_name"),
                                       (getSurname, setSurname, "employee_surname")
-                                    )
+  )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Company_NGSN, 2,
   (getName, setName, "company"),
@@ -1038,7 +1038,7 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company_AGSN,
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
                                       (getName, "employee_name"),
                                       (getSurname, "employee_surname")
-                                    )
+  )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Company_NCGN, 2,
   (getName, "company"),

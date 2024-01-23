@@ -778,7 +778,7 @@ public:
                }
                return Json(arg0.template as<double>() / arg1.template as<double>());
              }
-        );
+ );
     }
 };
 

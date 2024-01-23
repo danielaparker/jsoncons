@@ -448,7 +448,7 @@ public:
                }
                return Json(arg0.as<double>() / arg1.as<double>());
              }
-        );
+ );
     }
 };
 

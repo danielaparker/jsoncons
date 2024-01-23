@@ -187,7 +187,7 @@ namespace draft7 {
         },
         "default": true
     } 
-            )"); 
+ )"); 
 
             return sch;
         }

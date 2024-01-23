@@ -731,7 +731,7 @@ namespace jsoncons {
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
                                 extension_traits::has_reserve<Container>::value &&
                                 extension_traits::has_data_exact<value_type*,Container>::value 
-            , std::size_t>::type
+     , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
             std::size_t unread = length;
@@ -754,7 +754,7 @@ namespace jsoncons {
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
                                 extension_traits::has_reserve<Container>::value &&
                                 !extension_traits::has_data_exact<value_type*, Container>::value 
-            , std::size_t>::type
+     , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
             std::size_t unread = length;

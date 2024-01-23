@@ -157,7 +157,7 @@ namespace jsoncons {
                                                          forward<U2>(std::get<I2>(
                                                              std::declval<std::tuple<U2...>&>()))...)))
             : key_(std::forward<U1>(std::get<I1>(a))...)
-            , value_(std::forward<U2>(std::get<I2>(b))...) {
+     , value_(std::forward<U2>(std::get<I2>(b))...) {
             // make visual studio compiler happy about warning about unused a & b.
             // Visual studio's key_value implementation disables warning 4100.
             (void)a;

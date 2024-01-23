@@ -1957,7 +1957,7 @@ namespace jsonschema {
         type_validator(std::string&& schema_path,
             std::vector<keyword_validator_type>&& type_mapping,
             std::vector<std::string>&& expected_types
-            )
+ )
             : keyword_validator_base<Json>(std::move(schema_path)),
               type_mapping_(std::move(type_mapping)),
               expected_types_(std::move(expected_types))

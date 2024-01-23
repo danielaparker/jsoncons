@@ -52,7 +52,7 @@ TEST_CASE("jsonschema defaults tests")
 
             json expected = json::parse(R"(
             {"bar":"bad"}
-            )");
+ )");
 
             CHECK(data == expected);
         }
