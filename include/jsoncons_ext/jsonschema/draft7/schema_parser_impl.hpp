@@ -101,8 +101,6 @@ namespace draft7 {
             Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
 
-            bool is_ref = false;
-
             std::vector<keyword_validator_type> validators; 
             switch (sch.type())
             {
@@ -127,88 +125,96 @@ namespace draft7 {
                 }
                 case json_type::object_value:
                 {
-                    auto it = sch.find("default");
-                    if (it != sch.object_range().end()) 
+                    std::map<std::string,Json> unknown_keywords;
+                    bool is_ref = sch.contains("$ref");
+                    bool has_if = sch.contains("if");
+                    bool has_type = false;
+
+                    for (const auto& item : sch.object_range())
                     {
-                        default_value = it->value();
-                    }
-                    it = sch.find("$ref");
-                    if (it != sch.object_range().end()) // this schema is a reference
-                    {
-                        is_ref = true;
-                        schema_location relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(context.get_base_uri()); 
-                        validators.push_back(get_or_create_reference(id));
-                    }
-                    it = sch.find("definitions");
-                    if (it != sch.object_range().end()) 
-                    {
-                        for (const auto& def : it->value().object_range())
+                        if (item.key() == "$id")
                         {
-                            std::string k[] = { "definitions", def.key() };
-                            subschemas_.emplace_back(make_schema_validator(def.value(), new_context, k));
                         }
-                    }
-                    if (!is_ref)
-                    {
-                        validators.push_back(make_type_validator(sch, new_context));
-
-                        it = sch.find("enum");
-                        if (it != sch.object_range().end()) 
+                        else if (item.key() == "default")
                         {
-                            validators.push_back(make_enum_validator(it->value(), new_context));
+                            default_value = item.value();
                         }
-
-                        it = sch.find("const");
-                        if (it != sch.object_range().end()) 
+                        else if (item.key() == "$ref")
                         {
-                            validators.push_back(make_const_validator(it->value(), new_context));
+                            schema_location relative(item.value().template as<std::string>()); 
+                            auto id = relative.resolve(context.get_base_uri()); 
+                            validators.push_back(get_or_create_reference(id));
                         }
-
-                        it = sch.find("not");
-                        if (it != sch.object_range().end()) 
+                        else if (item.key() == "definitions")
                         {
-                            validators.push_back(make_not_validator(it->value(), new_context));
+                            for (const auto& def : item.value().object_range())
+                            {
+                                std::string k[] = { "definitions", def.key() };
+                                subschemas_.emplace_back(make_schema_validator(def.value(), new_context, k));
+                            }
                         }
-
-                        it = sch.find("allOf");
-                        if (it != sch.object_range().end()) 
+                        else if (is_ref) // do nothing
                         {
-                            validators.push_back(make_all_of_validator(it->value(), new_context));
-                        }
-
-                        it = sch.find("anyOf");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_any_of_validator(it->value(), new_context));
-                        }
-
-                        it = sch.find("oneOf");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_one_of_validator(it->value(), new_context));
-                        }
-
-                        it = sch.find("if");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_conditional_validator(it->value(), sch, new_context));
-                            // sch["if"] is object and has id, can be looked up
                         }
                         else
                         {
-                            auto then_it = sch.find("then");
-                            if (then_it != sch.object_range().end()) 
+                            if (!has_type)
                             {
-                                std::string sub_keys[] = { "then" };
-                                subschemas_.emplace_back(make_schema_validator(then_it->value(), new_context, sub_keys));
+                                validators.push_back(make_type_validator(sch, new_context));
+                                has_type = true;
                             }
 
-                            auto else_it = sch.find("else");
-                            if (else_it != sch.object_range().end()) 
+                            if (item.key() == "type")
                             {
-                                std::string sub_keys[] = { "else" };
-                                subschemas_.emplace_back(make_schema_validator(else_it->value(), new_context, sub_keys));
+                            }
+                            else if (item.key() == "enum")
+                            {
+                                validators.push_back(make_enum_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "const")
+                            {
+                                validators.push_back(make_const_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "not")
+                            {
+                                validators.push_back(make_not_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "allOf")
+                            {
+                                validators.push_back(make_all_of_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "anyOf")
+                            {
+                                validators.push_back(make_any_of_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "oneOf")
+                            {
+                                validators.push_back(make_one_of_validator(item.value(), new_context));
+                            }
+                            else if (item.key() == "if")
+                            {
+                                validators.push_back(make_conditional_validator(item.value(), sch, new_context));
+                                // sch["if"] is object and has id, can be looked up
+                            }
+                            else if (item.key() == "then")
+                            {
+                                if (!has_if)
+                                {
+                                    std::string sub_keys[] = { "then" };
+                                    subschemas_.emplace_back(make_schema_validator(item.value(), new_context, sub_keys));
+                                }
+                            }
+                            else if (item.key() == "else")
+                            {
+                                if (!has_if)
+                                {
+                                    std::string sub_keys[] = { "else" };
+                                    subschemas_.emplace_back(make_schema_validator(item.value(), new_context, sub_keys));
+                                }
+                            }
+                            else
+                            {
+                                unknown_keywords.emplace(item.key(), item.value());
                             }
                         }
                     }
@@ -218,9 +224,9 @@ namespace draft7 {
                     for (const auto& uri : new_context.uris()) 
                     { 
                         insert_schema(uri, p);
-                        for (const auto& item : sch.object_range())
+                        for (const auto& item : unknown_keywords)
                         {
-                            insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                            insert_unknown_keyword(uri, item.first, item.second); // save unknown keywords for later reference
                         }
                     }          
                     break;
@@ -1125,11 +1131,21 @@ namespace draft7 {
 
             for (const auto &file : subschema_registries_)
             {
+                bool first = true;
                 if (!file.second.unresolved.empty())
                 {
-                    JSONCONS_THROW(schema_error("After all files have been parsed, '" +
-                                                (file.first == "" ? "<root>" : file.first) +
-                                                "' has still undefined references."));
+                    std::string message = "After all files have been parsed, '" + 
+                        (file.first == "" ? "<root>" : file.first) +"' still has " + std::to_string(file.second.unresolved.size()) + " undefined references ";
+                    for (auto& item : file.second.unresolved)
+                    {
+                        if (!first)
+                        {
+                            message.append(", ");
+                            first = false;
+                        }
+                        message.append("'" + item.first + "' ");
+                    }
+                    JSONCONS_THROW(schema_error(message));
                 }
             }
         }

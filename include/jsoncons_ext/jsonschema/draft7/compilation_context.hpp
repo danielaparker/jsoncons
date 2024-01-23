@@ -72,7 +72,7 @@ namespace draft7 {
             std::vector<schema_location> new_uris;
             for (const auto& uri : uris_)
             {
-                if (uri.is_absolute())
+                if (!uri.has_plain_name_fragment())
                 {
                     new_uris.push_back(uri);
                 }
