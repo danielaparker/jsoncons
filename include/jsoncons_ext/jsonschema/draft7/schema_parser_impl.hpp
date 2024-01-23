@@ -127,10 +127,13 @@ namespace draft7 {
                 }
                 case json_type::object_value:
                 {
+                    std::set<std::string> known_keywords;
+
                     auto it = sch.find("default");
                     if (it != sch.object_range().end()) 
                     {
                         default_value = it->value();
+                        known_keywords.insert("default");
                     }
                     it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
@@ -139,6 +142,7 @@ namespace draft7 {
                         schema_location relative(it->value().template as<std::string>()); 
                         auto id = relative.resolve(context.get_base_uri()); 
                         validators.push_back(get_or_create_reference(id));
+                        known_keywords.insert("$ref");
                     }
                     it = sch.find("definitions");
                     if (it != sch.object_range().end()) 
@@ -148,51 +152,59 @@ namespace draft7 {
                             std::string k[] = { "definitions", def.key() };
                             subschemas_.emplace_back(make_schema_validator(def.value(), new_context, k));
                         }
+                        known_keywords.insert("definitions");
                     }
                     if (!is_ref)
                     {
-                        validators.push_back(make_type_validator(sch, new_context));
+                        validators.push_back(make_type_validator(sch, new_context, known_keywords));
 
                         it = sch.find("enum");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_enum_validator(it->value(), new_context));
+                            known_keywords.insert("enum");
                         }
 
                         it = sch.find("const");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_const_validator(it->value(), new_context));
+                            known_keywords.insert("const");
                         }
 
                         it = sch.find("not");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_not_validator(it->value(), new_context));
+                            known_keywords.insert("not");
                         }
 
                         it = sch.find("allOf");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_all_of_validator(it->value(), new_context));
+                            known_keywords.insert("allOf");
                         }
 
                         it = sch.find("anyOf");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_any_of_validator(it->value(), new_context));
+                            known_keywords.insert("anyOf");
                         }
 
                         it = sch.find("oneOf");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_one_of_validator(it->value(), new_context));
+                            known_keywords.insert("oneOf");
                         }
 
                         it = sch.find("if");
                         if (it != sch.object_range().end()) 
                         {
                             validators.push_back(make_conditional_validator(it->value(), sch, new_context));
+                            known_keywords.insert("if");
                             // sch["if"] is object and has id, can be looked up
                         }
                         else
@@ -202,6 +214,7 @@ namespace draft7 {
                             {
                                 std::string sub_keys[] = { "then" };
                                 subschemas_.emplace_back(make_schema_validator(then_it->value(), new_context, sub_keys));
+                                known_keywords.insert("then");
                             }
 
                             auto else_it = sch.find("else");
@@ -209,6 +222,7 @@ namespace draft7 {
                             {
                                 std::string sub_keys[] = { "else" };
                                 subschemas_.emplace_back(make_schema_validator(else_it->value(), new_context, sub_keys));
+                                known_keywords.insert("else");
                             }
                         }
                     }
@@ -220,7 +234,10 @@ namespace draft7 {
                         insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
-                            insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                            if (known_keywords.find(item.key()) == known_keywords.end())
+                            {
+                                insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                            }
                         }
                     }          
                     break;
@@ -291,13 +308,12 @@ namespace draft7 {
         }
 
         std::unique_ptr<type_validator<Json>> make_type_validator(const Json& sch,
-            const compilation_context& context)
+            const compilation_context& context, std::set<std::string> known_keywords)
         {
             std::string schema_path = context.get_absolute_uri().string();
             std::vector<std::string> expected_types;
 
             std::vector<keyword_validator_type> type_mapping{(uint8_t)(json_type::object_value)+1};
-            std::set<std::string> known_keywords;
 
             auto it = sch.find("type");
             if (it == sch.object_range().end()) 
