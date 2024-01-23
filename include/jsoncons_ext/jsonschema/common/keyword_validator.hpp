@@ -56,7 +56,7 @@ namespace jsonschema {
     public:
         virtual ~validator_base() = default;
 
-        virtual const std::string& schema_path() const = 0;
+        virtual const uri& schema_path() const = 0;
 
         void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -87,11 +87,11 @@ namespace jsonschema {
     template <class Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
-        std::string schema_path_;
+        uri schema_path_;
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        keyword_validator_base(const std::string& schema_path)
+        keyword_validator_base(const uri& schema_path)
             : schema_path_(schema_path)
         {
         }
@@ -101,7 +101,7 @@ namespace jsonschema {
         keyword_validator_base& operator=(const keyword_validator_base&) = delete;
         keyword_validator_base& operator=(keyword_validator_base&&) = default;
 
-        const std::string& schema_path() const override
+        const uri& schema_path() const override
         {
             return schema_path_;
         }
@@ -149,9 +149,9 @@ namespace jsonschema {
             return base_uri_;
         }
 
-        const std::string& schema_path() const override
+        const uri& schema_path() const override
         {
-            static std::string s = "#";
+            static uri s = uri("#");
             return referred_schema_ ? referred_schema_->schema_path() : s;
         }
 
@@ -163,7 +163,7 @@ namespace jsonschema {
                 referred_schema = referred_schema_->clone(base_uri);
             }
 
-            return jsoncons::make_unique<ref_validator>(base_uri, std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(referred_schema_->schema_path().resolve(base_uri), std::move(referred_schema));
         }
 
     private:
@@ -177,9 +177,9 @@ namespace jsonschema {
             if (!referred_schema_)
             {
                 reporter.error(validation_output("", 
-                                                 this->schema_path(), 
+                                                 this->schema_path().string(), 
                                                  instance_location.to_uri_fragment(), 
-                                                 "Unresolved schema reference " + this->schema_path()));
+                                                 "Unresolved schema reference " + this->schema_path().string()));
                 return;
             }
 
@@ -194,11 +194,11 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::string schema_path_;
+        uri schema_path_;
         bool value_;
 
     public:
-        boolean_schema_validator(const std::string& schema_path, bool value)
+        boolean_schema_validator(const uri& schema_path, bool value)
             : schema_path_(schema_path), value_(value)
         {
         }
@@ -208,14 +208,14 @@ namespace jsonschema {
             return jsoncons::optional<Json>{};
         }
 
-        const std::string& schema_path() const override
+        const uri& schema_path() const override
         {
             return schema_path_;
         }
 
         schema_validator_type clone(const uri& base_uri) const final
         {
-            return jsoncons::make_unique<boolean_schema_validator>(schema_path_, value_);
+            return jsoncons::make_unique<boolean_schema_validator>(schema_path_.resolve(base_uri), value_);
         }
 
     private:
@@ -228,7 +228,7 @@ namespace jsonschema {
             if (!value_)
             {
                 reporter.error(validation_output("false", 
-                    this->schema_path(), 
+                    this->schema_path().string(), 
                     instance_location.to_uri_fragment(), 
                     "False schema always fails"));
             }
@@ -242,12 +242,12 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        std::string schema_path_;
+        uri schema_path_;
         std::vector<keyword_validator_type> validators_;
         Json default_value_;
 
     public:
-        object_schema_validator(const std::string& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value)
+        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value)
             : schema_path_(schema_path),
               validators_(std::move(validators)),
               default_value_(std::move(default_value))
@@ -259,7 +259,7 @@ namespace jsonschema {
             return default_value_;
         }
 
-        const std::string& schema_path() const override
+        const uri& schema_path() const override
         {
             return schema_path_;
         }
@@ -272,7 +272,7 @@ namespace jsonschema {
                 validators.push_back(validator->clone(base_uri));
             }
 
-            return jsoncons::make_unique<object_schema_validator>(schema_path_, std::move(validators), Json(default_value_));
+            return jsoncons::make_unique<object_schema_validator>(schema_path_.resolve(base_uri), std::move(validators), Json(default_value_));
         }
 
     private:
@@ -313,13 +313,13 @@ namespace jsonschema {
         {
         }
 
-        const std::string& schema_path() const override
+        const uri& schema_path() const override
         {
-            static std::string s("#");
+            static uri s("#");
             return validator_ != nullptr ? validator_->schema_path() : s;
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone(const uri&) const final 
         {
             return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
         }

@@ -83,7 +83,7 @@ namespace jsonschema {
             return message_;
         }
 
-        const std::string& schema_path() const
+        const uri& schema_path() const
         {
             return schema_path_;
         }
