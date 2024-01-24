@@ -44,13 +44,13 @@ namespace jsonschema {
     class validation_output 
     {
         std::string keyword_;
-        std::string schema_path_;
+        uri schema_path_;
         std::string instance_location_;
         std::string message_;
         std::vector<validation_output> nested_errors_;
     public:
         validation_output(std::string keyword,
-                          std::string schema_path,
+                          uri schema_path,
                           std::string instance_location,
                           std::string message)
             : keyword_(std::move(keyword)), 
@@ -61,7 +61,7 @@ namespace jsonschema {
         }
 
         validation_output(const std::string& keyword,
-                          const std::string& schema_path,
+                          const uri& schema_path,
                           const std::string& instance_location,
                           const std::string& message,
                           const std::vector<validation_output>& nested_errors)
@@ -86,6 +86,16 @@ namespace jsonschema {
         const uri& schema_path() const
         {
             return schema_path_;
+        }
+
+        const std::string keyword_location() const
+        {
+            return "#" + std::string(schema_path_.fragment());
+        }
+
+        const std::string absolute_keyword_location() const
+        {
+            return schema_path_.string();
         }
 
         const std::string& keyword() const

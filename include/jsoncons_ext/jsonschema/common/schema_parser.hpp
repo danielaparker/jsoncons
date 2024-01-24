@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
+#include <jsoncons_ext/jsonschema/common/keywords.hpp>
 
 namespace jsoncons {
 namespace jsonschema {

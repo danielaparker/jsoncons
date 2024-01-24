@@ -15,6 +15,7 @@
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;
 
+#if 0
 TEST_CASE("jsonschema output format tests")
 {
     SECTION("Basic")
@@ -55,7 +56,7 @@ TEST_CASE("jsonschema output format tests")
 ]
         )");
 
-        /* auto sch = jsonschema::make_schema(schema);
+        auto sch = jsonschema::make_schema(schema);
         jsonschema::json_validator<json> validator(sch);
 
         auto reporter = [](const jsonschema::validation_output& o)
@@ -85,13 +86,136 @@ TEST_CASE("jsonschema output format tests")
                 }
             }
         };
-        validator.validate(instance, reporter);*/
+        validator.validate(instance, reporter);
 
     }
 }
-
+#endif
 /*
 : Expected minimum item count: 3, found: 2
 /1: Required key "y" not found
 /1: Validation failed for additional property "z". False schema always fails
 */
+
+// https://github.com/json-schema-org/json-schema-spec/issues/643
+
+TEST_CASE("jsonschema output format tests 2")
+{
+    json schema = json::parse(R"(
+{
+  "$id":"http://schemarepo.org/schemas/user.json",
+  "$schema":"http://json-schema.org/draft-07/schema#",
+  "type":"object",
+  "definitions":{
+    "min18":{
+      "type":"integer",
+      "minimum":18
+    },
+    "username":{
+      "type":"string",
+      "minLength":8
+    },
+    "member":{
+      "type":"object",
+      "properties":{
+        "age":{"$ref":"#/definitions/min18"},
+        "username":{"$ref":"#/definitions/username"}
+      }
+    },
+    "membershipTypes":{"enum":["admin","user"]}
+  },
+  "oneOf":[
+    {
+      "properties":{
+        "member":{"$ref":"#/definitions/member"},
+        "membershipType":{"$ref":"#/definitions/membershipTypes"}
+      }
+    },
+    {
+      "properties":{
+        "membershipType":{"const":"guest"},
+        "firstName":{"type":"string"},
+        "lastName":{"type":"string"}
+      },
+      "additionalProperties":false
+    }
+  ]
+}
+    )");
+
+/*
+
+Actual:
+
+oneOf, #/oneOf, http://schemarepo.org/schemas/user.json#/oneOf
+    minimum, #/definitions/min18/minimum, http://schemarepo.org/schemas/user.json#/definitions/min18/minimum
+    minLength, #/definitions/username/minLength, http://schemarepo.org/schemas/user.json#/definitions/username/minLength
+    additionalProperties, #/oneOf/1/additionalProperties, http://schemarepo.org/schemas/user.json#/oneOf/1/additionalProperties
+    const, #/oneOf/1/properties/membershipType/const, http://schemarepo.org/schemas/user.json#/oneOf/1/properties/membershipType/const
+ 
+Expected:
+ 
+ {
+  "valid":false,
+  "errors":[
+    {
+      "keywordLocation":"#/oneOf",
+      "instanceLocation":"/",
+      "message":"the instance did not pass any of the subschema"
+    },
+    {
+      "keywordLocation":"#/oneOf/0/properties/member/properties/age/$ref/minimum",
+      "absoluteKeywordLocation":"http://schemarepo.org/schemas/user.json#/definitions/min18/minimum",
+      "instanceLocation":"/member/age",
+      "message":"value is too small"
+    },
+    {
+      "keywordLocation":"#/oneOf/0/properties/member/properties/userName/$ref/minLength",
+      "absoluteKeywordLocation":"http://schemarepo.org/schemas/user.json#/definitions/username/minLength",
+      "instanceLocation":"/member/username",
+      "message":"value is too short"
+    },
+    {
+      "keywordLocation":"#/oneOf/1/membershipType",
+      "instanceLocation":"/member/membershipType",
+      "message":"value does not match the required value"
+    },
+    {
+      "keywordLocation":"#/oneOf/1/additionalProperties",
+      "instanceLocation":"/member/member",
+      "message":"additional properties are not allowed"
+    }
+  ]
+}
+ 
+*/
+    SECTION("With ref")
+    {
+
+        json instance = json::parse(R"(
+{
+  "member":{
+      "age":5,            // doesn't meet minimum
+      "username":"aName"  // doesn't meet minLength
+  },
+  "membershipType":"user"
+}
+)");
+
+        auto sch = jsonschema::make_schema(schema);
+        jsonschema::json_validator<json> validator(sch);
+
+        auto reporter = [](const jsonschema::validation_output& o)
+        {
+            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+
+            for (auto& item : o.nested_errors())
+            {
+                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+            }
+        };
+        validator.validate(instance, reporter);
+
+    }
+}
+

@@ -426,7 +426,7 @@ namespace draft201909 {
         {
             uri schema_path = context.make_schema_path_with("string");
             //std::cout << "update_uris 2 string " << sch << "\n";
-            auto new_context = context.update_uris(sch, schema_path.string());
+            auto new_context = context.update_uris(sch, "string");
 
             std::vector<keyword_validator_type> validators;
             auto it = sch.find("maxLength");
@@ -583,7 +583,7 @@ namespace draft201909 {
         {
             uri schema_path = context.make_schema_path_with("array");
             //std::cout << "update_uris 3 array\n" << pretty_print(sch) << "\n";
-            auto new_context = context.update_uris(sch, schema_path.string());
+            auto new_context = context.update_uris(sch, "array");
 
             std::vector<keyword_validator_type> validators;
 
@@ -817,11 +817,11 @@ namespace draft201909 {
         }
 
         std::unique_ptr<integer_validator<Json>> make_integer_validator(const compilation_context& context, 
-            const Json& sch, std::set<std::string>& keywords)
+            const Json& sch, std::set<std::string>& keywords) 
         {
             uri schema_path = context.make_schema_path_with("integer");
             //std::cout << "update_uris 4 integer " << sch << "\n";
-            auto new_context = context.update_uris(sch, schema_path.string());
+            auto new_context = context.update_uris(sch, "integer");
 
             std::vector<keyword_validator_type> validators;
 
@@ -869,7 +869,7 @@ namespace draft201909 {
         {
             uri schema_path = context.make_schema_path_with("number");
             //std::cout << "update_uris 5 number " << sch << "\n";
-            auto new_context = context.update_uris(sch, schema_path.string());
+            auto new_context = context.update_uris(sch, "number");
 
             std::vector<keyword_validator_type> validators;
 
@@ -977,7 +977,7 @@ namespace draft201909 {
         {
             uri schema_path = context.make_schema_path_with("allOf");
             //std::cout << "update_uris 6 allOf " << sch << "\n";
-            auto new_context2 = context.update_uris(sch, schema_path.string());
+            auto new_context2 = context.update_uris(sch, "allOf");
             std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;

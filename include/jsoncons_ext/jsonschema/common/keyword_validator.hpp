@@ -177,7 +177,7 @@ namespace jsonschema {
             if (!referred_schema_)
             {
                 reporter.error(validation_output("", 
-                                                 this->schema_path().string(), 
+                                                 this->schema_path(), 
                                                  instance_location.to_uri_fragment(), 
                                                  "Unresolved schema reference " + this->schema_path().string()));
                 return;
@@ -228,7 +228,7 @@ namespace jsonschema {
             if (!value_)
             {
                 reporter.error(validation_output("false", 
-                    this->schema_path().string(), 
+                    this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "False schema always fails"));
             }
