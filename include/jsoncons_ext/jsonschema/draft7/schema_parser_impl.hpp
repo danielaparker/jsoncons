@@ -10,7 +10,7 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/draft7/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
@@ -95,7 +95,7 @@ namespace draft7 {
         schema_validator_type make_schema_validator(const compilation_context& context, const Json& sch,
             jsoncons::span<const std::string> keys) //override
         {
-            auto new_context = context.update_uris(sch, keys);
+            auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
 
             Json default_value{jsoncons::null_type()};
@@ -1261,6 +1261,67 @@ namespace draft7 {
             {
                 return subschema_registries_.insert(file, {loc, {}})->second;
             }
+        }
+
+        compilation_context make_compilation_context(const compilation_context& parent, const Json& sch, jsoncons::span<const std::string> keys) const
+        {
+            // Exclude uri's that are not plain name identifiers
+            std::vector<schema_location> new_uris;
+            for (const auto& uri : parent.uris())
+            {
+                if (!uri.has_plain_name_fragment())
+                {
+                    new_uris.push_back(uri);
+                }
+            }
+
+            if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
+            }
+
+            // Append the keys for this sub-schema to the uri's
+            for (const auto& key : keys)
+            {
+                for (auto& uri : new_uris)
+                {
+                    auto new_u = uri.append(key);
+                    uri = schema_location(new_u);
+                }
+            }
+            if (sch.is_object())
+            {
+                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+                if (it != sch.object_range().end()) 
+                {
+                    std::string id = it->value().template as<std::string>(); 
+                    schema_location relative(id); 
+                    schema_location new_uri = relative.resolve(parent.get_base_uri());
+                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                    // Add it to the list if it is not already there
+                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                    {
+                        new_uris.emplace_back(new_uri); 
+                    }
+                }
+                it = sch.find("$recursiveAnchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    bool is_recursive_anchor = it->value().template as<bool>();  
+                    if (is_recursive_anchor)
+                    {
+                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
+                    }
+                }
+            }
+
+            std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            for (const auto& uri : new_uris)
+            {
+                std::cout << "    " << uri.string() << "\n";
+            }
+
+            return compilation_context(new_uris);
         }
 
     };

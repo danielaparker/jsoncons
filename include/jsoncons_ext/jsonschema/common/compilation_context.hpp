@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,7 +16,6 @@
 
 namespace jsoncons {
 namespace jsonschema {
-namespace draft7 {
 
     class compilation_context
     {
@@ -38,12 +37,12 @@ namespace draft7 {
         explicit compilation_context(const std::vector<schema_location>& uris)
             : uris_(uris)
         {
-            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{"#"};
+            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
         explicit compilation_context(std::vector<schema_location>&& uris)
             : uris_(std::move(uris))
         {
-            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{"#"};
+            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
 
         const std::vector<schema_location>& uris() const {return uris_;}
@@ -53,9 +52,26 @@ namespace draft7 {
             return absolute_uri_;
         }
 
-        uri get_base_uri() const
+        uri get_base_uri(uri_anchor_flags anchor_flags=uri_anchor_flags()) const
         {
-            return absolute_uri_.base();
+            switch (anchor_flags)
+            {
+            case uri_anchor_flags::recursive_anchor:
+            {
+                for (auto it = uris_.rbegin();
+                     it != uris_.rend();
+                     ++it)
+                {
+                    if (it->is_recursive_anchor())
+                    {
+                        return it->uri();
+                    }
+                }
+                return absolute_uri_.base();
+            }
+            default:
+                return absolute_uri_.base();
+            }
         }
 
         template <class Json>
@@ -98,56 +114,31 @@ namespace draft7 {
                 if (it != sch.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
+                    schema_location relative(id); 
+                    schema_location new_uri = relative.resolve(get_base_uri());
+                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
                     {
-                        schema_location relative(id); 
-                        schema_location new_uri = relative.resolve(new_uris.back());
                         new_uris.emplace_back(new_uri); 
+                    }
+                }
+                it = sch.find("$recursiveAnchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    bool is_recursive_anchor = it->value().template as<bool>();  
+                    if (is_recursive_anchor)
+                    {
+                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
                     }
                 }
             }
 
-            /*std::cout << "\ncontext\n";
+            std::cout << "Absolute URI: " << absolute_uri_.string() << "\n";
             for (const auto& uri : new_uris)
             {
                 std::cout << "    " << uri.string() << "\n";
-            }*/
-
-            return compilation_context(new_uris);
-        }
-
-        compilation_context update_uris(jsoncons::span<const std::string> keys) const
-        {
-            // Exclude uri's that are not plain name identifiers
-            std::vector<schema_location> new_uris;
-            for (const auto& uri : uris_)
-            {
-                if (!uri.has_plain_name_fragment())
-                {
-                    new_uris.push_back(uri);
-                }
             }
-
-            if (new_uris.empty())
-            {
-                new_uris.emplace_back("#");
-            }
-
-            // Append the keys for this sub-schema to the uri's
-            for (const auto& key : keys)
-            {
-                for (auto& uri : new_uris)
-                {
-                    auto new_u = uri.append(key);
-                    uri = schema_location(new_u);
-                }
-            }
-
-            //for (const auto& uri : new_uris)
-            //{
-            //    std::cout << "    " << uri.string() << "\n";
-            //}
 
             return compilation_context(new_uris);
         }
@@ -165,7 +156,6 @@ namespace draft7 {
         }
     };
 
-} // namespace draft7
 } // namespace jsonschema
 } // namespace jsoncons
 

@@ -15,7 +15,7 @@
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
-#include <jsoncons_ext/jsonschema/draft201909/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
 #include <cassert>
 #include <set>
@@ -117,7 +117,7 @@ namespace draft201909 {
         {
             std::cout << "make_schema_validator.update_uris "  << is_def.size() << " " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
 
-            auto new_context = context.update_uris(sch, keys);
+            auto new_context = make_compilation_context(context, sch, keys);
 
             Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
@@ -424,27 +424,25 @@ namespace draft201909 {
         std::unique_ptr<string_validator<Json>> make_string_validator(const compilation_context& context,
             const Json& sch)
         {
-            uri schema_path = context.make_schema_path_with("string");
-            //std::cout << "update_uris 2 string " << sch << "\n";
-            auto new_context = context.update_uris(sch, "string");
+            uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
             auto it = sch.find("maxLength");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_max_length_validator(new_context, it->value()));
+                validators.emplace_back(make_max_length_validator(context, it->value()));
             }
 
             it = sch.find("minLength");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_min_length_validator(new_context, it->value()));
+                validators.emplace_back(make_min_length_validator(context, it->value()));
             }
 
             it = sch.find("contentEncoding");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_content_encoding_validator(new_context, it->value()));
+                validators.emplace_back(make_content_encoding_validator(context, it->value()));
                 // If "contentEncoding" is set to "binary", a Json value
                 // of type json_type::byte_string_value is accepted.
             }
@@ -452,21 +450,21 @@ namespace draft201909 {
             it = sch.find("contentMediaType");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_content_media_type_validator(new_context, it->value()));
+                validators.emplace_back(make_content_media_type_validator(context, it->value()));
             }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
             it = sch.find("pattern");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_pattern_validator(new_context, it->value()));
+                validators.emplace_back(make_pattern_validator(context, it->value()));
             }
 #endif
 
             it = sch.find("format");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_format_validator(new_context, it->value()));
+                validators.emplace_back(make_format_validator(context, it->value()));
             }
 
             return jsoncons::make_unique<string_validator<Json>>(schema_path, std::move(validators));
@@ -581,9 +579,7 @@ namespace draft201909 {
         std::unique_ptr<array_validator<Json>> make_array_validator(const compilation_context& context, 
             const Json& sch)
         {
-            uri schema_path = context.make_schema_path_with("array");
-            //std::cout << "update_uris 3 array\n" << pretty_print(sch) << "\n";
-            auto new_context = context.update_uris(sch, "array");
+            uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
 
@@ -819,9 +815,7 @@ namespace draft201909 {
         std::unique_ptr<integer_validator<Json>> make_integer_validator(const compilation_context& context, 
             const Json& sch, std::set<std::string>& keywords) 
         {
-            uri schema_path = context.make_schema_path_with("integer");
-            //std::cout << "update_uris 4 integer " << sch << "\n";
-            auto new_context = context.update_uris(sch, "integer");
+            uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
 
@@ -829,35 +823,35 @@ namespace draft201909 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_integer_validator(new_context, it->value()));
+                validators.emplace_back(make_maximum_integer_validator(context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_integer_validator(new_context, it->value()));
+                validators.emplace_back(make_minimum_integer_validator(context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_integer_validator(new_context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_integer_validator(context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_integer_validator(new_context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_integer_validator(context, it->value()));
             }
 
             it = sch.find("multipleOf");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("multipleOf");
-                validators.emplace_back(make_multiple_of_validator(new_context, it->value()));
+                validators.emplace_back(make_multiple_of_validator(context, it->value()));
             }
 
 
@@ -867,9 +861,7 @@ namespace draft201909 {
         std::unique_ptr<number_validator<Json>> make_number_validator(const compilation_context& context, 
             const Json& sch, std::set<std::string>& keywords)
         {
-            uri schema_path = context.make_schema_path_with("number");
-            //std::cout << "update_uris 5 number " << sch << "\n";
-            auto new_context = context.update_uris(sch, "number");
+            uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
 
@@ -877,35 +869,35 @@ namespace draft201909 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_number_validator(new_context, it->value()));
+                validators.emplace_back(make_maximum_number_validator(context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_number_validator(new_context, it->value()));
+                validators.emplace_back(make_minimum_number_validator(context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_number_validator(new_context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_number_validator(context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_number_validator(new_context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_number_validator(context, it->value()));
             }
 
             it = sch.find("multipleOf");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("multipleOf");
-                validators.emplace_back(make_multiple_of_validator(new_context, it->value()));
+                validators.emplace_back(make_multiple_of_validator(context, it->value()));
             }
 
 
@@ -914,13 +906,13 @@ namespace draft201909 {
 
         std::unique_ptr<null_validator<Json>> make_null_validator(const compilation_context& context)
         {
-            uri schema_path = context.make_schema_path_with("null");
+            uri schema_path = context.get_absolute_uri();
             return jsoncons::make_unique<null_validator<Json>>(schema_path);
         }
 
         std::unique_ptr<boolean_validator<Json>> make_boolean_validator(const compilation_context& context)
         {
-            uri schema_path = context.make_schema_path_with("boolean");
+            uri schema_path = context.get_absolute_uri();
             return jsoncons::make_unique<boolean_validator<Json>>(schema_path);
         }
 
@@ -976,16 +968,11 @@ namespace draft201909 {
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("allOf");
-            //std::cout << "update_uris 6 allOf " << sch << "\n";
-            auto new_context2 = context.update_uris(sch, "allOf");
             std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                //std::cout << "update_uris 7 " << sch << "\n";
-                auto new_context = context.update_uris(subsch, jsoncons::span<const std::string>{});
-
                 /*std::cout << "\nThe context\n";
                 for (const auto& uri : new_context.uris())
                 {
@@ -993,7 +980,7 @@ namespace draft201909 {
                 }*/
                 std::string sub_keys[] = { all_of_criterion<Json>::key(), std::to_string(c++) };
 
-                subschemas.emplace_back(make_schema_validator(new_context, subsch, sub_keys));
+                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
@@ -1380,6 +1367,68 @@ namespace draft201909 {
                 }
             }
             return is_valid;
+        }
+
+        compilation_context make_compilation_context(const compilation_context& parent,
+            const Json& sch, jsoncons::span<const std::string> keys) const
+        {
+            // Exclude uri's that are not plain name identifiers
+            std::vector<schema_location> new_uris;
+            for (const auto& uri : parent.uris())
+            {
+                if (!uri.has_plain_name_fragment())
+                {
+                    new_uris.push_back(uri);
+                }
+            }
+
+            if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
+            }
+
+            // Append the keys for this sub-schema to the uri's
+            for (const auto& key : keys)
+            {
+                for (auto& uri : new_uris)
+                {
+                    auto new_u = uri.append(key);
+                    uri = schema_location(new_u);
+                }
+            }
+            if (sch.is_object())
+            {
+                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+                if (it != sch.object_range().end()) 
+                {
+                    std::string id = it->value().template as<std::string>(); 
+                    schema_location relative(id); 
+                    schema_location new_uri = relative.resolve(parent.get_base_uri());
+                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                    // Add it to the list if it is not already there
+                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                    {
+                        new_uris.emplace_back(new_uri); 
+                    }
+                }
+                it = sch.find("$recursiveAnchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    bool is_recursive_anchor = it->value().template as<bool>();  
+                    if (is_recursive_anchor)
+                    {
+                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
+                    }
+                }
+            }
+
+            std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            for (const auto& uri : new_uris)
+            {
+                std::cout << "    " << uri.string() << "\n";
+            }
+
+            return compilation_context(new_uris);
         }
 
     };
