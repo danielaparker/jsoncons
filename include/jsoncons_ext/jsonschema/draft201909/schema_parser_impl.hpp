@@ -1100,7 +1100,7 @@ namespace draft201909 {
                         {
                             auto location = context.make_schema_path_with("dependencies");
                             dependent_required.emplace(dep.key(), 
-                                make_required_validator(compilation_context(std::vector<schema_location>{{location}}),
+                                make_required_validator(compilation_context(&context, std::vector<schema_location>{{location}}),
                                     dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
@@ -1130,7 +1130,7 @@ namespace draft201909 {
                         {
                             auto location = context.make_schema_path_with("dependentRequired");
                             dependent_required.emplace(dep.key(), 
-                                make_required_validator(compilation_context(std::vector<schema_location>{{location}}),
+                                make_required_validator(compilation_context(&context, std::vector<schema_location>{{location}}),
                                     dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
@@ -1370,7 +1370,7 @@ namespace draft201909 {
         }
 
         compilation_context make_compilation_context(const compilation_context& parent,
-            const Json& sch, jsoncons::span<const std::string> keys) const
+            const Json& sch, jsoncons::span<const std::string> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;
@@ -1428,7 +1428,7 @@ namespace draft201909 {
                 std::cout << "    " << uri.string() << "\n";
             }
 
-            return compilation_context(new_uris);
+            return compilation_context(std::addressof(parent), new_uris);
         }
 
     };
