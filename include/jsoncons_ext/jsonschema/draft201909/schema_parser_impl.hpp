@@ -115,7 +115,7 @@ namespace draft201909 {
         schema_validator_type make_schema_validator(const compilation_context& context,
             const Json& sch, jsoncons::span<const std::string> keys) 
         {
-            std::cout << "make_schema_validator.update_uris "  << is_def.size() << " " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
+            //std::cout << "make_schema_validator.update_uris "  << is_def.size() << " " << key_string(keys) << "\n" << pretty_print(sch) << "\n";
 
             auto new_context = make_compilation_context(context, sch, keys);
 
@@ -155,11 +155,11 @@ namespace draft201909 {
                     it = sch.find("$defs");
                     if (it != sch.object_range().end()) 
                     {
-                        std::cout << "$defs\n";
+                        //std::cout << "$defs\n";
                         for (const auto& def : it->value().object_range())
                         {
                             is_def.push(true);
-                            std::cout << "$defs key:" << def.key() << ", index = " << is_def.size() << "\n";
+                            //std::cout << "$defs key:" << def.key() << ", index = " << is_def.size() << "\n";
                             std::string sub_keys[] = { "$defs", def.key() };
                             subschemas_.emplace_back(make_schema_validator(new_context, def.value(), sub_keys));
                             is_def.pop();
@@ -286,7 +286,7 @@ namespace draft201909 {
                     { 
                         if (!is_def.empty())
                         {
-                            std::cout << "    " << uri.string() << "\n";
+                            //std::cout << "    " << uri.string() << "\n";
                         }
                         insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
@@ -301,7 +301,7 @@ namespace draft201909 {
                     break;
             }
 
-            std::cout << "End make_schema_validator " << is_def.size() << "\n";
+            //std::cout << "End make_schema_validator " << is_def.size() << "\n";
             
             return schema_validator_ptr;
         }
@@ -1372,6 +1372,8 @@ namespace draft201909 {
         compilation_context make_compilation_context(const compilation_context& parent,
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
+            uri_anchor_flags flags = uri_anchor_flags{};
+
             // Exclude uri's that are not plain name identifiers
             std::vector<schema_location> new_uris;
             for (const auto& uri : parent.uris())
@@ -1414,21 +1416,17 @@ namespace draft201909 {
                 it = sch.find("$recursiveAnchor"); 
                 if (it != sch.object_range().end()) 
                 {
-                    bool is_recursive_anchor = it->value().template as<bool>();  
-                    if (is_recursive_anchor)
-                    {
-                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
-                    }
+                    flags = uri_anchor_flags::recursive_anchor;
                 }
             }
 
-            std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            /*std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
             for (const auto& uri : new_uris)
             {
                 std::cout << "    " << uri.string() << "\n";
-            }
+            }*/
 
-            return compilation_context(std::addressof(parent), new_uris);
+            return compilation_context(std::addressof(parent), new_uris, flags);
         }
 
     };

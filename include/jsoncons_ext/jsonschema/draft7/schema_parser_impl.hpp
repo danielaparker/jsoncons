@@ -1305,15 +1305,6 @@ namespace draft7 {
                         new_uris.emplace_back(new_uri); 
                     }
                 }
-                it = sch.find("$recursiveAnchor"); 
-                if (it != sch.object_range().end()) 
-                {
-                    bool is_recursive_anchor = it->value().template as<bool>();  
-                    if (is_recursive_anchor)
-                    {
-                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
-                    }
-                }
             }
 
             std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";

@@ -17,20 +17,37 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    enum class uri_anchor_flags : int {recursive_anchor=1};
+
+    inline uri_anchor_flags operator|(const uri_anchor_flags &lhs, const uri_anchor_flags &rhs) 
+    {
+        return static_cast<uri_anchor_flags>(std::underlying_type<uri_anchor_flags>::type(lhs)
+                                            | std::underlying_type<uri_anchor_flags>::type(rhs));
+    }
+
+    inline uri_anchor_flags operator&(const uri_anchor_flags &lhs, const uri_anchor_flags &rhs) 
+    {
+        return static_cast<uri_anchor_flags>(std::underlying_type<uri_anchor_flags>::type(lhs)
+                                            & std::underlying_type<uri_anchor_flags>::type(rhs));
+    }
+
     class compilation_context
     {
         const compilation_context* parent_;
         uri absolute_uri_;
         std::vector<schema_location> uris_;
+        uri_anchor_flags anchor_flags_;
     public:
         explicit compilation_context(const schema_location& location)
             : parent_(nullptr), absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_location>{{location}})
+              uris_(std::vector<schema_location>{{location}}),
+              anchor_flags_{}
         {
         }
 
-        explicit compilation_context(const compilation_context* parent, const std::vector<schema_location>& uris)
-            : parent_(parent), uris_(uris)
+        explicit compilation_context(const compilation_context* parent, const std::vector<schema_location>& uris,
+            uri_anchor_flags flags = uri_anchor_flags{})
+            : parent_(parent), uris_(uris), anchor_flags_{flags}
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
@@ -44,93 +61,30 @@ namespace jsonschema {
 
         uri get_base_uri(uri_anchor_flags anchor_flags=uri_anchor_flags()) const
         {
-            switch (anchor_flags)
+            uri base = absolute_uri_.base();
+
+            if (parent_ != nullptr && parent_->anchor_flags_ == uri_anchor_flags::recursive_anchor)
             {
-            case uri_anchor_flags::recursive_anchor:
-            {
-                for (auto it = uris_.rbegin();
-                     it != uris_.rend();
-                     ++it)
+                switch (anchor_flags)
                 {
-                    if (it->is_recursive_anchor())
+                    case uri_anchor_flags::recursive_anchor:
                     {
-                        return it->uri();
+                        auto parent = parent_;
+                        while (parent != nullptr)
+                        {
+                            if (parent->anchor_flags_ == uri_anchor_flags::recursive_anchor)
+                            {
+                                base = parent->get_base_uri();
+                            }
+                            parent = parent->parent_;
+                        }
+                        break;
                     }
-                }
-                return absolute_uri_.base();
-            }
-            default:
-                return absolute_uri_.base();
-            }
-        }
-
-        template <class Json>
-        compilation_context update_uris(const Json& sch, const std::string& key) const
-        {
-            std::string sub_keys[] = {key};
-            return update_uris(sch, sub_keys);
-        }
-
-        template <class Json>
-        compilation_context update_uris(const Json& sch, jsoncons::span<const std::string> keys) const
-        {
-            // Exclude uri's that are not plain name identifiers
-            std::vector<schema_location> new_uris;
-            for (const auto& uri : uris_)
-            {
-                if (!uri.has_plain_name_fragment())
-                {
-                    new_uris.push_back(uri);
+                    default:
+                        break;
                 }
             }
-
-            if (new_uris.empty())
-            {
-                new_uris.emplace_back("#");
-            }
-
-            // Append the keys for this sub-schema to the uri's
-            for (const auto& key : keys)
-            {
-                for (auto& uri : new_uris)
-                {
-                    auto new_u = uri.append(key);
-                    uri = schema_location(new_u);
-                }
-            }
-            if (sch.is_object())
-            {
-                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
-                if (it != sch.object_range().end()) 
-                {
-                    std::string id = it->value().template as<std::string>(); 
-                    schema_location relative(id); 
-                    schema_location new_uri = relative.resolve(get_base_uri());
-                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
-                    // Add it to the list if it is not already there
-                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
-                    {
-                        new_uris.emplace_back(new_uri); 
-                    }
-                }
-                it = sch.find("$recursiveAnchor"); 
-                if (it != sch.object_range().end()) 
-                {
-                    bool is_recursive_anchor = it->value().template as<bool>();  
-                    if (is_recursive_anchor)
-                    {
-                        new_uris.back().anchor_flags(uri_anchor_flags::recursive_anchor);
-                    }
-                }
-            }
-
-            std::cout << "Absolute URI: " << absolute_uri_.string() << "\n";
-            for (const auto& uri : new_uris)
-            {
-                std::cout << "    " << uri.string() << "\n";
-            }
-
-            return compilation_context(new_uris);
+            return base;
         }
 
         std::string make_schema_path_with(const std::string& keyword) const
