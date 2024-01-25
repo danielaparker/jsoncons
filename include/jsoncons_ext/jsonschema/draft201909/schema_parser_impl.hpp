@@ -56,6 +56,7 @@ namespace draft201909 {
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
+        using recursive_ref_validator_type = recursive_ref_validator<Json>;
     private:
         struct subschema_registry
         {
@@ -146,7 +147,15 @@ namespace draft201909 {
                 }
                 case json_type::object_value:
                 {
-                    auto it = sch.find("default");
+                    bool is_recursive_anchor = false;
+
+                    auto it = sch.find("$recursiveAnchor"); 
+                    if (it != sch.object_range().end()) 
+                    {
+                        is_recursive_anchor = true;
+                    }
+
+                    it = sch.find("default");
                     if (it != sch.object_range().end()) 
                     {
                         default_value = it->value();
@@ -188,7 +197,7 @@ namespace draft201909 {
                         schema_location relative(it->value().template as<std::string>()); 
                         auto base_uri = new_context.get_base_uri(uri_anchor_flags::recursive_anchor);
                         auto id = relative.resolve(base_uri); // REVISIT
-                        validators.push_back(get_or_create_reference(id));
+                        validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.base()));
                     }
 
                     validators.push_back(make_type_validator(new_context, sch));
@@ -260,7 +269,7 @@ namespace draft201909 {
                     } 
 
                     schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri(),
-                        std::move(validators), std::move(default_value));
+                        std::move(validators), std::move(default_value), is_recursive_anchor);
                     schema_validator<Json>* p = schema_validator_ptr.get();
 
                     it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
