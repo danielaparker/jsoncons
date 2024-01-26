@@ -1,3 +1,7 @@
+0.173.3
+-------
+- Do you have a tool to collect all changes? or you type it manualy?
+
 0.173.2
 -------
 
@@ -1479,7 +1483,7 @@ Deprecated `basic_csv_options` functions removed:
 
 Defect fixes:
 
-- Fixes GCC 9.2 warning: ‘class jsoncons::json_exception’ 
+- Fixes GCC 9.2 warning: ï¿½class jsoncons::json_exceptionï¿½ 
   has virtual functions and accessible non-virtual destructor,
   contributed by KonstantinPlotnikov.
     
