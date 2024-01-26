@@ -1,10 +1,9 @@
 [
     {
-        "description": "$recursiveRef with nesting",
+        "description": "$recursiveRef without using nesting",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$id": "http://localhost:4242/draft2019-09/recursiveRef3/schema.json",
-            "$recursiveAnchor": true,
+            "$id": "http://localhost:4242/draft2019-09/recursiveRef2/schema.json",
             "$defs": {
                 "myobject": {
                     "$id": "myobject.json",
@@ -33,21 +32,21 @@
                 "description": "single level match",
                 "data": { "foo": "hi" },
                 "valid": true
-            },*/
+            },
             {
-                "description": "integer now matches as a property value",
+                "description": "integer does not match as a property value",
                 "data": { "foo": 1 },
-                "valid": true
-            }/*,
+                "valid": false
+            },*/
             {
                 "description": "two levels, properties match with inner definition",
                 "data": { "foo": { "bar": "hi" } },
                 "valid": true
-            },
+            }/*,
             {
-                "description": "two levels, properties match with $recursiveRef",
+                "description": "two levels, no match",
                 "data": { "foo": { "bar": 1 } },
-                "valid": true
+                "valid": false
             }*/
         ]
     }
