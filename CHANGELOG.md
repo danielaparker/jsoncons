@@ -1483,7 +1483,7 @@ Deprecated `basic_csv_options` functions removed:
 
 Defect fixes:
 
-- Fixes GCC 9.2 warning: �class jsoncons::json_exception� 
+- Fixes GCC 9.2 warning: class jsoncons::json_exception 
   has virtual functions and accessible non-virtual destructor,
   contributed by KonstantinPlotnikov.
     
