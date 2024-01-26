@@ -59,6 +59,9 @@ namespace jsonschema {
         }
 
     private:
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/) override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -119,6 +122,9 @@ namespace jsonschema {
         }
 
     private:
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -166,6 +172,9 @@ namespace jsonschema {
         }
 
     private:
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -212,6 +221,10 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -255,6 +268,9 @@ namespace jsonschema {
         }
 
     private:
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json&, 
             const jsonpointer::json_pointer&,
@@ -286,6 +302,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -331,6 +351,10 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -373,6 +397,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -436,6 +464,18 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : item_validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            if (additional_items_validator_)
+            {
+                additional_items_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -497,6 +537,14 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            if (validator_)
+            {
+                validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -563,6 +611,14 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            if (items_validator_)
+            {
+                items_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -604,6 +660,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -663,6 +723,10 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -714,6 +778,14 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
         void do_validate(const Json& instance,
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties,
@@ -762,6 +834,14 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            if (rule_)
+            {
+                rule_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -885,6 +965,14 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -942,6 +1030,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -979,6 +1071,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1018,6 +1114,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1055,6 +1155,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1092,6 +1196,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1145,6 +1253,14 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -1199,6 +1315,14 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -1246,6 +1370,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1277,7 +1405,12 @@ namespace jsonschema {
         {
             return jsoncons::make_unique<boolean_validator>(this->schema_path().resolve(base_uri));
         }
+
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json&, 
             const jsonpointer::json_pointer&,
             std::unordered_set<std::string>&, 
@@ -1314,6 +1447,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1359,6 +1496,10 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1401,6 +1542,10 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1524,7 +1669,38 @@ namespace jsonschema {
                 std::move(dependent_schemas),
                 std::move(property_name_validator));
         }
+
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : general_validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            for (auto& item : properties_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+    #if defined(JSONCONS_HAS_STD_REGEX)
+            for (auto& item : pattern_properties_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+    #endif
+            for (auto& item : dependent_required_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            for (auto& item : dependent_schemas_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            if (additional_properties_)
+                additional_properties_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            if (property_name_validator_)
+                property_name_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -1709,6 +1885,14 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            if (validator_)
+            {
+                validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -1772,6 +1956,14 @@ namespace jsonschema {
 
     private:
 
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -1832,7 +2024,24 @@ namespace jsonschema {
             return jsoncons::make_unique<conditional_validator>(this->schema_path().resolve(base_uri), 
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
+
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            if (if_validator_)
+            {
+                if_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            if (then_validator_)
+            {
+                then_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+            if (else_validator_)
+            {
+                else_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -1877,7 +2086,12 @@ namespace jsonschema {
         {
             return jsoncons::make_unique<enum_validator>(this->schema_path().resolve(base_uri), Json(value_));
         }
+
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1927,7 +2141,12 @@ namespace jsonschema {
         {
             return jsoncons::make_unique<const_validator>(this->schema_path().resolve(base_uri), Json(value_));
         }
+
     private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        {
+        }
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
@@ -1987,6 +2206,17 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : type_mapping_)
+            {
+                if (validator)
+                {
+                    validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+                }
+            }
+        }
 
         void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,

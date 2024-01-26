@@ -47,7 +47,7 @@ namespace draft201909 {
     };
 
     template <class Json>
-    class schema_parser_impl : public schema_parser<Json> 
+    class schema_parser_impl : public schema_parser<Json>, public schema_registry<Json> 
     {
     public:
         using validator_type = std::unique_ptr<validator_base<Json>>;
@@ -93,6 +93,17 @@ namespace draft201909 {
         schema_parser_impl& operator=(const schema_parser_impl&) = delete;
         schema_parser_impl(schema_parser_impl&&) = default;
         schema_parser_impl& operator=(schema_parser_impl&&) = default;
+
+        schema_validator<Json>* get_schema(const jsoncons::uri& uri) override
+        {
+            auto &doc = get_or_create_document(uri.base().string());
+            auto it = doc.schemas.find(std::string(uri.fragment()));
+            if (it == doc.schemas.end()) 
+            {
+                JSONCONS_THROW(schema_error("schema with " + uri.string() + " not found"));
+            }
+            return it->second;
+        }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
         {
@@ -152,7 +163,7 @@ namespace draft201909 {
                     auto it = sch.find("$recursiveAnchor"); 
                     if (it != sch.object_range().end()) 
                     {
-                        is_recursive_anchor = true;
+                        is_recursive_anchor = it->value().as<bool>();
                     }
 
                     it = sch.find("default");
@@ -1295,6 +1306,7 @@ namespace draft201909 {
                     ref.second->set_referred_schema(it->second->clone(ref.second->get_base_uri()));
                 }
             }
+            root_->resolve_recursive_refs(root_->schema_path(), root_->is_recursive_anchor(), *this);
         }
 
         void insert_unknown_keyword(const schema_location& uri, 
