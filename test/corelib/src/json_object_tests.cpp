@@ -483,94 +483,132 @@ TEST_CASE("test_object_equals")
     CHECK_FALSE(a == c);
 }
 
-TEST_CASE("test_json_object_iterator_1")
+TEST_CASE("json_object_iterator test 1")
 {
-    json a;
-    a["name1"] = "value1";
-    a["name2"] = "value2";
-    a["name3"] = "value3";
+    SECTION("object_iterator")
+    {
+        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-    json::object_iterator it = a.object_range().begin();
-    CHECK((*it).key() == "name1");
-    CHECK((*it).value() == json("value1"));
-    ++it;
-    CHECK((*it).key() == "name2");
-    CHECK((*it).value() == json("value2"));
+        json::object_iterator it = a.object_range().begin();
+        CHECK((*it).key() == "name1");
+        CHECK((*it).value() == json("value1"));
+        ++it;
+        CHECK((*it).key() == "name2");
+        CHECK((*it).value() == json("value2"));
 
-    CHECK((*(it++)).key() == "name2");
-    CHECK((*it).key() == "name3");
-    CHECK((*it).value() == json("value3"));
+        CHECK((*(it++)).key() == "name2");
+        CHECK((*it).key() == "name3");
+        CHECK((*it).value() == json("value3"));
 
-    CHECK((*(it--)).key() == "name3");
-    CHECK((*it).value() == json("value2"));
-    CHECK((*(--it)).value() == json("value1"));
+        CHECK((*(it--)).key() == "name3");
+        CHECK((*it).value() == json("value2"));
+        CHECK((*(--it)).value() == json("value1"));
 
-    json::key_value_type member = *it;
-    CHECK(member.key() == "name1");
-    CHECK(member.value() == json("value1"));
-}
+        json::key_value_type member = *it;
+        CHECK(member.key() == "name1");
+        CHECK(member.value() == json("value1"));
+    }
+    SECTION("const_object_iterator 1")
+    {
+        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-TEST_CASE("test_json_object_iterator_2")
-{
-    json a;
-    a["name1"] = "value1";
-    a["name2"] = "value2";
-    a["name3"] = "value3";
+        json::const_object_iterator it = a.object_range().begin();
+        CHECK((*it).key() == "name1");
+        CHECK((*it).value() == json("value1"));
+        ++it;
+        CHECK((*it).key() == "name2");
+        CHECK((*it).value() == json("value2"));
 
-    json::const_object_iterator it = a.object_range().begin();
-    CHECK((*it).key() == "name1");
-    CHECK((*it).value() == json("value1"));
-    ++it;
-    CHECK((*it).key() == "name2");
-    CHECK((*it).value() == json("value2"));
+        CHECK((*(it++)).key() == "name2");
+        CHECK((*it).key() == "name3");
+        CHECK((*it).value() == json("value3"));
 
-    CHECK((*(it++)).key() == "name2");
-    CHECK((*it).key() == "name3");
-    CHECK((*it).value() == json("value3"));
+        CHECK((*(it--)).key() == "name3");
+        CHECK((*it).value() == json("value2"));
 
-    CHECK((*(it--)).key() == "name3");
-    CHECK((*it).value() == json("value2"));
+        CHECK((*(--it)).value() == json("value1"));
 
-    CHECK((*(--it)).value() == json("value1"));
+        json::key_value_type member = *it;
+        CHECK(member.key() == "name1");
+        CHECK(member.value() == json("value1"));
+    }
+    SECTION("const_object_iterator 2")
+    {
+        const json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-    json::key_value_type member = *it;
-    CHECK(member.key() == "name1");
-    CHECK(member.value() == json("value1"));
-}
+        json::const_object_iterator it = static_cast<const json&>(a).object_range().begin();
+        CHECK((it == a.object_range().begin()));
+        CHECK_FALSE((it == a.object_range().end()));
+        CHECK((*it).key() == "name1");
+        CHECK((*it).value() == json("value1"));
+        ++it;
+        CHECK_FALSE((it == a.object_range().end()));
+        CHECK((*it).key() == "name2");
+        CHECK((*it).value() == json("value2"));
 
-TEST_CASE("test_json_object_iterator_3")
-{
-    json a;
-    a["name1"] = "value1";
-    a["name2"] = "value2";
-    a["name3"] = "value3";
+        CHECK((*(it++)).key() == "name2");
+        CHECK_FALSE((it == a.object_range().end()));
+        CHECK((*it).key() == "name3");
+        CHECK((*it).value() == json("value3"));
 
-    json::const_object_iterator it = static_cast<const json&>(a).object_range().begin();
-    CHECK((it == a.object_range().begin()));
-    CHECK_FALSE((it == a.object_range().end()));
-    CHECK((*it).key() == "name1");
-    CHECK((*it).value() == json("value1"));
-    ++it;
-    CHECK_FALSE((it == a.object_range().end()));
-    CHECK((*it).key() == "name2");
-    CHECK((*it).value() == json("value2"));
+        CHECK((*(it--)).key() == "name3");
+        CHECK((*it).value() == json("value2"));
 
-    CHECK((*(it++)).key() == "name2");
-    CHECK_FALSE((it == a.object_range().end()));
-    CHECK((*it).key() == "name3");
-    CHECK((*it).value() == json("value3"));
+        CHECK((*(--it)).value() == json("value1"));
+        CHECK((it == a.object_range().begin()));
 
-    CHECK((*(it--)).key() == "name3");
-    CHECK((*it).value() == json("value2"));
+        json::key_value_type member = *it;
+        CHECK(member.key() == "name1");
+        CHECK(member.value() == json("value1"));
 
-    CHECK((*(--it)).value() == json("value1"));
-    CHECK((it == a.object_range().begin()));
+        //*it = member; // Don't want this to compile
+    }
+    SECTION("json cbegin")
+    {
+        json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
 
-    json::key_value_type member = *it;
-    CHECK(member.key() == "name1");
-    CHECK(member.value() == json("value1"));
+        json::const_object_iterator it = a.object_range().cbegin();
+        CHECK((*it).key() == "name1");
+        CHECK((*it).value() == json("value1"));
+        ++it;
+        CHECK((*it).key() == "name2");
+        CHECK((*it).value() == json("value2"));
 
-    //*it = member; // Don't want this to compile
+        CHECK((*(it++)).key() == "name2");
+        CHECK((*it).key() == "name3");
+        CHECK((*it).value() == json("value3"));
+
+        CHECK((*(it--)).key() == "name3");
+        CHECK((*it).value() == json("value2"));
+        CHECK((*(--it)).value() == json("value1"));
+
+        json::key_value_type member = *it;
+        CHECK(member.key() == "name1");
+        CHECK(member.value() == json("value1"));
+    }
+    SECTION("const json cbegin")
+    {
+        const json a = json::parse(R"({"name1" : "value1","name2" : "value2","name3" : "value3"})");
+
+        json::const_object_iterator it = a.object_range().cbegin();
+        CHECK((*it).key() == "name1");
+        CHECK((*it).value() == json("value1"));
+        ++it;
+        CHECK((*it).key() == "name2");
+        CHECK((*it).value() == json("value2"));
+
+        CHECK((*(it++)).key() == "name2");
+        CHECK((*it).key() == "name3");
+        CHECK((*it).value() == json("value3"));
+
+        CHECK((*(it--)).key() == "name3");
+        CHECK((*it).value() == json("value2"));
+        CHECK((*(--it)).value() == json("value1"));
+
+        json::key_value_type member = *it;
+        CHECK(member.key() == "name1");
+        CHECK(member.value() == json("value1"));
+    }
 }
 
 TEST_CASE("test_object_key_proxy")
