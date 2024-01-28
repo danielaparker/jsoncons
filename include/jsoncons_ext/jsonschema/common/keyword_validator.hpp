@@ -257,6 +257,8 @@ namespace jsonschema {
 
         keyword_validator_type clone(const jsoncons::uri& base_uri) const override 
         {
+            std::cout << "recursive_ref_validator.clone " << "base_uri: << " << base_uri.string() << ", schema_path: " << this->schema_path().string() << "\n\n";
+
             auto uri = base_uri_.resolve(base_uri);
             return jsoncons::make_unique<recursive_ref_validator>(uri, referred_schema_);
         }
@@ -265,16 +267,20 @@ namespace jsonschema {
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
         {
+            uri relative("#");
+            uri location;
             if (has_recursive_anchor)
             {
-                referred_schema_ = schemas.get_schema(base);
+                location = relative.resolve(base);
             }
             else
             {
-                referred_schema_ = schemas.get_schema(base_uri_);
+                location = relative.resolve(base_uri_);
             }
+            referred_schema_ = schemas.get_schema(location);
             std::cout << "recursive_ref_validator::do_resolve_recursive_refs location: " << schema_path().string()
-                << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
+                << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor 
+                << "\n  location: " << location.string() << "\n\n";
         }
 
         void do_validate(const Json& instance, 
@@ -283,6 +289,8 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
+            std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+
             if (referred_schema_ == nullptr)
             {
                 reporter.error(validation_output("", 

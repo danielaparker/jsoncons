@@ -979,7 +979,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "combining_validator.do_validate " << instance << " " << validators_.size() << ", " << instance_location.to_string() << "\n";
+            std::cout << "combining_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
 
             size_t count = 0;
 
