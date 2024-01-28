@@ -235,14 +235,14 @@ namespace jsonschema {
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
         uri base_uri_;
-        schema_validator<Json>* referred_schema_;
+        schema_validator_type referred_schema_;
 
     public:
         recursive_ref_validator(const uri& base_uri) : base_uri_(base_uri), referred_schema_(nullptr)
         {}
 
-        recursive_ref_validator(const uri& base_uri, schema_validator<Json>* target)
-            : base_uri_(base_uri), referred_schema_(target) {}
+        recursive_ref_validator(const uri& base_uri, schema_validator_type&& target)
+            : base_uri_(base_uri), referred_schema_(std::move(target)) {}
 
         uri get_base_uri() const
         {
@@ -251,8 +251,7 @@ namespace jsonschema {
 
         const uri& schema_path() const override
         {
-            static uri s = uri("#");
-            return referred_schema_ ? referred_schema_->schema_path() : s;
+            return referred_schema_ ? referred_schema_->schema_path() : base_uri_;
         }
 
         keyword_validator_type clone(const jsoncons::uri& base_uri) const override 
@@ -260,7 +259,7 @@ namespace jsonschema {
             std::cout << "recursive_ref_validator.clone " << "base_uri: << " << base_uri.string() << ", schema_path: " << this->schema_path().string() << "\n\n";
 
             auto uri = base_uri_.resolve(base_uri);
-            return jsoncons::make_unique<recursive_ref_validator>(uri, referred_schema_);
+            return jsoncons::make_unique<recursive_ref_validator>(uri, referred_schema_ ? referred_schema_->clone(base_uri) : nullptr);
         }
 
     private:
@@ -277,7 +276,8 @@ namespace jsonschema {
             {
                 location = relative.resolve(base_uri_);
             }
-            referred_schema_ = schemas.get_schema(location);
+            referred_schema_ = schemas.get_schema(location)->clone(location);
+            referred_schema_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             std::cout << "recursive_ref_validator::do_resolve_recursive_refs location: " << schema_path().string()
                 << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor 
                 << "\n  location: " << location.string() << "\n\n";

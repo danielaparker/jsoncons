@@ -31,6 +31,8 @@
     ]
 }
 
+recursive_ref_validator.clone base_uri: << http://localhost:4242/draft2019-09/recursiveRef4/schema.json, schema_path: http://localhost:4242/draft2019-09/recursiveRef4/myobject.json
+
 object_schema_validator location::do_resolve_recursive_refs: http://localhost:4242/draft2019-09/recursiveRef4/schema.json#/anyOf/0, 0
   base: http://localhost:4242/draft2019-09/recursiveRef4/schema.json, has_recursive_anchor: 0
 
@@ -63,5 +65,26 @@ combining_validator.do_validate keywordLocation: << http://localhost:4242/draft2
 combining_validator.do_validate keywordLocation: << http://localhost:4242/draft2019-09/recursiveRef4/myobject.json#/anyOf, instanceLocation:
 recursive_ref_validator.do_validate keywordLocation: << http://localhost:4242/draft2019-09/recursiveRef4/myobject.json, instanceLocation:/foo
 combining_validator.do_validate keywordLocation: << http://localhost:4242/draft2019-09/recursiveRef4/myobject.json#/anyOf, instanceLocation:/foo
-recursive_ref_validator.do_validate keywordLocation: << #, instanceLocation:/foo/bar
+recursive_ref_validator.do_validate keywordLocation: << http://localhost:4242/draft2019-09/recursiveRef4/myobject.json, instanceLocation:/foo/bar
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test.exe is a Catch v2.13.10 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+jsonschema draft2019-09 tests
+  issues
+-------------------------------------------------------------------------------
+C:\Users\danie\source\repos\jsoncons\test\jsonschema\src\jsonschema_draft201909_tests.cpp(97)
+...............................................................................
+
+C:\Users\danie\source\repos\jsoncons\test\jsonschema\src\jsonschema_draft201909_tests.cpp(66): FAILED:
+  CHECK_FALSE( test_case["valid"].as<bool>() )
+with expansion:
+  !true
+
+  File: ./jsonschema/issues/draft2019-09/issue-recursiveRef.json
+  Test case 1.1: "two levels, properties match with inner definition"
+  Failed: #: No schema matched, but one of them is required to match
+  Nested error: #: Expected 1 integer, found object
+  Nested error: #: No schema matched, but one of them is required to match
