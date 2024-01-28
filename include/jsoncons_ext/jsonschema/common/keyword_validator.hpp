@@ -58,6 +58,7 @@ namespace jsonschema {
     class schema_registry
     {
     public:
+        virtual ~schema_registry() = default;
         virtual schema_validator<Json>* get_schema(const jsoncons::uri& uri) = 0;
     };
 
