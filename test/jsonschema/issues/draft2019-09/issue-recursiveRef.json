@@ -1,13 +1,14 @@
 [
     {
-        "description": "$recursiveRef without using nesting",
+        "description": "$recursiveRef with $recursiveAnchor: false works like $ref",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$id": "http://localhost:4242/draft2019-09/recursiveRef2/schema.json",
+            "$id": "http://localhost:4242/draft2019-09/recursiveRef4/schema.json",
+            "$recursiveAnchor": false,
             "$defs": {
                 "myobject": {
                     "$id": "myobject.json",
-                    "$recursiveAnchor": true,
+                    "$recursiveAnchor": false,
                     "anyOf": [
                         { "type": "string" },
                         {
@@ -44,7 +45,7 @@
                 "valid": true
             }/*,
             {
-                "description": "two levels, no match",
+                "description": "two levels, integer does not match as a property value",
                 "data": { "foo": { "bar": 1 } },
                 "valid": false
             }*/

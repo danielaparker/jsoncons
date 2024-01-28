@@ -194,15 +194,18 @@ namespace jsonschema {
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
         {
+            std::cout << "ref_validator location::do_resolve_recursive_refs: " << schema_path().string()
+                << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
+
             JSONCONS_ASSERT(referred_schema_)
 
-            if (referred_schema_->is_recursive_anchor())
+            if (has_recursive_anchor)
             {
-                referred_schema_->resolve_recursive_refs(has_recursive_anchor ? base : schema_path().base(), true, schemas);
+                referred_schema_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             }
             else
             {
-                referred_schema_->resolve_recursive_refs(schema_path(), false, schemas);
+                referred_schema_->resolve_recursive_refs(referred_schema_->schema_path(), referred_schema_->is_recursive_anchor(), schemas);
             }
         }
 
@@ -262,8 +265,16 @@ namespace jsonschema {
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
         {
-            referred_schema_ = schemas.get_schema(base);
-            std::cout << "recursive_ref_validator::do_resolve_recursive_refs base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
+            if (has_recursive_anchor)
+            {
+                referred_schema_ = schemas.get_schema(base);
+            }
+            else
+            {
+                referred_schema_ = schemas.get_schema(base_uri_);
+            }
+            std::cout << "recursive_ref_validator::do_resolve_recursive_refs location: " << schema_path().string()
+                << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
         }
 
         void do_validate(const Json& instance, 
@@ -394,10 +405,29 @@ namespace jsonschema {
     private:
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
         {
-            for (auto& validator : validators_)
+            if (has_recursive_anchor)
             {
-                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+                for (auto& validator : validators_)
+                {
+                    validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+                }
             }
+            else if (is_recursive_anchor_)
+            {
+                for (auto& validator : validators_)
+                {
+                    validator->resolve_recursive_refs(schema_path(), is_recursive_anchor_, schemas);
+                }
+            }
+            else
+            {
+                for (auto& validator : validators_)
+                {
+                    validator->resolve_recursive_refs(schema_path(), is_recursive_anchor_, schemas);
+                }
+            }
+            std::cout << "object_schema_validator location::do_resolve_recursive_refs: " << schema_path().string() << ", " << is_recursive_anchor_
+                     << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
         }
 
         void do_validate(const Json& instance, 

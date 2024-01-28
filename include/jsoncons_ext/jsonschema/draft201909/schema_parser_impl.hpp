@@ -163,7 +163,7 @@ namespace draft201909 {
                     auto it = sch.find("$recursiveAnchor"); 
                     if (it != sch.object_range().end()) 
                     {
-                        is_recursive_anchor = it->value().as<bool>();
+                        is_recursive_anchor = it->value().template as<bool>();
                     }
 
                     it = sch.find("default");
