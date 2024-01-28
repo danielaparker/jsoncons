@@ -1,3 +1,11 @@
+0.173.3
+-------
+
+Defect fixes:
+
+- Fixed const issue with cbegin and cend functions through PR #481
+
+
 0.173.2
 -------
 
