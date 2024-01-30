@@ -2,7 +2,8 @@
 
 ```cpp
 range<array_iterator,const_array_iterator> array_range();
-range<const_array_iterator,const_array_iterator> array_range() const;
+range<const_array_iterator,const_array_iterator> array_range() const;         (until 0.173.3)
+const range<const_array_iterator,const_array_iterator> array_range() const;   (since 0.173.3)
 ```
 Returns a [range](range.md) that supports a range-based for loop over the elements of a `json` array      
 Throws `std::domain_error` if not an array.
