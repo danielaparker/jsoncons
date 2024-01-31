@@ -447,11 +447,6 @@ namespace jsoncons {
         using array_iterator = typename array_iterator_typedefs<policy_type,key_type,basic_json>::array_iterator_type;                    
         using const_array_iterator = typename array_iterator_typedefs<policy_type,key_type,basic_json>::const_array_iterator_type;                    
 
-        using object_range_type = range<object_iterator,const_array_iterator>;
-        using const_object_range_type = range<const_object_iterator,const_array_iterator>;
-        using array_range_type = range<array_iterator,const_array_iterator>;
-        using const_array_range_type = range<const_array_iterator,const_array_iterator>;
-
     private:
 
         static constexpr uint8_t major_type_shift = 0x04;
@@ -1309,22 +1304,22 @@ namespace jsoncons {
                 return evaluate();
             }
 
-            object_range_type object_range()
+            range<object_iterator, const_object_iterator> object_range()
             {
                 return evaluate().object_range();
             }
 
-            const_object_range_type object_range() const
+            range<const_object_iterator, const_object_iterator> object_range() const
             {
                 return evaluate().object_range();
             }
 
-            array_range_type array_range()
+            range<array_iterator, const_array_iterator> array_range()
             {
                 return evaluate().array_range();
             }
 
-            const_array_range_type array_range() const
+            range<const_array_iterator, const_array_iterator> array_range() const
             {
                 return evaluate().array_range();
             }
@@ -2079,25 +2074,25 @@ namespace jsoncons {
             }
 
             JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-            object_range_type members()
+            range<object_iterator, const_object_iterator> members()
             {
                 return evaluate().object_range();
             }
 
             JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-            const_object_range_type members() const
+            range<const_object_iterator, const_object_iterator> members() const
             {
                 return evaluate().object_range();
             }
 
             JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-            array_range_type elements()
+            range<array_iterator, const_array_iterator> elements()
             {
                 return evaluate().array_range();
             }
 
             JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-            const_array_range_type elements() const
+            range<const_array_iterator, const_array_iterator> elements() const
             {
                 return evaluate().array_range();
             }
@@ -5972,25 +5967,25 @@ namespace jsoncons {
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        object_range_type members()
+        range<object_iterator, const_object_iterator> members()
         {
             return object_range();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        const_object_range_type members() const
+        range<const_object_iterator, const_object_iterator> members() const
         {
             return object_range();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        array_range_type elements()
+        range<array_iterator, const_array_iterator> elements()
         {
             return array_range();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        const_array_range_type elements() const
+        range<const_array_iterator, const_array_iterator> elements() const
         {
             return array_range();
         }
@@ -6002,28 +5997,28 @@ namespace jsoncons {
         }
     #endif
 
-        object_range_type object_range()
+        range<object_iterator, const_object_iterator> object_range()
         {
             switch (storage_kind())
             {
             case json_storage_kind::empty_object_value:
-                return object_range_type(object_iterator(), object_iterator());
+                return range<object_iterator, const_object_iterator>(object_iterator(), object_iterator());
             case json_storage_kind::object_value:
-                return object_range_type(object_iterator(cast<object_storage>().value().begin()),
+                return range<object_iterator, const_object_iterator>(object_iterator(cast<object_storage>().value().begin()),
                                               object_iterator(cast<object_storage>().value().end()));
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
             }
         }
 
-        const_object_range_type object_range() const
+        range<const_object_iterator, const_object_iterator> object_range() const
         {
             switch (storage_kind())
             {
                 case json_storage_kind::empty_object_value:
-                    return const_object_range_type(const_object_iterator(), const_object_iterator());
+                    return range<const_object_iterator, const_object_iterator>(const_object_iterator(), const_object_iterator());
                 case json_storage_kind::object_value:
-                    return const_object_range_type(const_object_iterator(cast<object_storage>().value().begin()),
+                    return range<const_object_iterator, const_object_iterator>(const_object_iterator(cast<object_storage>().value().begin()),
                                                         const_object_iterator(cast<object_storage>().value().end()));
                 case json_storage_kind::json_const_pointer:
                     return cast<json_const_pointer_storage>().value()->object_range();
@@ -6032,24 +6027,24 @@ namespace jsoncons {
             }
         }
 
-        array_range_type array_range()
+        range<array_iterator, const_array_iterator> array_range()
         {
             switch (storage_kind())
             {
                 case json_storage_kind::array_value:
-                    return array_range_type(cast<array_storage>().value().begin(),
+                    return range<array_iterator, const_array_iterator>(cast<array_storage>().value().begin(),
                         cast<array_storage>().value().end());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
             }
         }
 
-        const_array_range_type array_range() const
+        range<const_array_iterator, const_array_iterator> array_range() const
         {
             switch (storage_kind())
             {
                 case json_storage_kind::array_value:
-                    return const_array_range_type(cast<array_storage>().value().begin(),
+                    return range<const_array_iterator, const_array_iterator>(cast<array_storage>().value().begin(),
                         cast<array_storage>().value().end());
                 case json_storage_kind::json_const_pointer:
                     return cast<json_const_pointer_storage>().value()->array_range();
