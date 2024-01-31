@@ -346,11 +346,11 @@ namespace jsoncons {
         {
         }
 
-        iterator begin()
+        iterator begin() const noexcept
         {
             return first_;
         }
-        iterator end()
+        iterator end() const noexcept
         {
             return last_;
         }
@@ -362,11 +362,11 @@ namespace jsoncons {
         {
             return last_;
         }
-        reverse_iterator rbegin()
+        reverse_iterator rbegin() const noexcept
         {
             return reverse_iterator(last_);
         }
-        reverse_iterator rend()
+        reverse_iterator rend() const noexcept
         {
             return reverse_iterator(first_);
         }
