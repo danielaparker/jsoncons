@@ -2,8 +2,7 @@
 
 ```c++
 range<object_iterator,const_object_iterator> object_range();
-range<const_object_iterator,const_object_iterator> object_range() const;         (until 0.173.3) 
-const range<const_object_iterator,const_object_iterator> object_range() const;   (since 0.173.3)
+range<const_object_iterator,const_object_iterator> object_range() const;
 ```
 Returns a [range](range.md) that supports a range-based for loop over the key-value pairs of a `basic_json` object      
 Throws `std::domain_error` if not an object.

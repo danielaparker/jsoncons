@@ -346,19 +346,11 @@ namespace jsoncons {
         {
         }
 
-        iterator begin() noexcept
+        iterator begin() const noexcept
         {
             return first_;
         }
-        iterator end() noexcept
-        {
-            return last_;
-        }
-        const_iterator begin() const noexcept
-        {
-            return first_;
-        }
-        const_iterator end() const noexcept
+        iterator end() const noexcept
         {
             return last_;
         }
@@ -370,19 +362,11 @@ namespace jsoncons {
         {
             return last_;
         }
-        reverse_iterator rbegin() noexcept
+        reverse_iterator rbegin() const noexcept
         {
             return reverse_iterator(last_);
         }
-        reverse_iterator rend() noexcept
-        {
-            return reverse_iterator(first_);
-        }
-        const_reverse_iterator rbegin() const noexcept
-        {
-            return reverse_iterator(last_);
-        }
-        const_reverse_iterator rend() const noexcept
+        reverse_iterator rend() const noexcept
         {
             return reverse_iterator(first_);
         }
@@ -1325,7 +1309,7 @@ namespace jsoncons {
                 return evaluate().object_range();
             }
 
-            const range<const_object_iterator, const_object_iterator> object_range() const
+            range<const_object_iterator, const_object_iterator> object_range() const
             {
                 return evaluate().object_range();
             }
@@ -1335,7 +1319,7 @@ namespace jsoncons {
                 return evaluate().array_range();
             }
 
-            const range<const_array_iterator, const_array_iterator> array_range() const
+            range<const_array_iterator, const_array_iterator> array_range() const
             {
                 return evaluate().array_range();
             }
@@ -6027,7 +6011,7 @@ namespace jsoncons {
             }
         }
 
-        const range<const_object_iterator, const_object_iterator> object_range() const
+        range<const_object_iterator, const_object_iterator> object_range() const
         {
             switch (storage_kind())
             {
@@ -6055,7 +6039,7 @@ namespace jsoncons {
             }
         }
 
-        const range<const_array_iterator, const_array_iterator> array_range() const
+        range<const_array_iterator, const_array_iterator> array_range() const
         {
             switch (storage_kind())
             {
