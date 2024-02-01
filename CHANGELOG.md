@@ -5,7 +5,6 @@ Defect fixes:
 
 - Made all member functions of [jsoncons::range](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json/range.md) const
 
-
 0.173.2
 -------
 
