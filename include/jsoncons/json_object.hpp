@@ -105,7 +105,7 @@ namespace jsoncons {
             : key_(std::move(name)), value_(std::forward<Args>(args)...)
         {
         }
-
+/*
         template <typename... Args>
         key_value(const key_type& name,  Args&& ... args, const allocator_type& alloc)
             : key_(name, alloc), value_(std::forward<Args>(args)..., alloc)
@@ -117,7 +117,7 @@ namespace jsoncons {
             : key_(std::move(name),alloc), value_(std::forward<Args>(args)...,alloc)
         {
         }
-
+*/
         key_value(const key_value& member)
             : key_(member.key_), value_(member.value_)
         {
@@ -560,13 +560,13 @@ namespace jsoncons {
                 auto last = first + count;
 
                 std::sort(first, last, compare);
-                members_.emplace_back(first->name, std::move(first->value));
+                members_.emplace_back(key_type(first->name,get_allocator()), std::move(first->value));
                 auto prev_it = first;
                 for (auto it = first+1; it != last; ++it)
                 {
                     if (it->name != prev_it->name)
                     {
-                        members_.emplace_back(it->name, std::move(it->value));
+                        members_.emplace_back(key_type(it->name,get_allocator()), std::move(it->value));
                     }
                     ++prev_it;
                 }
