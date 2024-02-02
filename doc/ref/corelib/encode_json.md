@@ -1,7 +1,7 @@
 ### jsoncons::encode_json
 
 Encode a C++ data structure to a JSON formatted string or stream. `encode_json` will work for all types that
-have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md) defined.
+have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json_type_traits.md) defined.
 
 ```cpp
 #include <jsoncons/encode_json.hpp>

@@ -3059,7 +3059,7 @@ for (const auto& item : keys)
 *ptr = "str";
 ```
 
-Since 0.162.0, you can also accomplish this with [jsonpointer::add](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonpointer/add.md):
+Since 0.162.0, you can also accomplish this with [jsonpointer::add](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/jsonpointer/add.md):
 
 ```cpp
 #include <iostream>
