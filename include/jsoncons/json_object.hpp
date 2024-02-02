@@ -138,32 +138,6 @@ namespace jsoncons {
         {
         }
 
-        template <typename... U1, typename... U2>
-        JSONCONS_CONSTEXPR key_value(std::piecewise_construct_t /*unused*/, std::tuple<U1...> a,
-                 std::tuple<U2...>
-                     b) noexcept(noexcept(key_value(std::declval<std::tuple<U1...>&>(),
-                                               std::declval<std::tuple<U2...>&>(),
-                                               jsoncons::extension_traits::index_sequence_for<U1...>(),
-                                               jsoncons::extension_traits::index_sequence_for<U2...>())))
-            : key_value(a, b, jsoncons::extension_traits::index_sequence_for<U1...>(),
-                   jsoncons::extension_traits::index_sequence_for<U2...>()) {
-        }
-
-        template <typename... U1, size_t... I1, typename... U2, size_t... I2>
-        key_value(std::tuple<U1...>& a, std::tuple<U2...>& b, jsoncons::extension_traits::index_sequence<I1...> /*unused*/, jsoncons::extension_traits::index_sequence<I2...> /*unused*/) noexcept(
-            noexcept(KeyT(std::forward<U1>(std::get<I1>(
-                std::declval<std::tuple<
-                    U1...>&>()))...)) && noexcept(ValueT(std::
-                                                         forward<U2>(std::get<I2>(
-                                                             std::declval<std::tuple<U2...>&>()))...)))
-            : key_(std::forward<U1>(std::get<I1>(a))...)
-     , value_(std::forward<U2>(std::get<I2>(b))...) {
-            // make visual studio compiler happy about warning about unused a & b.
-            // Visual studio's key_value implementation disables warning 4100.
-            (void)a;
-            (void)b;
-        }
-
         const key_type& key() const
         {
             return key_;
