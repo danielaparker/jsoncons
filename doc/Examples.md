@@ -5,6 +5,7 @@
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
 [Read JSON Lines](#A10)  
+[Query JSON Lines in Parallel with JMESPath](#A13)  
 [Parse JSON from an iterator range](#A11)  
 [Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
@@ -160,7 +161,7 @@ while (!reader.eof())
     }
 }
 ```
-Ouput:
+Output:
 ```
 ["Name","Session","Score","Completed"]
 ["Gilbert","2013",24,true]
@@ -169,6 +170,53 @@ Ouput:
 ```
 
 See [JSON Lines](https://jsonlines.org/). 
+
+<div id="A13"/> 
+
+#### Query JSON Lines in Parallel with JMESPath
+
+``` cpp
+#include "jsoncons_ext/jmespath/jmespath.hpp"
+#include <string>
+#include <execution>
+#include <concurrent_vector.h> // microsoft PPL library
+
+int main(int argc, char* argv[])
+{
+    std::vector<std::string> lines = {{
+        R"({"name": "Seattle", "state" : "WA"})",
+        R"({ "name": "New York", "state" : "NY" })",
+        R"({ "name": "Bellevue", "state" : "WA" })",
+        R"({ "name": "Olympia", "state" : "WA" })"
+    }};
+
+    auto expr = jsoncons::jmespath::make_expression<jsoncons::json>(
+        R"([@][?state=='WA'].name)");
+
+    concurrency::concurrent_vector<std::string> result;
+
+    auto f = [&](const std::string& line)
+        {
+            const auto j = jsoncons::json::parse(line);
+            const auto r = expr.evaluate(j);
+            if (!r.empty())
+                result.push_back(r.at(0).as<std::string>());
+        };
+
+    std::for_each(std::execution::par, lines.begin(), lines.end(), f);
+
+    for (const auto& s : result)
+    {
+        std::cout << s << "\n";
+    }
+}
+```
+Output:
+```
+Seattle
+Bellevue
+Olympia
+```
 
 <div id="A11"/> 
 
