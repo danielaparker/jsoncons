@@ -4423,7 +4423,7 @@ namespace jsoncons {
 
         void create_object_implicitly(std::false_type)
         {
-            static_assert(std::true_type::value, "Cannot create object implicitly - alloc is stateful.");
+            JSONCONS_THROW(json_runtime_error<std::domain_error>("Cannot create object implicitly - allocator is stateful."));
         }
 
         void create_object_implicitly(std::true_type)
