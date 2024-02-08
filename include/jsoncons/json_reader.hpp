@@ -723,8 +723,8 @@ namespace jsoncons {
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use json_stream_reader") typedef json_stream_reader json_reader;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_reader") typedef wjson_stream_reader wjson_reader;
+    JSONCONS_DEPRECATED_MSG("Instead, use json_stream_reader") typedef legacy_basic_json_reader<char> json_reader;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_reader") typedef legacy_basic_json_reader<wchar_t> wjson_reader;
 #endif
 }
 
