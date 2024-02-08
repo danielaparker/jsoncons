@@ -73,7 +73,7 @@ You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library man
 
 Or, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
 
-Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
+Or, download the latest code on [main](https://github.com/danielaparker/jsoncons/archive/main.zip).
 
 ## How to use it
 

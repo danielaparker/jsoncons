@@ -1,3 +1,12 @@
+0.173.4
+-------
+
+Defect fixes
+
+- Fixed issue #485 where `basic_json` member names did not use `polymorphic_allocator`
+
+- Addressed issue #482 by replacing `static_assert` with runtime exception
+
 0.173.3
 -------
 

@@ -349,8 +349,10 @@ using csv_string_cursor = basic_csv_cursor<char,jsoncons::string_source<char>>;
 using wcsv_stream_cursor = basic_csv_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
 using wcsv_string_cursor = basic_csv_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
 
-using csv_cursor = basic_csv_cursor<char>;
-using wcsv_cursor = basic_csv_cursor<wchar_t>;
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_cursor") typedef csv_stream_cursor csv_cursor;
+JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_cursor") typedef wcsv_stream_cursor wcsv_cursor;
+#endif
 
 }}
 

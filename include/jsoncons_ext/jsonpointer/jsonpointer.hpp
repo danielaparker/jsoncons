@@ -478,7 +478,7 @@ namespace jsoncons { namespace jsonpointer {
     using basic_json_ptr = basic_json_pointer<CharT>;
     JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer address;
     JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer json_ptr;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_pointer") typedef json_pointer wjson_ptr;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_pointer") typedef wjson_pointer wjson_ptr;
     #endif
 
     namespace detail {
