@@ -333,15 +333,15 @@ namespace jsoncons { namespace csv {
         }
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    using csv_reader = legacy_basic_csv_reader<char>;
-    using wcsv_reader = legacy_basic_csv_reader<wchar_t>;
-#endif
-
     using csv_string_reader = basic_csv_reader<char,string_source<char>>;
     using wcsv_string_reader = basic_csv_reader<wchar_t,string_source<wchar_t>>;
     using csv_stream_reader = basic_csv_reader<char,stream_source<char>>;
     using wcsv_stream_reader = basic_csv_reader<wchar_t,stream_source<wchar_t>>;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_reader") typedef legacy_basic_csv_reader<char> csv_reader;
+    JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_reader") typedef legacy_basic_csv_reader<wchar_t> wcsv_reader;
+#endif
 
 }}
 
