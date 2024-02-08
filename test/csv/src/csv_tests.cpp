@@ -137,7 +137,7 @@ TEST_CASE("n_objects_test")
 
     options.assume_header(true)
             .mapping_kind(csv::csv_mapping_kind::n_rows);
-    csv::csv_reader reader1(bond_yields,decoder,options);
+    csv::csv_string_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
     //std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
@@ -145,7 +145,7 @@ TEST_CASE("n_objects_test")
 
     options.assume_header(true);
     options.mapping_kind(csv::csv_mapping_kind::n_objects);
-    csv::csv_reader reader2(bond_yields,decoder,options);
+    csv::csv_string_reader reader2(bond_yields,decoder,options);
     reader2.read();
     ojson val2 = decoder.get_result();
     //std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
