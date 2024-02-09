@@ -53,9 +53,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<content_encoding_validator>(this->schema_path().resolve(base_uri), content_encoding_);
+            return jsoncons::make_unique<content_encoding_validator>(this->schema_path(), content_encoding_);
         }
 
     private:
@@ -118,9 +118,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<content_media_type_validator>(this->schema_path().resolve(base_uri), content_media_type_);
+            return jsoncons::make_unique<content_media_type_validator>(this->schema_path(), content_media_type_);
         }
 
     private:
@@ -169,9 +169,9 @@ namespace jsonschema {
 
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<format_validator>(this->schema_path().resolve(base_uri), format_check_);
+            return jsoncons::make_unique<format_validator>(this->schema_path(), format_check_);
         }
 
     private:
@@ -217,9 +217,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<pattern_validator>(this->schema_path().resolve(base_uri), pattern_string_, regex_);
+            return jsoncons::make_unique<pattern_validator>(this->schema_path(), pattern_string_, regex_);
         }
 
     private:
@@ -266,9 +266,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<pattern_validator>(this->schema_path().resolve(base_uri));
+            return jsoncons::make_unique<pattern_validator>(this->schema_path());
         }
 
     private:
@@ -300,9 +300,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<max_length_validator>(this->schema_path().resolve(base_uri), max_length_);
+            return jsoncons::make_unique<max_length_validator>(this->schema_path(), max_length_);
         }
 
     private:
@@ -349,9 +349,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<max_items_validator>(this->schema_path().resolve(base_uri), max_items_);
+            return jsoncons::make_unique<max_items_validator>(this->schema_path(), max_items_);
         }
 
     private:
@@ -397,9 +397,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<min_items_validator>(this->schema_path().resolve(base_uri), min_items_);
+            return jsoncons::make_unique<min_items_validator>(this->schema_path(), min_items_);
         }
 
     private:
@@ -451,21 +451,21 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<schema_validator_type> item_validators;
             for (auto& validator : item_validators_)
             {
-                item_validators.push_back(validator->clone(base_uri));
+                item_validators.push_back(validator->clone());
             }
             schema_validator_type additional_items_validator; 
             
             if (additional_items_validator_)
             {
-                additional_items_validator = additional_items_validator_->clone(base_uri);
+                additional_items_validator = additional_items_validator_->clone();
             }
 
-            return jsoncons::make_unique<items_array_validator>(this->schema_path().resolve(base_uri), std::move(item_validators),
+            return jsoncons::make_unique<items_array_validator>(this->schema_path(), std::move(item_validators),
                 std::move(additional_items_validator));
         }
 
@@ -531,15 +531,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->clone(base_uri);
+                validator = validator_->clone();
             }
 
-            return jsoncons::make_unique<contains_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<contains_validator>(this->schema_path(),
                 std::move(validator));
         }
 
@@ -606,14 +606,14 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             schema_validator_type items_validator;
             if (items_validator_)
             {
-                items_validator = items_validator_->clone(base_uri);
+                items_validator = items_validator_->clone();
             }
-            return jsoncons::make_unique<items_object_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<items_object_validator>(this->schema_path(),
                 std::move(items_validator));
         }
 
@@ -661,9 +661,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<unique_items_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<unique_items_validator>(this->schema_path(),
                 are_unique_);
         }
 
@@ -724,9 +724,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<min_length_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<min_length_validator>(this->schema_path(),
                 min_length_);
         }
 
@@ -775,15 +775,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->clone(base_uri));
+                validators.emplace_back(validator->clone());
             }
 
-            return jsoncons::make_unique<string_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<string_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -831,15 +831,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             schema_validator_type rule;
             if (rule_)
             {
-                rule = rule_->clone(base_uri);
+                rule = rule_->clone();
             }
 
-            return jsoncons::make_unique<not_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<not_validator>(this->schema_path(),
                 std::move(rule));
         }
 
@@ -967,15 +967,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<schema_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->clone(base_uri));
+                validators.emplace_back(validator->clone());
             }
 
-            return jsoncons::make_unique<combining_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<combining_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -1040,9 +1040,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<maximum_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<maximum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1082,9 +1082,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<exclusive_maximum_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<exclusive_maximum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1124,11 +1124,11 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            //std::cout << "clone minimum " << this->schema_path().string() << ", base: " << base_uri.string() << ", resolve: " << this->schema_path().resolve(base_uri).string() << "\n\n"; 
+            //std::cout << "clone minimum " << this->schema_path().string() << ", resolve: " << this->schema_path().string() << "\n\n"; 
 
-            return jsoncons::make_unique<minimum_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<minimum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1168,9 +1168,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<exclusive_minimum_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<exclusive_minimum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1210,9 +1210,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<multiple_of_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<multiple_of_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1262,15 +1262,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->clone(base_uri));
+                validators.emplace_back(validator->clone());
             }
 
-            return jsoncons::make_unique<integer_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<integer_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -1325,15 +1325,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->clone(base_uri));
+                validators.emplace_back(validator->clone());
             }
 
-            return jsoncons::make_unique<number_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<number_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -1388,9 +1388,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<null_validator>(this->schema_path().resolve(base_uri));
+            return jsoncons::make_unique<null_validator>(this->schema_path());
         }
 
     private:
@@ -1426,9 +1426,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<boolean_validator>(this->schema_path().resolve(base_uri));
+            return jsoncons::make_unique<boolean_validator>(this->schema_path());
         }
 
     private:
@@ -1465,9 +1465,9 @@ namespace jsonschema {
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<required_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<required_validator>(this->schema_path(),
                 items_);
         }
 
@@ -1515,9 +1515,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<max_properties_validator>(this->schema_path().resolve(base_uri), max_properties_);
+            return jsoncons::make_unique<max_properties_validator>(this->schema_path(), max_properties_);
         }
 
     private:
@@ -1563,9 +1563,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<min_properties_validator>(this->schema_path().resolve(base_uri), min_properties_);
+            return jsoncons::make_unique<min_properties_validator>(this->schema_path(), min_properties_);
         }
 
     private:
@@ -1641,18 +1641,18 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> general_validators;
             for (auto& validator : general_validators_)
             {
-                general_validators.emplace_back(validator->clone(base_uri));
+                general_validators.emplace_back(validator->clone());
             }
 
             std::map<std::string, schema_validator_type> properties;
             for (auto& item : properties_)
             {
-                properties.emplace(item.first, item.second->clone(base_uri));
+                properties.emplace(item.first, item.second->clone());
             }
 
 
@@ -1660,34 +1660,34 @@ namespace jsonschema {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             for (auto& item : pattern_properties_)
             {
-                pattern_properties.emplace_back(item.first, item.second->clone(base_uri));
+                pattern_properties.emplace_back(item.first, item.second->clone());
             }
         #endif
             schema_validator_type additional_properties;
             if (additional_properties_)
             {
-                additional_properties = additional_properties_->clone(base_uri);
+                additional_properties = additional_properties_->clone();
             }
 
             std::map<std::string, keyword_validator_type> dependent_required;
             for (auto& item : dependent_required_)
             {
-                dependent_required.emplace(item.first, item.second->clone(base_uri));
+                dependent_required.emplace(item.first, item.second->clone());
             }
 
             std::map<std::string, schema_validator_type> dependent_schemas;
             for (auto& item : dependent_schemas_)
             {
-                dependent_schemas.emplace(item.first, item.second->clone(base_uri));
+                dependent_schemas.emplace(item.first, item.second->clone());
             }
 
             schema_validator_type property_name_validator;
             if (property_name_validator_)
             {
-                property_name_validator = property_name_validator_->clone(base_uri);
+                property_name_validator = property_name_validator_->clone();
             }
 
-            return jsoncons::make_unique<object_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<object_validator>(this->schema_path(),
                 std::move(general_validators), std::move(properties),
         #if defined(JSONCONS_HAS_STD_REGEX)
                 std::move(pattern_properties),
@@ -1901,14 +1901,14 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->clone(base_uri);
+                validator = validator_->clone();
             }
-            return jsoncons::make_unique<unevaluated_properties_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<unevaluated_properties_validator>(this->schema_path(),
                 std::move(validator));
         }
 
@@ -1971,15 +1971,15 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->clone(base_uri));
+                validators.emplace_back(validator->clone());
             }
 
-            return jsoncons::make_unique<array_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<array_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -2032,25 +2032,25 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             schema_validator_type if_validator;
             if (if_validator_)
             {
-                if_validator = if_validator_->clone(base_uri);
+                if_validator = if_validator_->clone();
             }
             schema_validator_type then_validator;
             if (then_validator_)
             {
-                then_validator = then_validator_->clone(base_uri);
+                then_validator = then_validator_->clone();
             }
             schema_validator_type else_validator;
             if (else_validator_)
             {
-                else_validator = else_validator_->clone(base_uri);
+                else_validator = else_validator_->clone();
             }
 
-            return jsoncons::make_unique<conditional_validator>(this->schema_path().resolve(base_uri), 
+            return jsoncons::make_unique<conditional_validator>(this->schema_path(), 
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
 
@@ -2111,9 +2111,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<enum_validator>(this->schema_path().resolve(base_uri), Json(value_));
+            return jsoncons::make_unique<enum_validator>(this->schema_path(), Json(value_));
         }
 
     private:
@@ -2167,9 +2167,9 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
-            return jsoncons::make_unique<const_validator>(this->schema_path().resolve(base_uri), Json(value_));
+            return jsoncons::make_unique<const_validator>(this->schema_path(), Json(value_));
         }
 
     private:
@@ -2216,14 +2216,14 @@ namespace jsonschema {
         {
         }
 
-        keyword_validator_type clone(const uri& base_uri) const final 
+        keyword_validator_type clone() const final 
         {
             std::vector<keyword_validator_type> type_mapping;
             for (auto& validator : type_mapping_)
             {
                 if (validator)
                 {
-                    type_mapping.emplace_back(validator->clone(base_uri));
+                    type_mapping.emplace_back(validator->clone());
                 }
                 else
                 {
@@ -2231,7 +2231,7 @@ namespace jsonschema {
                 }
             }
 
-            return jsoncons::make_unique<type_validator>(this->schema_path().resolve(base_uri),
+            return jsoncons::make_unique<type_validator>(this->schema_path(),
                 std::move(type_mapping), 
                 std::vector<std::string>(expected_types_));
         }
