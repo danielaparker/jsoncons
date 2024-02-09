@@ -214,7 +214,7 @@ Expected:
                 std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
             }
         };
-        validator.validate(json_pointer{}, instance, reporter);
+        validator.validate(instance, reporter);
 
     }
 }
