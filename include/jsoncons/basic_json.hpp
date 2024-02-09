@@ -5435,6 +5435,7 @@ namespace jsoncons {
         {
             switch (storage_kind())
             {
+                case json_storage_kind::null_value:
                 case json_storage_kind::empty_object_value:
                     return default_value;
                 case json_storage_kind::object_value:
