@@ -86,7 +86,7 @@ TEST_CASE("jsonschema output format tests")
                 }
             }
         };
-        validator.validate(instance, reporter);
+        validator.validate(json_pointer{}, instance, reporter);
 
     }
 }
@@ -214,7 +214,7 @@ Expected:
                 std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
             }
         };
-        validator.validate(instance, reporter);
+        validator.validate(json_pointer{}, instance, reporter);
 
     }
 }

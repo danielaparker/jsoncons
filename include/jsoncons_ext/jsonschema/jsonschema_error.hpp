@@ -44,16 +44,19 @@ namespace jsonschema {
     class validation_output 
     {
         std::string keyword_;
+        jsonpointer::json_pointer evaluation_path_;
         uri schema_path_;
         std::string instance_location_;
         std::string message_;
         std::vector<validation_output> nested_errors_;
     public:
         validation_output(std::string keyword,
-                          uri schema_path,
-                          std::string instance_location,
-                          std::string message)
+            jsonpointer::json_pointer evaluation_path,
+            uri schema_path,
+            std::string instance_location,
+            std::string message)
             : keyword_(std::move(keyword)), 
+              evaluation_path_(std::move(evaluation_path)),
               schema_path_(std::move(schema_path)),
               instance_location_(std::move(instance_location)),
               message_(std::move(message))
@@ -61,11 +64,13 @@ namespace jsonschema {
         }
 
         validation_output(const std::string& keyword,
-                          const uri& schema_path,
-                          const std::string& instance_location,
-                          const std::string& message,
-                          const std::vector<validation_output>& nested_errors)
+            const jsonpointer::json_pointer& evaluation_path,
+            const uri& schema_path,
+            const std::string& instance_location,
+            const std::string& message,
+            const std::vector<validation_output>& nested_errors)
             : keyword_(keyword),
+              evaluation_path_(evaluation_path),
               schema_path_(schema_path),
               instance_location_(instance_location), 
               message_(message),
@@ -81,6 +86,11 @@ namespace jsonschema {
         const std::string& message() const
         {
             return message_;
+        }
+
+        const jsonpointer::json_pointer& evaluation_path() const
+        {
+            return evaluation_path_;
         }
 
         const uri& schema_path() const

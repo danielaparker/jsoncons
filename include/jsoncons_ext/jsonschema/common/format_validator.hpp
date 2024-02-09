@@ -831,28 +831,30 @@ namespace jsonschema {
     }
 
     // format checkers
-    using format_checker = std::function<void(const uri& schema_path,
-                                              const jsonpointer::json_pointer& instance_location, 
-                                              const std::string&, 
-                                              error_reporter& reporter)>;
+    using format_checker = std::function<void(const jsonpointer::json_pointer& evaluation_path, 
+        const uri& schema_path,
+        const jsonpointer::json_pointer& instance_location, 
+        const std::string&, 
+        error_reporter& reporter)>;
 
     inline
-    void rfc3339_date_check(const uri& schema_path,
+    void rfc3339_date_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                             const jsonpointer::json_pointer& instance_location, 
                             const std::string& value,
                             error_reporter& reporter)
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_output("date", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a RFC 3339 date string"));
+            reporter.error(validation_output("date",
+                evaluation_path,
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a RFC 3339 date string"));
         }
     }
 
     inline
-    void rfc3339_time_check(const uri& schema_path,
+    void rfc3339_time_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                             const jsonpointer::json_pointer& instance_location, 
                             const std::string &value,
                             error_reporter& reporter)
@@ -860,29 +862,31 @@ namespace jsonschema {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
             reporter.error(validation_output("time", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a RFC 3339 time string"));
+                evaluation_path,
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a RFC 3339 time string"));
         }
     }
 
     inline
-    void rfc3339_date_time_check(const uri& schema_path,
+    void rfc3339_date_time_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                                  const jsonpointer::json_pointer& instance_location, 
                                  const std::string &value,
                                  error_reporter& reporter)
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_output("date-time",  
-                                             schema_path,
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a RFC 3339 date-time string"));
+            reporter.error(validation_output("date-time", 
+                evaluation_path,  
+                schema_path,
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a RFC 3339 date-time string"));
         }
     }
 
     inline
-    void email_check(const uri& schema_path,
+    void email_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                      const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
@@ -890,14 +894,15 @@ namespace jsonschema {
         if (!validate_email_rfc5322(value))        
         {
             reporter.error(validation_output("email", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
+                evaluation_path, 
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
         }
     } 
 
     inline
-    void hostname_check(const uri& schema_path,
+    void hostname_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                         const jsonpointer::json_pointer& instance_location, 
                         const std::string& value,
                         error_reporter& reporter) 
@@ -905,14 +910,15 @@ namespace jsonschema {
         if (!validate_hostname_rfc1034(value))
         {
             reporter.error(validation_output("hostname", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
+                evaluation_path, 
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
         }
     } 
 
     inline
-    void ipv4_check(const uri& schema_path,
+    void ipv4_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                     const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
@@ -920,14 +926,15 @@ namespace jsonschema {
         if (!validate_ipv4_rfc2673(value))
         {
             reporter.error(validation_output("ipv4", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
+                evaluation_path, 
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
         }
     } 
 
     inline
-    void ipv6_check(const uri& schema_path,
+    void ipv6_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                     const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
@@ -935,14 +942,15 @@ namespace jsonschema {
         if (!validate_ipv6_rfc2373(value))
         {
             reporter.error(validation_output("ipv6", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
+                evaluation_path, 
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
         }
     } 
 
     inline
-    void regex_check(const uri& schema_path,
+    void regex_check(const jsonpointer::json_pointer& evaluation_path, const uri& schema_path,
                      const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
@@ -955,9 +963,10 @@ namespace jsonschema {
         catch (const std::exception& e) 
         {
             reporter.error(validation_output("pattern", 
-                                             schema_path, 
-                                             instance_location.to_uri_fragment(), 
-                                             "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
+                evaluation_path, 
+                schema_path, 
+                instance_location.to_uri_fragment(), 
+                "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
         }
 #endif
     } 
