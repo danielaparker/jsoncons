@@ -51,12 +51,12 @@ namespace jsonschema {
         std::vector<validation_output> nested_errors_;
     public:
         validation_output(std::string keyword,
-            jsonpointer::json_pointer evaluation_path,
+            jsonpointer::json_pointer eval_path,
             uri schema_path,
             std::string instance_location,
             std::string message)
             : keyword_(std::move(keyword)), 
-              evaluation_path_(std::move(evaluation_path)),
+              evaluation_path_(std::move(eval_path)),
               schema_path_(std::move(schema_path)),
               instance_location_(std::move(instance_location)),
               message_(std::move(message))
@@ -64,13 +64,13 @@ namespace jsonschema {
         }
 
         validation_output(const std::string& keyword,
-            const jsonpointer::json_pointer& evaluation_path,
+            const jsonpointer::json_pointer& eval_path,
             const uri& schema_path,
             const std::string& instance_location,
             const std::string& message,
             const std::vector<validation_output>& nested_errors)
             : keyword_(keyword),
-              evaluation_path_(evaluation_path),
+              evaluation_path_(eval_path),
               schema_path_(schema_path),
               instance_location_(instance_location), 
               message_(message),
@@ -88,7 +88,7 @@ namespace jsonschema {
             return message_;
         }
 
-        const jsonpointer::json_pointer& evaluation_path() const
+        const jsonpointer::json_pointer& eval_path() const
         {
             return evaluation_path_;
         }
