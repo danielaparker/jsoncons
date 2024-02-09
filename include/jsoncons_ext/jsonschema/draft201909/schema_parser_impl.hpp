@@ -208,7 +208,7 @@ namespace draft201909 {
                         schema_location relative(it->value().template as<std::string>()); 
                         auto base_uri = new_context.get_base_uri(uri_anchor_flags::recursive_anchor);
                         auto id = relative.resolve(base_uri); // REVISIT
-                        validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.base()));
+                        validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(jsonpointer::json_pointer{}, id.base()));
                     }
 
                     validators.push_back(make_type_validator(new_context, sch));
@@ -424,7 +424,7 @@ namespace draft201909 {
                 }
             }
 
-            return jsoncons::make_unique<type_validator<Json>>(std::move(schema_path), 
+            return jsoncons::make_unique<type_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path), 
                 std::move(type_mapping), std::move(expected_types)
          );
         }
@@ -438,7 +438,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_encoding_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<content_encoding_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<string_validator<Json>> make_string_validator(const compilation_context& context,
@@ -487,7 +487,7 @@ namespace draft201909 {
                 validators.emplace_back(make_format_validator(context, it->value()));
             }
 
-            return jsoncons::make_unique<string_validator<Json>>(schema_path, std::move(validators));
+            return jsoncons::make_unique<string_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
         }
 
         std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const compilation_context& context, const Json& sch)
@@ -499,7 +499,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_media_type_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<content_media_type_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<format_validator<Json>> make_format_validator(const compilation_context& context, const Json& sch)
@@ -547,7 +547,7 @@ namespace draft201909 {
                 format_check = nullptr;
             }       
 
-            return jsoncons::make_unique<format_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<format_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 format_check);
         }
 
@@ -556,7 +556,7 @@ namespace draft201909 {
             uri schema_path = context.make_schema_path_with("pattern");
             auto pattern_string = sch.template as<std::string>();
             auto regex = std::regex(pattern_string, std::regex::ECMAScript);
-            return jsoncons::make_unique<pattern_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<pattern_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 pattern_string, regex);
         }
 
@@ -569,7 +569,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_length_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<max_length_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<max_items_validator<Json>> make_max_items_validator(const compilation_context& context, const Json& sch)
@@ -581,7 +581,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<max_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context& context, const Json& sch)
@@ -593,7 +593,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<min_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<array_validator<Json>> make_array_validator(const compilation_context& context, 
@@ -643,7 +643,7 @@ namespace draft201909 {
                     context));
             }
 
-            return jsoncons::make_unique<array_validator<Json>>(schema_path, std::move(validators));
+            return jsoncons::make_unique<array_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
         }
 
         std::unique_ptr<contains_validator<Json>> make_contains_validator(const Json& /*parent*/, const Json& sch,
@@ -653,7 +653,7 @@ namespace draft201909 {
 
             std::string sub_keys[] = { "contains" };
 
-            return jsoncons::make_unique<contains_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<contains_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 make_schema_validator(context, sch, sub_keys));
         }
 
@@ -683,7 +683,7 @@ namespace draft201909 {
                 }
             }
 
-            return jsoncons::make_unique<items_array_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<items_array_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
@@ -693,7 +693,7 @@ namespace draft201909 {
             uri schema_path = context.make_schema_path_with("items");
             std::string sub_keys[] = {"items"};
 
-            return jsoncons::make_unique<items_object_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<items_object_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 make_schema_validator(context, sch, sub_keys));
         }
 
@@ -701,7 +701,7 @@ namespace draft201909 {
         {
             uri schema_path = context.make_schema_path_with("uniqueItems");
             bool are_unique = sch.template as<bool>();
-            return jsoncons::make_unique<unique_items_validator<Json>>(schema_path, are_unique);
+            return jsoncons::make_unique<unique_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, are_unique);
         }
 
         std::unique_ptr<min_length_validator<Json>> make_min_length_validator(const compilation_context& context, const Json& sch)
@@ -713,14 +713,14 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_length_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<min_length_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<not_validator<Json>> make_not_validator(const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("not");
             std::string not_key[] = { "not" };
-            return jsoncons::make_unique<not_validator<Json>>(schema_path, 
+            return jsoncons::make_unique<not_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
                 make_schema_validator(context, sch, not_key));
         }
 
@@ -733,7 +733,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<int64_t>();
-            return jsoncons::make_unique<maximum_validator<Json,int64_t>>(schema_path, value);
+            return jsoncons::make_unique<maximum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<maximum_validator<Json,double>> make_maximum_number_validator(const compilation_context& context, const Json& sch)
@@ -745,7 +745,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<maximum_validator<Json,double>>(schema_path, value);
+            return jsoncons::make_unique<maximum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<exclusive_maximum_validator<Json,int64_t>> make_exclusive_maximum_integer_validator(const compilation_context& context, const Json& sch)
@@ -757,7 +757,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<int64_t>();
-            return jsoncons::make_unique<exclusive_maximum_validator<Json,int64_t>>(schema_path, value);
+            return jsoncons::make_unique<exclusive_maximum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<exclusive_maximum_validator<Json,double>> make_exclusive_maximum_number_validator(const compilation_context& context, const Json& sch)
@@ -769,7 +769,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<exclusive_maximum_validator<Json,double>>(schema_path, value);
+            return jsoncons::make_unique<exclusive_maximum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<minimum_validator<Json,int64_t>> make_minimum_integer_validator(const compilation_context& context, const Json& sch)
@@ -781,7 +781,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<int64_t>();
-            return jsoncons::make_unique<minimum_validator<Json,int64_t>>(schema_path, value);
+            return jsoncons::make_unique<minimum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<minimum_validator<Json,double>> make_minimum_number_validator(const compilation_context& context, const Json& sch)
@@ -793,7 +793,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<minimum_validator<Json,double>>(schema_path, value);
+            return jsoncons::make_unique<minimum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<exclusive_minimum_validator<Json,int64_t>> make_exclusive_minimum_integer_validator(const compilation_context& context, const Json& sch)
@@ -805,7 +805,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<int64_t>();
-            return jsoncons::make_unique<exclusive_minimum_validator<Json,int64_t>>(schema_path, value);
+            return jsoncons::make_unique<exclusive_minimum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<exclusive_minimum_validator<Json,double>> make_exclusive_minimum_number_validator(const compilation_context& context, const Json& sch)
@@ -817,7 +817,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<exclusive_minimum_validator<Json,double>>(schema_path, value);
+            return jsoncons::make_unique<exclusive_minimum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<multiple_of_validator<Json>> make_multiple_of_validator(const compilation_context& context, const Json& sch)
@@ -829,7 +829,7 @@ namespace draft201909 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<multiple_of_validator<Json>>(schema_path, value);
+            return jsoncons::make_unique<multiple_of_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
         std::unique_ptr<integer_validator<Json>> make_integer_validator(const compilation_context& context, 
@@ -875,7 +875,7 @@ namespace draft201909 {
             }
 
 
-            return jsoncons::make_unique<integer_validator<Json>>(schema_path, std::move(validators));
+            return jsoncons::make_unique<integer_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
         }
 
         std::unique_ptr<number_validator<Json>> make_number_validator(const compilation_context& context, 
@@ -921,38 +921,38 @@ namespace draft201909 {
             }
 
 
-            return jsoncons::make_unique<number_validator<Json>>(schema_path, std::move(validators));
+            return jsoncons::make_unique<number_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
         }
 
         std::unique_ptr<null_validator<Json>> make_null_validator(const compilation_context& context)
         {
             uri schema_path = context.get_absolute_uri();
-            return jsoncons::make_unique<null_validator<Json>>(schema_path);
+            return jsoncons::make_unique<null_validator<Json>>(jsonpointer::json_pointer{}, schema_path);
         }
 
         std::unique_ptr<boolean_validator<Json>> make_boolean_validator(const compilation_context& context)
         {
             uri schema_path = context.get_absolute_uri();
-            return jsoncons::make_unique<boolean_validator<Json>>(schema_path);
+            return jsoncons::make_unique<boolean_validator<Json>>(jsonpointer::json_pointer{}, schema_path);
         }
 
         std::unique_ptr<const_validator<Json>> make_const_validator(const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("const");
-            return jsoncons::make_unique<const_validator<Json>>(schema_path, sch);
+            return jsoncons::make_unique<const_validator<Json>>(jsonpointer::json_pointer{}, schema_path, sch);
         }
 
         std::unique_ptr<enum_validator<Json>> make_enum_validator(const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("enum");
-            return jsoncons::make_unique<enum_validator<Json>>(schema_path, sch);
+            return jsoncons::make_unique<enum_validator<Json>>(jsonpointer::json_pointer{}, schema_path, sch);
         }
 
         std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context,
             const std::vector<std::string>& items)
         {
             uri schema_path = context.make_schema_path_with("required");
-            return jsoncons::make_unique<required_validator<Json>>(schema_path, items);
+            return jsoncons::make_unique<required_validator<Json>>(jsonpointer::json_pointer{}, schema_path, items);
         }
 
         std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
@@ -980,7 +980,7 @@ namespace draft201909 {
                 else_validator = make_schema_validator(context, else_it->value(), else_key);
             }
 
-            return jsoncons::make_unique<conditional_validator<Json>>(std::move(schema_path),
+            return jsoncons::make_unique<conditional_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
 
@@ -1002,7 +1002,7 @@ namespace draft201909 {
 
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
         std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const compilation_context& context,
@@ -1017,7 +1017,7 @@ namespace draft201909 {
                 std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
         std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
@@ -1032,7 +1032,7 @@ namespace draft201909 {
                 std::string sub_keys[] = {one_of_criterion<Json>::key(), std::to_string(c++)};
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
         std::unique_ptr<object_validator<Json>> make_object_validator(const compilation_context& context,
@@ -1055,20 +1055,20 @@ namespace draft201909 {
             if (it != sch.object_range().end()) 
             {
                 auto max_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(context.make_schema_path_with("maxProperties"), max_properties));
+                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("maxProperties"), max_properties));
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 auto min_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(context.make_schema_path_with("minProperties"), min_properties));
+                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("minProperties"), min_properties));
             }
 
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(context.make_schema_path_with("required"), 
+                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("required"), 
                     it->value().template as<std::vector<std::string>>()));
             }
 
@@ -1191,7 +1191,7 @@ namespace draft201909 {
                 property_name_validator = make_schema_validator(context, property_names_it->value(), sub_keys);
             }
 
-            return jsoncons::make_unique<object_validator<Json>>(std::move(schema_path),
+            return jsoncons::make_unique<object_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
                 std::move(general_validators),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1211,7 +1211,7 @@ namespace draft201909 {
 
             std::string sub_keys[] = {"unevaluatedProperties"};
 
-            return jsoncons::make_unique<unevaluated_properties_validator<Json>>(std::move(schema_path),
+            return jsoncons::make_unique<unevaluated_properties_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
                 make_schema_validator(context, sch, sub_keys));
         }
 
@@ -1339,10 +1339,10 @@ namespace draft201909 {
             auto sch = doc.schemas.find(std::string(uri.fragment()));
             if (sch != doc.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->make_copy(jsonpointer::json_pointer{}));
+                return jsoncons::make_unique<ref_validator_type>(jsonpointer::json_pointer{}, uri.base(), sch->second->make_copy(jsonpointer::json_pointer{}));
             }
 
-            auto orig = jsoncons::make_unique<ref_validator_type>(uri.base());
+            auto orig = jsoncons::make_unique<ref_validator_type>(jsonpointer::json_pointer{}, uri.base());
             auto p = orig.get();
             doc.unresolved.emplace_back(std::string(uri.fragment()), p);
             
