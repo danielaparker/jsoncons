@@ -1303,7 +1303,7 @@ namespace draft201909 {
                     {
                         JSONCONS_THROW(schema_error(doc.first + " has undefined reference " + ref.first + "."));
                     }
-                    ref.second->set_referred_schema(it->second->clone());
+                    ref.second->set_referred_schema(it->second->make_copy(ref.second->eval_path()));
                 }
             }
             root_->resolve_recursive_refs(root_->schema_path(), root_->is_recursive_anchor(), *this);
@@ -1339,7 +1339,7 @@ namespace draft201909 {
             auto sch = doc.schemas.find(std::string(uri.fragment()));
             if (sch != doc.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->clone());
+                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->make_copy(jsonpointer::json_pointer{}));
             }
 
             auto orig = jsoncons::make_unique<ref_validator_type>(uri.base());

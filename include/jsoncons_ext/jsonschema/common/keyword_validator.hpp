@@ -102,13 +102,16 @@ namespace jsonschema {
 
         virtual const std::string& keyword_name() const = 0;
 
-        virtual keyword_validator_type clone() const = 0;
+        virtual const jsonpointer::json_pointer& eval_path() const = 0;
+
+        virtual keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const = 0;
     };
 
     template <class Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
         std::string keyword_name_;
+        jsonpointer::json_pointer eval_path_;
         uri schema_path_;
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -131,6 +134,11 @@ namespace jsonschema {
         const std::string& keyword_name() const override
         {
             return keyword_name_;
+        }
+
+        const jsonpointer::json_pointer& eval_path() const override
+        {
+            return eval_path_;
         }
 
         const uri& schema_path() const override
@@ -157,7 +165,7 @@ namespace jsonschema {
 
         virtual bool is_recursive_anchor() const = 0;
 
-        virtual schema_validator_type clone() const = 0;
+        virtual schema_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const = 0;
     };
 
     template <class Json>
@@ -191,7 +199,7 @@ namespace jsonschema {
             return false;
         }
 
-        schema_validator_type clone() const final
+        schema_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final
         {
             return jsoncons::make_unique<boolean_schema_validator>(schema_path_, value_);
         }
@@ -256,12 +264,12 @@ namespace jsonschema {
             return is_recursive_anchor_;
         }
 
-        schema_validator_type clone() const final
+        schema_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final
         {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.push_back(validator->clone());
+                validators.push_back(validator->make_copy(eval_path));
             }
 
             return jsoncons::make_unique<object_schema_validator>(schema_path_, std::move(validators), Json(default_value_), is_recursive_anchor_);
@@ -338,13 +346,19 @@ namespace jsonschema {
             return validator_->keyword_name();
         }
 
+        const jsonpointer::json_pointer& eval_path() const override
+        {
+            JSONCONS_ASSERT(validator_ != nullptr);
+            return validator_->eval_path();
+        }
+
         const uri& schema_path() const override
         {
             JSONCONS_ASSERT(validator_ != nullptr);
             return validator_->schema_path();
         }
 
-        keyword_validator_type clone() const final 
+        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
             return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
         }
