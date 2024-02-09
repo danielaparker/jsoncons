@@ -100,15 +100,23 @@ namespace jsonschema {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
+        virtual const std::string& keyword_name() const = 0;
+
         virtual keyword_validator_type clone() const = 0;
     };
 
     template <class Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
+        std::string keyword_name_;
         uri schema_path_;
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
+        keyword_validator_base(const std::string& keyword_name, const uri& schema_path)
+            : keyword_name_(keyword_name), schema_path_(schema_path)
+        {
+        }
 
         keyword_validator_base(const uri& schema_path)
             : schema_path_(schema_path)
@@ -119,6 +127,11 @@ namespace jsonschema {
         keyword_validator_base(keyword_validator_base&&) = default;
         keyword_validator_base& operator=(const keyword_validator_base&) = delete;
         keyword_validator_base& operator=(keyword_validator_base&&) = default;
+
+        const std::string& keyword_name() const override
+        {
+            return keyword_name_;
+        }
 
         const uri& schema_path() const override
         {
@@ -319,10 +332,16 @@ namespace jsonschema {
         {
         }
 
+        const std::string& keyword_name() const override
+        {
+            JSONCONS_ASSERT(validator_ != nullptr);
+            return validator_->keyword_name();
+        }
+
         const uri& schema_path() const override
         {
-            static uri s("#");
-            return validator_ != nullptr ? validator_->schema_path() : s;
+            JSONCONS_ASSERT(validator_ != nullptr);
+            return validator_->schema_path();
         }
 
         keyword_validator_type clone() const final 
