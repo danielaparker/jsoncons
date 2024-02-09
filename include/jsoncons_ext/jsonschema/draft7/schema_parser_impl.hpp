@@ -111,11 +111,13 @@ namespace draft7 {
                     uri schema_path = new_context.get_absolute_uri();
                     if (sch.template as<bool>())
                     {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, true);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, 
+                            schema_path, sch.template as<bool>());
                     }
                     else
                     {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, false);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, 
+                          schema_path, false);
                     }
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
@@ -225,7 +227,8 @@ namespace draft7 {
                             }
                         }
                     }
-                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri().string(),
+                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(jsonpointer::json_pointer{},
+                        new_context.get_absolute_uri().string(),
                         std::move(validators), std::move(default_value));
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 

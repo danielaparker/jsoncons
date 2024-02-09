@@ -142,12 +142,12 @@ namespace draft201909 {
                     if (sch.template as<bool>())
                     {
                         std::string schema_path = new_context.make_schema_path_with("true");
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, true);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, schema_path, true);
                     }
                     else
                     {
                         std::string schema_path = new_context.make_schema_path_with("false");
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(schema_path, false);
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, schema_path, false);
                     }
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
@@ -279,7 +279,8 @@ namespace draft201909 {
                         validators.push_back(make_unevaluated_properties_validator(new_context, it->value()));
                     } 
 
-                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(new_context.get_absolute_uri(),
+                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(jsonpointer::json_pointer{},
+                        new_context.get_absolute_uri(),
                         std::move(validators), std::move(default_value), is_recursive_anchor);
                     schema_validator<Json>* p = schema_validator_ptr.get();
 

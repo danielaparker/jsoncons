@@ -68,6 +68,8 @@ namespace jsonschema {
     public:
         virtual ~validator_base() = default;
 
+        virtual const jsonpointer::json_pointer& eval_path() const = 0;
+
         virtual const uri& schema_path() const = 0;
 
         void resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas)
@@ -75,19 +77,19 @@ namespace jsonschema {
             do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
-            do_validate(eval_path, instance, instance_location, evaluated_properties, reporter, patch);
+            do_validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
 
     private:
         virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
 
-        virtual void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        virtual void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -170,18 +172,24 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
+        jsonpointer::json_pointer eval_path_;
         uri schema_path_;
         bool value_;
 
     public:
-        boolean_schema_validator(const uri& schema_path, bool value)
-            : schema_path_(schema_path), value_(value)
+        boolean_schema_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, bool value)
+            : eval_path_(eval_path), schema_path_(schema_path), value_(value)
         {
         }
 
         jsoncons::optional<Json> get_default_value() const override
         {
             return jsoncons::optional<Json>{};
+        }
+
+        const jsonpointer::json_pointer& eval_path() const override
+        {
+            return eval_path_;
         }
 
         const uri& schema_path() const override
@@ -196,7 +204,7 @@ namespace jsonschema {
 
         schema_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final
         {
-            return jsoncons::make_unique<boolean_schema_validator>(schema_path_, value_);
+            return jsoncons::make_unique<boolean_schema_validator>(eval_path, schema_path_, value_);
         }
 
     private:
@@ -205,7 +213,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json&, 
+        void do_validate(const Json&, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
@@ -214,7 +222,7 @@ namespace jsonschema {
             if (!value_)
             {
                 reporter.error(validation_output("false", 
-                    eval_path, 
+                    eval_path(),
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "False schema always fails"));
@@ -229,15 +237,18 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
+        jsonpointer::json_pointer eval_path_;
         uri schema_path_;
         std::vector<keyword_validator_type> validators_;
         Json default_value_;
         bool is_recursive_anchor_;
 
     public:
-        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
+        object_schema_validator(const jsonpointer::json_pointer& eval_path, 
+            const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
             bool is_recursive_anchor = false)
-            : schema_path_(schema_path),
+            : eval_path_(eval_path),
+              schema_path_(schema_path),
               validators_(std::move(validators)),
               default_value_(std::move(default_value)),
               is_recursive_anchor_(is_recursive_anchor)
@@ -247,6 +258,11 @@ namespace jsonschema {
         jsoncons::optional<Json> get_default_value() const override
         {
             return default_value_;
+        }
+
+        const jsonpointer::json_pointer& eval_path() const override
+        {
+            return eval_path_;
         }
 
         const uri& schema_path() const override
@@ -267,7 +283,7 @@ namespace jsonschema {
                 validators.push_back(validator->make_copy(eval_path));
             }
 
-            return jsoncons::make_unique<object_schema_validator>(schema_path_, std::move(validators), Json(default_value_), is_recursive_anchor_);
+            return jsoncons::make_unique<object_schema_validator>(eval_path, schema_path_, std::move(validators), Json(default_value_), is_recursive_anchor_);
         }
 
     private:
@@ -298,7 +314,7 @@ namespace jsonschema {
                      << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -308,7 +324,7 @@ namespace jsonschema {
 
             for (auto& validator : validators_)
             {
-                validator->validate(eval_path, instance, instance_location, local_evaluated_properties, reporter, patch);
+                validator->validate(instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -353,7 +369,7 @@ namespace jsonschema {
             return validator_->schema_path();
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy(const jsonpointer::json_pointer& /*eval_path*/) const final
         {
             return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
         }
@@ -364,13 +380,13 @@ namespace jsonschema {
             validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        void do_validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
-            validator_->validate(eval_path, instance, instance_location, evaluated_properties, reporter, patch);
+            validator_->validate(instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
