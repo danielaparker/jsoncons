@@ -137,27 +137,27 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
-#  clang_build_cxx20:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: install_gcc
-#      run: |
-#           sudo apt update
-#           sudo apt install clang-14
-#      shell: bash
-#    - name: cmake
-#      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON 
-#      env:
-#        CC:   clang-14
-#        CXX:  clang++-14
-#
-#    - working-directory: build/
-#      run: cmake --build . --config ubuntu-latest
-#
-#    - working-directory: build/
-#      run: ctest -C ubuntu-latest --output-on-failure
+  clang_build_cxx20:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install clang-14
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON 
+      env:
+        CC:   clang-14
+        CXX:  clang++-14
+
+    - working-directory: build/
+      run: cmake --build . --config ubuntu-latest
+
+    - working-directory: build/
+      run: ctest -C ubuntu-latest --output-on-failure
 
 #  gcc_build_48:
 #    name: GCC 4.8
