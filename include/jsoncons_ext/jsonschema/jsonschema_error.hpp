@@ -44,7 +44,7 @@ namespace jsonschema {
     class validation_output 
     {
         std::string keyword_;
-        jsonpointer::json_pointer evaluation_path_;
+        jsonpointer::json_pointer eval_path_;
         uri schema_path_;
         std::string instance_location_;
         std::string message_;
@@ -56,7 +56,7 @@ namespace jsonschema {
             std::string instance_location,
             std::string message)
             : keyword_(std::move(keyword)), 
-              evaluation_path_(std::move(eval_path)),
+              eval_path_(std::move(eval_path)),
               schema_path_(std::move(schema_path)),
               instance_location_(std::move(instance_location)),
               message_(std::move(message))
@@ -70,7 +70,7 @@ namespace jsonschema {
             const std::string& message,
             const std::vector<validation_output>& nested_errors)
             : keyword_(keyword),
-              evaluation_path_(eval_path),
+              eval_path_(eval_path),
               schema_path_(schema_path),
               instance_location_(instance_location), 
               message_(message),
@@ -90,7 +90,7 @@ namespace jsonschema {
 
         const jsonpointer::json_pointer& eval_path() const
         {
-            return evaluation_path_;
+            return eval_path_;
         }
 
         const uri& schema_path() const
@@ -100,7 +100,7 @@ namespace jsonschema {
 
         const std::string keyword_location() const
         {
-            return "#" + std::string(schema_path_.fragment());
+            return eval_path_.to_string();
         }
 
         const std::string absolute_keyword_location() const

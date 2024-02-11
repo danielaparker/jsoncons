@@ -65,10 +65,10 @@ namespace jsonschema {
             schema_validator_type referred_schema;
             if (referred_schema_)
             {
-                referred_schema = referred_schema_->make_copy(eval_path);
+                referred_schema = referred_schema_->make_copy(eval_path / "$ref");
             }
 
-            return jsoncons::make_unique<ref_validator>(eval_path, referred_schema_->schema_path(), std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(eval_path / "$ref", referred_schema_->schema_path(), std::move(referred_schema));
         }
 
     private:
