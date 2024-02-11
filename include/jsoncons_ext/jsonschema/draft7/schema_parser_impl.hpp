@@ -93,8 +93,8 @@ namespace draft7 {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
 
-        schema_validator_type make_schema_validator(const compilation_context& context, const Json& sch,
-            jsoncons::span<const std::string> keys) //override
+        schema_validator_type make_schema_validator(const evaluation_context& eval_context, 
+            const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys) //override
         {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
@@ -112,12 +112,12 @@ namespace draft7 {
                     uri schema_path = new_context.get_absolute_uri();
                     if (sch.template as<bool>())
                     {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, 
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(eval_context.eval_path(), 
                             schema_path, sch.template as<bool>());
                     }
                     else
                     {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(jsonpointer::json_pointer{}, 
+                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>(eval_context.eval_path(), 
                           schema_path, false);
                     }
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -151,61 +151,63 @@ namespace draft7 {
                     {
                         for (const auto& def : it->value().object_range())
                         {
-                            std::string k[] = { "definitions", def.key() };
-                            subschemas_.emplace_back(make_schema_validator(new_context, def.value(), k));
+                            std::string sub_keys[] = { "definitions", def.key() };
+                            subschemas_.emplace_back(make_schema_validator(evaluation_context{}, 
+                                new_context, def.value(), sub_keys));
                         }
                         known_keywords.insert("definitions");
                     }
                     if (!is_ref)
                     {
-                        validators.push_back(make_type_validator(new_context, sch, known_keywords));
+                        validators.push_back(make_type_validator(eval_context, new_context, sch, known_keywords));
 
                         it = sch.find("enum");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_enum_validator(new_context, it->value()));
+                            validators.push_back(make_enum_validator(evaluation_context(eval_context, "enum"), new_context, it->value()));
                             known_keywords.insert("enum");
                         }
 
                         it = sch.find("const");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_const_validator(new_context, it->value()));
+                            validators.push_back(make_const_validator(evaluation_context{eval_context, "const"}, new_context, it->value()));
                             known_keywords.insert("const");
                         }
 
                         it = sch.find("not");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_not_validator(new_context, it->value()));
+                            validators.push_back(make_not_validator(evaluation_context{eval_context, "not"}, 
+                                new_context, it->value()));
                             known_keywords.insert("not");
                         }
 
                         it = sch.find("allOf");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_all_of_validator(new_context, it->value()));
+                            validators.push_back(make_all_of_validator(evaluation_context{eval_context, "allOf"}, new_context, it->value()));
                             known_keywords.insert("allOf");
                         }
 
                         it = sch.find("anyOf");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_any_of_validator(new_context, it->value()));
+                            validators.push_back(make_any_of_validator(evaluation_context{eval_context, "anyOf"}, new_context, it->value()));
                             known_keywords.insert("anyOf");
                         }
 
                         it = sch.find("oneOf");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_one_of_validator(new_context, it->value()));
+                            validators.push_back(make_one_of_validator(evaluation_context{eval_context, "oneOf"}, new_context, it->value()));
                             known_keywords.insert("oneOf");
                         }
 
                         it = sch.find("if");
                         if (it != sch.object_range().end()) 
                         {
-                            validators.push_back(make_conditional_validator(new_context, it->value(), sch));
+                            validators.push_back(make_conditional_validator(evaluation_context{eval_context, "if"}, new_context, it->value(), sch));
                             known_keywords.insert("if");
                             // sch["if"] is object and has id, can be looked up
                         }
@@ -215,7 +217,8 @@ namespace draft7 {
                             if (then_it != sch.object_range().end()) 
                             {
                                 std::string sub_keys[] = { "then" };
-                                subschemas_.emplace_back(make_schema_validator(new_context, then_it->value(), sub_keys));
+                                subschemas_.emplace_back(make_schema_validator(evaluation_context{eval_context, "then"}, 
+                                    new_context, then_it->value(), sub_keys));
                                 known_keywords.insert("then");
                             }
 
@@ -223,12 +226,13 @@ namespace draft7 {
                             if (else_it != sch.object_range().end()) 
                             {
                                 std::string sub_keys[] = { "else" };
-                                subschemas_.emplace_back(make_schema_validator(new_context, else_it->value(), sub_keys));
+                                subschemas_.emplace_back(make_schema_validator(evaluation_context{evaluation_context{eval_context, "else"}, 
+                                    sub_keys}, new_context, else_it->value(), sub_keys));
                                 known_keywords.insert("else");
                             }
                         }
                     }
-                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(jsonpointer::json_pointer{},
+                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
                         new_context.get_absolute_uri().string(),
                         std::move(validators), std::move(default_value));
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -255,62 +259,66 @@ namespace draft7 {
 
         void init_type_mapping(std::vector<keyword_validator_type>& type_mapping, const std::string& type,
             const Json& sch,
+            const evaluation_context& eval_context,
             const compilation_context& context,
             std::set<std::string>& keywords)
         {
             if (type == "null")
             {
-                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(context);
+                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(eval_context, context);
             }
             else if (type == "object")
             {
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(context, sch);
+                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(eval_context, context, sch);
             }
             else if (type == "array")
             {
-                type_mapping[(uint8_t)json_type::array_value] = make_array_validator(context, sch);
+                type_mapping[(uint8_t)json_type::array_value] = make_array_validator(eval_context, context, sch);
             }
             else if (type == "string")
             {
-                type_mapping[(uint8_t)json_type::string_value] = make_string_validator(context, sch);
+                type_mapping[(uint8_t)json_type::string_value] = make_string_validator(eval_context, context, sch);
                 // For binary types
-                type_mapping[(uint8_t) json_type::byte_string_value] = make_string_validator(context, sch);
+                type_mapping[(uint8_t) json_type::byte_string_value] = make_string_validator(eval_context, context, sch);
             }
             else if (type == "boolean")
             {
-                type_mapping[(uint8_t)json_type::bool_value] = make_boolean_validator(context);
+                type_mapping[(uint8_t)json_type::bool_value] = make_boolean_validator(eval_context, context);
             }
             else if (type == "integer")
             {
-                type_mapping[(uint8_t)json_type::int64_value] = make_integer_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::uint64_value] = make_integer_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::double_value] = make_integer_validator(context, sch, keywords);
+                type_mapping[(uint8_t)json_type::int64_value] = make_integer_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::uint64_value] = make_integer_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::double_value] = make_integer_validator(eval_context, context, sch, keywords);
             }
             else if (type == "number")
             {
-                type_mapping[(uint8_t)json_type::double_value] = make_number_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::int64_value] =  make_number_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::uint64_value] =  make_number_validator(context, sch, keywords);
+                type_mapping[(uint8_t)json_type::double_value] = make_number_validator(eval_context, 
+                    context, sch, keywords);
+                type_mapping[(uint8_t)json_type::int64_value] =  make_number_validator(eval_context, 
+                    context, sch, keywords);
+                type_mapping[(uint8_t)json_type::uint64_value] =  make_number_validator(eval_context, 
+                    context, sch, keywords);
             }
             else if (type.empty())
             {
-                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(context);
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(context, sch);
-                type_mapping[(uint8_t)json_type::array_value] = make_array_validator(context, sch);
-                type_mapping[(uint8_t)json_type::string_value] = make_string_validator(context, sch);
+                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(eval_context, context);
+                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(eval_context, context, sch);
+                type_mapping[(uint8_t)json_type::array_value] = make_array_validator(eval_context, context, sch);
+                type_mapping[(uint8_t)json_type::string_value] = make_string_validator(eval_context, context, sch);
                 // For binary types
-                type_mapping[(uint8_t) json_type::byte_string_value] = make_string_validator(context, sch);
-                type_mapping[(uint8_t)json_type::bool_value] = make_boolean_validator(context);
-                type_mapping[(uint8_t)json_type::int64_value] = make_integer_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::uint64_value] = make_integer_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::double_value] = make_integer_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::double_value] = make_number_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::int64_value] = make_number_validator(context, sch, keywords);
-                type_mapping[(uint8_t)json_type::uint64_value] = make_number_validator(context, sch, keywords);
+                type_mapping[(uint8_t) json_type::byte_string_value] = make_string_validator(eval_context, context, sch);
+                type_mapping[(uint8_t)json_type::bool_value] = make_boolean_validator(eval_context, context);
+                type_mapping[(uint8_t)json_type::int64_value] = make_integer_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::uint64_value] = make_integer_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::double_value] = make_integer_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::double_value] = make_number_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::int64_value] = make_number_validator(eval_context, context, sch, keywords);
+                type_mapping[(uint8_t)json_type::uint64_value] = make_number_validator(eval_context, context, sch, keywords);
             }
         }
 
-        std::unique_ptr<type_validator<Json>> make_type_validator(const compilation_context& context, 
+        std::unique_ptr<type_validator<Json>> make_type_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch, std::set<std::string> known_keywords)
         {
             std::string schema_path = context.get_absolute_uri().string();
@@ -321,7 +329,7 @@ namespace draft7 {
             auto it = sch.find("type");
             if (it == sch.object_range().end()) 
             {
-                init_type_mapping(type_mapping, "", sch, context, known_keywords);
+                init_type_mapping(type_mapping, "", sch, eval_context, context, known_keywords);
             }
             else 
             {
@@ -330,7 +338,7 @@ namespace draft7 {
                     case json_type::string_value: 
                     {
                         auto type = it->value().template as<std::string>();
-                        init_type_mapping(type_mapping, type, sch, context, known_keywords);
+                        init_type_mapping(type_mapping, type, sch, evaluation_context(eval_context, "type"), context, known_keywords);
                         expected_types.emplace_back(std::move(type));
                         break;
                     } 
@@ -340,7 +348,7 @@ namespace draft7 {
                         for (const auto& item : it->value().array_range())
                         {
                             auto type = item.template as<std::string>();
-                            init_type_mapping(type_mapping, type, sch, context, known_keywords);
+                            init_type_mapping(type_mapping, type, sch, evaluation_context(eval_context, "type"), context, known_keywords);
                             expected_types.emplace_back(std::move(type));
                         }
                         break;
@@ -350,12 +358,12 @@ namespace draft7 {
                 }
             }
 
-            return jsoncons::make_unique<type_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path), 
+            return jsoncons::make_unique<type_validator<Json>>(eval_context.eval_path(), std::move(schema_path), 
                 std::move(type_mapping), std::move(expected_types)
          );
         }
 
-        std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("contentEncoding");
             if (!sch.is_string())
@@ -364,10 +372,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_encoding_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<content_encoding_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<string_validator<Json>> make_string_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<string_validator<Json>> make_string_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -375,19 +383,19 @@ namespace draft7 {
             auto it = sch.find("maxLength");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_max_length_validator(context, it->value()));
+                validators.emplace_back(make_max_length_validator(evaluation_context{eval_context, "maxLength"}, context, it->value()));
             }
 
             it = sch.find("minLength");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_min_length_validator(context, it->value()));
+                validators.emplace_back(make_min_length_validator(evaluation_context{eval_context, "minLength"}, context, it->value()));
             }
 
             it = sch.find("contentEncoding");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_content_encoding_validator(context, it->value()));
+                validators.emplace_back(make_content_encoding_validator(evaluation_context{eval_context, "contentEncoding"}, context, it->value()));
                 // If "contentEncoding" is set to "binary", a Json value
                 // of type json_type::byte_string_value is accepted.
             }
@@ -395,27 +403,27 @@ namespace draft7 {
             it = sch.find("contentMediaType");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_content_media_type_validator(context, it->value()));
+                validators.emplace_back(make_content_media_type_validator(evaluation_context{eval_context, "contentMediaType"}, context, it->value()));
             }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
             it = sch.find("pattern");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_pattern_validator(context, it->value()));
+                validators.emplace_back(make_pattern_validator(evaluation_context{eval_context, "pattern"}, context, it->value()));
             }
 #endif
 
             it = sch.find("format");
             if (it != sch.object_range().end())
             {
-                validators.emplace_back(make_format_validator(context, it->value()));
+                validators.emplace_back(make_format_validator(evaluation_context{eval_context, "format"}, context, it->value()));
             }
 
-            return jsoncons::make_unique<string_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
+            return jsoncons::make_unique<string_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
-        std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("contentMediaType");
             if (!sch.is_string())
@@ -424,10 +432,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_media_type_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<content_media_type_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<format_validator<Json>> make_format_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<format_validator<Json>> make_format_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             auto schema_path = context.make_schema_path_with("format");
 
@@ -472,20 +480,20 @@ namespace draft7 {
                 format_check = nullptr;
             }       
 
-            return jsoncons::make_unique<format_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
+            return jsoncons::make_unique<format_validator<Json>>(eval_context.eval_path(), schema_path, 
                 format_check);
         }
 
-        std::unique_ptr<pattern_validator<Json>> make_pattern_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<pattern_validator<Json>> make_pattern_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("pattern");
             auto pattern_string = sch.template as<std::string>();
             auto regex = std::regex(pattern_string, std::regex::ECMAScript);
-            return jsoncons::make_unique<pattern_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
+            return jsoncons::make_unique<pattern_validator<Json>>(eval_context.eval_path(), schema_path, 
                 pattern_string, regex);
         }
 
-        std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maxLength");
             if (!sch.is_number())
@@ -494,10 +502,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_length_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<max_length_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<max_items_validator<Json>> make_max_items_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<max_items_validator<Json>> make_max_items_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maxItems");
             if (!sch.is_number())
@@ -506,10 +514,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<max_items_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("minItems");
             if (!sch.is_number())
@@ -518,10 +526,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<min_items_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<array_validator<Json>> make_array_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<array_validator<Json>> make_array_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -530,19 +538,19 @@ namespace draft7 {
             auto it = sch.find("maxItems");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_max_items_validator(context, it->value()));
+                validators.emplace_back(make_max_items_validator(evaluation_context{eval_context, "maxItems"}, context, it->value()));
             }
 
             it = sch.find("minItems");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_min_items_validator(context, it->value()));
+                validators.emplace_back(make_min_items_validator(evaluation_context{eval_context, "minItems"}, context, it->value()));
             }
 
             it = sch.find("uniqueItems");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_unique_items_validator(context, it->value()));
+                validators.emplace_back(make_unique_items_validator(evaluation_context{eval_context, "uniqueItems"}, context, it->value()));
             }
 
             it = sch.find("items");
@@ -551,36 +559,36 @@ namespace draft7 {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(make_items_array_validator(context, sch, it->value()));
+                    validators.emplace_back(make_items_array_validator(evaluation_context{eval_context, "items"}, context, sch, it->value()));
                 } 
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(make_items_object_validator(context, sch, it->value()));
+                    validators.emplace_back(make_items_object_validator(evaluation_context{eval_context, "items"}, context, sch, it->value()));
                 }
             }
 
             it = sch.find("contains");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_contains_validator(context, sch, it->value()));
+                validators.emplace_back(make_contains_validator(evaluation_context{eval_context, "contains"}, context, sch, it->value()));
             }
 
-            return jsoncons::make_unique<array_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
+            return jsoncons::make_unique<array_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
-        std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
+        std::unique_ptr<contains_validator<Json>> make_contains_validator(const evaluation_context& eval_context, const compilation_context& context,
             const Json& /*parent*/, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("contains");
 
             std::string sub_keys[] = { "contains" };
 
-            return jsoncons::make_unique<contains_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
-                make_schema_validator(context, sch, sub_keys));
+            return jsoncons::make_unique<contains_validator<Json>>(eval_context.eval_path(), schema_path, 
+                make_schema_validator(evaluation_context{}, context, sch, sub_keys));
         }
 
-        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 
+        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& parent, const Json& sch)
         {
             std::vector<schema_validator_type> item_validators;
@@ -595,40 +603,40 @@ namespace draft7 {
                 {
                     std::string sub_keys[] = {"items", std::to_string(c++)};
 
-                    item_validators.emplace_back(make_schema_validator(context, subsch, sub_keys));
+                    item_validators.emplace_back(make_schema_validator(evaluation_context{}, context, subsch, sub_keys));
                 }
 
                 auto it = parent.find("additionalItems");
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"additionalItems"};
-                    additional_items_validator = make_schema_validator(context, it->value(), sub_keys);
+                    additional_items_validator = make_schema_validator(evaluation_context{}, context, it->value(), sub_keys);
                 }
             }
 
-            return jsoncons::make_unique<items_array_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
+            return jsoncons::make_unique<items_array_validator<Json>>(eval_context.eval_path(), schema_path, 
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
-        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
+        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& /* parent */, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("items");
 
             std::string sub_keys[] = {"items"};
 
-            return jsoncons::make_unique<items_object_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
-                make_schema_validator(context, sch, sub_keys));
+            return jsoncons::make_unique<items_object_validator<Json>>(eval_context.eval_path(), schema_path, 
+                make_schema_validator(evaluation_context{}, context, sch, sub_keys));
         }
 
-        std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("uniqueItems");
             bool are_unique = sch.template as<bool>();
-            return jsoncons::make_unique<unique_items_validator<Json>>(jsonpointer::json_pointer{}, schema_path, are_unique);
+            return jsoncons::make_unique<unique_items_validator<Json>>(eval_context.eval_path(), schema_path, are_unique);
         }
 
-        std::unique_ptr<min_length_validator<Json>> make_min_length_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<min_length_validator<Json>> make_min_length_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("minLength");
             if (!sch.is_number())
@@ -637,18 +645,18 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_length_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<min_length_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<not_validator<Json>> make_not_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<not_validator<Json>> make_not_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("not");
             std::string not_key[] = { "not" };
-            return jsoncons::make_unique<not_validator<Json>>(jsonpointer::json_pointer{}, schema_path, 
-                make_schema_validator(context, sch, not_key));
+            return jsoncons::make_unique<not_validator<Json>>(eval_context.eval_path(), schema_path, 
+                make_schema_validator(evaluation_context{}, context, sch, not_key));
         }
 
-        std::unique_ptr<maximum_validator<Json,int64_t>> make_maximum_integer_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<maximum_validator<Json,int64_t>> make_maximum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maximum");
             if (!sch.is_number())
@@ -660,7 +668,7 @@ namespace draft7 {
             return jsoncons::make_unique<maximum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<maximum_validator<Json,double>> make_maximum_number_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<maximum_validator<Json,double>> make_maximum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maximum");
             if (!sch.is_number())
@@ -672,7 +680,7 @@ namespace draft7 {
             return jsoncons::make_unique<maximum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<exclusive_maximum_validator<Json,int64_t>> make_exclusive_maximum_integer_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_maximum_validator<Json,int64_t>> make_exclusive_maximum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMaximum");
             if (!sch.is_number())
@@ -684,7 +692,7 @@ namespace draft7 {
             return jsoncons::make_unique<exclusive_maximum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<exclusive_maximum_validator<Json,double>> make_exclusive_maximum_number_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_maximum_validator<Json,double>> make_exclusive_maximum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMaximum");
             if (!sch.is_number())
@@ -696,7 +704,7 @@ namespace draft7 {
             return jsoncons::make_unique<exclusive_maximum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<minimum_validator<Json,int64_t>> make_minimum_integer_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<minimum_validator<Json,int64_t>> make_minimum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("minimum");
 
@@ -711,7 +719,7 @@ namespace draft7 {
             return jsoncons::make_unique<minimum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<minimum_validator<Json,double>> make_minimum_number_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<minimum_validator<Json,double>> make_minimum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("minimum");
             if (!sch.is_number())
@@ -723,7 +731,7 @@ namespace draft7 {
             return jsoncons::make_unique<minimum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<exclusive_minimum_validator<Json,int64_t>> make_exclusive_minimum_integer_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_minimum_validator<Json,int64_t>> make_exclusive_minimum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMinimum");
             if (!sch.is_number())
@@ -735,7 +743,7 @@ namespace draft7 {
             return jsoncons::make_unique<exclusive_minimum_validator<Json,int64_t>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<exclusive_minimum_validator<Json,double>> make_exclusive_minimum_number_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_minimum_validator<Json,double>> make_exclusive_minimum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMinimum");
             if (!sch.is_number())
@@ -747,7 +755,7 @@ namespace draft7 {
             return jsoncons::make_unique<exclusive_minimum_validator<Json,double>>(jsonpointer::json_pointer{}, schema_path, value);
         }
 
-        std::unique_ptr<multiple_of_validator<Json>> make_multiple_of_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<multiple_of_validator<Json>> make_multiple_of_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("multipleOf");
             if (!sch.is_number())
@@ -756,10 +764,10 @@ namespace draft7 {
                 JSONCONS_THROW(schema_error(message));
             }
             auto value = sch.template as<double>();
-            return jsoncons::make_unique<multiple_of_validator<Json>>(jsonpointer::json_pointer{}, schema_path, value);
+            return jsoncons::make_unique<multiple_of_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<integer_validator<Json>> make_integer_validator(const compilation_context& context, 
+        std::unique_ptr<integer_validator<Json>> make_integer_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch, std::set<std::string>& keywords) 
         {
             uri schema_path = context.get_absolute_uri();
@@ -770,42 +778,42 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_integer_validator(context, it->value()));
+                validators.emplace_back(make_maximum_integer_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_integer_validator(context, it->value()));
+                validators.emplace_back(make_minimum_integer_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_integer_validator(context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_integer_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_integer_validator(context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_integer_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
             }
 
             it = sch.find("multipleOf");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("multipleOf");
-                validators.emplace_back(make_multiple_of_validator(context, it->value()));
+                validators.emplace_back(make_multiple_of_validator(evaluation_context{eval_context, "multipleOf"}, context, it->value()));
             }
 
 
-            return jsoncons::make_unique<integer_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
+            return jsoncons::make_unique<integer_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
-        std::unique_ptr<number_validator<Json>> make_number_validator(const compilation_context& context, 
+        std::unique_ptr<number_validator<Json>> make_number_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch, std::set<std::string>& keywords)
         {
             uri schema_path = context.get_absolute_uri();
@@ -816,74 +824,74 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_number_validator(context, it->value()));
+                validators.emplace_back(make_maximum_number_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_number_validator(context, it->value()));
+                validators.emplace_back(make_minimum_number_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_number_validator(context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_number_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_number_validator(context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_number_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
             }
 
             it = sch.find("multipleOf");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("multipleOf");
-                validators.emplace_back(make_multiple_of_validator(context, it->value()));
+                validators.emplace_back(make_multiple_of_validator(evaluation_context{eval_context, "multipleOf"}, context, it->value()));
             }
 
 
-            return jsoncons::make_unique<number_validator<Json>>(jsonpointer::json_pointer{}, schema_path, std::move(validators));
+            return jsoncons::make_unique<number_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
-        std::unique_ptr<null_validator<Json>> make_null_validator(const compilation_context& context)
+        std::unique_ptr<null_validator<Json>> make_null_validator(const evaluation_context& eval_context, const compilation_context& context)
         {
             uri schema_path = context.make_schema_path_with("null");
-            return jsoncons::make_unique<null_validator<Json>>(jsonpointer::json_pointer{}, schema_path);
+            return jsoncons::make_unique<null_validator<Json>>(eval_context.eval_path(), schema_path);
         }
 
-        std::unique_ptr<boolean_validator<Json>> make_boolean_validator(const compilation_context& context)
+        std::unique_ptr<boolean_validator<Json>> make_boolean_validator(const evaluation_context& eval_context, const compilation_context& context)
         {
             uri schema_path = context.get_absolute_uri();
-            return jsoncons::make_unique<boolean_validator<Json>>(jsonpointer::json_pointer{}, schema_path);
+            return jsoncons::make_unique<boolean_validator<Json>>(eval_context.eval_path(), schema_path);
         }
 
-        std::unique_ptr<const_validator<Json>> make_const_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<const_validator<Json>> make_const_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("const");
-            return jsoncons::make_unique<const_validator<Json>>(jsonpointer::json_pointer{}, schema_path, sch);
+            return jsoncons::make_unique<const_validator<Json>>(eval_context.eval_path(), schema_path, sch);
         }
 
-        std::unique_ptr<enum_validator<Json>> make_enum_validator(const compilation_context& context, const Json& sch)
+        std::unique_ptr<enum_validator<Json>> make_enum_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("enum");
-            return jsoncons::make_unique<enum_validator<Json>>(jsonpointer::json_pointer{}, schema_path, sch);
+            return jsoncons::make_unique<enum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
         }
 
-        std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context,
+        std::unique_ptr<required_validator<Json>> make_required_validator(const evaluation_context& eval_context, const compilation_context& context,
             const std::vector<std::string>& items)
         {
             uri schema_path = context.make_schema_path_with("required");
-            return jsoncons::make_unique<required_validator<Json>>(jsonpointer::json_pointer{}, schema_path, items);
+            return jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), schema_path, items);
         }
 
 
-        std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
+        std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const evaluation_context& eval_context, const compilation_context& context,
             const Json& sch_if, const Json& sch)
         {
             std::string schema_path = context.get_absolute_uri().string();
@@ -892,27 +900,27 @@ namespace draft7 {
             schema_validator_type else_validator(nullptr);
 
             std::string if_key[] = { "if" };
-            if_validator = make_schema_validator(context, sch_if, if_key);
+            if_validator = make_schema_validator(evaluation_context{}, context, sch_if, if_key);
 
             auto then_it = sch.find("then");
             if (then_it != sch.object_range().end()) 
             {
                 std::string then_key[] = { "then" };
-                then_validator = make_schema_validator(context, then_it->value(), then_key);
+                then_validator = make_schema_validator(evaluation_context{}, context, then_it->value(), then_key);
             }
 
             auto else_it = sch.find("else");
             if (else_it != sch.object_range().end()) 
             {
                 std::string else_key[] = { "else" };
-                else_validator = make_schema_validator(context, else_it->value(), else_key);
+                else_validator = make_schema_validator(evaluation_context{}, context, else_it->value(), else_key);
             }
 
-            return jsoncons::make_unique<conditional_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
+            return jsoncons::make_unique<conditional_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
 
-        std::unique_ptr<combining_validator<Json,all_of_criterion<Json>>> make_all_of_validator(const compilation_context& context,
+        std::unique_ptr<combining_validator<Json,all_of_criterion<Json>>> make_all_of_validator(const evaluation_context& eval_context, const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("allOf");
@@ -922,12 +930,12 @@ namespace draft7 {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { all_of_criterion<Json>::key(), std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+                subschemas.emplace_back(make_schema_validator(evaluation_context{}, context, subsch, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const compilation_context& context,
+        std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const evaluation_context& eval_context, const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("anyOf");
@@ -937,12 +945,12 @@ namespace draft7 {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+                subschemas.emplace_back(make_schema_validator(evaluation_context{}, context, subsch, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
+        std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const evaluation_context& eval_context, const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("oneOf");
@@ -952,12 +960,12 @@ namespace draft7 {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { one_of_criterion<Json>::key(), std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+                subschemas.emplace_back(make_schema_validator(evaluation_context{}, context, subsch, sub_keys));
             }
             return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<object_validator<Json>> make_object_validator(const compilation_context& context, 
+        std::unique_ptr<object_validator<Json>> make_object_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
@@ -975,20 +983,20 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 auto max_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("maxProperties"), max_properties));
+                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 auto min_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("minProperties"), min_properties));
+                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
             }
 
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(jsonpointer::json_pointer{}, context.make_schema_path_with("required"), 
+                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
                     it->value().template as<std::vector<std::string>>()));
             }
 
@@ -1001,7 +1009,7 @@ namespace draft7 {
                     properties.emplace(
                         std::make_pair(
                             prop.key(),
-                            make_schema_validator(context, prop.value(), sub_keys)));
+                            make_schema_validator(evaluation_context{}, context, prop.value(), sub_keys)));
                 }
             }
 
@@ -1015,7 +1023,7 @@ namespace draft7 {
                     pattern_properties.emplace_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
-                            make_schema_validator(context, prop.value(), sub_keys)));
+                            make_schema_validator(evaluation_context{}, context, prop.value(), sub_keys)));
                 }
             }
     #endif
@@ -1024,7 +1032,7 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 std::string sub_keys[] = {"additionalProperties"};
-                additional_properties = make_schema_validator(context, it->value(), sub_keys);
+                additional_properties = make_schema_validator(evaluation_context{eval_context, "additionalProperties"}, context, it->value(), sub_keys);
             }
 
             it = sch.find("dependencies");
@@ -1038,7 +1046,7 @@ namespace draft7 {
                         {
                             auto location = context.make_schema_path_with("dependencies");
                             dependent_required.emplace(dep.key(), 
-                                make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                                make_required_validator(evaluation_context{eval_context, "dependencies"}, compilation_context(nullptr, std::vector<schema_location>{{location}}),
                                     dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
@@ -1046,7 +1054,7 @@ namespace draft7 {
                         {
                             std::string sub_keys[] = {"dependencies"};
                             dependent_schemas.emplace(dep.key(),
-                                make_schema_validator(context, dep.value(), sub_keys));
+                                make_schema_validator(evaluation_context{eval_context, "dependencies"}, context, dep.value(), sub_keys));
                             break;
                         }
                         default:
@@ -1061,10 +1069,10 @@ namespace draft7 {
             if (property_names_it != sch.object_range().end()) 
             {
                 std::string sub_keys[] = {"propertyNames"};
-                property_name_validator = make_schema_validator(context, property_names_it->value(), sub_keys);
+                property_name_validator = make_schema_validator(evaluation_context{}, context, property_names_it->value(), sub_keys);
             }
 
-            return jsoncons::make_unique<object_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
+            return jsoncons::make_unique<object_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
                 std::move(general_validators),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
@@ -1104,7 +1112,7 @@ namespace draft7 {
         void load(const compilation_context& context, const Json& sch)
         {
             subschema_registries_.clear();
-            root_ = make_schema_validator(context, sch, {});
+            root_ = make_schema_validator(evaluation_context{}, context, sch, {});
 
             // load all external schemas that have not already been loaded
 
@@ -1124,7 +1132,7 @@ namespace draft7 {
                         if (resolver_) 
                         {
                             Json external_sch = resolver_(loc);
-                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_location(loc)), external_sch, {}));
+                            subschemas_.emplace_back(make_schema_validator(evaluation_context{}, compilation_context(schema_location(loc)), external_sch, {}));
                             ++loaded_count;
                         } 
                         else 
@@ -1194,7 +1202,7 @@ namespace draft7 {
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
-                    subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
+                    subschemas_.emplace_back(make_schema_validator(evaluation_context{}, compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
                     file.unknown_keywords[fragment] = value;
 
@@ -1229,7 +1237,7 @@ namespace draft7 {
                 if (unprocessed_keywords_it != file.unknown_keywords.end()) 
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
+                    auto s = make_schema_validator(evaluation_context{}, compilation_context(uri), subsch, {}); 
                     //auto p = s.get();
                     //subschemas_.emplace_back(std::move(s));
                     file.unknown_keywords.erase(unprocessed_keywords_it);

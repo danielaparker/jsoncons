@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -25,6 +25,16 @@ namespace jsonschema {
         {
         }
 
+        evaluation_context(const evaluation_context& other)
+        {
+            eval_path_ = other.eval_path_;
+        }
+
+        evaluation_context(evaluation_context&& other)
+        {
+            eval_path_ = std::move(other.eval_path_);
+        }
+
         evaluation_context(const evaluation_context& parent, jsoncons::span<const std::string> keys)
             : eval_path_(parent.eval_path())
         {
@@ -32,6 +42,18 @@ namespace jsonschema {
             {
                 eval_path_.append(key);
             }
+        }
+
+        evaluation_context(const evaluation_context& parent, const std::string& key)
+            : eval_path_(parent.eval_path())
+        {
+            eval_path_.append(key);
+        }
+
+        evaluation_context(const evaluation_context& parent, std::string&& key)
+            : eval_path_(parent.eval_path())
+        {
+            eval_path_.append(std::move(key));
         }
 
         const jsonpointer::json_pointer eval_path() const
