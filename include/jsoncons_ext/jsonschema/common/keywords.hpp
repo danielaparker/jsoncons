@@ -1629,18 +1629,21 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final
         {
-            for (const auto& key : items_)
+            if (instance.is_object())
             {
-                if (instance.find(key) == instance.object_range().end())
+                for (const auto& key : items_)
                 {
-                    reporter.error(validation_output(this->keyword_name(),
-                        this->eval_path(), 
-                        this->schema_path(), 
-                        instance_location.to_uri_fragment(), 
-                        "Required property \"" + key + "\" not found"));
-                    if (reporter.fail_early())
+                        if(instance.find(key)== instance.object_range().end())
                     {
-                        return;
+                            reporter.error(validation_output(this->keyword_name(),
+                                                             this->eval_path(),
+                                                             this->schema_path(),
+                                                             instance_location.to_uri_fragment(),
+                                                             "Required property \"" + key + "\" not found"));
+                            if(reporter.fail_early())
+                        {
+                                return;
+                        }
                     }
                 }
             }
@@ -1678,18 +1681,21 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
-            if (instance.size() > max_properties_)
+            if (instance.is_object())
             {
-                std::string message("Maximum properties: " + std::to_string(max_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    std::move(message)));
-                if (reporter.fail_early())
+                if (instance.size() > max_properties_)
                 {
-                    return;
+                    std::string message("Maximum properties: " + std::to_string(max_properties_));
+                    message.append(", found: " + std::to_string(instance.size()));
+                    reporter.error(validation_output(this->keyword_name(),
+                        this->eval_path(), 
+                        this->schema_path(), 
+                        instance_location.to_uri_fragment(), 
+                        std::move(message)));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -1726,18 +1732,21 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
-            if (instance.size() < min_properties_)
+            if (instance.is_object())
             {
-                std::string message("Maximum properties: " + std::to_string(min_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    std::move(message)));
-                if (reporter.fail_early())
+                if (instance.size() < min_properties_)
                 {
-                    return;
+                    std::string message("Maximum properties: " + std::to_string(min_properties_));
+                    message.append(", found: " + std::to_string(instance.size()));
+                    reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(),
+                            this->schema_path(),
+                            instance_location.to_uri_fragment(),
+                            std::move(message)));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -2648,10 +2657,6 @@ namespace jsonschema {
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
         {
-            for (auto& item : properties_)
-            {
-                item->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-            }
             if (additional_properties_)
                 additional_properties_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }

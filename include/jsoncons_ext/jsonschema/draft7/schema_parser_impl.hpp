@@ -262,6 +262,29 @@ namespace draft7 {
                     known_keywords.insert("else");
                 }
             }
+
+            // Object validators
+
+            it = sch.find("maxProperties");
+            if (it != sch.object_range().end()) 
+            {
+                auto max_properties = it->value().template as<std::size_t>();
+                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
+            }
+
+            it = sch.find("minProperties");
+            if (it != sch.object_range().end()) 
+            {
+                auto min_properties = it->value().template as<std::size_t>();
+                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
+            }
+
+            it = sch.find("required");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
+                    it->value().template as<std::vector<std::string>>()));
+            }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
                 context.get_absolute_uri().string(),
@@ -990,28 +1013,7 @@ namespace draft7 {
             std::map<std::string, schema_validator_type> dependent_schemas;
             schema_validator_type property_name_validator;
 
-            auto it = sch.find("maxProperties");
-            if (it != sch.object_range().end()) 
-            {
-                auto max_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
-            }
-
-            it = sch.find("minProperties");
-            if (it != sch.object_range().end()) 
-            {
-                auto min_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
-            }
-
-            it = sch.find("required");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
-                    it->value().template as<std::vector<std::string>>()));
-            }
-
-            it = sch.find("properties");
+            auto it = sch.find("properties");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& prop : it->value().object_range())
