@@ -132,10 +132,8 @@ namespace draft201909 {
 
             auto new_context = make_compilation_context(context, sch, keys);
 
-            Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
 
-            std::vector<keyword_validator_type> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
