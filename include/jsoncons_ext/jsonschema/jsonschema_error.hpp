@@ -100,7 +100,7 @@ namespace jsonschema {
 
         const std::string keyword_location() const
         {
-            return eval_path_.to_string();
+            return eval_path_.to_uri_fragment();
         }
 
         const std::string absolute_keyword_location() const

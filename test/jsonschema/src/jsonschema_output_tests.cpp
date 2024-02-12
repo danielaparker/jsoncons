@@ -143,19 +143,38 @@ TEST_CASE("jsonschema output format tests 2")
 }
     )");
 
+    SECTION("With ref")
+    {
+
+        json instance = json::parse(R"(
+{
+  "member":{
+      "age":5,  // doesn't meet minimum
+      "username":"aName"  // doesn't meet minLength
+  },
+  "membershipType":"user"
+}
+)");
+
+        auto sch = jsonschema::make_schema(schema);
+        jsonschema::json_validator<json> validator(sch);
+
+        auto reporter = [](const jsonschema::validation_output& o)
+        {
+                std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+
+                for (auto& item : o.nested_errors())
+                {
+                    std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+                }
+        };
+        validator.validate(instance, reporter);
+
+    }
+}
+
 /*
-
-Actual:
-
-oneOf, #/oneOf, http://schemarepo.org/schemas/user.json#/oneOf
-    minimum, #/definitions/min18/minimum, http://schemarepo.org/schemas/user.json#/definitions/min18/minimum
-    minLength, #/definitions/username/minLength, http://schemarepo.org/schemas/user.json#/definitions/username/minLength
-    additionalProperties, #/oneOf/1/additionalProperties, http://schemarepo.org/schemas/user.json#/oneOf/1/additionalProperties
-    const, #/oneOf/1/properties/membershipType/const, http://schemarepo.org/schemas/user.json#/oneOf/1/properties/membershipType/const
- 
-Expected:
- 
- {
+{
   "valid":false,
   "errors":[
     {
@@ -187,35 +206,5 @@ Expected:
     }
   ]
 }
- 
+
 */
-    SECTION("With ref")
-    {
-
-        json instance = json::parse(R"(
-{
-  "member":{
-      "age":5,            // doesn't meet minimum
-      "username":"aName"  // doesn't meet minLength
-  },
-  "membershipType":"user"
-}
-)");
-
-        auto sch = jsonschema::make_schema(schema);
-        jsonschema::json_validator<json> validator(sch);
-
-        auto reporter = [](const jsonschema::validation_output& o)
-        {
-            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
-
-            for (auto& item : o.nested_errors())
-            {
-                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
-            }
-        };
-        validator.validate(instance, reporter);
-
-    }
-}
-

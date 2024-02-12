@@ -1,4 +1,5 @@
-// Copyright 2013-2023 Daniel Parker
+// Copyright 2013-2023 Daniel Parker$ref
+// 
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -65,7 +66,7 @@ namespace jsonschema {
             schema_validator_type referred_schema;
             if (referred_schema_)
             {
-                referred_schema = referred_schema_->make_copy(eval_path / "$ref");
+                referred_schema = referred_schema_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<ref_validator>(eval_path / "$ref", referred_schema_->schema_path(), std::move(referred_schema));
@@ -75,8 +76,8 @@ namespace jsonschema {
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
         {
-            std::cout << "ref_validator location::do_resolve_recursive_refs: " << this->schema_path().string()
-                << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
+            //std::cout << "ref_validator location::do_resolve_recursive_refs: " << this->schema_path().string()
+            //    << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
 
             JSONCONS_ASSERT(referred_schema_)
 
@@ -133,9 +134,9 @@ namespace jsonschema {
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const override 
         {
-            std::cout << "recursive_ref_validator.make_copy " << ", schema_path: " << this->schema_path().string() << "\n\n";
+            //std::cout << "recursive_ref_validator.make_copy " << ", schema_path: " << this->schema_path().string() << "\n\n";
 
-            return jsoncons::make_unique<recursive_ref_validator>(eval_path, this->schema_path(), referred_schema_ ? referred_schema_->make_copy(eval_path) : nullptr);
+            return jsoncons::make_unique<recursive_ref_validator>(eval_path, this->schema_path(), referred_schema_ ? referred_schema_->make_copy(eval_path / this->keyword_name()) : nullptr);
         }
 
     private:
@@ -152,7 +153,7 @@ namespace jsonschema {
             {
                 location = relative.resolve(base_uri_);
             }
-            referred_schema_ = schemas.get_schema(location)->make_copy(eval_path);
+            referred_schema_ = schemas.get_schema(location)->make_copy(eval_path / this->keyword_name());
             referred_schema_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             std::cout << "recursive_ref_validator::do_resolve_recursive_refs location: " << schema_path().string()
                 << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor 
@@ -166,7 +167,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
-            std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+            //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
 
             if (referred_schema_ == nullptr)
             {
@@ -200,7 +201,7 @@ namespace jsonschema {
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
-            return jsoncons::make_unique<content_encoding_validator>(eval_path, this->schema_path(), content_encoding_);
+            return jsoncons::make_unique<content_encoding_validator>(eval_path / this->keyword_name(), this->schema_path(), content_encoding_);
         }
 
     private:
@@ -601,13 +602,13 @@ namespace jsonschema {
             std::vector<schema_validator_type> item_validators;
             for (auto& validator : item_validators_)
             {
-                item_validators.push_back(validator->make_copy(eval_path));
+                item_validators.push_back(validator->make_copy(eval_path / this->keyword_name()));
             }
             schema_validator_type additional_items_validator; 
             
             if (additional_items_validator_)
             {
-                additional_items_validator = additional_items_validator_->make_copy(eval_path);
+                additional_items_validator = additional_items_validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<items_array_validator>(eval_path, this->schema_path(), std::move(item_validators),
@@ -681,7 +682,7 @@ namespace jsonschema {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->make_copy(eval_path);
+                validator = validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<contains_validator>(eval_path, this->schema_path(),
@@ -756,7 +757,7 @@ namespace jsonschema {
             schema_validator_type items_validator;
             if (items_validator_)
             {
-                items_validator = items_validator_->make_copy(eval_path);
+                items_validator = items_validator_->make_copy(eval_path / this->keyword_name());
             }
             return jsoncons::make_unique<items_object_validator>(eval_path, this->schema_path(),
                 std::move(items_validator));
@@ -925,7 +926,7 @@ namespace jsonschema {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->make_copy(eval_path));
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             return jsoncons::make_unique<string_validator>(eval_path, this->schema_path(),
@@ -981,7 +982,7 @@ namespace jsonschema {
             schema_validator_type rule;
             if (rule_)
             {
-                rule = rule_->make_copy(eval_path);
+                rule = rule_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<not_validator>(eval_path, this->schema_path(),
@@ -1117,7 +1118,7 @@ namespace jsonschema {
             std::vector<schema_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->make_copy(eval_path));
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             return jsoncons::make_unique<combining_validator>(eval_path, this->schema_path(),
@@ -1140,7 +1141,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << "combining_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+            //std::cout << "combining_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
 
             size_t count = 0;
 
@@ -1412,7 +1413,7 @@ namespace jsonschema {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->make_copy(eval_path));
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             return jsoncons::make_unique<integer_validator>(eval_path, this->schema_path(),
@@ -1475,7 +1476,7 @@ namespace jsonschema {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->make_copy(eval_path));
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             return jsoncons::make_unique<number_validator>(eval_path, this->schema_path(),
@@ -1791,13 +1792,13 @@ namespace jsonschema {
             std::vector<keyword_validator_type> general_validators;
             for (auto& validator : general_validators_)
             {
-                general_validators.emplace_back(validator->make_copy(eval_path));
+                general_validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             std::map<std::string, schema_validator_type> properties;
             for (auto& item : properties_)
             {
-                properties.emplace(item.first, item.second->make_copy(eval_path));
+                properties.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
             }
 
 
@@ -1805,31 +1806,31 @@ namespace jsonschema {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             for (auto& item : pattern_properties_)
             {
-                pattern_properties.emplace_back(item.first, item.second->make_copy(eval_path));
+                pattern_properties.emplace_back(item.first, item.second->make_copy(eval_path / this->keyword_name()));
             }
         #endif
             schema_validator_type additional_properties;
             if (additional_properties_)
             {
-                additional_properties = additional_properties_->make_copy(eval_path);
+                additional_properties = additional_properties_->make_copy(eval_path / this->keyword_name());
             }
 
             std::map<std::string, keyword_validator_type> dependent_required;
             for (auto& item : dependent_required_)
             {
-                dependent_required.emplace(item.first, item.second->make_copy(eval_path));
+                dependent_required.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
             }
 
             std::map<std::string, schema_validator_type> dependent_schemas;
             for (auto& item : dependent_schemas_)
             {
-                dependent_schemas.emplace(item.first, item.second->make_copy(eval_path));
+                dependent_schemas.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
             }
 
             schema_validator_type property_name_validator;
             if (property_name_validator_)
             {
-                property_name_validator = property_name_validator_->make_copy(eval_path);
+                property_name_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<object_validator>(eval_path, this->schema_path(),
@@ -2051,7 +2052,7 @@ namespace jsonschema {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->make_copy(eval_path);
+                validator = validator_->make_copy(eval_path / this->keyword_name());
             }
             return jsoncons::make_unique<unevaluated_properties_validator>(eval_path, this->schema_path(),
                 std::move(validator));
@@ -2121,7 +2122,7 @@ namespace jsonschema {
             std::vector<keyword_validator_type> validators;
             for (auto& validator : validators_)
             {
-                validators.emplace_back(validator->make_copy(eval_path));
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
             }
 
             return jsoncons::make_unique<array_validator>(eval_path, this->schema_path(),
@@ -2182,17 +2183,17 @@ namespace jsonschema {
             schema_validator_type if_validator;
             if (if_validator_)
             {
-                if_validator = if_validator_->make_copy(eval_path);
+                if_validator = if_validator_->make_copy(eval_path / this->keyword_name());
             }
             schema_validator_type then_validator;
             if (then_validator_)
             {
-                then_validator = then_validator_->make_copy(eval_path);
+                then_validator = then_validator_->make_copy(eval_path / this->keyword_name());
             }
             schema_validator_type else_validator;
             if (else_validator_)
             {
-                else_validator = else_validator_->make_copy(eval_path);
+                else_validator = else_validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<conditional_validator>(eval_path, this->schema_path(), 
@@ -2368,7 +2369,7 @@ namespace jsonschema {
             {
                 if (validator)
                 {
-                    type_mapping.emplace_back(validator->make_copy(eval_path));
+                    type_mapping.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
                 }
                 else
                 {
