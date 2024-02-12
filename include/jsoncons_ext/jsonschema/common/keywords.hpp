@@ -2497,14 +2497,11 @@ namespace jsonschema {
                 jsonpointer::json_pointer pointer(instance_location);
                 pointer /= prop.key();
 
-                bool a_prop_or_pattern_matched = false;
                 auto properties_it = properties_.find(prop.key());
 
                 // check if it is in "properties"
                 if (properties_it != properties_.end()) 
                 {
-                    a_prop_or_pattern_matched = true;
-
                     std::size_t error_count = reporter.error_count();
                     properties_it->second->validate(prop.value() , pointer, evaluated_properties, reporter, patch);
                     if (reporter.error_count() == error_count)
@@ -2595,13 +2592,10 @@ namespace jsonschema {
                 jsonpointer::json_pointer pointer(instance_location);
                 pointer /= prop.key();
 
-                bool a_prop_or_pattern_matched = false;
-
                 // check all matching "patternProperties"
                 for (auto& schema_pp : pattern_properties_)
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
-                        a_prop_or_pattern_matched = true;
                         std::size_t error_count = reporter.error_count();
                         schema_pp.second->validate(prop.value() , pointer, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
