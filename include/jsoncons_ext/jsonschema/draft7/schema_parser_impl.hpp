@@ -280,7 +280,7 @@ namespace draft7 {
             }
             else if (type == "object")
             {
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(eval_context, context, sch);
+                type_mapping[(uint8_t)json_type::object_value] = make_legacy_object_validator(eval_context, context, sch);
             }
             else if (type == "array")
             {
@@ -314,7 +314,7 @@ namespace draft7 {
             else if (type.empty())
             {
                 type_mapping[(uint8_t)json_type::null_value] = make_null_checker(eval_context, context);
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(eval_context, context, sch);
+                type_mapping[(uint8_t)json_type::object_value] = make_legacy_object_validator(eval_context, context, sch);
                 type_mapping[(uint8_t)json_type::array_value] = make_array_validator(eval_context, context, sch);
                 type_mapping[(uint8_t)json_type::string_value] = make_string_validator(eval_context, context, sch);
                 // For binary types
@@ -976,11 +976,11 @@ namespace draft7 {
             return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(eval_context.eval_path(), std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<object_validator<Json>> make_object_validator(const evaluation_context& eval_context, const compilation_context& context, 
+        std::unique_ptr<legacy_object_validator<Json>> make_legacy_object_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
-            std::vector<keyword_validator_type> general_validators;
+            std::vector<keyword_validator_type> validators;
             std::map<std::string, schema_validator_type> properties;
         #if defined(JSONCONS_HAS_STD_REGEX)
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
@@ -994,20 +994,20 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 auto max_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
+                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 auto min_properties = it->value().template as<std::size_t>();
-                general_validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
+                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
             }
 
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                general_validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
+                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
                     it->value().template as<std::vector<std::string>>()));
             }
 
@@ -1083,8 +1083,8 @@ namespace draft7 {
                 property_name_validator = make_schema_validator(evaluation_context{}, context, property_names_it->value(), sub_keys);
             }
 
-            return jsoncons::make_unique<object_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
-                std::move(general_validators),
+            return jsoncons::make_unique<legacy_object_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
+                std::move(validators),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
                 std::move(pattern_properties),

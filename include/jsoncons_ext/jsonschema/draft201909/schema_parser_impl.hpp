@@ -347,7 +347,7 @@ namespace draft201909 {
             }
             else if (type == "object")
             {
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(context, sch);
+                type_mapping[(uint8_t)json_type::object_value] = make_legacy_object_validator(context, sch);
             }
             else if (type == "array")
             {
@@ -378,7 +378,7 @@ namespace draft201909 {
             else if (type.empty())
             {
                 type_mapping[(uint8_t)json_type::null_value] = make_null_validator(context);
-                type_mapping[(uint8_t)json_type::object_value] = make_object_validator(context, sch);
+                type_mapping[(uint8_t)json_type::object_value] = make_legacy_object_validator(context, sch);
                 type_mapping[(uint8_t)json_type::array_value] = make_array_validator(context, sch);
                 type_mapping[(uint8_t)json_type::string_value] = make_string_validator(context, sch);
                 // For binary types
@@ -1045,7 +1045,7 @@ namespace draft201909 {
             return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(jsonpointer::json_pointer{}, std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<object_validator<Json>> make_object_validator(const compilation_context& context,
+        std::unique_ptr<legacy_object_validator<Json>> make_legacy_object_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("object");
@@ -1201,7 +1201,7 @@ namespace draft201909 {
                 property_name_validator = make_schema_validator(context, property_names_it->value(), sub_keys);
             }
 
-            return jsoncons::make_unique<object_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
+            return jsoncons::make_unique<legacy_object_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path),
                 std::move(general_validators),
                 std::move(properties),
 #if defined(JSONCONS_HAS_STD_REGEX)
