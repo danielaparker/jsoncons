@@ -16,6 +16,7 @@
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
 #include <cassert>
 #include <set>
@@ -158,133 +159,10 @@ namespace draft201909 {
                 }
                 case json_type::object_value:
                 {
-                    bool is_recursive_anchor = false;
-
-                    auto it = sch.find("$recursiveAnchor"); 
-                    if (it != sch.object_range().end()) 
-                    {
-                        is_recursive_anchor = it->value().template as<bool>();
-                    }
-
-                    it = sch.find("default");
-                    if (it != sch.object_range().end()) 
-                    {
-                        default_value = it->value();
-                    }
-
-                    it = sch.find("$defs");
-                    if (it != sch.object_range().end()) 
-                    {
-                        //std::cout << "$defs\n";
-                        for (const auto& def : it->value().object_range())
-                        {
-                            is_def.push(true);
-                            //std::cout << "$defs key:" << def.key() << ", index = " << is_def.size() << "\n";
-                            std::string sub_keys[] = { "$defs", def.key() };
-                            subschemas_.emplace_back(make_schema_validator(new_context, def.value(), sub_keys));
-                            is_def.pop();
-                        }
-                    }
-                    it = sch.find("definitions");
-                    if (it != sch.object_range().end()) 
-                    {
-                        for (const auto& def : it->value().object_range())
-                        {
-                            std::string sub_keys[] = { "definitions", def.key() };
-                            subschemas_.emplace_back(make_schema_validator(new_context, def.value(), sub_keys));
-                        }
-                    }
-                    it = sch.find("$ref");
-                    if (it != sch.object_range().end()) // this schema has a reference
-                    {
-                        schema_location relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(new_context.get_base_uri()); 
-                        validators.push_back(get_or_create_reference(id));
-                    }
-
-                    it = sch.find("$recursiveRef");
-                    if (it != sch.object_range().end()) // this schema has a reference
-                    {
-                        schema_location relative(it->value().template as<std::string>()); 
-                        auto base_uri = new_context.get_base_uri(uri_anchor_flags::recursive_anchor);
-                        auto id = relative.resolve(base_uri); // REVISIT
-                        validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(jsonpointer::json_pointer{}, id.base()));
-                    }
-
-                    validators.push_back(make_type_validator(new_context, sch));
-
-
-                    it = sch.find("enum");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_enum_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("const");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_const_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("not");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_not_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("allOf");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_all_of_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("anyOf");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_any_of_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("oneOf");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_one_of_validator(new_context, it->value()));
-                    }
-
-                    it = sch.find("if");
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_conditional_validator(new_context, it->value(), sch));
-                        // sch["if"] is object and has id, can be looked up
-                    }
-                    else
-                    {
-                        auto then_it = sch.find("then");
-                        if (then_it != sch.object_range().end()) 
-                        {
-                            std::string sub_keys[] = { "then" };
-                            subschemas_.emplace_back(make_schema_validator(new_context, then_it->value(), sub_keys));
-                        }
-
-                        auto else_it = sch.find("else");
-                        if (else_it != sch.object_range().end()) 
-                        {
-                            std::string sub_keys[] = { "else" };
-                            subschemas_.emplace_back(make_schema_validator(new_context, else_it->value(), sub_keys));
-                        }
-                    }
-
-                    it = sch.find("unevaluatedProperties"); // must be last
-                    if (it != sch.object_range().end()) 
-                    {
-                        validators.push_back(make_unevaluated_properties_validator(new_context, it->value()));
-                    } 
-
-                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(jsonpointer::json_pointer{},
-                        new_context.get_absolute_uri(),
-                        std::move(validators), std::move(default_value), is_recursive_anchor);
+                    schema_validator_ptr = make_object_schema_validator(evaluation_context{}, new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
 
-                    it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
+                    auto it = sch.find("$anchor"); // If $anchor is found, this schema can be referenced by the id
                     if (it != sch.object_range().end()) 
                     {
                         std::string anchor = it->value().template as<std::string>(); 
@@ -325,6 +203,139 @@ namespace draft201909 {
             //std::cout << "End make_schema_validator " << is_def.size() << "\n";
             
             return schema_validator_ptr;
+        }
+
+
+        schema_validator_type make_object_schema_validator(const evaluation_context& eval_context, 
+            const compilation_context& context, const Json& sch)
+        {
+            Json default_value{ jsoncons::null_type() };
+            std::vector<keyword_validator_type> validators;
+
+            bool is_recursive_anchor = false;
+
+            auto it = sch.find("$recursiveAnchor"); 
+            if (it != sch.object_range().end()) 
+            {
+                is_recursive_anchor = it->value().template as<bool>();
+            }
+
+            it = sch.find("default");
+            if (it != sch.object_range().end()) 
+            {
+                default_value = it->value();
+            }
+
+            it = sch.find("$defs");
+            if (it != sch.object_range().end()) 
+            {
+                //std::cout << "$defs\n";
+                for (const auto& def : it->value().object_range())
+                {
+                    is_def.push(true);
+                    //std::cout << "$defs key:" << def.key() << ", index = " << is_def.size() << "\n";
+                    std::string sub_keys[] = { "$defs", def.key() };
+                    subschemas_.emplace_back(make_schema_validator(context, def.value(), sub_keys));
+                    is_def.pop();
+                }
+            }
+            it = sch.find("definitions");
+            if (it != sch.object_range().end()) 
+            {
+                for (const auto& def : it->value().object_range())
+                {
+                    std::string sub_keys[] = { "definitions", def.key() };
+                    subschemas_.emplace_back(make_schema_validator(context, def.value(), sub_keys));
+                }
+            }
+            it = sch.find("$ref");
+            if (it != sch.object_range().end()) // this schema has a reference
+            {
+                schema_location relative(it->value().template as<std::string>()); 
+                auto id = relative.resolve(context.get_base_uri()); 
+                validators.push_back(get_or_create_reference(id));
+            }
+
+            it = sch.find("$recursiveRef");
+            if (it != sch.object_range().end()) // this schema has a reference
+            {
+                schema_location relative(it->value().template as<std::string>()); 
+                auto base_uri = context.get_base_uri(uri_anchor_flags::recursive_anchor);
+                auto id = relative.resolve(base_uri); // REVISIT
+                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(jsonpointer::json_pointer{}, id.base()));
+            }
+
+            validators.push_back(make_type_validator(context, sch));
+
+
+            it = sch.find("enum");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_enum_validator(context, it->value()));
+            }
+
+            it = sch.find("const");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_const_validator(context, it->value()));
+            }
+
+            it = sch.find("not");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_not_validator(context, it->value()));
+            }
+
+            it = sch.find("allOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_all_of_validator(context, it->value()));
+            }
+
+            it = sch.find("anyOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_any_of_validator(context, it->value()));
+            }
+
+            it = sch.find("oneOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_one_of_validator(context, it->value()));
+            }
+
+            it = sch.find("if");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_conditional_validator(context, it->value(), sch));
+                // sch["if"] is object and has id, can be looked up
+            }
+            else
+            {
+                auto then_it = sch.find("then");
+                if (then_it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "then" };
+                    subschemas_.emplace_back(make_schema_validator(context, then_it->value(), sub_keys));
+                }
+
+                auto else_it = sch.find("else");
+                if (else_it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "else" };
+                    subschemas_.emplace_back(make_schema_validator(context, else_it->value(), sub_keys));
+                }
+            }
+
+            it = sch.find("unevaluatedProperties"); // must be last
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_unevaluated_properties_validator(context, it->value()));
+            } 
+
+            return jsoncons::make_unique<object_schema_validator<Json>>(jsonpointer::json_pointer{},
+                context.get_absolute_uri(),
+                std::move(validators), std::move(default_value), is_recursive_anchor);
         }
 
         void init_type_mapping(std::vector<keyword_validator_type>& type_mapping, const std::string& type,
