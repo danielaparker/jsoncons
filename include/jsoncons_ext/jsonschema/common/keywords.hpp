@@ -1781,7 +1781,7 @@ namespace jsonschema {
             schema_validator_type&& additional_properties,
             std::map<std::string, keyword_validator_type>&& dependent_required,
             std::map<std::string, schema_validator_type>&& dependent_schemas,
-            schema_validator_type&& property_name_validator
+            schema_validator_type&& property_names_validator
         )
             : keyword_validator_base<Json>("object", eval_path, std::move(schema_path)), 
               general_validators_(std::move(general_validators)),
@@ -1792,7 +1792,7 @@ namespace jsonschema {
               additional_properties_(std::move(additional_properties)),
               dependent_required_(std::move(dependent_required)),
               dependent_schemas_(std::move(dependent_schemas)),
-              property_name_validator_(std::move(property_name_validator))
+              property_name_validator_(std::move(property_names_validator))
         {
         }
 
@@ -1836,10 +1836,10 @@ namespace jsonschema {
                 dependent_schemas.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
             }
 
-            schema_validator_type property_name_validator;
+            schema_validator_type property_names_validator;
             if (property_name_validator_)
             {
-                property_name_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
+                property_names_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<legacy_object_validator>(eval_path, this->schema_path(),
@@ -1850,7 +1850,7 @@ namespace jsonschema {
                 std::move(additional_properties),
                 std::move(dependent_required),
                 std::move(dependent_schemas),
-                std::move(property_name_validator));
+                std::move(property_names_validator));
         }
 
     private:
@@ -2557,7 +2557,7 @@ namespace jsonschema {
         pattern_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("patternProperties", eval_path, std::move(schema_path)), 
               pattern_properties_(std::move(pattern_properties))
         {
         }
@@ -2628,7 +2628,7 @@ namespace jsonschema {
             std::unordered_set<std::string>&& properties,
             schema_validator_type&& additional_properties
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("additionalProperties", eval_path, std::move(schema_path)), 
               properties_(std::move(properties)),
               additional_properties_(std::move(additional_properties))
         {
@@ -2719,7 +2719,7 @@ namespace jsonschema {
         dependent_required_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::map<std::string, keyword_validator_type>&& dependent_required
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path), 
+            : keyword_validator_base<Json>("dependentRequired", eval_path, std::move(schema_path), 
               dependent_required_(std::move(dependent_required)))
         {
         }
@@ -2778,7 +2778,7 @@ namespace jsonschema {
         dependent_schemas_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::map<std::string, schema_validator_type>&& dependent_schemas
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path), 
+            : keyword_validator_base<Json>("dependentSchemas", eval_path, std::move(schema_path), 
               dependent_schemas_(std::move(dependent_schemas)))
         {
         }
@@ -2826,7 +2826,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class property_name_validator : public keyword_validator_base<Json>
+    class property_names_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -2834,24 +2834,24 @@ namespace jsonschema {
         schema_validator_type property_name_validator_;
 
     public:
-        property_name_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
-            schema_validator_type&& property_name_validator
+        property_names_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+            schema_validator_type&& property_names_validator
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path), 
-              property_name_validator_(std::move(property_name_validator)))
+            : keyword_validator_base<Json>("propertyNames", eval_path, std::move(schema_path), 
+              property_name_validator_(std::move(property_names_validator)))
         {
         }
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
-            schema_validator_type property_name_validator;
+            schema_validator_type property_names_validator;
             if (property_name_validator_)
             {
-                property_name_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
+                property_names_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
             }
 
-            return jsoncons::make_unique<property_name_validator>(eval_path, this->schema_path(),
-                std::move(property_name_validator));
+            return jsoncons::make_unique<property_names_validator>(eval_path, this->schema_path(),
+                std::move(property_names_validator));
         }
 
     private:
@@ -2896,7 +2896,7 @@ namespace jsonschema {
             std::map<std::string, keyword_validator_type>&& dependent_required,
             std::map<std::string, schema_validator_type>&& dependent_schemas
         )
-            : keyword_validator_base<Json>("object", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("dependencies", eval_path, std::move(schema_path)), 
               dependent_required_(std::move(dependent_required)),
               dependent_schemas_(std::move(dependent_schemas))
         {
