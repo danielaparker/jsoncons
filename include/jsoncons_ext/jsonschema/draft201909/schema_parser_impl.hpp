@@ -204,7 +204,7 @@ namespace draft201909 {
         }
 
 
-        schema_validator_type make_object_schema_validator(const evaluation_context& eval_context, 
+        schema_validator_type make_object_schema_validator(const evaluation_context& /*eval_context*/, 
             const compilation_context& context, const Json& sch)
         {
             Json default_value{ jsoncons::null_type() };
