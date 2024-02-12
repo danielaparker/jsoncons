@@ -1848,18 +1848,6 @@ namespace jsoncons {
                 return os;
             }
 
-            template <class T>
-            T get_with_default(const string_view_type& name, const T& default_value) const
-            {
-                return evaluate().template get_with_default<T>(name,default_value);
-            }
-
-            template <class T = std::basic_string<char_type>>
-            T get_with_default(const string_view_type& name, const char_type* default_value) const
-            {
-                return evaluate().template get_with_default<T>(name,default_value);
-            }
-
             std::basic_string<char_type> to_string() const 
             {
                 return evaluate().to_string();
@@ -1877,6 +1865,21 @@ namespace jsoncons {
 
     #if !defined(JSONCONS_NO_DEPRECATED)
 
+            template <class T>
+            JSONCONS_DEPRECATED_MSG("Instead, use get_value_or")
+            T get_with_default(const string_view_type& name, const T& default_value) const
+            {
+                return evaluate().template get_with_default<T>(name,default_value);
+            }
+
+            template <class T = std::basic_string<char_type>>
+            JSONCONS_DEPRECATED_MSG("Instead, use get_value_or")
+            T get_with_default(const string_view_type& name, const char_type* default_value) const
+            {
+                return evaluate().template get_with_default<T>(name,default_value);
+            }
+
+            JSONCONS_DEPRECATED_MSG("Instead, use get_or_null")
             const basic_json& get_with_default(const string_view_type& name) const
             {
                 return evaluate().at_or_null(name);
@@ -5430,11 +5433,31 @@ namespace jsoncons {
             }
         }
 
+        std::basic_string<char_type> to_string() const noexcept
+        {
+            using string_type2 = std::basic_string<char_type>;
+            string_type2 s;
+            basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type2>> encoder(s);
+            dump(encoder);
+            return s;
+        }
+
+    #if !defined(JSONCONS_NO_DEPRECATED)
+        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
+        basic_json(const byte_string_view& bytes, 
+                   semantic_tag tag, 
+                   const Allocator& alloc = Allocator())
+            : basic_json(byte_string_arg, bytes, tag, alloc)
+        {
+        }
+
         template<class T>
+        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or")
         T get_with_default(const string_view_type& key, const T& default_value) const
         {
             switch (storage_kind())
             {
+                case json_storage_kind::null_value:
                 case json_storage_kind::empty_object_value:
                     return default_value;
                 case json_storage_kind::object_value:
@@ -5459,6 +5482,7 @@ namespace jsoncons {
         }
 
         template<class T = std::basic_string<char_type>>
+        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or")
         T get_with_default(const string_view_type& key, const char_type* default_value) const
         {
             switch (storage_kind())
@@ -5483,24 +5507,6 @@ namespace jsoncons {
                 default:
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
             }
-        }
-
-        std::basic_string<char_type> to_string() const noexcept
-        {
-            using string_type2 = std::basic_string<char_type>;
-            string_type2 s;
-            basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type2>> encoder(s);
-            dump(encoder);
-            return s;
-        }
-
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
-        basic_json(const byte_string_view& bytes, 
-                   semantic_tag tag, 
-                   const Allocator& alloc = Allocator())
-            : basic_json(byte_string_arg, bytes, tag, alloc)
-        {
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
