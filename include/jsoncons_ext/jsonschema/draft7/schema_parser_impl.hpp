@@ -99,12 +99,8 @@ namespace draft7 {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
 
-            Json default_value{jsoncons::null_type()};
             schema_validator_type schema_validator_ptr;
 
-            bool is_ref = false;
-
-            std::vector<keyword_validator_type> validators; 
             switch (sch.type())
             {
                 case json_type::bool_value:
@@ -131,22 +127,7 @@ namespace draft7 {
                 {
                     std::set<std::string> known_keywords;
 
-                    auto it = sch.find("default");
-                    if (it != sch.object_range().end()) 
-                    {
-                        default_value = it->value();
-                        known_keywords.insert("default");
-                    }
-                    it = sch.find("$ref");
-                    if (it != sch.object_range().end()) // this schema is a reference
-                    {
-                        is_ref = true;
-                        schema_location relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(context.get_base_uri()); 
-                        validators.push_back(get_or_create_reference(evaluation_context(eval_context, "$ref"), id));
-                        known_keywords.insert("$ref");
-                    }
-                    it = sch.find("definitions");
+                    auto it = sch.find("definitions");
                     if (it != sch.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
@@ -157,84 +138,23 @@ namespace draft7 {
                         }
                         known_keywords.insert("definitions");
                     }
-                    if (!is_ref)
+                    it = sch.find("$ref");
+                    if (it != sch.object_range().end()) // this schema is a reference
                     {
-                        validators.push_back(make_type_validator(eval_context, new_context, sch, known_keywords));
-
-                        it = sch.find("enum");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_enum_validator(evaluation_context(eval_context, "enum"), new_context, it->value()));
-                            known_keywords.insert("enum");
-                        }
-
-                        it = sch.find("const");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_const_validator(evaluation_context{eval_context, "const"}, new_context, it->value()));
-                            known_keywords.insert("const");
-                        }
-
-                        it = sch.find("not");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_not_validator(evaluation_context{eval_context, "not"}, 
-                                new_context, it->value()));
-                            known_keywords.insert("not");
-                        }
-
-                        it = sch.find("allOf");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_all_of_validator(evaluation_context{eval_context, "allOf"}, new_context, it->value()));
-                            known_keywords.insert("allOf");
-                        }
-
-                        it = sch.find("anyOf");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_any_of_validator(evaluation_context{eval_context, "anyOf"}, new_context, it->value()));
-                            known_keywords.insert("anyOf");
-                        }
-
-                        it = sch.find("oneOf");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_one_of_validator(evaluation_context{eval_context, "oneOf"}, new_context, it->value()));
-                            known_keywords.insert("oneOf");
-                        }
-
-                        it = sch.find("if");
-                        if (it != sch.object_range().end()) 
-                        {
-                            validators.push_back(make_conditional_validator(evaluation_context{eval_context, "if"}, new_context, it->value(), sch));
-                            known_keywords.insert("if");
-                            // sch["if"] is object and has id, can be looked up
-                        }
-                        else
-                        {
-                            auto then_it = sch.find("then");
-                            if (then_it != sch.object_range().end()) 
-                            {
-                                std::string sub_keys[] = { "then" };
-                                subschemas_.emplace_back(make_schema_validator(evaluation_context{eval_context, "then"}, 
-                                    new_context, then_it->value(), sub_keys));
-                                known_keywords.insert("then");
-                            }
-
-                            auto else_it = sch.find("else");
-                            if (else_it != sch.object_range().end()) 
-                            {
-                                std::string sub_keys[] = { "else" };
-                                subschemas_.emplace_back(make_schema_validator(evaluation_context{evaluation_context{eval_context, "else"}, 
-                                    sub_keys}, new_context, else_it->value(), sub_keys));
-                                known_keywords.insert("else");
-                            }
-                        }
+                        std::vector<keyword_validator_type> validators;
+                        Json default_value{ jsoncons::null_type() };
+                        schema_location relative(it->value().template as<std::string>()); 
+                        auto id = relative.resolve(context.get_base_uri()); 
+                        validators.push_back(get_or_create_reference(evaluation_context(eval_context, "$ref"), id));
+                        known_keywords.insert("$ref");
+                        schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
+                            new_context.get_absolute_uri().string(),
+                            std::move(validators), std::move(default_value));
                     }
-                    schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
-                        new_context.get_absolute_uri().string(),
-                        std::move(validators), std::move(default_value));
+                    else
+                    {
+                        schema_validator_ptr = make_object_schema_validator(eval_context, new_context, sch);
+                    }
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
@@ -257,6 +177,97 @@ namespace draft7 {
             return schema_validator_ptr;
         }
 
+        schema_validator_type make_object_schema_validator(const evaluation_context& eval_context, 
+            const compilation_context& context, const Json& sch)
+        {
+            Json default_value{ jsoncons::null_type() };
+            std::vector<keyword_validator_type> validators;
+            std::set<std::string> known_keywords;
+
+            auto it = sch.find("default");
+            if (it != sch.object_range().end()) 
+            {
+                default_value = it->value();
+                known_keywords.insert("default");
+            }
+            validators.push_back(make_type_validator(eval_context, context, sch, known_keywords));
+
+            it = sch.find("enum");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_enum_validator(evaluation_context(eval_context, "enum"), context, it->value()));
+                known_keywords.insert("enum");
+            }
+
+            it = sch.find("const");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_const_validator(evaluation_context{eval_context, "const"}, context, it->value()));
+                known_keywords.insert("const");
+            }
+
+            it = sch.find("not");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_not_validator(evaluation_context{eval_context, "not"}, 
+                    context, it->value()));
+                known_keywords.insert("not");
+            }
+
+            it = sch.find("allOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_all_of_validator(evaluation_context{eval_context, "allOf"}, context, it->value()));
+                known_keywords.insert("allOf");
+            }
+
+            it = sch.find("anyOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_any_of_validator(evaluation_context{eval_context, "anyOf"}, context, it->value()));
+                known_keywords.insert("anyOf");
+            }
+
+            it = sch.find("oneOf");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_one_of_validator(evaluation_context{eval_context, "oneOf"}, context, it->value()));
+                known_keywords.insert("oneOf");
+            }
+
+            it = sch.find("if");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_conditional_validator(evaluation_context{eval_context, "if"}, context, it->value(), sch));
+                known_keywords.insert("if");
+                // sch["if"] is object and has id, can be looked up
+            }
+            else
+            {
+                auto then_it = sch.find("then");
+                if (then_it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "then" };
+                    subschemas_.emplace_back(make_schema_validator(evaluation_context{eval_context, "then"}, 
+                        context, then_it->value(), sub_keys));
+                    known_keywords.insert("then");
+                }
+
+                auto else_it = sch.find("else");
+                if (else_it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "else" };
+                    subschemas_.emplace_back(make_schema_validator(evaluation_context{evaluation_context{eval_context, "else"}, 
+                        sub_keys}, context, else_it->value(), sub_keys));
+                    known_keywords.insert("else");
+                }
+            }
+            
+            return jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
+                context.get_absolute_uri().string(),
+                std::move(validators), std::move(default_value));
+        }
+
         void init_type_mapping(std::vector<keyword_validator_type>& type_mapping, const std::string& type,
             const Json& sch,
             const evaluation_context& eval_context,
@@ -265,7 +276,7 @@ namespace draft7 {
         {
             if (type == "null")
             {
-                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(eval_context, context);
+                type_mapping[(uint8_t)json_type::null_value] = make_null_checker(eval_context, context);
             }
             else if (type == "object")
             {
@@ -302,7 +313,7 @@ namespace draft7 {
             }
             else if (type.empty())
             {
-                type_mapping[(uint8_t)json_type::null_value] = make_null_validator(eval_context, context);
+                type_mapping[(uint8_t)json_type::null_value] = make_null_checker(eval_context, context);
                 type_mapping[(uint8_t)json_type::object_value] = make_object_validator(eval_context, context, sch);
                 type_mapping[(uint8_t)json_type::array_value] = make_array_validator(eval_context, context, sch);
                 type_mapping[(uint8_t)json_type::string_value] = make_string_validator(eval_context, context, sch);
@@ -859,7 +870,7 @@ namespace draft7 {
             return jsoncons::make_unique<number_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
-        std::unique_ptr<null_validator<Json>> make_null_validator(const evaluation_context& eval_context, const compilation_context& context)
+        std::unique_ptr<null_validator<Json>> make_null_checker(const evaluation_context& eval_context, const compilation_context& context)
         {
             uri schema_path = context.make_schema_path_with("null");
             return jsoncons::make_unique<null_validator<Json>>(eval_context.eval_path(), schema_path);
