@@ -655,7 +655,7 @@ namespace draft7 {
             uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
-
+/*
             auto it = sch.find("maxItems");
             if (it != sch.object_range().end()) 
             {
@@ -694,7 +694,7 @@ namespace draft7 {
             {
                 validators.emplace_back(make_contains_validator(evaluation_context{eval_context, "contains"}, context, sch, it->value()));
             }
-
+*/
             return jsoncons::make_unique<array_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
