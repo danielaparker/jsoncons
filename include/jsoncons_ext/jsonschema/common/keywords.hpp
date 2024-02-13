@@ -512,6 +512,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
             if (instance.size() > max_items_)
             {
                 std::string message("Expected maximum item count: " + std::to_string(max_items_));
@@ -560,6 +565,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
             if (instance.size() < min_items_)
             {
                 std::string message("Expected maximum item count: " + std::to_string(min_items_));
@@ -635,6 +645,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json& patch) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
             size_t index = 0;
             auto validator_it = item_validators_.cbegin();
 
@@ -705,6 +720,10 @@ namespace jsonschema {
             error_reporter& reporter,
             Json& patch) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
 
             if (validator_) 
             {
@@ -779,6 +798,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json& patch) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
             size_t index = 0;
             if (items_validator_)
             {
@@ -825,6 +849,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
             if (are_unique_ && !array_has_unique_items(instance))
             {
                 reporter.error(validation_output(this->keyword_name(),
@@ -2114,59 +2143,6 @@ namespace jsonschema {
         }
     };
 
-    // array
-
-    template <class Json>
-    class array_validator : public keyword_validator_base<Json>
-    {
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-
-        std::vector<keyword_validator_type> validators_;
-    public:
-        array_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::vector<keyword_validator_type>&& validators)
-            : keyword_validator_base<Json>("array", eval_path, schema_path), validators_(std::move(validators))
-        {
-        }
-
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
-        {
-            std::vector<keyword_validator_type> validators;
-            for (auto& validator : validators_)
-            {
-                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
-            }
-
-            return jsoncons::make_unique<array_validator>(eval_path, this->schema_path(),
-                std::move(validators));
-        }
-
-    private:
-
-        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
-        {
-            for (auto& validator : validators_)
-            {
-                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-            }
-        }
-
-        void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const final
-        {
-            for (const auto& validator : validators_)
-            {
-                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return;
-                }
-            }
-        }
-    };
-
     template <class Json>
     class conditional_validator : public keyword_validator_base<Json>
     {
@@ -3010,6 +2986,59 @@ namespace jsonschema {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
                     dep.second->validate(instance, pointer, evaluated_properties, reporter, patch); // validate
+                }
+            }
+        }
+    };
+
+    // array
+
+    template <class Json>
+    class array_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+
+        std::vector<keyword_validator_type> validators_;
+    public:
+        array_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::vector<keyword_validator_type>&& validators)
+            : keyword_validator_base<Json>("array", eval_path, schema_path), validators_(std::move(validators))
+        {
+        }
+
+        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        {
+            std::vector<keyword_validator_type> validators;
+            for (auto& validator : validators_)
+            {
+                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
+            }
+
+            return jsoncons::make_unique<array_validator>(eval_path, this->schema_path(),
+                std::move(validators));
+        }
+
+    private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& validator : validators_)
+            {
+                validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            for (const auto& validator : validators_)
+            {
+                validator->validate(instance, instance_location, evaluated_properties, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
                 }
             }
         }

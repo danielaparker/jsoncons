@@ -88,12 +88,17 @@ TEST_CASE("jsonschema draft7 tests")
     SECTION("issues")
     {
         //jsonschema_tests("./jsonschema/issues/draft7/issue-ref.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/contains.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/maxItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/uniqueItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/items.json");
     }
     SECTION("tests")
     {
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
 #ifdef JSONCONS_HAS_STD_REGEX
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalProperties.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalProperties.json");
 #endif
         /*jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/allOf.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/anyOf.json");

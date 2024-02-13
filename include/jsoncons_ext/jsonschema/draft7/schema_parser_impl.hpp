@@ -331,6 +331,47 @@ namespace draft7 {
                 validators.emplace_back(make_property_names_validator(evaluation_context(eval_context, "propertyNames"),
                     context, it->value()));
             }
+
+            // Array validators
+
+            it = sch.find("maxItems");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_max_items_validator(evaluation_context{eval_context, "maxItems"}, context, it->value()));
+            }
+
+            it = sch.find("minItems");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_min_items_validator(evaluation_context{eval_context, "minItems"}, context, it->value()));
+            }
+
+            it = sch.find("uniqueItems");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_unique_items_validator(evaluation_context{eval_context, "uniqueItems"}, context, it->value()));
+            }
+
+            it = sch.find("items");
+            if (it != sch.object_range().end()) 
+            {
+
+                if (it->value().type() == json_type::array_value) 
+                {
+                    validators.emplace_back(make_items_array_validator(evaluation_context{eval_context, "items"}, context, sch, it->value()));
+                } 
+                else if (it->value().type() == json_type::object_value ||
+                           it->value().type() == json_type::bool_value)
+                {
+                    validators.emplace_back(make_items_object_validator(evaluation_context{eval_context, "items"}, context, sch, it->value()));
+                }
+            }
+
+            it = sch.find("contains");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_contains_validator(evaluation_context{eval_context, "contains"}, context, sch, it->value()));
+            }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
                 context.get_absolute_uri(),
