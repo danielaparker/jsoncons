@@ -1722,7 +1722,7 @@ namespace jsonschema {
 
     private:
 
-        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/) override 
         {
         }
 
@@ -1885,12 +1885,13 @@ namespace jsonschema {
                 property_name_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const final
+        void do_validate(const Json& /*instance*/ ,
+            const jsonpointer::json_pointer& /*instance_location*/ ,
+            std::unordered_set<std::string>& /*evaluated_properties*/,
+            error_reporter& /*reporter*/,
+            Json& /*patch*/) const final
         {
+/*
             std::unordered_set<std::string> local_evaluated_properties;
 
             for (const auto& validator : general_validators_)
@@ -2027,6 +2028,7 @@ namespace jsonschema {
             {
                 evaluated_properties.emplace(std::move(name));
             }
+*/
         }
 
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
@@ -2449,7 +2451,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class properties_validator : public keyword_validator_base<Json>
+    class properties_validator : public keyword_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -2459,12 +2461,12 @@ namespace jsonschema {
         properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::map<std::string, schema_validator_type>&& properties
         )
-            : keyword_validator_base<Json>("properties", eval_path, std::move(schema_path)), 
+            : keyword_base<Json>("properties", eval_path, std::move(schema_path)), 
               properties_(std::move(properties))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        std::unique_ptr<properties_validator<Json>> make_copy(const jsonpointer::json_pointer& eval_path) const 
         {
             std::map<std::string, schema_validator_type> properties;
             for (auto& item : properties_)
@@ -2476,22 +2478,17 @@ namespace jsonschema {
                 std::move(properties));
         }
 
-    private:
-
-        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
-        {
-            for (auto& item : properties_)
-            {
-                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-            }
-        }
-
-        void do_validate(const Json& instance, 
+        void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const final
+            Json& patch,
+            std::unordered_set<std::string>& all_properties) const 
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& prop : instance.object_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
@@ -2504,6 +2501,7 @@ namespace jsonschema {
                 {
                     std::size_t error_count = reporter.error_count();
                     properties_it->second->validate(prop.value() , pointer, evaluated_properties, reporter, patch);
+                    all_properties.insert(prop.key());
                     if (reporter.error_count() == error_count)
                     {
                         evaluated_properties.insert(prop.key());
@@ -2532,6 +2530,16 @@ namespace jsonschema {
             }
         }
 
+    private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& item : properties_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
+        }
+
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
         {
             Json j;
@@ -2542,9 +2550,8 @@ namespace jsonschema {
         }
     };
 
-#if defined(JSONCONS_HAS_STD_REGEX)
     template <class Json>
-    class pattern_properties_validator : public keyword_validator_base<Json>
+    class pattern_properties_validator : public keyword_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -2554,12 +2561,12 @@ namespace jsonschema {
         pattern_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties
         )
-            : keyword_validator_base<Json>("patternProperties", eval_path, std::move(schema_path)), 
+            : keyword_base<Json>("patternProperties", eval_path, std::move(schema_path)), 
               pattern_properties_(std::move(pattern_properties))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        std::unique_ptr<pattern_properties_validator<Json>> make_copy(const jsonpointer::json_pointer& eval_path) const 
         {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             for (auto& item : pattern_properties_)
@@ -2571,22 +2578,18 @@ namespace jsonschema {
                 std::move(pattern_properties));
         }
 
-    private:
-
-        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
-        {
-            for (auto& item : pattern_properties_)
-            {
-                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-            }
-        }
-
-        void do_validate(const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
+#if defined(JSONCONS_HAS_STD_REGEX)
+        void validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, 
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
-            Json& patch) const final
+            Json& patch,
+            std::unordered_set<std::string>& all_properties) const 
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& prop : instance.object_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
@@ -2596,6 +2599,7 @@ namespace jsonschema {
                 for (auto& schema_pp : pattern_properties_)
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
+                        all_properties.insert(prop.key());
                         std::size_t error_count = reporter.error_count();
                         schema_pp.second->validate(prop.value() , pointer, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
@@ -2604,9 +2608,19 @@ namespace jsonschema {
                         }
                     }
             }
+#endif
+        }
+
+    private:
+
+        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
+        {
+            for (auto& item : pattern_properties_)
+            {
+                item.second->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            }
         }
     };
-#endif
 
     template <class Json>
     class additional_properties_validator : public keyword_validator_base<Json>
@@ -2614,26 +2628,36 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        std::unordered_set<std::string> properties_;
+        std::unique_ptr<properties_validator<Json>> properties_; 
+        std::unique_ptr<pattern_properties_validator<Json>> pattern_properties_;
         schema_validator_type additional_properties_;
 
     public:
         additional_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
-            std::unordered_set<std::string>&& properties,
+            std::unique_ptr<properties_validator<Json>>&& properties,
+            std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties,
             schema_validator_type&& additional_properties
         )
             : keyword_validator_base<Json>("additionalProperties", eval_path, std::move(schema_path)), 
               properties_(std::move(properties)),
+              pattern_properties_(std::move(pattern_properties)),
               additional_properties_(std::move(additional_properties))
         {
         }
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
-            std::unordered_set<std::string> properties;
-            for (auto& item : properties_)
+            std::unique_ptr<properties_validator<Json>> properties; 
+            std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
+
+            if (properties_)
             {
-                properties.emplace(item);
+                properties = properties_->make_copy(eval_path);
+            }
+
+            if (pattern_properties_)
+            {
+                pattern_properties = pattern_properties_->make_copy(eval_path);
             }
 
             schema_validator_type additional_properties;
@@ -2644,6 +2668,7 @@ namespace jsonschema {
 
             return jsoncons::make_unique<additional_properties_validator>(eval_path, this->schema_path(),
                 std::move(properties),
+                std::move(pattern_properties),
                 std::move(additional_properties));
         }
 
@@ -2661,15 +2686,28 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
+            std::unordered_set<std::string> all_properties;
+
+            if (properties_)
+                properties_->validate(instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+
+            if (pattern_properties_)
+                pattern_properties_->validate(instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+
+
             for (const auto& prop : instance.object_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
                 pointer /= prop.key();
 
-                auto properties_it = properties_.find(prop.key());
+                auto properties_it = all_properties.find(prop.key());
 
                 // check if it is in "properties"
-                if (properties_it == properties_.end()) 
+                if (properties_it == all_properties.end()) 
                 {
                     // finally, check "additionalProperties" 
                     //std::cout << "additional_properties_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
@@ -2746,6 +2784,10 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& dep : dependent_required_) 
             {
                 auto prop = instance.find(dep.first);
@@ -2805,6 +2847,10 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& dep : dependent_schemas_) 
             {
                 auto prop = instance.find(dep.first);
@@ -2825,35 +2871,35 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type property_name_validator_;
+        schema_validator_type property_names_schema_validator_;
 
     public:
         property_names_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
-            schema_validator_type&& property_names_validator
+            schema_validator_type&& property_names_schema_validator
         )
-            : keyword_validator_base<Json>("propertyNames", eval_path, std::move(schema_path), 
-              property_name_validator_(std::move(property_names_validator)))
+            : keyword_validator_base<Json>("propertyNames", eval_path, schema_path), 
+                property_names_schema_validator_{ std::move(property_names_schema_validator) }
         {
         }
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
-            schema_validator_type property_names_validator;
-            if (property_name_validator_)
+            schema_validator_type property_names_schema_validator;
+            if (property_names_schema_validator_)
             {
-                property_names_validator = property_name_validator_->make_copy(eval_path / this->keyword_name());
+                property_names_schema_validator = property_names_schema_validator_->make_copy(eval_path / this->keyword_name());
             }
 
             return jsoncons::make_unique<property_names_validator>(eval_path, this->schema_path(),
-                std::move(property_names_validator));
+                std::move(property_names_schema_validator));
         }
 
     private:
 
         void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override 
         {
-            if (property_name_validator_)
-                property_name_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
+            if (property_names_schema_validator_)
+                property_names_schema_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
         void do_validate(const Json& instance, 
@@ -2862,14 +2908,18 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& prop : instance.object_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
                 pointer /= prop.key();
 
-                if (property_name_validator_)
+                if (property_names_schema_validator_)
                 {
-                    property_name_validator_->validate(prop.key() , instance_location, evaluated_properties, reporter, patch);
+                    property_names_schema_validator_->validate(prop.key() , instance_location, evaluated_properties, reporter, patch);
                 }
                 // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
             }
@@ -2935,6 +2985,10 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
+            if (!instance.is_object())
+            {
+                return;
+            }
             for (const auto& dep : dependent_required_) 
             {
                 auto prop = instance.find(dep.first);

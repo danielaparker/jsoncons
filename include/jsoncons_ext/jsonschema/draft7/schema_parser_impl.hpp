@@ -148,7 +148,7 @@ namespace draft7 {
                         validators.push_back(get_or_create_reference(evaluation_context(eval_context, "$ref"), id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
-                            new_context.get_absolute_uri().string(),
+                            new_context.get_absolute_uri(),
                             std::move(validators), std::move(default_value));
                     }
                     else
@@ -269,25 +269,71 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 auto max_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("maxProperties"), max_properties));
+                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>(eval_context.eval_path(), 
+                    context.make_schema_path_with("maxProperties"), max_properties));
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 auto min_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("minProperties"), min_properties));
+                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>(eval_context.eval_path(), 
+                    context.make_schema_path_with("minProperties"), min_properties));
             }
 
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), context.make_schema_path_with("required"), 
-                    it->value().template as<std::vector<std::string>>()));
+                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>(eval_context.eval_path(), 
+                    context.make_schema_path_with("required"), it->value().template as<std::vector<std::string>>()));
+            }
+
+            std::unique_ptr<properties_validator<Json>> properties;
+            it = sch.find("properties");
+            if (it != sch.object_range().end()) 
+            {
+                properties = make_properties_validator(evaluation_context(eval_context, "properties"),
+                    context, it->value());
+            }
+            std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
+
+    #if defined(JSONCONS_HAS_STD_REGEX)
+            it = sch.find("patternProperties");
+            if (it != sch.object_range().end())
+            {
+                pattern_properties = make_pattern_properties_validator(evaluation_context(eval_context, "patternProperties"),
+                    context, it->value());
+            }
+    #endif
+
+            it = sch.find("additionalProperties");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_additional_properties_validator(evaluation_context(eval_context, "additionalProperties"),
+                    context, it->value(), std::move(properties), std::move(pattern_properties)));
+            }
+            else
+            {
+                validators.emplace_back(make_additional_properties_validator(evaluation_context(eval_context, "additionalProperties"),
+                    context, Json(true), std::move(properties), std::move(pattern_properties)));
+            }
+
+            it = sch.find("dependencies");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_dependencies_validator(evaluation_context(eval_context, "dependencies"),
+                    context, it->value()));
+            }
+
+            auto property_names_it = sch.find("propertyNames");
+            if (property_names_it != sch.object_range().end()) 
+            {
+                validators.emplace_back(make_property_names_validator(evaluation_context(eval_context, "propertyNames"),
+                    context, it->value()));
             }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
-                context.get_absolute_uri().string(),
+                context.get_absolute_uri(),
                 std::move(validators), std::move(default_value));
         }
 
@@ -999,9 +1045,10 @@ namespace draft7 {
             return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(eval_context.eval_path(), std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<legacy_object_validator<Json>> make_legacy_object_validator(const evaluation_context& eval_context, const compilation_context& context, 
-            const Json& sch)
+        std::unique_ptr<legacy_object_validator<Json>> make_legacy_object_validator(const evaluation_context& eval_context, const compilation_context& context,
+            const Json& /*sch*/)
         {
+
             uri schema_path = context.get_absolute_uri();
             std::vector<keyword_validator_type> validators;
             std::map<std::string, schema_validator_type> properties;
@@ -1012,7 +1059,7 @@ namespace draft7 {
             std::map<std::string, keyword_validator_type> dependent_required;
             std::map<std::string, schema_validator_type> dependent_schemas;
             schema_validator_type property_names_validator;
-
+/*
             auto it = sch.find("properties");
             if (it != sch.object_range().end()) 
             {
@@ -1084,7 +1131,7 @@ namespace draft7 {
                 std::string sub_keys[] = {"propertyNames"};
                 property_names_validator = make_schema_validator(evaluation_context{}, context, property_names_it->value(), sub_keys);
             }
-
+*/
             return jsoncons::make_unique<legacy_object_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
                 std::move(validators),
                 std::move(properties),
@@ -1104,20 +1151,12 @@ namespace draft7 {
             uri schema_path = context.get_absolute_uri();
             std::map<std::string, schema_validator_type> properties;
 
-            auto it = sch.find("properties");
-            if (it != sch.object_range().end())
+            for (const auto& prop : sch.object_range())
             {
-                for (const auto& prop : it->value().object_range())
-                {
-                    std::string sub_keys[] =
-                    {"properties", prop.key()};
-                    properties.emplace(
-                                       std::make_pair(
-                                                      prop.key(),
-                                                      make_schema_validator(evaluation_context
-                    {}
-                                                                            , context, prop.value(), sub_keys)));
-                }
+                std::string sub_keys[] =
+                {"properties", prop.key()};
+                properties.emplace(std::make_pair(prop.key(), 
+                    make_schema_validator(eval_context, context, prop.value(), sub_keys)));
             }
 
             return jsoncons::make_unique<properties_validator<Json>>(eval_context.eval_path(),
@@ -1132,17 +1171,13 @@ namespace draft7 {
             uri schema_path = context.get_absolute_uri();
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             
-            auto it = sch.find("patternProperties");
-            if (it != sch.object_range().end()) 
+            for (const auto& prop : sch.object_range())
             {
-                for (const auto& prop : it->value().object_range())
-                {
-                    std::string sub_keys[] = {prop.key()};
-                    pattern_properties.emplace_back(
-                        std::make_pair(
-                            std::regex(prop.key(), std::regex::ECMAScript),
-                            make_schema_validator(evaluation_context{}, context, prop.value(), sub_keys)));
-                }
+                std::string sub_keys[] = {prop.key()};
+                pattern_properties.emplace_back(
+                    std::make_pair(
+                        std::regex(prop.key(), std::regex::ECMAScript),
+                        make_schema_validator(eval_context, context, prop.value(), sub_keys)));
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
@@ -1151,43 +1186,19 @@ namespace draft7 {
 #endif
        
 
-        std::unique_ptr<additional_properties_validator<Json>> make_additional_properties_validator(const evaluation_context& eval_context, const compilation_context& context, 
-            const Json& sch)
+        std::unique_ptr<additional_properties_validator<Json>> make_additional_properties_validator(const evaluation_context& eval_context, 
+            const compilation_context& context, const Json& sch, 
+            std::unique_ptr<properties_validator<Json>>&& properties, std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties)
         {
             uri schema_path = context.get_absolute_uri();
             std::vector<keyword_validator_type> validators;
-            std::unordered_set<std::string> properties;
             schema_validator_type additional_properties;
 
-            auto it = sch.find("properties");
-            if (it != sch.object_range().end()) 
-            {
-                for (const auto& prop : it->value().object_range())
-                {
-                    properties.emplace(prop.key());
-                }
-            }
-
-    #if defined(JSONCONS_HAS_STD_REGEX)
-            it = sch.find("patternProperties");
-            if (it != sch.object_range().end()) 
-            {
-                for (const auto& prop : it->value().object_range())
-                {
-                    properties.emplace(prop.key());
-                }
-            }
-    #endif
-
-            it = sch.find("additionalProperties");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = {"additionalProperties"};
-                additional_properties = make_schema_validator(evaluation_context{eval_context, "additionalProperties"}, context, it->value(), sub_keys);
-            }
+            std::string sub_keys[] = {"additionalProperties"};
+            additional_properties = make_schema_validator(evaluation_context{eval_context, "additionalProperties"}, context, sch, sub_keys);
 
             return jsoncons::make_unique<additional_properties_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
-                std::move(properties),
+                std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
         }
                 
@@ -1199,56 +1210,49 @@ namespace draft7 {
             std::map<std::string, keyword_validator_type> dependent_required;
             std::map<std::string, schema_validator_type> dependent_schemas;
 
-            auto it = sch.find("dependencies");
-            if (it != sch.object_range().end()) 
+            for (const auto& dep : sch.object_range())
             {
-                for (const auto& dep : it->value().object_range())
+                switch (dep.value().type()) 
                 {
-                    switch (dep.value().type()) 
+                    case json_type::array_value:
                     {
-                        case json_type::array_value:
-                        {
-                            auto location = context.make_schema_path_with("dependencies");
-                            dependent_required.emplace(dep.key(), 
-                                make_required_validator(evaluation_context{eval_context, "dependencies"}, compilation_context(nullptr, std::vector<schema_location>{{location}}),
-                                    dep.value().template as<std::vector<std::string>>()));
-                            break;
-                        }
-                        case json_type::object_value:
-                        {
-                            std::string sub_keys[] = {"dependencies"};
-                            dependent_schemas.emplace(dep.key(),
-                                make_schema_validator(evaluation_context{eval_context, "dependencies"}, context, dep.value(), sub_keys));
-                            break;
-                        }
-                        default:
-                        {
-                            break;
-                        }
+                        auto location = context.make_schema_path_with("dependencies");
+                        dependent_required.emplace(dep.key(), 
+                            make_required_validator(evaluation_context{eval_context, "dependencies"}, compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                                dep.value().template as<std::vector<std::string>>()));
+                        break;
+                    }
+                    case json_type::object_value:
+                    {
+                        std::string sub_keys[] = {"dependencies"};
+                        dependent_schemas.emplace(dep.key(),
+                            make_schema_validator(evaluation_context{eval_context, "dependencies"}, context, dep.value(), sub_keys));
+                        break;
+                    }
+                    default:
+                    {
+                        break;
                     }
                 }
             }
+            
 
             return jsoncons::make_unique<dependencies_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
                 std::move(dependent_required), std::move(dependent_schemas));
         }
 
 
-        std::unique_ptr<property_names_validator<Json>> make_property_names_validator(const evaluation_context& eval_context, const compilation_context& context, 
-            const Json& sch)
+        std::unique_ptr<property_names_validator<Json>> make_property_names_validator(const evaluation_context& eval_context, 
+            const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
-            schema_validator_type property_names_validator;
+            schema_validator_type property_names_schema_validator;
 
-            auto property_names_it = sch.find("propertyNames");
-            if (property_names_it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = {"propertyNames"};
-                property_names_validator = make_schema_validator(evaluation_context{}, context, property_names_it->value(), sub_keys);
-            }
+            std::string sub_keys[] = { "propertyNames"};
+            property_names_schema_validator = make_schema_validator(eval_context, context, sch, sub_keys);
 
             return jsoncons::make_unique<property_names_validator<Json>>(eval_context.eval_path(), std::move(schema_path),
-                std::move(property_names_validator));
+                std::move(property_names_schema_validator));
         }
 
         void parse(const Json& sch) override

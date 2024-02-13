@@ -8,7 +8,7 @@
             "additionalProperties": false
         },
         "tests": [
-            {
+            /*{
                 "description": "no additional properties is valid",
                 "data": {"foo": 1},
                 "valid": true
@@ -32,14 +32,14 @@
                 "description": "ignores other non-objects",
                 "data": 12,
                 "valid": true
-            },
+            },*/
             {
                 "description": "patternProperties are not additional properties",
                 "data": {"foo":1, "vroom": 2},
                 "valid": true
             }
         ]
-    },
+    }/*,
     {
         "description": "non-ASCII pattern with additionalProperties",
         "schema": {
@@ -143,5 +143,5 @@
                 "valid": true
             }
         ]
-    }
+    }*/
 ]

@@ -145,6 +145,49 @@ namespace jsonschema {
     };
 
     template <class Json>
+    class keyword_base 
+    {
+        std::string keyword_name_;
+        jsonpointer::json_pointer eval_path_;
+        uri schema_path_;
+    public:
+
+        keyword_base(const std::string& keyword_name, const jsonpointer::json_pointer& eval_path, const uri& schema_path)
+            : keyword_name_(keyword_name), eval_path_(eval_path), schema_path_(schema_path)
+        {
+        }
+
+        virtual ~keyword_base() = default;
+
+        keyword_base(const keyword_base&) = delete;
+        keyword_base(keyword_base&&) = default;
+        keyword_base& operator=(const keyword_base&) = delete;
+        keyword_base& operator=(keyword_base&&) = default;
+
+        const std::string& keyword_name() const 
+        {
+            return keyword_name_;
+        }
+
+        const uri& schema_path() const 
+        {
+            return schema_path_;
+        }
+
+        const jsonpointer::json_pointer& eval_path() const 
+        {
+            return eval_path_;
+        }
+
+        void resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas)
+        {
+            do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
+        }
+    private:
+        virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
+    };
+
+    template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
