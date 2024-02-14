@@ -365,8 +365,8 @@ namespace draft201909 {
                     context, it->value()));
             }
 
-            auto property_names_it = sch.find("propertyNames");
-            if (property_names_it != sch.object_range().end()) 
+            it = sch.find("propertyNames");
+            if (it != sch.object_range().end()) 
             {
                 validators.emplace_back(make_property_names_validator(evaluation_context(eval_context, "propertyNames"),
                     context, it->value()));

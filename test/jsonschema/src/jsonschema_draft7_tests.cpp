@@ -88,28 +88,14 @@ TEST_CASE("jsonschema draft7 tests")
     SECTION("issues")
     {
         //jsonschema_tests("./jsonschema/issues/draft7/issue-ref.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/contains.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/maxItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/uniqueItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/items.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/exclusiveMaximum.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/exclusiveMinimum.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/maximum.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minimum.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/multipleOf.json");
-
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/maxLength.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minLength.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json");
     }
     SECTION("tests")
     {
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
 #ifdef JSONCONS_HAS_STD_REGEX
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalProperties.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalProperties.json");
 #endif
-        /*jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/allOf.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/allOf.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/anyOf.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/boolean_schema.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/const.json");
@@ -178,7 +164,6 @@ TEST_CASE("jsonschema draft7 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri-template.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json");
-        */
     }
 
     SECTION("#417")
