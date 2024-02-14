@@ -378,25 +378,25 @@ namespace draft7 {
             it = sch.find("maximum");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_maximum_integer_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
+                validators.emplace_back(make_maximum_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_minimum_integer_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
+                validators.emplace_back(make_minimum_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_exclusive_maximum_integer_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_exclusive_minimum_integer_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
             }
 
             it = sch.find("multipleOf");
@@ -809,7 +809,7 @@ namespace draft7 {
                 make_schema_validator(evaluation_context{}, context, sch, not_key));
         }
 
-        std::unique_ptr<maximum_validator<Json>> make_maximum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<maximum_validator<Json>> make_maximum_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maximum");
             if (!sch.is_number())
@@ -820,18 +820,7 @@ namespace draft7 {
             return jsoncons::make_unique<maximum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
         }
 
-        std::unique_ptr<maximum_validator<Json>> make_maximum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("maximum");
-            if (!sch.is_number())
-            {
-                std::string message("maximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<maximum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
-        }
-
-        std::unique_ptr<exclusive_maximum_validator<Json>> make_exclusive_maximum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_maximum_validator<Json>> make_exclusive_maximum_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMaximum");
             if (!sch.is_number())
@@ -842,22 +831,11 @@ namespace draft7 {
             return jsoncons::make_unique<exclusive_maximum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
         }
 
-        std::unique_ptr<exclusive_maximum_validator<Json>> make_exclusive_maximum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("exclusiveMaximum");
-            if (!sch.is_number())
-            {
-                std::string message("exclusiveMaximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<exclusive_maximum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
-        }
-
-        std::unique_ptr<minimum_validator<Json>> make_minimum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<minimum_validator<Json>> make_minimum_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("minimum");
 
-            //std::cout << "make_minimum_integer_validator uri: " << context.get_absolute_uri().string() << ", " << schema_path.string() << "\n";
+            //std::cout << "make_minimum_validator uri: " << context.get_absolute_uri().string() << ", " << schema_path.string() << "\n";
                 
             if (!sch.is_number())
             {
@@ -867,29 +845,7 @@ namespace draft7 {
             return jsoncons::make_unique<minimum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
         }
 
-        std::unique_ptr<minimum_validator<Json>> make_minimum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("minimum");
-            if (!sch.is_number())
-            {
-                std::string message("minimum must be an number");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<minimum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
-        }
-
-        std::unique_ptr<exclusive_minimum_validator<Json>> make_exclusive_minimum_integer_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("exclusiveMinimum");
-            if (!sch.is_number())
-            {
-                std::string message("exclusiveMinimum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<exclusive_minimum_validator<Json>>(eval_context.eval_path(), schema_path, sch);
-        }
-
-        std::unique_ptr<exclusive_minimum_validator<Json>> make_exclusive_minimum_number_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<exclusive_minimum_validator<Json>> make_exclusive_minimum_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("exclusiveMinimum");
             if (!sch.is_number())
@@ -912,8 +868,8 @@ namespace draft7 {
             return jsoncons::make_unique<multiple_of_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<integer_validator<Json>> make_integer_validator(const evaluation_context& eval_context, const compilation_context& context, 
-            const Json& sch, std::set<std::string>& keywords) 
+        std::unique_ptr<integer_validator<Json>> make_integer_validator(const evaluation_context& eval_context, const compilation_context& context,
+            const Json& sch, std::set<std::string>& /*keywords*/)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -923,28 +879,28 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_integer_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
+                validators.emplace_back(make_maximum_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_integer_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
+                validators.emplace_back(make_minimum_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_integer_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_integer_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
             }
 
             it = sch.find("multipleOf");
@@ -969,28 +925,28 @@ namespace draft7 {
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("maximum");
-                validators.emplace_back(make_maximum_number_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
+                validators.emplace_back(make_maximum_validator(evaluation_context{eval_context, "maximum"}, context, it->value()));
             }
 
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("minimum");
-                validators.emplace_back(make_minimum_number_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
+                validators.emplace_back(make_minimum_validator(evaluation_context{eval_context, "minimum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMaximum");
-                validators.emplace_back(make_exclusive_maximum_number_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_maximum_validator(evaluation_context{eval_context, "exclusiveMaximum"}, context, it->value()));
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
                 keywords.insert("exclusiveMinimum");
-                validators.emplace_back(make_exclusive_minimum_number_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
+                validators.emplace_back(make_exclusive_minimum_validator(evaluation_context{eval_context, "exclusiveMinimum"}, context, it->value()));
             }
 
             it = sch.find("multipleOf");
