@@ -215,6 +215,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
             if (content_encoding_ == "base64")
             {
                 auto s = instance.template as<jsoncons::string_view>();
@@ -280,6 +285,12 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
+
             if (content_media_type_ == "application/Json")
             {
                 auto sv = instance.as_string_view();
@@ -331,6 +342,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
             if (format_check_ != nullptr) 
             {
                 auto s = instance.template as<std::string>();
@@ -380,6 +396,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
             auto s = instance.template as<std::string>();
             if (!std::regex_search(s, regex_))
             {
@@ -463,6 +484,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length > max_length_)
@@ -917,6 +943,11 @@ namespace jsonschema {
             error_reporter& reporter,
             Json&) const final
         {
+            if (!instance.is_string())
+            {
+                return;
+            }
+
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length < min_length_) 

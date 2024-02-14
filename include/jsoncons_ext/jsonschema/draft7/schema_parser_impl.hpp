@@ -404,6 +404,48 @@ namespace draft7 {
             {
                 validators.emplace_back(make_multiple_of_validator(evaluation_context{eval_context, "multipleOf"}, context, it->value()));
             }
+
+            // string validators
+
+            it = sch.find("maxLength");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_max_length_validator(evaluation_context{eval_context, "maxLength"}, context, it->value()));
+            }
+
+            it = sch.find("minLength");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_min_length_validator(evaluation_context{eval_context, "minLength"}, context, it->value()));
+            }
+
+            it = sch.find("contentEncoding");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_content_encoding_validator(evaluation_context{eval_context, "contentEncoding"}, context, it->value()));
+                // If "contentEncoding" is set to "binary", a Json value
+                // of type json_type::byte_string_value is accepted.
+            }
+
+            it = sch.find("contentMediaType");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_content_media_type_validator(evaluation_context{eval_context, "contentMediaType"}, context, it->value()));
+            }
+
+#if defined(JSONCONS_HAS_STD_REGEX)
+            it = sch.find("pattern");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_pattern_validator(evaluation_context{eval_context, "pattern"}, context, it->value()));
+            }
+#endif
+
+            it = sch.find("format");
+            if (it != sch.object_range().end())
+            {
+                validators.emplace_back(make_format_validator(evaluation_context{eval_context, "format"}, context, it->value()));
+            }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(eval_context.eval_path(),
                 context.get_absolute_uri(),
@@ -528,11 +570,12 @@ namespace draft7 {
             return jsoncons::make_unique<content_encoding_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<string_validator<Json>> make_string_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<string_validator<Json>> make_string_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& /*sch*/)
         {
             uri schema_path = context.get_absolute_uri();
 
             std::vector<keyword_validator_type> validators;
+/*
             auto it = sch.find("maxLength");
             if (it != sch.object_range().end())
             {
@@ -572,7 +615,7 @@ namespace draft7 {
             {
                 validators.emplace_back(make_format_validator(evaluation_context{eval_context, "format"}, context, it->value()));
             }
-
+*/
             return jsoncons::make_unique<string_validator<Json>>(eval_context.eval_path(), schema_path, std::move(validators));
         }
 
@@ -682,7 +725,7 @@ namespace draft7 {
             return jsoncons::make_unique<min_items_validator<Json>>(eval_context.eval_path(), schema_path, value);
         }
 
-        std::unique_ptr<array_validator<Json>> make_array_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& sch)
+        std::unique_ptr<array_validator<Json>> make_array_validator(const evaluation_context& eval_context, const compilation_context& context, const Json& /*sch*/)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -869,7 +912,7 @@ namespace draft7 {
         }
 
         std::unique_ptr<integer_validator<Json>> make_integer_validator(const evaluation_context& eval_context, const compilation_context& context,
-            const Json& sch, std::set<std::string>& /*keywords*/)
+            const Json& /*sch*/, std::set<std::string>& /*keywords*/)
         {
             uri schema_path = context.get_absolute_uri();
 
