@@ -2993,8 +2993,8 @@ namespace jsonschema {
         dependent_required_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::map<std::string, keyword_validator_type>&& dependent_required
         )
-            : keyword_validator_base<Json>("dependentRequired", eval_path, std::move(schema_path), 
-              dependent_required_(std::move(dependent_required)))
+            : keyword_validator_base<Json>("dependentRequired", eval_path, std::move(schema_path)), 
+              dependent_required_(std::move(dependent_required))
         {
         }
 
@@ -3056,8 +3056,8 @@ namespace jsonschema {
         dependent_schemas_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::map<std::string, schema_validator_type>&& dependent_schemas
         )
-            : keyword_validator_base<Json>("dependentSchemas", eval_path, std::move(schema_path), 
-              dependent_schemas_(std::move(dependent_schemas)))
+            : keyword_validator_base<Json>("dependentSchemas", eval_path, std::move(schema_path)), 
+              dependent_schemas_(std::move(dependent_schemas))
         {
         }
 
