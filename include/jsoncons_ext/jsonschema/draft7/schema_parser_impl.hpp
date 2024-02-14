@@ -190,7 +190,12 @@ namespace draft7 {
                 default_value = it->value();
                 known_keywords.insert("default");
             }
-            validators.push_back(make_type_validator(eval_context, context, sch, known_keywords));
+            it = sch.find("type");
+            if (it != sch.object_range().end()) 
+            {
+                validators.push_back(make_type_validator(evaluation_context(eval_context, "type"), context, it->value()));
+                known_keywords.insert("type");
+            }
 
             it = sch.find("enum");
             if (it != sch.object_range().end()) 
@@ -513,7 +518,7 @@ namespace draft7 {
             }
         }
 
-        std::unique_ptr<type_validator<Json>> make_type_validator(const evaluation_context& eval_context, const compilation_context& context, 
+        std::unique_ptr<legacy_type_validator<Json>> make_legacy_type_validator(const evaluation_context& eval_context, const compilation_context& context, 
             const Json& sch, std::set<std::string> known_keywords)
         {
             std::string schema_path = context.get_absolute_uri().string();
@@ -553,8 +558,95 @@ namespace draft7 {
                 }
             }
 
-            return jsoncons::make_unique<type_validator<Json>>(eval_context.eval_path(), std::move(schema_path), 
+            return jsoncons::make_unique<legacy_type_validator<Json>>(eval_context.eval_path(), std::move(schema_path), 
                 std::move(type_mapping), std::move(expected_types)
+         );
+        }
+
+        std::unique_ptr<type_validator<Json>> make_type_validator(const evaluation_context& eval_context, const compilation_context& context, 
+            const Json& sch)
+        {
+            std::string schema_path = context.get_absolute_uri().string();
+            std::vector<json_schema_type> expected_types;
+
+            switch (sch.type()) 
+            { 
+                case json_type::string_value: 
+                {
+                    auto type = sch.template as<std::string>();
+                    if (type == "null")
+                    {
+                        expected_types.push_back(json_schema_type::null);
+                    }
+                    else if (type == "object")
+                    {
+                        expected_types.push_back(json_schema_type::object);
+                    }
+                    else if (type == "array")
+                    {
+                        expected_types.push_back(json_schema_type::array);
+                    }
+                    else if (type == "string")
+                    {
+                        expected_types.push_back(json_schema_type::string);
+                    }
+                    else if (type == "boolean")
+                    {
+                        expected_types.push_back(json_schema_type::boolean);
+                    }
+                    else if (type == "integer")
+                    {
+                        expected_types.push_back(json_schema_type::integer);
+                    }
+                    else if (type == "number")
+                    {
+                        expected_types.push_back(json_schema_type::number);
+                    }
+                    break;
+                } 
+
+                case json_type::array_value: // "type": ["type1", "type2"]
+                {
+                    for (const auto& item : sch.array_range())
+                    {
+                        auto type = item.template as<std::string>();
+                        if (type == "null")
+                        {
+                            expected_types.push_back(json_schema_type::null);
+                        }
+                        else if (type == "object")
+                        {
+                            expected_types.push_back(json_schema_type::object);
+                        }
+                        else if (type == "array")
+                        {
+                            expected_types.push_back(json_schema_type::array);
+                        }
+                        else if (type == "string")
+                        {
+                            expected_types.push_back(json_schema_type::string);
+                        }
+                        else if (type == "boolean")
+                        {
+                            expected_types.push_back(json_schema_type::boolean);
+                        }
+                        else if (type == "integer")
+                        {
+                            expected_types.push_back(json_schema_type::integer);
+                        }
+                        else if (type == "number")
+                        {
+                            expected_types.push_back(json_schema_type::number);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return jsoncons::make_unique<type_validator<Json>>(eval_context.eval_path(), std::move(schema_path), 
+                std::move(expected_types)
          );
         }
 

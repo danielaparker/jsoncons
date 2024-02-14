@@ -2453,7 +2453,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class type_validator : public keyword_validator_base<Json>
+    class legacy_type_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
@@ -2461,12 +2461,12 @@ namespace jsonschema {
         std::vector<std::string> expected_types_;
 
     public:
-        type_validator(const type_validator&) = delete;
-        type_validator& operator=(const type_validator&) = delete;
-        type_validator(type_validator&&) = default;
-        type_validator& operator=(type_validator&&) = default;
+        legacy_type_validator(const legacy_type_validator&) = delete;
+        legacy_type_validator& operator=(const legacy_type_validator&) = delete;
+        legacy_type_validator(legacy_type_validator&&) = default;
+        legacy_type_validator& operator=(legacy_type_validator&&) = default;
 
-        type_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        legacy_type_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
             std::vector<keyword_validator_type>&& type_mapping,
             std::vector<std::string>&& expected_types
  )
@@ -2491,7 +2491,7 @@ namespace jsonschema {
                 }
             }
 
-            return jsoncons::make_unique<type_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<legacy_type_validator>(eval_path, this->schema_path(),
                 std::move(type_mapping), 
                 std::vector<std::string>(expected_types_));
         }
@@ -2535,6 +2535,145 @@ namespace jsonschema {
                             }
                         }
                         ss << expected_types_[i];
+                        //std::cout << ", " << i << ". expected " << expected_types_[i];
+                }
+                ss << ", found " << instance.type();
+
+                reporter.error(validation_output(this->keyword_name(),
+                    this->eval_path(), 
+                    this->schema_path(), 
+                    instance_location.to_uri_fragment(), 
+                    ss.str()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+            //std::cout << "\n";
+        }
+    };
+
+    enum class json_schema_type{null,object,array,string,boolean,integer,number};
+
+    template <class Json>
+    class type_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+
+        std::vector<json_schema_type> expected_types_;
+
+    public:
+        type_validator(const type_validator&) = delete;
+        type_validator& operator=(const type_validator&) = delete;
+        type_validator(type_validator&&) = default;
+        type_validator& operator=(type_validator&&) = default;
+
+        type_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+            std::vector<json_schema_type>&& expected_types)
+            : keyword_validator_base<Json>("type", eval_path, std::move(schema_path)),
+              expected_types_(std::move(expected_types))
+        {
+        }
+
+        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        {
+            return jsoncons::make_unique<type_validator>(eval_path, this->schema_path(),
+                std::vector<json_schema_type>(expected_types_));
+        }
+
+    private:
+
+        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/) override
+        {
+        }
+
+        void do_validate(const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& /*valuated_properties*/,
+            error_reporter& reporter, 
+            Json& /*patch*/) const final
+        {
+            bool is_type_found = false;
+
+            auto end = expected_types_.end();
+            for (auto it = expected_types_.begin(); it != end && !is_type_found; ++it)
+            {
+                switch (*it)
+                {
+                    case json_schema_type::null:
+                        if (instance.is_null()) // OK
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::object:
+                        if (instance.is_object()) // OK
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::array:
+                        if (instance.is_array())  // OK
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::string:  // OK
+                        if (instance.is_string())
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::boolean: // OK
+                        if (instance.is_bool())
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::integer:
+                        if (instance.is_number())
+                        {
+                            if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
+                            {
+                                reporter.error(validation_output(this->keyword_name(),
+                                    this->eval_path(), 
+                                    this->schema_path(), 
+                                    instance_location.to_uri_fragment(), 
+                                    "Instance is not an integer"));
+                                if (reporter.fail_early())
+                                {
+                                    return;
+                                }
+                            }
+                            is_type_found = true;
+                        }
+                        break;
+                    case json_schema_type::number:
+                        if (instance.is_number())
+                        {
+                            is_type_found = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!is_type_found)
+            {
+                std::ostringstream ss;
+                ss << "Expected " << expected_types_.size() << " ";
+                for (std::size_t i = 0; i < expected_types_.size(); ++i)
+                {
+                        if (i > 0)
+                        { 
+                            ss << ", ";
+                            if (i+1 == expected_types_.size())
+                            { 
+                                ss << "or ";
+                            }
+                        }
+                        ss << (int)expected_types_[i];
                         //std::cout << ", " << i << ". expected " << expected_types_[i];
                 }
                 ss << ", found " << instance.type();

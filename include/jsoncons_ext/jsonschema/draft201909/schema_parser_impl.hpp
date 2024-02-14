@@ -263,7 +263,7 @@ namespace draft201909 {
                 validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(jsonpointer::json_pointer{}, id.base()));
             }
 
-            validators.push_back(make_type_validator(context, sch));
+            validators.push_back(make_legacy_type_validator(context, sch));
 
 
             it = sch.find("enum");
@@ -393,7 +393,7 @@ namespace draft201909 {
             }
         }
 
-        std::unique_ptr<type_validator<Json>> make_type_validator(const compilation_context& context,
+        std::unique_ptr<legacy_type_validator<Json>> make_legacy_type_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
@@ -434,7 +434,7 @@ namespace draft201909 {
                 }
             }
 
-            return jsoncons::make_unique<type_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path), 
+            return jsoncons::make_unique<legacy_type_validator<Json>>(jsonpointer::json_pointer{}, std::move(schema_path), 
                 std::move(type_mapping), std::move(expected_types)
          );
         }
