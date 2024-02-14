@@ -1202,16 +1202,18 @@ namespace jsonschema {
         }
     };
 
-    template <class Json,class T>
+    template <class Json>
     class maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        T value_;
+        Json value_;
+        std::string message_;
 
     public:
-        maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, T value)
-            : keyword_validator_base<Json>("maximum", eval_path, schema_path), value_(value)
+        maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("maximum", eval_path, schema_path), value_(value),
+              message_{" is greater than maximum " + value.template as<std::string>()}
         {
         }
 
@@ -1232,28 +1234,51 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final 
         {
-            T value = instance.template as<T>(); 
-            if (value > value_)
+            switch (instance.type())
             {
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds maximum of " + std::to_string(value_)));
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                {
+                    if (instance.template as<int64_t>() > value_.template as<int64_t>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                case json_type::double_value:
+                {
+                    if (instance.template as<double>() > value_.template as<double>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
     };
 
-    template <class Json,class T>
+    template <class Json>
     class exclusive_maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        T value_;
+        Json value_;
+        std::string message_;
 
     public:
-        exclusive_maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, T value)
-            : keyword_validator_base<Json>("exclusiveMaximum", eval_path, schema_path), value_(value)
+        exclusive_maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("exclusiveMaximum", eval_path, schema_path), value_(value),
+              message_{" is no less than exclusiveMaximum " + value.template as<std::string>()}
         {
         }
 
@@ -1274,28 +1299,51 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final 
         {
-            T value = instance.template as<T>(); 
-            if (value >= value_)
+            switch (instance.type())
             {
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds exclusiveMaximum of " + std::to_string(value_)));
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                {
+                    if (instance.template as<int64_t>() >= value_.template as<int64_t>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                case json_type::double_value:
+                {
+                    if (instance.template as<double>() >= value_.template as<double>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
     };
 
-    template <class Json,class T>
+    template <class Json>
     class minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        T value_;
+        Json value_;
+        std::string message_;
 
     public:
-        minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, T value)
-            : keyword_validator_base<Json>("minimum", eval_path, schema_path), value_(value)
+        minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("minimum", eval_path, schema_path), value_(value),
+              message_{" is less than minimum " + value.template as<std::string>()}
         {
         }
 
@@ -1318,28 +1366,51 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final 
         {
-            T value = instance.template as<T>(); 
-            if (value < value_)
+            switch (instance.type())
             {
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds minimum of " + std::to_string(value_)));
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                {
+                    if (instance.template as<int64_t>() < value_.template as<int64_t>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                case json_type::double_value:
+                {
+                    if (instance.template as<double>() < value_.template as<double>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
     };
 
-    template <class Json,class T>
+    template <class Json>
     class exclusive_minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        T value_;
+        Json value_;
+        std::string message_;
 
     public:
-        exclusive_minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, T value)
-            : keyword_validator_base<Json>("exclusiveMinimum", eval_path, schema_path), value_(value)
+        exclusive_minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("exclusiveMinimum", eval_path, schema_path), value_(value),
+              message_{" is no greater than exclusiveMinimum " + value.template as<std::string>()}
         {
         }
 
@@ -1360,14 +1431,35 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final 
         {
-            T value = instance.template as<T>(); 
-            if (value <= value_)
+            switch (instance.type())
             {
-                reporter.error(validation_output(this->keyword_name(),
-                    this->eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_uri_fragment(), 
-                    instance.template as<std::string>() + " exceeds exclusiveMinimum of " + std::to_string(value_)));
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                {
+                    if (instance.template as<int64_t>() <= value_.template as<int64_t>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                case json_type::double_value:
+                {
+                    if (instance.template as<double>() <= value_.template as<double>())
+                    {
+                        reporter.error(validation_output(this->keyword_name(),
+                            this->eval_path(), 
+                            this->schema_path(), 
+                            instance_location.to_uri_fragment(), 
+                            instance.template as<std::string>() + message_));
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
         }
     };
@@ -1402,6 +1494,10 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json&) const final
         {
+            if (!instance.is_number())
+            {
+                return;
+            }
             double value = instance.template as<double>();
             if (value != 0) // Exclude zero
             {

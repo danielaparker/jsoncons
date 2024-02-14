@@ -93,6 +93,11 @@ TEST_CASE("jsonschema draft7 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minItems.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/uniqueItems.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/items.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/exclusiveMaximum.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/exclusiveMinimum.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/maximum.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/minimum.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/multipleOf.json");
     }
     SECTION("tests")
     {
