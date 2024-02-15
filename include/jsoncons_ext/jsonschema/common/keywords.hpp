@@ -47,38 +47,32 @@ namespace jsonschema {
         schema_validator_type referred_schema_;
 
     public:
-        ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path) 
-            : keyword_validator_base<Json>("$ref", eval_path, schema_path)
+        ref_validator(const uri& schema_path) 
+            : keyword_validator_base<Json>("$ref", schema_path)
         {
-            std::cout << "ref_validator: " << this->eval_path().to_uri_fragment() << "\n"; 
         }
 
-        ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, schema_validator_type&& target)
-            : keyword_validator_base<Json>("$ref", eval_path, schema_path), referred_schema_(std::move(target)) 
+        ref_validator(const uri& schema_path, schema_validator_type&& target)
+            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(std::move(target)) 
         {
-            std::cout << "ref_validator: " << this->eval_path().to_uri_fragment() << ", " << referred_schema_->eval_path() << "\n"; 
         }
 
-        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target->make_copy(this->eval_path()); }
+        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target->make_copy(); }
 
         uri get_base_uri() const
         {
             return this->schema_path();
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const override 
+        keyword_validator_type make_copy() const override 
         {
-            jsonpointer::json_pointer path1{ eval_path };
-            path1.append(this->keyword_name());
-
-            std::cout << "ref_validator " << path1.to_uri_fragment() << "\n";
             schema_validator_type referred_schema;
             if (referred_schema_)
             {
-                referred_schema = referred_schema_->make_copy(path1);
+                referred_schema = referred_schema_->make_copy();
             }
 
-            return jsoncons::make_unique<ref_validator>(path1, referred_schema_->schema_path(), std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(referred_schema_->schema_path(), std::move(referred_schema));
         }
 
     private:
@@ -131,23 +125,23 @@ namespace jsonschema {
         schema_validator_type referred_schema_;
 
     public:
-        recursive_ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path) 
-            : keyword_validator_base<Json>("$recursiveRef", eval_path, schema_path), referred_schema_(nullptr)
+        recursive_ref_validator(const uri& schema_path) 
+            : keyword_validator_base<Json>("$recursiveRef", schema_path), referred_schema_(nullptr)
         {}
 
-        recursive_ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, schema_validator_type&& target)
-            : keyword_validator_base<Json>("$recursiveRef", eval_path, schema_path), referred_schema_(std::move(target)) {}
+        recursive_ref_validator(const uri& schema_path, schema_validator_type&& target)
+            : keyword_validator_base<Json>("$recursiveRef", schema_path), referred_schema_(std::move(target)) {}
 
         uri get_base_uri() const
         {
             return this->schema_path();
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const override 
+        keyword_validator_type make_copy() const override 
         {
             //std::cout << "recursive_ref_validator.make_copy " << ", schema_path: " << this->schema_path().string() << "\n\n";
 
-            return jsoncons::make_unique<recursive_ref_validator>(eval_path, this->schema_path(), referred_schema_ ? referred_schema_->make_copy(eval_path / this->keyword_name()) : nullptr);
+            return jsoncons::make_unique<recursive_ref_validator>(this->schema_path(), referred_schema_ ? referred_schema_->make_copy() : nullptr);
         }
 
     private:
@@ -164,7 +158,7 @@ namespace jsonschema {
             {
                 location = relative.resolve(base_uri_);
             }
-            referred_schema_ = schemas.get_schema(location)->make_copy(eval_path / this->keyword_name());
+            referred_schema_ = schemas.get_schema(location)->make_copy();
             referred_schema_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             std::cout << "recursive_ref_validator::do_resolve_recursive_refs location: " << schema_path().string()
                 << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor 
@@ -206,15 +200,15 @@ namespace jsonschema {
         std::string content_encoding_;
 
     public:
-        content_encoding_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const std::string& content_encoding)
-            : keyword_validator_base<Json>("contentEncoding", eval_path, schema_path), 
+        content_encoding_validator(const uri& schema_path, const std::string& content_encoding)
+            : keyword_validator_base<Json>("contentEncoding", schema_path), 
               content_encoding_(content_encoding)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<content_encoding_validator>(eval_path / this->keyword_name(), this->schema_path(), content_encoding_);
+            return jsoncons::make_unique<content_encoding_validator>(this->schema_path(), content_encoding_);
         }
 
     private:
@@ -278,15 +272,15 @@ namespace jsonschema {
         std::string content_media_type_;
 
     public:
-        content_media_type_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const std::string& content_media_type)
-            : keyword_validator_base<Json>("contentMediaType", eval_path, schema_path), 
+        content_media_type_validator(const uri& schema_path, const std::string& content_media_type)
+            : keyword_validator_base<Json>("contentMediaType", schema_path), 
               content_media_type_(content_media_type)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<content_media_type_validator>(eval_path, this->schema_path(), content_media_type_);
+            return jsoncons::make_unique<content_media_type_validator>(this->schema_path(), content_media_type_);
         }
 
     private:
@@ -336,15 +330,15 @@ namespace jsonschema {
         format_checker format_check_;
 
     public:
-        format_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const format_checker& format_check)
-            : keyword_validator_base<Json>("format", eval_path, schema_path), format_check_(format_check)
+        format_validator(const uri& schema_path, const format_checker& format_check)
+            : keyword_validator_base<Json>("format", schema_path), format_check_(format_check)
         {
 
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<format_validator>(eval_path, this->schema_path(), format_check_);
+            return jsoncons::make_unique<format_validator>(this->schema_path(), format_check_);
         }
 
     private:
@@ -389,16 +383,16 @@ namespace jsonschema {
         std::regex regex_;
 
     public:
-        pattern_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        pattern_validator(const uri& schema_path,
             const std::string& pattern_string, const std::regex& regex)
-            : keyword_validator_base<Json>("pattern", eval_path, schema_path), 
+            : keyword_validator_base<Json>("pattern", schema_path), 
               pattern_string_(pattern_string), regex_(regex)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<pattern_validator>(eval_path, this->schema_path(), pattern_string_, regex_);
+            return jsoncons::make_unique<pattern_validator>(this->schema_path(), pattern_string_, regex_);
         }
 
     private:
@@ -447,14 +441,14 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
     public:
-        pattern_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path)
-            : keyword_validator_base<Json>("pattern", eval_path, schema_path)
+        pattern_validator(const uri& schema_path)
+            : keyword_validator_base<Json>("pattern", schema_path)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<pattern_validator>(eval_path, this->schema_path());
+            return jsoncons::make_unique<pattern_validator>(this->schema_path());
         }
 
     private:
@@ -481,14 +475,14 @@ namespace jsonschema {
 
         std::size_t max_length_;
     public:
-        max_length_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t max_length)
-            : keyword_validator_base<Json>("maxLength", eval_path, schema_path), max_length_(max_length)
+        max_length_validator(const uri& schema_path, std::size_t max_length)
+            : keyword_validator_base<Json>("maxLength", schema_path), max_length_(max_length)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<max_length_validator>(eval_path, this->schema_path(), max_length_);
+            return jsoncons::make_unique<max_length_validator>(this->schema_path(), max_length_);
         }
 
     private:
@@ -537,14 +531,14 @@ namespace jsonschema {
 
         std::size_t max_items_;
     public:
-        max_items_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t max_items)
-            : keyword_validator_base<Json>("maxItems", eval_path, schema_path), max_items_(max_items)
+        max_items_validator(const uri& schema_path, std::size_t max_items)
+            : keyword_validator_base<Json>("maxItems", schema_path), max_items_(max_items)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<max_items_validator>(eval_path, this->schema_path(), max_items_);
+            return jsoncons::make_unique<max_items_validator>(this->schema_path(), max_items_);
         }
 
     private:
@@ -592,14 +586,14 @@ namespace jsonschema {
 
         std::size_t min_items_;
     public:
-        min_items_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t min_items)
-            : keyword_validator_base<Json>("minItems", eval_path, schema_path), min_items_(min_items)
+        min_items_validator(const uri& schema_path, std::size_t min_items)
+            : keyword_validator_base<Json>("minItems", schema_path), min_items_(min_items)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<min_items_validator>(eval_path, this->schema_path(), min_items_);
+            return jsoncons::make_unique<min_items_validator>(this->schema_path(), min_items_);
         }
 
     private:
@@ -649,30 +643,30 @@ namespace jsonschema {
         std::vector<schema_validator_type> item_validators_;
         schema_validator_type additional_items_validator_;
     public:
-        items_array_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, 
+        items_array_validator(const uri& schema_path, 
             std::vector<schema_validator_type>&& item_validators,
             schema_validator_type&& additional_items_validator)
-            : keyword_validator_base<Json>("items", eval_path, schema_path), 
+            : keyword_validator_base<Json>("items", schema_path), 
               item_validators_(std::move(item_validators)), 
               additional_items_validator_(std::move(additional_items_validator))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::vector<schema_validator_type> item_validators;
             for (auto& validator : item_validators_)
             {
-                item_validators.push_back(validator->make_copy(eval_path / this->keyword_name()));
+                item_validators.push_back(validator->make_copy());
             }
             schema_validator_type additional_items_validator; 
             
             if (additional_items_validator_)
             {
-                additional_items_validator = additional_items_validator_->make_copy(eval_path / this->keyword_name());
+                additional_items_validator = additional_items_validator_->make_copy();
             }
 
-            return jsoncons::make_unique<items_array_validator>(eval_path, this->schema_path(), std::move(item_validators),
+            return jsoncons::make_unique<items_array_validator>(this->schema_path(), std::move(item_validators),
                 std::move(additional_items_validator));
         }
 
@@ -738,22 +732,22 @@ namespace jsonschema {
 
         schema_validator_type validator_;
     public:
-        contains_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, 
+        contains_validator(const uri& schema_path, 
             schema_validator_type&& validator)
-            : keyword_validator_base<Json>("contains", eval_path, schema_path), 
+            : keyword_validator_base<Json>("contains", schema_path), 
               validator_(std::move(validator))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->make_copy(eval_path / this->keyword_name());
+                validator = validator_->make_copy();
             }
 
-            return jsoncons::make_unique<contains_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<contains_validator>(this->schema_path(),
                 std::move(validator));
         }
 
@@ -819,21 +813,21 @@ namespace jsonschema {
 
         schema_validator_type items_validator_;
     public:
-        items_object_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, 
+        items_object_validator(const uri& schema_path, 
             schema_validator_type&& items_validator)
-            : keyword_validator_base<Json>("items", eval_path, schema_path), 
+            : keyword_validator_base<Json>("items", schema_path), 
               items_validator_(std::move(items_validator))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type items_validator;
             if (items_validator_)
             {
-                items_validator = items_validator_->make_copy(eval_path / this->keyword_name());
+                items_validator = items_validator_->make_copy();
             }
-            return jsoncons::make_unique<items_object_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<items_object_validator>(this->schema_path(),
                 std::move(items_validator));
         }
 
@@ -883,14 +877,14 @@ namespace jsonschema {
 
         bool are_unique_;
     public:
-        unique_items_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, bool are_unique)
-            : keyword_validator_base<Json>("uniqueItems", eval_path, schema_path), are_unique_(are_unique)
+        unique_items_validator(const uri& schema_path, bool are_unique)
+            : keyword_validator_base<Json>("uniqueItems", schema_path), are_unique_(are_unique)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<unique_items_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<unique_items_validator>(this->schema_path(),
                 are_unique_);
         }
 
@@ -953,14 +947,14 @@ namespace jsonschema {
         std::size_t min_length_;
 
     public:
-        min_length_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t min_length)
-            : keyword_validator_base<Json>("minLength", eval_path, schema_path), min_length_(min_length)
+        min_length_validator(const uri& schema_path, std::size_t min_length)
+            : keyword_validator_base<Json>("minLength", schema_path), min_length_(min_length)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<min_length_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<min_length_validator>(this->schema_path(),
                 min_length_);
         }
 
@@ -1012,22 +1006,22 @@ namespace jsonschema {
         schema_validator_type rule_;
 
     public:
-        not_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        not_validator(const uri& schema_path,
             schema_validator_type&& rule)
-            : keyword_validator_base<Json>("not", eval_path, schema_path), 
+            : keyword_validator_base<Json>("not", schema_path), 
               rule_(std::move(rule))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type rule;
             if (rule_)
             {
-                rule = rule_->make_copy(eval_path / this->keyword_name());
+                rule = rule_->make_copy();
             }
 
-            return jsoncons::make_unique<not_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<not_validator>(this->schema_path(),
                 std::move(rule));
         }
 
@@ -1150,29 +1144,23 @@ namespace jsonschema {
         std::vector<schema_validator_type> validators_;
 
     public:
-        combining_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        combining_validator(const uri& schema_path,
              std::vector<schema_validator_type>&& validators)
-            : keyword_validator_base<Json>(Criterion::key(), eval_path, std::move(schema_path)),
+            : keyword_validator_base<Json>(Criterion::key(), std::move(schema_path)),
               validators_(std::move(validators))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::vector<schema_validator_type> validators;
 
-            jsonpointer::json_pointer path1(eval_path);
-            path1.append(this->keyword_name());
-            std::cout << this->keyword_name() << " " << path1.to_uri_fragment() << "\n";
-
             for (std::size_t i = 0; i < validators_.size(); ++i)
             {
-                jsonpointer::json_pointer path2(path1);
-                path2.append(i);
-                validators.emplace_back(validators_[i]->make_copy(path2));
+                validators.emplace_back(validators_[i]->make_copy());
             }
 
-            return jsoncons::make_unique<combining_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<combining_validator>(this->schema_path(),
                 std::move(validators));
         }
 
@@ -1238,15 +1226,15 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
-            : keyword_validator_base<Json>("maximum", eval_path, schema_path), value_(value),
+        maximum_validator(const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("maximum", schema_path), value_(value),
               message_{" is greater than maximum " + value.template as<std::string>()}
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<maximum_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<maximum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1305,15 +1293,15 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        exclusive_maximum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
-            : keyword_validator_base<Json>("exclusiveMaximum", eval_path, schema_path), value_(value),
+        exclusive_maximum_validator(const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("exclusiveMaximum", schema_path), value_(value),
               message_{" is no less than exclusiveMaximum " + value.template as<std::string>()}
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<exclusive_maximum_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<exclusive_maximum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1372,17 +1360,17 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
-            : keyword_validator_base<Json>("minimum", eval_path, schema_path), value_(value),
+        minimum_validator(const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("minimum", schema_path), value_(value),
               message_{" is less than minimum " + value.template as<std::string>()}
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             //std::cout << "make_copy minimum " << this->schema_path().string() << ", resolve: " << this->schema_path().string() << "\n\n"; 
 
-            return jsoncons::make_unique<minimum_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<minimum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1441,15 +1429,15 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        exclusive_minimum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& value)
-            : keyword_validator_base<Json>("exclusiveMinimum", eval_path, schema_path), value_(value),
+        exclusive_minimum_validator(const uri& schema_path, const Json& value)
+            : keyword_validator_base<Json>("exclusiveMinimum", schema_path), value_(value),
               message_{" is no greater than exclusiveMinimum " + value.template as<std::string>()}
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<exclusive_minimum_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<exclusive_minimum_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1507,14 +1495,14 @@ namespace jsonschema {
         double value_;
 
     public:
-        multiple_of_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, double value)
-            : keyword_validator_base<Json>("multipleOf", eval_path, schema_path), value_(value)
+        multiple_of_validator(const uri& schema_path, double value)
+            : keyword_validator_base<Json>("multipleOf", schema_path), value_(value)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<multiple_of_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<multiple_of_validator>(this->schema_path(),
                 value_);
         }
 
@@ -1565,9 +1553,9 @@ namespace jsonschema {
         std::vector<std::string> items_;
 
     public:
-        required_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        required_validator(const uri& schema_path,
             const std::vector<std::string>& items)
-            : keyword_validator_base<Json>("required", eval_path, schema_path), items_(items)
+            : keyword_validator_base<Json>("required", schema_path), items_(items)
         {
         }
 
@@ -1576,9 +1564,9 @@ namespace jsonschema {
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<required_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<required_validator>(this->schema_path(),
                 items_);
         }
 
@@ -1629,14 +1617,14 @@ namespace jsonschema {
 
         std::size_t max_properties_;
     public:
-        max_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t max_properties)
-            : keyword_validator_base<Json>("maxProperties", eval_path, schema_path), max_properties_(max_properties)
+        max_properties_validator(const uri& schema_path, std::size_t max_properties)
+            : keyword_validator_base<Json>("maxProperties", schema_path), max_properties_(max_properties)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<max_properties_validator>(eval_path, this->schema_path(), max_properties_);
+            return jsoncons::make_unique<max_properties_validator>(this->schema_path(), max_properties_);
         }
 
     private:
@@ -1682,14 +1670,14 @@ namespace jsonschema {
 
         std::size_t min_properties_;
     public:
-        min_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, std::size_t min_properties)
-            : keyword_validator_base<Json>("minProperties", eval_path, schema_path), min_properties_(min_properties)
+        min_properties_validator(const uri& schema_path, std::size_t min_properties)
+            : keyword_validator_base<Json>("minProperties", schema_path), min_properties_(min_properties)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<min_properties_validator>(eval_path, this->schema_path(), min_properties_);
+            return jsoncons::make_unique<min_properties_validator>(this->schema_path(), min_properties_);
         }
 
     private:
@@ -1735,22 +1723,22 @@ namespace jsonschema {
         schema_validator_type validator_;
 
     public:
-        unevaluated_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        unevaluated_properties_validator(const uri& schema_path,
             schema_validator_type&& validator
         )
-            : keyword_validator_base<Json>("unevaluatedProperties", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_path)), 
               validator_(std::move(validator))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type validator;
             if (validator_)
             {
-                validator = validator_->make_copy(eval_path / this->keyword_name());
+                validator = validator_->make_copy();
             }
-            return jsoncons::make_unique<unevaluated_properties_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<unevaluated_properties_validator>(this->schema_path(),
                 std::move(validator));
         }
 
@@ -1812,36 +1800,36 @@ namespace jsonschema {
         schema_validator_type else_validator_;
 
     public:
-        conditional_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        conditional_validator(const uri& schema_path,
           schema_validator_type&& if_validator,
           schema_validator_type&& then_validator,
           schema_validator_type&& else_validator
-        ) : keyword_validator_base<Json>("", eval_path, std::move(schema_path)), 
+        ) : keyword_validator_base<Json>("", std::move(schema_path)), 
               if_validator_(std::move(if_validator)), 
               then_validator_(std::move(then_validator)), 
               else_validator_(std::move(else_validator))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type if_validator;
             if (if_validator_)
             {
-                if_validator = if_validator_->make_copy(eval_path / this->keyword_name());
+                if_validator = if_validator_->make_copy();
             }
             schema_validator_type then_validator;
             if (then_validator_)
             {
-                then_validator = then_validator_->make_copy(eval_path / this->keyword_name());
+                then_validator = then_validator_->make_copy();
             }
             schema_validator_type else_validator;
             if (else_validator_)
             {
-                else_validator = else_validator_->make_copy(eval_path / this->keyword_name());
+                else_validator = else_validator_->make_copy();
             }
 
-            return jsoncons::make_unique<conditional_validator>(eval_path, this->schema_path(), 
+            return jsoncons::make_unique<conditional_validator>(this->schema_path(), 
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
 
@@ -1898,14 +1886,14 @@ namespace jsonschema {
         Json value_;
 
     public:
-        enum_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& sch)
-            : keyword_validator_base<Json>("enum", eval_path, schema_path), value_(sch)
+        enum_validator(const uri& schema_path, const Json& sch)
+            : keyword_validator_base<Json>("enum", schema_path), value_(sch)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<enum_validator>(eval_path, this->schema_path(), Json(value_));
+            return jsoncons::make_unique<enum_validator>(this->schema_path(), Json(value_));
         }
 
     private:
@@ -1956,14 +1944,14 @@ namespace jsonschema {
         Json value_;
 
     public:
-        const_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, const Json& sch)
-            : keyword_validator_base<Json>("const", eval_path, schema_path), value_(sch)
+        const_validator(const uri& schema_path, const Json& sch)
+            : keyword_validator_base<Json>("const", schema_path), value_(sch)
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<const_validator>(eval_path, this->schema_path(), Json(value_));
+            return jsoncons::make_unique<const_validator>(this->schema_path(), Json(value_));
         }
 
     private:
@@ -2005,16 +1993,16 @@ namespace jsonschema {
         type_validator(type_validator&&) = default;
         type_validator& operator=(type_validator&&) = default;
 
-        type_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        type_validator(const uri& schema_path,
             std::vector<json_schema_type>&& expected_types)
-            : keyword_validator_base<Json>("type", eval_path, std::move(schema_path)),
+            : keyword_validator_base<Json>("type", std::move(schema_path)),
               expected_types_(std::move(expected_types))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
-            return jsoncons::make_unique<type_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<type_validator>(this->schema_path(),
                 std::vector<json_schema_type>(expected_types_));
         }
 
@@ -2139,28 +2127,24 @@ namespace jsonschema {
 
         std::map<std::string, schema_validator_type> properties_;
     public:
-        properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        properties_validator(const uri& schema_path,
             std::map<std::string, schema_validator_type>&& properties
         )
-            : keyword_base<Json>("properties", eval_path, std::move(schema_path)), 
+            : keyword_base<Json>("properties", std::move(schema_path)), 
               properties_(std::move(properties))
         {
         }
 
-        std::unique_ptr<properties_validator<Json>> make_copy(const jsonpointer::json_pointer& eval_path) const 
+        std::unique_ptr<properties_validator<Json>> make_copy() const 
         {
             std::map<std::string, schema_validator_type> properties;
 
-            jsonpointer::json_pointer path1(eval_path);
-            std::cout << "properties " << path1.to_uri_fragment() << "\n";
-
-            path1.append(this->keyword_name());
             for (const auto& item : properties_)
             {
-                properties.emplace(item.first, item.second->make_copy(path1 / item.first));
+                properties.emplace(item.first, item.second->make_copy());
             }
 
-            return jsoncons::make_unique<properties_validator>(path1, this->schema_path(),
+            return jsoncons::make_unique<properties_validator>(this->schema_path(),
                 std::move(properties));
         }
 
@@ -2250,23 +2234,23 @@ namespace jsonschema {
         std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties_;
 
     public:
-        pattern_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        pattern_properties_validator(const uri& schema_path,
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties
         )
-            : keyword_base<Json>("patternProperties", eval_path, std::move(schema_path)), 
+            : keyword_base<Json>("patternProperties", std::move(schema_path)), 
               pattern_properties_(std::move(pattern_properties))
         {
         }
 
-        std::unique_ptr<pattern_properties_validator<Json>> make_copy(const jsonpointer::json_pointer& eval_path) const 
+        std::unique_ptr<pattern_properties_validator<Json>> make_copy() const 
         {
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             for (auto& item : pattern_properties_)
             {
-                pattern_properties.emplace_back(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                pattern_properties.emplace_back(item.first, item.second->make_copy());
             }
 
-            return jsoncons::make_unique<pattern_properties_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<pattern_properties_validator>(this->schema_path(),
                 std::move(pattern_properties));
         }
 
@@ -2325,40 +2309,40 @@ namespace jsonschema {
         schema_validator_type additional_properties_;
 
     public:
-        additional_properties_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        additional_properties_validator(const uri& schema_path,
             std::unique_ptr<properties_validator<Json>>&& properties,
             std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties,
             schema_validator_type&& additional_properties
         )
-            : keyword_validator_base<Json>("additionalProperties", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("additionalProperties", std::move(schema_path)), 
               properties_(std::move(properties)),
               pattern_properties_(std::move(pattern_properties)),
               additional_properties_(std::move(additional_properties))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::unique_ptr<properties_validator<Json>> properties; 
             std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
 
             if (properties_)
             {
-                properties = properties_->make_copy(eval_path);
+                properties = properties_->make_copy();
             }
 
             if (pattern_properties_)
             {
-                pattern_properties = pattern_properties_->make_copy(eval_path);
+                pattern_properties = pattern_properties_->make_copy();
             }
 
             schema_validator_type additional_properties;
             if (additional_properties_)
             {
-                additional_properties = additional_properties_->make_copy(eval_path / this->keyword_name());
+                additional_properties = additional_properties_->make_copy();
             }
 
-            return jsoncons::make_unique<additional_properties_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<additional_properties_validator>(this->schema_path(),
                 std::move(properties),
                 std::move(pattern_properties),
                 std::move(additional_properties));
@@ -2454,23 +2438,23 @@ namespace jsonschema {
         std::map<std::string, keyword_validator_type> dependent_required_;
 
     public:
-        dependent_required_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        dependent_required_validator(const uri& schema_path,
             std::map<std::string, keyword_validator_type>&& dependent_required
         )
-            : keyword_validator_base<Json>("dependentRequired", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("dependentRequired", std::move(schema_path)), 
               dependent_required_(std::move(dependent_required))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::map<std::string, keyword_validator_type> dependent_required;
             for (auto& item : dependent_required_)
             {
-                dependent_required.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                dependent_required.emplace(item.first, item.second->make_copy());
             }
 
-            return jsoncons::make_unique<dependent_required_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<dependent_required_validator>(this->schema_path(),
                 std::move(dependent_required));
         }
 
@@ -2520,23 +2504,23 @@ namespace jsonschema {
         std::map<std::string, schema_validator_type> dependent_schemas_;
 
     public:
-        dependent_schemas_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        dependent_schemas_validator(const uri& schema_path,
             std::map<std::string, schema_validator_type>&& dependent_schemas
         )
-            : keyword_validator_base<Json>("dependentSchemas", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("dependentSchemas", std::move(schema_path)), 
               dependent_schemas_(std::move(dependent_schemas))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::map<std::string, schema_validator_type> dependent_schemas;
             for (auto& item : dependent_schemas_)
             {
-                dependent_schemas.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                dependent_schemas.emplace(item.first, item.second->make_copy());
             }
 
-            return jsoncons::make_unique<dependent_schemas_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<dependent_schemas_validator>(this->schema_path(),
                 std::move(dependent_schemas));
         }
 
@@ -2586,23 +2570,23 @@ namespace jsonschema {
         schema_validator_type property_names_schema_validator_;
 
     public:
-        property_names_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        property_names_validator(const uri& schema_path,
             schema_validator_type&& property_names_schema_validator
         )
-            : keyword_validator_base<Json>("propertyNames", eval_path, schema_path), 
+            : keyword_validator_base<Json>("propertyNames", schema_path), 
                 property_names_schema_validator_{ std::move(property_names_schema_validator) }
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             schema_validator_type property_names_schema_validator;
             if (property_names_schema_validator_)
             {
-                property_names_schema_validator = property_names_schema_validator_->make_copy(eval_path / this->keyword_name());
+                property_names_schema_validator = property_names_schema_validator_->make_copy();
             }
 
-            return jsoncons::make_unique<property_names_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<property_names_validator>(this->schema_path(),
                 std::move(property_names_schema_validator));
         }
 
@@ -2651,31 +2635,31 @@ namespace jsonschema {
         std::map<std::string, schema_validator_type> dependent_schemas_;
 
     public:
-        dependencies_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path,
+        dependencies_validator(const uri& schema_path,
             std::map<std::string, keyword_validator_type>&& dependent_required,
             std::map<std::string, schema_validator_type>&& dependent_schemas
         )
-            : keyword_validator_base<Json>("dependencies", eval_path, std::move(schema_path)), 
+            : keyword_validator_base<Json>("dependencies", std::move(schema_path)), 
               dependent_required_(std::move(dependent_required)),
               dependent_schemas_(std::move(dependent_schemas))
         {
         }
 
-        keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
+        keyword_validator_type make_copy() const final 
         {
             std::map<std::string, keyword_validator_type> dependent_required;
             for (auto& item : dependent_required_)
             {
-                dependent_required.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                dependent_required.emplace(item.first, item.second->make_copy());
             }
 
             std::map<std::string, schema_validator_type> dependent_schemas;
             for (auto& item : dependent_schemas_)
             {
-                dependent_schemas.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                dependent_schemas.emplace(item.first, item.second->make_copy());
             }
 
-            return jsoncons::make_unique<dependencies_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<dependencies_validator>(this->schema_path(),
                 std::move(dependent_required),
                 std::move(dependent_schemas));
         }
