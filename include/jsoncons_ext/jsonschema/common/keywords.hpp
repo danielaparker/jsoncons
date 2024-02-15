@@ -63,13 +63,17 @@ namespace jsonschema {
 
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const override 
         {
+            jsonpointer::json_pointer path1{ eval_path };
+            path1.append(this->keyword_name());
+
+            std::cout << "ref_validator " << path1.to_uri_fragment() << "\n";
             schema_validator_type referred_schema;
             if (referred_schema_)
             {
-                referred_schema = referred_schema_->make_copy(eval_path / this->keyword_name());
+                referred_schema = referred_schema_->make_copy(path1);
             }
 
-            return jsoncons::make_unique<ref_validator>(eval_path / "$ref", referred_schema_->schema_path(), std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(path1, referred_schema_->schema_path(), std::move(referred_schema));
         }
 
     private:
@@ -1123,9 +1127,16 @@ namespace jsonschema {
         keyword_validator_type make_copy(const jsonpointer::json_pointer& eval_path) const final 
         {
             std::vector<schema_validator_type> validators;
-            for (auto& validator : validators_)
+
+            jsonpointer::json_pointer path1(eval_path);
+            path1.append(this->keyword_name());
+            std::cout << this->keyword_name() << " " << path1.to_uri_fragment() << "\n";
+
+            for (std::size_t i = 0; i < validators_.size(); ++i)
             {
-                validators.emplace_back(validator->make_copy(eval_path / this->keyword_name()));
+                jsonpointer::json_pointer path2(path1);
+                path2.append(i);
+                validators.emplace_back(validators_[i]->make_copy(path2));
             }
 
             return jsoncons::make_unique<combining_validator>(eval_path, this->schema_path(),
@@ -2071,12 +2082,17 @@ namespace jsonschema {
         std::unique_ptr<properties_validator<Json>> make_copy(const jsonpointer::json_pointer& eval_path) const 
         {
             std::map<std::string, schema_validator_type> properties;
-            for (auto& item : properties_)
+
+            jsonpointer::json_pointer path1(eval_path);
+            std::cout << "properties " << path1.to_uri_fragment() << "\n";
+
+            path1.append(this->keyword_name());
+            for (const auto& item : properties_)
             {
-                properties.emplace(item.first, item.second->make_copy(eval_path / this->keyword_name()));
+                properties.emplace(item.first, item.second->make_copy(path1 / item.first));
             }
 
-            return jsoncons::make_unique<properties_validator>(eval_path, this->schema_path(),
+            return jsoncons::make_unique<properties_validator>(path1, this->schema_path(),
                 std::move(properties));
         }
 
@@ -2295,11 +2311,22 @@ namespace jsonschema {
             std::unordered_set<std::string> all_properties;
 
             if (properties_)
+            {
                 properties_->validate(instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
 
             if (pattern_properties_)
+            {
                 pattern_properties_->validate(instance, instance_location, evaluated_properties, reporter, patch, all_properties);
-
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
 
             for (const auto& prop : instance.object_range()) 
             {
