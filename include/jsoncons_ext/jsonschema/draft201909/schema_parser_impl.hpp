@@ -1214,7 +1214,8 @@ namespace draft201909 {
             auto unresolved_it = file.unresolved.find(std::string(uri.fragment()));
             if (unresolved_it != file.unresolved.end()) 
             {
-                unresolved_it->second->set_referred_schema(s->make_copy(unresolved_it->second->eval_path()));
+                //unresolved_it->second->set_referred_schema(s->make_copy(unresolved_it->second->eval_path()));
+                unresolved_it->second->set_referred_schema(s);
                 file.unresolved.erase(unresolved_it);
             }
         }

@@ -49,12 +49,17 @@ namespace jsonschema {
     public:
         ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path) 
             : keyword_validator_base<Json>("$ref", eval_path, schema_path)
-        {}
+        {
+            std::cout << "ref_validator: " << this->eval_path().to_uri_fragment() << "\n"; 
+        }
 
         ref_validator(const jsonpointer::json_pointer& eval_path, const uri& schema_path, schema_validator_type&& target)
-            : keyword_validator_base<Json>("$ref", eval_path, schema_path), referred_schema_(std::move(target)) {}
+            : keyword_validator_base<Json>("$ref", eval_path, schema_path), referred_schema_(std::move(target)) 
+        {
+            std::cout << "ref_validator: " << this->eval_path().to_uri_fragment() << ", " << referred_schema_->eval_path() << "\n"; 
+        }
 
-        void set_referred_schema(schema_validator_type&& target) { referred_schema_ = std::move(target); }
+        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target->make_copy(this->eval_path()); }
 
         uri get_base_uri() const
         {
