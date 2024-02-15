@@ -12,7 +12,6 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <unordered_set>
 
 namespace jsoncons {
