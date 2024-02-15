@@ -1215,7 +1215,7 @@ namespace draft201909 {
                 if (unresolved != file.unresolved.end())
                     subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
-                    file.unknown_keywords.try_emplace(fragment, value);
+                    file.unknown_keywords.emplace(fragment, value);
 
                 // recursively add possible subschemas of unknown keywords
                 if (value.type() == json_type::object_value)
