@@ -100,23 +100,25 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const override
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             if (!referred_schema_)
             {
                 reporter.error(validation_output(this->keyword_name(), 
-                    context.eval_path(),
+                    this_path,
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "Unresolved schema reference " + this->schema_path().string()));
                 return;
             }
 
-            referred_schema_->validate(context, instance, instance_location, evaluated_properties, reporter, patch);
+            referred_schema_->validate(this_path, instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
@@ -170,7 +172,7 @@ namespace jsonschema {
            */
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -180,15 +182,17 @@ namespace jsonschema {
 
             if (referred_schema_ == nullptr)
             {
+                jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                 reporter.error(validation_output(this->keyword_name(), 
-                    context.eval_path(),
+                    this_path,
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "Unresolved schema reference " + this->schema_path().string()));
                 return;
             }
 
-            referred_schema_->validate(context, instance, instance_location, evaluated_properties, reporter, patch);
+            referred_schema_->validate(eval_path, instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
@@ -218,7 +222,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -229,6 +233,8 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             if (content_encoding_ == "base64")
             {
                 auto s = instance.template as<jsoncons::string_view>();
@@ -237,7 +243,7 @@ namespace jsonschema {
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
                     reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(), 
                         instance_location.to_uri_fragment(), 
                         "Content is not a base64 string"));
@@ -250,7 +256,7 @@ namespace jsonschema {
             else if (!content_encoding_.empty())
             {
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(),
                     instance_location.to_uri_fragment(), 
                     "unable to check for contentEncoding '" + content_encoding_ + "'"));
@@ -288,7 +294,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -299,6 +305,7 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
 
             if (content_media_type_ == "application/Json")
             {
@@ -310,7 +317,7 @@ namespace jsonschema {
                 if (ec)
                 {
                     reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(), 
                         instance_location.to_uri_fragment(), 
                         std::string("Content is not JSON: ") + ec.message()));
@@ -345,7 +352,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -358,9 +365,10 @@ namespace jsonschema {
 
             if (format_check_ != nullptr) 
             {
+                jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
                 auto s = instance.template as<std::string>();
 
-                format_check_(context.eval_path(), this->schema_path(), instance_location, s, reporter);
+                format_check_(this_path, this->schema_path(), instance_location, s, reporter);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -399,7 +407,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -410,6 +418,8 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             auto s = instance.template as<std::string>();
             if (!std::regex_search(s, regex_))
             {
@@ -419,7 +429,7 @@ namespace jsonschema {
                 message.append(pattern_string_);
                 message.append("\"");
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(),
                     instance_location.to_uri_fragment(), 
                     std::move(message)));
@@ -487,7 +497,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -498,12 +508,14 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length > max_length_)
             {
                 reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(), 
                         instance_location.to_uri_fragment(), 
                         std::string("Expected maxLength: ") + std::to_string(max_length_)
@@ -541,7 +553,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -552,12 +564,14 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             if (instance.size() > max_items_)
             {
                 std::string message("Expected maximum item count: " + std::to_string(max_items_));
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(),
                         instance_location.to_uri_fragment(), 
                         std::move(message)));
@@ -594,7 +608,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -605,12 +619,14 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             if (instance.size() < min_items_)
             {
                 std::string message("Expected maximum item count: " + std::to_string(min_items_));
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(),
                         instance_location.to_uri_fragment(), 
                         std::move(message)));
@@ -674,7 +690,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
@@ -684,6 +700,8 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
 
             size_t index = 0;
             auto validator_it = item_validators_.cbegin();
@@ -695,13 +713,13 @@ namespace jsonschema {
                 if (validator_it != item_validators_.cend())
                 {
                     pointer /= index++;
-                    (*validator_it)->validate(context, item, pointer, evaluated_properties, reporter, patch);
+                    (*validator_it)->validate(this_path, item, pointer, evaluated_properties, reporter, patch);
                     ++validator_it;
                 }
                 else if (additional_items_validator_ != nullptr)
                 {
                     pointer /= index++;
-                    additional_items_validator_->validate(context, item, pointer, evaluated_properties, reporter, patch);
+                    additional_items_validator_->validate(this_path, item, pointer, evaluated_properties, reporter, patch);
                 }
                 else
                     break;
@@ -749,7 +767,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
@@ -762,12 +780,14 @@ namespace jsonschema {
 
             if (validator_) 
             {
+                jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                 bool contained = false;
                 collecting_error_reporter local_reporter;
                 for (const auto& item : instance.array_range()) 
                 {
                     std::size_t mark = local_reporter.errors.size();
-                    validator_->validate(context, item, instance_location, evaluated_properties, local_reporter, patch);
+                    validator_->validate(this_path, item, instance_location, evaluated_properties, local_reporter, patch);
                     if (mark == local_reporter.errors.size()) 
                     {
                         contained = true;
@@ -777,7 +797,7 @@ namespace jsonschema {
                 if (!contained)
                 {
                     reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(), 
                         instance_location.to_uri_fragment(), 
                         "Expected at least one array item to match \"contains\" schema", 
@@ -827,7 +847,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
@@ -838,6 +858,8 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             size_t index = 0;
             if (items_validator_)
             {
@@ -845,7 +867,7 @@ namespace jsonschema {
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    items_validator_->validate(context, item, pointer, evaluated_properties, reporter, patch);
+                    items_validator_->validate(this_path, item, pointer, evaluated_properties, reporter, patch);
                     index++;
                 }
             }
@@ -878,7 +900,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -889,10 +911,12 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             if (are_unique_ && !array_has_unique_items(instance))
             {
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "Array items are not unique"));
@@ -946,7 +970,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -957,12 +981,14 @@ namespace jsonschema {
                 return;
             }
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             auto sv = instance.as_string_view();
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length < min_length_) 
             {
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     std::string("Expected minLength: ") + std::to_string(min_length_)
@@ -1015,19 +1041,21 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             collecting_error_reporter local_reporter;
-            rule_->validate(context, instance, instance_location, evaluated_properties, local_reporter, patch);
+            rule_->validate(this_path, instance, instance_location, evaluated_properties, local_reporter, patch);
 
             if (local_reporter.errors.empty())
             {
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "Instance must not be valid against schema"));
@@ -1158,7 +1186,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -1170,16 +1198,21 @@ namespace jsonschema {
 
             collecting_error_reporter local_reporter;
 
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             bool is_complete = false;
-            for (auto& s : validators_) 
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
+                jsonpointer::json_pointer item_path{this_path};
+                item_path.append(i);
+
                 std::size_t mark = local_reporter.errors.size();
-                s->validate(context, instance, instance_location, evaluated_properties, local_reporter, patch);
+                validators_[i]->validate(item_path, instance, instance_location, evaluated_properties, local_reporter, patch);
                 if (!is_complete)
                 {
                     if (mark == local_reporter.errors.size())
                         count++;
-                    if (Criterion::is_complete(context.eval_path(), instance, instance_location, reporter, local_reporter, count))
+                    if (Criterion::is_complete(item_path, instance, instance_location, reporter, local_reporter, count))
                         is_complete = true;
                 }
             }
@@ -1187,7 +1220,7 @@ namespace jsonschema {
             if (count == 0)
             {
                 reporter.error(validation_output(Criterion::key(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "No schema matched, but one of them is required to match", 
@@ -1222,12 +1255,14 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
             Json&) const final 
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             switch (instance.type())
             {
                 case json_type::int64_value:
@@ -1236,7 +1271,7 @@ namespace jsonschema {
                     if (instance.template as<int64_t>() > value_.template as<int64_t>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1248,7 +1283,7 @@ namespace jsonschema {
                     if (instance.template as<double>() > value_.template as<double>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1287,12 +1322,14 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
             Json&) const final 
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             switch (instance.type())
             {
                 case json_type::int64_value:
@@ -1301,7 +1338,7 @@ namespace jsonschema {
                     if (instance.template as<int64_t>() >= value_.template as<int64_t>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1313,7 +1350,7 @@ namespace jsonschema {
                     if (instance.template as<double>() >= value_.template as<double>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1354,12 +1391,14 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
             Json&) const final 
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             switch (instance.type())
             {
                 case json_type::int64_value:
@@ -1368,7 +1407,7 @@ namespace jsonschema {
                     if (instance.template as<int64_t>() < value_.template as<int64_t>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1380,7 +1419,7 @@ namespace jsonschema {
                     if (instance.template as<double>() < value_.template as<double>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1419,12 +1458,14 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
             Json&) const final 
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             switch (instance.type())
             {
                 case json_type::int64_value:
@@ -1433,7 +1474,7 @@ namespace jsonschema {
                     if (instance.template as<int64_t>() <= value_.template as<int64_t>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1445,7 +1486,7 @@ namespace jsonschema {
                     if (instance.template as<double>() <= value_.template as<double>())
                     {
                         reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(), 
+                            this_path, 
                             this->schema_path(), 
                             instance_location.to_uri_fragment(), 
                             instance.template as<std::string>() + message_));
@@ -1482,7 +1523,7 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
@@ -1492,13 +1533,15 @@ namespace jsonschema {
             {
                 return;
             }
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             double value = instance.template as<double>();
             if (value != 0) // Exclude zero
             {
                 if (!is_multiple_of(value, static_cast<double>(value_)))
                 {
                     reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(),
                         instance_location.to_uri_fragment(), 
                         instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
@@ -1545,30 +1588,35 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
             Json&) const final
         {
-            if (instance.is_object())
+            if (!instance.is_object())
             {
-                for (const auto& key : items_)
+                return;
+            }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
+            for (const auto& key : items_)
+            {
+                    if(instance.find(key) == instance.object_range().end())
                 {
-                        if(instance.find(key)== instance.object_range().end())
+                        reporter.error(validation_output(this->keyword_name(),
+                                                         this_path,
+                                                         this->schema_path(),
+                                                         instance_location.to_uri_fragment(),
+                                                         "Required property \"" + key + "\" not found"));
+                        if(reporter.fail_early())
                     {
-                            reporter.error(validation_output(this->keyword_name(),
-                                                             context.eval_path(),
-                                                             this->schema_path(),
-                                                             instance_location.to_uri_fragment(),
-                                                             "Required property \"" + key + "\" not found"));
-                            if(reporter.fail_early())
-                        {
-                                return;
-                        }
+                            return;
                     }
                 }
             }
+            
         }
     };
 
@@ -1597,7 +1645,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -1607,10 +1655,12 @@ namespace jsonschema {
             {
                 if (instance.size() > max_properties_)
                 {
+                    jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                     std::string message("Maximum properties: " + std::to_string(max_properties_));
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output(this->keyword_name(),
-                        context.eval_path(), 
+                        this_path, 
                         this->schema_path(), 
                         instance_location.to_uri_fragment(), 
                         std::move(message)));
@@ -1648,7 +1698,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
@@ -1658,10 +1708,12 @@ namespace jsonschema {
             {
                 if (instance.size() < min_properties_)
                 {
+                    jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                     std::string message("Maximum properties: " + std::to_string(min_properties_));
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output(this->keyword_name(),
-                            context.eval_path(),
+                            this_path,
                             this->schema_path(),
                             instance_location.to_uri_fragment(),
                             std::move(message)));
@@ -1712,7 +1764,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -1727,6 +1779,8 @@ namespace jsonschema {
 
             if (validator_)
             {
+                jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                 for (const auto& prop : instance.object_range()) 
                 {
                     auto prop_it = evaluated_properties.find(prop.key());
@@ -1736,7 +1790,7 @@ namespace jsonschema {
                     {
                         
                         std::size_t error_count = reporter.error_count();
-                        validator_->validate(context, prop.value() , instance_location, evaluated_properties, reporter, patch);
+                        validator_->validate(this_path, prop.value() , instance_location, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
                         {
                             evaluated_properties.insert(prop.key());
@@ -1808,26 +1862,27 @@ namespace jsonschema {
                 else_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             }
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
             if (if_validator_) 
             {
                 collecting_error_reporter local_reporter;
 
-                if_validator_->validate(context, instance, instance_location, evaluated_properties, local_reporter, patch);
+                if_validator_->validate(this_path, instance, instance_location, evaluated_properties, local_reporter, patch);
                 if (local_reporter.errors.empty()) 
                 {
                     if (then_validator_)
-                        then_validator_->validate(context, instance, instance_location, evaluated_properties, reporter, patch);
+                        then_validator_->validate(this_path, instance, instance_location, evaluated_properties, reporter, patch);
                 } 
                 else 
                 {
                     if (else_validator_)
-                        else_validator_->validate(context, instance, instance_location, evaluated_properties, reporter, patch);
+                        else_validator_->validate(this_path, instance, instance_location, evaluated_properties, reporter, patch);
                 }
             }
         }
@@ -1858,12 +1913,14 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/)         override 
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
             Json&) const final
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             bool in_range = false;
             for (const auto& item : value_.array_range())
             {
@@ -1877,7 +1934,7 @@ namespace jsonschema {
             if (!in_range)
             {
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     instance.template as<std::string>() + " is not a valid enum value"));
@@ -1914,18 +1971,22 @@ namespace jsonschema {
         void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/) override 
         {
         }
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter,
             Json&) const final
         {
             if (value_ != instance)
+            {
+                jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "Instance is not const"));
+            }
         }
     };
 
@@ -1963,12 +2024,14 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& /*valuated_properties*/,
             error_reporter& reporter, 
             Json& /*patch*/) const final
         {
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             bool is_type_found = false;
 
             auto end = expected_types_.end();
@@ -2012,7 +2075,7 @@ namespace jsonschema {
                             if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
                             {
                                 reporter.error(validation_output(this->keyword_name(),
-                                    context.eval_path(), 
+                                    this_path, 
                                     this->schema_path(), 
                                     instance_location.to_uri_fragment(), 
                                     "Instance is not an integer"));
@@ -2055,7 +2118,7 @@ namespace jsonschema {
                 ss << ", found " << instance.type();
 
                 reporter.error(validation_output(this->keyword_name(),
-                    context.eval_path(), 
+                    this_path, 
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     ss.str()));
@@ -2101,7 +2164,7 @@ namespace jsonschema {
                 std::move(properties));
         }
 
-        void validate(const evaluation_context& context, const Json& instance, 
+        void validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2112,8 +2175,14 @@ namespace jsonschema {
             {
                 return;
             }
+            jsonpointer::json_pointer this_path{eval_path};
+            this_path.append(this->keyword_name());
+
             for (const auto& prop : instance.object_range()) 
             {
+                jsonpointer::json_pointer prop_path{this_path};
+                prop_path.append(prop.key());
+
                 jsonpointer::json_pointer pointer(instance_location);
                 pointer /= prop.key();
 
@@ -2123,7 +2192,7 @@ namespace jsonschema {
                 if (properties_it != properties_.end()) 
                 {
                     std::size_t error_count = reporter.error_count();
-                    properties_it->second->validate(context, prop.value() , pointer, evaluated_properties, reporter, patch);
+                    properties_it->second->validate(prop_path, prop.value() , pointer, evaluated_properties, reporter, patch);
                     all_properties.insert(prop.key());
                     if (reporter.error_count() == error_count)
                     {
@@ -2202,7 +2271,7 @@ namespace jsonschema {
         }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
-        void validate(const evaluation_context& context, const Json& instance, 
+        void validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2224,7 +2293,7 @@ namespace jsonschema {
                     {
                         all_properties.insert(prop.key());
                         std::size_t error_count = reporter.error_count();
-                        schema_pp.second->validate(context, prop.value() , pointer, evaluated_properties, reporter, patch);
+                        schema_pp.second->validate(eval_path, prop.value() , pointer, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
                         {
                             evaluated_properties.insert(prop.key());
@@ -2303,7 +2372,7 @@ namespace jsonschema {
                 additional_properties_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2313,11 +2382,14 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             std::unordered_set<std::string> all_properties;
 
             if (properties_)
             {
-                properties_->validate(context, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+                properties_->validate(this_path, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
                 if (reporter.fail_early())
                 {
                     return;
@@ -2326,7 +2398,7 @@ namespace jsonschema {
 
             if (pattern_properties_)
             {
-                pattern_properties_->validate(context, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+                pattern_properties_->validate(this_path, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
                 if (reporter.fail_early())
                 {
                     return;
@@ -2350,11 +2422,11 @@ namespace jsonschema {
                         //std::cout << " !!!additionalProperties!!!";
                         collecting_error_reporter local_reporter;
 
-                        additional_properties_->validate(context, prop.value() , pointer, evaluated_properties, local_reporter, patch);
+                        additional_properties_->validate(this_path, prop.value() , pointer, evaluated_properties, local_reporter, patch);
                         if (!local_reporter.errors.empty())
                         {
                             reporter.error(validation_output(this->keyword_name(),
-                                context.eval_path(), 
+                                this_path, 
                                 additional_properties_->schema_path().string(),
                                 instance_location.to_uri_fragment(), 
                                 "Additional prop \"" + prop.key() + "\" found but was invalid."));
@@ -2412,7 +2484,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2422,6 +2494,9 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             for (const auto& dep : dependent_required_) 
             {
                 auto prop = instance.find(dep.first);
@@ -2430,7 +2505,7 @@ namespace jsonschema {
                     // if dependency-prop is present in instance
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
-                    dep.second->validate(context, instance, pointer, evaluated_properties, reporter, patch); // validate
+                    dep.second->validate(this_path, instance, pointer, evaluated_properties, reporter, patch); // validate
                 }
             }
         }
@@ -2475,7 +2550,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2485,6 +2560,9 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             for (const auto& dep : dependent_schemas_) 
             {
                 auto prop = instance.find(dep.first);
@@ -2493,7 +2571,7 @@ namespace jsonschema {
                     // if dependency-prop is present in instance
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
-                    dep.second->validate(context, instance, pointer, evaluated_properties, reporter, patch); // validate
+                    dep.second->validate(this_path, instance, pointer, evaluated_properties, reporter, patch); // validate
                 }
             }
         }
@@ -2536,7 +2614,7 @@ namespace jsonschema {
                 property_names_schema_validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2546,6 +2624,9 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             for (const auto& prop : instance.object_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
@@ -2553,7 +2634,7 @@ namespace jsonschema {
 
                 if (property_names_schema_validator_)
                 {
-                    property_names_schema_validator_->validate(context, prop.key() , instance_location, evaluated_properties, reporter, patch);
+                    property_names_schema_validator_->validate(this_path, prop.key() , instance_location, evaluated_properties, reporter, patch);
                 }
                 // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
             }
@@ -2613,7 +2694,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context& context, const Json& instance, 
+        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -2623,6 +2704,9 @@ namespace jsonschema {
             {
                 return;
             }
+
+            jsonpointer::json_pointer this_path = eval_path / this->keyword_name();
+
             for (const auto& dep : dependent_required_) 
             {
                 auto prop = instance.find(dep.first);
@@ -2631,7 +2715,7 @@ namespace jsonschema {
                     // if dependency-prop is present in instance
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
-                    dep.second->validate(context, instance, pointer, evaluated_properties, reporter, patch); // validate
+                    dep.second->validate(this_path, instance, pointer, evaluated_properties, reporter, patch); // validate
                 }
             }
 
@@ -2643,7 +2727,7 @@ namespace jsonschema {
                     // if dependency-prop is present in instance
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= dep.first;
-                    dep.second->validate(context, instance, pointer, evaluated_properties, reporter, patch); // validate
+                    dep.second->validate(this_path, instance, pointer, evaluated_properties, reporter, patch); // validate
                 }
             }
         }

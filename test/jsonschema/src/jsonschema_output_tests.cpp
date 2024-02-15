@@ -15,7 +15,6 @@
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;
 
-#if 0
 TEST_CASE("jsonschema output format tests")
 {
     SECTION("Basic")
@@ -61,6 +60,13 @@ TEST_CASE("jsonschema output format tests")
 
         auto reporter = [](const jsonschema::validation_output& o)
         {
+            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+
+            for (auto& item : o.nested_errors())
+            {
+                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+            }
+/*
             if (o.keyword() == "minItems")
             {
                 CHECK(o.schema_path() == std::string("https://example.com/polygon#/minItems"));
@@ -79,18 +85,19 @@ TEST_CASE("jsonschema output format tests")
             }
             else
             {
-                std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.schema_path() << "\n";
-                for (const auto& nested : o.nested_errors())
-                {
-                    std::cout << "    " << nested.message() << "\n";
-                }
+                //std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.schema_path() << "\n";
+                //for (const auto& nested : o.nested_errors())
+                //{
+                //    std::cout << "    " << nested.message() << "\n";
+                //}
             }
+ */
         };
-        validator.validate(json_pointer{}, instance, reporter);
+        validator.validate(instance, reporter);
 
     }
 }
-#endif
+
 /*
 : Expected minimum item count: 3, found: 2
 /1: Required key "y" not found
@@ -143,7 +150,7 @@ TEST_CASE("jsonschema output format tests 2")
 }
     )");
 
-    SECTION("With ref")
+    /*SECTION("With ref")
     {
 
         json instance = json::parse(R"(
@@ -161,16 +168,16 @@ TEST_CASE("jsonschema output format tests 2")
 
         auto reporter = [](const jsonschema::validation_output& o)
         {
-                std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
 
-                for (auto& item : o.nested_errors())
-                {
-                    std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
-                }
+            for (auto& item : o.nested_errors())
+            {
+                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+            }
         };
         validator.validate(instance, reporter);
 
-    }
+    }*/
 }
 
 /*
