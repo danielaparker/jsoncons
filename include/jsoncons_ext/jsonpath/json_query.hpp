@@ -189,8 +189,8 @@ namespace jsonpath {
 
     // Legacy replace function
     template<class Json, class UnaryCallback>
-    typename std::enable_if<extension_traits::is_unary_function_object<UnaryCallback,Json>::value,void>::type
     JSONCONS_DEPRECATED_MSG("Instead, use json_replace(Json&, const Json::string_view_type&, BinaryCallback)")
+    typename std::enable_if<extension_traits::is_unary_function_object<UnaryCallback,Json>::value,void>::type
     json_replace(Json& root_value, const typename Json::string_view_type& path , UnaryCallback callback)
     {
         using jsonpath_traits_type = jsoncons::jsonpath::legacy_jsonpath_traits<Json, Json&>;
