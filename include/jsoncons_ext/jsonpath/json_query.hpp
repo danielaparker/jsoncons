@@ -185,11 +185,8 @@ namespace jsonpath {
         expr.evaluate(resources, root_value, path_node_type{}, root_value, f, options);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED) 
-
     // Legacy replace function
     template<class Json, class UnaryCallback>
-    JSONCONS_DEPRECATED_MSG("Instead, use json_replace(Json&, const Json::string_view_type&, BinaryCallback)")
     typename std::enable_if<extension_traits::is_unary_function_object<UnaryCallback,Json>::value,void>::type
     json_replace(Json& root_value, const typename Json::string_view_type& path , UnaryCallback callback)
     {
@@ -213,7 +210,6 @@ namespace jsonpath {
         result_options options = result_options::nodups | result_options::path | result_options::sort_descending;
         expr.evaluate(resources, root_value, path_node_type{}, root_value, f, options);
     }
-#endif
 
 } // namespace jsonpath
 } // namespace jsoncons

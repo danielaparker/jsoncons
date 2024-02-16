@@ -197,8 +197,6 @@ __jsonpointer__|&nbsp;|&nbsp;
 &nbsp;|`unflatten_options::object`|`unflatten_options::assume_object`
 &nbsp;|`insert_or_assign`|`add`
 &nbsp;|`insert`|`add_if_absent`
-__jsonpath__|&nbsp;|&nbsp;
-&nbsp;|`json_replace(Json&, const Json::string_view_type&, UnaryCallback`|`json_replace(Json&, const Json::string_view_type&, BinaryCallback`&nbsp;|``|``
 &nbsp;|``|``
 &nbsp;|``|``
 &nbsp;|``|``
