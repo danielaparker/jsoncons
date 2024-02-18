@@ -71,23 +71,85 @@ namespace draft201909 {
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;
 
+        using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, const Json& sch)>;
+
+        std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
+
     public:
         schema_parser_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
 
             : resolver_(resolver)
         {
+            init();
         }
 
         schema_parser_impl(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
         {
+            init();
         }
 
         schema_parser_impl(const schema_parser_impl&) = delete;
         schema_parser_impl& operator=(const schema_parser_impl&) = delete;
         schema_parser_impl(schema_parser_impl&&) = default;
         schema_parser_impl& operator=(schema_parser_impl&&) = default;
+
+        void init()
+        {
+            keyword_factory_map_.emplace("type", 
+                [&](const compilation_context& context, const Json& sch){return make_type_validator(context, sch);});
+            keyword_factory_map_.emplace("contentEncoding", 
+                [&](const compilation_context& context, const Json& sch){return make_content_encoding_validator(context, sch);});
+            keyword_factory_map_.emplace("contentMediaType", 
+                [&](const compilation_context& context, const Json& sch){return make_content_media_type_validator(context, sch);});
+            keyword_factory_map_.emplace("format", 
+                [&](const compilation_context& context, const Json& sch){return make_format_validator(context, sch);});
+#if defined(JSONCONS_HAS_STD_REGEX)
+            keyword_factory_map_.emplace("pattern", 
+                [&](const compilation_context& context, const Json& sch){return make_pattern_validator(context, sch);});
+#endif
+            keyword_factory_map_.emplace("maxLength", 
+                [&](const compilation_context& context, const Json& sch){return make_max_length_validator(context, sch);});
+            keyword_factory_map_.emplace("maxItems", 
+                [&](const compilation_context& context, const Json& sch){return make_max_items_validator(context, sch);});
+            keyword_factory_map_.emplace("minItems", 
+                [&](const compilation_context& context, const Json& sch){return make_min_items_validator(context, sch);});
+            keyword_factory_map_.emplace("contains", 
+                [&](const compilation_context& context, const Json& sch){return make_contains_validator(context, sch);});
+            keyword_factory_map_.emplace("uniqueItems", 
+                [&](const compilation_context& context, const Json& sch){return make_unique_items_validator(context, sch);});
+            keyword_factory_map_.emplace("minLength", 
+                [&](const compilation_context& context, const Json& sch){return make_min_length_validator(context, sch);});
+            keyword_factory_map_.emplace("not", 
+                [&](const compilation_context& context, const Json& sch){return make_not_validator(context, sch);});
+            keyword_factory_map_.emplace("maximum", 
+                [&](const compilation_context& context, const Json& sch){return make_maximum_validator(context, sch);});
+            keyword_factory_map_.emplace("exclusiveMaximum", 
+                [&](const compilation_context& context, const Json& sch){return make_exclusive_maximum_validator(context, sch);});
+            keyword_factory_map_.emplace("minimum", 
+                [&](const compilation_context& context, const Json& sch){return make_minimum_validator(context, sch);});
+            keyword_factory_map_.emplace("exclusiveMinimum", 
+                [&](const compilation_context& context, const Json& sch){return make_exclusive_minimum_validator(context, sch);});
+            keyword_factory_map_.emplace("multipleOf", 
+                [&](const compilation_context& context, const Json& sch){return make_multiple_of_validator(context, sch);});
+            keyword_factory_map_.emplace("const", 
+                [&](const compilation_context& context, const Json& sch){return make_const_validator(context, sch);});
+            keyword_factory_map_.emplace("enum", 
+                [&](const compilation_context& context, const Json& sch){return make_enum_validator(context, sch);});
+            keyword_factory_map_.emplace("allOf", 
+                [&](const compilation_context& context, const Json& sch){return make_all_of_validator(context, sch);});
+            keyword_factory_map_.emplace("anyOf", 
+                [&](const compilation_context& context, const Json& sch){return make_any_of_validator(context, sch);});
+            keyword_factory_map_.emplace("oneOf", 
+                [&](const compilation_context& context, const Json& sch){return make_one_of_validator(context, sch);});
+            keyword_factory_map_.emplace("dependencies", 
+                [&](const compilation_context& context, const Json& sch){return make_dependencies_validator(context, sch);});
+            keyword_factory_map_.emplace("propertyNames", 
+                [&](const compilation_context& context, const Json& sch){return make_property_names_validator(context, sch);});
+            keyword_factory_map_.emplace("required", 
+                [&](const compilation_context& context, const Json& sch){return make_required_validator(context, sch);});
+        }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
         {
@@ -400,7 +462,7 @@ namespace draft201909 {
             it = sch.find("contains");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_contains_validator(context, sch, it->value()));
+                validators.emplace_back(make_contains_validator(context, it->value()));
             }
 
             // integer and number
@@ -694,7 +756,7 @@ namespace draft201909 {
         }
 
         std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
-            const Json& /*parent*/, const Json& sch)
+            const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("contains");
 
@@ -843,13 +905,11 @@ namespace draft201909 {
             return jsoncons::make_unique<enum_validator<Json>>( schema_path, sch);
         }
 
-        std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context,
-            const std::vector<std::string>& items)
+        std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("required");
-            return jsoncons::make_unique<required_validator<Json>>( schema_path, items);
+            return jsoncons::make_unique<required_validator<Json>>( schema_path, sch.template as<std::vector<std::string>>());
         }
-
 
         std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
             const Json& sch_if, const Json& sch)
@@ -999,7 +1059,7 @@ namespace draft201909 {
                         auto location = context.make_schema_path_with("dependencies");
                         dependent_required.emplace(dep.key(), 
                             make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
-                                dep.value().template as<std::vector<std::string>>()));
+                                dep.value()));
                         break;
                     }
                     case json_type::object_value:
@@ -1036,7 +1096,7 @@ namespace draft201909 {
                         auto location = context.make_schema_path_with("dependentRequired");
                         dependent_required.emplace(dep.key(), 
                             make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
-                                dep.value().template as<std::vector<std::string>>()));
+                                dep.value()));
                         break;
                     }
                     default:
