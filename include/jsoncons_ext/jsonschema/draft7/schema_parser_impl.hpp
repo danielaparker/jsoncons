@@ -292,14 +292,6 @@ namespace draft7 {
                     known_keywords.insert("else");
                 }
             }
-/*
-            it = sch.find("required");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>( 
-                    context.make_schema_path_with("required"), it->value()));
-            }
-*/
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
