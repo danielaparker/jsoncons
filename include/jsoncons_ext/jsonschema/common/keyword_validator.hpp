@@ -10,7 +10,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <unordered_set>
 
@@ -75,20 +75,20 @@ namespace jsonschema {
             do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void validate(const jsonpointer::json_pointer& eval_path,
+        void validate(const evaluation_context& eval_context,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const 
         {
-            do_validate(eval_path, instance, instance_location, evaluated_properties, reporter, patch);
+            do_validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch);
         }
 
     private:
         virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
 
-        virtual void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        virtual void do_validate(const evaluation_context& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -235,7 +235,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json&, 
+        void do_validate(const evaluation_context& eval_context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
@@ -244,7 +244,7 @@ namespace jsonschema {
             if (!value_)
             {
                 reporter.error(validation_output("false", 
-                    eval_path,
+                    eval_context.eval_path(),
                     this->schema_path(), 
                     instance_location.to_uri_fragment(), 
                     "False schema always fails"));
@@ -328,7 +328,7 @@ namespace jsonschema {
                      << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        void do_validate(const evaluation_context& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -338,7 +338,7 @@ namespace jsonschema {
 
             for (auto& validator : validators_)
             {
-                validator->validate(eval_path, instance, instance_location, local_evaluated_properties, reporter, patch);
+                validator->validate(eval_context, instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -388,13 +388,13 @@ namespace jsonschema {
             validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const jsonpointer::json_pointer& eval_path, const Json& instance, 
+        void do_validate(const evaluation_context& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,
             Json& patch) const override
         {
-            validator_->validate(eval_path, instance, instance_location, evaluated_properties, reporter, patch);
+            validator_->validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 
