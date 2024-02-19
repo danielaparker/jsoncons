@@ -319,39 +319,6 @@ namespace draft7 {
                 validators.emplace_back(make_additional_properties_validator(context, Json(true), 
                     std::move(properties), std::move(pattern_properties)));
             }
-/*
-            it = sch.find("dependencies");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_dependencies_validator(context, it->value()));
-            }
-
-            it = sch.find("propertyNames");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_property_names_validator(context, it->value()));
-            }
-
-            // Array validators
-
-            it = sch.find("maxItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_max_items_validator(context, it->value()));
-            }
-
-            it = sch.find("minItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_min_items_validator(context, it->value()));
-            }
-
-            it = sch.find("uniqueItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_unique_items_validator(context, it->value()));
-            }
-*/
             it = sch.find("items");
             if (it != sch.object_range().end()) 
             {
@@ -366,87 +333,6 @@ namespace draft7 {
                     validators.emplace_back(make_items_object_validator(context, it->value()));
                 }
             }
-/*
-            it = sch.find("contains");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_contains_validator(context, it->value()));
-            }
-
-            // integer and number
-
-            it = sch.find("maximum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_maximum_validator(context, it->value()));
-            }
-
-            it = sch.find("minimum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_minimum_validator(context, it->value()));
-            }
-
-            it = sch.find("exclusiveMaximum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_exclusive_maximum_validator(context, it->value()));
-            }
-
-            it = sch.find("exclusiveMinimum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_exclusive_minimum_validator(context, it->value()));
-            }
-
-            it = sch.find("multipleOf");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_multiple_of_validator(context, it->value()));
-            }
-
-            // string validators
-
-            it = sch.find("maxLength");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_max_length_validator(context, it->value()));
-            }
-
-            it = sch.find("minLength");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_min_length_validator(context, it->value()));
-            }
-
-            it = sch.find("contentEncoding");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_content_encoding_validator(context, it->value()));
-                // If "contentEncoding" is set to "binary", a Json value
-                // of type json_type::byte_string_value is accepted.
-            }
-
-            it = sch.find("contentMediaType");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_content_media_type_validator(context, it->value()));
-            }
-
-#if defined(JSONCONS_HAS_STD_REGEX)
-            it = sch.find("pattern");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_pattern_validator(context, it->value()));
-            }
-#endif
-
-            it = sch.find("format");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_format_validator(context, it->value()));
-            }
-*/            
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),
                 std::move(validators), std::move(default_value));

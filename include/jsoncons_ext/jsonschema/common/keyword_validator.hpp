@@ -75,7 +75,7 @@ namespace jsonschema {
             do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void validate(const evaluation_context& eval_context,
+        void validate(const evaluation_context<Json>& eval_context,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -88,7 +88,7 @@ namespace jsonschema {
     private:
         virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
 
-        virtual void do_validate(const evaluation_context& eval_context, const Json& instance, 
+        virtual void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
@@ -235,7 +235,7 @@ namespace jsonschema {
         {
         }
 
-        void do_validate(const evaluation_context& eval_context, const Json&, 
+        void do_validate(const evaluation_context<Json>& eval_context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>&, 
             error_reporter& reporter, 
@@ -324,21 +324,25 @@ namespace jsonschema {
                     validator->resolve_recursive_refs(schema_path(), is_recursive_anchor_, schemas);
                 }
             }
-            std::cout << "object_schema_validator location::do_resolve_recursive_refs: " << schema_path().string() << ", " << is_recursive_anchor_
-                     << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
+            //std::cout << "object_schema_validator location::do_resolve_recursive_refs: " << schema_path().string() << ", " << is_recursive_anchor_
+            //         << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
         }
 
-        void do_validate(const evaluation_context& eval_context, const Json& instance, 
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter, 
             Json& patch) const final
         {
+            //std::cout << "object_schema_validator: " << eval_context.eval_path().to_uri_fragment() << " " << instance << "\n\n";
+
             std::unordered_set<std::string> local_evaluated_properties;
 
+            evaluation_context<Json> this_context{eval_context, this};
             for (auto& validator : validators_)
             {
-                validator->validate(eval_context, instance, instance_location, local_evaluated_properties, reporter, patch);
+                //std::cout << "    " << validator->keyword_name() << "\n";
+                validator->validate(this_context, instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -388,7 +392,7 @@ namespace jsonschema {
             validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
         }
 
-        void do_validate(const evaluation_context& eval_context, const Json& instance, 
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             std::unordered_set<std::string>& evaluated_properties, 
             error_reporter& reporter,

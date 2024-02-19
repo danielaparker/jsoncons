@@ -16,9 +16,14 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    template <class Json>
+    class schema_validator;
+
+    template <class Json>
     class evaluation_context
     {
     private:
+        std::vector<const schema_validator<Json>*> dynamic_scope_;
         jsonpointer::json_pointer eval_path_;
     public:
         evaluation_context()
@@ -26,23 +31,34 @@ namespace jsonschema {
         }
 
         evaluation_context(const evaluation_context& other)
+            : dynamic_scope_{other.dynamic_scope_}, eval_path_{other.eval_path_}
         {
-            eval_path_ = other.eval_path_;
         }
 
         evaluation_context(evaluation_context&& other)
+            : dynamic_scope_{std::move(other.dynamic_scope_)}, eval_path_{std::move(other.eval_path_)}
         {
-            eval_path_ = std::move(other.eval_path_);
+        }
+
+        evaluation_context(const evaluation_context& parent, const schema_validator<Json>* validator)
+            : dynamic_scope_{ parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ }
+        {
+            dynamic_scope_.push_back(validator);
         }
 
         evaluation_context(const evaluation_context& parent, const std::string& name)
-            : eval_path_(parent.eval_path() / name)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name)
         {
         }
 
         evaluation_context(const evaluation_context& parent, std::size_t index)
-            : eval_path_(parent.eval_path() / index)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index)
         {
+        }
+
+        const std::vector<const schema_validator<Json>*>& dynamic_scope() const
+        {
+            return dynamic_scope_;
         }
 
         const jsonpointer::json_pointer eval_path() const

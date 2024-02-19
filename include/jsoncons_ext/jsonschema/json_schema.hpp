@@ -47,7 +47,7 @@ namespace jsonschema {
             Json& patch) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(evaluation_context{}, instance, instance_location, evaluated_properties, reporter, patch);
+            root_->validate(evaluation_context<Json>{}, instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 

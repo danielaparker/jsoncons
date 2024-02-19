@@ -149,6 +149,12 @@ namespace draft201909 {
                 [&](const compilation_context& context, const Json& sch){return make_property_names_validator(context, sch);});
             keyword_factory_map_.emplace("required", 
                 [&](const compilation_context& context, const Json& sch){return make_required_validator(context, sch);});
+            keyword_factory_map_.emplace("dependentRequired", 
+                [&](const compilation_context& context, const Json& sch){return make_dependent_required_validator(context, sch);});
+            keyword_factory_map_.emplace("dependentSchemas", 
+                [&](const compilation_context& context, const Json& sch){return make_dependent_schemas_validator(context, sch);});
+            keyword_factory_map_.emplace("unevaluatedProperties", 
+                [&](const compilation_context& context, const Json& sch){return make_unevaluated_properties_validator(context, sch);});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
@@ -255,6 +261,7 @@ namespace draft201909 {
                 default_value = it->value();
                 known_keywords.insert("default");
             }
+
             it = sch.find("$ref");
             if (it != sch.object_range().end()) // this schema has a reference
             {
@@ -267,58 +274,22 @@ namespace draft201909 {
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 schema_location relative(it->value().template as<std::string>()); 
-                auto base_uri = context.get_base_uri(uri_anchor_flags::recursive_anchor);
+                auto base_uri = context.get_base_uri();
                 auto id = relative.resolve(base_uri); // REVISIT
-                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.base()));
+                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
             }
 
-            it = sch.find("type");
-            if (it != sch.object_range().end()) 
+            for (const auto& key_value : sch.object_range())
             {
-                validators.push_back(make_type_validator(context, it->value()));
-                known_keywords.insert("type");
-            }
-
-            it = sch.find("enum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_enum_validator(context, it->value()));
-                known_keywords.insert("enum");
-            }
-
-            it = sch.find("const");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_const_validator(context, it->value()));
-                known_keywords.insert("const");
-            }
-
-            it = sch.find("not");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_not_validator(context, it->value()));
-                known_keywords.insert("not");
-            }
-
-            it = sch.find("allOf");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_all_of_validator(context, it->value()));
-                known_keywords.insert("allOf");
-            }
-
-            it = sch.find("anyOf");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_any_of_validator(context, it->value()));
-                known_keywords.insert("anyOf");
-            }
-
-            it = sch.find("oneOf");
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_one_of_validator(context, it->value()));
-                known_keywords.insert("oneOf");
+                auto factory_it = keyword_factory_map_.find(key_value.key());
+                if (factory_it != keyword_factory_map_.end())
+                {
+                    auto validator = factory_it->second(context, key_value.value());
+                    if (validator)
+                    {   
+                        validators.emplace_back(std::move(validator));
+                    }
+                }
             }
 
             it = sch.find("if");
@@ -349,29 +320,6 @@ namespace draft201909 {
 
             // Object validators
 
-            it = sch.find("maxProperties");
-            if (it != sch.object_range().end()) 
-            {
-                auto max_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<max_properties_validator<Json>>( 
-                    context.make_schema_path_with("maxProperties"), max_properties));
-            }
-
-            it = sch.find("minProperties");
-            if (it != sch.object_range().end()) 
-            {
-                auto min_properties = it->value().template as<std::size_t>();
-                validators.emplace_back(jsoncons::make_unique<min_properties_validator<Json>>( 
-                    context.make_schema_path_with("minProperties"), min_properties));
-            }
-
-            it = sch.find("required");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(jsoncons::make_unique<required_validator<Json>>( 
-                    context.make_schema_path_with("required"), it->value().template as<std::vector<std::string>>()));
-            }
-
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
@@ -400,50 +348,6 @@ namespace draft201909 {
                     std::move(properties), std::move(pattern_properties)));
             }
 
-            it = sch.find("dependencies");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_dependencies_validator(context, it->value()));
-            }
-
-            it = sch.find("dependentRequired");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_dependent_required_validator(context, it->value()));
-            }
-
-            it = sch.find("dependentSchemas");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_dependent_schemas_validator(context, it->value()));
-            }
-
-            it = sch.find("propertyNames");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_property_names_validator(context, it->value()));
-            }
-
-            // Array validators
-
-            it = sch.find("maxItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_max_items_validator(context, it->value()));
-            }
-
-            it = sch.find("minItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_min_items_validator(context, it->value()));
-            }
-
-            it = sch.find("uniqueItems");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_unique_items_validator(context, it->value()));
-            }
-
             it = sch.find("items");
             if (it != sch.object_range().end()) 
             {
@@ -458,92 +362,6 @@ namespace draft201909 {
                     validators.emplace_back(make_items_object_validator(context, sch, it->value()));
                 }
             }
-
-            it = sch.find("contains");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_contains_validator(context, it->value()));
-            }
-
-            // integer and number
-
-            it = sch.find("maximum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_maximum_validator(context, it->value()));
-            }
-
-            it = sch.find("minimum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_minimum_validator(context, it->value()));
-            }
-
-            it = sch.find("exclusiveMaximum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_exclusive_maximum_validator(context, it->value()));
-            }
-
-            it = sch.find("exclusiveMinimum");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_exclusive_minimum_validator(context, it->value()));
-            }
-
-            it = sch.find("multipleOf");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(make_multiple_of_validator(context, it->value()));
-            }
-
-            // string validators
-
-            it = sch.find("maxLength");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_max_length_validator(context, it->value()));
-            }
-
-            it = sch.find("minLength");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_min_length_validator(context, it->value()));
-            }
-
-            it = sch.find("contentEncoding");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_content_encoding_validator(context, it->value()));
-                // If "contentEncoding" is set to "binary", a Json value
-                // of type json_type::byte_string_value is accepted.
-            }
-
-            it = sch.find("contentMediaType");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_content_media_type_validator(context, it->value()));
-            }
-
-#if defined(JSONCONS_HAS_STD_REGEX)
-            it = sch.find("pattern");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_pattern_validator(context, it->value()));
-            }
-#endif
-
-            it = sch.find("format");
-            if (it != sch.object_range().end())
-            {
-                validators.emplace_back(make_format_validator(context, it->value()));
-            }
-
-            it = sch.find("unevaluatedProperties"); // must be last
-            if (it != sch.object_range().end()) 
-            {
-                validators.push_back(make_unevaluated_properties_validator(context, it->value()));
-            } 
             
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),
@@ -955,7 +773,7 @@ namespace draft201909 {
             return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
         }
 
-        std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const compilation_context& context,
+        std::unique_ptr<any_of_validator<Json>> make_any_of_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("anyOf");
@@ -967,7 +785,7 @@ namespace draft201909 {
                 std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<any_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
 
         std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
@@ -1177,7 +995,7 @@ namespace draft201909 {
                 if (it != sch.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
-                    if (sv.find("json-schema.org/draft-07/schema#") == string_view::npos)
+                    if (sv.find("https://json-schema.org/draft/2019-09/schema") == string_view::npos)
                     {
                         std::string message("Unsupported schema version ");
                         message.append(sv.data(), sv.size());
