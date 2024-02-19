@@ -47,7 +47,6 @@ namespace draft7 {
     {
     public:
         using validator_type = std::unique_ptr<validator_base<Json>>;
-        using keyword_validator_wrapper_type = keyword_validator_wrapper<Json>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -1032,19 +1031,15 @@ namespace draft7 {
                     auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
                     file.unknown_keywords.erase(unprocessed_keywords_it);
                     auto orig = jsoncons::make_unique<ref_validator_type>(uri.base(), s.get());
-                    auto p = orig.get();
                     subschemas_.emplace_back(std::move(s));
-                    subschemas_.emplace_back(std::move(orig));
-                    return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
+                    return orig;
                 }
             }
 
             // get or create a ref_validator
             auto orig = jsoncons::make_unique<ref_validator_type>(uri.base());
-            auto p = orig.get();
-            subschemas_.emplace_back(std::move(orig));
-            file.unresolved.emplace_back(std::string(uri.fragment()), p);
-            return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
+            file.unresolved.emplace_back(std::string(uri.fragment()), orig.get());
+            return orig;
         }
 
         subschema_registry& get_or_create_file(const std::string& loc)

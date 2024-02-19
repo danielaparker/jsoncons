@@ -294,43 +294,6 @@ namespace jsonschema {
         }
     };
 
-    // keyword_validator_wrapper
-
-    template <class Json>
-    class keyword_validator_wrapper : public keyword_validator<Json>
-    {
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-        keyword_validator<Json>* validator_;
-    public:
-        keyword_validator_wrapper(keyword_validator<Json>* validator)
-            : validator_(validator)
-        {
-        }
-
-        const std::string& keyword_name() const override
-        {
-            JSONCONS_ASSERT(validator_ != nullptr);
-            return validator_->keyword_name();
-        }
-
-        const uri& schema_path() const override
-        {
-            JSONCONS_ASSERT(validator_ != nullptr);
-            return validator_->schema_path();
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, 
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter,
-            Json& patch) const override
-        {
-            validator_->validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch);
-        }
-    };
-
 } // namespace jsonschema
 } // namespace jsoncons
 

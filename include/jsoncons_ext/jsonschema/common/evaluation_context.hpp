@@ -61,7 +61,7 @@ namespace jsonschema {
             return dynamic_scope_;
         }
 
-        const jsonpointer::json_pointer eval_path() const
+        const jsonpointer::json_pointer& eval_path() const
         {
             return eval_path_;
         }
