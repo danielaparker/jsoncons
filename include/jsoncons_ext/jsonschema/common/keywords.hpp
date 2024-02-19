@@ -44,20 +44,20 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        schema_validator_type referred_schema_;
+        const schema_validator<Json>* referred_schema_;
 
     public:
         ref_validator(const uri& schema_path) 
-            : keyword_validator_base<Json>("$ref", schema_path)
+            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
         {
         }
 
-        ref_validator(const uri& schema_path, schema_validator_type&& target)
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(std::move(target)) 
+        ref_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
+            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
         {
         }
 
-        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target->make_copy(); }
+        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
 
         uri get_base_uri() const
         {
@@ -66,13 +66,7 @@ namespace jsonschema {
 
         keyword_validator_type make_copy() const override 
         {
-            schema_validator_type referred_schema;
-            if (referred_schema_)
-            {
-                referred_schema = referred_schema_->make_copy();
-            }
-
-            return jsoncons::make_unique<ref_validator>(referred_schema_->schema_path(), std::move(referred_schema));
+            return jsoncons::make_unique<ref_validator>(referred_schema_->schema_path(), referred_schema_);
         }
 
     private:
@@ -84,14 +78,14 @@ namespace jsonschema {
 
             JSONCONS_ASSERT(referred_schema_)
 
-            if (has_recursive_anchor)
+            /*if (has_recursive_anchor)
             {
                 referred_schema_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
             }
             else
             {
                 referred_schema_->resolve_recursive_refs(referred_schema_->schema_path(), referred_schema_->is_recursive_anchor(), schemas);
-            }
+            }*/
         }
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 

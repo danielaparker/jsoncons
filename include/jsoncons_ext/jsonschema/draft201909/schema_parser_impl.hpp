@@ -1112,7 +1112,7 @@ namespace draft201909 {
             auto sch = file.schemas.find(std::string(uri.fragment()));
             if (sch != file.schemas.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second->make_copy());
+                return jsoncons::make_unique<ref_validator_type>(uri.base(), sch->second);
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -1128,8 +1128,9 @@ namespace draft201909 {
                     auto &subsch = unprocessed_keywords_it->second; 
                     auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
                     file.unknown_keywords.erase(unprocessed_keywords_it);
-                    auto orig = jsoncons::make_unique<ref_validator_type>(uri.base(), std::move(s));
+                    auto orig = jsoncons::make_unique<ref_validator_type>(uri.base(), s.get());
                     auto p = orig.get();
+                    subschemas_.emplace_back(std::move(s));
                     subschemas_.emplace_back(std::move(orig));
                     return jsoncons::make_unique<keyword_validator_wrapper_type>(p);
                 }
