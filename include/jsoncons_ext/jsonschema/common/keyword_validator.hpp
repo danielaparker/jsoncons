@@ -70,11 +70,6 @@ namespace jsonschema {
 
         virtual const uri& schema_path() const = 0;
 
-        void resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas)
-        {
-            do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
-        }
-
         void validate(const evaluation_context<Json>& eval_context,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -86,8 +81,6 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
-
         virtual void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -102,8 +95,6 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         virtual const std::string& keyword_name() const = 0;
-
-        virtual keyword_validator_type make_copy() const = 0;
     };
 
     template <class Json>
@@ -164,12 +155,7 @@ namespace jsonschema {
             return schema_path_;
         }
 
-        void resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas)
-        {
-            do_resolve_recursive_refs(base, has_recursive_anchor, schemas);
-        }
     private:
-        virtual void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) = 0;
     };
 
     template <class Json>
@@ -189,8 +175,6 @@ namespace jsonschema {
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
         virtual bool is_recursive_anchor() const = 0;
-
-        virtual schema_validator_type make_copy() const = 0;
     };
 
     template <class Json>
@@ -224,16 +208,7 @@ namespace jsonschema {
             return false;
         }
 
-        schema_validator_type make_copy() const final
-        {
-            return jsoncons::make_unique<boolean_schema_validator>(schema_path_, value_);
-        }
-
     private:
-
-        void do_resolve_recursive_refs(const uri& /*base*/, bool /*has_recursive_anchor*/, schema_registry<Json>& /*schemas*/) override
-        {
-        }
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
@@ -289,44 +264,7 @@ namespace jsonschema {
             return is_recursive_anchor_;
         }
 
-        schema_validator_type make_copy() const final
-        {
-            std::vector<keyword_validator_type> validators;
-            for (auto& validator : validators_)
-            {
-                validators.push_back(validator->make_copy());
-            }
-
-            return jsoncons::make_unique<object_schema_validator>(schema_path_, std::move(validators), Json(default_value_), is_recursive_anchor_);
-        }
-
     private:
-        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
-        {
-            if (has_recursive_anchor)
-            {
-                for (auto& validator : validators_)
-                {
-                    validator->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-                }
-            }
-            else if (is_recursive_anchor_)
-            {
-                for (auto& validator : validators_)
-                {
-                    validator->resolve_recursive_refs(schema_path(), is_recursive_anchor_, schemas);
-                }
-            }
-            else
-            {
-                for (auto& validator : validators_)
-                {
-                    validator->resolve_recursive_refs(schema_path(), is_recursive_anchor_, schemas);
-                }
-            }
-            //std::cout << "object_schema_validator location::do_resolve_recursive_refs: " << schema_path().string() << ", " << is_recursive_anchor_
-            //         << "\n  base: " << base.string() << ", has_recursive_anchor: " << has_recursive_anchor << "\n\n";
-        }
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
@@ -381,16 +319,7 @@ namespace jsonschema {
             return validator_->schema_path();
         }
 
-        keyword_validator_type make_copy() const final
-        {
-            return jsoncons::make_unique<keyword_validator_wrapper>(validator_);
-        }
-
     private:
-        void do_resolve_recursive_refs(const uri& base, bool has_recursive_anchor, schema_registry<Json>& schemas) override
-        {
-            validator_->resolve_recursive_refs(base, has_recursive_anchor, schemas);
-        }
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
