@@ -148,11 +148,11 @@ namespace draft201909 {
             keyword_factory_map_.emplace("required", 
                 [&](const compilation_context& context, const Json& sch){return this->make_required_validator(context, sch);});
             keyword_factory_map_.emplace("dependentRequired", 
-                [&](const compilation_context& context, const Json& sch){return make_dependent_required_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_dependent_required_validator(context, sch);});
             keyword_factory_map_.emplace("dependentSchemas", 
-                [&](const compilation_context& context, const Json& sch){return make_dependent_schemas_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_dependent_schemas_validator(context, sch);});
             keyword_factory_map_.emplace("unevaluatedProperties", 
-                [&](const compilation_context& context, const Json& sch){return make_unevaluated_properties_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_unevaluated_properties_validator(context, sch);});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
@@ -490,75 +490,6 @@ namespace draft201909 {
             return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_path),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
-        }
-                
-        std::unique_ptr<dependent_required_validator<Json>> make_dependent_required_validator( 
-            const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.get_absolute_uri();
-            std::map<std::string, keyword_validator_type> dependent_required;
-
-            for (const auto& dep : sch.object_range())
-            {
-                switch (dep.value().type()) 
-                {
-                    case json_type::array_value:
-                    {
-                        auto location = context.make_schema_path_with("dependentRequired");
-                        dependent_required.emplace(dep.key(), 
-                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
-                                dep.value()));
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return jsoncons::make_unique<dependent_required_validator<Json>>( std::move(schema_path),
-                std::move(dependent_required));
-        }
-
-        std::unique_ptr<dependent_schemas_validator<Json>> make_dependent_schemas_validator( const compilation_context& context, 
-            const Json& sch)
-        {
-            uri schema_path = context.get_absolute_uri();
-            std::map<std::string, schema_validator_type> dependent_schemas;
-
-            for (const auto& dep : sch.object_range())
-            {
-                switch (dep.value().type()) 
-                {
-                    case json_type::object_value:
-                    {
-                        std::string sub_keys[] = {"dependentSchemas"};
-                        dependent_schemas.emplace(dep.key(),
-                            make_schema_validator(context, dep.value(), sub_keys));
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-            }
-            
-
-            return jsoncons::make_unique<dependent_schemas_validator<Json>>( std::move(schema_path),
-                std::move(dependent_schemas));
-        }
-
-        std::unique_ptr<unevaluated_properties_validator<Json>> make_unevaluated_properties_validator(
-            const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.get_absolute_uri();
-
-            std::string sub_keys[] = {"unevaluatedProperties"};
-
-            return jsoncons::make_unique<unevaluated_properties_validator<Json>>( std::move(schema_path),
-                make_schema_validator(context, sch, sub_keys));
         }
 
         void parse(const Json& sch) override
