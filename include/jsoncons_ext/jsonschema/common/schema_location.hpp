@@ -28,9 +28,9 @@ namespace jsonschema {
         schema_location(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
-            if (!uri_.fragment().empty())
+            if (!uri_.encoded_fragment().empty())
             {
-                identifier_ = std::string(uri_.fragment().data(), uri_.fragment().size());
+                identifier_ = std::string(uri_.encoded_fragment().data(), uri_.encoded_fragment().size());
                 unescape_percent(identifier_);
             }
         }
@@ -71,11 +71,6 @@ namespace jsonschema {
             return uri_.is_absolute();
         }
 
-        std::string identifier() const
-        {
-            return identifier_;
-        }
-
         std::string fragment() const
         {
             return identifier_;
@@ -104,7 +99,7 @@ namespace jsonschema {
             if (has_plain_name_fragment())
                 return *this;
 
-            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= field;
 
             jsoncons::uri new_uri(uri_.scheme(),
@@ -127,7 +122,7 @@ namespace jsonschema {
             if (has_plain_name_fragment())
                 return *this;
 
-            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= index;
 
             jsoncons::uri new_uri(uri_.scheme(),

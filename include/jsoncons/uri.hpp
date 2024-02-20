@@ -12,6 +12,7 @@
 #include <sstream> 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { 
 
@@ -183,9 +184,14 @@ namespace jsoncons {
 
         string_view query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
 
-        string_view fragment() const noexcept { return string_view(uri_.data()+fragment_.first,(fragment_.second-fragment_.first)); }
+        string_view encoded_fragment() const noexcept { return string_view(uri_.data()+fragment_.first,(fragment_.second-fragment_.first)); }
 
         string_view authority() const noexcept { return string_view(uri_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
+
+        std::string fragment() const
+        {
+            return decode_part(encoded_fragment());
+        }
 
         uri resolve(const uri& base) const
         {
@@ -283,9 +289,9 @@ namespace jsoncons {
               }
             }
 
-            if (!this->fragment().empty()) 
+            if (!this->encoded_fragment().empty()) 
             {
-                fragment = std::string(this->fragment());
+                fragment = std::string(this->encoded_fragment());
             }
 
             return uri(std::string(base.scheme()), userinfo, host, port, path, query, fragment);
@@ -305,7 +311,7 @@ namespace jsoncons {
             if (result != 0) return result;
             result = query().compare(other.query());
             if (result != 0) return result;
-            result = fragment().compare(other.fragment());
+            result = encoded_fragment().compare(other.encoded_fragment());
 
             return result;
         }
@@ -338,6 +344,30 @@ namespace jsoncons {
         friend bool operator>=(const uri& lhs, const uri& rhs)
         {
             return lhs.compare(rhs) >= 0;
+        }
+
+        static std::string decode_part(const jsoncons::string_view& encoded)
+        {
+            std::string decoded;
+
+            for (std::size_t i = 0; i < encoded.size();)
+            {
+                if (encoded[i] == '%' && (encoded.size() - i) >= 3)
+                {
+                    auto hex = encoded.substr(i + 1, 2);
+
+                    uint8_t n;
+                    jsoncons::detail::to_integer_base16(hex.data(), hex.size(), n);
+                    decoded.push_back((char)n);
+                    i += 3;
+                }
+                else
+                {
+                    decoded.push_back(encoded[i]);
+                    ++i;
+                }
+            }
+            return decoded;
         }
 
     private:
@@ -631,6 +661,7 @@ namespace jsoncons {
                 path.erase(last_slash);
             }
         }
+
     };
 
 } // namespace jsoncons

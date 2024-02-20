@@ -230,3 +230,32 @@ TEST_CASE("uri resolve tests")
         CHECK(uri.is_absolute());
     }
 }
+
+TEST_CASE("uri part decode tests")
+{
+    SECTION("test 1")
+    {
+        std::string raw = "%7e";
+        std::string expected = "~";
+
+        std::string decoded = jsoncons::uri::decode_part(raw);
+        CHECK(decoded == expected);
+    }
+    SECTION("test 2")
+    {
+        std::string raw = "%25";
+        std::string expected = "%";
+
+        std::string decoded = jsoncons::uri::decode_part(raw);
+        CHECK(decoded == expected);
+    }
+    SECTION("test 3")
+    {
+        std::string raw = "foo%25bar%7ebaz";
+        std::string expected = "foo%bar~baz";
+
+        std::string decoded = jsoncons::uri::decode_part(raw);
+        CHECK(decoded == expected);
+    }
+}
+
