@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_PARSER_IMPL_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_IMPL_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_IMPL_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -13,7 +13,7 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_parser.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <cassert>
 #include <set>
@@ -26,16 +26,17 @@
 
 namespace jsoncons {
 namespace jsonschema {
-namespace draft7 {
+namespace draft201909 {
 
     template <class Json>
     struct default_uri_resolver
     {
         Json operator()(const jsoncons::uri& uri)
         {
-            if (uri.path() == "/draft-07/schema") 
+            if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
             {
-                return schema_draft7<Json>::get_schema();
+                JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support") + "https://json-schema.org/draft/2019-09/schema"));
+                //return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
@@ -43,13 +44,14 @@ namespace draft7 {
     };
 
     template <class Json>
-    class schema_parser_impl : public schema_parser<Json> 
+    class schema_builder_impl : public schema_builder<Json> 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
+        using recursive_ref_validator_type = recursive_ref_validator<Json>;
     private:
         struct subschema_registry
         {
@@ -72,24 +74,24 @@ namespace draft7 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_parser_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
+        schema_builder_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
 
             : resolver_(resolver)
         {
             init();
         }
 
-        schema_parser_impl(uri_resolver<Json>&& resolver) noexcept
+        schema_builder_impl(uri_resolver<Json>&& resolver) noexcept
 
             : resolver_(std::move(resolver))
         {
             init();
         }
 
-        schema_parser_impl(const schema_parser_impl&) = delete;
-        schema_parser_impl& operator=(const schema_parser_impl&) = delete;
-        schema_parser_impl(schema_parser_impl&&) = default;
-        schema_parser_impl& operator=(schema_parser_impl&&) = default;
+        schema_builder_impl(const schema_builder_impl&) = delete;
+        schema_builder_impl& operator=(const schema_builder_impl&) = delete;
+        schema_builder_impl(schema_builder_impl&&) = default;
+        schema_builder_impl& operator=(schema_builder_impl&&) = default;
 
         void init()
         {
@@ -145,6 +147,12 @@ namespace draft7 {
                 [&](const compilation_context& context, const Json& sch){return this->make_property_names_validator(context, sch);});
             keyword_factory_map_.emplace("required", 
                 [&](const compilation_context& context, const Json& sch){return this->make_required_validator(context, sch);});
+            keyword_factory_map_.emplace("dependentRequired", 
+                [&](const compilation_context& context, const Json& sch){return this->make_dependent_required_validator(context, sch);});
+            keyword_factory_map_.emplace("dependentSchemas", 
+                [&](const compilation_context& context, const Json& sch){return this->make_dependent_schemas_validator(context, sch);});
+            keyword_factory_map_.emplace("unevaluatedProperties", 
+                [&](const compilation_context& context, const Json& sch){return this->make_unevaluated_properties_validator(context, sch);});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
@@ -152,8 +160,8 @@ namespace draft7 {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
 
-        schema_validator_type make_schema_validator( 
-            const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys) override
+        schema_validator_type make_schema_validator(const compilation_context& context, 
+            const Json& sch, jsoncons::span<const std::string> keys) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
@@ -197,23 +205,18 @@ namespace draft7 {
                         }
                         known_keywords.insert("definitions");
                     }
-                    it = sch.find("$ref");
-                    if (it != sch.object_range().end()) // this schema is a reference
+                    it = sch.find("$defs");
+                    if (it != sch.object_range().end()) 
                     {
-                        std::vector<keyword_validator_type> validators;
-                        Json default_value{ jsoncons::null_type() };
-                        schema_location relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(context.get_base_uri()); 
-                        validators.push_back(get_or_create_reference(id));
-                        known_keywords.insert("$ref");
-                        schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
-                            new_context.get_absolute_uri(),
-                            std::move(validators), std::move(default_value));
+                        for (const auto& def : it->value().object_range())
+                        {
+                            std::string sub_keys[] = { "$defs", def.key() };
+                            subschemas_.emplace_back(make_schema_validator(
+                                new_context, def.value(), sub_keys));
+                        }
+                        known_keywords.insert("definitions");
                     }
-                    else
-                    {
-                        schema_validator_ptr = make_object_schema_validator(new_context, sch);
-                    }
+                    schema_validator_ptr = make_object_schema_validator(new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
@@ -242,14 +245,36 @@ namespace draft7 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
+            bool is_recursive_anchor = false;
 
-            //fo
+            auto it = sch.find("$recursiveAnchor"); 
+            if (it != sch.object_range().end()) 
+            {
+                is_recursive_anchor = it->value().template as<bool>();
+            }
 
-            auto it = sch.find("default");
+            it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
                 default_value = it->value();
                 known_keywords.insert("default");
+            }
+
+            it = sch.find("$ref");
+            if (it != sch.object_range().end()) // this schema has a reference
+            {
+                schema_location relative(it->value().template as<std::string>()); 
+                auto id = relative.resolve(context.get_base_uri()); 
+                validators.push_back(get_or_create_reference(id));
+            }
+
+            it = sch.find("$recursiveRef");
+            if (it != sch.object_range().end()) // this schema has a reference
+            {
+                schema_location relative(it->value().template as<std::string>()); 
+                auto base_uri = context.get_base_uri();
+                auto id = relative.resolve(base_uri); // REVISIT
+                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
             }
 
             for (const auto& key_value : sch.object_range())
@@ -290,6 +315,9 @@ namespace draft7 {
                     known_keywords.insert("else");
                 }
             }
+
+            // Object validators
+
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
@@ -317,6 +345,7 @@ namespace draft7 {
                 validators.emplace_back(make_additional_properties_validator(context, Json(true), 
                     std::move(properties), std::move(pattern_properties)));
             }
+
             it = sch.find("items");
             if (it != sch.object_range().end()) 
             {
@@ -328,15 +357,16 @@ namespace draft7 {
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(make_items_object_validator(context, it->value()));
+                    validators.emplace_back(make_items_object_validator(context, sch, it->value()));
                 }
             }
+            
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),
-                std::move(validators), std::move(default_value));
+                std::move(validators), std::move(default_value), is_recursive_anchor);
         }
 
-        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context,
+        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 
             const Json& parent, const Json& sch)
         {
             std::vector<schema_validator_type> item_validators;
@@ -366,8 +396,8 @@ namespace draft7 {
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
-        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context,
-            const Json& sch)
+        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
+            const Json& /* parent */, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("items");
 
@@ -405,7 +435,7 @@ namespace draft7 {
             return jsoncons::make_unique<conditional_validator<Json>>( std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
-        
+                
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
             const Json& sch)
         {
@@ -420,13 +450,13 @@ namespace draft7 {
                     make_schema_validator(context, prop.value(), sub_keys)));
             }
 
-            return jsoncons::make_unique<properties_validator<Json>>(
-                                                                     std::move(schema_path), std::move(properties));
+            return jsoncons::make_unique<properties_validator<Json>>(std::move(schema_path), 
+                std::move(properties));
         }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
                 
-        std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator(const compilation_context& context, 
+        std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator( const compilation_context& context, 
             const Json& sch)
         {
             uri schema_path = context.get_absolute_uri();
@@ -444,10 +474,9 @@ namespace draft7 {
             return jsoncons::make_unique<pattern_properties_validator<Json>>( std::move(schema_path),
                 std::move(pattern_properties));
         }
-#endif
-       
+#endif       
 
-        std::unique_ptr<additional_properties_validator<Json>> make_additional_properties_validator(
+        std::unique_ptr<additional_properties_validator<Json>> make_additional_properties_validator( 
             const compilation_context& context, const Json& sch, 
             std::unique_ptr<properties_validator<Json>>&& properties, std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties)
         {
@@ -462,7 +491,7 @@ namespace draft7 {
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
         }
-                
+
         void parse(const Json& sch) override
         {
             parse(sch, "#");
@@ -476,7 +505,7 @@ namespace draft7 {
                 if (it != sch.object_range().end())
                 {
                     auto sv = it->value().as_string_view();
-                    if (sv.find("json-schema.org/draft-07/schema#") == string_view::npos)
+                    if (sv.find("https://json-schema.org/draft/2019-09/schema") == string_view::npos)
                     {
                         std::string message("Unsupported schema version ");
                         message.append(sv.data(), sv.size());
@@ -495,7 +524,7 @@ namespace draft7 {
             // load all external schemas that have not already been loaded
 
             std::size_t loaded_count = 0;
-            do 
+            do
             {
                 loaded_count = 0;
 
@@ -503,24 +532,23 @@ namespace draft7 {
                 for (const auto& item : subschema_registries_)
                     locations.push_back(item.first);
 
-                for (const auto& loc : locations) 
+                for (const auto& loc : locations)
                 {
                     if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
-                    { 
-                        if (resolver_) 
+                    {
+                        if (resolver_)
                         {
                             Json external_sch = resolver_(loc);
                             subschemas_.emplace_back(make_schema_validator(compilation_context(schema_location(loc)), external_sch, {}));
                             ++loaded_count;
-                        } 
-                        else 
+                        }
+                        else
                         {
                             JSONCONS_THROW(schema_error("External schema reference '" + loc + "' needs to be loaded, but no resolver provided"));
                         }
                     }
                 }
-            } 
-            while (loaded_count > 0);
+            } while (loaded_count > 0);
 
             resolve_references();
         }
@@ -690,7 +718,7 @@ namespace draft7 {
 
     };
 
-} // namespace draft7
+} // namespace draft201909
 } // namespace jsonschema
 } // namespace jsoncons
 
