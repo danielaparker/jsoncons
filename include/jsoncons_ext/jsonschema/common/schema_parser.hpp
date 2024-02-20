@@ -359,6 +359,100 @@ namespace jsonschema {
             return jsoncons::make_unique<unique_items_validator<Json>>( schema_path, are_unique);
         }
 
+        virtual std::unique_ptr<combining_validator<Json,all_of_criterion<Json>>> make_all_of_validator(const compilation_context& context,
+            const Json& sch)
+        {
+            uri schema_path = context.make_schema_path_with("allOf");
+            std::vector<schema_validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : sch.array_range())
+            {
+                std::string sub_keys[] = { all_of_criterion<Json>::key(), std::to_string(c++) };
+                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+            }
+            return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+        }
+
+        virtual std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const compilation_context& context,
+            const Json& sch)
+        {
+            uri schema_path = context.make_schema_path_with("anyOf");
+            std::vector<schema_validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : sch.array_range())
+            {
+                std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
+                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+            }
+            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+        }
+
+        virtual std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
+            const Json& sch)
+        {
+            uri schema_path = context.make_schema_path_with("oneOf");
+            std::vector<schema_validator_type> subschemas;
+
+            size_t c = 0;
+            for (const auto& subsch : sch.array_range())
+            {
+                std::string sub_keys[] = { one_of_criterion<Json>::key(), std::to_string(c++) };
+                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
+            }
+            return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+        }
+
+        virtual std::unique_ptr<dependencies_validator<Json>> make_dependencies_validator(const compilation_context& context, 
+            const Json& sch)
+        {
+            uri schema_path = context.get_absolute_uri();
+            std::map<std::string, keyword_validator_type> dependent_required;
+            std::map<std::string, schema_validator_type> dependent_schemas;
+
+            for (const auto& dep : sch.object_range())
+            {
+                switch (dep.value().type()) 
+                {
+                    case json_type::array_value:
+                    {
+                        auto location = context.make_schema_path_with("dependencies");
+                        dependent_required.emplace(dep.key(), 
+                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                                dep.value().template as<std::vector<std::string>>()));
+                        break;
+                    }
+                    case json_type::object_value:
+                    {
+                        std::string sub_keys[] = {"dependencies"};
+                        dependent_schemas.emplace(dep.key(),
+                            make_schema_validator(context, dep.value(), sub_keys));
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }         
+
+            return jsoncons::make_unique<dependencies_validator<Json>>( std::move(schema_path),
+                std::move(dependent_required), std::move(dependent_schemas));
+        }
+
+        virtual std::unique_ptr<property_names_validator<Json>> make_property_names_validator(
+            const compilation_context& context, const Json& sch)
+        {
+            uri schema_path = context.get_absolute_uri();
+            schema_validator_type property_names_schema_validator;
+
+            std::string sub_keys[] = { "propertyNames"};
+            property_names_schema_validator = make_schema_validator(context, sch, sub_keys);
+
+            return jsoncons::make_unique<property_names_validator<Json>>( std::move(schema_path),
+                std::move(property_names_schema_validator));
+        }
     };
 
 } // namespace jsonschema
