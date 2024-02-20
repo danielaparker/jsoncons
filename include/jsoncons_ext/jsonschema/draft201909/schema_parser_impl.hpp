@@ -47,7 +47,6 @@ namespace draft201909 {
     class schema_parser_impl : public schema_parser<Json> 
     {
     public:
-        using validator_type = std::unique_ptr<validator_base<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -65,7 +64,7 @@ namespace draft201909 {
         schema_validator_type root_;
 
         // Owns all subschemas
-        std::vector<validator_type> subschemas_;
+        std::vector<schema_validator_type> subschemas_;
 
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;
