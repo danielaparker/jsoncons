@@ -164,12 +164,12 @@ namespace jsoncons {
 
         bool is_opaque() const noexcept 
         {
-          return is_absolute() && !authority().empty();
+          return is_absolute() && !encoded_authority().empty();
         }
 
         uri base() const noexcept 
         { 
-            return uri{ scheme(), userinfo(), host(), port(), path(), jsoncons::string_view(), jsoncons::string_view()};
+            return uri{ scheme(), userinfo(), host(), port(), encoded_path(), jsoncons::string_view(), jsoncons::string_view()};
         }
 
         string_view scheme() const noexcept { return string_view(uri_.data()+scheme_.first,(scheme_.second-scheme_.first)); }
@@ -180,17 +180,32 @@ namespace jsoncons {
 
         string_view port() const noexcept { return string_view(uri_.data()+port_.first,(port_.second-port_.first)); }
 
-        string_view path() const noexcept { return string_view(uri_.data()+path_.first,(path_.second-path_.first)); }
+        string_view encoded_path() const noexcept { return string_view(uri_.data()+path_.first,(path_.second-path_.first)); }
 
-        string_view query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
+        string_view encoded_query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
 
         string_view encoded_fragment() const noexcept { return string_view(uri_.data()+fragment_.first,(fragment_.second-fragment_.first)); }
 
-        string_view authority() const noexcept { return string_view(uri_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
+        string_view encoded_authority() const noexcept { return string_view(uri_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
+
+        std::string path() const
+        {
+            return decode_part(encoded_path());
+        }
+
+        std::string query() const
+        {
+            return decode_part(encoded_query());
+        }
 
         std::string fragment() const
         {
             return decode_part(encoded_fragment());
+        }
+
+        std::string authority() const
+        {
+            return decode_part(encoded_authority());
         }
 
         uri resolve(const uri& base) const
@@ -210,7 +225,7 @@ namespace jsoncons {
 
             std::string userinfo, host, port, path, query, fragment;
 
-            if (!authority().empty()) 
+            if (!encoded_authority().empty()) 
             {
               // g -> http://g
               if (!this->userinfo().empty()) 
@@ -228,48 +243,48 @@ namespace jsoncons {
                   port = std::string(this->port());
               }
 
-              if (!this->path().empty()) 
+              if (!this->encoded_path().empty()) 
               {
-                  path = remove_dot_segments(this->path());
+                  path = remove_dot_segments(this->encoded_path());
               }
 
-              if (!this->query().empty()) 
+              if (!this->encoded_query().empty()) 
               {
-                  query = std::string(this->query());
+                  query = std::string(this->encoded_query());
               }
             } 
             else 
             {
-              if (this->path().empty()) 
+              if (this->encoded_path().empty()) 
               {
-                if (!base.path().empty()) 
+                if (!base.encoded_path().empty()) 
                 {
-                    path = std::string(base.path());
+                    path = std::string(base.encoded_path());
                 }
 
-                if (!this->query().empty()) 
+                if (!this->encoded_query().empty()) 
                 {
-                    query = std::string(this->query());
+                    query = std::string(this->encoded_query());
                 } 
-                else if (!base.query().empty()) 
+                else if (!base.encoded_query().empty()) 
                 {
-                    query = std::string(base.query());
+                    query = std::string(base.encoded_query());
                 }
               } 
               else 
               {
-                  if (this->path().front() == '/') 
+                  if (this->encoded_path().front() == '/') 
                   {
-                    path = remove_dot_segments(this->path());
+                    path = remove_dot_segments(this->encoded_path());
                   } 
                   else 
                   {
                       path = merge_paths(base, *this);
                   }
 
-                  if (!this->query().empty()) 
+                  if (!this->encoded_query().empty()) 
                   {
-                      query = std::string(this->query());
+                      query = std::string(this->encoded_query());
                   }
               }
 
@@ -307,9 +322,9 @@ namespace jsoncons {
             if (result != 0) return result;
             result = port().compare(other.port());
             if (result != 0) return result;
-            result = path().compare(other.path());
+            result = encoded_path().compare(other.encoded_path());
             if (result != 0) return result;
-            result = query().compare(other.query());
+            result = encoded_query().compare(other.encoded_query());
             if (result != 0) return result;
             result = encoded_fragment().compare(other.encoded_fragment());
 
@@ -636,19 +651,19 @@ namespace jsoncons {
         {
             std::string result;
 
-            if (base.path().empty()) 
+            if (base.encoded_path().empty()) 
             {
                 result = "/";
             } 
             else 
             {
-                const auto& base_path = base.path();
+                const auto& base_path = base.encoded_path();
                 auto last_slash = base_path.rfind('/');
                 result.append(std::string(base_path.substr(0,last_slash+1)));
             }
-            if (!relative.path().empty()) 
+            if (!relative.encoded_path().empty()) 
             {
-                result.append(relative.path().begin(), relative.path().end());
+                result.append(relative.encoded_path().begin(), relative.encoded_path().end());
             }
             return remove_dot_segments(jsoncons::string_view(result));
         }

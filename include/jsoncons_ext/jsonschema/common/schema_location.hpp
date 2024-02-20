@@ -106,8 +106,8 @@ namespace jsonschema {
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),
-                                  uri_.path(),
-                                  uri_.query(),
+                                  uri_.encoded_path(),
+                                  uri_.encoded_query(),
                                   pointer.to_string());
 
             schema_location wrapper;
@@ -129,8 +129,8 @@ namespace jsonschema {
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),
-                                  uri_.path(),
-                                  uri_.query(),
+                                  uri_.encoded_path(),
+                                  uri_.encoded_query(),
                                   pointer.to_string());
 
             schema_location wrapper;
