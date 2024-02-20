@@ -105,8 +105,6 @@ namespace draft7 {
             keyword_factory_map_.emplace("pattern", 
                 [&](const compilation_context& context, const Json& sch){return make_pattern_validator(context, sch);});
 #endif
-            keyword_factory_map_.emplace("maxLength", 
-                [&](const compilation_context& context, const Json& sch){return make_max_length_validator(context, sch);});
             keyword_factory_map_.emplace("maxItems", 
                 [&](const compilation_context& context, const Json& sch){return make_max_items_validator(context, sch);});
             keyword_factory_map_.emplace("minItems", 
@@ -115,24 +113,26 @@ namespace draft7 {
                 [&](const compilation_context& context, const Json& sch){return make_contains_validator(context, sch);});
             keyword_factory_map_.emplace("uniqueItems", 
                 [&](const compilation_context& context, const Json& sch){return make_unique_items_validator(context, sch);});
+            keyword_factory_map_.emplace("maxLength", 
+                [&](const compilation_context& context, const Json& sch){return this->make_max_length_validator(context, sch);});
             keyword_factory_map_.emplace("minLength", 
-                [&](const compilation_context& context, const Json& sch){return make_min_length_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_min_length_validator(context, sch);});
             keyword_factory_map_.emplace("not", 
-                [&](const compilation_context& context, const Json& sch){return make_not_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_not_validator(context, sch);});
             keyword_factory_map_.emplace("maximum", 
-                [&](const compilation_context& context, const Json& sch){return make_maximum_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_maximum_validator(context, sch);});
             keyword_factory_map_.emplace("exclusiveMaximum", 
-                [&](const compilation_context& context, const Json& sch){return make_exclusive_maximum_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_exclusive_maximum_validator(context, sch);});
             keyword_factory_map_.emplace("minimum", 
-                [&](const compilation_context& context, const Json& sch){return make_minimum_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_minimum_validator(context, sch);});
             keyword_factory_map_.emplace("exclusiveMinimum", 
-                [&](const compilation_context& context, const Json& sch){return make_exclusive_minimum_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_exclusive_minimum_validator(context, sch);});
             keyword_factory_map_.emplace("multipleOf", 
-                [&](const compilation_context& context, const Json& sch){return make_multiple_of_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_multiple_of_validator(context, sch);});
             keyword_factory_map_.emplace("const", 
-                [&](const compilation_context& context, const Json& sch){return make_const_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_const_validator(context, sch);});
             keyword_factory_map_.emplace("enum", 
-                [&](const compilation_context& context, const Json& sch){return make_enum_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_enum_validator(context, sch);});
             keyword_factory_map_.emplace("allOf", 
                 [&](const compilation_context& context, const Json& sch){return make_all_of_validator(context, sch);});
             keyword_factory_map_.emplace("anyOf", 
@@ -144,7 +144,7 @@ namespace draft7 {
             keyword_factory_map_.emplace("propertyNames", 
                 [&](const compilation_context& context, const Json& sch){return make_property_names_validator(context, sch);});
             keyword_factory_map_.emplace("required", 
-                [&](const compilation_context& context, const Json& sch){return make_required_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_required_validator(context, sch);});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
@@ -153,7 +153,7 @@ namespace draft7 {
         }
 
         schema_validator_type make_schema_validator( 
-            const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys) //override
+            const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
             //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
@@ -505,18 +505,6 @@ namespace draft7 {
                 pattern_string, regex);
         }
 
-        std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("maxLength");
-            if (!sch.is_number())
-            {
-                std::string message("maxLength must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_length_validator<Json>>( schema_path, value);
-        }
-
         std::unique_ptr<max_items_validator<Json>> make_max_items_validator(const compilation_context& context, const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("maxItems");
@@ -599,104 +587,6 @@ namespace draft7 {
             bool are_unique = sch.template as<bool>();
             return jsoncons::make_unique<unique_items_validator<Json>>( schema_path, are_unique);
         }
-
-        std::unique_ptr<min_length_validator<Json>> make_min_length_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("minLength");
-            if (!sch.is_number())
-            {
-                std::string message("minLength must be an integer value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_length_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<not_validator<Json>> make_not_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("not");
-            std::string not_key[] = { "not" };
-            return jsoncons::make_unique<not_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, not_key));
-        }
-
-        std::unique_ptr<maximum_validator<Json>> make_maximum_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("maximum");
-            if (!sch.is_number())
-            {
-                std::string message("maximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<maximum_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<exclusive_maximum_validator<Json>> make_exclusive_maximum_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("exclusiveMaximum");
-            if (!sch.is_number())
-            {
-                std::string message("exclusiveMaximum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<exclusive_maximum_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<keyword_validator<Json>> make_minimum_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("minimum");
-
-            //std::cout << "make_minimum_validator uri: " << context.get_absolute_uri().string() << ", " << schema_path.string() << "\n";
-                
-            if (!sch.is_number())
-            {
-                std::string message("minimum must be an integer");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<minimum_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<exclusive_minimum_validator<Json>> make_exclusive_minimum_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("exclusiveMinimum");
-            if (!sch.is_number())
-            {
-                std::string message("exclusiveMinimum must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            return jsoncons::make_unique<exclusive_minimum_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<multiple_of_validator<Json>> make_multiple_of_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("multipleOf");
-            if (!sch.is_number())
-            {
-                std::string message("multipleOf must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<double>();
-            return jsoncons::make_unique<multiple_of_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<const_validator<Json>> make_const_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("const");
-            return jsoncons::make_unique<const_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<enum_validator<Json>> make_enum_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("enum");
-            return jsoncons::make_unique<enum_validator<Json>>( schema_path, sch);
-        }
-
-        std::unique_ptr<required_validator<Json>> make_required_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("required");
-            return jsoncons::make_unique<required_validator<Json>>( schema_path, sch.template as<std::vector<std::string>>());
-        }
-
 
         std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
             const Json& sch_if, const Json& sch)
@@ -845,7 +735,7 @@ namespace draft7 {
                     {
                         auto location = context.make_schema_path_with("dependencies");
                         dependent_required.emplace(dep.key(), 
-                            make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
                                 dep.value().template as<std::vector<std::string>>()));
                         break;
                     }
