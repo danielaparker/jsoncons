@@ -96,25 +96,25 @@ namespace draft201909 {
         void init()
         {
             keyword_factory_map_.emplace("type", 
-                [&](const compilation_context& context, const Json& sch){return make_type_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_type_validator(context, sch);});
             keyword_factory_map_.emplace("contentEncoding", 
-                [&](const compilation_context& context, const Json& sch){return make_content_encoding_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_content_encoding_validator(context, sch);});
             keyword_factory_map_.emplace("contentMediaType", 
-                [&](const compilation_context& context, const Json& sch){return make_content_media_type_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_content_media_type_validator(context, sch);});
             keyword_factory_map_.emplace("format", 
-                [&](const compilation_context& context, const Json& sch){return make_format_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_format_validator(context, sch);});
 #if defined(JSONCONS_HAS_STD_REGEX)
             keyword_factory_map_.emplace("pattern", 
-                [&](const compilation_context& context, const Json& sch){return make_pattern_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_pattern_validator(context, sch);});
 #endif
             keyword_factory_map_.emplace("maxItems", 
-                [&](const compilation_context& context, const Json& sch){return make_max_items_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_max_items_validator(context, sch);});
             keyword_factory_map_.emplace("minItems", 
-                [&](const compilation_context& context, const Json& sch){return make_min_items_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_min_items_validator(context, sch);});
             keyword_factory_map_.emplace("contains", 
-                [&](const compilation_context& context, const Json& sch){return make_contains_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_contains_validator(context, sch);});
             keyword_factory_map_.emplace("uniqueItems", 
-                [&](const compilation_context& context, const Json& sch){return make_unique_items_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch){return this->make_unique_items_validator(context, sch);});
             keyword_factory_map_.emplace("maxLength", 
                 [&](const compilation_context& context, const Json& sch){return this->make_max_length_validator(context, sch);});
             keyword_factory_map_.emplace("minLength", 
@@ -366,210 +366,6 @@ namespace draft201909 {
                 std::move(validators), std::move(default_value), is_recursive_anchor);
         }
 
-        std::unique_ptr<type_validator<Json>> make_type_validator(const compilation_context& context,
-            const Json& sch)
-        {
-            std::string schema_path = context.get_absolute_uri().string();
-            std::vector<json_schema_type> expected_types;
-
-            switch (sch.type()) 
-            { 
-                case json_type::string_value: 
-                {
-                    auto type = sch.template as<std::string>();
-                    if (type == "null")
-                    {
-                        expected_types.push_back(json_schema_type::null);
-                    }
-                    else if (type == "object")
-                    {
-                        expected_types.push_back(json_schema_type::object);
-                    }
-                    else if (type == "array")
-                    {
-                        expected_types.push_back(json_schema_type::array);
-                    }
-                    else if (type == "string")
-                    {
-                        expected_types.push_back(json_schema_type::string);
-                    }
-                    else if (type == "boolean")
-                    {
-                        expected_types.push_back(json_schema_type::boolean);
-                    }
-                    else if (type == "integer")
-                    {
-                        expected_types.push_back(json_schema_type::integer);
-                    }
-                    else if (type == "number")
-                    {
-                        expected_types.push_back(json_schema_type::number);
-                    }
-                    break;
-                } 
-
-                case json_type::array_value: // "type": ["type1", "type2"]
-                {
-                    for (const auto& item : sch.array_range())
-                    {
-                        auto type = item.template as<std::string>();
-                        if (type == "null")
-                        {
-                            expected_types.push_back(json_schema_type::null);
-                        }
-                        else if (type == "object")
-                        {
-                            expected_types.push_back(json_schema_type::object);
-                        }
-                        else if (type == "array")
-                        {
-                            expected_types.push_back(json_schema_type::array);
-                        }
-                        else if (type == "string")
-                        {
-                            expected_types.push_back(json_schema_type::string);
-                        }
-                        else if (type == "boolean")
-                        {
-                            expected_types.push_back(json_schema_type::boolean);
-                        }
-                        else if (type == "integer")
-                        {
-                            expected_types.push_back(json_schema_type::integer);
-                        }
-                        else if (type == "number")
-                        {
-                            expected_types.push_back(json_schema_type::number);
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            return jsoncons::make_unique<type_validator<Json>>( std::move(schema_path), 
-                std::move(expected_types)
-         );
-        }
-
-        std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("contentEncoding");
-            if (!sch.is_string())
-            {
-                std::string message("contentEncoding must be a string");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_encoding_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("contentMediaType");
-            if (!sch.is_string())
-            {
-                std::string message("contentMediaType must be a string");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_media_type_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<format_validator<Json>> make_format_validator(const compilation_context& context, const Json& sch)
-        {
-            auto schema_path = context.make_schema_path_with("format");
-
-            std::string format = sch.template as<std::string>();
-
-            format_checker format_check;
-            if (format == "date-time")
-            {
-                format_check = rfc3339_date_time_check;
-            }
-            else if (format == "date") 
-            {
-                format_check = rfc3339_date_check;
-            } 
-            else if (format == "time") 
-            {
-                format_check = rfc3339_time_check;
-            } 
-            else if (format == "email") 
-            {
-                format_check = email_check;
-            } 
-            else if (format == "hostname") 
-            {
-                format_check = hostname_check;
-            } 
-            else if (format == "ipv4") 
-            {
-                format_check = ipv4_check;
-            } 
-            else if (format == "ipv6") 
-            {
-                format_check = ipv6_check;
-            } 
-            else if (format == "regex") 
-            {
-                format_check = regex_check;
-            } 
-            else
-            {
-                // Not supported - ignore
-                format_check = nullptr;
-            }       
-
-            return jsoncons::make_unique<format_validator<Json>>( schema_path, 
-                format_check);
-        }
-
-        std::unique_ptr<pattern_validator<Json>> make_pattern_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("pattern");
-            auto pattern_string = sch.template as<std::string>();
-            auto regex = std::regex(pattern_string, std::regex::ECMAScript);
-            return jsoncons::make_unique<pattern_validator<Json>>( schema_path, 
-                pattern_string, regex);
-        }
-
-        std::unique_ptr<max_items_validator<Json>> make_max_items_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("maxItems");
-            if (!sch.is_number())
-            {
-                std::string message("maxItems must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("minItems");
-            if (!sch.is_number())
-            {
-                std::string message("minItems must be a number value");
-                JSONCONS_THROW(schema_error(message));
-            }
-            auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>( schema_path, value);
-        }
-
-        std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
-            const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("contains");
-
-            std::string sub_keys[] = { "contains" };
-
-            return jsoncons::make_unique<contains_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, sub_keys));
-        }
-
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 
             const Json& parent, const Json& sch)
         {
@@ -609,13 +405,6 @@ namespace draft201909 {
 
             return jsoncons::make_unique<items_object_validator<Json>>( schema_path, 
                 make_schema_validator(context, sch, sub_keys));
-        }
-
-        std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const compilation_context& context, const Json& sch)
-        {
-            uri schema_path = context.make_schema_path_with("uniqueItems");
-            bool are_unique = sch.template as<bool>();
-            return jsoncons::make_unique<unique_items_validator<Json>>( schema_path, are_unique);
         }
 
         std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
