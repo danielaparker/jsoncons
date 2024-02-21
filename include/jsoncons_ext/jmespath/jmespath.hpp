@@ -5188,6 +5188,7 @@ namespace jmespath {
 
         static bool is_punct(char c)
         {
+            switch (c)
             {
                 case ',':
                 case ';':

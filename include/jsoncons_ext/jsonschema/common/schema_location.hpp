@@ -30,8 +30,7 @@ namespace jsonschema {
             uri_ = jsoncons::uri(uri);
             if (!uri_.encoded_fragment().empty())
             {
-                identifier_ = std::string(uri_.encoded_fragment().data(), uri_.encoded_fragment().size());
-                unescape_percent(identifier_);
+                identifier_ = std::string(uri_.fragment().data(), uri_.fragment().size());
             }
         }
 
@@ -61,7 +60,7 @@ namespace jsonschema {
             return uri_.base();
         }
 
-        jsoncons::string_view path() const
+        std::string path() const
         {
             return uri_.path();
         }
@@ -176,22 +175,6 @@ namespace jsonschema {
             return lhs.compare(rhs) >= 0;
         }
     private:
-        static void unescape_percent(std::string& s)
-        {
-            if (s.size() >= 3)
-            {
-                std::size_t pos = s.size() - 2;
-                while (pos-- >= 1)
-                {
-                    if (s[pos] == '%')
-                    {
-                        std::string hex = s.substr(pos + 1, 2);
-                        char ch = (char) std::strtoul(hex.c_str(), nullptr, 16);
-                        s.replace(pos, 3, 1, ch);
-                    }
-                }
-            }
-        }
     };
 
 } // namespace jsonschema
