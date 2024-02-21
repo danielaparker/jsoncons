@@ -259,7 +259,7 @@ TEST_CASE("json_reader json lines")
     }
 }
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 TEST_CASE("json_reader stateful allocator tests")
 {

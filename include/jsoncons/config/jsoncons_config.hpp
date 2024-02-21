@@ -296,17 +296,6 @@ namespace jsoncons {
 #define JSONCONS_STRING_CONSTANT(CharT, Str) string_constant_of_type<CharT>(Str, JSONCONS_WIDEN(Str))
 #define JSONCONS_STRING_VIEW_CONSTANT(CharT, Str) string_view_constant_of_type<CharT>(Str, JSONCONS_WIDEN(Str))
 
-#if defined(__clang__) 
-#define JSONCONS_HAS_STD_REGEX 1
-#define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
-#elif (defined(__GNUC__) && (__GNUC__ == 4)) && (defined(__GNUC__) && __GNUC_MINOR__ < 9)
-// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
-// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
-// and gcc doesn't support allocators with no default constructor
-#else
-#define JSONCONS_HAS_STD_REGEX 1
-#define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
-#endif
 
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 

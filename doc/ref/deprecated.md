@@ -4,6 +4,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 Related class|Old name|Replacement
 --------|-----------|--------------
+__corelib__|&nbsp;|&nbsp;
 `basic_json`|&nbsp;|&nbsp;
 &nbsp;|`owjson`|`wojson`
 &nbsp;|`json_deserializer`|`json_decoder<json>`
@@ -145,16 +146,19 @@ Related class|Old name|Replacement
 &nbsp;|`wjson_compressed_string_serializer`|`wcompact_json_string_encoder`
 &nbsp;|`compact_json_encoder`|`compact_json_stream_encoder`
 &nbsp;|`wcompact_json_encoder`|`compact_wjson_stream_encoder`
+__bson__|&nbsp;|&nbsp;
 `basic_bson_reader`|&nbsp;|&nbsp;
 &nbsp;|`bson_reader`|`bson_stream_reader`
 &nbsp;|`bson_buffer_reader`|`bson_bytes_reader`
 `basic_bson_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+__cbor__|&nbsp;|&nbsp;
 `basic_cbor_reader`|&nbsp;|&nbsp;
 &nbsp;|`cbor_reader`|`cbor_stream_reader`
 &nbsp;|`cbor_buffer_reader`|`cbor_bytes_reader`
 `basic_cbor_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+__csv__|&nbsp;|&nbsp;
 `basic_csv_reader`|&nbsp;|&nbsp;
 &nbsp;|`csv_reader`|`csv_string_reader` or `csv_stream_reader`
 &nbsp;|`wcsv_reader`|`wcsv_string_reader` or `wcsv_stream_reader`
@@ -173,16 +177,19 @@ Related class|Old name|Replacement
 &nbsp;|`wcsv_serializing_options`|`wcsv_options`
 &nbsp;|`mapping`|`mapping_kind`
 &nbsp;|`floating_point_format`|`float_format`
+__msgpack__|&nbsp;|&nbsp;
 `basic_msgpack_reader`|&nbsp;|&nbsp;
 &nbsp;|`msgpack_reader`|`msgpack_stream_reader`
 &nbsp;|`msgpack_buffer_reader`|`msgpack_bytes_reader`
 `basic_msgpack_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+__ubjson__|&nbsp;|&nbsp;
 `basic_ubjson_reader`|&nbsp;|&nbsp;
 &nbsp;|`ubjson_reader`|`ubjson_stream_reader`
 &nbsp;|`ubjson_buffer_reader`|`ubjson_bytes_reader`
 `basic_ubjson_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+__jsonpointer__|&nbsp;|&nbsp;
 `basic_json_pointer`|&nbsp;|&nbsp;
 &nbsp;|`address`|`json_pointer`
 &nbsp;|`json_ptr`|`json_pointer`
@@ -190,10 +197,6 @@ Related class|Old name|Replacement
 &nbsp;|`unflatten_options::object`|`unflatten_options::assume_object`
 &nbsp;|`insert_or_assign`|`add`
 &nbsp;|`insert`|`add_if_absent`
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
 &nbsp;|``|``
 &nbsp;|``|``
 &nbsp;|``|``

@@ -26,7 +26,7 @@ TEST_CASE("heap_string test")
     heap_string_factory_type::destroy(ptr);
 }
 
-#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 
 TEST_CASE("heap_string with polymorphic allocator test")
