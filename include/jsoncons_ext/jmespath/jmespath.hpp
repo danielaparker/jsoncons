@@ -43,8 +43,7 @@ namespace jmespath {
     {
         static int precedence_level(operator_kind oper)
         {
-            switch (oper)
-            {
+             {
                 case operator_kind::projection_op:
                     return 11;
                 case operator_kind::flatten_projection_op:
@@ -5150,73 +5149,6 @@ namespace jmespath {
                 ec = jmespath_errc::invalid_codepoint;
             }
             return cp;
-        }
-
-        static bool is_alpha(char c) 
-        {
-            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-        }
-
-        static bool is_digit(char c) 
-        {
-            return (c >= '0' && c <= '9');
-        }
-
-        static bool is_alphanum(char c)
-        {
-            return is_alpha(c) || is_digit(c);
-        }
-
-        static bool is_unreserved(char c)
-        {
-            switch (c)
-            {
-                case '_':
-                case '-':
-                case '!':
-                case '.':
-                case '~':
-                case '\'':
-                case '(':
-                case ')':
-                case '*':
-                    return true;
-                default:
-                    return is_alphanum(c);
-            }
-        }
-
-        static bool is_punct(char c)
-        {
-            switch (c)
-            {
-                case ',':
-                case ';':
-                case ':':
-                case '$':
-                case '&':
-                case '+':
-                case '=':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-
-        static bool is_unreserved(char c)
-        {
-            switch (c)
-            {
-                case '?':
-                case '/':
-                case '[':
-                case ']':
-                case '@':
-                    return true;
-                default:
-                    return is_punct(c);
-            }
         }
     };
 
