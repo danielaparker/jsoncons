@@ -37,13 +37,14 @@ namespace jmespath {
         gt_op,
         gte_op,
         not_op
-    };
+    }; 
 
     struct operator_table final
     {
         static int precedence_level(operator_kind oper)
         {
-             {
+            switch (oper)
+            {
                 case operator_kind::projection_op:
                     return 11;
                 case operator_kind::flatten_projection_op:
