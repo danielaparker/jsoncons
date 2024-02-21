@@ -5195,7 +5195,7 @@ namespace jmespath {
                 case ':':
                 case '$':
                 case '&':
-                case '+'':
+                case '+':
                 case '=':
                     return true;
                 default:

@@ -52,7 +52,15 @@ namespace jsonschema {
 
         bool has_plain_name_fragment() const
         {
-            return !identifier_.empty() && identifier_.front() != '/';
+            if (identifier_.empty())
+            {
+                return false;
+            }
+            std::error_code ec;
+            jsonpointer::json_pointer::parse(identifier_, ec);
+            return ec ? true : false;
+
+            //return !identifier_.empty() && identifier_.front() != '/';
         }
 
         jsoncons::uri base() const
