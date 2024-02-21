@@ -395,9 +395,10 @@ namespace jsoncons {
         {
             std::string decoded;
 
-            for (std::size_t i = 0; i < encoded.size();)
+            std::size_t length = encoded.size();
+            for (std::size_t i = 0; i < length;)
             {
-                if (encoded[i] == '%' && (encoded.size() - i) >= 3)
+                if (encoded[i] == '%' && (length - i) >= 3)
                 {
                     auto hex = encoded.substr(i + 1, 2);
 

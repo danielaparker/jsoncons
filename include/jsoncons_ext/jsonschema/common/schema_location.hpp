@@ -28,16 +28,14 @@ namespace jsonschema {
         schema_location(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
-            if (!uri_.encoded_fragment().empty())
-            {
-                identifier_ = std::string(uri_.fragment().data(), uri_.fragment().size());
-            }
+            identifier_ = uri_.fragment();
         }
 
         schema_location(const uri& uri)
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
+            identifier_ = uri_.fragment();
         }
 
         jsoncons::uri uri() const
@@ -52,15 +50,14 @@ namespace jsonschema {
 
         bool has_plain_name_fragment() const
         {
-            if (identifier_.empty())
+            std::string identifier = uri_.fragment();
+            if (identifier.empty())
             {
                 return false;
             }
             std::error_code ec;
-            jsonpointer::json_pointer::parse(identifier_, ec);
+            jsonpointer::json_pointer::parse(identifier, ec);
             return ec ? true : false;
-
-            //return !identifier_.empty() && identifier_.front() != '/';
         }
 
         jsoncons::uri base() const
