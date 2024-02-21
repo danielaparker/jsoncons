@@ -13,6 +13,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { 
 
@@ -359,6 +360,35 @@ namespace jsoncons {
         friend bool operator>=(const uri& lhs, const uri& rhs)
         {
             return lhs.compare(rhs) >= 0;
+        }
+
+        static void encode_part(const jsoncons::string_view& sv, std::string& encoded)
+        {
+            const std::size_t length = sv.size();
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                switch (sv[i])
+                {
+                    case ';':
+                    //case '/':
+                    case '?':
+                    case ':':
+                    //case '@':
+                    case '&':
+                    case '=':
+                    case '+':
+                    case '$':
+                    case ',':
+                    case '%':
+                        encoded.push_back('%');
+                        jsoncons::detail::integer_to_string_hex((uint8_t)sv[i], encoded);
+                        break;
+                    default:
+                        encoded.push_back(sv[i]);
+                        break;
+                }
+            }
+
         }
 
         static std::string decode_part(const jsoncons::string_view& encoded)
