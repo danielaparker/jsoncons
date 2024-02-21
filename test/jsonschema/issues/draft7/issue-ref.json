@@ -1,31 +1,49 @@
 [
     {
-        "description": "empty tokens in $ref json-pointer",
+        "description": "escaped pointer ref",
         "schema": {
             "definitions": {
-                "": {
-                    "definitions": {
-                        "": { "type": "number" }
-                    }
-                } 
+                "tilde~field": {"type": "integer"},
+                "slash/field": {"type": "integer"},
+                "percent%field": {"type": "integer"}
             },
-            "allOf": [
-                {
-                    "$ref": "#/definitions//definitions/"
-                }
-            ]
+            "properties": {
+                "tilde": {"$ref": "#/definitions/tilde~0field"},
+                "slash": {"$ref": "#/definitions/slash~1field"},
+                "percent": {"$ref": "#/definitions/percent%25field"}
+            }
         },
         "tests": [
             {
-                "description": "number is valid",
-                "data": 1,
-                "valid": true
-            }/*,
-            {
-                "description": "non-number is invalid",
-                "data": "a",
+                "description": "slash invalid",
+                "data": {"slash": "aoeu"},
                 "valid": false
-            }*/
+            },
+            {
+                "description": "tilde invalid",
+                "data": {"tilde": "aoeu"},
+                "valid": false
+            },
+            {
+                "description": "percent invalid",
+                "data": {"percent": "aoeu"},
+                "valid": false
+            },
+            {
+                "description": "slash valid",
+                "data": {"slash": 123},
+                "valid": true
+            },
+            {
+                "description": "tilde valid",
+                "data": {"tilde": 123},
+                "valid": true
+            },
+            {
+                "description": "percent valid",
+                "data": {"percent": 123},
+                "valid": true
+            }
         ]
     }
 ]

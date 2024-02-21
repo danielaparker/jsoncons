@@ -45,16 +45,16 @@ namespace jsonschema {
 
         bool has_fragment() const
         {
-            return !identifier_.empty();
+            return !uri_.encoded_fragment().empty();
         }
 
         bool has_plain_name_fragment() const
         {
-            std::string identifier = uri_.fragment();
-            if (identifier.empty())
+            if (!has_fragment())
             {
                 return false;
             }
+            std::string identifier = uri_.fragment();
             std::error_code ec;
             jsonpointer::json_pointer::parse(identifier, ec);
             return ec ? true : false;
@@ -77,6 +77,11 @@ namespace jsonschema {
 
         std::string fragment() const
         {
+            /*auto s = uri_.fragment();
+            if (s != identifier_)
+            {
+                std::cout << "DIFFERENT: " << identifier_ << ", " << s << "\n";
+            }*/
             return identifier_;
         }
 
