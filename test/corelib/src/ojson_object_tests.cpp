@@ -332,7 +332,7 @@ TEST_CASE("test_ojson_merge_or_update_move")
     }
 }
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <common/FreeListAllocator.hpp>
 #include <scoped_allocator>

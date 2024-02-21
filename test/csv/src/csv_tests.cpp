@@ -1501,7 +1501,7 @@ TEST_CASE("csv detect bom")
     }
 }
 /*
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 TEST_CASE("csv_reader constructors")
 {
     const std::string input = R"(Date,1Y,2Y,3Y,5Y

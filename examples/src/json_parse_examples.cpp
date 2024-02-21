@@ -100,7 +100,7 @@ void max_nesting_path_example()
     }
 }
 
-#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 
 // since 0.171.0

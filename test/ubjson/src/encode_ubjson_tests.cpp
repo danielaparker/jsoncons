@@ -210,7 +210,7 @@ TEST_CASE("encode_ubjson overloads")
     }
 }
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;

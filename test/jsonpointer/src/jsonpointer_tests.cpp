@@ -683,7 +683,7 @@ TEST_CASE("to_uri_fragment test")
     }
 }
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <common/FreeListAllocator.hpp>
 
