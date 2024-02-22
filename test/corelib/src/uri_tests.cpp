@@ -3,6 +3,7 @@
 
 #include <jsoncons/uri.hpp>
 #include <catch/catch.hpp>
+#include <iostream>
 
 TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)")
 {
@@ -256,6 +257,29 @@ TEST_CASE("uri part decode tests")
 
         std::string decoded = jsoncons::uri::decode_part(raw);
         CHECK(decoded == expected);
+    }
+}
+
+TEST_CASE("uri part encode tests")
+{
+    SECTION("test 1")
+    {
+        std::string part = "/@_-!.~'()*azAZ09,;:$&+=%3F%ae";
+        std::string expected = part;
+
+        std::string encoded;
+        jsoncons::uri::encode_path(part, encoded);
+        CHECK(encoded == expected);
+    }
+    
+    SECTION("test 2")
+    {
+        std::string part = "%?/[]@,;:$&+=";
+        std::string expected = "%25%3F/%5B%5D@,;:$&+=";
+
+        std::string encoded;
+        jsoncons::uri::encode_path(part, encoded);
+        CHECK(encoded == expected);
     }
 }
 

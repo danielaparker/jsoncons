@@ -14,6 +14,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>
+#include <iostream>
 
 namespace jsoncons { 
 
@@ -362,35 +363,6 @@ namespace jsoncons {
             return lhs.compare(rhs) >= 0;
         }
 
-        static void encode_part(const jsoncons::string_view& sv, std::string& encoded)
-        {
-            const std::size_t length = sv.size();
-            for (std::size_t i = 0; i < length; ++i)
-            {
-                switch (sv[i])
-                {
-                    case ';':
-                    //case '/':
-                    case '?':
-                    case ':':
-                    //case '@':
-                    case '&':
-                    case '=':
-                    case '+':
-                    case '$':
-                    case ',':
-                    case '%':
-                        encoded.push_back('%');
-                        jsoncons::detail::integer_to_string_hex((uint8_t)sv[i], encoded);
-                        break;
-                    default:
-                        encoded.push_back(sv[i]);
-                        break;
-                }
-            }
-
-        }
-
         static std::string decode_part(const jsoncons::string_view& encoded)
         {
             std::string decoded;
@@ -708,6 +680,168 @@ namespace jsoncons {
             }
         }
 
+        static bool is_alpha(char ch)
+        {
+            return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'); 
+        }
+
+        static bool is_digit(char ch)
+        {
+            return (ch >= '0' && ch <= '9'); 
+        }
+
+        static bool is_alphanum(char ch)
+        {
+            return is_alpha(ch) || is_digit(ch); 
+        }
+
+        static bool is_unreserved(char ch)
+        {
+            switch (ch)
+            {
+                case '_':
+                case '-':
+                case '!':
+                case '.':
+                case '~':
+                case '\'':
+                case '(':
+                case ')':
+                case '*':
+                    return true;
+                default:
+                    return is_alphanum(ch);
+            }
+        }
+
+        static bool is_punct(char ch)
+        {
+            switch (ch)
+            {
+                case ',':
+                case ';':
+                case ':':
+                case '$':
+                case '&':
+                case '+':
+                case '=':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        static bool is_reserved(char ch)
+        {
+            switch (ch)
+            { 
+                case '?':
+                case '/':
+                case '[':
+                case ']':
+                case '@':
+                    return true;
+                default:
+                    return is_punct(ch);
+            }
+        }
+
+        static bool is_hex(char ch)
+        {
+            switch(ch)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': 
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        static bool is_escaped(const char* s, std::size_t length)
+        {
+            bool is_esc = false;
+
+            return length < 3 ? false : s[0] == '%' && is_hex(s[1]) && is_hex(s[2]);
+        }
+
+    public:
+
+        // If a path is given then it is appended. Any character not in the unreserved, punct, 
+        // escaped, or other categories, and not equal to the slash character ('/') or the 
+        // commercial-at character ('@'), is quoted.
+
+        static void encode_path(const jsoncons::string_view& sv, std::string& encoded)
+        {
+            const std::size_t length1 = sv.size() <= 2 ? 0 : sv.size() - 2;
+
+            std::size_t i = 0;
+            for (; i < length1; ++i)
+            {
+                char ch = sv[i];
+
+                switch (ch)
+                {
+                    case '/':
+                    case '@':
+                        encoded.push_back(sv[i]);
+                        break;
+                    default:
+                    {
+                        bool escaped = is_escaped(sv.data()+i,3);
+                        if (!is_unreserved(ch) && !is_punct(ch) && !escaped)
+                        {
+                            encoded.push_back('%');
+                            if (uint8_t(ch) <= 15)
+                            {
+                                std::cout << "PAD\n";
+                                encoded.push_back('0');
+                            }
+                            jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                        }
+                        else if (escaped)
+                        {
+                            encoded.push_back(ch);
+                            encoded.push_back(sv[++i]);
+                            encoded.push_back(sv[++i]);
+                        }
+                        else
+                        {
+                            encoded.push_back(ch);
+                        }
+                        break;
+                    }
+                }
+            }
+ 
+            const std::size_t length2 = sv.size();
+            for (; i < length2; ++i)
+            {
+                char ch = sv[i];
+
+                switch (ch)
+                {
+                    case '/':
+                    case '@':
+                        encoded.push_back(ch);
+                        break;
+                    default:
+                    {
+                        if (!is_unreserved(ch) && !is_punct(ch))
+                        {
+                            encoded.push_back('%');
+                            jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                        }
+                        else
+                        {
+                            encoded.push_back(ch);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     };
 
 } // namespace jsoncons
