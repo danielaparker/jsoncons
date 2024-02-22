@@ -147,7 +147,7 @@ namespace jsoncons {
             {
                 uri_.append("#");
                 fragment_.first = uri_.length();
-                uri_.append(std::string(fragment));
+                encode_illegal_characters(fragment, uri_);
                 fragment_.second = uri_.length();
             }
             else
@@ -193,8 +193,6 @@ namespace jsoncons {
 
         string_view encoded_query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
 
-        string_view encoded_fragment() const noexcept { return string_view(uri_.data()+fragment_.first,(fragment_.second-fragment_.first)); }
-
         string_view encoded_authority() const noexcept { return string_view(uri_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
 
         std::string path() const
@@ -210,6 +208,11 @@ namespace jsoncons {
         std::string fragment() const
         {
             return decode_part(encoded_fragment());
+        }
+
+        string_view encoded_fragment() const noexcept 
+        { 
+            return string_view(uri_.data()+fragment_.first,(fragment_.second-fragment_.first)); 
         }
 
         std::string authority() const
@@ -935,7 +938,7 @@ namespace jsoncons {
             {
                 char ch = sv[i];
 
-                if (!is_unreserved(ch) && !is_punct(ch))
+                if (!is_unreserved(ch) && !is_reserved(ch))
                 {
                     encoded.push_back('%');
                     jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
