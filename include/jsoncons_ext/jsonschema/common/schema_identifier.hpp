@@ -25,13 +25,13 @@ namespace jsonschema {
         {
         }
 
-        schema_identifier(const std::string& uri)
+        explicit schema_identifier(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
             identifier_ = uri_.fragment();
         }
 
-        schema_identifier(const uri& uri)
+        explicit schema_identifier(const uri& uri)
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
@@ -77,20 +77,12 @@ namespace jsonschema {
 
         std::string fragment() const
         {
-            /*auto s = uri_.fragment();
-            if (s != identifier_)
-            {
-                std::cout << "DIFFERENT: " << identifier_ << ", " << s << "\n";
-            }*/
             return identifier_;
         }
 
         schema_identifier resolve(const schema_identifier& uri) const
         {
-            schema_identifier new_uri;
-            new_uri.identifier_ = identifier_;
-            new_uri.uri_ = uri_.resolve(uri.uri_);
-            return new_uri;
+            return schema_identifier(uri_.resolve(uri.uri_));
         }
 
         int compare(const schema_identifier& other) const
@@ -116,14 +108,10 @@ namespace jsonschema {
                                   uri_.host(),
                                   uri_.port(),
                                   uri_.path(),
-                                  uri_.encoded_query(),
+                                  uri_.query(),
                                   pointer.to_string());
 
-            schema_identifier wrapper;
-            wrapper.uri_ = new_uri;
-            wrapper.identifier_ = pointer.to_string();
-
-            return wrapper;
+            return schema_identifier(new_uri);
         }
 
         schema_identifier append(std::size_t index) const
@@ -142,11 +130,7 @@ namespace jsonschema {
                                   uri_.encoded_query(),
                                   pointer.to_string());
 
-            schema_identifier wrapper;
-            wrapper.uri_ = new_uri;
-            wrapper.identifier_ = pointer.to_string();
-
-            return wrapper;
+            return schema_identifier(new_uri);
         }
 
         std::string string() const

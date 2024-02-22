@@ -264,7 +264,7 @@ namespace draft201909 {
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 schema_identifier relative(it->value().template as<std::string>()); 
-                auto id = relative.resolve(context.get_base_uri()); 
+                auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
                 validators.push_back(get_or_create_reference(id));
             }
 
@@ -273,7 +273,7 @@ namespace draft201909 {
             {
                 schema_identifier relative(it->value().template as<std::string>()); 
                 auto base_uri = context.get_base_uri();
-                auto id = relative.resolve(base_uri); // REVISIT
+                auto id = relative.resolve(schema_identifier{ base_uri }); // REVISIT
                 validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
             }
 
@@ -697,7 +697,7 @@ namespace draft201909 {
                 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_identifier relative(id); 
-                    schema_identifier new_uri = relative.resolve(parent.get_base_uri());
+                    schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_base_uri() });
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

@@ -203,7 +203,7 @@ namespace draft7 {
                         std::vector<keyword_validator_type> validators;
                         Json default_value{ jsoncons::null_type() };
                         schema_identifier relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(context.get_base_uri()); 
+                        auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
                         validators.push_back(get_or_create_reference(id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
@@ -669,7 +669,7 @@ namespace draft7 {
                 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_identifier relative(id); 
-                    schema_identifier new_uri = relative.resolve(parent.get_base_uri());
+                    schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_base_uri() });
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
