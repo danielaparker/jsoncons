@@ -115,7 +115,7 @@ namespace jsonschema {
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),
-                                  uri_.encoded_path(),
+                                  uri_.path(),
                                   uri_.encoded_query(),
                                   pointer.to_string());
 
@@ -138,7 +138,7 @@ namespace jsonschema {
                                   uri_.userinfo(),
                                   uri_.host(),
                                   uri_.port(),
-                                  uri_.encoded_path(),
+                                  uri_.path(),
                                   uri_.encoded_query(),
                                   pointer.to_string());
 
