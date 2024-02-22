@@ -86,10 +86,6 @@ Checks if the pointer is empty
    string_type to_string() const
 Returns a JSON Pointer represented as a string value, escaping any `/` or `~` characters.
 
-   string_type to_uri_fragment() const
-Returns a string representing the JSON Pointer as a URI fragment identifier, 
-escaping any `/` or `~` characters.
-
 
 #### Static member functions
 
