@@ -121,7 +121,8 @@ namespace jsoncons {
                 {
                     uri_.push_back('/');
                 }
-                uri_.append(std::string(path));
+                //uri_.append(std::string(path));
+                encode_path(path, uri_);
                 path_.second = uri_.length();
             }
             else
@@ -171,7 +172,7 @@ namespace jsoncons {
 
         uri base() const noexcept 
         { 
-            return uri{ scheme(), userinfo(), host(), port(), encoded_path(), jsoncons::string_view(), jsoncons::string_view()};
+            return uri{ scheme(), userinfo(), host(), port(), path(), jsoncons::string_view(), jsoncons::string_view()};
         }
 
         string_view scheme() const noexcept { return string_view(uri_.data()+scheme_.first,(scheme_.second-scheme_.first)); }
@@ -761,8 +762,6 @@ namespace jsoncons {
 
         static bool is_escaped(const char* s, std::size_t length)
         {
-            bool is_esc = false;
-
             return length < 3 ? false : s[0] == '%' && is_hex(s[1]) && is_hex(s[2]);
         }
 
