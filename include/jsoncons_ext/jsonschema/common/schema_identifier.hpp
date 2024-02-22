@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_LOCATION_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_LOCATION_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/uri.hpp>
@@ -16,22 +16,22 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class schema_location
+    class schema_identifier
     {
         jsoncons::uri uri_;
         std::string identifier_;
     public:
-        schema_location()
+        schema_identifier()
         {
         }
 
-        schema_location(const std::string& uri)
+        schema_identifier(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
             identifier_ = uri_.fragment();
         }
 
-        schema_location(const uri& uri)
+        schema_identifier(const uri& uri)
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
@@ -85,15 +85,15 @@ namespace jsonschema {
             return identifier_;
         }
 
-        schema_location resolve(const schema_location& uri) const
+        schema_identifier resolve(const schema_identifier& uri) const
         {
-            schema_location new_uri;
+            schema_identifier new_uri;
             new_uri.identifier_ = identifier_;
             new_uri.uri_ = uri_.resolve(uri.uri_);
             return new_uri;
         }
 
-        int compare(const schema_location& other) const
+        int compare(const schema_identifier& other) const
         {
             int result = uri_.compare(other.uri_);
             if (result != 0) 
@@ -103,7 +103,7 @@ namespace jsonschema {
             return result; 
         }
 
-        schema_location append(const std::string& field) const
+        schema_identifier append(const std::string& field) const
         {
             if (has_plain_name_fragment())
                 return *this;
@@ -119,14 +119,14 @@ namespace jsonschema {
                                   uri_.encoded_query(),
                                   pointer.to_string());
 
-            schema_location wrapper;
+            schema_identifier wrapper;
             wrapper.uri_ = new_uri;
             wrapper.identifier_ = pointer.to_string();
 
             return wrapper;
         }
 
-        schema_location append(std::size_t index) const
+        schema_identifier append(std::size_t index) const
         {
             if (has_plain_name_fragment())
                 return *this;
@@ -142,7 +142,7 @@ namespace jsonschema {
                                   uri_.encoded_query(),
                                   pointer.to_string());
 
-            schema_location wrapper;
+            schema_identifier wrapper;
             wrapper.uri_ = new_uri;
             wrapper.identifier_ = pointer.to_string();
 
@@ -155,32 +155,32 @@ namespace jsonschema {
             return s;
         }
 
-        friend bool operator==(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator==(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) == 0;
         }
 
-        friend bool operator!=(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator!=(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) != 0;
         }
 
-        friend bool operator<(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator<(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) < 0;
         }
 
-        friend bool operator<=(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator<=(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) <= 0;
         }
 
-        friend bool operator>(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator>(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) > 0;
         }
 
-        friend bool operator>=(const schema_location& lhs, const schema_location& rhs)
+        friend bool operator>=(const schema_identifier& lhs, const schema_identifier& rhs)
         {
             return lhs.compare(rhs) >= 0;
         }

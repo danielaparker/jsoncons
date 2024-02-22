@@ -263,7 +263,7 @@ namespace draft201909 {
             it = sch.find("$ref");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                schema_location relative(it->value().template as<std::string>()); 
+                schema_identifier relative(it->value().template as<std::string>()); 
                 auto id = relative.resolve(context.get_base_uri()); 
                 validators.push_back(get_or_create_reference(id));
             }
@@ -271,7 +271,7 @@ namespace draft201909 {
             it = sch.find("$recursiveRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                schema_location relative(it->value().template as<std::string>()); 
+                schema_identifier relative(it->value().template as<std::string>()); 
                 auto base_uri = context.get_base_uri();
                 auto id = relative.resolve(base_uri); // REVISIT
                 validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
@@ -513,7 +513,7 @@ namespace draft201909 {
                     }
                 }
             }
-            load(compilation_context(schema_location(retrieval_uri)), sch);
+            load(compilation_context(schema_identifier(retrieval_uri)), sch);
         }
 
         void load(const compilation_context& context, const Json& sch)
@@ -539,7 +539,7 @@ namespace draft201909 {
                         if (resolver_)
                         {
                             Json external_sch = resolver_(loc);
-                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_location(loc)), external_sch, {}));
+                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
                             ++loaded_count;
                         }
                         else
@@ -555,7 +555,7 @@ namespace draft201909 {
 
     private:
 
-        void insert_schema(const schema_location& uri, schema_validator<Json>* s)
+        void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
         {
             auto& file = get_or_create_file(uri.base().string());
             auto schemas_it = file.schemas.find(std::string(uri.fragment()));
@@ -585,13 +585,13 @@ namespace draft201909 {
             //root_->resolve_recursive_refs(root_->schema_path(), root_->is_recursive_anchor(), root_.get());
         }
 
-        void insert_unknown_keyword(const schema_location& uri, 
+        void insert_unknown_keyword(const schema_identifier& uri, 
                                     const std::string& key, 
                                     const Json& value)
         {
             auto &file = get_or_create_file(uri.base().string());
             auto new_u = uri.append(key);
-            schema_location new_uri(new_u);
+            schema_identifier new_uri(new_u);
 
             if (new_uri.has_fragment() && !new_uri.has_plain_name_fragment()) 
             {
@@ -614,7 +614,7 @@ namespace draft201909 {
             }
         }
 
-        keyword_validator_type get_or_create_reference(const schema_location& uri)
+        keyword_validator_type get_or_create_reference(const schema_identifier& uri)
         {
             auto &file = get_or_create_file(uri.base().string());
 
@@ -667,7 +667,7 @@ namespace draft201909 {
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
-            std::vector<schema_location> new_uris;
+            std::vector<schema_identifier> new_uris;
             for (const auto& uri : parent.uris())
             {
                 if (!uri.has_plain_name_fragment())
@@ -687,7 +687,7 @@ namespace draft201909 {
                 for (auto& uri : new_uris)
                 {
                     auto new_u = uri.append(key);
-                    uri = schema_location(new_u);
+                    uri = schema_identifier(new_u);
                 }
             }
             if (sch.is_object())
@@ -696,8 +696,8 @@ namespace draft201909 {
                 if (it != sch.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
-                    schema_location relative(id); 
-                    schema_location new_uri = relative.resolve(parent.get_base_uri());
+                    schema_identifier relative(id); 
+                    schema_identifier new_uri = relative.resolve(parent.get_base_uri());
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_location.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -21,32 +21,32 @@ namespace draft201909 {
     class compilation_context
     {
         uri absolute_uri_;
-        std::vector<schema_location> uris_;
+        std::vector<schema_identifier> uris_;
     public:
-        explicit compilation_context(const schema_location& location)
+        explicit compilation_context(const schema_identifier& location)
             : absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_location>{{location}})
+              uris_(std::vector<schema_identifier>{{location}})
         {
         }
 
-        explicit compilation_context(schema_location&& location)
+        explicit compilation_context(schema_identifier&& location)
             : absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_location>{{std::move(location)}})
+              uris_(std::vector<schema_identifier>{{std::move(location)}})
         {
         }
 
-        explicit compilation_context(const std::vector<schema_location>& uris)
+        explicit compilation_context(const std::vector<schema_identifier>& uris)
             : uris_(uris)
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
-        explicit compilation_context(std::vector<schema_location>&& uris)
+        explicit compilation_context(std::vector<schema_identifier>&& uris)
             : uris_(std::move(uris))
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
 
-        const std::vector<schema_location>& uris() const {return uris_;}
+        const std::vector<schema_identifier>& uris() const {return uris_;}
 
         const uri& get_absolute_uri() const
         {

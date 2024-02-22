@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_location.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -35,24 +35,24 @@ namespace jsonschema {
     {
         const compilation_context* parent_;
         uri absolute_uri_;
-        std::vector<schema_location> uris_;
+        std::vector<schema_identifier> uris_;
         uri_anchor_flags anchor_flags_;
     public:
-        explicit compilation_context(const schema_location& location)
+        explicit compilation_context(const schema_identifier& location)
             : parent_(nullptr), absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_location>{{location}}),
+              uris_(std::vector<schema_identifier>{{location}}),
               anchor_flags_{}
         {
         }
 
-        explicit compilation_context(const compilation_context* parent, const std::vector<schema_location>& uris,
+        explicit compilation_context(const compilation_context* parent, const std::vector<schema_identifier>& uris,
             uri_anchor_flags flags = uri_anchor_flags{})
             : parent_(parent), uris_(uris), anchor_flags_{flags}
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
 
-        const std::vector<schema_location>& uris() const {return uris_;}
+        const std::vector<schema_identifier>& uris() const {return uris_;}
 
         const uri& get_absolute_uri() const
         {

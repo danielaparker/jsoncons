@@ -419,7 +419,7 @@ namespace jsonschema {
                     {
                         auto location = context.make_schema_path_with("dependencies");
                         dependent_required.emplace(dep.key(), 
-                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_identifier>{{location}}),
                                 dep.value().template as<std::vector<std::string>>()));
                         break;
                     }
@@ -470,7 +470,7 @@ namespace jsonschema {
                     {
                         auto location = context.make_schema_path_with("dependentRequired");
                         dependent_required.emplace(dep.key(), 
-                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_location>{{location}}),
+                            this->make_required_validator(compilation_context(nullptr, std::vector<schema_identifier>{{location}}),
                                 dep.value()));
                         break;
                     }
