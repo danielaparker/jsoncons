@@ -135,7 +135,7 @@ namespace jsoncons {
             {
                 uri_.append("?");
                 query_.first = uri_.length();
-                uri_.append(std::string(query));
+                encode_illegal_characters(query, uri_);
                 query_.second = uri_.length();
             }
             else
@@ -189,10 +189,6 @@ namespace jsoncons {
 
         string_view port() const noexcept { return string_view(uri_.data()+port_.first,(port_.second-port_.first)); }
 
-        string_view encoded_path() const noexcept { return string_view(uri_.data()+path_.first,(path_.second-path_.first)); }
-
-        string_view encoded_query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
-
         string_view encoded_authority() const noexcept { return string_view(uri_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
 
         std::string path() const
@@ -200,10 +196,14 @@ namespace jsoncons {
             return decode_part(encoded_path());
         }
 
+        string_view encoded_path() const noexcept { return string_view(uri_.data()+path_.first,(path_.second-path_.first)); }
+
         std::string query() const
         {
             return decode_part(encoded_query());
         }
+
+        string_view encoded_query() const noexcept { return string_view(uri_.data()+query_.first,(query_.second-query_.first)); }
 
         std::string fragment() const
         {
