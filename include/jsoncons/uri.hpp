@@ -62,7 +62,8 @@ namespace jsoncons {
                 if (!userinfo.empty()) 
                 {
                     userinfo_.first = uri_.length();
-                    uri_.append(std::string(userinfo));
+                    //uri_.append(std::string(userinfo));
+                    encode_userinfo(userinfo, uri_);
                     userinfo_.second = uri_.length();
                     uri_.append("@");
                 }
@@ -177,7 +178,12 @@ namespace jsoncons {
 
         string_view scheme() const noexcept { return string_view(uri_.data()+scheme_.first,(scheme_.second-scheme_.first)); }
 
-        string_view userinfo() const noexcept { return string_view(uri_.data()+userinfo_.first,(userinfo_.second-userinfo_.first)); }
+        std::string userinfo() const 
+        {
+            return decode_part(encoded_userinfo());
+        }
+
+        string_view encoded_userinfo() const noexcept { return string_view(uri_.data()+userinfo_.first,(userinfo_.second-userinfo_.first)); }
 
         string_view host() const noexcept { return string_view(uri_.data()+host_.first,(host_.second-host_.first)); }
 
@@ -231,9 +237,9 @@ namespace jsoncons {
             if (!encoded_authority().empty()) 
             {
               // g -> http://g
-              if (!this->userinfo().empty()) 
+              if (!this->encoded_userinfo().empty()) 
               {
-                  userinfo = std::string(this->userinfo());
+                  userinfo = std::string(this->encoded_userinfo());
               }
 
               if (!this->host().empty()) 
@@ -291,9 +297,9 @@ namespace jsoncons {
                   }
               }
 
-              if (!base.userinfo().empty()) 
+              if (!base.encoded_userinfo().empty()) 
               {
-                  userinfo = std::string(base.userinfo());
+                  userinfo = std::string(base.encoded_userinfo());
               }
 
               if (!base.host().empty()) 
@@ -319,7 +325,7 @@ namespace jsoncons {
         {
             int result = scheme().compare(other.scheme());
             if (result != 0) return result;
-            result = userinfo().compare(other.userinfo());
+            result = encoded_userinfo().compare(other.encoded_userinfo());
             if (result != 0) return result;
             result = host().compare(other.host());
             if (result != 0) return result;
@@ -767,9 +773,8 @@ namespace jsoncons {
 
     public:
 
-        // If a path is given then it is appended. Any character not in the unreserved, punct, 
-        // escaped, or other categories, and not equal to the slash character ('/') or the 
-        // commercial-at character ('@'), is quoted.
+        // Any character not in the unreserved, punct or escaped categories, and not equal 
+        // to the slash character ('/') or the  commercial-at character ('@'), is quoted.
 
         static void encode_path(const jsoncons::string_view& sv, std::string& encoded)
         {
@@ -794,7 +799,6 @@ namespace jsoncons {
                             encoded.push_back('%');
                             if (uint8_t(ch) <= 15)
                             {
-                                std::cout << "PAD\n";
                                 encoded.push_back('0');
                             }
                             jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
@@ -838,6 +842,57 @@ namespace jsoncons {
                         }
                         break;
                     }
+                }
+            }
+        }
+
+
+        // Any character not in the unreserved, punct, or escaped categories is quoted.
+
+        static void encode_userinfo(const jsoncons::string_view& sv, std::string& encoded)
+        {
+            const std::size_t length1 = sv.size() <= 2 ? 0 : sv.size() - 2;
+
+            std::size_t i = 0;
+            for (; i < length1; ++i)
+            {
+                char ch = sv[i];
+
+                bool escaped = is_escaped(sv.data()+i,3);
+                if (!is_unreserved(ch) && !is_punct(ch) && !escaped)
+                {
+                    encoded.push_back('%');
+                    if (uint8_t(ch) <= 15)
+                    {
+                        encoded.push_back('0');
+                    }
+                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                }
+                else if (escaped)
+                {
+                    encoded.push_back(ch);
+                    encoded.push_back(sv[++i]);
+                    encoded.push_back(sv[++i]);
+                }
+                else
+                {
+                    encoded.push_back(ch);
+                }
+            }
+ 
+            const std::size_t length2 = sv.size();
+            for (; i < length2; ++i)
+            {
+                char ch = sv[i];
+
+                if (!is_unreserved(ch) && !is_punct(ch))
+                {
+                    encoded.push_back('%');
+                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                }
+                else
+                {
+                    encoded.push_back(ch);
                 }
             }
         }

@@ -18,7 +18,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         CHECK(uri.userinfo() == jsoncons::string_view("john.doe"));
         CHECK(uri.host() == jsoncons::string_view("www.example.com"));
         CHECK(uri.port() == jsoncons::string_view("123"));
-        CHECK(uri.encoded_path() == jsoncons::string_view("/forum/questions/"));
+        CHECK(uri.path() == jsoncons::string_view("/forum/questions/"));
         CHECK(uri.encoded_query() == jsoncons::string_view("tag=networking&order=newest"));
         CHECK(uri.encoded_fragment() == jsoncons::string_view("top"));
         CHECK(uri.base().string() == "https://john.doe@www.example.com:123/forum/questions/");
