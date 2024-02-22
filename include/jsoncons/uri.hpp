@@ -896,6 +896,56 @@ namespace jsoncons {
                 }
             }
         }
+
+        // The set of all legal URI characters consists of the unreserved, reserved, escaped characters.
+
+        static void encode_illegal_characters(const jsoncons::string_view& sv, std::string& encoded)
+        {
+            const std::size_t length1 = sv.size() <= 2 ? 0 : sv.size() - 2;
+
+            std::size_t i = 0;
+            for (; i < length1; ++i)
+            {
+                char ch = sv[i];
+
+                bool escaped = is_escaped(sv.data()+i,3);
+                if (!is_unreserved(ch) && !is_reserved(ch) && !escaped)
+                {
+                    encoded.push_back('%');
+                    if (uint8_t(ch) <= 15)
+                    {
+                        encoded.push_back('0');
+                    }
+                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                }
+                else if (escaped)
+                {
+                    encoded.push_back(ch);
+                    encoded.push_back(sv[++i]);
+                    encoded.push_back(sv[++i]);
+                }
+                else
+                {
+                    encoded.push_back(ch);
+                }
+            }
+ 
+            const std::size_t length2 = sv.size();
+            for (; i < length2; ++i)
+            {
+                char ch = sv[i];
+
+                if (!is_unreserved(ch) && !is_punct(ch))
+                {
+                    encoded.push_back('%');
+                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                }
+                else
+                {
+                    encoded.push_back(ch);
+                }
+            }
+        }
     };
 
 } // namespace jsoncons

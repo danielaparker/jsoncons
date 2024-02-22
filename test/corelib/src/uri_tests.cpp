@@ -283,3 +283,16 @@ TEST_CASE("uri part encode tests")
     }
 }
 
+TEST_CASE("uri part encode illegal characters tests")
+{
+    SECTION("test 1")
+    {
+        std::string part = "_-!.~\()*azAZ09?/[]@,;:$&+=%3F%ae";
+        std::string expected = part;
+
+        std::string encoded;
+        jsoncons::uri::encode_illegal_characters(part, encoded);
+        CHECK(encoded == expected);
+    }
+}
+
