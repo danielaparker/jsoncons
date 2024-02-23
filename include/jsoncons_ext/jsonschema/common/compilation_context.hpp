@@ -19,18 +19,17 @@ namespace jsonschema {
 
     class compilation_context
     {
-        const compilation_context* parent_;
         uri absolute_uri_;
         std::vector<schema_identifier> uris_;
     public:
         explicit compilation_context(const schema_identifier& location)
-            : parent_(nullptr), absolute_uri_(location.uri()), 
+            : absolute_uri_(location.uri()), 
               uris_(std::vector<schema_identifier>{{location}})
         {
         }
 
-        explicit compilation_context(const compilation_context* parent, const std::vector<schema_identifier>& uris)
-            : parent_(parent), uris_(uris)
+        explicit compilation_context(const std::vector<schema_identifier>& uris)
+            : uris_(uris)
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
