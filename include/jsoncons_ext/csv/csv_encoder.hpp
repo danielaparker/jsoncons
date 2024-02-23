@@ -943,10 +943,8 @@ using basic_csv_serializer = basic_csv_encoder<CharT,Sink,Allocator>;
 
 JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
 JSONCONS_DEPRECATED_MSG("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
 JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_encoder") typedef csv_stream_encoder wcsv_encoder;
+JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_encoder") typedef wcsv_stream_encoder wcsv_encoder;
 #endif
 
 }}
