@@ -18,12 +18,12 @@
 
 namespace jsoncons { 
 
-    struct fragment_part_arg_t
+    struct uri_fragment_part_t
     {
-        explicit fragment_part_arg_t() = default; 
+        explicit uri_fragment_part_t() = default; 
     };
 
-    constexpr fragment_part_arg_t fragment_part_arg{};
+    constexpr uri_fragment_part_t uri_fragment_part{};
 
     class uri
     {
@@ -53,7 +53,7 @@ namespace jsoncons {
         {
         }
 
-        uri(const uri& other, fragment_part_arg_t, jsoncons::string_view fragment)
+        uri(const uri& other, uri_fragment_part_t, jsoncons::string_view fragment)
             : uri_string_(other.uri_string_), scheme_(other.scheme_), userinfo_(other.userinfo_), host_(other.host_), 
               port_(other.port_), path_(other.path_), query_(other.query_)
         {
@@ -670,18 +670,25 @@ namespace jsoncons {
                     host = std::make_pair(start,start);
                     port = std::make_pair(start,start);
                     path = std::make_pair(start,s.size());
+                    query = std::make_pair(s.size(), s.size());
+                    fragment = std::make_pair(s.size(), s.size());
                     break;
                 case parse_state::expect_userinfo:
                     userinfo = std::make_pair(start,start);
                     host = std::make_pair(start,start);
                     port = std::make_pair(start,start);
                     path = std::make_pair(start,s.size());
+                    query = std::make_pair(s.size(), s.size());
+                    fragment = std::make_pair(s.size(), s.size());
                     break;
                 case parse_state::expect_path:
                     path = std::make_pair(start,s.size());
+                    query = std::make_pair(s.size(), s.size());
+                    fragment = std::make_pair(s.size(), s.size());
                     break;
                 case parse_state::expect_query:
                     query = std::make_pair(start,s.size());
+                    fragment = std::make_pair(s.size(), s.size());
                     break;
                 case parse_state::expect_fragment:
                     fragment = std::make_pair(start,s.size());

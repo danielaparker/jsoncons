@@ -296,3 +296,17 @@ TEST_CASE("uri part encode illegal characters tests")
     }
 }
 
+TEST_CASE("uri constructors")
+{
+    SECTION("test 1")
+    {
+        jsoncons::uri x{"http://localhost:4242/draft2019-09/recursiveRef6/base.json"};
+
+        jsoncons::uri y{ x, jsoncons::uri_fragment_part, "/anyOf" };
+
+        jsoncons::uri expected{"http://localhost:4242/draft2019-09/recursiveRef6/base.json#/anyOf"};
+
+        CHECK(expected == y);       
+    }
+}
+

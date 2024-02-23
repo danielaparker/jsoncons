@@ -103,15 +103,9 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= field;
 
-            jsoncons::uri new_uri(uri_.scheme(),
-                                  uri_.userinfo(),
-                                  uri_.host(),
-                                  uri_.port(),
-                                  uri_.path(),
-                                  uri_.query(),
-                                  pointer.to_string());
+            jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
 
-            return schema_identifier(new_uri);
+            return schema_identifier(std::move(new_uri));
         }
 
         schema_identifier append(std::size_t index) const
@@ -122,15 +116,9 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= index;
 
-            jsoncons::uri new_uri(uri_.scheme(),
-                                  uri_.userinfo(),
-                                  uri_.host(),
-                                  uri_.port(),
-                                  uri_.path(),
-                                  uri_.encoded_query(),
-                                  pointer.to_string());
+            jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
 
-            return schema_identifier(new_uri);
+            return schema_identifier(std::move(new_uri));
         }
 
         std::string string() const
