@@ -342,7 +342,7 @@ namespace draft7 {
             std::vector<schema_validator_type> item_validators;
             schema_validator_type additional_items_validator = nullptr;
 
-            uri schema_path = context.make_schema_path_with("items");
+            uri schema_path{context.make_schema_path_with("items")};
 
             if (sch.type() == json_type::array_value) 
             {
@@ -369,7 +369,7 @@ namespace draft7 {
         std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context,
             const Json& sch)
         {
-            uri schema_path = context.make_schema_path_with("items");
+            uri schema_path{context.make_schema_path_with("items")};
 
             std::string sub_keys[] = {"items"};
 

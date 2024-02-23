@@ -392,7 +392,7 @@ namespace jsonschema {
         virtual std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
             const Json& sch)
         {
-            uri schema_path = context.make_schema_path_with("oneOf");
+            uri schema_path{ context.make_schema_path_with("oneOf") };
             std::vector<schema_validator_type> subschemas;
 
             size_t c = 0;
