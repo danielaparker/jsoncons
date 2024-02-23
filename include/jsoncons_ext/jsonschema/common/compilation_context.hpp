@@ -17,37 +17,20 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    enum class uri_anchor_flags : int {recursive_anchor=1};
-
-    inline uri_anchor_flags operator|(const uri_anchor_flags &lhs, const uri_anchor_flags &rhs) 
-    {
-        return static_cast<uri_anchor_flags>(std::underlying_type<uri_anchor_flags>::type(lhs)
-                                            | std::underlying_type<uri_anchor_flags>::type(rhs));
-    }
-
-    inline uri_anchor_flags operator&(const uri_anchor_flags &lhs, const uri_anchor_flags &rhs) 
-    {
-        return static_cast<uri_anchor_flags>(std::underlying_type<uri_anchor_flags>::type(lhs)
-                                            & std::underlying_type<uri_anchor_flags>::type(rhs));
-    }
-
     class compilation_context
     {
         const compilation_context* parent_;
         uri absolute_uri_;
         std::vector<schema_identifier> uris_;
-        uri_anchor_flags anchor_flags_;
     public:
         explicit compilation_context(const schema_identifier& location)
             : parent_(nullptr), absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_identifier>{{location}}),
-              anchor_flags_{}
+              uris_(std::vector<schema_identifier>{{location}})
         {
         }
 
-        explicit compilation_context(const compilation_context* parent, const std::vector<schema_identifier>& uris,
-            uri_anchor_flags flags = uri_anchor_flags{})
-            : parent_(parent), uris_(uris), anchor_flags_{flags}
+        explicit compilation_context(const compilation_context* parent, const std::vector<schema_identifier>& uris)
+            : parent_(parent), uris_(uris)
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
@@ -59,32 +42,9 @@ namespace jsonschema {
             return absolute_uri_;
         }
 
-        uri get_base_uri(uri_anchor_flags anchor_flags=uri_anchor_flags()) const
+        uri get_base_uri() const
         {
-            uri base = absolute_uri_.base();
-
-            if (parent_ != nullptr && parent_->anchor_flags_ == uri_anchor_flags::recursive_anchor)
-            {
-                switch (anchor_flags)
-                {
-                    case uri_anchor_flags::recursive_anchor:
-                    {
-                        auto parent = parent_;
-                        while (parent != nullptr)
-                        {
-                            if (parent->anchor_flags_ == uri_anchor_flags::recursive_anchor)
-                            {
-                                base = parent->get_base_uri();
-                            }
-                            parent = parent->parent_;
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-            return base;
+            return absolute_uri_.base();
         }
 
         std::string make_schema_path_with(const std::string& keyword) const
