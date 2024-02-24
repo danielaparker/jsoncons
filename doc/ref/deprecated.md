@@ -151,6 +151,13 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`wjson_compressed_string_serializer`|`wcompact_json_string_encoder`
 &nbsp;|`compact_json_encoder`|`compact_json_stream_encoder`
 &nbsp;|`wcompact_json_encoder`|`compact_wjson_stream_encoder`
+`ser_error`|&nbsp;|&nbsp;
+&nbsp;|`line_number()`|`line()`
+&nbsp;|`column_number()`|`column()`
+&nbsp;|`serialization_error`|`ser_error`
+&nbsp;|`json_parse_exception`|`ser_error`
+&nbsp;|`parse_exception`|`ser_error`
+&nbsp;|`parse_error`|`ser_error`
 __bson__|&nbsp;|&nbsp;
 `basic_bson_reader`|&nbsp;|&nbsp;
 &nbsp;|`bson_reader`|`bson_stream_reader`
@@ -171,6 +178,8 @@ __cbor__|&nbsp;|&nbsp;
 &nbsp;|`cbor_encoder`|`cbor_stream_encoder`
 &nbsp;|`cbor_serializer`|`cbor_stream_encoder`
 &nbsp;|`cbor_buffer_serializer`|`cbor_bytes_encoder`
+`cbor_options`|&nbsp;|&nbsp;
+&nbsp;|`enable_typed_arrays`|`use_typed_arrays`
 __csv__|&nbsp;|&nbsp;
 `csv_errc`|&nbsp;|&nbsp;
 &nbsp;|`csv_parser_errc`|`csv_errc`
