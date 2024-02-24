@@ -705,6 +705,21 @@ namespace draft201909 {
                         new_uris.emplace_back(new_uri); 
                     }
                 }
+                it = sch.find("$anchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    auto value = it->value().template as<std::string>();
+                    if (validate_anchor(value))
+                    {
+                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
+                        schema_identifier identifier{ new_uri };
+                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                        {
+                            new_uris.emplace_back(std::move(identifier)); 
+                        }
+                    }
+                }
             }
 /*
             std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
@@ -714,6 +729,37 @@ namespace draft201909 {
             }
 */
             return compilation_context(new_uris);
+        }
+
+        static bool validate_anchor(const std::string& s)
+        {
+            if (s.empty())
+            {
+                return false;
+            }
+            if (!((s[0] >= 'a' && s[0] <= 'z') || (s[0] >= 'A' && s[0] <= 'Z')))
+            {
+                return false;
+            }
+
+            for (std::size_t i = 1; i < s.size(); ++i)
+            {
+                switch (s[i])
+                {
+                    case '-':
+                    case '_':
+                    case ':':
+                    case '.':
+                        break;
+                    default:
+                        if (!((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9')))
+                        {
+                            return false;
+                        }
+                        break;
+                }
+            }
+            return true;
         }
 
     };

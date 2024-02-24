@@ -1,27 +1,28 @@
  [
     {
-        "description": "invalid anchors",
-        "comment": "Section 8.2.3",
+        "description": "Location-independent identifier with absolute URI",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$ref": "https://json-schema.org/draft/2019-09/schema"
+            "$ref": "http://localhost:1234/draft2019-09/bar#foo",
+            "$defs": {
+                "A": {
+                    "$id": "http://localhost:1234/draft2019-09/bar",
+                    "$anchor": "foo",
+                    "type": "integer"
+                }
+            }
         },
         "tests": [
             {
-                "description": "MUST start with a letter (and not #)",
-                "data": { "$anchor" : "#foo" },
-                "valid": false
-            }/*,
-            {
-                "description": "JSON pointers are not valid",
-                "data": { "$anchor" : "/a/b" },
-                "valid": false
+                "data": 1,
+                "description": "match",
+                "valid": true
             },
             {
-                "description": "invalid with valid beginning",
-                "data": { "$anchor" : "foo#something" },
+                "data": "a",
+                "description": "mismatch",
                 "valid": false
-            }*/
+            }
         ]
     }
 ]
