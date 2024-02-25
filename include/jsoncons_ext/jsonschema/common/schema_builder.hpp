@@ -342,7 +342,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
-            const Json& sch)
+            const Json& sch, const Json&)
         {
             uri schema_path = context.make_schema_path_with("contains");
 
