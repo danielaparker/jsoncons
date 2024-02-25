@@ -206,7 +206,7 @@
                 "valid": false
             }
         ]
-    }/*,
+    },
     {
         "description": "invalid anchors",
         "comment": "Section 8.2.3",
@@ -231,5 +231,5 @@
                 "valid": false
             }
         ]
-    }*/
+    }
 ]

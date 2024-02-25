@@ -20,8 +20,8 @@ namespace {
     {
         if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
         {
-            JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
-            //return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
+            //JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
+            return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
         }
         else
         {
@@ -105,9 +105,9 @@ TEST_CASE("jsonschema draft2019-09 tests")
     }
     SECTION("tests")
     {
-/*
+
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/anchor.json"); // UNCOMMENT METASCHEMA
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/additionalItems.json");
+/*        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/additionalItems.json");
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/additionalProperties.json");
 #endif
