@@ -2209,6 +2209,25 @@ namespace jsonschema {
             : keyword_base<Json>("maxContains", schema_path), max_value_(max_value)
         {
         }
+
+        void validate(const evaluation_context<Json>& eval_context, 
+            const jsonpointer::json_pointer& instance_location,
+            std::size_t count, 
+            error_reporter& reporter) const 
+        {
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+            if (count > max_value_)
+            {
+                std::string message("Expected maxContains: " + std::to_string(max_value_));
+                message.append(", actual: " + std::to_string(count));
+                reporter.error(validation_output(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_path(),
+                        instance_location.to_string(), 
+                        std::move(message)));
+            }
+        }
     };
 
     // minItems
@@ -2224,6 +2243,25 @@ namespace jsonschema {
             : keyword_base<Json>("minContains", schema_path), min_value_(min_value)
         {
         }
+
+        void validate(const evaluation_context<Json>& eval_context, 
+            const jsonpointer::json_pointer& instance_location,
+            std::size_t count, 
+            error_reporter& reporter) const 
+        {
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+            if (count < min_value_)
+            {
+                std::string message("Expected minContains: " + std::to_string(min_value_));
+                message.append(", actual: " + std::to_string(count));
+                reporter.error(validation_output(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_path(),
+                        instance_location.to_string(), 
+                        std::move(message)));
+            }
+        }
     };
 
     template <class Json>
@@ -2233,8 +2271,8 @@ namespace jsonschema {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type schema_validator_;
-        std::unique_ptr<min_contains_keyword<Json>> min_contains_;
         std::unique_ptr<max_contains_keyword<Json>> max_contains_;
+        std::unique_ptr<min_contains_keyword<Json>> min_contains_;
 
     public:
         contains_validator(const uri& schema_path,
@@ -2246,12 +2284,12 @@ namespace jsonschema {
 
         contains_validator(const uri& schema_path,
             schema_validator_type&& schema_validator,
-            std::unique_ptr<min_contains_keyword<Json>>&& min_contains,
-            std::unique_ptr<max_contains_keyword<Json>>&& max_contains)
+            std::unique_ptr<max_contains_keyword<Json>>&& max_contains,
+            std::unique_ptr<min_contains_keyword<Json>>&& min_contains)
             : keyword_validator_base<Json>("contains", std::move(schema_path)), 
               schema_validator_(std::move(schema_validator)),
-              min_contains_(std::move(min_contains)),
-              max_contains_(std::move(max_contains))
+              max_contains_(std::move(max_contains)),
+              min_contains_(std::move(min_contains))
         {
         }
 
@@ -2275,7 +2313,7 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
-            bool contained = false;
+            std::size_t contains_count = 0;
             collecting_error_reporter local_reporter;
             for (const auto& item : instance.array_range()) 
             {
@@ -2283,11 +2321,15 @@ namespace jsonschema {
                 schema_validator_->validate(this_context, item, instance_location, evaluated_properties, local_reporter, patch);
                 if (mark == local_reporter.errors.size()) 
                 {
-                    contained = true;
-                    break;
+                    ++contains_count;
                 }
             }
-            if (!contained)
+            if (max_contains_ && min_contains_)
+            {
+                max_contains_->validate(this_context, instance_location, contains_count, reporter);
+                min_contains_->validate(this_context, instance_location, contains_count, reporter);
+            }
+            else if (contains_count == 0)
             {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 

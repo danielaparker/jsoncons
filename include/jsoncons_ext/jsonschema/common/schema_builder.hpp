@@ -342,14 +342,42 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
-            const Json& sch, const Json&)
+            const Json& sch, const Json& parent)
         {
             uri schema_path = context.make_schema_path_with("contains");
 
             std::string sub_keys[] = { "contains" };
 
+            std::unique_ptr<max_contains_keyword<Json>> max_contains;
+            auto it = parent.find("maxContains");
+            if (it != parent.object_range().end()) 
+            {
+                uri path = context.make_schema_path_with("maxContains");
+                auto value = it->value().template as<std::size_t>();
+                max_contains = jsoncons::make_unique<max_contains_keyword<Json>>(path, value);
+            }
+            else
+            {
+                uri path = context.make_schema_path_with("maxContains");
+                max_contains = jsoncons::make_unique<max_contains_keyword<Json>>(path, (std::numeric_limits<std::size_t>::max)());
+            }
+
+            std::unique_ptr<min_contains_keyword<Json>> min_contains;
+            it = parent.find("minContains");
+            if (it != parent.object_range().end()) 
+            {
+                uri path = context.make_schema_path_with("minContains");
+                auto value = it->value().template as<std::size_t>();
+                min_contains = jsoncons::make_unique<min_contains_keyword<Json>>(path, value);
+            }
+            else
+            {
+                uri path = context.make_schema_path_with("minContains");
+                min_contains = jsoncons::make_unique<min_contains_keyword<Json>>(path, 1);
+            }
+
             return jsoncons::make_unique<contains_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, sub_keys));
+                make_schema_validator(context, sch, sub_keys), std::move(max_contains), std::move(min_contains));
         }
 
         virtual std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const compilation_context& context, const Json& sch)
