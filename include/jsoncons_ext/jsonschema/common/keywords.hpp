@@ -591,69 +591,6 @@ namespace jsonschema {
         }
     };
 
-    // contains
-
-    template <class Json>
-    class contains_validator : public keyword_validator_base<Json>
-    {
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
-
-        schema_validator_type validator_;
-    public:
-        contains_validator(const uri& schema_path, 
-            schema_validator_type&& validator)
-            : keyword_validator_base<Json>("contains", schema_path), 
-              validator_(std::move(validator))
-        {
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter,
-            Json& patch) const final
-        {
-            if (!instance.is_array())
-            {
-                return;
-            }
-
-            if (validator_) 
-            {
-                evaluation_context<Json> this_context(eval_context, this->keyword_name());
-
-                bool contained = false;
-                collecting_error_reporter local_reporter;
-                for (const auto& item : instance.array_range()) 
-                {
-                    std::size_t mark = local_reporter.errors.size();
-                    validator_->validate(this_context, item, instance_location, evaluated_properties, local_reporter, patch);
-                    if (mark == local_reporter.errors.size()) 
-                    {
-                        contained = true;
-                        break;
-                    }
-                }
-                if (!contained)
-                {
-                    reporter.error(validation_output(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_path(), 
-                        instance_location.to_string(), 
-                        "Expected at least one array item to match \"contains\" schema", 
-                        local_reporter.errors));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
-                }
-            }
-        }
-    };
-
     template <class Json>
     class items_object_validator : public keyword_validator_base<Json>
     {
@@ -2258,6 +2195,112 @@ namespace jsonschema {
                     dep.second->validate(this_context, instance, pointer, evaluated_properties, reporter, patch); // validate
                 }
             }
+        }
+    };
+
+    template <class Json>
+    class max_contains_keyword : public keyword_base<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+
+        std::size_t max_value_;
+    public:
+        max_contains_keyword(const uri& schema_path, std::size_t max_value)
+            : keyword_base<Json>("maxContains", schema_path), max_value_(max_value)
+        {
+        }
+    };
+
+    // minItems
+
+    template <class Json>
+    class min_contains_keyword : public keyword_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+
+        std::size_t min_value_;
+    public:
+        min_contains_keyword(const uri& schema_path, std::size_t min_value)
+            : keyword_base<Json>("minContains", schema_path), min_value_(min_value)
+        {
+        }
+    };
+
+    template <class Json>
+    class contains_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+
+        schema_validator_type schema_validator_;
+        std::unique_ptr<min_contains_keyword<Json>> min_contains_;
+        std::unique_ptr<max_contains_keyword<Json>> max_contains_;
+
+    public:
+        contains_validator(const uri& schema_path,
+            schema_validator_type&& schema_validator)
+            : keyword_validator_base<Json>("contains", std::move(schema_path)), 
+              schema_validator_(std::move(schema_validator))
+        {
+        }
+
+        contains_validator(const uri& schema_path,
+            schema_validator_type&& schema_validator,
+            std::unique_ptr<min_contains_keyword<Json>>&& min_contains,
+            std::unique_ptr<max_contains_keyword<Json>>&& max_contains)
+            : keyword_validator_base<Json>("contains", std::move(schema_path)), 
+              schema_validator_(std::move(schema_validator)),
+              min_contains_(std::move(min_contains)),
+              max_contains_(std::move(max_contains))
+        {
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
+            if (!schema_validator_) 
+            {
+                return;
+            }
+
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+            bool contained = false;
+            collecting_error_reporter local_reporter;
+            for (const auto& item : instance.array_range()) 
+            {
+                std::size_t mark = local_reporter.errors.size();
+                schema_validator_->validate(this_context, item, instance_location, evaluated_properties, local_reporter, patch);
+                if (mark == local_reporter.errors.size()) 
+                {
+                    contained = true;
+                    break;
+                }
+            }
+            if (!contained)
+            {
+                reporter.error(validation_output(this->keyword_name(),
+                    this_context.eval_path(), 
+                    this->schema_path(), 
+                    instance_location.to_string(), 
+                    "Expected at least one array item to match \"contains\" schema", 
+                    local_reporter.errors));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+            
         }
     };
 
