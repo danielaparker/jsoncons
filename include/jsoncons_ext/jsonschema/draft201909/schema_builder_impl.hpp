@@ -35,8 +35,8 @@ namespace draft201909 {
         {
             if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
             {
-                JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support") + "https://json-schema.org/draft/2019-09/schema"));
-                //return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+                //JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support") + "https://json-schema.org/draft/2019-09/schema"));
+                return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
