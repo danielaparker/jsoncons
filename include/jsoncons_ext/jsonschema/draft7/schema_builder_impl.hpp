@@ -685,7 +685,7 @@ namespace draft7 {
                 std::cout << "    " << uri.string() << "\n";
             }
 */
-            return compilation_context(std::addressof(parent), new_uris);
+            return compilation_context(new_uris);
         }
 
     };

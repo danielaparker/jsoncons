@@ -5,12 +5,10 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 Related class|Old name|Replacement
 --------|-----------|--------------
 __corelib__|&nbsp;|&nbsp;
+`json_errc`|&nbsp;|&nbsp;
+&nbsp;|`json_parser_errc`|`json_errc`
 `basic_json`|&nbsp;|&nbsp;
 &nbsp;|`owjson`|`wojson`
-&nbsp;|`json_deserializer`|`json_decoder<json>`
-&nbsp;|`wjson_deserializer`|`json_decoder<wjson>`
-&nbsp;|`ojson_deserializer`|`json_decoder<ojson>`
-&nbsp;|`wojson_deserializer`|`json_decoder<wojson>`
 &nbsp;|`preserve_order_policy`|`order_preserving_policy`
 &nbsp;|`value_type`|No replacement
 &nbsp;|`kvp_type`|`key_value_type`
@@ -117,6 +115,9 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`json_reader`|`json_string_reader` or `json_stream_reader`
 &nbsp;|`wjson_reader`|`wjson_string_reader` or `wjson_stream_reader`
 &nbsp;|`max_nesting_depth`|Use `max_nesting_depth` in options
+`basic_staj_event`|&nbsp;|&nbsp;
+&nbsp;|`stream_event`|`staj_event`
+&nbsp;|`wstream_event`|`wstaj_event`
 `basic_json_cursor`|&nbsp;|&nbsp;
 &nbsp;|`class basic_json_pull_reader`|`basic_json_cursor`
 &nbsp;|`json_pull_reader`|`json_stream_cursor`
@@ -126,6 +127,10 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`json_cursor`|`json_stream_cursor`
 &nbsp;|`wjson_cursor`|`wjson_stream_cursor`
 `json_decoder`|&nbsp;|&nbsp;
+&nbsp;|`json_deserializer`|`json_decoder<json>`
+&nbsp;|`wjson_deserializer`|`json_decoder<wjson>`
+&nbsp;|`ojson_deserializer`|`json_decoder<ojson>`
+&nbsp;|`wojson_deserializer`|`json_decoder<wojson>`
 &nbsp;|`json_decoder(result_allocator_arg_t, const allocator_type& alloc, const temp_allocator_type& temp_alloc)`|`json_decoder(const allocator_type& alloc, const temp_allocator_type& temp_alloc)`
 &nbsp;|`root()`|`get_result()`
 `basic_json_encoder`|&nbsp;|&nbsp;
@@ -152,13 +157,23 @@ __bson__|&nbsp;|&nbsp;
 &nbsp;|`bson_buffer_reader`|`bson_bytes_reader`
 `basic_bson_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+`basic_bson_encoder`|&nbsp;|&nbsp;
+&nbsp;|`bson_encoder`|`bson_stream_encoder`
+&nbsp;|`bson_serializer`|`bson_stream_encoder`
+&nbsp;|`bson_buffer_serializer`|`bson_bytes_encoder`
 __cbor__|&nbsp;|&nbsp;
 `basic_cbor_reader`|&nbsp;|&nbsp;
 &nbsp;|`cbor_reader`|`cbor_stream_reader`
 &nbsp;|`cbor_buffer_reader`|`cbor_bytes_reader`
 `basic_cbor_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+`basic_cbor_encoder`|&nbsp;|&nbsp;
+&nbsp;|`cbor_encoder`|`cbor_stream_encoder`
+&nbsp;|`cbor_serializer`|`cbor_stream_encoder`
+&nbsp;|`cbor_buffer_serializer`|`cbor_bytes_encoder`
 __csv__|&nbsp;|&nbsp;
+`csv_errc`|&nbsp;|&nbsp;
+&nbsp;|`csv_parser_errc`|`csv_errc`
 `basic_csv_reader`|&nbsp;|&nbsp;
 &nbsp;|`csv_reader`|`csv_string_reader` or `csv_stream_reader`
 &nbsp;|`wcsv_reader`|`wcsv_string_reader` or `wcsv_stream_reader`
@@ -177,18 +192,31 @@ __csv__|&nbsp;|&nbsp;
 &nbsp;|`wcsv_serializing_options`|`wcsv_options`
 &nbsp;|`mapping`|`mapping_kind`
 &nbsp;|`floating_point_format`|`float_format`
+`basic_csv_encoder`|&nbsp;|&nbsp;
+&nbsp;|`csv_serializer`|`csv_stream_encoder`
+&nbsp;|`csv_string_serializer`|`csv_string_encoder`
+&nbsp;|`csv_encoder`|`csv_stream_encoder`
+&nbsp;|`wcsv_encoder`|`wcsv_stream_encoder`
 __msgpack__|&nbsp;|&nbsp;
 `basic_msgpack_reader`|&nbsp;|&nbsp;
 &nbsp;|`msgpack_reader`|`msgpack_stream_reader`
 &nbsp;|`msgpack_buffer_reader`|`msgpack_bytes_reader`
 `basic_msgpack_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+`basic_msgpack_encoder`|&nbsp;|&nbsp;
+&nbsp;|`msgpack_encoder`|`msgpack_stream_encoder`
+&nbsp;|`msgpack_serializer`|`msgpack_stream_encoder`
+&nbsp;|`msgpack_buffer_serializer`|`msgpack_bytes_encoder`
 __ubjson__|&nbsp;|&nbsp;
 `basic_ubjson_reader`|&nbsp;|&nbsp;
 &nbsp;|`ubjson_reader`|`ubjson_stream_reader`
 &nbsp;|`ubjson_buffer_reader`|`ubjson_bytes_reader`
 `basic_ubjson_cursor`|&nbsp;|&nbsp;
 &nbsp;|`read`|`read_to`
+`basic_ubjson_encoder`|&nbsp;|&nbsp;
+&nbsp;|`ubjson_encoder`|`ubjson_stream_encoder`
+&nbsp;|`ubjson_serializer`|`ubjson_stream_encoder`
+&nbsp;|`ubjson_buffer_serializer`|`ubjson_bytes_encoder`
 __jsonpointer__|&nbsp;|&nbsp;
 `basic_json_pointer`|&nbsp;|&nbsp;
 &nbsp;|`address`|`json_pointer`
@@ -197,14 +225,4 @@ __jsonpointer__|&nbsp;|&nbsp;
 &nbsp;|`unflatten_options::object`|`unflatten_options::assume_object`
 &nbsp;|`insert_or_assign`|`add`
 &nbsp;|`insert`|`add_if_absent`
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
-&nbsp;|``|``
 

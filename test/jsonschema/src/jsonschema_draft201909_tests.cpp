@@ -20,8 +20,8 @@ namespace {
     {
         if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
         {
-            JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
-            //return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
+            //JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
+            return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
         }
         else
         {
@@ -100,7 +100,8 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-not.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-ref.json");
-        jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
+        //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/anchor.json"); // UNCOMMENT METASCHEMA
     }
     SECTION("tests")
     {
@@ -145,7 +146,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/not.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/oneOf.json");
 */
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/recursiveRef.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/recursiveRef.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedItems.json");
 
