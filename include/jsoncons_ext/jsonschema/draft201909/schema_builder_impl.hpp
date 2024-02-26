@@ -156,7 +156,37 @@ namespace draft201909 {
         }
 
         std::shared_ptr<json_schema<Json>> get_schema() override
-        {
+        {                        
+            // load all external schemas that have not already been loaded
+            std::size_t loaded_count = 0;
+            do
+            {
+                loaded_count = 0;
+
+                std::vector<std::string> locations;
+                for (const auto& item : subschema_registries_)
+                    locations.push_back(item.first);
+
+                for (const auto& loc : locations)
+                {
+                    if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
+                    {
+                        if (resolver_)
+                        {
+                            Json external_sch = resolver_(loc);
+                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
+                            ++loaded_count;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW(schema_error("External schema reference '" + loc + "' needs to be loaded, but no resolver provided"));
+                        }
+                    }
+                }
+            } while (loaded_count > 0);
+
+            resolve_references();
+
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
         }
 
@@ -513,44 +543,8 @@ namespace draft201909 {
                     }
                 }
             }
-            load(compilation_context(schema_identifier(retrieval_uri)), sch);
-        }
-
-        void load(const compilation_context& context, const Json& sch)
-        {
             subschema_registries_.clear();
-            root_ = make_schema_validator(context, sch, {});
-
-            // load all external schemas that have not already been loaded
-
-            std::size_t loaded_count = 0;
-            do
-            {
-                loaded_count = 0;
-
-                std::vector<std::string> locations;
-                for (const auto& item : subschema_registries_)
-                    locations.push_back(item.first);
-
-                for (const auto& loc : locations)
-                {
-                    if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
-                    {
-                        if (resolver_)
-                        {
-                            Json external_sch = resolver_(loc);
-                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
-                            ++loaded_count;
-                        }
-                        else
-                        {
-                            JSONCONS_THROW(schema_error("External schema reference '" + loc + "' needs to be loaded, but no resolver provided"));
-                        }
-                    }
-                }
-            } while (loaded_count > 0);
-
-            resolve_references();
+            root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }
 
     private:
