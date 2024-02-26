@@ -502,20 +502,6 @@ namespace draft7 {
 
         void parse(const Json& sch, const std::string& retrieval_uri) override
         {
-            if (sch.is_object())
-            {
-                auto it = sch.find("$schema");
-                if (it != sch.object_range().end())
-                {
-                    auto sv = it->value().as_string_view();
-                    if (sv.find("json-schema.org/draft-07/schema#") == string_view::npos)
-                    {
-                        std::string message("Unsupported schema version ");
-                        message.append(sv.data(), sv.size());
-                        JSONCONS_THROW(schema_error(message));
-                    }
-                }
-            }
             subschema_registries_.clear();
             root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }

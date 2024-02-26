@@ -27,12 +27,18 @@ namespace jsonschema {
                 {
                     parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_impl<Json>>(std::forward<Args>(args)...);
                 }
-                else
+                else if (it->value() == "http://json-schema.org/draft-07/schema#")
                 {
                     parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(std::forward<Args>(args)...);
                 }
+                else
+                {
+                    std::string message("Unsupported schema version ");
+                    message.append(it->value().template as<std::string>());
+                    JSONCONS_THROW(schema_error(message));
+                }
             }
-            else
+            else 
             {
                 parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(std::forward<Args>(args)...);
             }
