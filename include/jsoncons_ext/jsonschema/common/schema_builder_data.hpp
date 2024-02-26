@@ -43,6 +43,7 @@ namespace jsonschema {
         using ref_validator_type = ref_validator<Json>;
         using recursive_ref_validator_type = recursive_ref_validator<Json>;
 
+        uri_resolver<Json> resolver_;
         schema_validator_type root_;
 
         // Owns all subschemas
@@ -52,7 +53,8 @@ namespace jsonschema {
         std::map<std::string, subschema_registry<Json>> subschema_registries_;
 
     public:
-        schema_builder_data() noexcept
+        schema_builder_data(const uri_resolver<Json>& resolver) noexcept
+            : resolver_(resolver)
         {
         }
 

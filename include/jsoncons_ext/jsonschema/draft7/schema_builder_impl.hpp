@@ -39,15 +39,14 @@ namespace draft7 {
         using ref_validator_type = ref_validator<Json>;
     private:
         schema_builder_data<Json>* data_ptr_;
-        uri_resolver<Json> resolver_;
 
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, const Json& sch, const Json& parent)>;
 
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_impl(schema_builder_data<Json>* data_ptr, const uri_resolver<Json>& resolver) noexcept
-            : data_ptr_(data_ptr), resolver_(resolver)
+        schema_builder_impl(schema_builder_data<Json>* data_ptr) noexcept
+            : data_ptr_(data_ptr)
         {
             init();
         }
@@ -130,9 +129,9 @@ namespace draft7 {
                 {
                     if (data_ptr_->subschema_registries_[loc].schemas.empty()) // registry for this file is empty
                     { 
-                        if (resolver_) 
+                        if (data_ptr_->resolver_) 
                         {
-                            Json external_sch = resolver_(loc);
+                            Json external_sch = data_ptr_->resolver_(loc);
                             data_ptr_->subschemas_.emplace_back(make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
                             ++loaded_count;
                         } 

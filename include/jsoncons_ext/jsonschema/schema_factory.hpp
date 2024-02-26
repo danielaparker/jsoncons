@@ -33,7 +33,7 @@ namespace jsonschema {
     };
 
     template <class Json,class... Args>
-    std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, Args&&... args)
+    std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, schema_builder_data<Json>* data_ptr)
     {
         std::unique_ptr<schema_builder<Json>> parser_ptr;
 
@@ -44,11 +44,11 @@ namespace jsonschema {
             { 
                 if (it->value() == "https://json-schema.org/draft/2019-09/schema")
                 {
-                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_impl<Json>>(std::forward<Args>(args)...);
+                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_impl<Json>>(data_ptr);
                 }
                 else if (it->value() == "http://json-schema.org/draft-07/schema#")
                 {
-                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(std::forward<Args>(args)...);
+                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
                 }
                 else
                 {
@@ -59,12 +59,12 @@ namespace jsonschema {
             }
             else 
             {
-                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(std::forward<Args>(args)...);
+                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
             }
         }
         else
         {
-            parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(std::forward<Args>(args)...);
+            parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
         }
         return parser_ptr;
     }
@@ -73,8 +73,8 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), resolver);
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(resolver);
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -82,8 +82,8 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), default_uri_resolver<Json>{});
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(default_uri_resolver<Json>{});
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -92,8 +92,8 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const URIResolver& resolver)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), resolver);
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(resolver);
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }
@@ -101,8 +101,8 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), default_uri_resolver<Json>{});
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(default_uri_resolver<Json>{});
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }
