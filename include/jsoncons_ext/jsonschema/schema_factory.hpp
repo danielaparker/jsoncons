@@ -24,7 +24,7 @@ namespace jsonschema {
             }
             else if (uri.string() == "http://json-schema.org/draft-07/schema#") 
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+                return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.string()));
@@ -70,18 +70,34 @@ namespace jsonschema {
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver=default_uri_resolver<Json>{})
+    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
         auto parser_ptr = make_schema_builder(sch, resolver);
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
 
+    template <class Json>
+    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
+    {
+        auto parser_ptr = make_schema_builder(sch, default_uri_resolver<Json>{});
+        parser_ptr->parse(sch, retrieval_uri);
+        return parser_ptr->get_schema();
+    }
+
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const URIResolver& resolver=default_uri_resolver<Json>{})
+    make_schema(const Json& sch, const URIResolver& resolver)
     {
         auto parser_ptr = make_schema_builder(sch, resolver);
+        parser_ptr->parse(sch, "#");
+        return parser_ptr->get_schema();
+    }
+
+    template <class Json>
+    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
+    {
+        auto parser_ptr = make_schema_builder(sch, default_uri_resolver<Json>{});
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }
