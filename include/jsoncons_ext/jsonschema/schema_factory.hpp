@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
 #define JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
 
+#include <jsoncons_ext/jsonschema/common/schema_builder_data.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_builder_impl.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_impl.hpp>
 
@@ -72,7 +73,8 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        auto parser_ptr = make_schema_builder(sch, resolver);
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), resolver);
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -80,7 +82,8 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
     {
-        auto parser_ptr = make_schema_builder(sch, default_uri_resolver<Json>{});
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), default_uri_resolver<Json>{});
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -89,7 +92,8 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const URIResolver& resolver)
     {
-        auto parser_ptr = make_schema_builder(sch, resolver);
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), resolver);
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }
@@ -97,7 +101,8 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
     {
-        auto parser_ptr = make_schema_builder(sch, default_uri_resolver<Json>{});
+        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>();
+        auto parser_ptr = make_schema_builder(sch, data_ptr.get(), default_uri_resolver<Json>{});
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }

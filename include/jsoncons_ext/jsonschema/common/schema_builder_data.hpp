@@ -10,6 +10,8 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
+#include <jsoncons_ext/jsonschema/common/keyword_validator.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -18,6 +20,18 @@
 
 namespace jsoncons {
 namespace jsonschema {
+    
+    template <class Json>
+    struct subschema_registry
+    {
+        using schema_validator_pointer = schema_validator<Json>*;
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using ref_validator_type = ref_validator<Json>;
+
+        std::map<std::string, schema_validator_pointer> schemas; // schemas
+        std::vector<std::pair<std::string, ref_validator_type*>> unresolved; // unresolved references
+        std::map<std::string, Json> unknown_keywords;
+    };
 
     template <class Json>
     class schema_builder_data 
@@ -28,13 +42,6 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
         using recursive_ref_validator_type = recursive_ref_validator<Json>;
-    
-        struct subschema_registry
-        {
-            std::map<std::string, schema_validator_pointer> schemas; // schemas
-            std::vector<std::pair<std::string, ref_validator_type*>> unresolved; // unresolved references
-            std::map<std::string, Json> unknown_keywords;
-        };
 
         schema_validator_type root_;
 
@@ -42,7 +49,7 @@ namespace jsonschema {
         std::vector<schema_validator_type> subschemas_;
 
         // Map location to subschema_registry
-        std::map<std::string, subschema_registry> subschema_registries_;
+        std::map<std::string, subschema_registry<Json>> subschema_registries_;
 
     public:
         schema_builder_data() noexcept
@@ -83,7 +90,7 @@ namespace jsonschema {
             }
         }
 
-        subschema_registry& get_or_create_file(const std::string& loc)
+        subschema_registry<Json>& get_or_create_file(const std::string& loc)
         {
             auto file = subschema_registries_.find(loc);
             if (file != subschema_registries_.end())
