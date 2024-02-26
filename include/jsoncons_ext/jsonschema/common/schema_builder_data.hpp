@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_SCHEMA_DATA_HPP
-#define JSONCONS_JSONSCHEMA_SCHEMA_DATA_HPP
+#ifndef JSONCONS_JSONSCHEMA_SCHEMA_BUILDER_DATA_HPP
+#define JSONCONS_JSONSCHEMA_SCHEMA_BUILDER_DATA_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -20,7 +20,7 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
-    class schema_data 
+    class schema_builder_data 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -45,14 +45,14 @@ namespace jsonschema {
         std::map<std::string, subschema_registry> subschema_registries_;
 
     public:
-        schema_data() noexcept
+        schema_builder_data() noexcept
         {
         }
 
-        schema_data(const schema_data&) = delete;
-        schema_data& operator=(const schema_data&) = delete;
-        schema_data(schema_data&&) = default;
-        schema_data& operator=(schema_data&&) = default;
+        schema_builder_data(const schema_builder_data&) = delete;
+        schema_builder_data& operator=(const schema_builder_data&) = delete;
+        schema_builder_data(schema_builder_data&&) = default;
+        schema_builder_data& operator=(schema_builder_data&&) = default;
 
         void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
         {
