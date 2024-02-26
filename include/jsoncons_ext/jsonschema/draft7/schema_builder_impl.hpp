@@ -29,20 +29,6 @@ namespace jsonschema {
 namespace draft7 {
 
     template <class Json>
-    struct default_uri_resolver
-    {
-        Json operator()(const jsoncons::uri& uri)
-        {
-            if (uri.path() == "/draft-07/schema") 
-            {
-                return schema_draft7<Json>::get_schema();
-            }
-
-            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.base().string()));
-        }
-    };
-
-    template <class Json>
     class schema_builder_impl : public schema_builder<Json> 
     {
     public:
@@ -72,16 +58,9 @@ namespace draft7 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_impl(const uri_resolver<Json>& resolver = default_uri_resolver<Json>()) noexcept
+        schema_builder_impl(const uri_resolver<Json>& resolver) noexcept
 
             : resolver_(resolver)
-        {
-            init();
-        }
-
-        schema_builder_impl(uri_resolver<Json>&& resolver) noexcept
-
-            : resolver_(std::move(resolver))
         {
             init();
         }

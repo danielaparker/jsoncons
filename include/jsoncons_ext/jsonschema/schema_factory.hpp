@@ -13,6 +13,24 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    template <class Json>
+    struct default_uri_resolver
+    {
+        Json operator()(const jsoncons::uri& uri)
+        {
+            if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
+            {
+                return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
+            }
+            else if (uri.string() == "http://json-schema.org/draft-07/schema#") 
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+            }
+
+            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.string()));
+        }
+    };
+
     template <class Json,class... Args>
     std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, Args&&... args)
     {
@@ -52,7 +70,7 @@ namespace jsonschema {
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
+    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver=default_uri_resolver<Json>{})
     {
         auto parser_ptr = make_schema_builder(sch, resolver);
         parser_ptr->parse(sch, retrieval_uri);
@@ -61,25 +79,9 @@ namespace jsonschema {
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const URIResolver& resolver)
+    make_schema(const Json& sch, const URIResolver& resolver=default_uri_resolver<Json>{})
     {
         auto parser_ptr = make_schema_builder(sch, resolver);
-        parser_ptr->parse(sch, "#");
-        return parser_ptr->get_schema();
-    }
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
-    {
-        auto parser_ptr = make_schema_builder(sch);
-        parser_ptr->parse(sch, retrieval_uri);
-        return parser_ptr->get_schema();
-    }
-
-    template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
-    {
-        auto parser_ptr = make_schema_builder(sch);
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }

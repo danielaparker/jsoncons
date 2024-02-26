@@ -204,10 +204,10 @@ TEST_CASE("jsonschema draft7 tests")
     ]
  )");
 
-            auto sch = jsoncons::jsonschema::make_schema(schema);
-            jsoncons::jsonschema::json_validator<jsoncons::json> validator(sch);
+        auto sch = jsoncons::jsonschema::make_schema(schema, resolver);
+        jsoncons::jsonschema::json_validator<jsoncons::json> validator(sch);
 
-            CHECK_FALSE(validator.is_valid(instance));
+        CHECK_FALSE(validator.is_valid(instance));
     }
 //#endif
 }
