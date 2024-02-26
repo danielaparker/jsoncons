@@ -502,7 +502,6 @@ namespace draft7 {
 
         void parse(const Json& sch, const std::string& retrieval_uri) override
         {
-            subschema_registries_.clear();
             root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }
 
