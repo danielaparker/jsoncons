@@ -77,7 +77,7 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        schema_builder_data<Json>> data(resolver);
+        schema_builder_data<Json> data(resolver);
         schema_builder_factory_impl<Json> schema_builder_factory;
 
         auto parser_ptr = schema_builder_factory.make_schema_builder(sch, &data);
