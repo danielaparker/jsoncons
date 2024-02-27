@@ -91,7 +91,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
     {
-        schema_builder_factory_impl<Json> schema_builder_factory(resolver);
+        schema_builder_factory_impl<Json> schema_builder_factory(default_uri_resolver<Json>{});
 
         schema_builder_factory.parse(sch, retrieval_uri);
         return schema_builder_factory.get_schema();
@@ -110,7 +110,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
     {
-        schema_builder_factory_impl<Json> schema_builder_factory(resolver);
+        schema_builder_factory_impl<Json> schema_builder_factory(default_uri_resolver<Json>{});
 
         schema_builder_factory.parse(sch, "#");
         return schema_builder_factory.get_schema();
