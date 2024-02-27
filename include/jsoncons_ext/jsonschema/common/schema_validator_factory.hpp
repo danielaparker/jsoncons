@@ -13,6 +13,18 @@
 
 namespace jsoncons {
 namespace jsonschema {
+    
+    template <class Json>
+    struct subschema_registry
+    {
+        using schema_validator_pointer = schema_validator<Json>*;
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using ref_validator_type = ref_validator<Json>;
+
+        std::map<std::string, schema_validator_pointer> schemas; // schemas
+        std::vector<std::pair<std::string, ref_validator_type*>> unresolved; // unresolved references
+        std::map<std::string, Json> unknown_keywords;
+    };
 
     template <class Json>
     class schema_validator_factory
@@ -27,6 +39,10 @@ namespace jsonschema {
 
         virtual compilation_context make_compilation_context(const compilation_context& parent,
             const Json& sch, jsoncons::span<const std::string> keys) const = 0;
+
+        virtual void build_schema(const Json& sch, const std::string& retrieval_uri) = 0;
+
+        virtual std::shared_ptr<json_schema<Json>> get_schema() = 0;
 
         virtual schema_validator_type make_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys) = 0;

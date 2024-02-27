@@ -14,7 +14,6 @@
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator_factory.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
 #include <cassert>
 #include <set>
@@ -39,15 +38,22 @@ namespace draft201909 {
         using ref_validator_type = ref_validator<Json>;
         using recursive_ref_validator_type = recursive_ref_validator<Json>;
 
-        schema_builder<Json>* schema_builder_ptr_;
+        uri_resolver<Json> resolver_;
+        schema_validator_type root_;
+
+        // Owns all subschemas
+        std::vector<schema_validator_type> subschemas_;
+
+        // Map location to subschema_registry
+        std::map<std::string, subschema_registry<Json>> subschema_registries_;
 
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, const Json& sch, const Json& parent)>;
 
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_validator_factory_impl(schema_builder<Json>* schema_builder_ptr) noexcept
-            : schema_builder_ptr_(schema_builder_ptr)
+        schema_validator_factory_impl(const uri_resolver<Json>& resolver) noexcept
+            : resolver_(resolver)
         {
             init();
         }
@@ -150,7 +156,7 @@ namespace draft201909 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        schema_builder_ptr_->insert_schema(uri, p);
+                        insert_schema(uri, p);
                     }          
                     break;
                 }
@@ -164,7 +170,7 @@ namespace draft201909 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "definitions", def.key() };
-                            schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(
+                            subschemas_.emplace_back(make_schema_validator(
                                 new_context, def.value(), sub_keys));
                         }
                         known_keywords.insert("definitions");
@@ -175,7 +181,7 @@ namespace draft201909 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "$defs", def.key() };
-                            schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(
+                            subschemas_.emplace_back(make_schema_validator(
                                 new_context, def.value(), sub_keys));
                         }
                         known_keywords.insert("definitions");
@@ -184,7 +190,7 @@ namespace draft201909 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        schema_builder_ptr_->insert_schema(uri, p);
+                        insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
@@ -267,7 +273,7 @@ namespace draft201909 {
                 if (then_it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "then" };
-                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(context, then_it->value(), sub_keys));
+                    subschemas_.emplace_back(make_schema_validator(context, then_it->value(), sub_keys));
                     known_keywords.insert("then");
                 }
 
@@ -275,7 +281,7 @@ namespace draft201909 {
                 if (else_it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "else" };
-                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(context, else_it->value(), sub_keys));
+                    subschemas_.emplace_back(make_schema_validator(context, else_it->value(), sub_keys));
                     known_keywords.insert("else");
                 }
             }
@@ -456,13 +462,95 @@ namespace draft201909 {
                 std::move(additional_properties));
         }
 
+        void build_schema(const Json& sch, const std::string& retrieval_uri) final 
+        {
+            root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
+        }
+
+        std::shared_ptr<json_schema<Json>> get_schema()
+        {                        
+            // load all external schemas that have not already been loaded
+            std::size_t loaded_count = 0;
+            do
+            {
+                loaded_count = 0;
+
+                std::vector<std::string> locations;
+                for (const auto& item : subschema_registries_)
+                    locations.push_back(item.first);
+
+                for (const auto& loc : locations)
+                {
+                    if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
+                    {
+                        if (resolver_)
+                        {
+                            Json external_sch = resolver_(loc);
+                            subschemas_.emplace_back(make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
+                            ++loaded_count;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW(schema_error("External schema reference '" + loc + "' needs to be loaded, but no resolver provided"));
+                        }
+                    }
+                }
+            } while (loaded_count > 0);
+
+            resolve_references();
+
+            return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
+        }
+
+        void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
+        {
+            auto& file = get_or_create_file(uri.base().string());
+            auto schemas_it = file.schemas.find(std::string(uri.fragment()));
+            if (schemas_it != file.schemas.end()) 
+            {
+                //JSONCONS_THROW(schema_error("schema with " + uri.string() + " already inserted"));
+                return;
+            }
+
+            file.schemas.insert({std::string(uri.fragment()), s});
+        }
+
+        void resolve_references()
+        {
+            for (auto& doc : subschema_registries_)
+            {
+                for (auto& ref : doc.second.unresolved)
+                {
+                    auto it = doc.second.schemas.find(ref.first);
+                    if (it == doc.second.schemas.end())
+                    {
+                        JSONCONS_THROW(schema_error(doc.first + " has undefined reference " + ref.first + "."));
+                    }
+                    ref.second->set_referred_schema(it->second);
+                }
+            }
+        }
+
+        subschema_registry<Json>& get_or_create_file(const std::string& loc)
+        {
+            auto file = subschema_registries_.find(loc);
+            if (file != subschema_registries_.end())
+            {
+                return file->second;
+            }
+            else
+            {
+                return subschema_registries_.insert(file, {loc, {}})->second;
+            }
+        }
+
     private:
 
         void insert_unknown_keyword(const schema_identifier& uri, 
                                     const std::string& key, 
                                     const Json& value)
         {
-            auto &file = schema_builder_ptr_->get_or_create_file(uri.base().string());
+            auto &file = get_or_create_file(uri.base().string());
             auto new_u = uri.append(key);
             schema_identifier new_uri(new_u);
 
@@ -474,7 +562,7 @@ namespace draft201909 {
                     [fragment](const std::pair<std::string,ref_validator<Json>*>& pr) {return pr.first == fragment;});
                 //auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
-                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
+                    subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
                     file.unknown_keywords.emplace(fragment, value);
 
@@ -489,7 +577,7 @@ namespace draft201909 {
 
         keyword_validator_type get_or_create_reference(const schema_identifier& uri)
         {
-            auto &file = schema_builder_ptr_->get_or_create_file(uri.base().string());
+            auto &file = get_or_create_file(uri.base().string());
 
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
@@ -512,7 +600,7 @@ namespace draft201909 {
                     auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
                     file.unknown_keywords.erase(unprocessed_keywords_it);
                     auto orig = jsoncons::make_unique<ref_validator_type>(uri.base(), s.get());
-                    schema_builder_ptr_->subschemas_.emplace_back(std::move(s));
+                    subschemas_.emplace_back(std::move(s));
                     return orig;
                 }
             }
