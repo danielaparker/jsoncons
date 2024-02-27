@@ -53,8 +53,6 @@ namespace jsonschema {
         // Map location to subschema_registry
         std::map<std::string, subschema_registry<Json>> subschema_registries_;
 
-        std::unique_ptr<schema_validator_factory<Json>> default_validator_factory_ptr_;
-
     public:
         schema_builder(const uri_resolver<Json>& resolver) noexcept
             : resolver_(resolver)
@@ -77,8 +75,8 @@ namespace jsonschema {
 
         void build_schema(const Json& sch, const std::string& retrieval_uri) 
         {
-            default_validator_factory_ptr_ = make_schema_validator_factory(sch);
-            root_ = default_validator_factory_ptr_->make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
+            auto validator_factory_ptr_ = make_schema_validator_factory(sch);
+            root_ = validator_factory_ptr_->make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema()
