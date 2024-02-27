@@ -37,7 +37,7 @@ namespace jmespath {
         gt_op,
         gte_op,
         not_op
-    };
+    }; 
 
     struct operator_table final
     {

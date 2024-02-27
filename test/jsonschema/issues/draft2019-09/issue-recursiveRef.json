@@ -1,53 +1,40 @@
 [
     {
-        "description": "$recursiveRef with nesting",
+        "description": "$recursiveRef with no $recursiveAnchor in the initial target schema resource",
         "schema": {
             "$schema": "https://json-schema.org/draft/2019-09/schema",
-            "$id": "http://localhost:4242/draft2019-09/recursiveRef3/schema.json",
+            "$id": "http://localhost:4242/draft2019-09/recursiveRef6/base.json",
             "$recursiveAnchor": true,
-            "$defs": {
-                "myobject": {
-                    "$id": "myobject.json",
-                    "$recursiveAnchor": true,
-                    "anyOf": [
-                        { "type": "string" },
-                        {
-                            "type": "object",
-                            "additionalProperties": { "$recursiveRef": "#" }
-                        }
-                    ]
-                }
-            },
             "anyOf": [
-                { "type": "integer" },
-                { "$ref": "#/$defs/myobject" }
+                { "type": "boolean" },
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$id": "http://localhost:4242/draft2019-09/recursiveRef6/inner.json",
+                        "$comment": "there is no $recursiveAnchor: true here, so we do NOT recurse to the base",
+                        "anyOf": [
+                            { "type": "integer" },
+                            { "type": "object", "additionalProperties": { "$recursiveRef": "#" } }
+                        ]
+                    }
+                }
             ]
         },
         "tests": [
             /*{
-                "description": "integer matches at the outer level",
-                "data": 1,
-                "valid": true
-            },
-            {
-                "description": "single level match",
-                "data": { "foo": "hi" },
-                "valid": true
+                "description": "leaf node does not match; no recursion",
+                "data": { "foo": true },
+                "valid": false
             },*/
             {
-                "description": "integer now matches as a property value",
-                "data": { "foo": 1 },
+                "description": "leaf node matches: recursion uses the inner schema",
+                "data": { "foo": { "bar": 1 } },
                 "valid": true
             }/*,
             {
-                "description": "two levels, properties match with inner definition",
-                "data": { "foo": { "bar": "hi" } },
-                "valid": true
-            },
-            {
-                "description": "two levels, properties match with $recursiveRef",
-                "data": { "foo": { "bar": 1 } },
-                "valid": true
+                "description": "leaf node does not match: recursion uses the inner schema",
+                "data": { "foo": { "bar": true } },
+                "valid": false
             }*/
         ]
     }

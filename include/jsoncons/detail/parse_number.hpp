@@ -160,6 +160,51 @@ bool is_base10(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
+bool is_base16(const CharT* s, std::size_t length)
+{
+    integer_chars_state state = integer_chars_state::initial;
+
+    const CharT* end = s + length; 
+    while (s < end)
+    {
+        switch(state)
+        {
+            case integer_chars_state::initial:
+            {
+                switch(*s)
+                {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be base16
+                    case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                        state = integer_chars_state::base16;
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            }
+            case integer_chars_state::base16:
+            {
+                switch(*s)
+                {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be base16
+                    case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                        state = integer_chars_state::base16;
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return state == integer_chars_state::base16 ? true : false;
+}
+
+template <class T, class CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_decimal(const CharT* s, std::size_t length, T& n)
 {

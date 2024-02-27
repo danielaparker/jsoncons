@@ -12,7 +12,7 @@
 #include <catch/catch.hpp>
 #include <scoped_allocator>
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 using namespace jsoncons;
 

@@ -1,7 +1,7 @@
 ### jsoncons::decode_json
 
 Decodes a JSON data format to a C++ data structure. `decode_json` will 
-work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md) defined.
+work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json_type_traits.md) defined.
 
 ```cpp
 #include <jsoncons/decode_json.hpp>

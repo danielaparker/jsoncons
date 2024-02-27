@@ -134,7 +134,7 @@ namespace { namespace ns {
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
 
-#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;

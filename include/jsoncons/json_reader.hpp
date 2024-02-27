@@ -717,14 +717,15 @@ namespace jsoncons {
         }
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    using json_reader = legacy_basic_json_reader<char>;
-    using wjson_reader = legacy_basic_json_reader<wchar_t>;
-#endif
     using json_string_reader = basic_json_reader<char,string_source<char>>;
     using wjson_string_reader = basic_json_reader<wchar_t,string_source<wchar_t>>;
     using json_stream_reader = basic_json_reader<char,stream_source<char>>;
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use json_stream_reader") typedef legacy_basic_json_reader<char> json_reader;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_reader") typedef legacy_basic_json_reader<wchar_t> wjson_reader;
+#endif
 }
 
 #endif

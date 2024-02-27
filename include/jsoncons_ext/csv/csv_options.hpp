@@ -36,7 +36,7 @@ enum class csv_mapping_kind : uint8_t
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-using mapping_kind = csv_mapping_kind;
+JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_kind") typedef csv_mapping_kind  mapping_kind;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
 JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_kind") typedef csv_mapping_kind mapping_type;

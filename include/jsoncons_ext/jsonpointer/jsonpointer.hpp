@@ -367,34 +367,6 @@ namespace jsoncons { namespace jsonpointer {
             return buffer;
         }
 
-        string_type to_uri_fragment() const
-        {
-            string_type buffer{'#'};
-            for (const auto& token : tokens_)
-            {
-                buffer.push_back('/');
-                string_type s = escape_uri_string(token);
-                for (auto c : s)
-                {
-                    switch (c)
-                    {
-                        case '~':
-                            buffer.push_back('~');
-                            buffer.push_back('0');
-                            break;
-                        case '/':
-                            buffer.push_back('~');
-                            buffer.push_back('1');
-                            break;
-                        default:
-                            buffer.push_back(c);
-                            break;
-                    }
-                }
-            }
-            return buffer;
-        }
-
         // Iterators
         iterator begin() const
         {
@@ -478,7 +450,7 @@ namespace jsoncons { namespace jsonpointer {
     using basic_json_ptr = basic_json_pointer<CharT>;
     JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer address;
     JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer json_ptr;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_pointer") typedef json_pointer wjson_ptr;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_pointer") typedef wjson_pointer wjson_ptr;
     #endif
 
     namespace detail {

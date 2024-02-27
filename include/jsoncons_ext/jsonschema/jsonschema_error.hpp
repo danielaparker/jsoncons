@@ -44,16 +44,19 @@ namespace jsonschema {
     class validation_output 
     {
         std::string keyword_;
-        std::string schema_path_;
+        jsonpointer::json_pointer eval_path_;
+        uri schema_path_;
         std::string instance_location_;
         std::string message_;
         std::vector<validation_output> nested_errors_;
     public:
         validation_output(std::string keyword,
-                          std::string schema_path,
-                          std::string instance_location,
-                          std::string message)
+            jsonpointer::json_pointer eval_path,
+            uri schema_path,
+            std::string instance_location,
+            std::string message)
             : keyword_(std::move(keyword)), 
+              eval_path_(std::move(eval_path)),
               schema_path_(std::move(schema_path)),
               instance_location_(std::move(instance_location)),
               message_(std::move(message))
@@ -61,11 +64,13 @@ namespace jsonschema {
         }
 
         validation_output(const std::string& keyword,
-                          const std::string& schema_path,
-                          const std::string& instance_location,
-                          const std::string& message,
-                          const std::vector<validation_output>& nested_errors)
+            const jsonpointer::json_pointer& eval_path,
+            const uri& schema_path,
+            const std::string& instance_location,
+            const std::string& message,
+            const std::vector<validation_output>& nested_errors)
             : keyword_(keyword),
+              eval_path_(eval_path),
               schema_path_(schema_path),
               instance_location_(instance_location), 
               message_(message),
@@ -83,9 +88,24 @@ namespace jsonschema {
             return message_;
         }
 
-        const std::string& schema_path() const
+        const jsonpointer::json_pointer& eval_path() const
+        {
+            return eval_path_;
+        }
+
+        const uri& schema_path() const
         {
             return schema_path_;
+        }
+
+        const std::string keyword_location() const
+        {
+            return eval_path_.to_string();
+        }
+
+        const std::string absolute_keyword_location() const
+        {
+            return schema_path_.string();
         }
 
         const std::string& keyword() const

@@ -10,7 +10,7 @@
 #include <ctime>
 #include <cstddef>
 #include <scoped_allocator>
-#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 #endif
 #include <catch/catch.hpp>
@@ -25,7 +25,7 @@ TEST_CASE("extension_traits tests")
         CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<std::allocator<char>>::value);
         CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<FreeListAllocator<char>>::value);
         CHECK(jsoncons::extension_traits::is_propagating_allocator<MyScopedAllocator<char>>::value);
-#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
+#if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
         CHECK(jsoncons::extension_traits::is_propagating_allocator<std::pmr::polymorphic_allocator<char>>::value);
 #endif
     }
