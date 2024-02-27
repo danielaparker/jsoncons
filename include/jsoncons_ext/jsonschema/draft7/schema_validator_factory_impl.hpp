@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_IMPL_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_IMPL_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_VALIDATOR_FACTORY_IMPL_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_VALIDATOR_FACTORY_IMPL_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -13,9 +13,9 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator_factory.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder_data.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -30,7 +30,7 @@ namespace jsonschema {
 namespace draft7 {
 
     template <class Json>
-    class schema_builder_impl : public schema_builder<Json> 
+    class schema_validator_factory_impl : public schema_validator_factory<Json> 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -38,23 +38,23 @@ namespace draft7 {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
     private:
-        schema_builder_data<Json>* data_ptr_;
+        schema_builder<Json>* schema_builder_ptr_;
 
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, const Json& sch, const Json& parent)>;
 
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_impl(schema_builder_data<Json>* data_ptr) noexcept
-            : data_ptr_(data_ptr)
+        schema_validator_factory_impl(schema_builder<Json>* schema_builder_ptr) noexcept
+            : schema_builder_ptr_(schema_builder_ptr)
         {
             init();
         }
 
-        schema_builder_impl(const schema_builder_impl&) = delete;
-        schema_builder_impl& operator=(const schema_builder_impl&) = delete;
-        schema_builder_impl(schema_builder_impl&&) = default;
-        schema_builder_impl& operator=(schema_builder_impl&&) = default;
+        schema_validator_factory_impl(const schema_validator_factory_impl&) = delete;
+        schema_validator_factory_impl& operator=(const schema_validator_factory_impl&) = delete;
+        schema_validator_factory_impl(schema_validator_factory_impl&&) = default;
+        schema_validator_factory_impl& operator=(schema_validator_factory_impl&&) = default;
 
         void init()
         {
@@ -138,7 +138,7 @@ namespace draft7 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        data_ptr_->insert_schema(uri, p);
+                        schema_builder_ptr_->insert_schema(uri, p);
                     }          
                     break;
                 }
@@ -152,7 +152,7 @@ namespace draft7 {
                         for (const auto& def : it->value().object_range())
                         {
                             std::string sub_keys[] = { "definitions", def.key() };
-                            data_ptr_->subschemas_.emplace_back(make_schema_validator(
+                            schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(
                                 new_context, def.value(), sub_keys));
                         }
                         known_keywords.insert("definitions");
@@ -177,7 +177,7 @@ namespace draft7 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        data_ptr_->insert_schema(uri, p);
+                        schema_builder_ptr_->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
@@ -238,7 +238,7 @@ namespace draft7 {
                 if (then_it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "then" };
-                    data_ptr_->subschemas_.emplace_back(make_schema_validator(context, then_it->value(), sub_keys));
+                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(context, then_it->value(), sub_keys));
                     known_keywords.insert("then");
                 }
 
@@ -246,7 +246,7 @@ namespace draft7 {
                 if (else_it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "else" };
-                    data_ptr_->subschemas_.emplace_back(make_schema_validator(context, else_it->value(), sub_keys));
+                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(context, else_it->value(), sub_keys));
                     known_keywords.insert("else");
                 }
             }
@@ -429,7 +429,7 @@ namespace draft7 {
                                     const std::string& key, 
                                     const Json& value)
         {
-            auto &file = data_ptr_->get_or_create_file(uri.base().string());
+            auto &file = schema_builder_ptr_->get_or_create_file(uri.base().string());
             auto new_u = uri.append(key);
             schema_identifier new_uri(new_u);
 
@@ -441,7 +441,7 @@ namespace draft7 {
                     [fragment](const std::pair<std::string,ref_validator<Json>*>& pr) {return pr.first == fragment;});
                 //auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
-                    data_ptr_->subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
+                    schema_builder_ptr_->subschemas_.emplace_back(make_schema_validator(compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
                     file.unknown_keywords.emplace(fragment, value);
 
@@ -456,7 +456,7 @@ namespace draft7 {
 
         keyword_validator_type get_or_create_reference(const schema_identifier& uri)
         {
-            auto &file = data_ptr_->get_or_create_file(uri.base().string());
+            auto &file = schema_builder_ptr_->get_or_create_file(uri.base().string());
 
             // a schema already exists
             auto sch = file.schemas.find(std::string(uri.fragment()));
@@ -479,7 +479,7 @@ namespace draft7 {
                     auto s = make_schema_validator(compilation_context(uri), subsch, {}); 
                     file.unknown_keywords.erase(unprocessed_keywords_it);
                     auto orig = jsoncons::make_unique<ref_validator_type>(uri.base(), s.get());
-                    data_ptr_->subschemas_.emplace_back(std::move(s));
+                    schema_builder_ptr_->subschemas_.emplace_back(std::move(s));
                     return orig;
                 }
             }
