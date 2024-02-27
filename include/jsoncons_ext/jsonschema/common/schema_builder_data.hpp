@@ -11,7 +11,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
-#include <jsoncons_ext/jsonschema/common/keyword_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <cassert>
 #include <set>

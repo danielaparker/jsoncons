@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
 #include <memory>
-#include <jsoncons_ext/jsonschema/common/keywords.hpp>
+#include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 
 namespace jsoncons {

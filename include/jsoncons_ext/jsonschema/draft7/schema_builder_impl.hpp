@@ -12,7 +12,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
-#include <jsoncons_ext/jsonschema/common/keywords.hpp>
+#include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder_data.hpp>
