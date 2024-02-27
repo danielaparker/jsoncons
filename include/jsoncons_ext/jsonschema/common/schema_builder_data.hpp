@@ -66,6 +66,53 @@ namespace jsonschema {
 
         virtual std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch) = 0;
 
+        void parse(const Json& sch) 
+        {
+            parse(sch, "#");
+        }
+
+        void parse(const Json& sch, const std::string& retrieval_uri) 
+        {
+            auto parser_ptr = make_schema_builder(sch);
+            root_ = parser_ptr->make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
+        }
+
+        std::shared_ptr<json_schema<Json>> get_schema()
+        {                        
+            // load all external schemas that have not already been loaded
+            std::size_t loaded_count = 0;
+            do
+            {
+                loaded_count = 0;
+
+                std::vector<std::string> locations;
+                for (const auto& item : subschema_registries_)
+                    locations.push_back(item.first);
+
+                for (const auto& loc : locations)
+                {
+                    if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
+                    {
+                        if (resolver_)
+                        {
+                            Json external_sch = resolver_(loc);
+                            auto builder = make_schema_builder(external_sch);
+                            subschemas_.emplace_back(builder->make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
+                            ++loaded_count;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW(schema_error("External schema reference '" + loc + "' needs to be loaded, but no resolver provided"));
+                        }
+                    }
+                }
+            } while (loaded_count > 0);
+
+            resolve_references();
+
+            return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
+        }
+
         void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
         {
             auto& file = get_or_create_file(uri.base().string());

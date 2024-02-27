@@ -23,12 +23,6 @@ namespace jsonschema {
 
         virtual ~schema_builder() = default;
 
-        virtual void parse(const Json& sch) = 0;
-
-        virtual void parse(const Json& sch, const std::string& retrieval_uri) = 0;
-
-        virtual std::shared_ptr<json_schema<Json>> get_schema() = 0;
-
         virtual compilation_context make_compilation_context(const compilation_context& parent,
             const Json& sch, jsoncons::span<const std::string> keys) const = 0;
 

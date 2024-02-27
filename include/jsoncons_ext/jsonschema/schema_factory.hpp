@@ -84,9 +84,8 @@ namespace jsonschema {
     {
         schema_builder_factory_impl<Json> schema_builder_factory(resolver);
 
-        auto parser_ptr = schema_builder_factory.make_schema_builder(sch);
-        parser_ptr->parse(sch, retrieval_uri);
-        return parser_ptr->get_schema();
+        schema_builder_factory.parse(sch, retrieval_uri);
+        return schema_builder_factory.get_schema();
     }
 
     template <class Json>
@@ -94,9 +93,8 @@ namespace jsonschema {
     {
         schema_builder_factory_impl<Json> schema_builder_factory(resolver);
 
-        auto parser_ptr = schema_builder_factory.make_schema_builder(sch);
-        parser_ptr->parse(sch, retrieval_uri);
-        return parser_ptr->get_schema();
+        schema_builder_factory.parse(sch, retrieval_uri);
+        return schema_builder_factory.get_schema();
     }
 
     template <class Json,class URIResolver>
@@ -105,9 +103,8 @@ namespace jsonschema {
     {
         schema_builder_factory_impl<Json> schema_builder_factory(resolver);
 
-        auto parser_ptr = schema_builder_factory.make_schema_builder(sch);
-        parser_ptr->parse(sch, "#");
-        return parser_ptr->get_schema();
+        schema_builder_factory.parse(sch, "#");
+        return schema_builder_factory.get_schema();
     }
 
     template <class Json>
@@ -115,9 +112,8 @@ namespace jsonschema {
     {
         schema_builder_factory_impl<Json> schema_builder_factory(resolver);
 
-        auto parser_ptr = schema_builder_factory.make_schema_builder(sch);
-        parser_ptr->parse(sch, "#");
-        return parser_ptr->get_schema();
+        schema_builder_factory.parse(sch, "#");
+        return schema_builder_factory.get_schema();
     }
 
 } // namespace jsonschema
