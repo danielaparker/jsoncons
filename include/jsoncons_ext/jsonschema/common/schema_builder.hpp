@@ -53,6 +53,8 @@ namespace jsonschema {
         // Map location to subschema_registry
         std::map<std::string, subschema_registry<Json>> subschema_registries_;
 
+        std::unique_ptr<schema_validator_factory<Json>> default_validator_factory_ptr_;
+
     public:
         schema_builder(const uri_resolver<Json>& resolver) noexcept
             : resolver_(resolver)
@@ -66,17 +68,17 @@ namespace jsonschema {
         schema_builder(schema_builder&&) = default;
         schema_builder& operator=(schema_builder&&) = default;
 
-        virtual std::unique_ptr<schema_validator_factory<Json>> make_schema_builder(const Json& sch) = 0;
+        virtual std::unique_ptr<schema_validator_factory<Json>> make_schema_validator_factory(const Json& sch) = 0;
 
-        void parse(const Json& sch) 
+        void build_schema(const Json& sch) 
         {
-            parse(sch, "#");
+            build_schema(sch, "#");
         }
 
-        void parse(const Json& sch, const std::string& retrieval_uri) 
+        void build_schema(const Json& sch, const std::string& retrieval_uri) 
         {
-            auto parser_ptr = make_schema_builder(sch);
-            root_ = parser_ptr->make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
+            default_validator_factory_ptr_ = make_schema_validator_factory(sch);
+            root_ = default_validator_factory_ptr_->make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema()
@@ -98,8 +100,8 @@ namespace jsonschema {
                         if (resolver_)
                         {
                             Json external_sch = resolver_(loc);
-                            auto builder = make_schema_builder(external_sch);
-                            subschemas_.emplace_back(builder->make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
+                            auto validator_factory = make_schema_validator_factory(external_sch);
+                            subschemas_.emplace_back(validator_factory->make_schema_validator(compilation_context(schema_identifier(loc)), external_sch, {}));
                             ++loaded_count;
                         }
                         else

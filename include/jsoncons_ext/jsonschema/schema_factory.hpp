@@ -23,7 +23,7 @@ namespace jsonschema {
         {
         }
 
-        std::unique_ptr<schema_validator_factory<Json>> make_schema_builder(const Json& sch)
+        std::unique_ptr<schema_validator_factory<Json>> make_schema_validator_factory(const Json& sch)
         {
             std::unique_ptr<schema_validator_factory<Json>> parser_ptr;
 
@@ -84,7 +84,7 @@ namespace jsonschema {
     {
         schema_builder_impl<Json> schema_builder_factory(resolver);
 
-        schema_builder_factory.parse(sch, retrieval_uri);
+        schema_builder_factory.build_schema(sch, retrieval_uri);
         return schema_builder_factory.get_schema();
     }
 
@@ -93,7 +93,7 @@ namespace jsonschema {
     {
         schema_builder_impl<Json> schema_builder_factory(default_uri_resolver<Json>{});
 
-        schema_builder_factory.parse(sch, retrieval_uri);
+        schema_builder_factory.build_schema(sch, retrieval_uri);
         return schema_builder_factory.get_schema();
     }
 
@@ -103,7 +103,7 @@ namespace jsonschema {
     {
         schema_builder_impl<Json> schema_builder_factory(resolver);
 
-        schema_builder_factory.parse(sch, "#");
+        schema_builder_factory.build_schema(sch, "#");
         return schema_builder_factory.get_schema();
     }
 
@@ -112,7 +112,7 @@ namespace jsonschema {
     {
         schema_builder_impl<Json> schema_builder_factory(default_uri_resolver<Json>{});
 
-        schema_builder_factory.parse(sch, "#");
+        schema_builder_factory.build_schema(sch, "#");
         return schema_builder_factory.get_schema();
     }
 
