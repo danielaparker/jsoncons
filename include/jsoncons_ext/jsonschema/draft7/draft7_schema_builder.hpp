@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_VALIDATOR_FACTORY_IMPL_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_VALIDATOR_FACTORY_IMPL_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT7_DRAFT7_SCHEMA_BUILDER_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT7_DRAFT7_SCHEMA_BUILDER_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -13,7 +13,7 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validator_factory.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <cassert>
 #include <set>
@@ -29,7 +29,7 @@ namespace jsonschema {
 namespace draft7 {
 
     template <class Json>
-    class schema_validator_factory_impl : public schema_validator_factory<Json> 
+    class draft7_schema_builder : public schema_builder<Json> 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -52,16 +52,16 @@ namespace draft7 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_validator_factory_impl(const uri_resolver<Json>& resolver) noexcept
+        draft7_schema_builder(const uri_resolver<Json>& resolver) noexcept
             : resolver_(resolver)
         {
             init();
         }
 
-        schema_validator_factory_impl(const schema_validator_factory_impl&) = delete;
-        schema_validator_factory_impl& operator=(const schema_validator_factory_impl&) = delete;
-        schema_validator_factory_impl(schema_validator_factory_impl&&) = default;
-        schema_validator_factory_impl& operator=(schema_validator_factory_impl&&) = default;
+        draft7_schema_builder(const draft7_schema_builder&) = delete;
+        draft7_schema_builder& operator=(const draft7_schema_builder&) = delete;
+        draft7_schema_builder(draft7_schema_builder&&) = default;
+        draft7_schema_builder& operator=(draft7_schema_builder&&) = default;
 
         void init()
         {
@@ -440,7 +440,7 @@ namespace draft7 {
             root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
         }
 
-        std::shared_ptr<json_schema<Json>> get_schema()
+        std::shared_ptr<json_schema<Json>> get_schema() final
         {                        
             // load all external schemas that have not already been loaded
             std::size_t loaded_count = 0;

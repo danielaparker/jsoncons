@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_VALIDATOR_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_VALIDATOR_FACTORY_HPP
+#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
+#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
 #include <memory>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
@@ -27,13 +27,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class schema_validator_factory
+    class schema_builder
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
 
-        virtual ~schema_validator_factory() = default;
+        virtual ~schema_builder() = default;
 
         virtual const char* schema_version() const noexcept = 0;
 
