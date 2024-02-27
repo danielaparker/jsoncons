@@ -12,6 +12,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -62,6 +63,8 @@ namespace jsonschema {
         schema_builder_data& operator=(const schema_builder_data&) = delete;
         schema_builder_data(schema_builder_data&&) = default;
         schema_builder_data& operator=(schema_builder_data&&) = default;
+
+        virtual std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch) = 0;
 
         void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
         {

@@ -8,8 +8,8 @@
 #define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
 #include <memory>
-#include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <jsoncons_ext/jsonschema/common/keywords.hpp>
+#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -553,13 +553,6 @@ namespace jsonschema {
                 make_schema_validator(context, sch, sub_keys));
         }
 
-    };
-
-    template <class Json>
-    class schema_builder_factory
-    {
-    public:
-        std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, schema_builder_data<Json>* data_ptr) = 0;
     };
 
 } // namespace jsonschema
