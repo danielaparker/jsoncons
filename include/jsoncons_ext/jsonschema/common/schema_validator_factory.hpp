@@ -23,6 +23,8 @@ namespace jsonschema {
 
         virtual ~schema_validator_factory() = default;
 
+        virtual const char* schema_version() const noexcept = 0;
+
         virtual compilation_context make_compilation_context(const compilation_context& parent,
             const Json& sch, jsoncons::span<const std::string> keys) const = 0;
 

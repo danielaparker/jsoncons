@@ -112,6 +112,11 @@ namespace draft7 {
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_required_validator(context, sch);});
         }
 
+        const char* schema_version() const noexcept final
+        {
+            return "http://json-schema.org/draft-07/schema#";
+        }
+
         schema_validator_type make_schema_validator( 
             const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys) override
         {

@@ -25,7 +25,7 @@ namespace jsonschema {
 
         std::unique_ptr<schema_validator_factory<Json>> make_schema_validator_factory(const Json& sch)
         {
-            std::unique_ptr<schema_validator_factory<Json>> parser_ptr;
+            std::unique_ptr<schema_validator_factory<Json>> validator_factory_ptr;
 
             if (sch.is_object())
             {
@@ -34,11 +34,11 @@ namespace jsonschema {
                 { 
                     if (it->value() == "https://json-schema.org/draft/2019-09/schema")
                     {
-                        parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_validator_factory_impl<Json>>(this);
+                        validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_validator_factory_impl<Json>>(this);
                     }
                     else if (it->value() == "http://json-schema.org/draft-07/schema#")
                     {
-                        parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
+                        validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
                     }
                     else
                     {
@@ -49,14 +49,18 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
+                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
                 }
+            }
+            else if (sch.is_bool())
+            {
+                validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
             }
             else
             {
-                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_impl<Json>>(this);
+                 JSONCONS_THROW(schema_error("Schema must be object or boolean"));
             }
-            return parser_ptr;
+            return validator_factory_ptr;
         }
     };
 
