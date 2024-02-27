@@ -552,6 +552,10 @@ namespace draft201909 {
                 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_identifier relative(id); 
+                    if (relative.has_fragment())
+                    {
+                        JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
+                    }
                     schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_base_uri() });
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
