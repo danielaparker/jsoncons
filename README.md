@@ -69,7 +69,7 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 ## Get jsoncons
 
-You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library manager to install the [jsoncons package](https://github.com/microsoft/vcpkg/tree/main/ports/jsoncons).
+You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library manager to install the [jsoncons package](https://github.com/microsoft/vcpkg/tree/master/ports/jsoncons).
 
 Or, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
 
@@ -96,9 +96,9 @@ If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS`
 
 - [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
 
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/main/report/performance.md)
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
 
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/main/report/performance_fp.md)
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
 [JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
 
@@ -776,7 +776,7 @@ The jsoncons implementation of the Grisu3 algorithm for printing floating-point 
 The macro `JSONCONS_ALL_MEMBER_TRAITS` follows the approach taken by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
 The jsoncons implementations of BSON decimal128 to and from string,
-and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/main/src/libbson).
+and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/master/src/libbson).
 
-Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/main/acknowledgements.md)
+Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
  

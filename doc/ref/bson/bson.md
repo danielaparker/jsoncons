@@ -297,7 +297,7 @@ Output:
 ### Acknowledgements
 
 The jsoncons implementations of BSON decimal128 to and from string,
-and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/main/src/libbson).
+and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/master/src/libbson).
 
 The decimal128, regex, and ObjectId examples are from the libbson test cases.
 

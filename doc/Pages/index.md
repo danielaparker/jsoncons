@@ -27,9 +27,9 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
 to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
 
 - With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/corelib/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -40,7 +40,7 @@ But it also supports efficient access to the underlying data using StAX-style pu
 And it supports incremental parsing into a user's preferred form, using
 information about user types provided by specializations of [json_type_traits](doc/ref/corelib/json_type_traits.md).
 
-The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
+The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
 supports semantic tagging of datetimes, epoch times, big integers, 
 big decimals, big floats and binary encodings. This allows it to preserve these type semantics when parsing 
@@ -73,9 +73,9 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md)
 
 - As a stream of parse events
 
@@ -142,10 +142,10 @@ Marilyn C, 0.9
 #### As a strongly typed C++ data structure
 
 jsoncons supports transforming JSON texts into C++ data structures. 
-The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/encode_json.md) 
+The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json_type_traits.md) 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json_type_traits.md) 
 defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
@@ -274,7 +274,7 @@ the enum values, and the macro `JSONCONS_ALL_CTOR_GETTER_TRAITS`
 generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-See [examples](https://github.com/danielaparker/jsoncons/blob/main/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
 #### With cursor-level access
 
@@ -665,7 +665,7 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/basic_json_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
 ```cpp
 json_options options;
@@ -716,7 +716,7 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/rename_object_key_filter.md)
+You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/rename_object_key_filter.md)
 
 ```cpp
 #include <sstream>
@@ -755,7 +755,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/basic_json_filter.md) for details.
+Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_filter.md) for details.
 <div id="A8"/>
 ### JSONPath
 
@@ -863,22 +863,22 @@ Output:
 <div id="A9"/>
 ### About jsoncons::json
 
-The [json](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
 ```cpp
 typedef basic_json<char,
                    Policy = sorted_policy,
                    Allocator = std::allocator<char>> json;
 ```
-If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/ojson.md) instead.
+If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/ojson.md) instead.
 
-The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/main/ref/doc/wjson.md)
+The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/ref/doc/wjson.md)
 ```cpp
 typedef basic_json<wchar_t,
                    Policy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/wojson.md) instead.
+If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/wojson.md) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```cpp
@@ -917,7 +917,7 @@ which prints
 <div id="A11"/>
 ### ojson and wojson
 
-The [ojson](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/main/doc/ref/corelib/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```cpp
 ojson o = ojson::parse(R"(
 {
@@ -974,5 +974,5 @@ Output:
 }
 ```
 
-For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/main/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/main/doc/Reference.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/main/Roadmap.md). 
+For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Reference.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
 
