@@ -59,6 +59,8 @@ namespace jsonschema {
         {
         }
 
+        virtual ~schema_builder_data() = default;
+
         schema_builder_data(const schema_builder_data&) = delete;
         schema_builder_data& operator=(const schema_builder_data&) = delete;
         schema_builder_data(schema_builder_data&&) = default;
