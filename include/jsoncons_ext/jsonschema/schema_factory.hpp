@@ -15,6 +15,47 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
+    class schema_builder_factory_impl
+    {
+    public:
+        std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, schema_builder_data<Json>* data_ptr)
+        {
+            std::unique_ptr<schema_builder<Json>> parser_ptr;
+
+            if (sch.is_object())
+            {
+                auto it = sch.find("$schema");
+                if (it != sch.object_range().end())
+                { 
+                    if (it->value() == "https://json-schema.org/draft/2019-09/schema")
+                    {
+                        parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_impl<Json>>(data_ptr);
+                    }
+                    else if (it->value() == "http://json-schema.org/draft-07/schema#")
+                    {
+                        parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
+                    }
+                    else
+                    {
+                        std::string message("Unsupported schema version ");
+                        message.append(it->value().template as<std::string>());
+                        JSONCONS_THROW(schema_error(message));
+                    }
+                }
+                else 
+                {
+                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
+                }
+            }
+            else
+            {
+                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
+            }
+            return parser_ptr;
+        }
+    };
+
+    template <class Json>
     struct default_uri_resolver
     {
         Json operator()(const jsoncons::uri& uri)
@@ -32,49 +73,14 @@ namespace jsonschema {
         }
     };
 
-    template <class Json,class... Args>
-    std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, schema_builder_data<Json>* data_ptr)
-    {
-        std::unique_ptr<schema_builder<Json>> parser_ptr;
-
-        if (sch.is_object())
-        {
-            auto it = sch.find("$schema");
-            if (it != sch.object_range().end())
-            { 
-                if (it->value() == "https://json-schema.org/draft/2019-09/schema")
-                {
-                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_impl<Json>>(data_ptr);
-                }
-                else if (it->value() == "http://json-schema.org/draft-07/schema#")
-                {
-                    parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
-                }
-                else
-                {
-                    std::string message("Unsupported schema version ");
-                    message.append(it->value().template as<std::string>());
-                    JSONCONS_THROW(schema_error(message));
-                }
-            }
-            else 
-            {
-                parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
-            }
-        }
-        else
-        {
-            parser_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_impl<Json>>(data_ptr);
-        }
-        return parser_ptr;
-    }
-
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(resolver);
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
+        schema_builder_data<Json>> data(resolver);
+        schema_builder_factory_impl<Json> schema_builder_factory;
+
+        auto parser_ptr = schema_builder_factory.make_schema_builder(sch, &data);
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -82,8 +88,10 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(default_uri_resolver<Json>{});
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
+        schema_builder_data<Json> data(default_uri_resolver<Json>{});
+        schema_builder_factory_impl<Json> schema_builder_factory;
+
+        auto parser_ptr = schema_builder_factory.make_schema_builder(sch, &data);
         parser_ptr->parse(sch, retrieval_uri);
         return parser_ptr->get_schema();
     }
@@ -92,8 +100,10 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const URIResolver& resolver)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(resolver);
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
+        schema_builder_data<Json> data(resolver);
+        schema_builder_factory_impl<Json> schema_builder_factory;
+
+        auto parser_ptr = schema_builder_factory.make_schema_builder(sch, &data);
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }
@@ -101,8 +111,10 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
     {
-        auto data_ptr = jsoncons::make_unique<schema_builder_data<Json>>(default_uri_resolver<Json>{});
-        auto parser_ptr = make_schema_builder(sch, data_ptr.get());
+        schema_builder_data<Json> data(default_uri_resolver<Json>{});
+        schema_builder_factory_impl<Json> schema_builder_factory;
+
+        auto parser_ptr = schema_builder_factory.make_schema_builder(sch, &data);
         parser_ptr->parse(sch, "#");
         return parser_ptr->get_schema();
     }

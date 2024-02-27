@@ -555,6 +555,13 @@ namespace jsonschema {
 
     };
 
+    template <class Json>
+    class schema_builder_factory
+    {
+    public:
+        std::unique_ptr<schema_builder<Json>> make_schema_builder(const Json& sch, schema_builder_data<Json>* data_ptr) = 0;
+    };
+
 } // namespace jsonschema
 } // namespace jsoncons
 
