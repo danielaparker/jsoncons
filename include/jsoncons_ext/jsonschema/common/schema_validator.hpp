@@ -175,6 +175,8 @@ namespace jsonschema {
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
         virtual bool is_recursive_anchor() const = 0;
+
+        virtual const std::string& dynamic_anchor() const = 0;
     };
 
     template <class Json>
@@ -186,6 +188,7 @@ namespace jsonschema {
 
         uri schema_path_;
         bool value_;
+        std::string dummy_str_;
 
     public:
         boolean_schema_validator(const uri& schema_path, bool value)
@@ -206,6 +209,11 @@ namespace jsonschema {
         bool is_recursive_anchor() const final
         {
             return false;
+        }
+
+        const std::string& dynamic_anchor() const final
+        {
+            return dummy_str_;
         }
 
     private:
@@ -238,6 +246,7 @@ namespace jsonschema {
         std::vector<keyword_validator_type> validators_;
         Json default_value_;
         bool is_recursive_anchor_;
+        std::string dynamic_anchor_;
 
     public:
         object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
@@ -246,6 +255,15 @@ namespace jsonschema {
               validators_(std::move(validators)),
               default_value_(std::move(default_value)),
               is_recursive_anchor_(is_recursive_anchor)
+        {
+        }
+        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
+            std::string&& dynamic_anchor)
+            : schema_path_(schema_path),
+              validators_(std::move(validators)),
+              default_value_(std::move(default_value)),
+              is_recursive_anchor_(false),
+              dynamic_anchor_(std::move(dynamic_anchor))
         {
         }
 
@@ -262,6 +280,11 @@ namespace jsonschema {
         bool is_recursive_anchor() const final
         {
             return is_recursive_anchor_;
+        }
+
+        const std::string& dynamic_anchor() const final
+        {
+            return dynamic_anchor_;
         }
 
     private:

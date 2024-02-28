@@ -36,7 +36,7 @@ namespace draft202012 {
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
-        using recursive_ref_validator_type = recursive_ref_validator<Json>;
+        using dynamic_ref_validator_type = dynamic_ref_validator<Json>;
 
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, const Json& sch, const Json& parent)>;
 
@@ -206,12 +206,12 @@ namespace draft202012 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
-            bool is_recursive_anchor = false;
+            std::string dynamic_anchor;
 
             auto it = sch.find("$recursiveAnchor"); 
             if (it != sch.object_range().end()) 
             {
-                is_recursive_anchor = it->value().template as<bool>();
+                dynamic_anchor = it->value().template as<std::string>();
             }
 
             it = sch.find("default");
@@ -229,13 +229,14 @@ namespace draft202012 {
                 validators.push_back(get_or_create_reference(id));
             }
 
-            it = sch.find("$recursiveRef");
+            it = sch.find("$dynamicRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
+                std::string value = it->value().template as<std::string>();
                 schema_identifier relative(it->value().template as<std::string>()); 
                 auto base_uri = context.get_base_uri();
                 auto id = relative.resolve(schema_identifier{ base_uri }); // REVISIT
-                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
+                validators.push_back(jsoncons::make_unique<dynamic_ref_validator_type>(id.uri(), value));
             }
 
             for (const auto& key_value : sch.object_range())
@@ -324,7 +325,7 @@ namespace draft202012 {
             
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),
-                std::move(validators), std::move(default_value), is_recursive_anchor);
+                std::move(validators), std::move(default_value), std::move(dynamic_anchor));
         }
 
         std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 

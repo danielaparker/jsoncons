@@ -157,6 +157,77 @@ namespace jsonschema {
         }
     };
 
+    template <class Json>
+    class dynamic_ref_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+
+        std::string value_;
+
+    public:
+        dynamic_ref_validator(const uri& schema_path, const std::string& value) 
+            : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
+        {}
+
+        uri get_base_uri() const
+        {
+            return this->schema_path();
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const override
+        {
+            auto rit = eval_context.dynamic_scope().rbegin();
+            auto rend = eval_context.dynamic_scope().rend();
+
+            const schema_validator<Json>* schema_ptr = nullptr;
+
+            while (rit != rend && schema_ptr == nullptr)
+            {
+                if ((*rit)->schema_path() == this->schema_path())
+                {
+                    schema_ptr = *rit; 
+                }
+                ++rit;
+            }
+
+            JSONCONS_ASSERT(schema_ptr != nullptr);
+
+            if (schema_ptr->dynamic_anchor() == value_)
+            {
+                while (rit != rend)
+                {
+                    if ((*rit)->dynamic_anchor() == value_)
+                    {
+                        schema_ptr = *rit; 
+                    }
+                    ++rit;
+                }
+            }
+
+            //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+            if (schema_ptr == nullptr)
+            {
+                reporter.error(validation_output(this->keyword_name(), 
+                    this_context.eval_path(),
+                    this->schema_path(), 
+                    instance_location.to_string(), 
+                    "Unresolved schema reference " + this->schema_path().string()));
+                return;
+            }
+
+            schema_ptr->validate(this_context, instance, instance_location, evaluated_properties, reporter, patch);
+        }
+    };
+
     // contentEncoding
 
     template <class Json>
