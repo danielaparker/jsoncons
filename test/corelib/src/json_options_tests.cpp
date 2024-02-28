@@ -280,6 +280,34 @@ TEST_CASE("object_array with/without line_length_limit")
     }
 }
 
+TEST_CASE("json_options line_indent")
+{
+    SECTION("array with line_indent_kind::same_line")
+    {
+        std::string j_str = R"(["1", "2", 3, 4])";
+        jsoncons::json j_arr = jsoncons::json::parse(j_str);
+        jsoncons::json_options options;
+        options.spaces_around_comma(jsoncons::spaces_option::space_after);
+        options.line_splits(jsoncons::line_split_kind::same_line);
+        std::string buffer;
+        jsoncons::encode_json(j_arr, buffer, options, jsoncons::indenting::indent);
+
+        CHECK(j_str == buffer);
+    }
+    SECTION("array with line_indent_kind::same_line")
+    {
+        std::string j_str = R"(["1", ["2", 3, 4]])";
+        jsoncons::json j_arr = jsoncons::json::parse(j_str);
+        jsoncons::json_options options;
+        options.spaces_around_comma(jsoncons::spaces_option::space_after);
+        options.line_splits(jsoncons::line_split_kind::same_line);
+        std::string buffer;
+        jsoncons::encode_json(j_arr, buffer, options, jsoncons::indenting::indent);
+
+        CHECK(j_str == buffer);
+    }
+}
+
 TEST_CASE("array_object with/without line_length_limit")
 {
     std::string s = R"(
