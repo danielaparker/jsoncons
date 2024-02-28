@@ -635,6 +635,66 @@ namespace jsonschema {
         }
     };
 
+    // items
+
+    template <class Json>
+    class prefix_items_validator : public keyword_validator_base<Json>
+    {
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+
+        std::vector<schema_validator_type> item_validators_;
+        schema_validator_type additional_items_validator_;
+    public:
+        prefix_items_validator(const uri& schema_path, 
+            std::vector<schema_validator_type>&& item_validators,
+            schema_validator_type&& additional_items_validator)
+            : keyword_validator_base<Json>("prefixItems", schema_path), 
+              item_validators_(std::move(item_validators)), 
+              additional_items_validator_(std::move(additional_items_validator))
+        {
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter,
+            Json& patch) const final
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
+            size_t index = 0;
+            auto validator_it = item_validators_.cbegin();
+
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+            for (const auto& item : instance.array_range()) 
+            {
+                jsonpointer::json_pointer pointer(instance_location);
+
+                if (validator_it != item_validators_.cend())
+                {
+                    evaluation_context<Json> item_context{this_context, index};
+                    pointer /= index++;
+                    (*validator_it)->validate(item_context, item, pointer, evaluated_properties, reporter, patch);
+                    ++validator_it;
+                }
+                else if (additional_items_validator_ != nullptr)
+                {
+                    pointer /= index++;
+                    additional_items_validator_->validate(eval_context, item, pointer, evaluated_properties, reporter, patch);
+                }
+                else
+                    break;
+
+            }
+        }
+    };
+
     // uniqueItems
 
     template <class Json>

@@ -316,13 +316,13 @@ namespace draft202012 {
                     std::move(properties), std::move(pattern_properties)));
             }
 
-            it = sch.find("items");
+            it = sch.find("prefixItems");
             if (it != sch.object_range().end()) 
             {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(make_items_array_validator(context, sch, it->value()));
+                    validators.emplace_back(make_prefix_items_validator(context, sch, it->value()));
                 } 
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
@@ -336,33 +336,33 @@ namespace draft202012 {
                 std::move(validators), std::move(default_value), is_recursive_anchor);
         }
 
-        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 
+        std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 
             const Json& parent, const Json& sch)
         {
             std::vector<schema_validator_type> item_validators;
             schema_validator_type additional_items_validator = nullptr;
 
-            uri schema_path{context.make_schema_path_with("items")};
+            uri schema_path{context.make_schema_path_with("prefixItems")};
 
             if (sch.type() == json_type::array_value) 
             {
                 size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
-                    std::string sub_keys[] = {"items", std::to_string(c++)};
+                    std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
 
                     item_validators.emplace_back(make_schema_validator(context, subsch, sub_keys));
                 }
 
-                auto it = parent.find("additionalItems");
+                auto it = parent.find("items");
                 if (it != parent.object_range().end()) 
                 {
-                    std::string sub_keys[] = {"additionalItems"};
+                    std::string sub_keys[] = {"items"};
                     additional_items_validator = make_schema_validator(context, it->value(), sub_keys);
                 }
             }
 
-            return jsoncons::make_unique<items_array_validator<Json>>( schema_path, 
+            return jsoncons::make_unique<prefix_items_validator<Json>>( schema_path, 
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
