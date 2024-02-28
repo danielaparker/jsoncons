@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT201909_DRAFT201909_SCHEMA_BUILDER_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT201909_DRAFT201909_SCHEMA_BUILDER_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -29,7 +29,7 @@ namespace jsonschema {
 namespace draft201909 {
 
     template <class Json>
-    class draft201909_schema_builder : public schema_builder<Json> 
+    class schema_builder_201909 : public schema_builder<Json> 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -52,16 +52,16 @@ namespace draft201909 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        draft201909_schema_builder(const uri_resolver<Json>& resolver) noexcept
+        schema_builder_201909(const uri_resolver<Json>& resolver) noexcept
             : resolver_(resolver)
         {
             init();
         }
 
-        draft201909_schema_builder(const draft201909_schema_builder&) = delete;
-        draft201909_schema_builder& operator=(const draft201909_schema_builder&) = delete;
-        draft201909_schema_builder(draft201909_schema_builder&&) = default;
-        draft201909_schema_builder& operator=(draft201909_schema_builder&&) = default;
+        schema_builder_201909(const schema_builder_201909&) = delete;
+        schema_builder_201909& operator=(const schema_builder_201909&) = delete;
+        schema_builder_201909(schema_builder_201909&&) = default;
+        schema_builder_201909& operator=(schema_builder_201909&&) = default;
 
         void init()
         {

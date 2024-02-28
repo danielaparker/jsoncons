@@ -7,8 +7,9 @@
 #ifndef JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
 #define JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
 
-#include <jsoncons_ext/jsonschema/draft7/draft7_schema_builder.hpp>
-#include <jsoncons_ext/jsonschema/draft201909/draft201909_schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_builder_7.hpp>
+#include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
+#include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -25,13 +26,17 @@ namespace jsonschema {
             auto it = sch.find("$schema");
             if (it != sch.object_range().end())
             { 
-                if (it->value() == "https://json-schema.org/draft/2019-09/schema")
+                if (it->value() == "https://json-schema.org/draft/2020-12/schema")
                 {
-                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::draft201909_schema_builder<Json>>(resolver);
+                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(resolver);
+                }
+                else if (it->value() == "https://json-schema.org/draft/2019-09/schema")
+                {
+                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(resolver);
                 }
                 else if (it->value() == "http://json-schema.org/draft-07/schema#")
                 {
-                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::draft7_schema_builder<Json>>(resolver);
+                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
                 }
                 else
                 {
@@ -42,12 +47,12 @@ namespace jsonschema {
             }
             else 
             {
-                validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::draft7_schema_builder<Json>>(resolver);
+                validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
             }
         }
         else if (sch.is_bool())
         {
-            validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::draft7_schema_builder<Json>>(resolver);
+            validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
         }
         else
         {

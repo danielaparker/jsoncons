@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT7_DRAFT7_SCHEMA_BUILDER_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT7_DRAFT7_SCHEMA_BUILDER_HPP
+#ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_7_HPP
+#define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_7_HPP
 
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
@@ -29,7 +29,7 @@ namespace jsonschema {
 namespace draft7 {
 
     template <class Json>
-    class draft7_schema_builder : public schema_builder<Json> 
+    class schema_builder_7 : public schema_builder<Json> 
     {
     public:
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -52,16 +52,16 @@ namespace draft7 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        draft7_schema_builder(const uri_resolver<Json>& resolver) noexcept
+        schema_builder_7(const uri_resolver<Json>& resolver) noexcept
             : resolver_(resolver)
         {
             init();
         }
 
-        draft7_schema_builder(const draft7_schema_builder&) = delete;
-        draft7_schema_builder& operator=(const draft7_schema_builder&) = delete;
-        draft7_schema_builder(draft7_schema_builder&&) = default;
-        draft7_schema_builder& operator=(draft7_schema_builder&&) = default;
+        schema_builder_7(const schema_builder_7&) = delete;
+        schema_builder_7& operator=(const schema_builder_7&) = delete;
+        schema_builder_7(schema_builder_7&&) = default;
+        schema_builder_7& operator=(schema_builder_7&&) = default;
 
         void init()
         {
