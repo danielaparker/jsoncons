@@ -482,7 +482,7 @@ namespace detail {
             }
             else 
             {
-                stack_.emplace_back(container_type::object, line_split_kind::multi_line, false,
+                stack_.emplace_back(container_type::object, options_.line_splits(), false,
                                     column_, column_+open_object_brace_str_.length());
             }
             indent();
@@ -575,7 +575,7 @@ namespace detail {
             }
             else 
             {
-                stack_.emplace_back(container_type::array, line_split_kind::multi_line, false,
+                stack_.emplace_back(container_type::array, options_.line_splits(), false,
                                     column_, column_+open_array_bracket_str_.length());
             }
             indent();
@@ -675,14 +675,14 @@ namespace detail {
                     break;
                 case semantic_tag::bigdec:
                 {
-                	// output lossless number
-                	if (options_.bigint_format() == bigint_chars_format::number)
-                	{
-	                	write_bigint_value(sv);
-				break;
-			}
-			JSONCONS_FALLTHROUGH;
-		}
+                    // output lossless number
+                    if (options_.bigint_format() == bigint_chars_format::number)
+                    {
+                        write_bigint_value(sv);
+                break;
+            }
+            JSONCONS_FALLTHROUGH;
+        }
                 default:
                 {
                     sink_.push_back('\"');
@@ -1336,14 +1336,14 @@ namespace detail {
                     break;
                 case semantic_tag::bigdec:
                 {
-                	// output lossless number
-                	if (options_.bigint_format() == bigint_chars_format::number)
-                	{
-	                	write_bigint_value(sv);
-                		break;
-			}
-			JSONCONS_FALLTHROUGH;
-		}
+                    // output lossless number
+                    if (options_.bigint_format() == bigint_chars_format::number)
+                    {
+                        write_bigint_value(sv);
+                        break;
+            }
+            JSONCONS_FALLTHROUGH;
+        }
                 default:
                 {
                     sink_.push_back('\"');
