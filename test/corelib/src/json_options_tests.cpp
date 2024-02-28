@@ -155,7 +155,8 @@ TEST_CASE("object_array with/without line_length_limit")
         json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::same_line);
+               .object_array_line_splits(line_split_kind::same_line)
+               .array_array_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -180,6 +181,7 @@ TEST_CASE("object_array with/without line_length_limit")
         json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
+               .array_array_line_splits(line_split_kind::new_line)
                .object_array_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
@@ -213,7 +215,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::multi_line);
+               .array_array_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -239,7 +241,8 @@ TEST_CASE("object_array with/without line_length_limit")
         json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::same_line);
+               .object_array_line_splits(line_split_kind::same_line)
+               .array_array_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -266,7 +269,8 @@ TEST_CASE("object_array with/without line_length_limit")
         json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::new_line);
+               .object_array_line_splits(line_split_kind::new_line)
+               .array_array_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
@@ -421,7 +425,8 @@ TEST_CASE("json_options tests")
         json j = json::parse(s);
 
         json_options options;
-        options.pad_inside_array_brackets(true);
+        options.pad_inside_array_brackets(true)
+               .object_array_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         j.dump_pretty(os, options);

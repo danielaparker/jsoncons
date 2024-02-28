@@ -26,7 +26,7 @@ JSONCONS_DEPRECATED_MSG("Instead, use float_chars_format") typedef float_chars_f
 
 enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
-enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
+enum class line_split_kind  : uint8_t {same_line=1, new_line, multi_line};
 
 enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -433,10 +433,10 @@ public:
           byte_string_format_(byte_string_chars_format::none),
           bigint_format_(bigint_chars_format::base10),
           line_splits_(line_split_kind::multi_line),
-          object_object_line_splits_(line_split_kind::multi_line),
-          object_array_line_splits_(line_split_kind::same_line),
-          array_array_line_splits_(line_split_kind::new_line),
-          array_object_line_splits_(line_split_kind::multi_line),
+          object_object_line_splits_(line_split_kind{}),
+          object_array_line_splits_(line_split_kind{}),
+          array_array_line_splits_(line_split_kind{}),
+          array_object_line_splits_(line_split_kind{}),
           spaces_around_colon_(spaces_option::space_after),
           spaces_around_comma_(spaces_option::space_after),
           precision_(0),
@@ -479,13 +479,13 @@ public:
 
     line_split_kind line_splits() const  {return line_splits_;}
 
-    line_split_kind object_object_line_splits() const  {return object_object_line_splits_;}
+    line_split_kind object_object_line_splits() const  {return object_object_line_splits_ == line_split_kind{} ? line_splits_ : object_object_line_splits_;}
 
-    line_split_kind array_object_line_splits() const  {return array_object_line_splits_;}
+    line_split_kind array_object_line_splits() const  {return array_object_line_splits_ == line_split_kind{} ? line_splits_ : array_object_line_splits_;}
 
-    line_split_kind object_array_line_splits() const  {return object_array_line_splits_;}
+    line_split_kind object_array_line_splits() const  {return object_array_line_splits_ == line_split_kind{} ? line_splits_ : object_array_line_splits_;}
 
-    line_split_kind array_array_line_splits() const  {return array_array_line_splits_;}
+    line_split_kind array_array_line_splits() const  {return array_array_line_splits_ == line_split_kind{} ? line_splits_ : array_array_line_splits_;}
 
     uint8_t indent_size() const 
     {
