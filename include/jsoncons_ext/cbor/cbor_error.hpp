@@ -90,7 +90,6 @@ std::error_code make_error_code(cbor_errc e)
 
 JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_error;
 JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_decode_error;
-JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_reader_errc;
 #endif
 
 }}

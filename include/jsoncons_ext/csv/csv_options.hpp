@@ -593,6 +593,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind")
     csv_mapping_kind mapping() const 
     {
         return mapping_kind();
@@ -876,6 +877,7 @@ public:
     }
 
 //#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind")
     basic_csv_options& mapping(csv_mapping_kind value)
     {
         this->mapping_ = value;
