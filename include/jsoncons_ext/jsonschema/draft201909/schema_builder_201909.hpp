@@ -206,12 +206,12 @@ namespace draft201909 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
-            bool is_recursive_anchor = false;
+            bool recursive_anchor = false;
 
             auto it = sch.find("$recursiveAnchor"); 
             if (it != sch.object_range().end()) 
             {
-                is_recursive_anchor = it->value().template as<bool>();
+                recursive_anchor = it->value().template as<bool>();
             }
 
             it = sch.find("default");
@@ -324,7 +324,7 @@ namespace draft201909 {
             
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),
-                std::move(validators), std::move(default_value), is_recursive_anchor);
+                std::move(validators), std::move(default_value), recursive_anchor);
         }
 
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 

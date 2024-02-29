@@ -128,11 +128,11 @@ namespace jsonschema {
 
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
-            if (schema_ptr->is_recursive_anchor())
+            if (schema_ptr->recursive_anchor())
             {
                 while (rit != rend)
                 {
-                    if ((*rit)->is_recursive_anchor())
+                    if ((*rit)->recursive_anchor())
                     {
                         schema_ptr = *rit; 
                     }
