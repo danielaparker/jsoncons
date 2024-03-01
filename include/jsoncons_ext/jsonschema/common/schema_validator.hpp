@@ -58,6 +58,7 @@ namespace jsonschema {
     class ref
     {
     public:
+        virtual ~ref() = default;
         virtual void set_referred_schema(const schema_validator<Json>* target) = 0;
     };
 
@@ -167,7 +168,7 @@ namespace jsonschema {
 
 
     template <class Json>
-    class dynamic_anchor_validator : public keyword_validator_base<Json>, public ref<Json>
+    class dynamic_anchor_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
