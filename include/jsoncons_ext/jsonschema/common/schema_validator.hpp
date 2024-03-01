@@ -180,11 +180,7 @@ namespace jsonschema {
         dynamic_anchor_validator(const uri& schema_path, const std::string& value) 
             : keyword_validator_base<Json>("$dynamicAnchor", schema_path), value_(value), referred_schema_{nullptr}
         {
-        }
-
-        dynamic_anchor_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
-        {
+            std::cout << "dynamic_anchor_validator path: " << schema_path.string() << ", value: " << value << "\n";
         }
 
         const std::string value() const
@@ -193,6 +189,11 @@ namespace jsonschema {
         }
 
         void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
+
+        const schema_validator<Json>* referred_schema() const
+        {
+            return referred_schema_;
+        }
 
         uri get_base_uri() const
         {

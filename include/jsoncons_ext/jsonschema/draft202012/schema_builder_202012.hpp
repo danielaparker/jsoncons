@@ -216,6 +216,8 @@ namespace draft202012 {
                 jsoncons::uri new_uri(uri, uri_fragment_part, value);
                 dynamic_anchor = jsoncons::make_unique<dynamic_anchor_validator<Json>>(new_uri,
                     value);
+                auto &file = this->get_or_create_file(new_uri.base().string());
+                file.unresolved.emplace_back(std::string(new_uri.fragment()), dynamic_anchor.get());
             }
 
             it = sch.find("default");
@@ -232,20 +234,17 @@ namespace draft202012 {
                 auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
                 validators.push_back(get_or_create_reference(id));
             }
-/*
+
             it = sch.find("$dynamicRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 std::string value = it->value().template as<std::string>();
-                schema_identifier relative(it->value().template as<std::string>()); 
-                auto base_uri = context.get_base_uri();
-                auto id = relative.resolve(schema_identifier{ base_uri }); // REVISIT
-                auto &file = this->get_or_create_file(id.base().string());
-                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri(), value);
-                file.unresolved.emplace_back(std::string(id.fragment()), orig.get());
+                schema_identifier relative(value); 
+                auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri().base(), value);
                 validators.push_back(std::move(orig));
             }
-*/
+
             for (const auto& key_value : sch.object_range())
             {
                 auto factory_it = keyword_factory_map_.find(key_value.key());

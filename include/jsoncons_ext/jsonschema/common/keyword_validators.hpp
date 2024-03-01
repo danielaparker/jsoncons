@@ -168,7 +168,9 @@ namespace jsonschema {
     public:
         dynamic_ref_validator(const uri& schema_path, const std::string& value) 
             : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
-        {}
+        {
+            std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value << "\n";
+        }
 
         uri get_base_uri() const
         {
@@ -186,10 +188,14 @@ namespace jsonschema {
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
 
+            std::cout << "dynamic_ref_validator::do_validate\n";
+
             const schema_validator<Json>* schema_ptr = nullptr;
 
             while (rit != rend && schema_ptr == nullptr)
             {
+                std::cout << "    " << (*rit)->schema_path().string() << ", " << this->schema_path().string() << "\n";
+
                 if ((*rit)->schema_path() == this->schema_path())
                 {
                     schema_ptr = *rit; 
@@ -205,7 +211,8 @@ namespace jsonschema {
                 {
                     if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == value_)
                     {
-                        schema_ptr = *rit; 
+                        //schema_ptr = *rit; 
+                        schema_ptr = (*rit)->dynamic_anchor()->referred_schema();
                     }
                     ++rit;
                 }
