@@ -39,7 +39,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class ref_validator : public keyword_validator_base<Json>
+    class ref_validator : public keyword_validator_base<Json>, public ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
@@ -57,7 +57,7 @@ namespace jsonschema {
         {
         }
 
-        void set_referred_schema(const schema_validator<Json>* target) { referred_schema_ = target; }
+        void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
 
         uri get_base_uri() const
         {
@@ -199,11 +199,11 @@ namespace jsonschema {
 
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
-            if (schema_ptr->dynamic_anchor() == value_)
+            if (schema_ptr->dynamic_anchor() && schema_ptr->dynamic_anchor()->value() == value_)
             {
                 while (rit != rend)
                 {
-                    if ((*rit)->dynamic_anchor() == value_)
+                    if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == value_)
                     {
                         schema_ptr = *rit; 
                     }

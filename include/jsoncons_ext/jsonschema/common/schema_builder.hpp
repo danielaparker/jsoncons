@@ -19,10 +19,10 @@ namespace jsonschema {
     {
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using ref_validator_type = ref_validator<Json>;
+        using ref_type = ref<Json>;
 
         std::map<std::string, schema_validator_pointer> schemas; // schemas
-        std::vector<std::pair<std::string, ref_validator_type*>> unresolved; // unresolved references
+        std::vector<std::pair<std::string, ref_type*>> unresolved; // unresolved references
         std::map<std::string, Json> unknown_keywords;
     };
 
@@ -33,7 +33,7 @@ namespace jsonschema {
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using ref_validator_type = ref_validator<Json>;
+        using ref_type = ref<Json>;
 
     private:
         uri_resolver<Json> resolver_;

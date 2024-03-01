@@ -206,12 +206,16 @@ namespace draft202012 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
-            std::string dynamic_anchor;
+            std::unique_ptr<dynamic_anchor_validator<Json>> dynamic_anchor;
 
-            auto it = sch.find("$recursiveAnchor"); 
+            auto it = sch.find("$dynamicAnchor"); 
             if (it != sch.object_range().end()) 
             {
-                dynamic_anchor = it->value().template as<std::string>();
+                std::string value = it->value().template as<std::string>();
+                auto uri = context.get_base_uri();
+                jsoncons::uri new_uri(uri, uri_fragment_part, value);
+                dynamic_anchor = jsoncons::make_unique<dynamic_anchor_validator<Json>>(new_uri,
+                    value);
             }
 
             it = sch.find("default");
@@ -228,7 +232,7 @@ namespace draft202012 {
                 auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
                 validators.push_back(get_or_create_reference(id));
             }
-
+/*
             it = sch.find("$dynamicRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
@@ -236,9 +240,12 @@ namespace draft202012 {
                 schema_identifier relative(it->value().template as<std::string>()); 
                 auto base_uri = context.get_base_uri();
                 auto id = relative.resolve(schema_identifier{ base_uri }); // REVISIT
-                validators.push_back(jsoncons::make_unique<dynamic_ref_validator_type>(id.uri(), value));
+                auto &file = this->get_or_create_file(id.base().string());
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri(), value);
+                file.unresolved.emplace_back(std::string(id.fragment()), orig.get());
+                validators.push_back(std::move(orig));
             }
-
+*/
             for (const auto& key_value : sch.object_range())
             {
                 auto factory_it = keyword_factory_map_.find(key_value.key());
@@ -482,7 +489,7 @@ namespace draft202012 {
                 auto fragment = std::string(new_uri.fragment());
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto unresolved = std::find_if(file.unresolved.begin(), file.unresolved.end(),
-                    [fragment](const std::pair<std::string,ref_validator<Json>*>& pr) {return pr.first == fragment;});
+                    [fragment](const std::pair<std::string,ref<Json>*>& pr) {return pr.first == fragment;});
                 //auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
                     this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}));
