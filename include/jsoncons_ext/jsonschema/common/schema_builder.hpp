@@ -21,8 +21,8 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_type = ref<Json>;
 
-        std::map<std::string, schema_validator_pointer> schemas; // schemas
-        std::vector<std::pair<std::string, ref_type*>> unresolved; // unresolved references
+        std::map<std::string, schema_validator_pointer> schema_dictionary; // schemas
+        std::vector<std::pair<std::string, ref_type*>> unresolved_refs; // unresolved references
         std::map<std::string, Json> unknown_keywords;
     };
 
@@ -41,9 +41,13 @@ namespace jsonschema {
 
         // Owns all subschemas
         std::vector<schema_validator_type> subschemas_;
-
+    public:
         // Map location to subschema_registry
         std::map<std::string, subschema_registry<Json>> subschema_registries_;
+
+        std::map<jsoncons::uri, schema_validator_pointer> schema_dictionary_; 
+        std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
+        std::map<jsoncons::uri, Json> unknown_keywords_;
 
     public:
 
@@ -80,7 +84,7 @@ namespace jsonschema {
 
                 for (const auto& loc : locations)
                 {
-                    if (subschema_registries_[loc].schemas.empty()) // registry for this file is empty
+                    if (subschema_registries_[loc].schema_dictionary.empty()) // registry for this file is empty
                     {
                         if (resolver_)
                         {
@@ -103,17 +107,26 @@ namespace jsonschema {
 
         void resolve_references()
         {
-            for (auto& doc : subschema_registries_)
+            /*for (auto& doc : subschema_registries_)
             {
-                for (auto& ref : doc.second.unresolved)
+                for (auto& ref : doc.second.unresolved_refs)
                 {
-                    auto it = doc.second.schemas.find(ref.first);
-                    if (it == doc.second.schemas.end())
+                    auto it = doc.second.schema_dictionary.find(ref.first);
+                    if (it == doc.second.schema_dictionary.end())
                     {
                         JSONCONS_THROW(schema_error(doc.first + " has undefined reference " + ref.first + "."));
                     }
                     ref.second->set_referred_schema(it->second);
                 }
+            }*/
+            for (auto& ref : unresolved_refs_)
+            {
+                auto it = schema_dictionary_.find(ref.first);
+                if (it == schema_dictionary_.end())
+                {
+                    JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
+                }
+                ref.second->set_referred_schema(it->second);
             }
         }
 
