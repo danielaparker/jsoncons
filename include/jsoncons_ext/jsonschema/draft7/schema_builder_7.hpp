@@ -455,10 +455,13 @@ namespace draft7 {
             {
                 auto fragment = std::string(new_uri.fragment());
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
-                auto unresolved_refs = std::find_if(file.unresolved_refs.begin(), file.unresolved_refs.end(),
-                    [fragment](const std::pair<std::string,ref<Json>*>& pr) {return pr.first == fragment;});
+                //auto unresolved_refs = std::find_if(file.unresolved_refs.begin(), file.unresolved_refs.end(),
+                //    [fragment](const std::pair<std::string,ref<Json>*>& pr) {return pr.first == fragment;});
                 //auto unresolved_refs = file.unresolved_refs.find(fragment);
-                if (unresolved_refs != file.unresolved_refs.end())
+
+                auto unresolved_refs = std::find_if(this->unresolved_refs_.begin(), this->unresolved_refs_.end(),
+                    [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
+                if (unresolved_refs != this->unresolved_refs_.end())
                     this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
                 {
