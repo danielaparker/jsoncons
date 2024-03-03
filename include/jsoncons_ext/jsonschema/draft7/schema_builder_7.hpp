@@ -524,7 +524,7 @@ namespace draft7 {
 
             // get or create a ref_validator
             auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
-            file.unresolved_refs.emplace_back(std::string(identifier.fragment()), orig.get());
+            //file.unresolved_refs.emplace_back(std::string(identifier.fragment()), orig.get());
 
             this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
             return orig;
