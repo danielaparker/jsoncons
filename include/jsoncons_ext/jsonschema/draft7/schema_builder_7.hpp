@@ -166,7 +166,7 @@ namespace draft7 {
                         std::vector<keyword_validator_type> validators;
                         Json default_value{ jsoncons::null_type() };
                         schema_identifier relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(schema_identifier{ context.get_base_uri() });
+                        auto id = relative.resolve(schema_identifier{ context.get_absolute_uri() });
                         validators.push_back(get_or_create_reference(id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
@@ -480,10 +480,24 @@ namespace draft7 {
             auto &file = this->get_or_create_file(identifier.base().string());
 
             // a schema already exists
-            auto sch = file.schema_dictionary.find(std::string(identifier.fragment()));
+            /*auto sch = file.schema_dictionary.find(std::string(identifier.fragment()));
             if (sch != file.schema_dictionary.end())
             {
+                if (this->schema_dictionary_.find(identifier.uri()) == this->schema_dictionary_.end())
+                {
+                    std::cout << "BUT " << identifier.uri().string() << " NOT in schema_dictionary_\n";
+                    for (const auto& x : this->schema_dictionary_)
+                    {
+                        std::cout << "    " << x.first.string() << "\n";
+                    }
+                }
                 return jsoncons::make_unique<ref_validator_type>(identifier.base(), sch->second);
+            }*/
+
+            auto it = this->schema_dictionary_.find(identifier.uri());
+            if (it != this->schema_dictionary_.end())
+            {
+                return jsoncons::make_unique<ref_validator_type>(identifier.base(), it->second);
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -508,6 +522,7 @@ namespace draft7 {
             // get or create a ref_validator
             auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
             file.unresolved_refs.emplace_back(std::string(identifier.fragment()), orig.get());
+
             this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
             return orig;
         }
@@ -546,7 +561,7 @@ namespace draft7 {
                 {
                     std::string id = it->value().template as<std::string>(); 
                     schema_identifier relative(id); 
-                    schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_base_uri() });
+                    schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_absolute_uri() });
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

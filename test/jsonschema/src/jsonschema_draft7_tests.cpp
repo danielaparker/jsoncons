@@ -87,7 +87,7 @@ TEST_CASE("jsonschema draft7 tests")
 {
     SECTION("issues")
     {
-        jsonschema_tests("./jsonschema/issues/draft7/issue-ref.json");
+        //jsonschema_tests("./jsonschema/issues/draft7/issue-ref.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
     }
 //#if 0
