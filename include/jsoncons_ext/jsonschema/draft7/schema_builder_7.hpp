@@ -428,16 +428,6 @@ namespace draft7 {
 
         void insert_schema(const schema_identifier& identifier, schema_validator<Json>* s)
         {
-            auto& file = this->get_or_create_file(identifier.base().string());
-            auto schemas_it = file.schema_dictionary.find(std::string(identifier.fragment()));
-            if (schemas_it != file.schema_dictionary.end()) 
-            {
-                //JSONCONS_THROW(schema_error("schema with " + identifier.string() + " already inserted"));
-                return;
-            }
-
-            file.schema_dictionary.insert({std::string(identifier.fragment()), s});
-
             this->schema_dictionary_.emplace(identifier.uri(), s);
         }
 
@@ -447,7 +437,6 @@ namespace draft7 {
                                     const std::string& key, 
                                     const Json& value)
         {
-            auto &file = this->get_or_create_file(uri.base().string());
             auto new_u = uri.append(key);
             schema_identifier new_uri(new_u);
 
@@ -455,9 +444,6 @@ namespace draft7 {
             {
                 auto fragment = std::string(new_uri.fragment());
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
-                //auto unresolved_refs = std::find_if(file.unresolved_refs.begin(), file.unresolved_refs.end(),
-                //    [fragment](const std::pair<std::string,ref<Json>*>& pr) {return pr.first == fragment;});
-                //auto unresolved_refs = file.unresolved_refs.find(fragment);
 
                 auto unresolved_refs = std::find_if(this->unresolved_refs_.begin(), this->unresolved_refs_.end(),
                     [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
@@ -465,7 +451,7 @@ namespace draft7 {
                     this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}));
                 else // no, nothing ref'd it, keep for later
                 {
-                    file.unknown_keywords.emplace(fragment, value);
+                    //file.unknown_keywords.emplace(fragment, value);
                     this->unknown_keywords_.emplace(new_uri.uri(), value);
                 }
 
@@ -480,8 +466,6 @@ namespace draft7 {
 
         keyword_validator_type get_or_create_reference(const schema_identifier& identifier)
         {
-            this->get_or_create_file(identifier.base().string());
-
             // a schema already exists
             auto it = this->schema_dictionary_.find(identifier.uri());
             if (it != this->schema_dictionary_.end())
@@ -496,7 +480,6 @@ namespace draft7 {
             if (identifier.has_fragment() && !identifier.has_plain_name_fragment()) 
             {
                 std::string fragment = std::string(identifier.fragment());
-                //auto unprocessed_keywords_it = file.unknown_keywords.find(fragment);
 
                 auto it2 = this->unknown_keywords_.find(identifier.uri());
                 if (it2 != this->unknown_keywords_.end())
@@ -512,7 +495,6 @@ namespace draft7 {
 
             // get or create a ref_validator
             auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
-            //file.unresolved_refs.emplace_back(std::string(identifier.fragment()), orig.get());
 
             this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
             return orig;
