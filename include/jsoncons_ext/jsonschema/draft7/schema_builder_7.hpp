@@ -480,23 +480,9 @@ namespace draft7 {
 
         keyword_validator_type get_or_create_reference(const schema_identifier& identifier)
         {
-            auto &file = this->get_or_create_file(identifier.base().string());
+            this->get_or_create_file(identifier.base().string());
 
             // a schema already exists
-            /*auto sch = file.schema_dictionary.find(std::string(identifier.fragment()));
-            if (sch != file.schema_dictionary.end())
-            {
-                if (this->schema_dictionary_.find(identifier.uri()) == this->schema_dictionary_.end())
-                {
-                    std::cout << "BUT " << identifier.uri().string() << " NOT in schema_dictionary_\n";
-                    for (const auto& x : this->schema_dictionary_)
-                    {
-                        std::cout << "    " << x.first.string() << "\n";
-                    }
-                }
-                return jsoncons::make_unique<ref_validator_type>(identifier.base(), sch->second);
-            }*/
-
             auto it = this->schema_dictionary_.find(identifier.uri());
             if (it != this->schema_dictionary_.end())
             {
@@ -510,12 +496,14 @@ namespace draft7 {
             if (identifier.has_fragment() && !identifier.has_plain_name_fragment()) 
             {
                 std::string fragment = std::string(identifier.fragment());
-                auto unprocessed_keywords_it = file.unknown_keywords.find(fragment);
-                if (unprocessed_keywords_it != file.unknown_keywords.end()) 
+                //auto unprocessed_keywords_it = file.unknown_keywords.find(fragment);
+
+                auto it2 = this->unknown_keywords_.find(identifier.uri());
+                if (it2 != this->unknown_keywords_.end())
                 {
-                    auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = make_schema_validator(compilation_context(identifier), subsch, {}); 
-                    file.unknown_keywords.erase(unprocessed_keywords_it);
+                    auto& subsch = it2->second;
+                    auto s = make_schema_validator(compilation_context(identifier), subsch, {});
+                    this->unknown_keywords_.erase(it2);
                     auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base(), s.get());
                     this->save_schema(std::move(s));
                     return orig;
