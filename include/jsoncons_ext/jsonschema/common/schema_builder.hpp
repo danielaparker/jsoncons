@@ -58,6 +58,12 @@ namespace jsonschema {
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {                        
+            std::cout << "schema_dictionary:\n";
+            for (auto& member : schema_dictionary_)
+            {
+                std::cout << "    " << member.first.string() << "\n";
+            }
+
             // load all external schemas that have not already been loaded
             std::size_t loaded_count = 0;
             do
@@ -66,7 +72,14 @@ namespace jsonschema {
 
                 std::vector<jsoncons::uri> locations;
                 for (const auto& item : unresolved_refs_)
+                {
                     locations.push_back(item.first);
+                }
+                std::cout << "unresolved_refs:\n";
+                for (auto& member : unresolved_refs_)
+                {
+                    std::cout << "    " << member.first.string() << "\n";
+                }
 
                 for (const auto& loc : locations)
                 {

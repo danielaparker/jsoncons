@@ -3,6 +3,48 @@ dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-
 dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#thingy, value: thingy
 dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#thingy, value: thingy
 
+schema_dictionary:    
+    #
+    #/$defs/start
+    #/$defs/start/additionalProperties
+    #/$defs/thingy
+    #/$defs/thingy/additionalProperties
+    #/additionalProperties
+    #/if
+    #/if/$defs/thingy
+    #/if/$defs/thingy/additionalProperties
+    #/if/additionalProperties
+    #/then
+    #/then/$defs/thingy
+    #/then/$defs/thingy/additionalProperties
+    #/then/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#/$defs/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#/$defs/thingy/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope#/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/$defs/start
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/$defs/start/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/$defs/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/$defs/thingy/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/if
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/if/$defs/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/if/$defs/thingy/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/if/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/then
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/then/$defs/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/then/$defs/thingy/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main#/then/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#/$defs/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#/$defs/thingy/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#/additionalProperties
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start#/additionalProperties
+
   File: ./jsonschema/issues/draft2020-12/issue-DynamicRef.json 1
 Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/dynamic-ref-leaving-dynamic-scope/inner_scope for schema loading
 
@@ -46,7 +88,7 @@ Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/dynamic-ref-leaving-d
     }
 }
 
-8.2.3.2. Dynamic References with "$dynamicRef"
+8.2.3.2. Dynamic References with "$dynamicRef"
 
 The "$dynamicRef" keyword is an applicator that allows for deferring the 
 full resolution until runtime, at which point it is resolved each time it 
@@ -75,8 +117,7 @@ For a full example using these keyword, see appendix C.  The difference
 between the hyper-schema meta-schema in pre-2019 drafts and an this draft 
 dramatically demonstrates the utility of these keywords.  
 
-
-Appendix C. Example of recursive schema extension
+Appendix C. Example of recursive schema extension
 
 Consider the following two schemas describing a simple recursive tree 
 structure, where each node in the tree can have a "data" field of any 
