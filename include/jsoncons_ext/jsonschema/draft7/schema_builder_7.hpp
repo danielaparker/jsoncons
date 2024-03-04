@@ -141,7 +141,7 @@ namespace draft7 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, p);
+                        this->insert_schema(uri, p);
                     }          
                     break;
                 }
@@ -180,7 +180,7 @@ namespace draft7 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, p);
+                        this->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
@@ -424,11 +424,6 @@ namespace draft7 {
             return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_path),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
-        }
-
-        void insert_schema(const schema_identifier& identifier, schema_validator<Json>* s)
-        {
-            this->schema_dictionary_.emplace(identifier.uri(), s);
         }
 
     private:

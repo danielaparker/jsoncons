@@ -147,7 +147,7 @@ namespace draft201909 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, p);
+                        this->insert_schema(uri, p);
                     }          
                     break;
                 }
@@ -181,7 +181,7 @@ namespace draft201909 {
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
-                        insert_schema(uri, p);
+                        this->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
@@ -451,19 +451,6 @@ namespace draft201909 {
             return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_path),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
-        }
-
-        void insert_schema(const schema_identifier& uri, schema_validator<Json>* s)
-        {
-            auto& file = this->get_or_create_file(uri.base().string());
-            auto schemas_it = file.schema_dictionary.find(std::string(uri.fragment()));
-            if (schemas_it != file.schema_dictionary.end()) 
-            {
-                //JSONCONS_THROW(schema_error("schema with " + uri.string() + " already inserted"));
-                return;
-            }
-
-            file.schema_dictionary.insert({std::string(uri.fragment()), s});
         }
 
     private:

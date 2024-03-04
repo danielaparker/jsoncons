@@ -657,6 +657,11 @@ namespace jsonschema {
                 make_schema_validator(context, sch, sub_keys));
         }
 
+        void insert_schema(const schema_identifier& identifier, schema_validator<Json>* s)
+        {
+            this->schema_dictionary_.emplace(identifier.uri(), s);
+        }
+
     };
 
 } // namespace jsonschema
