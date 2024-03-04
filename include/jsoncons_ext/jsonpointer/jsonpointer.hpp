@@ -121,20 +121,9 @@ namespace jsoncons { namespace jsonpointer {
                 return basic_json_pointer<CharT>();
             }
 
-            const char_type* p;
-            const char_type* pend;
+            const char_type* p = input.data();
+            const char_type* pend = input.data() + input.size();
             string_type unescaped;
-            if (input[0] == '#') 
-            {
-                unescaped = unescape_uri_string(input, ec);
-                p = unescaped.data() + 1;
-                pend = unescaped.data() + unescaped.size();
-            }
-            else
-            {
-                p = input.data();
-                pend = input.data() + input.size();
-            }
 
             auto state = jsonpointer::detail::pointer_state::start;
             string_type buffer;
@@ -198,77 +187,6 @@ namespace jsoncons { namespace jsonpointer {
                 tokens.push_back(buffer);
             }
             return basic_json_pointer(tokens);
-        }
-
-        static string_type escape_uri_string(const string_type& s)
-        {
-            string_type escaped;
-            for (auto ch : s)
-            {
-                switch (ch)
-                {
-                    case '%':
-                        escaped.append(string_type{'%','2','5'});
-                        break;
-                    case '^':
-                        escaped.append(string_type{'%','5','E'});
-                        break;
-                    case '|':
-                        escaped.append(string_type{'%','7','C'});
-                        break;
-                    case '\\':
-                        escaped.append(string_type{'%','5','C'});
-                        break;
-                    case '\"':
-                        escaped.append(string_type{'%','2','2'});
-                        break;
-                    case ' ':
-                        escaped.append(string_type{'%','2','0'});
-                        break;
-                    default:
-                        escaped.push_back(ch);
-                        break;
-                }
-            }
-
-            return escaped;
-        }
-
-        static string_type unescape_uri_string(const string_view_type& s, std::error_code& ec)
-        {
-            if (s.size() < 3)
-            {
-                return string_type(s);
-            }
-            string_type unescaped;
-            std::size_t last = s.size() - 2;
-            std::size_t pos = 0;
-            while (pos < last)
-            {
-                if (s[pos] == '%')
-                {
-                    uint8_t ch;
-                    auto result = jsoncons::detail::to_integer_base16(s.data() + (pos+1), 2, ch);
-                    if (!result)
-                    {
-                        ec = jsonpointer_errc::invalid_uri_escaped_data;
-                        return string_type(s);
-                    }
-                    unescaped.push_back(ch);
-                    pos += 3;
-                }
-                else
-                {
-                    unescaped.push_back(s[pos]);
-                    ++pos;
-                }
-            }
-            while (pos < s.size())
-            {
-                unescaped.push_back(s[pos]);
-                ++pos;
-            }
-            return unescaped;
         }
 
         // operator=
