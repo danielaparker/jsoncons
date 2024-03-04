@@ -165,8 +165,8 @@ namespace draft7 {
                     {
                         std::vector<keyword_validator_type> validators;
                         Json default_value{ jsoncons::null_type() };
-                        schema_identifier relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(schema_identifier{ context.get_absolute_uri() });
+                        uri_wrapper relative(it->value().template as<std::string>()); 
+                        auto id = relative.resolve(uri_wrapper{ context.get_absolute_uri() });
                         validators.push_back(this->get_or_create_reference(id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
@@ -432,7 +432,7 @@ namespace draft7 {
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
-            std::vector<schema_identifier> new_uris;
+            std::vector<uri_wrapper> new_uris;
             for (const auto& uri : parent.uris())
             {
                 if (!uri.has_plain_name_fragment())
@@ -452,7 +452,7 @@ namespace draft7 {
                 for (auto& uri : new_uris)
                 {
                     auto new_u = uri.append(key);
-                    uri = schema_identifier(new_u);
+                    uri = uri_wrapper(new_u);
                 }
             }
             if (sch.is_object())
@@ -461,8 +461,8 @@ namespace draft7 {
                 if (it != sch.object_range().end()) 
                 {
                     std::string id = it->value().template as<std::string>(); 
-                    schema_identifier relative(id); 
-                    schema_identifier new_uri = relative.resolve(schema_identifier{ parent.get_absolute_uri() });
+                    uri_wrapper relative(id); 
+                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_absolute_uri() });
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

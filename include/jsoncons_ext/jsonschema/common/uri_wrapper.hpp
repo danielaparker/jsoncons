@@ -16,22 +16,22 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class schema_identifier
+    class uri_wrapper
     {
         jsoncons::uri uri_;
         std::string identifier_;
     public:
-        schema_identifier()
+        uri_wrapper()
         {
         }
 
-        explicit schema_identifier(const std::string& uri)
+        explicit uri_wrapper(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
             identifier_ = uri_.fragment();
         }
 
-        explicit schema_identifier(const uri& uri)
+        explicit uri_wrapper(const uri& uri)
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
@@ -80,12 +80,12 @@ namespace jsonschema {
             return identifier_;
         }
 
-        schema_identifier resolve(const schema_identifier& uri) const
+        uri_wrapper resolve(const uri_wrapper& uri) const
         {
-            return schema_identifier(uri_.resolve(uri.uri_));
+            return uri_wrapper(uri_.resolve(uri.uri_));
         }
 
-        int compare(const schema_identifier& other) const
+        int compare(const uri_wrapper& other) const
         {
             int result = uri_.compare(other.uri_);
             if (result != 0) 
@@ -95,7 +95,7 @@ namespace jsonschema {
             return result; 
         }
 
-        schema_identifier append(const std::string& field) const
+        uri_wrapper append(const std::string& field) const
         {
             if (has_plain_name_fragment())
                 return *this;
@@ -105,10 +105,10 @@ namespace jsonschema {
 
             jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
 
-            return schema_identifier(std::move(new_uri));
+            return uri_wrapper(std::move(new_uri));
         }
 
-        schema_identifier append(std::size_t index) const
+        uri_wrapper append(std::size_t index) const
         {
             if (has_plain_name_fragment())
                 return *this;
@@ -118,7 +118,7 @@ namespace jsonschema {
 
             jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
 
-            return schema_identifier(std::move(new_uri));
+            return uri_wrapper(std::move(new_uri));
         }
 
         std::string string() const
@@ -127,32 +127,32 @@ namespace jsonschema {
             return s;
         }
 
-        friend bool operator==(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator==(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) == 0;
         }
 
-        friend bool operator!=(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator!=(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) != 0;
         }
 
-        friend bool operator<(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator<(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) < 0;
         }
 
-        friend bool operator<=(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator<=(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) <= 0;
         }
 
-        friend bool operator>(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator>(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) > 0;
         }
 
-        friend bool operator>=(const schema_identifier& lhs, const schema_identifier& rhs)
+        friend bool operator>=(const uri_wrapper& lhs, const uri_wrapper& rhs)
         {
             return lhs.compare(rhs) >= 0;
         }

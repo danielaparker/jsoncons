@@ -1,0 +1,168 @@
+dynamic_ref_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope, value: inner_scope#thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope#thingy, value: thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#thingy, value: thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#thingy, value: thingy
+
+  File: ./jsonschema/issues/draft2020-12/issue-DynamicRef.json 1
+Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/dynamic-ref-leaving-dynamic-scope/inner_scope for schema loading
+
+// after leaving a dynamic scope, it is not used by a $dynamicRef
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
+    "if": {
+        "$id": "first_scope",
+        "$defs": {
+            "thingy": {
+                "$comment": "this is first_scope#thingy",
+                "$dynamicAnchor": "thingy",
+                "type": "number"
+            }
+        }
+    },
+    "then": {
+        "$id": "second_scope",
+        "$ref": "start",
+        "$defs": {
+            "thingy": {
+                "$comment": "this is second_scope#thingy, the final destination of the $dynamicRef",
+                "$dynamicAnchor": "thingy",
+                "type": "null"
+            }
+        }
+    },
+    "$defs": {
+        "start": {
+            "$comment": "this is the landing spot from $ref",
+            "$id": "start",
+            "$dynamicRef": "inner_scope#thingy"
+        },
+        "thingy": {
+            "$comment": "this is the first stop for the $dynamicRef",
+            "$id": "inner_scope",
+            "$dynamicAnchor": "thingy",
+            "type": "string"
+        }
+    }
+}
+
+8.2.3.2. Dynamic References with "$dynamicRef"
+
+The "$dynamicRef" keyword is an applicator that allows for deferring the 
+full resolution until runtime, at which point it is resolved each time it 
+is encountered while evaluating an instance.  
+
+Together with "$dynamicAnchor", "$dynamicRef" implements a cooperative 
+extension mechanism that is primarily useful with recursive schemas 
+(schemas that reference themselves).  Both the extension point and the 
+runtime-determined extension target are defined with "$dynamicAnchor", and 
+only exhibit runtime dynamic behavior when referenced with "$dynamicRef".  
+
+The value of the "$dynamicRef" property MUST be a string which is a 
+URI-Reference.  Resolved against the current URI base, it produces the URI 
+used as the starting point for runtime resolution.  This initial 
+resolution is safe to perform on schema load.  
+
+If the initially resolved starting point URI includes a fragment that was 
+created by the "$dynamicAnchor" keyword, the initial URI MUST be replaced 
+by the URI (including the fragment) for the outermost schema resource in 
+the dynamic scope (Section 7.1) that defines an identically named fragment 
+with "$dynamicAnchor".  
+
+Otherwise, its behavior is identical to "$ref", and no runtime resolution is needed.
+
+For a full example using these keyword, see appendix C.  The difference 
+between the hyper-schema meta-schema in pre-2019 drafts and an this draft 
+dramatically demonstrates the utility of these keywords.  
+
+
+Appendix C. Example of recursive schema extension
+
+Consider the following two schemas describing a simple recursive tree 
+structure, where each node in the tree can have a "data" field of any 
+type.  The first schema allows and ignores other instance properties.  The 
+second is more strict and only allows the "data" and "children" 
+properties.  An example instance with "data" misspelled as "daat" is also 
+shown.  
+
+
+// tree schema, extensible
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/tree",
+    "$dynamicAnchor": "node",
+
+    "type": "object",
+    "properties": {
+        "data": true,
+        "children": {
+            "type": "array",
+            "items": {
+                "$dynamicRef": "#node"
+            }
+        }
+    }
+}
+
+// strict-tree schema, guards against misspelled properties
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/strict-tree",
+    "$dynamicAnchor": "node",
+
+    "$ref": "tree",
+    "unevaluatedProperties": false
+}
+
+// instance with misspelled field
+{
+    "children": [ { "daat": 1 } ]
+}
+
+When we load these two schemas, we will notice the "$dynamicAnchor" named 
+"node" (note the lack of "#" as this is just the name) present in each, 
+resulting in the following full schema URIs: 
+
+"https://example.com/tree#node"
+"https://example.com/strict-tree#node"
+In addition, JSON Schema implementations keep track of the fact that these 
+fragments were created with "$dynamicAnchor".  
+
+If we apply the "strict-tree" schema to the instance, we will follow the 
+"$ref" to the "tree" schema, examine its "children" subschema, and find 
+the "$dynamicRef": to "#node" (note the "#" for URI fragment syntax) in 
+its "items" subschema.  That reference resolves to 
+"https://example.com/tree#node", which is a URI with a fragment created by 
+"$dynamicAnchor".  Therefore we must examine the dynamic scope before 
+following the reference.  
+
+At this point, the dynamic path is 
+"#/$ref/properties/children/items/$dynamicRef", with a dynamic scope 
+containing (from the outermost scope to the innermost): 
+
+"https://example.com/strict-tree#"
+"https://example.com/tree#"
+"https://example.com/tree#/properties/children"
+"https://example.com/tree#/properties/children/items"
+Since we are looking for a plain name fragment, which can be defined 
+anywhere within a schema resource, the JSON Pointer fragments are 
+irrelevant to this check.  That means that we can remove those fragments 
+and eliminate consecutive duplicates, producing: 
+
+"https://example.com/strict-tree"
+"https://example.com/tree"
+In this case, the outermost resource also has a "node" fragment defined by 
+"$dynamicAnchor".  Therefore instead of resolving the "$dynamicRef" to 
+"https://example.com/tree#node", we resolve it to 
+"https://example.com/strict-tree#node".  
+
+This way, the recursion in the "tree" schema recurses to the root of 
+"strict-tree", instead of only applying "strict-tree" to the instance 
+root, but applying "tree" to instance children.  
+
+This example shows both "$dynamicAnchor"s in the same place in each 
+schema, specifically the resource root schema.  Since plain-name fragments 
+are independent of the JSON structure, this would work just as well if one 
+or both of the node schema objects were moved under "$defs".  It is the 
+matching "$dynamicAnchor" values which tell us how to resolve the dynamic 
+reference, not any sort of correlation in JSON structure.  

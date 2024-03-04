@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_identifier.hpp>
+#include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -20,21 +20,21 @@ namespace jsonschema {
     class compilation_context
     {
         uri absolute_uri_;
-        std::vector<schema_identifier> uris_;
+        std::vector<uri_wrapper> uris_;
     public:
-        explicit compilation_context(const schema_identifier& location)
+        explicit compilation_context(const uri_wrapper& location)
             : absolute_uri_(location.uri()), 
-              uris_(std::vector<schema_identifier>{{location}})
+              uris_(std::vector<uri_wrapper>{{location}})
         {
         }
 
-        explicit compilation_context(const std::vector<schema_identifier>& uris)
+        explicit compilation_context(const std::vector<uri_wrapper>& uris)
             : uris_(uris)
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
 
-        const std::vector<schema_identifier>& uris() const {return uris_;}
+        const std::vector<uri_wrapper>& uris() const {return uris_;}
 
         const uri& get_absolute_uri() const
         {

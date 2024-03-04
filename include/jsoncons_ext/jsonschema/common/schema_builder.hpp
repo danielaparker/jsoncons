@@ -53,7 +53,7 @@ namespace jsonschema {
 
         void build_schema(const Json& sch, const std::string& retrieval_uri) 
         {
-            root_ = make_schema_validator(compilation_context(schema_identifier(retrieval_uri)), sch, {});
+            root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {});
         }
 
         std::shared_ptr<json_schema<Json>> get_schema()
@@ -75,7 +75,7 @@ namespace jsonschema {
                         if (resolver_)
                         {
                             Json external_sch = resolver_(loc.base());
-                            this->save_schema(make_schema_validator(compilation_context(schema_identifier(loc.base())), external_sch, {}));
+                            this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), external_sch, {}));
                             ++loaded_count;
                         }
                         else
@@ -524,7 +524,7 @@ namespace jsonschema {
                     {
                         auto location = context.make_schema_path_with("dependencies");
                         dependent_required.emplace(dep.key(), 
-                            this->make_required_validator(compilation_context(std::vector<schema_identifier>{{schema_identifier{ location }}}),
+                            this->make_required_validator(compilation_context(std::vector<uri_wrapper>{{uri_wrapper{ location }}}),
                                 dep.value().template as<std::vector<std::string>>()));
                         break;
                     }
@@ -575,7 +575,7 @@ namespace jsonschema {
                     {
                         auto location = context.make_schema_path_with("dependentRequired");
                         dependent_required.emplace(dep.key(), 
-                            this->make_required_validator(compilation_context(std::vector<schema_identifier>{{schema_identifier{ location }}}),
+                            this->make_required_validator(compilation_context(std::vector<uri_wrapper>{{uri_wrapper{ location }}}),
                                 dep.value()));
                         break;
                     }
@@ -630,17 +630,17 @@ namespace jsonschema {
                 make_schema_validator(context, sch, sub_keys));
         }
 
-        void insert_schema(const schema_identifier& identifier, schema_validator<Json>* s)
+        void insert_schema(const uri_wrapper& identifier, schema_validator<Json>* s)
         {
             this->schema_dictionary_.emplace(identifier.uri(), s);
         }
 
-        void insert_unknown_keyword(const schema_identifier& uri, 
+        void insert_unknown_keyword(const uri_wrapper& uri, 
                                     const std::string& key, 
                                     const Json& value)
         {
             auto new_u = uri.append(key);
-            schema_identifier new_uri(new_u);
+            uri_wrapper new_uri(new_u);
 
             if (new_uri.has_fragment() && !new_uri.has_plain_name_fragment()) 
             {
@@ -668,7 +668,7 @@ namespace jsonschema {
             }
         }
 
-        keyword_validator_type get_or_create_reference(const schema_identifier& identifier)
+        keyword_validator_type get_or_create_reference(const uri_wrapper& identifier)
         {
             // a schema already exists
             auto it = this->schema_dictionary_.find(identifier.uri());
