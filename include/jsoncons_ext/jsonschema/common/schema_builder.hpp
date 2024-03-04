@@ -13,18 +13,6 @@
 
 namespace jsoncons {
 namespace jsonschema {
-    
-    template <class Json>
-    struct subschema_registry
-    {
-        using schema_validator_pointer = schema_validator<Json>*;
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using ref_type = ref<Json>;
-
-        std::map<std::string, schema_validator_pointer> schema_dictionary; // schemas
-        std::vector<std::pair<std::string, ref_type*>> unresolved_refs; // unresolved references
-        std::map<std::string, Json> unknown_keywords;
-    };
 
     template <class Json>
     class schema_builder
@@ -33,6 +21,7 @@ namespace jsonschema {
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using ref_validator_type = ref_validator<Json>;
         using ref_type = ref<Json>;
 
     private:
@@ -42,9 +31,6 @@ namespace jsonschema {
         // Owns all subschemas
         std::vector<schema_validator_type> subschemas_;
     public:
-        // Map location to subschema_registry
-        std::map<std::string, subschema_registry<Json>> subschema_registries_;
-
         std::map<jsoncons::uri, schema_validator_pointer> schema_dictionary_; 
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
@@ -115,19 +101,6 @@ namespace jsonschema {
                     JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
                 }
                 ref.second->set_referred_schema(it->second);
-            }
-        }
-
-        subschema_registry<Json>& get_or_create_file(const std::string& loc)
-        {
-            auto file = subschema_registries_.find(loc);
-            if (file != subschema_registries_.end())
-            {
-                return file->second;
-            }
-            else
-            {
-                return subschema_registries_.insert(file, {loc, {}})->second;
             }
         }
 
@@ -660,6 +633,75 @@ namespace jsonschema {
         void insert_schema(const schema_identifier& identifier, schema_validator<Json>* s)
         {
             this->schema_dictionary_.emplace(identifier.uri(), s);
+        }
+
+        void insert_unknown_keyword(const schema_identifier& uri, 
+                                    const std::string& key, 
+                                    const Json& value)
+        {
+            auto new_u = uri.append(key);
+            schema_identifier new_uri(new_u);
+
+            if (new_uri.has_fragment() && !new_uri.has_plain_name_fragment()) 
+            {
+                // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
+                auto unresolved_refs = std::find_if(this->unresolved_refs_.begin(), this->unresolved_refs_.end(),
+                    [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
+                if (unresolved_refs != this->unresolved_refs_.end())
+                {
+                    this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}));
+                }
+                else // no, nothing ref'd it, keep for later
+                {
+                    //file.unknown_keywords.emplace(fragment, value);
+                    this->unknown_keywords_.emplace(new_uri.uri(), value);
+                }
+
+                // recursively add possible subschemas of unknown keywords
+                if (value.type() == json_type::object_value)
+                {
+                    for (const auto& subsch : value.object_range())
+                    {
+                        insert_unknown_keyword(new_uri, subsch.key(), subsch.value());
+                    }
+                }
+            }
+        }
+
+        keyword_validator_type get_or_create_reference(const schema_identifier& identifier)
+        {
+            // a schema already exists
+            auto it = this->schema_dictionary_.find(identifier.uri());
+            if (it != this->schema_dictionary_.end())
+            {
+                return jsoncons::make_unique<ref_validator_type>(identifier.base(), it->second);
+            }
+
+            // referencing an unknown keyword, turn it into schema
+            //
+            // an unknown keyword can only be referenced by a JSONPointer,
+            // not by a plain name identifier
+            if (identifier.has_fragment() && !identifier.has_plain_name_fragment()) 
+            {
+                //std::string fragment = std::string(identifier.fragment());
+
+                auto it2 = this->unknown_keywords_.find(identifier.uri());
+                if (it2 != this->unknown_keywords_.end())
+                {
+                    auto& subsch = it2->second;
+                    auto s = make_schema_validator(compilation_context(identifier), subsch, {});
+                    this->unknown_keywords_.erase(it2);
+                    auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base(), s.get());
+                    this->save_schema(std::move(s));
+                    return orig;
+                }
+            }
+
+            // get or create a ref_validator
+            auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
+
+            this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
+            return orig;
         }
 
     };

@@ -167,7 +167,7 @@ namespace draft7 {
                         Json default_value{ jsoncons::null_type() };
                         schema_identifier relative(it->value().template as<std::string>()); 
                         auto id = relative.resolve(schema_identifier{ context.get_absolute_uri() });
-                        validators.push_back(get_or_create_reference(id));
+                        validators.push_back(this->get_or_create_reference(id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
                             new_context.get_absolute_uri(),
@@ -185,7 +185,7 @@ namespace draft7 {
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
                             {
-                                insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
+                                this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                             }
                         }
                     }          
@@ -427,73 +427,6 @@ namespace draft7 {
         }
 
     private:
-
-        void insert_unknown_keyword(const schema_identifier& uri, 
-                                    const std::string& key, 
-                                    const Json& value)
-        {
-            auto new_u = uri.append(key);
-            schema_identifier new_uri(new_u);
-
-            if (new_uri.has_fragment() && !new_uri.has_plain_name_fragment()) 
-            {
-                auto fragment = std::string(new_uri.fragment());
-                // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
-
-                auto unresolved_refs = std::find_if(this->unresolved_refs_.begin(), this->unresolved_refs_.end(),
-                    [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
-                if (unresolved_refs != this->unresolved_refs_.end())
-                    this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}));
-                else // no, nothing ref'd it, keep for later
-                {
-                    //file.unknown_keywords.emplace(fragment, value);
-                    this->unknown_keywords_.emplace(new_uri.uri(), value);
-                }
-
-                // recursively add possible subschemas of unknown keywords
-                if (value.type() == json_type::object_value)
-                    for (const auto& subsch : value.object_range())
-                    {
-                        insert_unknown_keyword(new_uri, subsch.key(), subsch.value());
-                    }
-            }
-        }
-
-        keyword_validator_type get_or_create_reference(const schema_identifier& identifier)
-        {
-            // a schema already exists
-            auto it = this->schema_dictionary_.find(identifier.uri());
-            if (it != this->schema_dictionary_.end())
-            {
-                return jsoncons::make_unique<ref_validator_type>(identifier.base(), it->second);
-            }
-
-            // referencing an unknown keyword, turn it into schema
-            //
-            // an unknown keyword can only be referenced by a JSONPointer,
-            // not by a plain name identifier
-            if (identifier.has_fragment() && !identifier.has_plain_name_fragment()) 
-            {
-                std::string fragment = std::string(identifier.fragment());
-
-                auto it2 = this->unknown_keywords_.find(identifier.uri());
-                if (it2 != this->unknown_keywords_.end())
-                {
-                    auto& subsch = it2->second;
-                    auto s = make_schema_validator(compilation_context(identifier), subsch, {});
-                    this->unknown_keywords_.erase(it2);
-                    auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base(), s.get());
-                    this->save_schema(std::move(s));
-                    return orig;
-                }
-            }
-
-            // get or create a ref_validator
-            auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
-
-            this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
-            return orig;
-        }
 
         compilation_context make_compilation_context(const compilation_context& parent, 
             const Json& sch, jsoncons::span<const std::string> keys) const override
