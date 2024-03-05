@@ -168,31 +168,23 @@ namespace jsonschema {
 
 
     template <class Json>
-    class dynamic_anchor_validator : public keyword_validator_base<Json>, public virtual ref<Json>
+    class dynamic_anchor_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        std::string value_;
-        const schema_validator<Json>* referred_schema_;
+        jsoncons::uri value_;
 
     public:
-        dynamic_anchor_validator(const uri& schema_path, const std::string& value) 
-            : keyword_validator_base<Json>("$dynamicAnchor", schema_path), value_(value), referred_schema_{nullptr}
+        dynamic_anchor_validator(const uri& schema_path, const jsoncons::uri& value) 
+            : keyword_validator_base<Json>("$dynamicAnchor", schema_path), value_(value)
         {
-            std::cout << "dynamic_anchor_validator path: " << schema_path.string() << ", value: " << value << "\n";
+            std::cout << "dynamic_anchor_validator path: " << this->schema_path().string() << ", value: " << value_.string() << "\n";
         }
 
-        const std::string value() const
+        const jsoncons::uri value() const
         {
             return value_;
-        }
-
-        void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
-
-        const schema_validator<Json>* referred_schema() const
-        {
-            return referred_schema_;
         }
 
         uri get_base_uri() const
@@ -208,19 +200,6 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
-            evaluation_context<Json> this_context(eval_context, this->keyword_name());
-
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output(this->keyword_name(), 
-                    this_context.eval_path(),
-                    this->schema_path(), 
-                    instance_location.to_string(), 
-                    "Unresolved schema reference " + this->schema_path().string()));
-                return;
-            }
-
-            referred_schema_->validate(this_context, instance, instance_location, evaluated_properties, reporter, patch);
         }
     };
 

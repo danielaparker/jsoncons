@@ -70,24 +70,16 @@ namespace jsonschema {
             {
                 loaded_count = 0;
 
-                std::vector<jsoncons::uri> locations;
-                for (const auto& item : unresolved_refs_)
+                for (std::size_t i = unresolved_refs_.size(); i-- > 0; )
                 {
-                    locations.push_back(item.first);
-                }
-                std::cout << "unresolved_refs:\n";
-                for (auto& member : unresolved_refs_)
-                {
-                    std::cout << "    " << member.first.string() << "\n";
-                }
-
-                for (const auto& loc : locations)
-                {
+                    auto loc = unresolved_refs_[i].first;
                     if (schema_dictionary_.find(loc) == schema_dictionary_.end()) // registry for this file is empty
                     {
                         if (resolver_)
                         {
-                            Json external_sch = resolver_(loc.base());
+                            Json external_sch = resolver_(loc);
+                            unresolved_refs_.erase(unresolved_refs_.begin()+i);
+
                             this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), external_sch, {}));
                             ++loaded_count;
                         }

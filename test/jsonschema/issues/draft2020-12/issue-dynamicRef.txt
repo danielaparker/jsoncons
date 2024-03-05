@@ -1,9 +1,10 @@
 dynamic_ref_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope, value: inner_scope#thingy
-dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope#thingy, value: thingy
-dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/first_scope#thingy, value: thingy
-dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#thingy, value: thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy, value: thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy, value: thingy
+dynamic_anchor_validator path: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy, value: thingy
+ref_validator2: https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start
 
-schema_dictionary:    
+schema_dictionary:
     #
     #/$defs/start
     #/$defs/start/additionalProperties
@@ -44,11 +45,14 @@ schema_dictionary:
     https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope#/additionalProperties
     https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start
     https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start#/additionalProperties
-
+unresolved_refs:
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy
+    https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/thingy
   File: ./jsonschema/issues/draft2020-12/issue-DynamicRef.json 1
-Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/dynamic-ref-leaving-dynamic-scope/inner_scope for schema loading
+Could not open ./jsonschema/JSON-Schema-Test-Suite/remotes/dynamic-ref-leaving-dynamic-scope/thingy for schema loading
 
-// after leaving a dynamic scope, it is not used by a $dynamicRef
+// after leaving a dynamic scope, it is not used by a $dynamicRef
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",

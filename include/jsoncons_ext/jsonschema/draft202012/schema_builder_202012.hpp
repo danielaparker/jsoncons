@@ -211,11 +211,12 @@ namespace draft202012 {
             if (it != sch.object_range().end()) 
             {
                 std::string value = it->value().template as<std::string>();
-                auto uri = context.get_base_uri();
-                jsoncons::uri new_uri(uri, uri_fragment_part, value);
-                dynamic_anchor = jsoncons::make_unique<dynamic_anchor_validator<Json>>(new_uri,
-                    value);
-                this->unresolved_refs_.emplace_back(new_uri, dynamic_anchor.get());
+                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
+
+                uri_wrapper relative("$dynamicAnchor");
+                auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
+                dynamic_anchor = jsoncons::make_unique<dynamic_anchor_validator<Json>>(id.uri(),
+                    new_uri);
             }
 
             it = sch.find("default");
@@ -239,7 +240,7 @@ namespace draft202012 {
                 std::string value = it->value().template as<std::string>();
                 uri_wrapper relative(value); 
                 auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri().base(), value);
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri().base(), id.uri());
                 validators.push_back(std::move(orig));
             }
 

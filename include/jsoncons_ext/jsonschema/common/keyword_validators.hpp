@@ -50,11 +50,13 @@ namespace jsonschema {
         ref_validator(const uri& schema_path) 
             : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
         {
+            std::cout << "ref_validator: " << this->schema_path().string() << "\n";
         }
 
         ref_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
             : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
         {
+            std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
         }
 
         void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
@@ -163,14 +165,16 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        std::string value_;
+        jsoncons::uri value_;
 
     public:
-        dynamic_ref_validator(const uri& schema_path, const std::string& value) 
+        dynamic_ref_validator(const uri& schema_path, const jsoncons::uri& value) 
             : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
         {
-            std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value << "\n";
+            std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
         }
+
+        const jsoncons::uri& value() const { return value_; }
 
         uri get_base_uri() const
         {
@@ -194,9 +198,10 @@ namespace jsonschema {
 
             while (rit != rend && schema_ptr == nullptr)
             {
-                std::cout << "    " << (*rit)->schema_path().string() << ", " << this->schema_path().string() << "\n";
+                std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
+                    ", " << this->value().string() << "\n";
 
-                if ((*rit)->schema_path() == this->schema_path())
+                if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == this->value())
                 {
                     schema_ptr = *rit; 
                 }
@@ -204,19 +209,6 @@ namespace jsonschema {
             }
 
             JSONCONS_ASSERT(schema_ptr != nullptr);
-
-            if (schema_ptr->dynamic_anchor() && schema_ptr->dynamic_anchor()->value() == value_)
-            {
-                while (rit != rend)
-                {
-                    if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == value_)
-                    {
-                        //schema_ptr = *rit; 
-                        schema_ptr = (*rit)->dynamic_anchor()->referred_schema();
-                    }
-                    ++rit;
-                }
-            }
 
             //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
 
