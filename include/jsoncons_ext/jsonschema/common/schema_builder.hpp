@@ -77,8 +77,7 @@ namespace jsonschema {
                     {
                         if (resolver_)
                         {
-                            Json external_sch = resolver_(loc);
-                            unresolved_refs_.erase(unresolved_refs_.begin()+i);
+                            Json external_sch = resolver_(loc.base());
 
                             this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), external_sch, {}));
                             ++loaded_count;
