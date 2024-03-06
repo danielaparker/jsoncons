@@ -2,11 +2,12 @@
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
-Related class|Old name|Replacement
+Category/class|Old name|Replacement
 --------|-----------|--------------
 __corelib__|&nbsp;|&nbsp;
 `json_errc`|&nbsp;|&nbsp;
 &nbsp;|`json_parser_errc`|`json_errc`
+&nbsp;|`json_parse_errc`|`json_errc`
 `basic_json`|&nbsp;|&nbsp;
 &nbsp;|`owjson`|`wojson`
 &nbsp;|`preserve_order_policy`|`order_preserving_policy`
@@ -59,9 +60,28 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`precision`|No replacement
 &nbsp;|`decimal_places`|No replacement
 &nbsp;|`get_stor_type`|`storage_kind`
+`bigint_chars_format`|&nbsp;|&nbsp;
+&nbsp;|`bignum_chars_format`|`bigint_chars_format`
+&nbsp;|`bigint_chars_format::integer`|`bigint_chars_format::number`
 `basic_json_options`|&nbsp;|&nbsp;
 &nbsp;|`enum class chars_format`|`float_chars_format`
-&nbsp;|`bigint_chars_format::integer`|`bigint_chars_format::number`
+`basic_json_parser`|&nbsp;|&nbsp;
+&nbsp;|`end_parse`|`finish_parse`
+&nbsp;|`set_source`|`update`
+`json_type_traits`|&nbsp;|&nbsp;
+&nbsp;|`is_json_type_traits_impl`|`is_json_type_traits_declared`
+&nbsp;|`set_source`|`update`
+`json_filter`|&nbsp;|&nbsp;
+&nbsp;|`to_handler`|`destination`
+&nbsp;|`input_handler`|`destination`
+&nbsp;|`downstream_handler`|`destination`
+&nbsp;|`destination_handler`|`destination`
+&nbsp;|`json_content_filter`|`json_filter`
+&nbsp;|`wjson_content_filter`|`wjson_filter`
+&nbsp;|`rename_name_filter`|`rename_object_key_filter`
+&nbsp;|`wrename_name_filter`|`wrename_object_key_filter`
+&nbsp;|`rename_object_member_filter`|`rename_object_key_filter`
+&nbsp;|`wrename_object_member_filter`|`wrename_object_key_filter`
 &nbsp;|`default_parse_error_handler`|`default_json_parsing`
 &nbsp;|`strict_parse_error_handler`|`strict_json_parsing`
 &nbsp;|`can_read_nan_replacement`|`enable_nan_to_num() or enable_nan_to_str()`
@@ -158,6 +178,14 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`json_parse_exception`|`ser_error`
 &nbsp;|`parse_exception`|`ser_error`
 &nbsp;|`parse_error`|`ser_error`
+`conv_error.hpp`|&nbsp;|&nbsp;
+&nbsp;|`convert_error`|`conv_error`
+`semantic_tag`|&nbsp;|&nbsp;
+&nbsp;|`semantic_tag::big_integer`|`semantic_tag::bigint`
+&nbsp;|`semantic_tag::big_decimal`|`semantic_tag::bigdec`
+&nbsp;|`semantic_tag::big_float`|`semantic_tag::bigfloat`
+&nbsp;|`semantic_tag::date_time`|`semantic_tag::datetime`
+&nbsp;|`semantic_tag::timestamp`|`semantic_tag::epoch_second`
 __bson__|&nbsp;|&nbsp;
 `basic_bson_reader`|&nbsp;|&nbsp;
 &nbsp;|`bson_reader`|`bson_stream_reader`
@@ -180,6 +208,9 @@ __cbor__|&nbsp;|&nbsp;
 &nbsp;|`cbor_buffer_serializer`|`cbor_bytes_encoder`
 `cbor_options`|&nbsp;|&nbsp;
 &nbsp;|`enable_typed_arrays`|`use_typed_arrays`
+`cbor_error.hpp`|&nbsp;|&nbsp;
+&nbsp;|`cbor_error`|`ser_error`
+&nbsp;|`cbor_decode_error`|`ser_error`
 __csv__|&nbsp;|&nbsp;
 `csv_errc`|&nbsp;|&nbsp;
 &nbsp;|`csv_parser_errc`|`csv_errc`
