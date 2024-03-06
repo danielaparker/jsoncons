@@ -179,7 +179,7 @@ namespace jsonschema {
         dynamic_anchor_validator(const uri& schema_path, const jsoncons::uri& value) 
             : keyword_base<Json>("$dynamicAnchor", schema_path), value_(value)
         {
-            std::cout << "dynamic_anchor_validator path: " << this->schema_path().string() << ", value: " << value_.string() << "\n";
+            //std::cout << "dynamic_anchor_validator path: " << this->schema_path().string() << ", value: " << value_.string() << "\n";
         }
 
         const jsoncons::uri value() const

@@ -50,13 +50,13 @@ namespace jsonschema {
         ref_validator(const uri& schema_path) 
             : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
         {
-            std::cout << "ref_validator: " << this->schema_path().string() << "\n";
+            //std::cout << "ref_validator: " << this->schema_path().string() << "\n";
         }
 
         ref_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
             : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
         {
-            std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
+            //std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
         }
 
         void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
@@ -171,7 +171,7 @@ namespace jsonschema {
         dynamic_ref_validator(const uri& schema_path, const jsoncons::uri& value) 
             : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
         {
-            std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
+            //std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
         }
 
         const jsoncons::uri& value() const { return value_; }
@@ -192,14 +192,14 @@ namespace jsonschema {
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
 
-            std::cout << "dynamic_ref_validator::do_validate\n";
+            //std::cout << "dynamic_ref_validator::do_validate\n";
 
             const schema_validator<Json>* schema_ptr = nullptr;
 
             while (rit != rend && schema_ptr == nullptr)
             {
-                std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
-                    ", " << this->value().string() << "\n";
+                //std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
+                //    ", " << this->value().string() << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == this->value())
                 {
@@ -210,8 +210,8 @@ namespace jsonschema {
 
             while (rit != rend)
             {
-                std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
-                    ", " << this->value().string() << "\n";
+                //std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
+                //    ", " << this->value().string() << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value().fragment() == this->value().fragment())
                 {
@@ -1953,10 +1953,6 @@ namespace jsonschema {
                     {
                         evaluated_properties.insert(prop.key());
                     }
-                }
-                else
-                {
-                    std::cout << "property " << prop.key() << " not found\n";
                 }
             }
                 // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
