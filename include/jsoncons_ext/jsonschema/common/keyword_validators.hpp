@@ -1905,7 +1905,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class properties_validator : public keyword_base<Json>
+    class properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -1915,7 +1915,7 @@ namespace jsonschema {
         properties_validator(const uri& schema_path,
             std::map<std::string, schema_validator_type>&& properties
         )
-            : keyword_base<Json>("properties", std::move(schema_path)), 
+            : keyword_validator_base<Json>("properties", std::move(schema_path)),
               properties_(std::move(properties))
         {
         }
@@ -1954,6 +1954,10 @@ namespace jsonschema {
                         evaluated_properties.insert(prop.key());
                     }
                 }
+                else
+                {
+                    std::cout << "property " << prop.key() << " not found\n";
+                }
             }
                 // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
 
@@ -1979,6 +1983,16 @@ namespace jsonschema {
 
     private:
 
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            std::unordered_set<std::string> all_properties;
+            validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+        }
+
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
         {
             Json j;
@@ -1990,7 +2004,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class pattern_properties_validator : public keyword_base<Json>
+    class pattern_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -2000,7 +2014,7 @@ namespace jsonschema {
         pattern_properties_validator(const uri& schema_path,
             std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties
         )
-            : keyword_base<Json>("patternProperties", std::move(schema_path)), 
+            : keyword_validator_base<Json>("patternProperties", std::move(schema_path)),
               pattern_properties_(std::move(pattern_properties))
         {
         }
@@ -2041,6 +2055,16 @@ namespace jsonschema {
         }
 
     private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            std::unordered_set<std::string>& evaluated_properties, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            std::unordered_set<std::string> all_properties;
+            validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch, all_properties);
+        }
     };
 
     template <class Json>
