@@ -168,7 +168,7 @@ namespace jsonschema {
 
 
     template <class Json>
-    class dynamic_anchor_validator : public keyword_validator_base<Json>
+    class dynamic_anchor_validator : public keyword_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
@@ -177,7 +177,7 @@ namespace jsonschema {
 
     public:
         dynamic_anchor_validator(const uri& schema_path, const jsoncons::uri& value) 
-            : keyword_validator_base<Json>("$dynamicAnchor", schema_path), value_(value)
+            : keyword_base<Json>("$dynamicAnchor", schema_path), value_(value)
         {
             std::cout << "dynamic_anchor_validator path: " << this->schema_path().string() << ", value: " << value_.string() << "\n";
         }
@@ -192,15 +192,6 @@ namespace jsonschema {
             return this->schema_path();
         }
 
-    private:
-
-        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
-            error_reporter& reporter, 
-            Json& patch) const override
-        {
-        }
     };
 
 

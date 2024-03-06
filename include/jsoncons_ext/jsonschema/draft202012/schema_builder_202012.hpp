@@ -327,6 +327,16 @@ namespace draft202012 {
                     validators.emplace_back(make_items_object_validator(context, sch, it->value()));
                 }
             }
+
+            it = sch.find("items");
+            if (it != sch.object_range().end()) 
+            {
+                if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
+                {
+                    validators.emplace_back(make_items_object_validator(context, sch, it->value()));
+                }
+            }
+
             
             return jsoncons::make_unique<object_schema_validator<Json>>(
                 context.get_absolute_uri(),

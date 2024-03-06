@@ -208,6 +208,18 @@ namespace jsonschema {
                 ++rit;
             }
 
+            while (rit != rend)
+            {
+                std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
+                    ", " << this->value().string() << "\n";
+
+                if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value().fragment() == this->value().fragment())
+                {
+                    schema_ptr = *rit; 
+                }
+                ++rit;
+            }
+
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
             //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
