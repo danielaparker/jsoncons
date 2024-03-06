@@ -277,9 +277,18 @@ namespace draft7 {
             }
             else
             {
-                validators.emplace_back(make_additional_properties_validator(context, Json(true), 
-                    std::move(properties), std::move(pattern_properties)));
+                if (properties)
+                {
+                    validators.emplace_back(std::move(properties));
+                }
+#if defined(JSONCONS_HAS_STD_REGEX)
+                if (pattern_properties)
+                {
+                    validators.emplace_back(std::move(pattern_properties));
+                }
+#endif
             }
+
             it = sch.find("items");
             if (it != sch.object_range().end()) 
             {

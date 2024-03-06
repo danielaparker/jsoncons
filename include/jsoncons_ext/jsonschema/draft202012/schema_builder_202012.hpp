@@ -316,7 +316,7 @@ namespace draft202012 {
 #if defined(JSONCONS_HAS_STD_REGEX)
                 if (pattern_properties)
                 {
-                    //validators.emplace_back(std::move(pattern_properties));
+                    validators.emplace_back(std::move(pattern_properties));
                 }
 #endif
             }
