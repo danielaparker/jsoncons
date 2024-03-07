@@ -160,12 +160,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class dynamic_ref_validator : public keyword_validator_base<Json>
+    class dynamic_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
         jsoncons::uri value_;
+        const schema_validator<Json>* referred_schema_;
 
     public:
         dynamic_ref_validator(const uri& schema_path, const jsoncons::uri& value) 
@@ -173,6 +174,8 @@ namespace jsonschema {
         {
             //std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
         }
+
+        void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
 
         const jsoncons::uri& value() const { return value_; }
 
@@ -192,14 +195,14 @@ namespace jsonschema {
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
 
-            //std::cout << "dynamic_ref_validator::do_validate\n";
+            std::cout << "dynamic_ref_validator::do_validate\n";
 
             const schema_validator<Json>* schema_ptr = nullptr;
 
             while (rit != rend && schema_ptr == nullptr)
             {
-                //std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
-                //    ", " << this->value().string() << "\n";
+                std::cout << "  (1) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "X") <<
+                    ", " << this->value().string() << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == this->value())
                 {
@@ -210,14 +213,19 @@ namespace jsonschema {
 
             while (rit != rend)
             {
-                //std::cout << "    " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
-                //    ", " << this->value().string() << "\n";
+                std::cout << "  (2)" << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") <<
+                    ", " << this->value().string() << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value().fragment() == this->value().fragment())
                 {
                     schema_ptr = *rit; 
                 }
                 ++rit;
+            }
+
+            if (schema_ptr == nullptr)
+            {
+                schema_ptr = referred_schema_;
             }
 
             JSONCONS_ASSERT(schema_ptr != nullptr);

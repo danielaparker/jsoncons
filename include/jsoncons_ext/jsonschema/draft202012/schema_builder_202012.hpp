@@ -241,6 +241,7 @@ namespace draft202012 {
                 uri_wrapper relative(value); 
                 auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
                 auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri().base(), id.uri());
+                this->unresolved_refs_.emplace_back(id.uri(), orig.get());
                 validators.push_back(std::move(orig));
             }
 
@@ -526,6 +527,21 @@ namespace draft202012 {
                     }
                 }
                 it = sch.find("$anchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    auto value = it->value().template as<std::string>();
+                    if (validate_anchor(value))
+                    {
+                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
+                        uri_wrapper identifier{ new_uri };
+                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                        {
+                            new_uris.emplace_back(std::move(identifier)); 
+                        }
+                    }
+                }
+                it = sch.find("$dynamicAnchor"); 
                 if (it != sch.object_range().end()) 
                 {
                     auto value = it->value().template as<std::string>();
