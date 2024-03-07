@@ -195,13 +195,13 @@ namespace jsonschema {
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
 
-            std::cout << "dynamic_ref_validator::do_validate " << this->value().string() << "\n";
+            //std::cout << "dynamic_ref_validator::do_validate " << this->value().string() << "\n";
 
             const schema_validator<Json>* schema_ptr = nullptr;
 
             while (rit != rend && schema_ptr == nullptr)
             {
-                std::cout << "  (1) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
+                //std::cout << "  (1) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value() == this->value())
                 {
@@ -212,7 +212,7 @@ namespace jsonschema {
 
             while (rit != rend)
             {
-                std::cout << "  (2) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
+                //std::cout << "  (2) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
 
                 if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value().fragment() == this->value().fragment())
                 {
