@@ -476,11 +476,6 @@ namespace draft201909 {
                 }
             }
 
-            if (new_uris.empty())
-            {
-                new_uris.emplace_back("#");
-            }
-
             // Append the keys for this sub-schema to the uri's
             for (const auto& key : keys)
             {
@@ -524,6 +519,11 @@ namespace draft201909 {
                         }
                     }
                 }
+            }
+
+            if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
             }
 /*
             std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
