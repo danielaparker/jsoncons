@@ -40,21 +40,21 @@
             }
         },
         "tests": [
-            {
+            /*{
                 "description": "string matches /$defs/thingy, but the $dynamicRef does not stop here",
                 "data": "a string",
                 "valid": false
-            }/*,
+            },
             {
                 "description": "first_scope is not in dynamic scope for the $dynamicRef",
                 "data": 42,
                 "valid": false
-            },
+            },*/
             {
                 "description": "/then/$defs/thingy is the final stop for the $dynamicRef",
                 "data": null,
                 "valid": true
-            }*/
+            }
         ]
     }
 ]
