@@ -580,20 +580,15 @@ namespace draft202012 {
                 }
             }
 
-            /*if (new_uris.empty())
-            {
-                new_uris.emplace_back("#");
-            }*/
-
             // Append the keys for this sub-schema to the uri's
-            /*for (const auto& key : keys)
+            for (const auto& key : keys)
             {
                 for (auto& uri : new_uris)
                 {
                     auto new_u = uri.append(key);
                     uri = uri_wrapper(new_u);
                 }
-            }*/
+            }
 
             if (sch.is_object())
             {
