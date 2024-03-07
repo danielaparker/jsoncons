@@ -31,7 +31,7 @@ namespace jsonschema {
         // Owns all subschemas
         std::vector<schema_validator_type> subschemas_;
     public:
-        std::map<jsoncons::uri, schema_validator_pointer> schema_dictionary_; 
+        std::map<jsoncons::uri, schema_validator_pointer> schema_store_; 
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
 
@@ -51,6 +51,11 @@ namespace jsonschema {
             subschemas_.emplace_back(std::move(schema));
         }
 
+        void build_schema(const Json& sch) 
+        {
+            root_ = make_schema_validator(compilation_context{}, sch, {});
+        }
+
         void build_schema(const Json& sch, const std::string& retrieval_uri) 
         {
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {});
@@ -58,11 +63,11 @@ namespace jsonschema {
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {                        
-            //std::cout << "schema_dictionary:\n";
-            //for (auto& member : schema_dictionary_)
-            //{
-            //    std::cout << "    " << member.first.string() << "\n";
-            //}
+            std::cout << "schema_store:\n";
+            for (auto& member : schema_store_)
+            {
+                std::cout << "    " << member.first.string() << "\n";
+            }
 
             // load all external schemas that have not already been loaded
             std::size_t loaded_count = 0;
@@ -73,7 +78,7 @@ namespace jsonschema {
                 for (std::size_t i = unresolved_refs_.size(); i-- > 0; )
                 {
                     auto loc = unresolved_refs_[i].first;
-                    if (schema_dictionary_.find(loc) == schema_dictionary_.end()) // registry for this file is empty
+                    if (schema_store_.find(loc) == schema_store_.end()) // registry for this file is empty
                     {
                         if (resolver_)
                         {
@@ -99,8 +104,8 @@ namespace jsonschema {
         {
             for (auto& ref : unresolved_refs_)
             {
-                auto it = schema_dictionary_.find(ref.first);
-                if (it == schema_dictionary_.end())
+                auto it = schema_store_.find(ref.first);
+                if (it == schema_store_.end())
                 {
                     JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
                 }
@@ -636,7 +641,7 @@ namespace jsonschema {
 
         void insert_schema(const uri_wrapper& identifier, schema_validator<Json>* s)
         {
-            this->schema_dictionary_.emplace(identifier.uri(), s);
+            this->schema_store_.emplace(identifier.uri(), s);
         }
 
         void insert_unknown_keyword(const uri_wrapper& uri, 
@@ -675,8 +680,8 @@ namespace jsonschema {
         keyword_validator_type get_or_create_reference(const uri_wrapper& identifier)
         {
             // a schema already exists
-            auto it = this->schema_dictionary_.find(identifier.uri());
-            if (it != this->schema_dictionary_.end())
+            auto it = this->schema_store_.find(identifier.uri());
+            if (it != this->schema_store_.end())
             {
                 return jsoncons::make_unique<ref_validator_type>(identifier.base(), it->second);
             }

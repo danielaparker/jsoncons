@@ -480,7 +480,7 @@ namespace draft202012 {
 
     private:
 
-        compilation_context make_compilation_context(const compilation_context& parent, 
+        /*compilation_context make_compilation_context(const compilation_context& parent, 
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
@@ -557,13 +557,105 @@ namespace draft202012 {
                     }
                 }
             }
-/*
-            std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
-            for (const auto& uri : new_uris)
+
+          //std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+          //for (const auto& uri : new_uris)
+          //{
+          //    std::cout << "    " << uri.string() << "\n";
+          //}
+
+            return compilation_context(new_uris);
+        }*/
+
+        compilation_context make_compilation_context(const compilation_context& parent, 
+            const Json& sch, jsoncons::span<const std::string> keys) const override
+        {
+            // Exclude uri's that are not plain name identifiers
+            std::vector<uri_wrapper> new_uris;
+            for (const auto& uri : parent.uris())
             {
-                std::cout << "    " << uri.string() << "\n";
+                if (!uri.has_plain_name_fragment())
+                {
+                    new_uris.push_back(uri);
+                }
             }
-*/
+
+            /*if (new_uris.empty())
+            {
+                new_uris.emplace_back("#");
+            }*/
+
+            // Append the keys for this sub-schema to the uri's
+            /*for (const auto& key : keys)
+            {
+                for (auto& uri : new_uris)
+                {
+                    auto new_u = uri.append(key);
+                    uri = uri_wrapper(new_u);
+                }
+            }*/
+
+            if (sch.is_object())
+            {
+                auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
+                if (it != sch.object_range().end()) 
+                {
+                    std::string id = it->value().template as<std::string>(); 
+                    uri_wrapper relative(id); 
+                    if (relative.has_fragment())
+                    {
+                        JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
+                    }
+                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
+                    //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
+                    // Add it to the list if it is not already there
+                    if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
+                    {
+                        new_uris.emplace_back(new_uri); 
+                    }
+                }
+                if (new_uris.empty())
+                {
+                    new_uris.emplace_back("#");
+                }
+                it = sch.find("$anchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    auto value = it->value().template as<std::string>();
+                    if (validate_anchor(value))
+                    {
+                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
+                        uri_wrapper identifier{ new_uri };
+                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                        {
+                            new_uris.emplace_back(std::move(identifier)); 
+                        }
+                    }
+                }
+                it = sch.find("$dynamicAnchor"); 
+                if (it != sch.object_range().end()) 
+                {
+                    auto value = it->value().template as<std::string>();
+                    if (validate_anchor(value))
+                    {
+                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
+                        uri_wrapper identifier{ new_uri };
+                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                        {
+                            new_uris.emplace_back(std::move(identifier)); 
+                        }
+                    }
+                }
+            }
+
+            //std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            //for (const auto& uri : new_uris)
+            //{
+            //    std::cout << "    " << uri.string() << "\n";
+            //}
+
             return compilation_context(new_uris);
         }
 

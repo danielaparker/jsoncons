@@ -104,7 +104,7 @@ namespace jsonschema {
     {
         auto schema_builder = make_schema_validator_factory(sch, resolver);
 
-        schema_builder->build_schema(sch, "#");
+        schema_builder->build_schema(sch);
         return schema_builder->get_schema();
     }
 
@@ -113,7 +113,7 @@ namespace jsonschema {
     {
         auto schema_builder = make_schema_validator_factory(sch, default_uri_resolver<Json>{});
 
-        schema_builder->build_schema(sch, "#");
+        schema_builder->build_schema(sch);
         return schema_builder->get_schema();
     }
 

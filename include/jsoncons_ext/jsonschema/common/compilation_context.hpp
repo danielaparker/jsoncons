@@ -22,6 +22,11 @@ namespace jsonschema {
         uri absolute_uri_;
         std::vector<uri_wrapper> uris_;
     public:
+
+        compilation_context()
+        {
+        }
+
         explicit compilation_context(const uri_wrapper& location)
             : absolute_uri_(location.uri()), 
               uris_(std::vector<uri_wrapper>{{location}})
