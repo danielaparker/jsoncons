@@ -149,21 +149,23 @@ namespace draft7 {
                 {
                     std::set<std::string> known_keywords;
 
-                    auto it = sch.find("definitions");
-                    if (it != sch.object_range().end()) 
-                    {
-                        for (const auto& def : it->value().object_range())
-                        {
-                            std::string sub_keys[] = { "definitions", def.key() };
-                            this->save_schema(make_schema_validator(
-                                new_context, def.value(), sub_keys));
-                        }
-                        known_keywords.insert("definitions");
-                    }
-                    it = sch.find("$ref");
+                    auto it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
                         std::vector<keyword_validator_type> validators;
+                        std::map<std::string,schema_validator_type> defs;
+
+                        auto it2 = sch.find("definitions");
+                        if (it2 != sch.object_range().end()) 
+                        {
+                            for (const auto& def : it2->value().object_range())
+                            {
+                                std::string sub_keys[] = { "definitions", def.key() };
+                                defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys));
+                            }
+                            known_keywords.insert("definitions");
+                        }
+
                         Json default_value{ jsoncons::null_type() };
                         uri_wrapper relative(it->value().template as<std::string>()); 
                         auto id = relative.resolve(uri_wrapper{ context.get_absolute_uri() });
@@ -171,7 +173,7 @@ namespace draft7 {
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
                             new_context.get_absolute_uri(),
-                            std::move(validators), std::move(default_value));
+                            std::move(validators), std::move(defs), std::move(default_value));
                     }
                     else
                     {
@@ -205,10 +207,20 @@ namespace draft7 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
+            std::map<std::string,schema_validator_type> defs;
 
-            //fo
+            auto it = sch.find("definitions");
+            if (it != sch.object_range().end()) 
+            {
+                for (const auto& def : it->value().object_range())
+                {
+                    std::string sub_keys[] = { "definitions", def.key() };
+                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys));
+                }
+                known_keywords.insert("definitions");
+            }
 
-            auto it = sch.find("default");
+            it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
                 default_value = it->value();
@@ -303,9 +315,8 @@ namespace draft7 {
                     validators.emplace_back(make_items_object_validator(context, it->value()));
                 }
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(
-                context.get_absolute_uri(),
-                std::move(validators), std::move(default_value));
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(),
+                std::move(validators), std::move(defs), std::move(default_value));
         }
 
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context,

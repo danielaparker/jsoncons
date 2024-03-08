@@ -282,23 +282,29 @@ namespace jsonschema {
 
         uri schema_path_;
         std::vector<keyword_validator_type> validators_;
+        std::map<std::string,schema_validator_type> defs_;
         Json default_value_;
         bool recursive_anchor_;
         std::unique_ptr<dynamic_anchor_validator<Json>> dynamic_anchor_;
 
     public:
-        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
-            bool recursive_anchor = false)
+        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, 
+            std::map<std::string,schema_validator_type>&& defs,
+            Json&& default_value, bool recursive_anchor = false)
             : schema_path_(schema_path),
               validators_(std::move(validators)),
+              defs_(std::move(defs)),
               default_value_(std::move(default_value)),
               recursive_anchor_(recursive_anchor)
         {
         }
-        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, Json&& default_value,
+        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, 
+            std::map<std::string,schema_validator_type>&& defs,
+            Json&& default_value,
             std::unique_ptr<dynamic_anchor_validator<Json>>&& dynamic_anchor)
             : schema_path_(schema_path),
               validators_(std::move(validators)),
+              defs_(std::move(defs)),
               default_value_(std::move(default_value)),
               recursive_anchor_(false),
               dynamic_anchor_(std::move(dynamic_anchor))

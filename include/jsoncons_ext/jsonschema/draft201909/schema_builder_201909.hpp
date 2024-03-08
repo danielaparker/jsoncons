@@ -155,28 +155,6 @@ namespace draft201909 {
                 {
                     std::set<std::string> known_keywords;
 
-                    auto it = sch.find("definitions");
-                    if (it != sch.object_range().end()) 
-                    {
-                        for (const auto& def : it->value().object_range())
-                        {
-                            std::string sub_keys[] = { "definitions", def.key() };
-                            this->save_schema(make_schema_validator(
-                                new_context, def.value(), sub_keys));
-                        }
-                        known_keywords.insert("definitions");
-                    }
-                    it = sch.find("$defs");
-                    if (it != sch.object_range().end()) 
-                    {
-                        for (const auto& def : it->value().object_range())
-                        {
-                            std::string sub_keys[] = { "$defs", def.key() };
-                            this->save_schema(make_schema_validator(
-                                new_context, def.value(), sub_keys));
-                        }
-                        known_keywords.insert("definitions");
-                    }
                     schema_validator_ptr = make_object_schema_validator(new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
@@ -207,8 +185,30 @@ namespace draft201909 {
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
             bool recursive_anchor = false;
+            std::map<std::string,schema_validator_type> defs;
 
-            auto it = sch.find("$recursiveAnchor"); 
+            auto it = sch.find("definitions");
+            if (it != sch.object_range().end()) 
+            {
+                for (const auto& def : it->value().object_range())
+                {
+                    std::string sub_keys[] = { "definitions", def.key() };
+                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys));
+                }
+                known_keywords.insert("definitions");
+            }
+            it = sch.find("$defs");
+            if (it != sch.object_range().end()) 
+            {
+                for (const auto& def : it->value().object_range())
+                {
+                    std::string sub_keys[] = { "$defs", def.key() };
+                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys));
+                }
+                known_keywords.insert("$defs");
+            }
+
+            it = sch.find("$recursiveAnchor"); 
             if (it != sch.object_range().end()) 
             {
                 recursive_anchor = it->value().template as<bool>();
@@ -330,9 +330,8 @@ namespace draft201909 {
                 }
             }
             
-            return jsoncons::make_unique<object_schema_validator<Json>>(
-                context.get_absolute_uri(),
-                std::move(validators), std::move(default_value), recursive_anchor);
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(),
+                std::move(validators), std::move(defs), std::move(default_value), recursive_anchor);
         }
 
         std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context, 
