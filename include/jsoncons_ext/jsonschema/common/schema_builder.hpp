@@ -63,11 +63,11 @@ namespace jsonschema {
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {                        
-            std::cout << "schema_store:\n";
-            for (auto& member : schema_store_)
-            {
-                std::cout << "    " << member.first.string() << "\n";
-            }
+            //std::cout << "schema_store:\n";
+            //for (auto& member : schema_store_)
+            //{
+            //    std::cout << "    " << member.first.string() << "\n";
+            //}
 
             // load all external schemas that have not already been loaded
             std::size_t loaded_count = 0;
