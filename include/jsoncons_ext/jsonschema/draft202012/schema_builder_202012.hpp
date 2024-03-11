@@ -183,7 +183,7 @@ namespace draft202012 {
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
-            std::unique_ptr<dynamic_anchor_validator<Json>> dynamic_anchor;
+            jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
 
             auto it = sch.find("definitions");
@@ -212,11 +212,7 @@ namespace draft202012 {
             {
                 std::string value = it->value().template as<std::string>();
                 jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
-
-                uri_wrapper relative("$dynamicAnchor");
-                auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                dynamic_anchor = jsoncons::make_unique<dynamic_anchor_validator<Json>>(id.uri(),
-                    new_uri);
+                dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
             }
 
             it = sch.find("default");

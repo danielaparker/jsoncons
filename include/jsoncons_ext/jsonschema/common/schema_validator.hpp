@@ -168,34 +168,6 @@ namespace jsonschema {
 
 
     template <class Json>
-    class dynamic_anchor_validator : public keyword_base<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
-
-        jsoncons::uri value_;
-
-    public:
-        dynamic_anchor_validator(const uri& schema_path, const jsoncons::uri& value) 
-            : keyword_base<Json>("$dynamicAnchor", schema_path), value_(value)
-        {
-            //std::cout << "dynamic_anchor_validator path: " << this->schema_path().string() << ", value: " << value_.string() << "\n";
-        }
-
-        const jsoncons::uri value() const
-        {
-            return value_;
-        }
-
-        uri get_base_uri() const
-        {
-            return this->schema_path();
-        }
-
-    };
-
-
-    template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
@@ -213,7 +185,7 @@ namespace jsonschema {
 
         virtual bool recursive_anchor() const = 0;
 
-        virtual const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const = 0;
+        virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
 
         virtual const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const = 0;
     };
@@ -228,7 +200,7 @@ namespace jsonschema {
         uri schema_path_;
         bool value_;
 
-        std::unique_ptr<dynamic_anchor_validator<Json>> dynamic_anchor_;
+        jsoncons::optional<jsoncons::uri> dynamic_anchor_;
 
     public:
         boolean_schema_validator(const uri& schema_path, bool value)
@@ -251,12 +223,12 @@ namespace jsonschema {
             return false;
         }
 
-        const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const final
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
         }
 
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
         {
             return nullptr;
         }
@@ -292,7 +264,7 @@ namespace jsonschema {
         std::map<std::string,schema_validator_type> defs_;
         Json default_value_;
         bool recursive_anchor_;
-        std::unique_ptr<dynamic_anchor_validator<Json>> dynamic_anchor_;
+        jsoncons::optional<jsoncons::uri> dynamic_anchor_;
 
     public:
         object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, 
@@ -308,7 +280,7 @@ namespace jsonschema {
         object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
-            std::unique_ptr<dynamic_anchor_validator<Json>>&& dynamic_anchor)
+            jsoncons::optional<jsoncons::uri>&& dynamic_anchor)
             : schema_path_(schema_path),
               validators_(std::move(validators)),
               defs_(std::move(defs)),
@@ -333,7 +305,7 @@ namespace jsonschema {
             return recursive_anchor_;
         }
 
-        const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const final
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
         }
@@ -342,7 +314,7 @@ namespace jsonschema {
         {
             if (dynamic_anchor_)
             {
-                if (s == dynamic_anchor_->value().fragment())
+                if (s == dynamic_anchor_.value().fragment())
                 {
                     return this;
                 }
