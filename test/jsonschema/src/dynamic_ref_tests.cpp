@@ -195,3 +195,83 @@ TEST_CASE("jsonschema $dynamicRef tests")
     }
 }
 
+TEST_CASE("jsonschema $dynamicRef tests 2")
+{
+    std::string schema_string = R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
+    "if": {
+        "$id": "first_scope",
+        "$defs": {
+            "thingy": {
+                "$comment": "this is first_scope#thingy",
+                "$dynamicAnchor": "thingy",
+                "type": "number"
+            }
+        }
+    },
+    "then": {
+        "$id": "second_scope",
+        "$ref": "start",
+        "$defs": {
+            "thingy": {
+                "$comment": "this is second_scope#thingy, the final destination of the $dynamicRef",
+                "$dynamicAnchor": "thingy",
+                "type": "null"
+            }
+        }
+    },
+    "$defs": {
+        "start": {
+            "$comment": "this is the landing spot from $ref",
+            "$id": "start",
+            "$dynamicRef": "inner_scope#thingy"
+        },
+        "thingy": {
+            "$comment": "this is the first stop for the $dynamicRef",
+            "$id": "inner_scope",
+            "$dynamicAnchor": "thingy",
+            "type": "string"
+        }
+    }
+}
+    )";
+
+    json schema = json::parse(schema_string);
+
+    auto sch = jsonschema::make_schema(schema); 
+
+    SECTION("/then/$defs/thingy is the final stop for the $dynamicRef")
+    {
+        try
+        {
+            // will throw schema_error if JSON Schema loading fails 
+
+            // Data
+            json data(jsoncons::null_type{});
+
+            jsonschema::json_validator<json> validator(sch); 
+
+            std::size_t error_count = 0;
+            auto reporter = [&](const jsonschema::validation_output& o)
+            {
+                std::cout << "  Failed: " << "eval_path: " << o.eval_path().to_string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location() << ": " << o.message() << "\n";
+                for (const auto& err : o.nested_errors())
+                {
+                    std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                }
+                ++error_count;
+            };
+            validator.validate(data, reporter);
+            CHECK(error_count > 0);
+            //std::cout << "error_count: " << error_count << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+
+    }
+}
+

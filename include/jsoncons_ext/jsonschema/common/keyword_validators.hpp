@@ -197,9 +197,9 @@ namespace jsonschema {
 
             //std::cout << "dynamic_ref_validator::do_validate " << this->value().string() << "\n";
 
-            const schema_validator<Json>* schema_ptr = nullptr;
+            const schema_validator<Json>* schema_ptr = referred_schema_;
 
-            while (rit != rend && schema_ptr == nullptr)
+            /*while (rit != rend && schema_ptr == nullptr)
             {
                 //std::cout << "  (1) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
 
@@ -208,22 +208,19 @@ namespace jsonschema {
                     schema_ptr = *rit; 
                 }
                 ++rit;
-            }
+            }*/
 
             while (rit != rend)
             {
                 //std::cout << "  (2) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
 
-                if ((*rit)->dynamic_anchor() && (*rit)->dynamic_anchor()->value().fragment() == this->value().fragment())
+                auto p = (*rit)->match_dynamic_anchor(this->value().fragment());
+                if (p != nullptr)
                 {
-                    schema_ptr = *rit; 
+                    schema_ptr = p;
                 }
-                ++rit;
-            }
 
-            if (schema_ptr == nullptr)
-            {
-                schema_ptr = referred_schema_;
+                ++rit;
             }
 
             JSONCONS_ASSERT(schema_ptr != nullptr);

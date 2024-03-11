@@ -214,6 +214,8 @@ namespace jsonschema {
         virtual bool recursive_anchor() const = 0;
 
         virtual const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const = 0;
+
+        virtual const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const = 0;
     };
 
     template <class Json>
@@ -252,6 +254,11 @@ namespace jsonschema {
         const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -329,6 +336,27 @@ namespace jsonschema {
         const std::unique_ptr<dynamic_anchor_validator<Json>>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (dynamic_anchor_)
+            {
+                if (s == dynamic_anchor_->value().fragment())
+                {
+                    return this;
+                }
+            }
+                for (const auto& member : defs_)
+                {
+                    const schema_validator<Json>* p = member.second->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            
+            return nullptr;
         }
 
     private:
