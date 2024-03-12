@@ -217,7 +217,6 @@ namespace jsonschema {
                 {
                     //std::cout << "  (2) [" << (*rit)->schema_path().string() << "] " << ((*rit)->dynamic_anchor() ? (*rit)->dynamic_anchor()->value().string() : "") << "\n";
 
-                    //auto p = (*rit)->match_dynamic_anchor(this->value().fragment());
                     auto p = (*rit)->match_dynamic_anchor(schema_ptr->dynamic_anchor()->fragment()); 
                     if (p != nullptr) 
                     {

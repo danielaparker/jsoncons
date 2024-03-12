@@ -36,15 +36,17 @@ namespace jsonschema {
         }
 
         evaluation_context(evaluation_context&& other)
-           : dynamic_scope_{std::move(other.dynamic_scope_)}, 
-             eval_path_{std::move(other.eval_path_)}
+        : dynamic_scope_
+        {std::move(other.dynamic_scope_)}
+        ,
+        eval_path_{std::move(other.eval_path_)}
         {
         }
 
         evaluation_context(const evaluation_context& parent, const schema_validator<Json> *validator)
             : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ }
         {
-            //if (validator->id())
+            if (validator->id()|| dynamic_scope_.empty())
             {
                 dynamic_scope_.push_back(validator);
             }
