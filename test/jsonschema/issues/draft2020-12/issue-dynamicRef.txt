@@ -1,59 +1,28 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
-    "if": {
-        "$id": "first_scope",
-        "$defs": {
-            "thingy": {
-                "$comment": "this is first_scope#thingy",
-                "$dynamicAnchor": "thingy",
-                "type": "number"
-            }
-        }
-    },
-    "then": {
-        "$id": "second_scope",
-        "$ref": "start",
-        "$defs": {
-            "thingy": {
-                "$comment": "this is second_scope#thingy, the final destination of the $dynamicRef",
-                "$dynamicAnchor": "thingy",
-                "type": "null"
-            }
-        }
-    },
+    "$id": "https://test.json-schema.org/unmatched-dynamic-anchor/root",
+    "$ref": "list",
     "$defs": {
-        "start": {
-            "$comment": "this is the landing spot from $ref",
-            "$id": "start",
-            "$dynamicRef": "inner_scope#thingy"
-        },
-        "thingy": {
-            "$comment": "this is the first stop for the $dynamicRef",
-            "$id": "inner_scope",
-            "$dynamicAnchor": "thingy",
+        "foo": {
+            "$dynamicAnchor": "items",
             "type": "string"
+        },
+        "list": {
+            "$id": "list",
+            "type": "array",
+            "items": { "$dynamicRef": "#items" },
+            "$defs": {
+                "items": {
+                    "$comment": "This is only needed to give the reference somewhere to resolve to when it behaves like $ref",
+                    "$anchor": "items",
+                    "$dynamicAnchor": "foo"
+                }
+            }
         }
     }
 }
 
-- A single schema document
-- Contains 3 schema resources
-  - One shares its root object with the schema document
-  - Two embedded under $defs
-      - Two have $id
-- Contains 2 other schemas under $defs without $id
-  - $dynamicAnchor creates plain name uri
+Any array is valid ["foo", 42] 
 
-"description": "/then/$defs/thingy is the final stop for the $dynamicRef",
-"data": null,
-
-File: ./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json
-Test case 1.1: "/then/$defs/thingy is the final stop for the $dynamicRef"
-Failed: : Expected 1 string, found null
-
-dynamic_ref_validator::do_validate https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/inner_scope#thingy
-  (1) [https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/start]
-  (1) [https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/second_scope]
-  (1) [https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main]
-
+  Test case 1.1: "Any array is valid"
+  Failed: /1: Expected 1 string, found uint64
