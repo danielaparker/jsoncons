@@ -264,7 +264,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
                 ++error_count;
             };
             validator.validate(data, reporter);
-            CHECK(error_count > 0);
+            CHECK(error_count == 0);
             //std::cout << "error_count: " << error_count << "\n";
         }
         catch (const std::exception& e)

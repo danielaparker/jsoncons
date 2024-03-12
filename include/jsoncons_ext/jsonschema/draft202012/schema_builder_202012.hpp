@@ -180,13 +180,22 @@ namespace draft202012 {
         schema_validator_type make_object_schema_validator( 
             const compilation_context& context, const Json& sch)
         {
+            jsoncons::optional<jsoncons::uri> id;
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
 
-            auto it = sch.find("definitions");
+
+            auto it = sch.find("$id"); 
+            if (it != sch.object_range().end()) 
+            {
+                std::string value = it->value().template as<std::string>();
+                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
+                id = jsoncons::optional<jsoncons::uri>(new_uri);
+            }
+            it = sch.find("definitions");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& def : it->value().object_range())
@@ -226,8 +235,8 @@ namespace draft202012 {
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 uri_wrapper relative(it->value().template as<std::string>()); 
-                auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                validators.push_back(this->get_or_create_reference(id));
+                auto ref = relative.resolve(uri_wrapper{ context.get_base_uri() });
+                validators.push_back(this->get_or_create_reference(ref));
             }
 
             it = sch.find("$dynamicRef");
@@ -235,9 +244,9 @@ namespace draft202012 {
             {
                 std::string value = it->value().template as<std::string>();
                 uri_wrapper relative(value); 
-                auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(id.uri().base(), id.uri());
-                this->unresolved_refs_.emplace_back(id.uri(), orig.get());
+                auto ref = relative.resolve(uri_wrapper{ context.get_base_uri() });
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(ref.uri().base(), ref.uri());
+                this->unresolved_refs_.emplace_back(ref.uri(), orig.get());
                 validators.push_back(std::move(orig));
             }
 
@@ -343,7 +352,7 @@ namespace draft202012 {
             }
 
             
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value), std::move(dynamic_anchor));
         }
 
@@ -373,7 +382,7 @@ namespace draft202012 {
                 }
             }
 
-            return jsoncons::make_unique<prefix_items_validator<Json>>( schema_path, 
+            return jsoncons::make_unique<prefix_items_validator<Json>>( schema_path,  
                 std::move(item_validators), std::move(additional_items_validator));
         }
 

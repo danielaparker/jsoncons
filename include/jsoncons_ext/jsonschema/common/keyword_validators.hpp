@@ -66,6 +66,11 @@ namespace jsonschema {
             return this->schema_path();
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            return referred_schema_->match_dynamic_anchor(s);
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -104,6 +109,11 @@ namespace jsonschema {
         uri get_base_uri() const
         {
             return this->schema_path();
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -184,6 +194,11 @@ namespace jsonschema {
             return this->schema_path();
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -258,6 +273,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -322,6 +342,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -372,6 +397,11 @@ namespace jsonschema {
 
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -416,6 +446,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>("pattern", schema_path), 
               pattern_string_(pattern_string), regex_(regex)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -465,6 +500,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const Json&, 
@@ -489,6 +529,11 @@ namespace jsonschema {
         max_length_validator(const uri& schema_path, std::size_t max_length)
             : keyword_validator_base<Json>("maxLength", schema_path), max_length_(max_length)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -538,6 +583,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -582,6 +632,11 @@ namespace jsonschema {
         min_items_validator(const uri& schema_path, std::size_t min_items)
             : keyword_validator_base<Json>("minItems", schema_path), min_items_(min_items)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -634,6 +689,30 @@ namespace jsonschema {
               item_validators_(std::move(item_validators)), 
               additional_items_validator_(std::move(additional_items_validator))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : item_validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
+            {
+                auto p = additional_items_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -691,6 +770,19 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (items_validator_ != nullptr && !items_validator_->id()) 
+            {
+                auto p = items_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -738,6 +830,30 @@ namespace jsonschema {
               item_validators_(std::move(item_validators)), 
               additional_items_validator_(std::move(additional_items_validator))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : item_validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
+            {
+                auto p = additional_items_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -792,6 +908,11 @@ namespace jsonschema {
         unique_items_validator(const uri& schema_path, bool are_unique)
             : keyword_validator_base<Json>("uniqueItems", schema_path), are_unique_(are_unique)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -854,6 +975,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -903,6 +1029,19 @@ namespace jsonschema {
             : keyword_validator_base<Json>("not", schema_path), 
               rule_(std::move(rule))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (rule_ != nullptr && !rule_->id()) 
+            {
+                auto p = rule_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -1023,6 +1162,22 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1083,6 +1238,22 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1136,6 +1307,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>("maximum", schema_path), value_(value),
               message_{" is greater than maximum " + value.template as<std::string>()}
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1196,6 +1372,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1252,6 +1433,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>("minimum", schema_path), value_(value),
               message_{" is less than minimum " + value.template as<std::string>()}
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1312,6 +1498,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1366,6 +1557,11 @@ namespace jsonschema {
         multiple_of_validator(const uri& schema_path, double value)
             : keyword_validator_base<Json>("multipleOf", schema_path), value_(value)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1423,6 +1619,11 @@ namespace jsonschema {
         required_validator& operator=(const required_validator&) = delete;
         required_validator& operator=(required_validator&&) = default;
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1471,6 +1672,11 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1515,6 +1721,11 @@ namespace jsonschema {
         min_properties_validator(const uri& schema_path, std::size_t min_properties)
             : keyword_validator_base<Json>("minProperties", schema_path), min_properties_(min_properties)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1564,6 +1775,19 @@ namespace jsonschema {
             : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_path)), 
               validator_(std::move(validator))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (validator_ != nullptr && !validator_->id()) 
+            {
+                auto p = validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -1631,6 +1855,35 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (if_validator_ != nullptr && !if_validator_->id()) 
+            {
+                auto p = if_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            if (then_validator_ != nullptr && !then_validator_->id()) 
+            {
+                auto p = then_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            if (else_validator_ != nullptr && !else_validator_->id()) 
+            {
+                auto p = else_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -1672,6 +1925,11 @@ namespace jsonschema {
         enum_validator(const uri& schema_path, const Json& sch)
             : keyword_validator_base<Json>("enum", schema_path), value_(sch)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1722,6 +1980,11 @@ namespace jsonschema {
         const_validator(const uri& schema_path, const Json& sch)
             : keyword_validator_base<Json>("const", schema_path), value_(sch)
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1790,6 +2053,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>("type", std::move(schema_path)),
               expected_types_(std::move(expected_types))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
+        {
+            return nullptr;
         }
 
     private:
@@ -1923,6 +2191,22 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& member : properties_)
+            {
+                if (!member.second->id())
+                {
+                    auto p = member.second->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
         void validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             std::unordered_set<std::string>& evaluated_properties, 
@@ -2018,6 +2302,22 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& member : pattern_properties_)
+            {
+                if (!member.second->id())
+                {
+                    auto p = member.second->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
 #if defined(JSONCONS_HAS_STD_REGEX)
         void validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
@@ -2087,6 +2387,35 @@ namespace jsonschema {
               pattern_properties_(std::move(pattern_properties)),
               additional_properties_(std::move(additional_properties))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (properties_ != nullptr)
+            {
+                auto p = properties_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            if (pattern_properties_ != nullptr)
+            {
+                auto p = pattern_properties_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            if (additional_properties_ != nullptr && !additional_properties_->id()) 
+            {
+                auto p = additional_properties_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -2181,6 +2510,19 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& member : dependent_required_)
+            {
+                auto p = member.second->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -2227,6 +2569,22 @@ namespace jsonschema {
         {
         }
 
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& member : dependent_schemas_)
+            {
+                if (!member.second->id())
+                {
+                    auto p = member.second->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
     private:
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
@@ -2271,6 +2629,22 @@ namespace jsonschema {
             : keyword_validator_base<Json>("propertyNames", schema_path), 
                 property_names_schema_validator_{ std::move(property_names_schema_validator) }
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (property_names_schema_validator_ != nullptr)
+            {
+                if (!property_names_schema_validator_->id())
+                {
+                    auto p = property_names_schema_validator_->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -2320,6 +2694,30 @@ namespace jsonschema {
               dependent_required_(std::move(dependent_required)),
               dependent_schemas_(std::move(dependent_schemas))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& member : dependent_required_)
+            {
+                auto p = member.second->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            for (const auto& member : dependent_schemas_)
+            {
+                if (!member.second->id())
+                {
+                    auto p = member.second->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
         }
 
     private:
@@ -2445,6 +2843,19 @@ namespace jsonschema {
             : keyword_validator_base<Json>("contains", std::move(schema_path)), 
               schema_validator_(std::move(schema_validator))
         {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (schema_validator_ != nullptr && !schema_validator_->id()) 
+            {
+                auto p = schema_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
         }
 
         contains_validator(const uri& schema_path,
