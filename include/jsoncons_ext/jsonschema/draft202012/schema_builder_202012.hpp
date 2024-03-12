@@ -334,7 +334,7 @@ namespace draft202012 {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(make_prefix_items_validator(context, sch, it->value()));
+                    validators.emplace_back(make_prefix_items_validator(context, it->value(), sch));
                 } 
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
@@ -343,22 +343,21 @@ namespace draft202012 {
                 }
             }
 
-            it = sch.find("items");
+            /*it = sch.find("items");
             if (it != sch.object_range().end()) 
             {
                 if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
                 {
                     validators.emplace_back(make_items_object_validator(context, sch, it->value()));
                 }
-            }
-
+            }*/
             
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value), std::move(dynamic_anchor));
         }
 
         std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 
-            const Json& parent, const Json& sch)
+            const Json& sch, const Json& parent)
         {
             std::vector<schema_validator_type> item_validators;
             schema_validator_type additional_items_validator = nullptr;

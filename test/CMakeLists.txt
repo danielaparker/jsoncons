@@ -104,6 +104,8 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_output_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
+               jsonschema/src/jsonschema_draft201909_tests.cpp
+               jsonschema/src/jsonschema_draft202012_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp

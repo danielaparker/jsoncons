@@ -96,48 +96,35 @@ TEST_CASE("jsonschema draft2020-12 tests")
 {
     SECTION("issues")
     {
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-anchor.json");
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-not.json");
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-ref.json");
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-recursiveRef.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anchor.json"); 
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/contains.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/maxContains.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/minContains.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/items.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/prefixItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
-        jsonschema_tests("./jsonschema/issues/draft2020-12/issue-DynamicRef.json");
-
+        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-items.json");
+        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
     }
-#if 0
+
     SECTION("tests")
     {
 
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anchor.json"); // UNCOMMENT METASCHEMA
-/*        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/additionalItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anchor.json"); 
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/additionalProperties.json");
 #endif
-*/
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/allOf.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anyOf.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/allOf.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anyOf.json");
 
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/boolean_schema.json");
-/*
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/boolean_schema.json");
+
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/const.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/contains.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/default.json");
 
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/defs.json");  // METASCHEMA
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/defs.json");  
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/enum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/exclusiveMaximum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/exclusiveMinimum.json");
 
 #ifdef JSONCONS_HAS_STD_REGEX
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/format.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/format.json");
 #endif
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/if-then-else.json");
@@ -154,20 +141,18 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/multipleOf.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/not.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/oneOf.json");
-*/
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/recursiveRef.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
-
-/*
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/pattern.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/patternProperties.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/properties.json");
 #endif
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/propertyNames.json");
-*/
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/ref.json"); // 2 comment out
+
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
+        
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
+
 /*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/refRemote.json");
 
@@ -198,5 +183,5 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri-template.json");
 */
     }
-#endif
+
 }
