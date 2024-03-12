@@ -240,31 +240,34 @@ namespace draft7 {
                 }
             }
 
+            schema_validator_type if_validator;
+            schema_validator_type then_validator;
+            schema_validator_type else_validator;
+
             it = sch.find("if");
             if (it != sch.object_range().end()) 
             {
-                validators.push_back(make_conditional_validator(context, it->value(), sch));
-                known_keywords.insert("if");
-                // sch["if"] is object and has id, can be looked up
+                std::string sub_keys[] = { "if" };
+                if_validator = make_schema_validator(context, it->value(), sub_keys);
             }
-            else
-            {
-                auto then_it = sch.find("then");
-                if (then_it != sch.object_range().end()) 
-                {
-                    std::string sub_keys[] = { "then" };
-                    this->save_schema(make_schema_validator(context, then_it->value(), sub_keys));
-                    known_keywords.insert("then");
-                }
 
-                auto else_it = sch.find("else");
-                if (else_it != sch.object_range().end()) 
-                {
-                    std::string sub_keys[] = { "else" };
-                    this->save_schema(make_schema_validator(context, else_it->value(), sub_keys));
-                    known_keywords.insert("else");
-                }
+            it = sch.find("then");
+            if (it != sch.object_range().end()) 
+            {
+                std::string sub_keys[] = { "then" };
+                then_validator = make_schema_validator(context, it->value(), sub_keys);
             }
+
+            it = sch.find("else");
+            if (it != sch.object_range().end()) 
+            {
+                std::string sub_keys[] = { "else" };
+                else_validator = make_schema_validator(context, it->value(), sub_keys);
+            }
+            validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
+                context.get_absolute_uri().string(),
+                std::move(if_validator), std::move(then_validator), std::move(else_validator)));
+            
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
@@ -385,7 +388,7 @@ namespace draft7 {
                 else_validator = make_schema_validator(context, else_it->value(), else_key);
             }
 
-            return jsoncons::make_unique<conditional_validator<Json>>( std::move(schema_path),
+            return jsoncons::make_unique<conditional_validator<Json>>(std::move(schema_path),
                 std::move(if_validator), std::move(then_validator), std::move(else_validator));
         }
         
