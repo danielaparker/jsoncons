@@ -362,35 +362,6 @@ namespace draft7 {
             return jsoncons::make_unique<items_object_validator<Json>>( schema_path, 
                 make_schema_validator(context, sch, sub_keys));
         }
-
-        std::unique_ptr<conditional_validator<Json>> make_conditional_validator(const compilation_context& context,
-            const Json& sch_if, const Json& sch)
-        {
-            std::string schema_path = context.get_absolute_uri().string();
-            schema_validator_type if_validator(nullptr);
-            schema_validator_type then_validator(nullptr);
-            schema_validator_type else_validator(nullptr);
-
-            std::string if_key[] = { "if" };
-            if_validator = make_schema_validator(context, sch_if, if_key);
-
-            auto then_it = sch.find("then");
-            if (then_it != sch.object_range().end()) 
-            {
-                std::string then_key[] = { "then" };
-                then_validator = make_schema_validator(context, then_it->value(), then_key);
-            }
-
-            auto else_it = sch.find("else");
-            if (else_it != sch.object_range().end()) 
-            {
-                std::string else_key[] = { "else" };
-                else_validator = make_schema_validator(context, else_it->value(), else_key);
-            }
-
-            return jsoncons::make_unique<conditional_validator<Json>>(std::move(schema_path),
-                std::move(if_validator), std::move(then_validator), std::move(else_validator));
-        }
         
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
             const Json& sch)
