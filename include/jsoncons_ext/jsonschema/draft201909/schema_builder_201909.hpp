@@ -232,10 +232,12 @@ namespace draft201909 {
             it = sch.find("$recursiveRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri_wrapper relative(it->value().template as<std::string>()); 
-                auto base_uri = context.get_base_uri();
-                auto id = relative.resolve(uri_wrapper{ base_uri }); // REVISIT
-                validators.push_back(jsoncons::make_unique<recursive_ref_validator_type>(id.uri()));
+                uri_wrapper relative(it->value().template as<std::string>());
+                auto ref = relative.resolve(uri_wrapper
+                { context.get_base_uri()});
+                auto orig = jsoncons::make_unique<recursive_ref_validator_type>(ref.uri().base()); 
+                this->unresolved_refs_.emplace_back(ref.uri(), orig.get());
+                validators.push_back(std::move(orig));
             }
 
             for (const auto& key_value : sch.object_range())

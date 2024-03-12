@@ -262,9 +262,9 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
 
-        jsoncons::optional<jsoncons::uri> id_;
         uri schema_path_;
-        std::vector<keyword_validator_type> validators_;
+        jsoncons::optional<jsoncons::uri> id_;
+        std::vector<keyword_validator_type> validators_; 
         std::map<std::string,schema_validator_type> defs_;
         Json default_value_;
         bool recursive_anchor_;

@@ -1,58 +1,32 @@
 [
     {
-        "description": "after leaving a dynamic scope, it is not used by a $dynamicRef",
+        "description": "A $dynamicRef without a matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor",
         "schema": {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
-            "if": {
-                "$id": "first_scope",
-                "$defs": {
-                    "thingy": {
-                        "$comment": "this is first_scope#thingy",
-                        "$dynamicAnchor": "thingy",
-                        "type": "number"
-                    }
-                }
-            },
-            "then": {
-                "$id": "second_scope",
-                "$ref": "start",
-                "$defs": {
-                    "thingy": {
-                        "$comment": "this is second_scope#thingy, the final destination of the $dynamicRef",
-                        "$dynamicAnchor": "thingy",
-                        "type": "null"
-                    }
-                }
-            },
+            "$id": "https://test.json-schema.org/dynamic-resolution-without-bookend/root",
+            "$ref": "list",
             "$defs": {
-                "start": {
-                    "$comment": "this is the landing spot from $ref",
-                    "$id": "start",
-                    "$dynamicRef": "inner_scope#thingy"
-                },
-                "thingy": {
-                    "$comment": "this is the first stop for the $dynamicRef",
-                    "$id": "inner_scope",
-                    "$dynamicAnchor": "thingy",
+                "foo": {
+                    "$dynamicAnchor": "items",
                     "type": "string"
+                },
+                "list": {
+                    "$id": "list",
+                    "type": "array",
+                    "items": { "$dynamicRef": "#items" },
+                    "$defs": {
+                        "items": {
+                            "$comment": "This is only needed to give the reference somewhere to resolve to when it behaves like $ref",
+                            "$anchor": "items"
+                        }
+                    }
                 }
             }
         },
         "tests": [
-            /*{
-                "description": "string matches /$defs/thingy, but the $dynamicRef does not stop here",
-                "data": "a string",
-                "valid": false
-            },
             {
-                "description": "first_scope is not in dynamic scope for the $dynamicRef",
-                "data": 42,
-                "valid": false
-            },*/
-            {
-                "description": "/then/$defs/thingy is the final stop for the $dynamicRef",
-                "data": null,
+                "description": "Any array is valid",
+                "data": ["foo", 42],
                 "valid": true
             }
         ]
