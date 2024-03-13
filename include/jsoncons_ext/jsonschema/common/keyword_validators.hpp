@@ -202,6 +202,14 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
+            std::cout << "dynamic_ref_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            std::cout << "evaluated_properties:\n";
+            for (const auto& s : evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
+
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
 
@@ -1785,12 +1793,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "Evaluated properties\n";
-            //for (const auto& s : evaluated_properties)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
+            std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            std::cout << "evaluated_properties:\n";
+            for (const auto& s : evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
             if (!instance.is_object())
             {
                 return;
@@ -1807,7 +1816,7 @@ namespace jsonschema {
                     // check if it is in "evaluated_properties"
                     if (prop_it == evaluated_properties.end()) 
                     {
-                        
+                        std::cout << "Not in evaluated properties: " << prop.key() << "\n";
                         std::size_t error_count = reporter.error_count();
                         validator_->validate(this_context, prop.value() , instance_location, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)

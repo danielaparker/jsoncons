@@ -365,7 +365,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "object_schema_validator: " << eval_context.eval_path().to_string() << " " << instance << "\n\n";
+            std::cout << "object_schema_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            std::cout << "evaluated_properties:\n";
+            for (const auto& s : evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
 
             std::unordered_set<std::string> local_evaluated_properties;
 
@@ -380,10 +386,19 @@ namespace jsonschema {
                 }
             }
 
+            std::cout << "local_evaluated_properties: \n";
             for (auto&& name : local_evaluated_properties)
             {
+                std::cout << "   " << name << "\n";
                 evaluated_properties.emplace(std::move(name));
             }
+            std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            std::cout << "evaluated_properties:\n";
+            for (const auto& s : evaluated_properties)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
         }
     };
 

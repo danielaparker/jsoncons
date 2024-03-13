@@ -111,8 +111,6 @@ namespace draft202012 {
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_dependent_required_validator(context, sch);});
             keyword_factory_map_.emplace("dependentSchemas", 
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_dependent_schemas_validator(context, sch);});
-            keyword_factory_map_.emplace("unevaluatedProperties", 
-                [&](const compilation_context& context, const Json& sch, const Json&){return this->make_unevaluated_properties_validator(context, sch);});
         }
 
         const char* schema_version() const noexcept final
@@ -186,7 +184,6 @@ namespace draft202012 {
             std::set<std::string> known_keywords;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
-
 
             auto it = sch.find("$id"); 
             if (it != sch.object_range().end()) 
@@ -352,6 +349,13 @@ namespace draft202012 {
                         validators.emplace_back(make_items_object_validator(context, sch, it->value()));
                     }
                 }
+            }
+            
+            // Must be last
+            it = sch.find("unevaluatedProperties");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(this->make_unevaluated_properties_validator(context, it->value()));
             }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),

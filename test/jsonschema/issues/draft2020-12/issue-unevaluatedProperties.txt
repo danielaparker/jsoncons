@@ -1,0 +1,61 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/derived",
+
+    "$ref": "/baseSchema",
+
+    "$defs": {
+        "derived": {
+            "$dynamicAnchor": "addons",
+            "properties": {
+                "bar": { "type": "string" }
+            }
+        },
+        "baseSchema": {
+            "$id": "/baseSchema",
+
+            "$comment": "unevaluatedProperties comes first so it's more likely to catch bugs with implementations that are sensitive to keyword ordering",
+            "unevaluatedProperties": false,
+            "type": "object",
+            "properties": {
+                "foo": { "type": "string" }
+            },
+            "$dynamicRef": "#addons",
+
+            "$defs": {
+                "defaultAddons": {
+                    "$comment": "Needed to satisfy the bookending requirement",
+                    "$dynamicAnchor": "addons"
+                }
+            }
+        }
+    }
+}
+
+"with no unevaluated properties"
+    {
+        "foo": "foo",
+        "bar": "bar"
+    }
+
+object_schema_validator begin[,https://example.com/derived]evaluated_properties:
+
+object_schema_validator begin[/$ref,https://example.com/baseSchema]evaluated_properties:
+
+dynamic_ref_validator [/$ref,https://example.com/baseSchema]evaluated_properties:
+
+object_schema_validator begin[/$ref/$dynamicRef,https://example.com/baseSchema#addons]evaluated_properties:
+
+local_evaluated_properties:
+object_schema_validator end[/$ref/$dynamicRef,https://example.com/baseSchema#addons]evaluated_properties:
+
+object_schema_validator begin[/$ref/properties/foo,https://example.com/baseSchema#/properties/foo]evaluated_properties:
+
+local_evaluated_properties:
+object_schema_validator end[/$ref/properties/foo,https://example.com/baseSchema#/properties/foo]evaluated_properties:
+
+unevaluated_properties_validator [/$ref,https://example.com/baseSchema]evaluated_properties:
+    foo
+
+Not in evaluated properties: bar
+
