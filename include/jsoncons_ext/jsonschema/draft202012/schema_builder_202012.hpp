@@ -178,21 +178,14 @@ namespace draft202012 {
         schema_validator_type make_object_schema_validator( 
             const compilation_context& context, const Json& sch)
         {
-            jsoncons::optional<jsoncons::uri> id;
-            Json default_value{ jsoncons::null_type() };
+            jsoncons::optional<jsoncons::uri> id = context.id();
+            Json default_value{jsoncons::null_type()};
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
 
-            auto it = sch.find("$id"); 
-            if (it != sch.object_range().end()) 
-            {
-                std::string value = it->value().template as<std::string>();
-                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
-                id = jsoncons::optional<jsoncons::uri>(new_uri);
-            }
-            it = sch.find("definitions");
+            auto it = sch.find("definitions");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& def : it->value().object_range())
@@ -571,18 +564,19 @@ namespace draft202012 {
                 }
             }
 
+            jsoncons::optional<uri> id;
             if (sch.is_object())
             {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    std::string id = it->value().template as<std::string>(); 
-                    uri_wrapper relative(id); 
+                    uri_wrapper relative(it->value().template as<std::string>()); 
                     if (relative.has_fragment())
                     {
                         JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
                     }
                     uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
+                    id = new_uri.uri();
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
@@ -632,7 +626,7 @@ namespace draft202012 {
             //    std::cout << "    " << uri.string() << "\n";
             //}
 
-            return compilation_context(new_uris);
+            return compilation_context(new_uris, id);
         }
 
         static bool validate_anchor(const std::string& s)

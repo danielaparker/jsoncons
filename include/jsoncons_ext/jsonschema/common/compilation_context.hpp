@@ -21,6 +21,7 @@ namespace jsonschema {
     {
         uri absolute_uri_;
         std::vector<uri_wrapper> uris_;
+        jsoncons::optional<uri> id_;
     public:
 
         compilation_context()
@@ -39,7 +40,18 @@ namespace jsonschema {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }
 
+        explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id)
+            : uris_(uris), id_(id) 
+        {
+            absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
+        }
+
         const std::vector<uri_wrapper>& uris() const {return uris_;}
+        
+        const jsoncons::optional<uri>& id() const
+        {
+            return id_;
+        }
 
         const uri& get_absolute_uri() const
         {

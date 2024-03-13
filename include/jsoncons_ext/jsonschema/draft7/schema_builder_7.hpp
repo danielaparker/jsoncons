@@ -172,7 +172,7 @@ namespace draft7 {
                         validators.push_back(this->get_or_create_reference(id));
                         known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
-                            new_context.get_absolute_uri(),
+                            new_context.get_absolute_uri(), context.id(),
                             std::move(validators), std::move(defs), std::move(default_value));
                     }
                     else
@@ -204,6 +204,7 @@ namespace draft7 {
         schema_validator_type make_object_schema_validator( 
             const compilation_context& context, const Json& sch)
         {
+            jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::set<std::string> known_keywords;
@@ -318,7 +319,7 @@ namespace draft7 {
                     validators.emplace_back(make_items_object_validator(context, it->value()));
                 }
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
         }
 
@@ -444,14 +445,15 @@ namespace draft7 {
                     uri = uri_wrapper(new_u);
                 }
             }
+            jsoncons::optional<uri> id;
             if (sch.is_object())
             {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    std::string id = it->value().template as<std::string>(); 
-                    uri_wrapper relative(id); 
+                    uri_wrapper relative(it->value().template as<std::string>()); 
                     uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_absolute_uri() });
+                    id = new_uri.uri();
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
@@ -472,7 +474,7 @@ namespace draft7 {
                 std::cout << "    " << uri.string() << "\n";
             }
 */
-            return compilation_context(new_uris);
+            return compilation_context(new_uris, id);
         }
 
     };

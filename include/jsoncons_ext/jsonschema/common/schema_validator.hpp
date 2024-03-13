@@ -271,10 +271,13 @@ namespace jsonschema {
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
 
     public:
-        object_schema_validator(const uri& schema_path, std::vector<keyword_validator_type>&& validators, 
+        object_schema_validator(const uri& schema_path, 
+            const jsoncons::optional<jsoncons::uri>& id,
+            std::vector<keyword_validator_type>&& validators, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value, bool recursive_anchor = false)
             : schema_path_(schema_path),
+              id_(id),
               validators_(std::move(validators)),
               defs_(std::move(defs)),
               default_value_(std::move(default_value)),
@@ -282,7 +285,7 @@ namespace jsonschema {
         {
         }
         object_schema_validator(const uri& schema_path, 
-            jsoncons::optional<jsoncons::uri>&& id,
+            const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
@@ -324,7 +327,7 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            //std::cout << "match_dynamic_anchor " << s;
+            //std::cout << "match_dynamic_anchor " << s << ", " << this->schema_path().string() << ", id: " << (id_ ? id_->string() : "") << "\n";
             if (dynamic_anchor_)
             {
                 //std::cout << ", fragment: " << dynamic_anchor_.value().fragment() << "\n";
@@ -334,6 +337,7 @@ namespace jsonschema {
                 }
             }
 
+            //std::cout << "    " << "checking validators\n";
             for (const auto& validator : validators_)
             {
                 const schema_validator<Json>* p = validator->match_dynamic_anchor(s);
@@ -342,8 +346,11 @@ namespace jsonschema {
                     return p;
                 }
             }
+            
+            //std::cout << "    " << "checking defs\n";
             for (const auto& member : defs_)
             {
+                //std::cout << "    " << member.first << "\n";
                 if (!member.second->id())
                 {
                     const schema_validator<Json>* p = member.second->match_dynamic_anchor(s);
@@ -352,6 +359,10 @@ namespace jsonschema {
                         return p;
                     }
                 }
+                //else
+                //{
+                //    std::cout << "    Skipping " << member.second->id()->string() << "\n"; 
+                //}
             }
             
             return nullptr;
@@ -365,19 +376,20 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << "object_schema_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            std::cout << "evaluated_properties:\n";
-            for (const auto& s : evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "object_schema_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             std::unordered_set<std::string> local_evaluated_properties;
 
             evaluation_context<Json> this_context{eval_context, this};
+            //std::cout << "validators:\n";
             for (auto& validator : validators_)
-            {
+            {               
                 //std::cout << "    " << validator->keyword_name() << "\n";
                 validator->validate(this_context, instance, instance_location, local_evaluated_properties, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
@@ -386,19 +398,19 @@ namespace jsonschema {
                 }
             }
 
-            std::cout << "local_evaluated_properties: \n";
+            //std::cout << "local_evaluated_properties: \n";
             for (auto&& name : local_evaluated_properties)
             {
-                std::cout << "   " << name << "\n";
+                //std::cout << "   " << name << "\n";
                 evaluated_properties.emplace(std::move(name));
             }
-            std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            std::cout << "evaluated_properties:\n";
-            for (const auto& s : evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
         }
     };
 

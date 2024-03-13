@@ -38,24 +38,12 @@
         "bar": "bar"
     }
 
-object_schema_validator begin[,https://example.com/derived]evaluated_properties:
-
-object_schema_validator begin[/$ref,https://example.com/baseSchema]evaluated_properties:
-
-dynamic_ref_validator [/$ref,https://example.com/baseSchema]evaluated_properties:
-
-object_schema_validator begin[/$ref/$dynamicRef,https://example.com/baseSchema#addons]evaluated_properties:
-
-local_evaluated_properties:
-object_schema_validator end[/$ref/$dynamicRef,https://example.com/baseSchema#addons]evaluated_properties:
-
-object_schema_validator begin[/$ref/properties/foo,https://example.com/baseSchema#/properties/foo]evaluated_properties:
-
-local_evaluated_properties:
-object_schema_validator end[/$ref/properties/foo,https://example.com/baseSchema#/properties/foo]evaluated_properties:
-
-unevaluated_properties_validator [/$ref,https://example.com/baseSchema]evaluated_properties:
-    foo
-
-Not in evaluated properties: bar
-
+dynamic_ref_validator [/$ref,https://example.com/baseSchema]match_dynamic_anchor addons, https://example.com/baseSchema, id: https://example.com/baseSchema
+match_dynamic_anchor addons, https://example.com/baseSchema#/properties/foo, id:
+match_dynamic_anchor addons, https://example.com/baseSchema#addons, id:
+Match found https://example.com/baseSchema#addons
+match_dynamic_anchor addons, https://example.com/derived, id: https://example.com/derived
+match_dynamic_anchor addons, https://example.com/baseSchema, id: https://example.com/baseSchema
+match_dynamic_anchor addons, https://example.com/baseSchema#/properties/foo, id:
+match_dynamic_anchor addons, https://example.com/baseSchema#addons, id:
+Match found https://example.com/baseSchema#addons

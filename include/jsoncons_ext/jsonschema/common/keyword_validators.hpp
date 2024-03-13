@@ -68,7 +68,7 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            return referred_schema_->match_dynamic_anchor(s);
+            return referred_schema_->id() ? nullptr: referred_schema_->match_dynamic_anchor(s);
         }
 
     private:
@@ -202,13 +202,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
-            std::cout << "dynamic_ref_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            std::cout << "evaluated_properties:\n";
-            for (const auto& s : evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "dynamic_ref_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             auto rit = eval_context.dynamic_scope().rbegin();
             auto rend = eval_context.dynamic_scope().rend();
@@ -217,6 +217,7 @@ namespace jsonschema {
 
             const schema_validator<Json> *schema_ptr = tentative_target_;
 
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
             if (schema_ptr->dynamic_anchor())
@@ -228,25 +229,17 @@ namespace jsonschema {
                     auto p = (*rit)->match_dynamic_anchor(schema_ptr->dynamic_anchor()->fragment()); 
                     if (p != nullptr) 
                     {
+                        //std::cout << "Match found " << p->schema_path().string() << "\n";
                         schema_ptr = p;
                     }
 
                     ++rit;
                 }
             }
+            
+            //assert(schema_ptr != tentative_target_);
 
             //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
-
-            evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            if (schema_ptr == nullptr)
-            {
-                reporter.error(validation_output(this->keyword_name(), 
-                    this_context.eval_path(),
-                    this->schema_path(), 
-                    instance_location.to_string(), 
-                    "Unresolved schema reference " + this->schema_path().string()));
-                return;
-            }
 
             schema_ptr->validate(this_context, instance, instance_location, evaluated_properties, reporter, patch);
         }
@@ -1793,13 +1786,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            std::cout << "evaluated_properties:\n";
-            for (const auto& s : evaluated_properties)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
             if (!instance.is_object())
             {
                 return;
@@ -1816,7 +1809,7 @@ namespace jsonschema {
                     // check if it is in "evaluated_properties"
                     if (prop_it == evaluated_properties.end()) 
                     {
-                        std::cout << "Not in evaluated properties: " << prop.key() << "\n";
+                        //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
                         std::size_t error_count = reporter.error_count();
                         validator_->validate(this_context, prop.value() , instance_location, evaluated_properties, reporter, patch);
                         if (reporter.error_count() == error_count)
@@ -2210,10 +2203,18 @@ namespace jsonschema {
             Json& patch,
             std::unordered_set<std::string>& all_properties) const 
         {
+            //std::cout << "properties_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]\n";
             if (!instance.is_object())
             {
                 return;
             }
+
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
@@ -2243,6 +2244,7 @@ namespace jsonschema {
             // reverse search
             for (auto const& prop : properties_) 
             {
+                //std::cout << "   prop:" << prop.first << "\n";
                 const auto finding = instance.find(prop.first);
                 if (finding == instance.object_range().end()) 
                 { 
@@ -2258,6 +2260,13 @@ namespace jsonschema {
                     }
                 }
             }
+            //std::cout << "properties_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "evaluated_properties:\n";
+            //for (const auto& s : evaluated_properties)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
         }
 
     private:
