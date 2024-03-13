@@ -29,7 +29,7 @@ namespace jsonschema {
         schema_validator_type root_;
 
         // Owns all subschemas
-        std::vector<schema_validator_type> subschemas_;
+        std::vector<schema_validator_type> schemas_;
     public:
         std::map<jsoncons::uri, schema_validator_pointer> schema_store_; 
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
@@ -48,7 +48,7 @@ namespace jsonschema {
 
         void save_schema(schema_validator_type&& schema)
         {
-            subschemas_.emplace_back(std::move(schema));
+            schemas_.emplace_back(std::move(schema));
         }
 
         void build_schema(const Json& sch) 
@@ -78,6 +78,7 @@ namespace jsonschema {
                 for (std::size_t i = unresolved_refs_.size(); i-- > 0; )
                 {
                     auto loc = unresolved_refs_[i].first;
+                    //std::cout << "unresolved: " << loc.string() << "\n";
                     if (schema_store_.find(loc) == schema_store_.end()) // registry for this file is empty
                     {
                         if (resolver_)
@@ -97,7 +98,7 @@ namespace jsonschema {
 
             resolve_references();
 
-            return std::make_shared<json_schema<Json>>(std::move(subschemas_), std::move(root_));
+            return std::make_shared<json_schema<Json>>(std::move(schemas_), std::move(root_));
         }
 
         void resolve_references()

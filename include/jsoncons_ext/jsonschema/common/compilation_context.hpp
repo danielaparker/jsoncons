@@ -48,7 +48,7 @@ namespace jsonschema {
 
         uri get_base_uri() const
         {
-            return absolute_uri_.base();
+            return absolute_uri_;
         }
 
         std::string make_schema_path_with(const std::string& keyword) const

@@ -120,6 +120,26 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
+    SECTION("urn:example:foo-bar-baz-qux?+CCResolve:cc=uk")
+    {
+        std::string s = "urn:example:foo-bar-baz-qux?+CCResolve:cc=uk";
+
+        jsoncons::uri uri(s); 
+
+        CHECK(uri.scheme() == jsoncons::string_view("urn"));
+        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.userinfo() == jsoncons::string_view(""));
+        CHECK(uri.host() == jsoncons::string_view(""));
+        CHECK(uri.port() == jsoncons::string_view(""));
+        CHECK(uri.encoded_path() == jsoncons::string_view("example:foo-bar-baz-qux"));
+        CHECK(uri.encoded_query() == jsoncons::string_view("+CCResolve:cc=uk"));
+        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.is_absolute());
+
+        jsoncons::uri relative("#/defs/bar");
+        jsoncons::uri new_uri = relative.resolve(uri);
+        std::cout << "new_uri: " << new_uri.string() << "\n"; 
+    }
 }
 
 TEST_CASE("uri fragment tests")
