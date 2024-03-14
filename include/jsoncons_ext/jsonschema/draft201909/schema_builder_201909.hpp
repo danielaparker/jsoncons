@@ -224,8 +224,8 @@ namespace draft201909 {
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 uri_wrapper relative(it->value().template as<std::string>()); 
-                auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                validators.push_back(this->get_or_create_reference(id));
+                auto resolved = relative.resolve(uri_wrapper{ context.get_base_uri() });
+                validators.push_back(this->get_or_create_reference(resolved));
             }
 
             it = sch.find("$recursiveRef");

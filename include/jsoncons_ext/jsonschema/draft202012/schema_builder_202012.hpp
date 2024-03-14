@@ -350,6 +350,12 @@ namespace draft202012 {
             {
                 validators.emplace_back(this->make_unevaluated_properties_validator(context, it->value()));
             }
+
+            it = sch.find("unevaluatedItems");
+            if (it != sch.object_range().end()) 
+            {
+                validators.emplace_back(this->make_unevaluated_items_validator(context, it->value()));
+            }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value), std::move(dynamic_anchor));

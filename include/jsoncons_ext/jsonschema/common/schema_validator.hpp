@@ -91,11 +91,9 @@ namespace jsonschema {
         }
 
         std::unordered_set<std::string>& evaluated_properties() {return evaluated_properties_;}
-
-        std::unordered_set<std::size_t>& evaluated_items() {return evaluated_items_;}
-
         const std::unordered_set<std::string>& evaluated_properties() const {return evaluated_properties_;}
 
+        std::unordered_set<std::size_t>& evaluated_items() {return evaluated_items_;}
         const std::unordered_set<std::size_t>& evaluated_items() const {return evaluated_items_;}
     };
 

@@ -709,6 +709,7 @@ namespace jsonschema {
             auto validator_it = item_validators_.cbegin();
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
+            
             for (const auto& item : instance.array_range()) 
             {
                 jsonpointer::json_pointer pointer(instance_location);
@@ -716,14 +717,26 @@ namespace jsonschema {
                 if (validator_it != item_validators_.cend())
                 {
                     evaluation_context<Json> item_context{this_context, index};
-                    pointer /= index++;
+                    pointer /= index;
+                    std::size_t errors = reporter.error_count();
                     (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items().insert(index);
+                    }
                     ++validator_it;
+                    ++index;
                 }
                 else if (additional_items_validator_ != nullptr)
                 {
-                    pointer /= index++;
+                    pointer /= index;
+                    std::size_t errors = reporter.error_count();
                     additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items().insert(index);
+                    }
+                    ++index;
                 }
                 else
                     break;
@@ -775,15 +788,20 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
-            size_t index = 0;
             if (items_validator_)
             {
+                size_t index = 0;
                 for (const auto& item : instance.array_range()) 
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
+                    std::size_t errors = reporter.error_count();
                     items_validator_->validate(this_context, item, pointer, results, reporter, patch);
-                    index++;
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items().insert(index);
+                    }
+                    ++index;
                 }
             }
         }
@@ -857,14 +875,26 @@ namespace jsonschema {
                 if (validator_it != item_validators_.cend())
                 {
                     evaluation_context<Json> item_context{this_context, index};
-                    pointer /= index++;
+                    pointer /= index;
+                    std::size_t errors = reporter.error_count();
                     (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items().insert(index);
+                    }
                     ++validator_it;
+                    ++index;
                 }
-                else if (additional_items_validator_ != nullptr)
+                else if (additional_items_validator_)
                 {
-                    pointer /= index++;
+                    pointer /= index;
+                    std::size_t errors = reporter.error_count();
                     additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items().insert(index);
+                    }
+                    ++index;
                 }
                 else
                     break;
@@ -1046,160 +1076,6 @@ namespace jsonschema {
     };
 
     template <class Json>
-    struct all_of_criterion
-    {
-        static const std::string& key()
-        {
-            static const std::string k("allOf");
-            return k;
-        }
-
-        static bool is_complete(const evaluation_context<Json>& eval_context, 
-            const Json&, 
-            const jsonpointer::json_pointer& instance_location, 
-            error_reporter& reporter, 
-            const collecting_error_reporter& local_reporter, 
-            std::size_t)
-        {
-            if (!local_reporter.errors.empty())
-                reporter.error(validation_output(key(),
-                    eval_context.eval_path(), 
-                    uri(""),
-                    instance_location.to_string(), 
-                    "At least one schema failed to match, but all are required to match. ", 
-                    local_reporter.errors));
-            return !local_reporter.errors.empty();
-        }
-    };
-
-    template <class Json>
-    struct any_of_criterion
-    {
-        static const std::string& key()
-        {
-            static const std::string k("anyOf");
-            return k;
-        }
-
-        static bool is_complete(const evaluation_context<Json>&, 
-            const Json&, 
-            const jsonpointer::json_pointer&, 
-            error_reporter&, 
-            const collecting_error_reporter&, 
-            std::size_t count)
-        {
-            //std::cout << "any_of_criterion is_complete\n";
-            return count == 1;
-        }
-    };
-
-    template <class Json>
-    struct one_of_criterion
-    {
-        static const std::string& key()
-        {
-            static const std::string k("oneOf");
-            return k;
-        }
-
-        static bool is_complete(const evaluation_context<Json>& eval_context, 
-            const Json&, 
-            const jsonpointer::json_pointer& instance_location, 
-            error_reporter& reporter, 
-            const collecting_error_reporter&, 
-            std::size_t count)
-        {
-            if (count > 1)
-            {
-                std::string message(std::to_string(count));
-                message.append(" subschemas matched, but exactly one is required to match");
-                reporter.error(validation_output(key(),
-                    eval_context.eval_path(), 
-                    uri("XXX"), 
-                    instance_location.to_string(), 
-                    std::move(message)));
-            }
-            return count > 1;
-        }
-    };
-
-    template <class Json,class Criterion>
-    class combining_validator : public keyword_validator_base<Json>
-    {
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
-
-        std::vector<schema_validator_type> validators_;
-
-    public:
-        combining_validator(const uri& schema_path,
-             std::vector<schema_validator_type>&& validators)
-            : keyword_validator_base<Json>(Criterion::key(), std::move(schema_path)),
-              validators_(std::move(validators))
-        {
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
-        {
-            for (const auto& validator : validators_)
-            {
-                if (!validator->id())
-                {
-                    auto p = validator->match_dynamic_anchor(s);
-                    if (p != nullptr)
-                    {
-                        return p;
-                    }
-                }
-            }
-            return nullptr;
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter, 
-            Json& patch) const final
-        {
-            //std::cout << "combining_validator.do_validate " << "keywordLocation: << " << this->schema_path().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
-
-            size_t count = 0;
-
-            collecting_error_reporter local_reporter;
-
-            evaluation_context<Json> this_context(eval_context, this->keyword_name());
-
-            bool is_complete = false;
-            for (std::size_t i = 0; i < validators_.size(); ++i) 
-            {
-                evaluation_context<Json> item_context(this_context, i);
-
-                std::size_t mark = local_reporter.errors.size();
-                validators_[i]->validate(item_context, instance, instance_location, results, local_reporter, patch);
-                if (!is_complete)
-                {
-                    if (mark == local_reporter.errors.size())
-                        count++;
-                    if (Criterion::is_complete(item_context, instance, instance_location, reporter, local_reporter, count))
-                        is_complete = true;
-                }
-            }
-
-            if (count == 0)
-            {
-                reporter.error(validation_output(Criterion::key(),
-                    this_context.eval_path(), 
-                    this->schema_path(), 
-                    instance_location.to_string(), 
-                    "No schema matched, but one of them is required to match", 
-                    local_reporter.errors));
-            }
-        }
-    };
-
-    template <class Json>
     class any_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1241,31 +1117,190 @@ namespace jsonschema {
         {
             //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
 
+            evaluation_results local_results;
             collecting_error_reporter local_reporter;
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
-            bool is_complete = false;
-            for (std::size_t i = 0; i < validators_.size() && !is_complete; ++i) 
+            std::size_t count = 0;
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_context<Json> item_context(this_context, i);
 
-                std::size_t mark = local_reporter.errors.size();
-                validators_[i]->validate(item_context, instance, instance_location, results, local_reporter, patch);
-                if (mark == local_reporter.errors.size())
+                std::size_t errors = local_reporter.errors.size();
+                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                if (errors == local_reporter.errors.size())
                 {
-                    is_complete = true;
+                    ++count;
                 }
-                //std::cout << "is_complete: " << i << " " << is_complete << "\n";
+                //std::cout << "success: " << i << " " << success << "\n";
             }
 
-            if (!is_complete)
+            if (count > 0)
+            {
+                results.merge(local_results);
+            }
+            else 
             {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location.to_string(), 
-                    "No schema matched, but one of them is required to match", 
+                    "No schema matched, but at least one of them is required to match", 
+                    local_reporter.errors));
+            }
+        }
+    };
+
+    template <class Json>
+    class one_of_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+
+        std::vector<schema_validator_type> validators_;
+
+    public:
+        one_of_validator(const uri& schema_path,
+             std::vector<schema_validator_type>&& validators)
+            : keyword_validator_base<Json>("oneOf", schema_path),
+              validators_(std::move(validators))
+        {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
+
+            evaluation_results local_results;
+            collecting_error_reporter local_reporter;
+
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+            std::size_t count = 0;
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
+            {
+                evaluation_context<Json> item_context(this_context, i);
+
+                std::size_t errors = local_reporter.errors.size();
+                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                if (errors == local_reporter.errors.size())
+                {
+                    ++count;
+                }
+                //std::cout << "success: " << i << " " << success << "\n";
+            }
+
+            if (count == 1)
+            {
+                results.merge(local_results);
+            }
+            else 
+            {
+                reporter.error(validation_output(this->keyword_name(),
+                    this_context.eval_path(), 
+                    this->schema_path(), 
+                    instance_location.to_string(), 
+                    "No schema matched, but exactly one of them is required to match", 
+                    local_reporter.errors));
+            }
+        }
+    };
+
+    template <class Json>
+    class all_of_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+
+        std::vector<schema_validator_type> validators_;
+
+    public:
+        all_of_validator(const uri& schema_path,
+             std::vector<schema_validator_type>&& validators)
+            : keyword_validator_base<Json>("allOf", schema_path),
+              validators_(std::move(validators))
+        {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
+
+            evaluation_results local_results;
+            collecting_error_reporter local_reporter;
+
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+            std::size_t count = 0;
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
+            {
+                evaluation_context<Json> item_context(this_context, i);
+
+                std::size_t errors = local_reporter.errors.size();
+                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                if (errors == local_reporter.errors.size())
+                {
+                    ++count;
+                }
+                //std::cout << "success: " << i << " " << success << "\n";
+            }
+
+            if (count == validators_.size())
+            {
+                results.merge(local_results);
+            }
+            else 
+            {
+                reporter.error(validation_output(this->keyword_name(),
+                    this_context.eval_path(), 
+                    this->schema_path(), 
+                    instance_location.to_string(), 
+                    "No schema matched, but all of them are required to match", 
                     local_reporter.errors));
             }
         }
@@ -1865,7 +1900,7 @@ namespace jsonschema {
             {
                 evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
-                for (std::size_t i = 0; i < instance.size(); ++) 
+                for (std::size_t i = 0; i < instance.size(); ++i) 
                 {
                     auto prop_it = results.evaluated_items().find(i);
 
@@ -1873,9 +1908,9 @@ namespace jsonschema {
                     if (prop_it == results.evaluated_items().end()) 
                     {
                         //std::cout << "Not in evaluated items: " << i << "\n";
-                        std::size_t error_count = reporter.error_count();
-                        validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
-                        if (reporter.error_count() == error_count)
+                        std::size_t errors = reporter.error_count();
+                        validator_->validate(this_context, std::to_string(i), instance_location, results, reporter, patch);
+                        if (errors == reporter.error_count())
                         {
                             results.evaluated_items().insert(i);
                         }
@@ -2961,9 +2996,9 @@ namespace jsonschema {
             collecting_error_reporter local_reporter;
             for (const auto& item : instance.array_range()) 
             {
-                std::size_t mark = local_reporter.errors.size();
+                std::size_t errors = local_reporter.errors.size();
                 schema_validator_->validate(this_context, item, instance_location, results, local_reporter, patch);
-                if (mark == local_reporter.errors.size()) 
+                if (errors == local_reporter.errors.size()) 
                 {
                     ++contains_count;
                 }

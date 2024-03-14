@@ -474,7 +474,7 @@ namespace jsonschema {
             return jsoncons::make_unique<unique_items_validator<Json>>( schema_path, are_unique);
         }
 
-        virtual std::unique_ptr<combining_validator<Json,all_of_criterion<Json>>> make_all_of_validator(const compilation_context& context,
+        virtual std::unique_ptr<all_of_validator<Json>> make_all_of_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("allOf");
@@ -483,13 +483,13 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { all_of_criterion<Json>::key(), std::to_string(c++) };
+                std::string sub_keys[] = { "allOf", std::to_string(c++) };
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,all_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<all_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
 
-        virtual std::unique_ptr<combining_validator<Json,any_of_criterion<Json>>> make_any_of_validator(const compilation_context& context,
+        virtual std::unique_ptr<any_of_validator<Json>> make_any_of_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path = context.make_schema_path_with("anyOf");
@@ -498,13 +498,13 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { any_of_criterion<Json>::key(), std::to_string(c++) };
+                std::string sub_keys[] = { "anyOf", std::to_string(c++) };
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,any_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<any_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
 
-        virtual std::unique_ptr<combining_validator<Json,one_of_criterion<Json>>> make_one_of_validator(const compilation_context& context,
+        virtual std::unique_ptr<one_of_validator<Json>> make_one_of_validator(const compilation_context& context,
             const Json& sch)
         {
             uri schema_path{ context.make_schema_path_with("oneOf") };
@@ -513,10 +513,10 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                std::string sub_keys[] = { one_of_criterion<Json>::key(), std::to_string(c++) };
+                std::string sub_keys[] = { "oneOf", std::to_string(c++) };
                 subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys));
             }
-            return jsoncons::make_unique<combining_validator<Json,one_of_criterion<Json>>>(std::move(schema_path), std::move(subschemas));
+            return jsoncons::make_unique<one_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
 
         virtual std::unique_ptr<dependencies_validator<Json>> make_dependencies_validator(const compilation_context& context, 
@@ -637,6 +637,17 @@ namespace jsonschema {
             std::string sub_keys[] = {"unevaluatedProperties"};
 
             return jsoncons::make_unique<unevaluated_properties_validator<Json>>( std::move(schema_path),
+                make_schema_validator(context, sch, sub_keys));
+        }
+
+        virtual std::unique_ptr<unevaluated_items_validator<Json>> make_unevaluated_items_validator(
+            const compilation_context& context, const Json& sch)
+        {
+            uri schema_path = context.get_absolute_uri();
+
+            std::string sub_keys[] = {"unevaluatedItems"};
+
+            return jsoncons::make_unique<unevaluated_items_validator<Json>>( std::move(schema_path),
                 make_schema_validator(context, sch, sub_keys));
         }
 
