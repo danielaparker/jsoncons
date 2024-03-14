@@ -1812,6 +1812,80 @@ namespace jsonschema {
     };
 
     template <class Json>
+    class unevaluated_items_validator : public keyword_validator_base<Json>
+    {
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+
+        schema_validator_type validator_;
+
+    public:
+        unevaluated_items_validator(const uri& schema_path,
+            schema_validator_type&& validator
+        )
+            : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_path)), 
+              validator_(std::move(validator))
+        {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            if (validator_ != nullptr && !validator_->id()) 
+            {
+                auto p = validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            //std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "results:\n";
+            //for (const auto& s : results)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
+            if (!instance.is_array())
+            {
+                return;
+            }
+
+            if (validator_)
+            {
+                evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+                for (std::size_t i = 0; i < instance.size(); ++) 
+                {
+                    auto prop_it = results.evaluated_items().find(i);
+
+                    // check if it is in "results"
+                    if (prop_it == results.evaluated_items().end()) 
+                    {
+                        //std::cout << "Not in evaluated items: " << i << "\n";
+                        std::size_t error_count = reporter.error_count();
+                        validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
+                        if (reporter.error_count() == error_count)
+                        {
+                            results.evaluated_items().insert(i);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    template <class Json>
     class conditional_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;

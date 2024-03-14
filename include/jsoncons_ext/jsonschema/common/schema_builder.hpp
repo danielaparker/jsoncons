@@ -714,6 +714,37 @@ namespace jsonschema {
             return orig;
         }
 
+        static bool validate_anchor(const std::string& s)
+        {
+            if (s.empty())
+            {
+                return false;
+            }
+            if (!((s[0] >= 'a' && s[0] <= 'z') || (s[0] >= 'A' && s[0] <= 'Z')))
+            {
+                return false;
+            }
+
+            for (std::size_t i = 1; i < s.size(); ++i)
+            {
+                switch (s[i])
+                {
+                    case '-':
+                    case '_':
+                    case ':':
+                    case '.':
+                        break;
+                    default:
+                        if (!((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9')))
+                        {
+                            return false;
+                        }
+                        break;
+                }
+            }
+            return true;
+        }
+
     };
 
 } // namespace jsonschema
