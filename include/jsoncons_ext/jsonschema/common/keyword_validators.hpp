@@ -270,7 +270,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -339,7 +339,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -394,7 +394,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -445,7 +445,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -497,7 +497,7 @@ namespace jsonschema {
 
         void do_validate(const Json&, 
             const jsonpointer::json_pointer&,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter&,
             Json&) const final
         {
@@ -528,7 +528,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -580,7 +580,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -631,7 +631,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -907,7 +907,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -972,7 +972,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -1306,7 +1306,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final 
         {
@@ -1369,7 +1369,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final 
         {
@@ -1432,7 +1432,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final 
         {
@@ -1495,7 +1495,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final 
         {
@@ -1556,7 +1556,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final
         {
@@ -1616,7 +1616,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter, 
             Json&) const final
         {
@@ -1669,7 +1669,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -1720,7 +1720,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -1925,7 +1925,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -1980,7 +1980,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>&, 
+            std::unordered_set<std::string>& /*evaluated_properties*/, 
             error_reporter& reporter,
             Json&) const final
         {
@@ -2053,7 +2053,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& /*valuated_properties*/,
+            std::unordered_set<std::string>& /*evaluated_properties*/,
             error_reporter& reporter, 
             Json& /*patch*/) const final
         {
