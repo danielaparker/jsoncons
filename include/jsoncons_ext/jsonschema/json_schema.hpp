@@ -41,12 +41,12 @@ namespace jsonschema {
 
         void validate(const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties,
+            evaluation_results& results,
             error_reporter& reporter, 
             Json& patch) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(evaluation_context<Json>{}, instance, instance_location, evaluated_properties, reporter, patch);
+            root_->validate(evaluation_context<Json>{}, instance, instance_location, results, reporter, patch);
         }
     };
 
