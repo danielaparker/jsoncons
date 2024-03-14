@@ -51,6 +51,59 @@ namespace jsonschema {
     };
 
 
+    struct collecting_error_reporter : public error_reporter
+    {
+        std::vector<validation_output> errors;
+
+    private:
+        void do_error(const validation_output& o) final
+        {
+            errors.push_back(o);
+        }
+    };
+    
+    class evaluation_results
+    {
+        std::unordered_set<std::string> evaluated_properties_;
+        std::unordered_set<std::size_t> evaluated_items_;
+    public:
+        void insert_property(const std::string& name)
+        {
+            evaluated_properties_.insert(name);
+        }
+
+        void insert_item(std::size_t index)
+        {
+            evaluated_items_.insert(index);
+        }
+        void merge(const evaluation_results& results)
+        {
+            for (auto&& name : results.evaluated_properties_)
+            {
+                evaluated_properties_.insert(name);
+            }
+            for (auto index : results.evaluated_items_)
+            {
+                evaluated_items_.insert(index);
+            }
+        }
+        void merge(evaluation_results&& results)
+        {
+            for (auto&& name : results.evaluated_properties_)
+            {
+                evaluated_properties_.insert(std::move(name));
+            }
+            for (auto index : results.evaluated_items_)
+            {
+                evaluated_items_.insert(index);
+            }
+        }
+
+        const std::unordered_set<std::string>& evaluated_properties() const {return evaluated_properties_;}
+
+        const std::unordered_set<std::size_t>& evaluated_items() const {return evaluated_items_;}
+    };
+
     template <class Json>
     class schema_validator;
 
@@ -73,17 +126,17 @@ namespace jsonschema {
         void validate(const evaluation_context<Json>& eval_context,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& results, 
             error_reporter& reporter, 
             Json& patch) const 
         {
-            do_validate(eval_context, instance, instance_location, evaluated_properties, reporter, patch);
+            do_validate(eval_context, instance, instance_location, results, reporter, patch);
         }
 
     private:
         virtual void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& results, 
             error_reporter& reporter, 
             Json& patch) const = 0;
     };
@@ -240,7 +293,7 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& /*evaluated_properties*/, 
+            std::unordered_set<std::string>& /*results*/, 
             error_reporter& reporter, 
             Json&) const final
         {
@@ -372,13 +425,13 @@ namespace jsonschema {
 
         void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
-            std::unordered_set<std::string>& evaluated_properties, 
+            std::unordered_set<std::string>& results, 
             error_reporter& reporter, 
             Json& patch) const final
         {
             //std::cout << "object_schema_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            //std::cout << "evaluated_properties:\n";
-            //for (const auto& s : evaluated_properties)
+            //std::cout << "results:\n";
+            //for (const auto& s : results)
             //{
             //    std::cout << "    " << s << "\n";
             //}
@@ -402,11 +455,11 @@ namespace jsonschema {
             for (auto&& name : local_evaluated_properties)
             {
                 //std::cout << "   " << name << "\n";
-                evaluated_properties.emplace(std::move(name));
+                results.emplace(std::move(name));
             }
             //std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            //std::cout << "evaluated_properties:\n";
-            //for (const auto& s : evaluated_properties)
+            //std::cout << "results:\n";
+            //for (const auto& s : results)
             //{
             //    std::cout << "    " << s << "\n";
             //}
