@@ -65,7 +65,7 @@ namespace jsonschema {
     struct evaluation_results
     {
         std::unordered_set<std::string> evaluated_properties_;
-        std::unordered_set<std::size_t> unevaluated_items_;
+        std::unordered_set<std::size_t> evaluated_items_;
 
         void merge(const evaluation_results& results)
         {
@@ -73,9 +73,9 @@ namespace jsonschema {
             {
                 evaluated_properties_.insert(name);
             }
-            for (auto index : results.unevaluated_items_)
+            for (auto index : results.evaluated_items_)
             {
-                unevaluated_items_.insert(index);
+                evaluated_items_.insert(index);
             }
         }
         void merge(evaluation_results&& results)
@@ -84,31 +84,31 @@ namespace jsonschema {
             {
                 evaluated_properties_.insert(std::move(name));
             }
-            for (auto index : results.unevaluated_items_)
+            for (auto index : results.evaluated_items_)
             {
-                unevaluated_items_.insert(index);
+                evaluated_items_.insert(index);
             }
         }
-        void merge(std::unordered_set<std::string>&& evaluated_properties)
+        void merge(std::unordered_set<std::string>&& properties)
         {
-            for (auto&& name : evaluated_properties)
+            for (auto&& name : properties)
             {
                 evaluated_properties_.insert(std::move(name));
             }
         }
-        void merge(const std::unordered_set<std::size_t>& unevaluated_items)
+        void merge(const std::unordered_set<std::size_t>& items)
         {
-            for (auto index : unevaluated_items)
+            for (auto index : items)
             {
-                unevaluated_items_.insert(index);
+                evaluated_items_.insert(index);
             }
         }
 
         std::unordered_set<std::string>& evaluated_properties() {return evaluated_properties_;}
         const std::unordered_set<std::string>& evaluated_properties() const {return evaluated_properties_;}
 
-        std::unordered_set<std::size_t>& unevaluated_items() {return unevaluated_items_;}
-        const std::unordered_set<std::size_t>& unevaluated_items() const {return unevaluated_items_;}
+        std::unordered_set<std::size_t>& evaluated_items() {return evaluated_items_;}
+        const std::unordered_set<std::size_t>& evaluated_items() const {return evaluated_items_;}
     };
 
     template <class Json>
@@ -460,11 +460,7 @@ namespace jsonschema {
 
             //if (!instance.is_object())
             {
-                results.merge(std::move(local_results.evaluated_properties_));
-            }
-            if (!instance.is_array())
-            {
-                results.merge(std::move(local_results.unevaluated_items_));
+                results.merge(std::move(local_results));
             }
             
             //std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";

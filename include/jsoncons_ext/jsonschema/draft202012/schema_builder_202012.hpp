@@ -396,7 +396,7 @@ namespace draft202012 {
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"contains"};
-                    contains_validator = this->make_contains_validator(context, it->value(), sch);
+                    contains_validator = this->make_contains_validator(context, it->value(), parent);
                 }
             }
 

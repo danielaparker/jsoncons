@@ -720,9 +720,9 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
+                    if (errors == reporter.error_count())
                     {
-                        results.unevaluated_items().insert(index);
+                        results.evaluated_items().insert(index);
                     }
                     ++validator_it;
                     ++index;
@@ -732,9 +732,9 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
+                    if (errors == reporter.error_count())
                     {
-                        results.unevaluated_items().insert(index);
+                        results.evaluated_items().insert(index);
                     }
                     ++index;
                 }
@@ -797,9 +797,9 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     items_validator_->validate(this_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
+                    if (errors == reporter.error_count())
                     {
-                        results.unevaluated_items().insert(index);
+                        results.evaluated_items().insert(index);
                     }
                     ++index;
                 }
@@ -1184,7 +1184,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
+            //std::cout << this->keyword_name() << " [" << eval_context.eval_path().to_string() << ", " << this->schema_path().string() << "]\n";
 
             evaluation_results local_results1;
             collecting_error_reporter local_reporter;
@@ -1199,6 +1199,11 @@ namespace jsonschema {
 
                 std::size_t errors = local_reporter.errors.size();
                 validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
+                //std::cout << "local_results2:\n";
+                //for (const auto& s : local_results2.evaluated_items_)
+                //{
+                //    std::cout << "    " << s << "\n";
+                //}
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
@@ -1206,6 +1211,12 @@ namespace jsonschema {
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
             }
+
+            //std::cout << "local_results1:\n";
+            //for (const auto& s : local_results1.evaluated_items_)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
 
             if (count == validators_.size())
             {
@@ -1801,13 +1812,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
-            //std::cout << "results:\n";
-            //for (const auto& s : results)
-            //{
-            //    std::cout << "    " << s << "\n";
-            //}
-            //std::cout << "\n";
+            std::cout << this->keyword_name() << " [" << eval_context.eval_path().to_string() << ", " << this->schema_path().string() << "]";
+            std::cout << "results:\n";
+            for (const auto& s : results.evaluated_items_)
+            {
+                std::cout << "    " << s << "\n";
+            }
+            std::cout << "\n";
             if (!instance.is_array())
             {
                 return;
@@ -1816,13 +1827,37 @@ namespace jsonschema {
             if (validator_)
             {
                 evaluation_context<Json> this_context(eval_context, this->keyword_name());
+
+                std::size_t index = 0;
+                for (const auto& item : instance.array_range()) 
+                {
+                    auto item_it = results.evaluated_items().find(index);
+
+                    // check if it is in "results"
+                    if (item_it == results.evaluated_items().end()) 
+                    {
+                        //std::cout << "Not in evaluated properties: " << item.key() << "\n";
+                        std::size_t error_count = reporter.error_count();
+                        validator_->validate(this_context, item, instance_location, results, reporter, patch);
+                        if (reporter.error_count() == error_count)
+                        {
+                            results.evaluated_items().insert(index);
+                        }
+                    }
+                    ++index;
+                }
+            }
+
+            /*if (validator_)
+            {
+                evaluation_context<Json> this_context(eval_context, this->keyword_name());
                 
                 for (auto index : results.unevaluated_items())
                 {
                     JSONCONS_ASSERT(index < instance.size());
                     validator_->validate(this_context, instance[index], instance_location, results, reporter, patch);
                 }
-            }
+            }*/
         }
     };
 
@@ -2906,21 +2941,25 @@ namespace jsonschema {
             {
                 std::size_t errors = local_reporter.errors.size();
                 schema_validator_->validate(this_context, item, instance_location, results, local_reporter, patch);
-                ++index;
                 if (errors == local_reporter.errors.size())
                 {
+                    std::cout << "contains Inserting index " << index << "\n";
+                    results.evaluated_items_.insert(index);
                     ++contains_count;
                 }
-            }
-            for (std::size_t i = index; i < instance.size(); ++i)
-            {
-                results.unevaluated_items_.insert(i);
+                ++index;
             }
             
-            if (max_contains_ && min_contains_)
+            if (max_contains_ || min_contains_)
             {
-                max_contains_->validate(this_context, instance_location, contains_count, reporter);
-                min_contains_->validate(this_context, instance_location, contains_count, reporter);
+                if (max_contains_)
+                {
+                    max_contains_->validate(this_context, instance_location, contains_count, reporter);
+                }
+                if (min_contains_)
+                {
+                    min_contains_->validate(this_context, instance_location, contains_count, reporter);
+                }
             }
             else if (contains_count == 0)
             {
@@ -3013,53 +3052,52 @@ namespace jsonschema {
             }
         
             size_t index = 0;
-            auto validator_it = item_validators_.cbegin();
+            auto it = instance.array_range().cbegin();
+            auto end_it = instance.array_range().cend();
         
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            for (const auto& item : instance.array_range()) 
+            for (const auto& validator : item_validators_) 
             {
-                jsonpointer::json_pointer pointer(instance_location);
-        
-                if (validator_it != item_validators_.cend())
+                if (it == end_it)
                 {
-                    evaluation_context<Json> item_context{this_context, index};
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
-                    {
-                        results.unevaluated_items().insert(index);
-                    }
-                    ++validator_it;
-                    ++index;
+                    break;
                 }
-                else if (additional_items_validator_ || contains_validator_)
+                jsonpointer::json_pointer pointer(instance_location);
+                pointer /= index;
+        
+                evaluation_context<Json> item_context{this_context, index};
+                std::size_t errors = reporter.error_count();
+                validator->validate(item_context, *it, pointer, results, reporter, patch);
+                if (errors == reporter.error_count())
                 {
+                    std::cout << "prefixItems insert: " << index << "\n";
+                    results.evaluated_items().insert(index);
+                }
+                ++it;
+                ++index;
+            }
+            if (additional_items_validator_ || contains_validator_)
+            {
+                while (it != end_it)
+                {
+                    jsonpointer::json_pointer pointer(instance_location);
+                    pointer /= index;
                     if (additional_items_validator_)
                     {
-                        pointer /= index;
                         std::size_t errors = reporter.error_count();
-                        additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
-                        if (errors < reporter.error_count())
+                        additional_items_validator_->validate(eval_context, *it, pointer, results, reporter, patch);
+                        if (errors == reporter.error_count())
                         {
-                            results.unevaluated_items().insert(index);
+                            results.evaluated_items().insert(index);
                         }
                     }
                     if (contains_validator_)
                     {
-                        pointer /= index;
-                        std::size_t errors = reporter.error_count();
-                        contains_validator_->validate(eval_context, item, pointer, results, reporter, patch);
-                        if (errors < reporter.error_count())
-                        {
-                            results.unevaluated_items().insert(index);
-                        }
+                        contains_validator_->validate(eval_context, instance, pointer, results, reporter, patch);
                     }
+                    ++it;
                     ++index;
                 }
-                else
-                    break;
-        
             }
         }
     };

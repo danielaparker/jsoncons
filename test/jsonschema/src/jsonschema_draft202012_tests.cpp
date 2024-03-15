@@ -110,9 +110,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/contains.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/prefixItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/items.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
     }
 
     SECTION("tests")
