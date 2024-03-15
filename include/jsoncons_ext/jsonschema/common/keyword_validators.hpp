@@ -1812,13 +1812,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::cout << this->keyword_name() << " [" << eval_context.eval_path().to_string() << ", " << this->schema_path().string() << "]";
-            std::cout << "results:\n";
-            for (const auto& s : results.evaluated_items_)
-            {
-                std::cout << "    " << s << "\n";
-            }
-            std::cout << "\n";
+            //std::cout << this->keyword_name() << " [" << eval_context.eval_path().to_string() << ", " << this->schema_path().string() << "]";
+            //std::cout << "results:\n";
+            //for (const auto& s : results.evaluated_items_)
+            //{
+            //    std::cout << "    " << s << "\n";
+            //}
+            //std::cout << "\n";
             if (!instance.is_array())
             {
                 return;
@@ -2943,7 +2943,6 @@ namespace jsonschema {
                 schema_validator_->validate(this_context, item, instance_location, results, local_reporter, patch);
                 if (errors == local_reporter.errors.size())
                 {
-                    std::cout << "contains Inserting index " << index << "\n";
                     results.evaluated_items_.insert(index);
                     ++contains_count;
                 }
@@ -2983,32 +2982,21 @@ namespace jsonschema {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
-        std::vector<schema_validator_type> item_validators_;
-        schema_validator_type additional_items_validator_;
-        std::unique_ptr<contains_validator<Json>> contains_validator_;
+        std::vector<schema_validator_type> prefix_items_validators_;
+        schema_validator_type items_validator_;
     public:
         prefix_items_validator(const uri& schema_path, 
             std::vector<schema_validator_type>&& item_validators,
             schema_validator_type&& additional_items_validator)
             : keyword_validator_base<Json>("prefixItems", schema_path), 
-              item_validators_(std::move(item_validators)), 
-              additional_items_validator_(std::move(additional_items_validator))
-        {
-        }
-        prefix_items_validator(const uri& schema_path, 
-            std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_validator,
-            std::unique_ptr<contains_validator<Json>>&& contains)
-            : keyword_validator_base<Json>("prefixItems", schema_path), 
-              item_validators_(std::move(item_validators)), 
-              additional_items_validator_(std::move(additional_items_validator)),
-              contains_validator_(std::move(contains))
+              prefix_items_validators_(std::move(item_validators)), 
+              items_validator_(std::move(additional_items_validator))
         {
         }
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : item_validators_)
+            for (const auto& validator : prefix_items_validators_)
             {
                 if (!validator->id())
                 {
@@ -3019,17 +3007,9 @@ namespace jsonschema {
                     }
                 }
             }
-            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
+            if (items_validator_ != nullptr && !items_validator_->id()) 
             {
-                auto p = additional_items_validator_->match_dynamic_anchor(s);
-                if (p != nullptr)
-                {
-                    return p;
-                }
-            }
-            if (contains_validator_ != nullptr) 
-            {
-                auto p = contains_validator_->match_dynamic_anchor(s);
+                auto p = items_validator_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -3056,7 +3036,7 @@ namespace jsonschema {
             auto end_it = instance.array_range().cend();
         
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            for (const auto& validator : item_validators_) 
+            for (const auto& validator : prefix_items_validators_) 
             {
                 if (it == end_it)
                 {
@@ -3070,30 +3050,25 @@ namespace jsonschema {
                 validator->validate(item_context, *it, pointer, results, reporter, patch);
                 if (errors == reporter.error_count())
                 {
-                    std::cout << "prefixItems insert: " << index << "\n";
                     results.evaluated_items().insert(index);
                 }
                 ++it;
                 ++index;
             }
-            if (additional_items_validator_ || contains_validator_)
+            if (items_validator_)
             {
                 while (it != end_it)
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    if (additional_items_validator_)
+                    if (items_validator_)
                     {
                         std::size_t errors = reporter.error_count();
-                        additional_items_validator_->validate(eval_context, *it, pointer, results, reporter, patch);
+                        items_validator_->validate(eval_context, *it, pointer, results, reporter, patch);
                         if (errors == reporter.error_count())
                         {
                             results.evaluated_items().insert(index);
                         }
-                    }
-                    if (contains_validator_)
-                    {
-                        contains_validator_->validate(eval_context, instance, pointer, results, reporter, patch);
                     }
                     ++it;
                     ++index;

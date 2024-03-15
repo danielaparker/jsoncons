@@ -71,6 +71,8 @@ namespace draft202012 {
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_max_items_validator(context, sch);});
             keyword_factory_map_.emplace("minItems", 
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_min_items_validator(context, sch);});
+            keyword_factory_map_.emplace("contains", 
+                [&](const compilation_context& context, const Json& sch, const Json& parent){return this->make_contains_validator(context, sch, parent);});
             keyword_factory_map_.emplace("uniqueItems", 
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_unique_items_validator(context, sch);});
             keyword_factory_map_.emplace("maxLength", 
@@ -342,11 +344,6 @@ namespace draft202012 {
                         validators.emplace_back(make_items_object_validator(context, it->value()));
                     }
                 }
-                it = sch.find("contains");
-                if (it != sch.object_range().end()) 
-                {
-                    validators.emplace_back(this->make_contains_validator(context, it->value(), sch));
-                }
             }
             
             // Must be last
@@ -371,7 +368,6 @@ namespace draft202012 {
         {
             std::vector<schema_validator_type> item_validators;
             schema_validator_type additional_items_validator;
-            std::unique_ptr<contains_validator<Json>> contains_validator;
 
             uri schema_path{context.make_schema_path_with("prefixItems")};
 
@@ -391,17 +387,10 @@ namespace draft202012 {
                     std::string sub_keys[] = {"items"};
                     additional_items_validator = make_schema_validator(context, it->value(), sub_keys);
                 }
-
-                it = parent.find("contains");
-                if (it != parent.object_range().end()) 
-                {
-                    std::string sub_keys[] = {"contains"};
-                    contains_validator = this->make_contains_validator(context, it->value(), parent);
-                }
             }
 
             return jsoncons::make_unique<prefix_items_validator<Json>>( schema_path,  
-                std::move(item_validators), std::move(additional_items_validator), std::move(contains_validator));
+                std::move(item_validators), std::move(additional_items_validator));
         }
 
         std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
