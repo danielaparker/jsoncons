@@ -47,6 +47,7 @@ namespace {
         }
 
         json tests = json::parse(is); 
+        //std::cout << pretty_print(tests) << "\n";
 
         int count = 0;
         for (const auto& test_group : tests.array_range()) 
@@ -60,8 +61,9 @@ namespace {
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
                 {
-                    std::size_t errors = 0;
+                    //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
+                    std::size_t errors = 0;
                     auto reporter = [&](const jsonschema::validation_output& o)
                     {
                         ++errors;

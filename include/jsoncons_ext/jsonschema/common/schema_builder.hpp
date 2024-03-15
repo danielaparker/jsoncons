@@ -428,6 +428,30 @@ namespace jsonschema {
             return jsoncons::make_unique<min_items_validator<Json>>( schema_path, value);
         }
 
+        virtual std::unique_ptr<max_properties_validator<Json>> make_max_properties_validator(const compilation_context& context, const Json& sch)
+        {
+            uri schema_path = context.make_schema_path_with("maxProperties");
+            if (!sch.is_number())
+            {
+                std::string message("maxProperties must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = sch.template as<std::size_t>();
+            return jsoncons::make_unique<max_properties_validator<Json>>( schema_path, value);
+        }
+
+        virtual std::unique_ptr<min_properties_validator<Json>> make_min_properties_validator(const compilation_context& context, const Json& sch)
+        {
+            uri schema_path = context.make_schema_path_with("minProperties");
+            if (!sch.is_number())
+            {
+                std::string message("minProperties must be a number value");
+                JSONCONS_THROW(schema_error(message));
+            }
+            auto value = sch.template as<std::size_t>();
+            return jsoncons::make_unique<min_properties_validator<Json>>( schema_path, value);
+        }
+
         virtual std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
             const Json& sch, const Json& parent)
         {
@@ -526,6 +550,8 @@ namespace jsonschema {
             std::map<std::string, keyword_validator_type> dependent_required;
             std::map<std::string, schema_validator_type> dependent_schemas;
 
+            //std::cout << "dependencies" << "\n" << pretty_print(sch) << "\n";
+
             for (const auto& dep : sch.object_range())
             {
                 switch (dep.value().type()) 
@@ -538,6 +564,7 @@ namespace jsonschema {
                                 dep.value().template as<std::vector<std::string>>()));
                         break;
                     }
+                    case json_type::bool_value:
                     case json_type::object_value:
                     {
                         std::string sub_keys[] = {"dependencies"};
@@ -610,6 +637,7 @@ namespace jsonschema {
             {
                 switch (dep.value().type()) 
                 {
+                    case json_type::bool_value:
                     case json_type::object_value:
                     {
                         std::string sub_keys[] = {"dependentSchemas"};

@@ -1627,10 +1627,11 @@ namespace jsonschema {
         {
             if (!instance.is_object())
             {
-                if (instance.size() > max_properties_)
-                {
-                    return;
-                }
+                return;
+            }
+            
+            if (instance.size() > max_properties_)
+            {
                 evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
                 std::string message("Maximum properties: " + std::to_string(max_properties_));
@@ -1640,12 +1641,7 @@ namespace jsonschema {
                     this->schema_path(), 
                     instance_location.to_string(), 
                     std::move(message)));
-                if (reporter.fail_early())
-                {
-                    return;
-                }
-                
-            }
+            }           
         }
     };
 
@@ -1691,10 +1687,6 @@ namespace jsonschema {
                         this->schema_path(),
                         instance_location.to_string(),
                         std::move(message)));
-                if (reporter.fail_early())
-                {
-                    return;
-                }
             }
             
         }

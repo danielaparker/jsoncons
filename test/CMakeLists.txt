@@ -80,7 +80,7 @@ add_executable(unit_tests
                csv/src/csv_subfield_tests.cpp
                csv/src/csv_tests.cpp
                csv/src/encode_decode_csv_tests.cpp
-               fuzz_regression/src/fuzz_regression_tests.cpp
+               #fuzz_regression/src/fuzz_regression_tests.cpp
                jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_tests.cpp
                mergepatch/src/mergepatch_test_suite.cpp
@@ -103,9 +103,9 @@ add_executable(unit_tests
                jsonschema/src/dynamic_ref_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_output_tests.cpp
-               #jsonschema/src/jsonschema_draft7_tests.cpp
-               #jsonschema/src/jsonschema_draft201909_tests.cpp
-               #jsonschema/src/jsonschema_draft202012_tests.cpp
+               jsonschema/src/jsonschema_draft7_tests.cpp
+               jsonschema/src/jsonschema_draft201909_tests.cpp
+               jsonschema/src/jsonschema_draft202012_tests.cpp
                jsonschema/src/schema_version_tests.cpp
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp

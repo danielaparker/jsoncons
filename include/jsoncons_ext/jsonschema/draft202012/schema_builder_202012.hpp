@@ -71,6 +71,10 @@ namespace draft202012 {
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_max_items_validator(context, sch);});
             keyword_factory_map_.emplace("minItems", 
                 [&](const compilation_context& context, const Json& sch, const Json&){return this->make_min_items_validator(context, sch);});
+            keyword_factory_map_.emplace("maxProperties", 
+                [&](const compilation_context& context, const Json& sch, const Json&){return this->make_max_properties_validator(context, sch);});
+            keyword_factory_map_.emplace("minProperties", 
+                [&](const compilation_context& context, const Json& sch, const Json&){return this->make_min_properties_validator(context, sch);});
             keyword_factory_map_.emplace("contains", 
                 [&](const compilation_context& context, const Json& sch, const Json& parent){return this->make_contains_validator(context, sch, parent);});
             keyword_factory_map_.emplace("uniqueItems", 
