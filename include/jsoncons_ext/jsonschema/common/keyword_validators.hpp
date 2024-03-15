@@ -809,100 +809,6 @@ namespace jsonschema {
 
     // items
 
-    template <class Json>
-    class prefix_items_validator : public keyword_validator_base<Json>
-    {
-        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-
-        std::vector<schema_validator_type> item_validators_;
-        schema_validator_type additional_items_validator_;
-    public:
-        prefix_items_validator(const uri& schema_path, 
-            std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_validator)
-            : keyword_validator_base<Json>("prefixItems", schema_path), 
-              item_validators_(std::move(item_validators)), 
-              additional_items_validator_(std::move(additional_items_validator))
-        {
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
-        {
-            for (const auto& validator : item_validators_)
-            {
-                if (!validator->id())
-                {
-                    auto p = validator->match_dynamic_anchor(s);
-                    if (p != nullptr)
-                    {
-                        return p;
-                    }
-                }
-            }
-            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
-            {
-                auto p = additional_items_validator_->match_dynamic_anchor(s);
-                if (p != nullptr)
-                {
-                    return p;
-                }
-            }
-            return nullptr;
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter,
-            Json& patch) const final
-        {
-            if (!instance.is_array())
-            {
-                return;
-            }
-
-            size_t index = 0;
-            auto validator_it = item_validators_.cbegin();
-
-            evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            for (const auto& item : instance.array_range()) 
-            {
-                jsonpointer::json_pointer pointer(instance_location);
-
-                if (validator_it != item_validators_.cend())
-                {
-                    evaluation_context<Json> item_context{this_context, index};
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
-                    {
-                        results.unevaluated_items().insert(index);
-                    }
-                    ++validator_it;
-                    ++index;
-                }
-                else if (additional_items_validator_)
-                {
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
-                    if (errors < reporter.error_count())
-                    {
-                        results.unevaluated_items().insert(index);
-                    }
-                    ++index;
-                }
-                else
-                    break;
-
-            }
-        }
-    };
-
     // uniqueItems
 
     template <class Json>
@@ -3004,7 +2910,6 @@ namespace jsonschema {
                 if (errors == local_reporter.errors.size())
                 {
                     ++contains_count;
-                    break;
                 }
             }
             for (std::size_t i = index; i < instance.size(); ++i)
@@ -3030,7 +2935,132 @@ namespace jsonschema {
                     return;
                 }
             }
-            
+        }
+    };
+
+    template <class Json>
+    class prefix_items_validator : public keyword_validator_base<Json>
+    {
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+
+        std::vector<schema_validator_type> item_validators_;
+        schema_validator_type additional_items_validator_;
+        std::unique_ptr<contains_validator<Json>> contains_validator_;
+    public:
+        prefix_items_validator(const uri& schema_path, 
+            std::vector<schema_validator_type>&& item_validators,
+            schema_validator_type&& additional_items_validator)
+            : keyword_validator_base<Json>("prefixItems", schema_path), 
+              item_validators_(std::move(item_validators)), 
+              additional_items_validator_(std::move(additional_items_validator))
+        {
+        }
+        prefix_items_validator(const uri& schema_path, 
+            std::vector<schema_validator_type>&& item_validators,
+            schema_validator_type&& additional_items_validator,
+            std::unique_ptr<contains_validator<Json>>&& contains)
+            : keyword_validator_base<Json>("prefixItems", schema_path), 
+              item_validators_(std::move(item_validators)), 
+              additional_items_validator_(std::move(additional_items_validator)),
+              contains_validator_(std::move(contains))
+        {
+        }
+
+        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
+        {
+            for (const auto& validator : item_validators_)
+            {
+                if (!validator->id())
+                {
+                    auto p = validator->match_dynamic_anchor(s);
+                    if (p != nullptr)
+                    {
+                        return p;
+                    }
+                }
+            }
+            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
+            {
+                auto p = additional_items_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            if (contains_validator_ != nullptr) 
+            {
+                auto p = contains_validator_->match_dynamic_anchor(s);
+                if (p != nullptr)
+                {
+                    return p;
+                }
+            }
+            return nullptr;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& eval_context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter,
+            Json& patch) const final
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+        
+            size_t index = 0;
+            auto validator_it = item_validators_.cbegin();
+        
+            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+            for (const auto& item : instance.array_range()) 
+            {
+                jsonpointer::json_pointer pointer(instance_location);
+        
+                if (validator_it != item_validators_.cend())
+                {
+                    evaluation_context<Json> item_context{this_context, index};
+                    pointer /= index;
+                    std::size_t errors = reporter.error_count();
+                    (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
+                    if (errors < reporter.error_count())
+                    {
+                        results.unevaluated_items().insert(index);
+                    }
+                    ++validator_it;
+                    ++index;
+                }
+                else if (additional_items_validator_ || contains_validator_)
+                {
+                    if (additional_items_validator_)
+                    {
+                        pointer /= index;
+                        std::size_t errors = reporter.error_count();
+                        additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch);
+                        if (errors < reporter.error_count())
+                        {
+                            results.unevaluated_items().insert(index);
+                        }
+                    }
+                    if (contains_validator_)
+                    {
+                        pointer /= index;
+                        std::size_t errors = reporter.error_count();
+                        contains_validator_->validate(eval_context, item, pointer, results, reporter, patch);
+                        if (errors < reporter.error_count())
+                        {
+                            results.unevaluated_items().insert(index);
+                        }
+                    }
+                    ++index;
+                }
+                else
+                    break;
+        
+            }
         }
     };
 

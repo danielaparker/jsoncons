@@ -108,8 +108,11 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-ref.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-items.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
-        jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
+        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/contains.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/prefixItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/items.json");
     }
 
     SECTION("tests")
@@ -161,7 +164,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/propertyNames.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/ref.json"); 
 */
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
         
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
 
