@@ -52,8 +52,10 @@ namespace {
 
                 for (const auto& test_case : test_group["tests"].array_range()) 
                 {
+                    std::size_t errors = 0;
                     auto reporter = [&](const jsonschema::validation_output& o)
                     {
+                        ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());
                         if (test_case["valid"].as<bool>())
                         {
@@ -65,12 +67,17 @@ namespace {
                                 std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
                             }
                         }
-                        else
-                        {
-                            //std::cout << o.what() << "\n";
-                        }
                     };
                     validator.validate(test_case.at("data"), reporter);
+                    if (errors == 0)
+                    {
+                        CHECK(test_case["valid"].as<bool>());
+                        if (!test_case["valid"].as<bool>())
+                        {
+                            std::cout << "  File: " << fpath << "\n";
+                            std::cout << "  Test case: " << test_case["description"] << "\n";
+                        }
+                    }
                 }
             }
             catch (const std::exception& e)
