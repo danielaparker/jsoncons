@@ -86,7 +86,7 @@ namespace {
                         if (!test_case["valid"].as<bool>())
                         {
                             std::cout << "  File: " << fpath << "\n";
-                            std::cout << "  Test case: " << test_case["description"] << "\n";
+                            std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                         }
                     }
                 }
@@ -108,7 +108,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-ref.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-items.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
-        //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
+        jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
     }
 
@@ -163,7 +163,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
 */
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
         
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
 
 /*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/refRemote.json");

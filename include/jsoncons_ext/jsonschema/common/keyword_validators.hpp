@@ -1061,8 +1061,9 @@ namespace jsonschema {
         {
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
+            evaluation_results local_results;
             collecting_error_reporter local_reporter;
-            rule_->validate(this_context, instance, instance_location, results, local_reporter, patch);
+            rule_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
 
             if (local_reporter.errors.empty())
             {
@@ -1071,6 +1072,10 @@ namespace jsonschema {
                     this->schema_path(), 
                     instance_location.to_string(), 
                     "Instance must not be valid against schema"));
+            }
+            else
+            {
+                results.merge(local_results);
             }
         }
     };
@@ -1117,20 +1122,22 @@ namespace jsonschema {
         {
             //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
 
-            evaluation_results local_results;
             collecting_error_reporter local_reporter;
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
+            evaluation_results local_results1;
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
+                evaluation_results local_results2;
                 evaluation_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
-                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
                 if (errors == local_reporter.errors.size())
                 {
+                    local_results1.merge(local_results2);
                     ++count;
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1138,7 +1145,7 @@ namespace jsonschema {
 
             if (count > 0)
             {
-                results.merge(local_results);
+                results.merge(local_results1);
             }
             else 
             {
@@ -1194,20 +1201,22 @@ namespace jsonschema {
         {
             //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
 
-            evaluation_results local_results;
             collecting_error_reporter local_reporter;
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
+            evaluation_results local_results1;
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
+                evaluation_results local_results2;
                 evaluation_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
-                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
                 if (errors == local_reporter.errors.size())
                 {
+                    local_results1.merge(local_results2);
                     ++count;
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1215,7 +1224,7 @@ namespace jsonschema {
 
             if (count == 1)
             {
-                results.merge(local_results);
+                results.merge(local_results1);
             }
             else 
             {
@@ -1271,7 +1280,7 @@ namespace jsonschema {
         {
             //std::cout << "any_of_validator.do_validate " << eval_context.eval_path().to_string() << ", " << instance << "\n";
 
-            evaluation_results local_results;
+            evaluation_results local_results1;
             collecting_error_reporter local_reporter;
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
@@ -1279,12 +1288,14 @@ namespace jsonschema {
             std::size_t count = 0;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
+                evaluation_results local_results2;
                 evaluation_context<Json> item_context(this_context, i);
 
                 std::size_t errors = local_reporter.errors.size();
-                validators_[i]->validate(item_context, instance, instance_location, local_results, local_reporter, patch);
+                validators_[i]->validate(item_context, instance, instance_location, local_results2, local_reporter, patch);
                 if (errors == local_reporter.errors.size())
                 {
+                    local_results1.merge(local_results2);
                     ++count;
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
@@ -1292,7 +1303,7 @@ namespace jsonschema {
 
             if (count == validators_.size())
             {
-                results.merge(local_results);
+                results.merge(local_results1);
             }
             else 
             {
@@ -1812,7 +1823,7 @@ namespace jsonschema {
         {
             //std::cout << "unevaluated_properties_validator [" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
-            //for (const auto& s : results)
+            //for (const auto& s : results.evaluated_properties_)
             //{
             //    std::cout << "    " << s << "\n";
             //}

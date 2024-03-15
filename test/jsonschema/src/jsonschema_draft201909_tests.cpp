@@ -84,7 +84,7 @@ namespace {
                         if (!test_case["valid"].as<bool>())
                         {
                             std::cout << "  File: " << fpath << "\n";
-                            std::cout << "  Test case: " << test_case["description"] << "\n";
+                            std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                         }
                     }
                 }
