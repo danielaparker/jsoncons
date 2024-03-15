@@ -47,6 +47,7 @@ namespace {
         }
 
         json tests = json::parse(is); 
+        //std::cout << pretty_print(tests) << "\n";
 
         int count = 0;
         for (const auto& test_group : tests.array_range()) 
@@ -60,6 +61,7 @@ namespace {
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
                 {
+                    //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     auto reporter = [&](const jsonschema::validation_output& o)
                     {
@@ -73,10 +75,6 @@ namespace {
                             {
                                 std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
                             }
-                        }
-                        else
-                        {
-                            //std::cout << o.what() << "\n";
                         }
                     };
                     validator.validate(test_case.at("data"), reporter);
@@ -101,9 +99,6 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/allOf.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/anyOf.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/oneOf.json");
     }
 
     SECTION("tests")
@@ -155,9 +150,9 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/propertyNames.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/ref.json"); 
 */
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
         
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
 
 /*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/refRemote.json");

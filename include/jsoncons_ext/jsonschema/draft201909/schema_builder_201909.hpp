@@ -276,9 +276,12 @@ namespace draft201909 {
                 std::string sub_keys[] = { "else" };
                 else_validator = make_schema_validator(context, it->value(), sub_keys);
             }
-            validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                context.get_absolute_uri().string(),
-                std::move(if_validator), std::move(then_validator), std::move(else_validator)));
+            if (if_validator || then_validator || else_validator)
+            {
+                validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
+                    context.get_absolute_uri().string(),
+                    std::move(if_validator), std::move(then_validator), std::move(else_validator)));
+            }
             
             // Object validators
 
