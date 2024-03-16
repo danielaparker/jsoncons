@@ -80,40 +80,43 @@ namespace jsonschema {
         ~json_validator() = default;
 
         // Validate input JSON against a JSON Schema with a default throwing error reporter
-        Json validate(const Json& instance) const
+        Json validate(const Json& instance, 
+            const evaluation_options& options = evaluation_options{}) const
         {
             throwing_error_reporter reporter;
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             evaluation_results results;
-            root_->validate(instance, instance_location, results, reporter, patch);
+            root_->validate(instance, instance_location, results, reporter, patch, options);
             return patch;
         }
 
         // Validate input JSON against a JSON Schema 
-        bool is_valid(const Json& instance) const
+        bool is_valid(const Json& instance, 
+            const evaluation_options& options = evaluation_options{}) const
         {
             fail_early_reporter reporter;
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             evaluation_results results;
-            root_->validate(instance, instance_location, results, reporter, patch);
+            root_->validate(instance, instance_location, results, reporter, patch, options);
             return reporter.error_count() == 0;
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
         typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
-        validate(const Json& instance, const Reporter& reporter) const
+        validate(const Json& instance, const Reporter& reporter, 
+            const evaluation_options& options = evaluation_options{}) const
         {
             jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
             evaluation_results results;
-            root_->validate(instance, instance_location, results, adaptor, patch);
+            root_->validate(instance, instance_location, results, adaptor, patch, options);
             return patch;
         }
     };

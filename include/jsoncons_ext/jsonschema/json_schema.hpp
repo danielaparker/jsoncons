@@ -43,10 +43,11 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
             error_reporter& reporter, 
-            Json& patch) const 
+            Json& patch, 
+            const evaluation_options& options) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(evaluation_context<Json>{}, instance, instance_location, results, reporter, patch);
+            root_->validate(evaluation_context<Json>{}, instance, instance_location, results, reporter, patch, options);
         }
     };
 

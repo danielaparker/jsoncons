@@ -64,51 +64,65 @@ namespace jsonschema {
     
     struct evaluation_results
     {
-        std::unordered_set<std::string> evaluated_properties_;
-        std::unordered_set<std::size_t> evaluated_items_;
+        std::unordered_set<std::string> evaluated_properties;
+        std::unordered_set<std::size_t> evaluated_items;
 
         void merge(const evaluation_results& results)
         {
-            for (auto&& name : results.evaluated_properties_)
+            for (auto&& name : results.evaluated_properties)
             {
-                evaluated_properties_.insert(name);
+                evaluated_properties.insert(name);
             }
-            for (auto index : results.evaluated_items_)
+            for (auto index : results.evaluated_items)
             {
-                evaluated_items_.insert(index);
+                evaluated_items.insert(index);
             }
         }
         void merge(evaluation_results&& results)
         {
-            for (auto&& name : results.evaluated_properties_)
+            for (auto&& name : results.evaluated_properties)
             {
-                evaluated_properties_.insert(std::move(name));
+                evaluated_properties.insert(std::move(name));
             }
-            for (auto index : results.evaluated_items_)
+            for (auto index : results.evaluated_items)
             {
-                evaluated_items_.insert(index);
+                evaluated_items.insert(index);
             }
         }
         void merge(std::unordered_set<std::string>&& properties)
         {
             for (auto&& name : properties)
             {
-                evaluated_properties_.insert(std::move(name));
+                evaluated_properties.insert(std::move(name));
             }
         }
         void merge(const std::unordered_set<std::size_t>& items)
         {
             for (auto index : items)
             {
-                evaluated_items_.insert(index);
+                evaluated_items.insert(index);
             }
         }
-
-        std::unordered_set<std::string>& evaluated_properties() {return evaluated_properties_;}
-        const std::unordered_set<std::string>& evaluated_properties() const {return evaluated_properties_;}
-
-        std::unordered_set<std::size_t>& evaluated_items() {return evaluated_items_;}
-        const std::unordered_set<std::size_t>& evaluated_items() const {return evaluated_items_;}
+    };
+    
+    class evaluation_options
+    {
+        bool require_format_validation_;
+    public:
+        evaluation_options()
+            : require_format_validation_(false)
+        {
+        }
+        
+        bool require_format_validation() const
+        {
+            return require_format_validation_;
+        }
+        evaluation_options& require_format_validation(bool value) 
+        {
+            require_format_validation_ = value;
+            return *this;
+        }
     };
 
     template <class Json>
@@ -135,9 +149,10 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const 
+            Json& patch, 
+            const evaluation_options& options) const 
         {
-            do_validate(eval_context, instance, instance_location, results, reporter, patch);
+            do_validate(eval_context, instance, instance_location, results, reporter, patch, options);
         }
 
     private:
@@ -145,7 +160,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const = 0;
+            Json& patch, const evaluation_options& options) const = 0;
     };
 
     template <class Json>
@@ -302,7 +317,8 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json&) const final
+            Json& /*patch*/, 
+            const evaluation_options& /*options*/) const final
         {
             if (!value_)
             {
@@ -434,7 +450,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const final
+            Json& patch, const evaluation_options& options) const final
         {
             //std::cout << "object_schema_validator begin[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
@@ -451,7 +467,7 @@ namespace jsonschema {
             for (auto& validator : validators_)
             {               
                 //std::cout << "    " << validator->keyword_name() << "\n";
-                validator->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                validator->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
