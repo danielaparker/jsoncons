@@ -674,14 +674,14 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
         std::vector<schema_validator_type> item_validators_;
-        schema_validator_type additional_items_validator_;
+        schema_validator_type additional_items_val_;
     public:
         items_array_validator(const uri& schema_path, 
             std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_validator)
+            schema_validator_type&& additional_items_val)
             : keyword_validator_base<Json>("items", schema_path), 
               item_validators_(std::move(item_validators)), 
-              additional_items_validator_(std::move(additional_items_validator))
+              additional_items_val_(std::move(additional_items_val))
         {
         }
 
@@ -698,9 +698,9 @@ namespace jsonschema {
                     }
                 }
             }
-            if (additional_items_validator_ != nullptr && !additional_items_validator_->id()) 
+            if (additional_items_val_ != nullptr && !additional_items_val_->id()) 
             {
-                auto p = additional_items_validator_->match_dynamic_anchor(s);
+                auto p = additional_items_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -745,11 +745,11 @@ namespace jsonschema {
                     ++validator_it;
                     ++index;
                 }
-                else if (additional_items_validator_ != nullptr)
+                else if (additional_items_val_ != nullptr)
                 {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
-                    additional_items_validator_->validate(eval_context, item, pointer, results, reporter, patch, options);
+                    additional_items_val_->validate(eval_context, item, pointer, results, reporter, patch, options);
                     if (errors == reporter.error_count())
                     {
                         results.evaluated_items.insert(index);
@@ -769,20 +769,20 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type items_validator_;
+        schema_validator_type items_val_;
     public:
         items_object_validator(const uri& schema_path, 
-            schema_validator_type&& items_validator)
+            schema_validator_type&& items_val)
             : keyword_validator_base<Json>("items", schema_path), 
-              items_validator_(std::move(items_validator))
+              items_val_(std::move(items_val))
         {
         }
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            if (items_validator_ != nullptr && !items_validator_->id()) 
+            if (items_val_ != nullptr && !items_val_->id()) 
             {
-                auto p = items_validator_->match_dynamic_anchor(s);
+                auto p = items_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -807,7 +807,7 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
 
-            if (items_validator_)
+            if (items_val_)
             {
                 size_t index = 0;
                 for (const auto& item : instance.array_range()) 
@@ -815,7 +815,7 @@ namespace jsonschema {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
-                    items_validator_->validate(this_context, item, pointer, results, reporter, patch, options);
+                    items_val_->validate(this_context, item, pointer, results, reporter, patch, options);
                     if (errors == reporter.error_count())
                     {
                         results.evaluated_items.insert(index);
@@ -1731,43 +1731,43 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type if_validator_;
-        schema_validator_type then_validator_;
-        schema_validator_type else_validator_;
+        schema_validator_type if_val_;
+        schema_validator_type then_val_;
+        schema_validator_type else_val_;
 
     public:
         conditional_validator(const uri& schema_path,
-          schema_validator_type&& if_validator,
-          schema_validator_type&& then_validator,
-          schema_validator_type&& else_validator
+          schema_validator_type&& if_val,
+          schema_validator_type&& then_val,
+          schema_validator_type&& else_val
         ) : keyword_validator_base<Json>("", std::move(schema_path)), 
-              if_validator_(std::move(if_validator)), 
-              then_validator_(std::move(then_validator)), 
-              else_validator_(std::move(else_validator))
+              if_val_(std::move(if_val)), 
+              then_val_(std::move(then_val)), 
+              else_val_(std::move(else_val))
         {
         }
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            if (if_validator_ != nullptr && !if_validator_->id()) 
+            if (if_val_ != nullptr && !if_val_->id()) 
             {
-                auto p = if_validator_->match_dynamic_anchor(s);
+                auto p = if_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
                 }
             }
-            if (then_validator_ != nullptr && !then_validator_->id()) 
+            if (then_val_ != nullptr && !then_val_->id()) 
             {
-                auto p = then_validator_->match_dynamic_anchor(s);
+                auto p = then_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
                 }
             }
-            if (else_validator_ != nullptr && !else_validator_->id()) 
+            if (else_val_ != nullptr && !else_val_->id()) 
             {
-                auto p = else_validator_->match_dynamic_anchor(s);
+                auto p = else_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -1786,20 +1786,20 @@ namespace jsonschema {
             const evaluation_options& options) const final
         {
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            if (if_validator_) 
+            if (if_val_) 
             {
                 collecting_error_reporter local_reporter;
 
-                if_validator_->validate(this_context, instance, instance_location, results, local_reporter, patch, options);
+                if_val_->validate(this_context, instance, instance_location, results, local_reporter, patch, options);
                 if (local_reporter.errors.empty()) 
                 {
-                    if (then_validator_)
-                        then_validator_->validate(this_context, instance, instance_location, results, reporter, patch, options);
+                    if (then_val_)
+                        then_val_->validate(this_context, instance, instance_location, results, reporter, patch, options);
                 } 
                 else 
                 {
-                    if (else_validator_)
-                        else_validator_->validate(this_context, instance, instance_location, results, reporter, patch, options);
+                    if (else_val_)
+                        else_val_->validate(this_context, instance, instance_location, results, reporter, patch, options);
                 }
             }
         }
@@ -2861,14 +2861,14 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
         std::vector<schema_validator_type> prefix_items_validators_;
-        schema_validator_type items_validator_;
+        schema_validator_type items_val_;
     public:
         prefix_items_validator(const uri& schema_path, 
             std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_validator)
+            schema_validator_type&& additional_items_val)
             : keyword_validator_base<Json>("prefixItems", schema_path), 
               prefix_items_validators_(std::move(item_validators)), 
-              items_validator_(std::move(additional_items_validator))
+              items_val_(std::move(additional_items_val))
         {
         }
 
@@ -2885,9 +2885,9 @@ namespace jsonschema {
                     }
                 }
             }
-            if (items_validator_ != nullptr && !items_validator_->id()) 
+            if (items_val_ != nullptr && !items_val_->id()) 
             {
-                auto p = items_validator_->match_dynamic_anchor(s);
+                auto p = items_val_->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -2934,16 +2934,16 @@ namespace jsonschema {
                 ++it;
                 ++index;
             }
-            if (items_validator_)
+            if (items_val_)
             {
                 while (it != end_it)
                 {
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    if (items_validator_)
+                    if (items_val_)
                     {
                         std::size_t errors = reporter.error_count();
-                        items_validator_->validate(eval_context, *it, pointer, results, reporter, patch, options);
+                        items_val_->validate(eval_context, *it, pointer, results, reporter, patch, options);
                         if (errors == reporter.error_count())
                         {
                             results.evaluated_items.insert(index);
