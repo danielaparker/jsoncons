@@ -341,10 +341,10 @@ namespace jsonschema {
 
     public:
         unevaluated_properties_validator(const uri& schema_path,
-            schema_validator_type&& validator
+            schema_validator_type&& val
         )
             : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_path)), 
-              validator_(std::move(validator))
+              validator_(std::move(val))
         {
         }
 
@@ -416,10 +416,10 @@ namespace jsonschema {
 
     public:
         unevaluated_items_validator(const uri& schema_path,
-            schema_validator_type&& validator
+            schema_validator_type&& val
         )
             : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_path)), 
-              validator_(std::move(validator))
+              validator_(std::move(val))
         {
         }
 
@@ -600,9 +600,9 @@ namespace jsonschema {
             }
 
             //std::cout << "    " << "checking validators\n";
-            for (const auto& validator : validators_)
+            for (const auto& val : validators_)
             {
-                const schema_validator<Json>* p = validator->match_dynamic_anchor(s);
+                const schema_validator<Json>* p = val->match_dynamic_anchor(s);
                 if (p != nullptr)
                 {
                     return p;
@@ -651,10 +651,10 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context{eval_context, this};
             //std::cout << "validators:\n";
-            for (auto& validator : validators_)
+            for (auto& val : validators_)
             {               
-                //std::cout << "    " << validator->keyword_name() << "\n";
-                validator->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
+                //std::cout << "    " << val->keyword_name() << "\n";
+                val->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;

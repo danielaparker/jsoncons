@@ -687,11 +687,11 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : item_validators_)
+            for (const auto& val : item_validators_)
             {
-                if (!validator->id())
+                if (!val->id())
                 {
-                    auto p = validator->match_dynamic_anchor(s);
+                    auto p = val->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
                         return p;
@@ -1026,11 +1026,11 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : validators_)
+            for (const auto& val : validators_)
             {
-                if (!validator->id())
+                if (!val->id())
                 {
-                    auto p = validator->match_dynamic_anchor(s);
+                    auto p = val->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
                         return p;
@@ -1106,11 +1106,11 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : validators_)
+            for (const auto& val : validators_)
             {
-                if (!validator->id())
+                if (!val->id())
                 {
-                    auto p = validator->match_dynamic_anchor(s);
+                    auto p = val->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
                         return p;
@@ -1186,11 +1186,11 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : validators_)
+            for (const auto& val : validators_)
             {
-                if (!validator->id())
+                if (!val->id())
                 {
-                    auto p = validator->match_dynamic_anchor(s);
+                    auto p = val->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
                         return p;
@@ -2874,11 +2874,11 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            for (const auto& validator : prefix_items_validators_)
+            for (const auto& val : prefix_items_validators_)
             {
-                if (!validator->id())
+                if (!val->id())
                 {
-                    auto p = validator->match_dynamic_anchor(s);
+                    auto p = val->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
                         return p;
@@ -2915,7 +2915,7 @@ namespace jsonschema {
             auto end_it = instance.array_range().cend();
         
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
-            for (const auto& validator : prefix_items_validators_) 
+            for (const auto& val : prefix_items_validators_) 
             {
                 if (it == end_it)
                 {
@@ -2926,7 +2926,7 @@ namespace jsonschema {
         
                 evaluation_context<Json> item_context{this_context, index};
                 std::size_t errors = reporter.error_count();
-                validator->validate(item_context, *it, pointer, results, reporter, patch, options);
+                val->validate(item_context, *it, pointer, results, reporter, patch, options);
                 if (errors == reporter.error_count())
                 {
                     results.evaluated_items.insert(index);
