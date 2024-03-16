@@ -185,6 +185,8 @@ namespace draft202012 {
             jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{jsoncons::null_type()};
             std::vector<keyword_validator_type> validators;
+            std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
+            std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;
             std::set<std::string> known_keywords;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
@@ -350,21 +352,20 @@ namespace draft202012 {
                 }
             }
             
-            // Must be last
             it = sch.find("unevaluatedProperties");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(this->make_unevaluated_properties_validator(context, it->value()));
+                unevaluated_properties_val = this->make_unevaluated_properties_validator(context, it->value());
             }
-
             it = sch.find("unevaluatedItems");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(this->make_unevaluated_items_validator(context, it->value()));
+                unevaluated_items_val = this->make_unevaluated_items_validator(context, it->value());
             }
             
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
-                std::move(validators), std::move(defs), std::move(default_value), std::move(dynamic_anchor));
+                std::move(validators), std::move(unevaluated_properties_val), std::move(unevaluated_items_val), 
+                std::move(defs), std::move(default_value), std::move(dynamic_anchor));
         }
 
         std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 
