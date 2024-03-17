@@ -2138,10 +2138,10 @@ namespace jsonschema {
                 // check if it is in "properties"
                 if (properties_it != properties_.end()) 
                 {
-                    std::size_t error_count = reporter.error_count();
+                    std::size_t errors = reporter.error_count();
                     properties_it->second->validate(prop_context, prop.value() , pointer, results, reporter, patch, options);
                     all_properties.insert(prop.key());
-                    if (reporter.error_count() == error_count)
+                    if (eval_context.require_evaluated_properties() && errors == reporter.error_count())
                     {
                         results.evaluated_properties.insert(prop.key());
                     }
@@ -2257,9 +2257,9 @@ namespace jsonschema {
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
                         all_properties.insert(prop.key());
-                        std::size_t error_count = reporter.error_count();
+                        std::size_t errors = reporter.error_count();
                         schema_pp.second->validate(prop_context, prop.value() , pointer, results, reporter, patch, options);
-                        if (reporter.error_count() == error_count)
+                        if (eval_context.require_evaluated_properties() && errors == reporter.error_count())
                         {
                             results.evaluated_properties.insert(prop.key());
                         }
@@ -2400,7 +2400,7 @@ namespace jsonschema {
                                 return;
                             }
                         }
-                        else
+                        else if (eval_context.require_evaluated_properties())
                         {
                             results.evaluated_properties.insert(prop.key());
                         }
