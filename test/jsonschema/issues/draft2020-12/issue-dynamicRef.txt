@@ -19,3 +19,28 @@
 }
 
 "a" "non-number is invalid"
+    #
+uri: http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo, base: http://localhost:1234/draft2020-12/detached-dynamicref.json
+
+schema_store before load external:
+    #
+uri: http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo, base: http://localhost:1234/draft2020-12/detached-dynamicref.json
+schema_store after load external:
+    #
+    http://localhost:1234/draft2020-12/detached-dynamicref.json
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo
+Unresolved refs
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo
+
+schema_store before load external:
+    http://localhost:1234/draft2020-12/detached-dynamicref.json
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/detached
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#detached
+schema_store after load external:
+    http://localhost:1234/draft2020-12/detached-dynamicref.json
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/detached
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#detached
+Unresolved refs
+    http://localhost:1234/draft2020-12/detached-dynamicref.json#detached

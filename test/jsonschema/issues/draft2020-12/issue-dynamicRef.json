@@ -11,7 +11,7 @@
                 "valid": false
             }
         ]
-    }/*,
+    },
     {
         "description": "$ref to $dynamicRef finds detached $dynamicAnchor",
         "schema": {
@@ -35,6 +35,6 @@
                 "valid": false
             }
         ]
-    }*/
+    }
 ]
 
