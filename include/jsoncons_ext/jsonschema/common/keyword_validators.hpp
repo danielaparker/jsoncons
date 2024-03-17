@@ -2245,7 +2245,7 @@ namespace jsonschema {
             {
                 return;
             }
-            evaluation_context<Json> this_context(eval_context, this->keyword_name());
+            evaluation_context<Json> this_context(eval_context, this->keyword_name(), evaluation_flags{});
             for (const auto& prop : instance.object_range()) 
             {
                 evaluation_context<Json> prop_context{this_context, prop.key()};
