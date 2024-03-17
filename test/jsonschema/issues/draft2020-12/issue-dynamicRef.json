@@ -1,36 +1,40 @@
 [
     {
-        "description": "A $dynamicRef with a non-matching $dynamicAnchor in the same schema resource behaves like a normal $ref to $anchor",
+        "description": "$ref to $dynamicRef finds detached $dynamicAnchor",
         "schema": {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": "https://test.json-schema.org/unmatched-dynamic-anchor/root",
-            "$ref": "list",
-            "$defs": {
-                "foo": {
-                    "$dynamicAnchor": "items",
-                    "type": "string"
-                },
-                "list": {
-                    "$id": "list",
-                    "type": "array",
-                    "items": { "$dynamicRef": "#items" },
-                    "$defs": {
-                        "items": {
-                            "$comment": "This is only needed to give the reference somewhere to resolve to when it behaves like $ref",
-                            "$anchor": "items",
-                            "$dynamicAnchor": "foo"
-                        }
-                    }
-                }
-            }
+            "$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
         },
         "tests": [
             {
-                "description": "Any array is valid",
-                "data": ["foo", 42],
-                "valid": true
+                "description": "non-number is invalid",
+                "data": "a",
+                "valid": false
             }
         ]
-    }
+    }/*,
+    {
+        "description": "$ref to $dynamicRef finds detached $dynamicAnchor",
+        "schema": {
+            "$id": "http://localhost:1234/draft2020-12/detached-dynamicref.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$defs": {
+              "foo": {
+                "$dynamicRef": "#detached"
+              },
+              "detached": {
+                "$dynamicAnchor": "detached",
+                "type": "integer"
+              }
+            },
+            "$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
+        },
+        "tests": [
+            {
+                "description": "non-number is invalid",
+                "data": "a",
+                "valid": false
+            }
+        ]
+    }*/
 ]
 

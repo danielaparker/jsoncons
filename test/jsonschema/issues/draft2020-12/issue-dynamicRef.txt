@@ -1,28 +1,21 @@
+"$ref to $dynamicRef finds detached $dynamicAnchor"
+
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://test.json-schema.org/unmatched-dynamic-anchor/root",
-    "$ref": "list",
-    "$defs": {
-        "foo": {
-            "$dynamicAnchor": "items",
-            "type": "string"
-        },
-        "list": {
-            "$id": "list",
-            "type": "array",
-            "items": { "$dynamicRef": "#items" },
-            "$defs": {
-                "items": {
-                    "$comment": "This is only needed to give the reference somewhere to resolve to when it behaves like $ref",
-                    "$anchor": "items",
-                    "$dynamicAnchor": "foo"
-                }
-            }
-        }
+  "$id": "http://localhost:1234/draft2020-12/detached-dynamicref.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "foo": {
+      "$dynamicRef": "#detached"
+    },
+    "detached": {
+      "$dynamicAnchor": "detached",
+      "type": "integer"
     }
+  }
 }
 
-Any array is valid ["foo", 42] 
+{
+    "$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
+}
 
-  Test case 1.1: "Any array is valid"
-  Failed: /1: Expected 1 string, found uint64
+"a" "non-number is invalid"

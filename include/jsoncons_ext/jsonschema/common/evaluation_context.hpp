@@ -63,7 +63,7 @@ namespace jsonschema {
     class evaluation_context
     {
     private:
-        std::vector<const schema_validator<Json> *> dynamic_scope_;
+        std::vector<const schema_validator<Json>*> dynamic_scope_;
         jsonpointer::json_pointer eval_path_;
         evaluation_flags flags_;
     public:

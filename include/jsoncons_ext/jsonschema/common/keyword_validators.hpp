@@ -14,6 +14,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/format_validator.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -162,11 +163,11 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        jsoncons::uri value_;
+        uri_wrapper value_;
         const schema_validator<Json>* tentative_target_;
 
     public:
-        dynamic_ref_validator(const uri& schema_path, const jsoncons::uri& value) 
+        dynamic_ref_validator(const uri& schema_path, const uri_wrapper& value) 
             : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
         {
             //std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
@@ -174,7 +175,7 @@ namespace jsonschema {
 
         void set_referred_schema(const schema_validator<Json>* target) final { tentative_target_ = target; }
 
-        const jsoncons::uri& value() const { return value_; }
+        const jsoncons::uri& value() const { return value_.uri(); }
 
         uri get_base_uri() const
         {
@@ -213,7 +214,7 @@ namespace jsonschema {
             evaluation_context<Json> this_context(eval_context, this->keyword_name());
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
-            if (schema_ptr->dynamic_anchor())
+            if (value_.has_plain_name_fragment() && schema_ptr->dynamic_anchor())
             {
                 while (rit != rend)
                 {
