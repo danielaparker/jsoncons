@@ -738,9 +738,12 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     (*validator_it)->validate(item_context, item, pointer, results, reporter, patch, options);
-                    if (errors == reporter.error_count())
+                    if (eval_context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        if (errors == reporter.error_count())
+                        {
+                            results.evaluated_items.insert(index);
+                        }
                     }
                     ++validator_it;
                     ++index;
@@ -750,9 +753,12 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     additional_items_val_->validate(eval_context, item, pointer, results, reporter, patch, options);
-                    if (errors == reporter.error_count())
+                    if (eval_context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        if (errors == reporter.error_count())
+                        {
+                            results.evaluated_items.insert(index);
+                        }
                     }
                     ++index;
                 }
@@ -816,9 +822,12 @@ namespace jsonschema {
                     pointer /= index;
                     std::size_t errors = reporter.error_count();
                     items_val_->validate(this_context, item, pointer, results, reporter, patch, options);
-                    if (errors == reporter.error_count())
+                    if (eval_context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        if (errors == reporter.error_count())
+                        {
+                            results.evaluated_items.insert(index);
+                        }
                     }
                     ++index;
                 }
@@ -2141,9 +2150,12 @@ namespace jsonschema {
                     std::size_t error_count = reporter.error_count();
                     properties_it->second->validate(prop_context, prop.value() , pointer, results, reporter, patch, options);
                     all_properties.insert(prop.key());
-                    if (reporter.error_count() == error_count)
+                    if (eval_context.require_evaluated_properties())
                     {
-                        results.evaluated_properties.insert(prop.key());
+                        if (reporter.error_count() == error_count)
+                        {
+                            results.evaluated_properties.insert(prop.key());
+                        }
                     }
                 }
             }
@@ -2259,9 +2271,12 @@ namespace jsonschema {
                         all_properties.insert(prop.key());
                         std::size_t error_count = reporter.error_count();
                         schema_pp.second->validate(prop_context, prop.value() , pointer, results, reporter, patch, options);
-                        if (reporter.error_count() == error_count)
+                        if (eval_context.require_evaluated_properties())
                         {
-                            results.evaluated_properties.insert(prop.key());
+                            if (reporter.error_count() == error_count)
+                            {
+                                results.evaluated_properties.insert(prop.key());
+                            }
                         }
                     }
             }
@@ -2400,7 +2415,7 @@ namespace jsonschema {
                                 return;
                             }
                         }
-                        else
+                        else if (eval_context.require_evaluated_properties())
                         {
                             results.evaluated_properties.insert(prop.key());
                         }
@@ -2819,10 +2834,13 @@ namespace jsonschema {
             {
                 std::size_t errors = local_reporter.errors.size();
                 schema_validator_->validate(this_context, item, instance_location, results, local_reporter, patch, options);
-                if (errors == local_reporter.errors.size())
+                if (eval_context.require_evaluated_items())
                 {
-                    results.evaluated_items.insert(index);
-                    ++contains_count;
+                    if (errors == local_reporter.errors.size())
+                    {
+                        results.evaluated_items.insert(index);
+                        ++contains_count;
+                    }
                 }
                 ++index;
             }
@@ -2927,9 +2945,12 @@ namespace jsonschema {
                 evaluation_context<Json> item_context{this_context, index};
                 std::size_t errors = reporter.error_count();
                 val->validate(item_context, *it, pointer, results, reporter, patch, options);
-                if (errors == reporter.error_count())
+                if (eval_context.require_evaluated_items())
                 {
-                    results.evaluated_items.insert(index);
+                    if (errors == reporter.error_count())
+                    {
+                        results.evaluated_items.insert(index);
+                    }
                 }
                 ++it;
                 ++index;
@@ -2944,9 +2965,12 @@ namespace jsonschema {
                     {
                         std::size_t errors = reporter.error_count();
                         items_val_->validate(eval_context, *it, pointer, results, reporter, patch, options);
-                        if (errors == reporter.error_count())
+                        if (eval_context.require_evaluated_items())
                         {
-                            results.evaluated_items.insert(index);
+                            if (errors == reporter.error_count())
+                            {
+                                results.evaluated_items.insert(index);
+                            }
                         }
                     }
                     ++it;

@@ -646,10 +646,14 @@ namespace jsonschema {
             //    std::cout << "    " << s << "\n";
             //}
             //std::cout << "\n";
-
+          
+            
             evaluation_results local_results;
 
-            evaluation_context<Json> this_context{eval_context, this};
+            bool require_evaluated_properties = eval_context.require_evaluated_properties() || unevaluated_properties_val_ != nullptr;
+            bool require_evaluated_items = eval_context.require_evaluated_items() || unevaluated_items_val_ != nullptr;
+            evaluation_context<Json> this_context{eval_context, this, require_evaluated_properties, require_evaluated_items};
+            
             //std::cout << "validators:\n";
             for (auto& val : validators_)
             {               
@@ -679,7 +683,14 @@ namespace jsonschema {
                 }
             }
 
-            results.merge(std::move(local_results));
+            if (eval_context.require_evaluated_properties())
+            {
+                results.merge(std::move(local_results.evaluated_properties));
+            }
+            if (eval_context.require_evaluated_items())
+            {
+                results.merge(std::move(local_results.evaluated_items));
+            }
             
             //std::cout << "object_schema_validator end[" << eval_context.eval_path().to_string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";

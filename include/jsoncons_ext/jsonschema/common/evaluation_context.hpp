@@ -25,26 +25,44 @@ namespace jsonschema {
     private:
         std::vector<const schema_validator<Json> *> dynamic_scope_;
         jsonpointer::json_pointer eval_path_;
+        bool require_evaluated_properties_;
+        bool require_evaluated_items_;
     public:
         evaluation_context()
+            : require_evaluated_properties_(false), require_evaluated_items_(false)
         {
         }
 
         evaluation_context(const evaluation_context& other)
-            : dynamic_scope_ { other.dynamic_scope_}, eval_path_{other.eval_path_}
+            : dynamic_scope_ { other.dynamic_scope_}, eval_path_{other.eval_path_},
+              require_evaluated_properties_(other.require_evaluated_properties_), 
+              require_evaluated_items_(other.require_evaluated_items_)
         {
         }
 
         evaluation_context(evaluation_context&& other)
-        : dynamic_scope_
-        {std::move(other.dynamic_scope_)}
-        ,
-        eval_path_{std::move(other.eval_path_)}
+            : dynamic_scope_{std::move(other.dynamic_scope_)},eval_path_{std::move(other.eval_path_)},
+              require_evaluated_properties_(other.require_evaluated_properties_), 
+              require_evaluated_items_(other.require_evaluated_items_)
         {
         }
 
         evaluation_context(const evaluation_context& parent, const schema_validator<Json> *validator)
-            : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ }
+            : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
+              require_evaluated_properties_(parent.require_evaluated_properties_), 
+              require_evaluated_items_(parent.require_evaluated_items_)
+        {
+            if (validator->id()|| dynamic_scope_.empty())
+            {
+                dynamic_scope_.push_back(validator);
+            }
+        }
+
+        evaluation_context(const evaluation_context& parent, const schema_validator<Json> *validator,
+            bool require_evaluated_properties, bool require_evaluated_items)
+            : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
+              require_evaluated_properties_(require_evaluated_properties), 
+              require_evaluated_items_(require_evaluated_items)
         {
             if (validator->id()|| dynamic_scope_.empty())
             {
@@ -53,12 +71,17 @@ namespace jsonschema {
         }
 
         evaluation_context(const evaluation_context& parent, const std::string& name)
-            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
+              require_evaluated_properties_(parent.require_evaluated_properties_), 
+              require_evaluated_items_(parent.require_evaluated_items_)
+              
         {
         }
 
         evaluation_context(const evaluation_context& parent, std::size_t index)
-            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index),
+              require_evaluated_properties_(parent.require_evaluated_properties_), 
+              require_evaluated_items_(parent.require_evaluated_items_)
         {
         }
 
@@ -70,6 +93,16 @@ namespace jsonschema {
         const jsonpointer::json_pointer& eval_path() const
         {
             return eval_path_;
+        }
+        
+        bool require_evaluated_properties() const
+        {
+            return require_evaluated_properties_;
+        }
+
+        bool require_evaluated_items() const
+        {
+            return require_evaluated_items_;
         }
     }; 
 
