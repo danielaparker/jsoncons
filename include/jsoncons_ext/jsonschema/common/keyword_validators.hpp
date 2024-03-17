@@ -2124,7 +2124,7 @@ namespace jsonschema {
             //}
             //std::cout << "\n";
 
-            evaluation_context<Json> this_context(eval_context, this->keyword_name(), false, false);
+            evaluation_context<Json> this_context(eval_context, this->keyword_name(), evaluation_flags{});
 
             for (const auto& prop : instance.object_range()) 
             {
