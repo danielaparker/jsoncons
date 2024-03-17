@@ -134,8 +134,9 @@ namespace jsonpath {
 
     enum class result_options {value=0, nodups=1, sort=2, sort_descending=4, path=8};
 
-    using result_type = result_options;
-
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use result_options") typedef result_options result_type;
+#endif
     inline result_options operator~(result_options a)
     {
         return static_cast<result_options>(~static_cast<unsigned int>(a));

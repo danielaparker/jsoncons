@@ -265,4 +265,6 @@ __jsonpointer__|&nbsp;|&nbsp;
 &nbsp;|`unflatten_options::object`|`unflatten_options::assume_object`
 &nbsp;|`insert_or_assign`|`add`
 &nbsp;|`insert`|`add_if_absent`
+`jsonpath.hpp`|&nbsp;|&nbsp;
+&nbsp;|`result_type`|`result_options`
 
