@@ -78,10 +78,26 @@ namespace jsonschema {
         {
         }
 
+        evaluation_context(const evaluation_context& parent, const std::string& name,
+            bool require_evaluated_properties, bool require_evaluated_items)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
+              require_evaluated_properties_(require_evaluated_properties), 
+              require_evaluated_items_(require_evaluated_items)
+        {
+        }
+
         evaluation_context(const evaluation_context& parent, std::size_t index)
             : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index),
               require_evaluated_properties_(parent.require_evaluated_properties_), 
               require_evaluated_items_(parent.require_evaluated_items_)
+        {
+        }
+
+        evaluation_context(const evaluation_context& parent, std::size_t index,
+            bool require_evaluated_properties, bool require_evaluated_items)
+            : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index),
+              require_evaluated_properties_(require_evaluated_properties), 
+              require_evaluated_items_(require_evaluated_items)
         {
         }
 

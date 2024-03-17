@@ -78,17 +78,6 @@ namespace jsonschema {
                 evaluated_items.insert(index);
             }
         }
-        void merge(evaluation_results&& results)
-        {
-            for (auto&& name : results.evaluated_properties)
-            {
-                evaluated_properties.insert(std::move(name));
-            }
-            for (auto index : results.evaluated_items)
-            {
-                evaluated_items.insert(index);
-            }
-        }
         void merge(std::unordered_set<std::string>&& properties)
         {
             for (auto&& name : properties)
