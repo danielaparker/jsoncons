@@ -85,7 +85,8 @@ namespace jsonschema {
                         {
                             Json external_sch = resolver_(loc.base());
 
-                            this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), external_sch, {}));
+                            std::cout << "uri: " << loc.string() << ", base: " << loc.base().string() << "\n";
+                            this->save_schema(make_schema_validator(compilation_context{}, external_sch, {}));
                             ++loaded_count;
                         }
                         else
