@@ -176,7 +176,7 @@ namespace jsonschema {
 
         void set_referred_schema(const schema_validator<Json>* target) final { tentative_target_ = target; }
 
-        const jsoncons::uri& value() const { uri_; }
+        const jsoncons::uri& value() const { return uri_; }
 
         uri get_base_uri() const
         {
