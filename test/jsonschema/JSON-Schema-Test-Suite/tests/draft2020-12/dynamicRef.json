@@ -116,7 +116,7 @@
                 "valid": false
             }
         ]
-    }/*,
+    },
     {
         "description": "A $dynamicRef without anchor in fragment behaves identical to $ref",
         "schema": {
@@ -154,7 +154,7 @@
                 "valid": true
             }
         ]
-    }*/,
+    },
     {
         "description": "A $dynamicRef with intermediate scopes that don't include a matching $dynamicAnchor does not affect dynamic scope resolution",
         "schema": {
