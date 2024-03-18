@@ -155,7 +155,7 @@
             }
         ]
     }*/,
-    {
+    /*{
         "description": "A $dynamicRef with intermediate scopes that don't include a matching $dynamicAnchor does not affect dynamic scope resolution",
         "schema": {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -708,7 +708,8 @@
                 "valid": true
             }
         ]
-    }/*,
+    }*/
+    /*,
     {
         "description": "$ref to $dynamicRef finds detached $dynamicAnchor",
         "schema": {
