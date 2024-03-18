@@ -63,6 +63,19 @@ namespace jsonschema {
             return dynamic_anchor_;
         }
 
+        bool has_dynamic_anchor(const std::string& anchor) const final
+        {
+            return false;
+        }
+
+        void insert_dynamic_anchor(const std::string& /*anchor*/) final
+        {
+        }
+
+        void insert_dynamic_anchor(std::string&& /*anchor*/) final
+        {
+        }
+
         const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
         {
             return nullptr;
@@ -104,6 +117,7 @@ namespace jsonschema {
         Json default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
+        std::unordered_set<std::string> dynamic_anchors_;
 
     public:
         object_schema_validator(const uri& schema_path, 
@@ -175,6 +189,23 @@ namespace jsonschema {
         {
             return id_;
         }
+
+        bool has_dynamic_anchor(const std::string& anchor) const final
+        {
+            auto it = dynamic_anchors_.find(anchor);
+            return it == dynamic_anchors_.end() ? false : true;
+        }
+
+        void insert_dynamic_anchor(const std::string& anchor) final
+        {
+            dynamic_anchors_.insert(anchor);
+        }
+
+        void insert_dynamic_anchor(std::string&& anchor) final
+        {
+            dynamic_anchors_.insert(std::move(anchor));
+        }
+
 
         const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
