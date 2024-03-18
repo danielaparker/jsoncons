@@ -387,7 +387,7 @@ namespace jsonschema {
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
         {
-            //std::cout << "match_dynamic_anchor " << s << ", " << this->schema_path().string() << ", id: " << (id_ ? id_->string() : "") << "\n";
+            std::cout << "start match_dynamic_anchor " << s << ", " << this->schema_path().string() << ", id: " << (id_ ? id_->string() : "") << "\n";
             if (dynamic_anchor_)
             {
                 //std::cout << ", fragment: " << dynamic_anchor_.value().fragment() << "\n";
@@ -416,6 +416,7 @@ namespace jsonschema {
                     const schema_validator<Json>* p = member.second->match_dynamic_anchor(s);
                     if (p != nullptr)
                     {
+                        std::cout << "end match_dynamic_anchor, found match\n";
                         return p;
                     }
                 }
@@ -424,6 +425,7 @@ namespace jsonschema {
                 //    std::cout << "    Skipping " << member.second->id()->string() << "\n"; 
                 //}
             }
+            std::cout << "end match_dynamic_anchor, match not found\n";
             
             return nullptr;
         }
