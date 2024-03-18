@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <unordered_set>
 
 namespace jsoncons {

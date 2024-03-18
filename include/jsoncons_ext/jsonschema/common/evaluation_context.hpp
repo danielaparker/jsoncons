@@ -88,7 +88,7 @@ namespace jsonschema {
             : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
               flags_(parent.flags_)
         {
-            if (validator->id()|| dynamic_scope_.empty())
+            if (validator->id() || dynamic_scope_.empty())
             {
                 dynamic_scope_.push_back(validator);
             }
@@ -99,7 +99,7 @@ namespace jsonschema {
             : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
               flags_(flags)
         {
-            if (validator->id()|| dynamic_scope_.empty())
+            if (validator->id() || dynamic_scope_.empty())
             {
                 dynamic_scope_.push_back(validator);
             }

@@ -12,7 +12,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
-#include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_draft202012.hpp>
 #include <cassert>
@@ -179,8 +179,8 @@ namespace draft202012 {
             return schema_validator_ptr;
         }
 
-        schema_validator_type make_object_schema_validator( 
-            const compilation_context& context, const Json& sch)
+        schema_validator_type make_object_schema_validator(const compilation_context& context, 
+            const Json& sch)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{jsoncons::null_type()};
