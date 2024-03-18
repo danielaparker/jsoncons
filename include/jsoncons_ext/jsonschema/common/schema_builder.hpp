@@ -63,11 +63,11 @@ namespace jsonschema {
 
         std::shared_ptr<json_schema<Json>> get_schema()
         {                        
-            std::cout << "schema_store before load external:\n";
-            for (auto& member : schema_store_)
-            {
-                std::cout << "    " << member.first.string() << "\n";
-            }
+            //std::cout << "schema_store:\n";
+            //for (auto& member : schema_store_)
+            //{
+            //    std::cout << "    " << member.first.string() << "\n";
+            //}
 
             // load all external schemas that have not already been loaded
             std::size_t loaded_count = 0;
@@ -85,8 +85,7 @@ namespace jsonschema {
                         {
                             Json external_sch = resolver_(loc.base());
 
-                            std::cout << "uri: " << loc.string() << ", base: " << loc.base().string() << "\n";
-                            this->save_schema(make_schema_validator(compilation_context{}, external_sch, {}));
+                            this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), external_sch, {}));
                             ++loaded_count;
                         }
                         else
@@ -97,12 +96,6 @@ namespace jsonschema {
                 }
             } while (loaded_count > 0);
 
-            std::cout << "schema_store after load external:\n";
-            for (auto& member : schema_store_)
-            {
-                std::cout << "    " << member.first.string() << "\n";
-            }
-
             resolve_references();
 
             return std::make_shared<json_schema<Json>>(std::move(schemas_), std::move(root_));
@@ -110,10 +103,8 @@ namespace jsonschema {
 
         void resolve_references()
         {
-            std::cout << "Unresolved refs\n";
             for (auto& ref : unresolved_refs_)
             {
-                std::cout << "    " << ref.first.string() << "\n";
                 auto it = schema_store_.find(ref.first);
                 if (it == schema_store_.end())
                 {

@@ -164,7 +164,6 @@ namespace jsonschema {
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
         uri_wrapper value_;
-        uri uri_;
         const schema_validator<Json>* tentative_target_;
 
     public:
@@ -172,12 +171,11 @@ namespace jsonschema {
             : keyword_validator_base<Json>("$dynamicRef", schema_path), value_(value)
         {
             //std::cout << "dynamic_ref_validator path: " << schema_path.string() << ", value: " << value.string() << "\n";
-            uri_ = value_.uri();
         }
 
         void set_referred_schema(const schema_validator<Json>* target) final { tentative_target_ = target; }
 
-        const jsoncons::uri& value() const { return uri_; }
+        const jsoncons::uri& value() const { return value_.uri(); }
 
         uri get_base_uri() const
         {
