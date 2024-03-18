@@ -639,17 +639,9 @@ namespace jsonschema {
             
             evaluation_results local_results;
 
-            evaluation_flags flags = eval_context.eval_flags();
-            if (unevaluated_properties_val_)
-            {
-                flags |= evaluation_flags::require_evaluated_properties;
-            }
-            if (unevaluated_items_val_)
-            {
-                flags |= evaluation_flags::require_evaluated_items;
-            }
-
-            evaluation_context<Json> this_context{eval_context, this, flags};
+            bool require_evaluated_properties = eval_context.require_evaluated_properties() || unevaluated_properties_val_ != nullptr;
+            bool require_evaluated_items = eval_context.require_evaluated_items() || unevaluated_items_val_ != nullptr;
+            evaluation_context<Json> this_context{eval_context, this, require_evaluated_properties, require_evaluated_items};
             
             //std::cout << "validators:\n";
             for (auto& val : validators_)
@@ -680,13 +672,11 @@ namespace jsonschema {
                 }
             }
 
-            if ((eval_context.eval_flags() & evaluation_flags::require_evaluated_properties)
-                 == evaluation_flags::require_evaluated_properties)
+            if (eval_context.require_evaluated_properties())
             {
                 results.merge(std::move(local_results.evaluated_properties));
             }
-            if ((eval_context.eval_flags() & evaluation_flags::require_evaluated_items)
-                 == evaluation_flags::require_evaluated_items)
+            if (eval_context.require_evaluated_items())
             {
                 results.merge(std::move(local_results.evaluated_items));
             }
