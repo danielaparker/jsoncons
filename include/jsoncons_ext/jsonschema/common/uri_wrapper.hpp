@@ -38,7 +38,7 @@ namespace jsonschema {
             identifier_ = uri_.fragment();
         }
 
-        jsoncons::uri uri() const
+        const jsoncons::uri& uri() const
         {
             return uri_;
         }
