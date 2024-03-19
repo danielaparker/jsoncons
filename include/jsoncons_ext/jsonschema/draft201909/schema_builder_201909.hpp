@@ -35,9 +35,8 @@ namespace draft201909 {
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using ref_validator_type = ref_validator<Json>;
         using recursive_ref_validator_type = recursive_ref_validator<Json>;
-        using anchor_dictionary_type = std::unordered_set<std::string>;
+        using anchor_dictionary_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
 
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_dictionary_type&)>;

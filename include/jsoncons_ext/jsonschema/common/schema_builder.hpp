@@ -23,7 +23,7 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
         using ref_type = ref<Json>;
-        using anchor_dictionary_type = std::unordered_set<std::string>;
+        using anchor_dictionary_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
 
     private:
         uri_resolver<Json> resolver_;

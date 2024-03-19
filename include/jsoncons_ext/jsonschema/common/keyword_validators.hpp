@@ -28,64 +28,6 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
-    class ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
-
-        const schema_validator<Json>* referred_schema_;
-
-    public:
-        ref_validator(const uri& schema_path) 
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
-        {
-            //std::cout << "ref_validator: " << this->schema_path().string() << "\n";
-        }
-
-        ref_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
-        {
-            //std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
-        }
-
-        void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
-
-        uri get_base_uri() const
-        {
-            return this->schema_path();
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
-        {
-            return referred_schema_->id() ? nullptr: referred_schema_->match_dynamic_anchor(s);
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter, 
-            Json& patch, 
-            const evaluation_options& options) const override
-        {
-            evaluation_context<Json> this_context(context, this->keyword_name());
-
-            if (!referred_schema_)
-            {
-                reporter.error(validation_output(this->keyword_name(), 
-                    this_context.eval_path(),
-                    this->schema_path(), 
-                    instance_location.to_string(), 
-                    "Unresolved schema reference " + this->schema_path().string()));
-                return;
-            }
-
-            referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch, options);
-        }
-    };
-
     template<class Json>
     class recursive_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
