@@ -115,6 +115,10 @@ namespace jsonschema {
                 {
                     JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
                 }
+                if (it->second == nullptr)
+                {
+                    JSONCONS_THROW(schema_error("Null referred schema " + ref.first.string()));
+                }
                 ref.second->set_referred_schema(it->second);
             }
         }
@@ -738,13 +742,13 @@ namespace jsonschema {
             }
         }
 
-        keyword_validator_type get_or_create_reference(const uri_wrapper& identifier)
+        std::unique_ptr<ref_validator<Json>> get_or_create_reference(const uri_wrapper& identifier)
         {
             // a schema already exists
             auto it = this->schema_store_.find(identifier.uri());
             if (it != this->schema_store_.end())
             {
-                return jsoncons::make_unique<ref_validator_type>(identifier.base(), it->second);
+                return jsoncons::make_unique<ref_validator_type>(identifier.uri(), it->second);
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -762,14 +766,14 @@ namespace jsonschema {
                     anchor_dictionary_type anchor_dict2;
                     auto s = make_schema_validator(compilation_context(identifier), subsch, {}, anchor_dict2);
                     this->unknown_keywords_.erase(it2);
-                    auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base(), s.get());
+                    auto orig = jsoncons::make_unique<ref_validator_type>(identifier.uri(), s.get());
                     this->save_schema(std::move(s));
                     return orig;
                 }
             }
 
             // get or create a ref_validator
-            auto orig = jsoncons::make_unique<ref_validator_type>(identifier.base());
+            auto orig = jsoncons::make_unique<ref_validator_type>(identifier.uri());
 
             this->unresolved_refs_.emplace_back(identifier.uri(), orig.get());
             return orig;

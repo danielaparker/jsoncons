@@ -183,7 +183,7 @@ namespace draft202012 {
         }
 
         schema_validator_type make_object_schema_validator(const compilation_context& context, 
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_dictionary_type& /*anchor_dict*/)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{jsoncons::null_type()};
@@ -222,7 +222,8 @@ namespace draft202012 {
                 std::string value = it->value().template as<std::string>();
                 jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
                 dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
-                anchor_dict.emplace(value, jsoncons::make_unique<ref_validator<Json>>(context.get_absolute_uri()));
+                //auto orig = this->get_or_create_reference(context.get_absolute_uri2());
+                //anchor_dict.emplace(value, std::move(orig));
             }
 
             it = sch.find("default");
