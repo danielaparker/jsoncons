@@ -247,10 +247,6 @@ namespace jsonschema {
 
         virtual bool has_dynamic_anchor(const std::string& anchor) const = 0;
 
-        virtual void insert_dynamic_anchor(const std::string& /*anchor*/) = 0;
-
-        virtual void insert_dynamic_anchor(std::string&& /*anchor*/) = 0;
-
         virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
 
         virtual const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const = 0;

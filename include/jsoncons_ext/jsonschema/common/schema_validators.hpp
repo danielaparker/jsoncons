@@ -63,17 +63,9 @@ namespace jsonschema {
             return dynamic_anchor_;
         }
 
-        bool has_dynamic_anchor(const std::string& anchor) const final
+        bool has_dynamic_anchor(const std::string& /*anchor*/) const final
         {
             return false;
-        }
-
-        void insert_dynamic_anchor(const std::string& /*anchor*/) final
-        {
-        }
-
-        void insert_dynamic_anchor(std::string&& /*anchor*/) final
-        {
         }
 
         const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
@@ -107,6 +99,7 @@ namespace jsonschema {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using anchor_dictionary_type = std::unordered_set<std::string>;
 
         uri schema_path_;
         jsoncons::optional<jsoncons::uri> id_;
@@ -117,7 +110,7 @@ namespace jsonschema {
         Json default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
-        std::unordered_set<std::string> dynamic_anchors_;
+        anchor_dictionary_type anchor_dict_;
 
     public:
         object_schema_validator(const uri& schema_path, 
@@ -158,7 +151,7 @@ namespace jsonschema {
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
-            const std::unordered_set<std::string>& dynamic_anchors)
+            const anchor_dictionary_type& anchor_dict)
             : schema_path_(schema_path),
               id_(std::move(id)),
               validators_(std::move(validators)),
@@ -168,7 +161,7 @@ namespace jsonschema {
               default_value_(std::move(default_value)),
               recursive_anchor_(false),
               dynamic_anchor_(std::move(dynamic_anchor)),
-              dynamic_anchors_(dynamic_anchors)
+              anchor_dict_(anchor_dict)
         {
         }
 
@@ -194,20 +187,9 @@ namespace jsonschema {
 
         bool has_dynamic_anchor(const std::string& anchor) const final
         {
-            auto it = dynamic_anchors_.find(anchor);
-            return it == dynamic_anchors_.end() ? false : true;
+            auto it = anchor_dict_.find(anchor);
+            return it == anchor_dict_.end() ? false : true;
         }
-
-        void insert_dynamic_anchor(const std::string& anchor) final
-        {
-            dynamic_anchors_.insert(anchor);
-        }
-
-        void insert_dynamic_anchor(std::string&& anchor) final
-        {
-            dynamic_anchors_.insert(std::move(anchor));
-        }
-
 
         const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
