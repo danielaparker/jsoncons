@@ -201,6 +201,12 @@ namespace jsonschema {
         const schema_validator<Json>* referred_schema_;
 
     public:
+        ref_validator(const ref_validator& other)
+            : keyword_validator_base<Json>(other.keyword_name(), other.schema_path()),
+                  referred_schema_{other.referred_schema_}
+        {
+        }
+        
         ref_validator(const uri& schema_path) 
             : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
         {
@@ -213,8 +219,6 @@ namespace jsonschema {
             //std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
         }
 
-        const schema_validator<Json>* referred_schema() const {return referred_schema_;}
-        
         void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
 
         uri get_base_uri() const
