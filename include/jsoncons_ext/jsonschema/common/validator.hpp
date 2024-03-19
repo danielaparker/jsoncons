@@ -219,6 +219,8 @@ namespace jsonschema {
             //std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
         }
 
+        const schema_validator<Json>* referred_schema() const {return referred_schema_;}
+        
         void set_referred_schema(const schema_validator<Json>* target) final { referred_schema_ = target; }
 
         uri get_base_uri() const
@@ -310,6 +312,8 @@ namespace jsonschema {
         virtual const jsoncons::optional<jsoncons::uri>& id() const = 0;
 
         virtual bool has_dynamic_anchor(const std::string& anchor) const = 0;
+
+        virtual const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const = 0;
 
         virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
 

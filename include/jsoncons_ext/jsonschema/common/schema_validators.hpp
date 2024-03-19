@@ -68,6 +68,11 @@ namespace jsonschema {
             return false;
         }
 
+        const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& /*anchor*/) const final
+        {
+            return nullptr;
+        }
+
         const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
         {
             return nullptr;
@@ -189,6 +194,12 @@ namespace jsonschema {
         {
             auto it = anchor_dict_.find(anchor);
             return it == anchor_dict_.end() ? false : true;
+        }
+
+        const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const final
+        {
+            auto it = anchor_dict_.find(anchor);
+            return (it == anchor_dict_.end()) ? nullptr : it->second->referred_schema();
         }
 
         const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
