@@ -28,9 +28,9 @@ namespace jsonschema {
         {
         }
 
-        explicit compilation_context(const uri_wrapper& location)
-            : absolute_uri_(location.uri()), 
-              uris_(std::vector<uri_wrapper>{{location}})
+        explicit compilation_context(const uri_wrapper& retrieval_uri)
+            : absolute_uri_(retrieval_uri.uri()), 
+              uris_(std::vector<uri_wrapper>{{retrieval_uri}})
         {
         }
 
@@ -41,7 +41,7 @@ namespace jsonschema {
         }
 
         explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id)
-            : uris_(uris), id_(id) 
+            : uris_(uris), id_(id)
         {
             absolute_uri_ = !uris.empty() ? uris.back().uri() : uri{ "#" };
         }

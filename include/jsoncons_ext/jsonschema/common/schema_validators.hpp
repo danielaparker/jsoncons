@@ -157,7 +157,8 @@ namespace jsonschema {
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
-            jsoncons::optional<jsoncons::uri>&& dynamic_anchor)
+            jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
+            const std::unordered_set<std::string>& dynamic_anchors)
             : schema_path_(schema_path),
               id_(std::move(id)),
               validators_(std::move(validators)),
@@ -166,7 +167,8 @@ namespace jsonschema {
               defs_(std::move(defs)),
               default_value_(std::move(default_value)),
               recursive_anchor_(false),
-              dynamic_anchor_(std::move(dynamic_anchor))
+              dynamic_anchor_(std::move(dynamic_anchor)),
+              dynamic_anchors_(dynamic_anchors)
         {
         }
 
