@@ -159,8 +159,6 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         virtual const std::string& keyword_name() const = 0;
-
-        virtual const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const = 0;
     };
 
     template <class Json>
@@ -226,11 +224,6 @@ namespace jsonschema {
         uri get_base_uri() const
         {
             return this->schema_path();
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
-        {
-            return referred_schema_->id() ? nullptr: referred_schema_->match_dynamic_anchor(s);
         }
 
     private:
@@ -311,13 +304,9 @@ namespace jsonschema {
 
         virtual const jsoncons::optional<jsoncons::uri>& id() const = 0;
 
-        virtual bool has_dynamic_anchor(const std::string& anchor) const = 0;
-
         virtual const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const = 0;
 
         virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
-
-        virtual const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const = 0;
     };
 
 } // namespace jsonschema

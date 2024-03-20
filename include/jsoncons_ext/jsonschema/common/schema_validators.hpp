@@ -63,17 +63,7 @@ namespace jsonschema {
             return dynamic_anchor_;
         }
 
-        bool has_dynamic_anchor(const std::string& /*anchor*/) const final
-        {
-            return false;
-        }
-
         const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& /*anchor*/) const final
-        {
-            return nullptr;
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& /*s*/) const final
         {
             return nullptr;
         }
@@ -190,12 +180,6 @@ namespace jsonschema {
             return id_;
         }
 
-        bool has_dynamic_anchor(const std::string& anchor) const final
-        {
-            auto it = anchor_dict_.find(anchor);
-            return it == anchor_dict_.end() ? false : true;
-        }
-
         const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const final
         {
             auto it = anchor_dict_.find(anchor);
@@ -205,49 +189,6 @@ namespace jsonschema {
         const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
-        }
-
-        const schema_validator<Json>* match_dynamic_anchor(const std::string& s) const final
-        {
-            //std::cout << "match_dynamic_anchor " << s << ", " << this->schema_path().string() << ", id: " << (id_ ? id_->string() : "") << "\n";
-            if (dynamic_anchor_)
-            {
-                //std::cout << ", fragment: " << dynamic_anchor_.value().fragment() << "\n";
-                if (s == dynamic_anchor_.value().fragment())
-                {
-                    return this;
-                }
-            }
-
-            //std::cout << "    " << "checking validators\n";
-            for (const auto& val : validators_)
-            {
-                const schema_validator<Json>* p = val->match_dynamic_anchor(s);
-                if (p != nullptr)
-                {
-                    return p;
-                }
-            }
-            
-            //std::cout << "    " << "checking defs\n";
-            for (const auto& member : defs_)
-            {
-                //std::cout << "    " << member.first << "\n";
-                if (!member.second->id())
-                {
-                    const schema_validator<Json>* p = member.second->match_dynamic_anchor(s);
-                    if (p != nullptr)
-                    {
-                        return p;
-                    }
-                }
-                //else
-                //{
-                //    std::cout << "    Skipping " << member.second->id()->string() << "\n"; 
-                //}
-            }
-            
-            return nullptr;
         }
 
     private:
