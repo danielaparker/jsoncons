@@ -372,7 +372,7 @@ namespace draft202012 {
             {
                 for (const auto& member : local_anchor_dict)
                 {
-                    anchor_dict.insert_or_assign(member.first, member.second);
+                    anchor_dict[member.first] = member.second;
                 }
             }
         
