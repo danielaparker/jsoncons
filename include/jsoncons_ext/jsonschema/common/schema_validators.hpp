@@ -104,7 +104,7 @@ namespace jsonschema {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using anchor_dictionary_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
+        using anchor_schema_map_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
 
         uri schema_path_;
         jsoncons::optional<jsoncons::uri> id_;
@@ -115,7 +115,7 @@ namespace jsonschema {
         Json default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
-        anchor_dictionary_type anchor_dict_;
+        anchor_schema_map_type anchor_dict_;
 
     public:
         object_schema_validator(const uri& schema_path, 
@@ -156,7 +156,7 @@ namespace jsonschema {
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
-            anchor_dictionary_type&& anchor_dict)
+            anchor_schema_map_type&& anchor_dict)
             : schema_path_(schema_path),
               id_(std::move(id)),
               validators_(std::move(validators)),

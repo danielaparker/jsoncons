@@ -23,7 +23,7 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
         using ref_type = ref<Json>;
-        using anchor_dictionary_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
+        using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
 
     private:
         uri_resolver<Json> resolver_;
@@ -54,13 +54,13 @@ namespace jsonschema {
 
         void build_schema(const Json& sch) 
         {
-            anchor_dictionary_type anchor_dict;
+            anchor_uri_map_type anchor_dict;
             root_ = make_schema_validator(compilation_context{}, sch, {}, anchor_dict);
         }
 
         void build_schema(const Json& sch, const std::string& retrieval_uri) 
         {
-            anchor_dictionary_type anchor_dict;
+            anchor_uri_map_type anchor_dict;
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
         }
 
@@ -88,7 +88,7 @@ namespace jsonschema {
                         {
                             Json external_sch = resolver_(loc.base());
 
-                            anchor_dictionary_type anchor_dict2;
+                            anchor_uri_map_type anchor_dict2;
                             this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), 
                                 external_sch, {}, anchor_dict2));
                             ++loaded_count;
@@ -129,7 +129,7 @@ namespace jsonschema {
             const Json& sch, jsoncons::span<const std::string> keys) const = 0;
 
         virtual schema_validator_type make_schema_validator(const compilation_context& context, 
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_dictionary_type& anchor_dict) = 0;
+            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
 
         virtual std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, 
             const Json& sch)
@@ -158,7 +158,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<not_validator<Json>> make_not_validator(const compilation_context& context, 
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.make_schema_path_with("not");
             std::string not_key[] = { "not" };
@@ -476,7 +476,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
-            const Json& sch, const Json& parent, anchor_dictionary_type& anchor_dict)
+            const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.make_schema_path_with("contains");
 
@@ -523,7 +523,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<all_of_validator<Json>> make_all_of_validator(const compilation_context& context,
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.make_schema_path_with("allOf");
             std::vector<schema_validator_type> subschemas;
@@ -538,7 +538,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<any_of_validator<Json>> make_any_of_validator(const compilation_context& context,
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.make_schema_path_with("anyOf");
             std::vector<schema_validator_type> subschemas;
@@ -553,7 +553,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<one_of_validator<Json>> make_one_of_validator(const compilation_context& context,
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path{ context.make_schema_path_with("oneOf") };
             std::vector<schema_validator_type> subschemas;
@@ -568,7 +568,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<dependencies_validator<Json>> make_dependencies_validator(const compilation_context& context, 
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.get_absolute_uri();
             std::map<std::string, keyword_validator_type> dependent_required;
@@ -608,7 +608,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<property_names_validator<Json>> make_property_names_validator(const compilation_context& context, 
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.get_absolute_uri();
             schema_validator_type property_names_schema_validator;
@@ -652,7 +652,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<dependent_schemas_validator<Json>> make_dependent_schemas_validator( const compilation_context& context, 
-            const Json& sch, anchor_dictionary_type& anchor_dict)
+            const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.get_absolute_uri();
             std::map<std::string, schema_validator_type> dependent_schemas;
@@ -682,7 +682,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<unevaluated_properties_validator<Json>> make_unevaluated_properties_validator(
-            const compilation_context& context, const Json& sch, anchor_dictionary_type& anchor_dict)
+            const compilation_context& context, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -693,7 +693,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<unevaluated_items_validator<Json>> make_unevaluated_items_validator(
-            const compilation_context& context, const Json& sch, anchor_dictionary_type& anchor_dict)
+            const compilation_context& context, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_path = context.get_absolute_uri();
 
@@ -722,7 +722,7 @@ namespace jsonschema {
                     [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
                 if (unresolved_refs != this->unresolved_refs_.end())
                 {
-                    anchor_dictionary_type anchor_dict2;
+                    anchor_uri_map_type anchor_dict2;
                     this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}, anchor_dict2));
                 }
                 else // no, nothing ref'd it, keep for later
@@ -763,7 +763,7 @@ namespace jsonschema {
                 if (it2 != this->unknown_keywords_.end())
                 {
                     auto& subsch = it2->second;
-                    anchor_dictionary_type anchor_dict2;
+                    anchor_uri_map_type anchor_dict2;
                     auto s = make_schema_validator(compilation_context(identifier), subsch, {}, anchor_dict2);
                     this->unknown_keywords_.erase(it2);
                     auto orig = jsoncons::make_unique<ref_validator_type>(identifier.uri(), s.get());
