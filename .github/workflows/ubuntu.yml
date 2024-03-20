@@ -104,7 +104,7 @@ jobs:
            sudo apt install clang-13
       shell: bash
     - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       env:
         CC:   clang-13
         CXX:  clang++-13
@@ -126,7 +126,7 @@ jobs:
            sudo apt install clang-14
       shell: bash
     - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       env:
         CC:   clang-14
         CXX:  clang++-14
