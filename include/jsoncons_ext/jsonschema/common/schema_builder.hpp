@@ -64,7 +64,7 @@ namespace jsonschema {
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
         }
 
-        std::shared_ptr<json_schema<Json>> get_schema()
+        std::unique_ptr<document_schema_validator<Json>> get_schema()
         {                        
             //std::cout << "schema_store:\n";
             //for (auto& member : schema_store_)
@@ -103,7 +103,7 @@ namespace jsonschema {
 
             resolve_references();
 
-            return std::make_shared<json_schema<Json>>(std::move(schemas_), std::move(root_));
+            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schemas_));
         }
 
         void resolve_references()

@@ -19,6 +19,71 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
+    class document_schema_validator : public schema_validator<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+
+        schema_validator_type schema_val_;
+        std::vector<schema_validator_type> schemas_;
+    public:
+        document_schema_validator(schema_validator_type&& schema_val, std::vector<schema_validator_type>&& schemas)
+            : schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
+        {
+            if (schema_val_ == nullptr)
+                JSONCONS_THROW(schema_error("There is no schema_val schema to validate an instance against"));
+        }
+
+        document_schema_validator(const document_schema_validator&) = delete;
+        document_schema_validator(document_schema_validator&&) = default;
+        document_schema_validator& operator=(const document_schema_validator&) = delete;
+        document_schema_validator& operator=(document_schema_validator&&) = default;      
+
+        jsoncons::optional<Json> get_default_value() const final
+        {
+            return schema_val_->get_default_value();
+        }
+
+        const uri& schema_path() const final
+        {
+            return schema_val_->schema_path();
+        }
+
+        bool recursive_anchor() const final
+        {
+            return schema_val_->recursive_anchor();
+        }
+
+        const jsoncons::optional<jsoncons::uri>& id() const final
+        {
+            return schema_val_->id();
+        }
+
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
+        {
+            return schema_val_->dynamic_anchor();
+        }
+
+        const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const final
+        {
+            return schema_val_->get_schema_for_dynamic_anchor(anchor);
+        }
+        
+    private:
+        void do_validate(const evaluation_context<Json>& context, 
+            const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results,
+            error_reporter& reporter, 
+            Json& patch, 
+            const evaluation_options& options) const 
+        {
+            JSONCONS_ASSERT(schema_val_ != nullptr);
+            schema_val_->validate(context, instance, instance_location, results, reporter, patch, options);
+        }
+    };
+
+    template <class Json>
     class boolean_schema_validator : public schema_validator<Json>
     {
     public:
@@ -38,12 +103,12 @@ namespace jsonschema {
         {
         }
 
-        jsoncons::optional<Json> get_default_value() const override
+        jsoncons::optional<Json> get_default_value() const final
         {
             return jsoncons::optional<Json>{};
         }
 
-        const uri& schema_path() const override
+        const uri& schema_path() const final
         {
             return schema_path_;
         }
