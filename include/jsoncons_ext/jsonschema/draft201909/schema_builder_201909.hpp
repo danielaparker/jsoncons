@@ -506,16 +506,17 @@ namespace draft201909 {
                 it = sch.find("$anchor"); 
                 if (it != sch.object_range().end()) 
                 {
-                    auto value = it->value().template as<std::string>();
-                    if (this->validate_anchor(value))
+                    auto anchor = it->value().template as<std::string>();
+                    if (!this->validate_anchor(anchor))
                     {
-                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
-                        uri_wrapper identifier{ new_uri };
-                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
-                        {
-                            new_uris.emplace_back(std::move(identifier)); 
-                        }
+                        JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
+                    }
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    uri_wrapper identifier{ new_uri };
+                    if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                    {
+                        new_uris.emplace_back(std::move(identifier)); 
                     }
                 }
             }

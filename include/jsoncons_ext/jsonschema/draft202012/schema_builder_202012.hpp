@@ -195,7 +195,16 @@ namespace draft202012 {
             std::map<std::string,schema_validator_type> defs;
             anchor_uri_map_type local_anchor_dict;
 
-            auto it = sch.find("definitions");
+            auto it = sch.find("$dynamicAnchor"); 
+            if (it != sch.object_range().end()) 
+            {
+                std::string value = it->value().template as<std::string>();
+                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
+                dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
+                local_anchor_dict.emplace(value, context.get_absolute_uri2());
+            }
+
+            it = sch.find("definitions");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& def : it->value().object_range())
@@ -357,15 +366,6 @@ namespace draft202012 {
             if (it != sch.object_range().end()) 
             {
                 unevaluated_items_val = this->make_unevaluated_items_validator(context, it->value(), local_anchor_dict);
-            }
-
-            it = sch.find("$dynamicAnchor"); 
-            if (it != sch.object_range().end()) 
-            {
-                std::string value = it->value().template as<std::string>();
-                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
-                dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
-                local_anchor_dict.insert_or_assign(value, context.get_absolute_uri2());
             }
 
             if (!id)
@@ -536,31 +536,33 @@ namespace draft202012 {
                 it = sch.find("$anchor"); 
                 if (it != sch.object_range().end()) 
                 {
-                    auto value = it->value().template as<std::string>();
-                    if (this->validate_anchor(value))
+                    auto anchor = it->value().template as<std::string>();
+                    if (!this->validate_anchor(anchor))
                     {
-                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
-                        uri_wrapper identifier{ new_uri };
-                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
-                        {
-                            new_uris.emplace_back(std::move(identifier)); 
-                        }
+                        JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
                     }
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    uri_wrapper identifier{ new_uri };
+                    if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                    {
+                        new_uris.emplace_back(std::move(identifier)); 
+                    }                  
                 }
                 it = sch.find("$dynamicAnchor"); 
                 if (it != sch.object_range().end()) 
                 {
-                    auto value = it->value().template as<std::string>();
-                    if (this->validate_anchor(value))
+                    auto anchor = it->value().template as<std::string>();
+                    if (!this->validate_anchor(anchor))
                     {
-                        auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                        jsoncons::uri new_uri(uri, uri_fragment_part, value);
-                        uri_wrapper identifier{ new_uri };
-                        if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
-                        {
-                            new_uris.emplace_back(std::move(identifier)); 
-                        }
+                        JSONCONS_THROW(schema_error("Invalid $dynamicAnchor " + anchor));
+                    }
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    uri_wrapper identifier{ new_uri };
+                    if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
+                    {
+                        new_uris.emplace_back(std::move(identifier)); 
                     }
                 }
             }

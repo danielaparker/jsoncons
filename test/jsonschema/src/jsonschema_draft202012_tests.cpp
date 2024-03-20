@@ -112,9 +112,9 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
     }
-#if 0
+//#if 0
     SECTION("tests")
     {
 
@@ -132,14 +132,14 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/default.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/defs.json");  
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/enum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/exclusiveMaximum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/exclusiveMinimum.json");
 
 #ifdef JSONCONS_HAS_STD_REGEX
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/format.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/format.json");
 #endif
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/if-then-else.json");
@@ -198,5 +198,5 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/uri-template.json");
 */
     }
-#endif
+//#endif
 }
