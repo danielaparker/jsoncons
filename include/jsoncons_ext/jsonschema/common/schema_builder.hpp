@@ -18,13 +18,10 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    using document_schema_validator_factory = std::function<std::unique_ptr<document_schema_validator<Json>>(const compilation_context&,
-        const Json&, jsoncons::span<const std::string>, const uri_resolver<Json>&)>;
-
-    template <class Json>
     class schema_builder
     {
     public:
+        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json& sch, const uri_resolver<Json>& resolver)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -33,6 +30,7 @@ namespace jsonschema {
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
 
     private:
+        schema_builder_factory_type builder_factory_;
         uri_resolver<Json> resolver_;
         schema_validator_type root_;
 
@@ -47,8 +45,8 @@ namespace jsonschema {
 
         schema_builder() = default;
 
-        schema_builder(uri_resolver<Json> resolver)
-            : resolver_(resolver)
+        schema_builder(const schema_builder_factory_type& builder_factory, uri_resolver<Json> resolver)
+            : builder_factory_(builder_factory), resolver_(resolver)
         {
         }
 
@@ -137,7 +135,31 @@ namespace jsonschema {
 
         virtual schema_validator_type make_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
+/*        
+        schema_validator_type make_boolean_schema_validator(const compilation_context& context, 
+            const Json& sch)
+        {
+            JSONCONS_ASSERT(sch.is_bool());
+            uri schema_path = context.get_absolute_uri();
+            return jsoncons::make_unique<boolean_schema_validator<Json>>( 
+               schema_path, sch.template as<bool>());
+        }
 
+        schema_validator_type make_embedded_schema_validator(const compilation_context& context, 
+            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
+        {
+            switch (sch.type())
+            {
+                case json_type::object_value:
+                    auto schema_builder = builder_factory_(sch, resolver_);
+                    break;
+                case json_type::bool_value:
+                    break;
+                default:
+                    JSONCONS_THROW(schema_error("Schema must be object or boolean"));
+            }
+        }
+*/
         virtual std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, 
             const Json& sch)
         {

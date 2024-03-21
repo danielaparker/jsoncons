@@ -50,15 +50,15 @@ namespace jsonschema {
                 { 
                     if (it->value() == "https://json-schema.org/draft/2020-12/schema")
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(resolver);
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, resolver);
                     }
                     else if (it->value() == "https://json-schema.org/draft/2019-09/schema")
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(resolver);
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, resolver);
                     }
                     else if (it->value() == "http://json-schema.org/draft-07/schema#")
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, resolver);
                     }
                     else
                     {
@@ -69,12 +69,12 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+                    builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, resolver);
                 }
             }
             else if (sch.is_bool())
             {
-                builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+                builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, resolver);
             }
             else
             {

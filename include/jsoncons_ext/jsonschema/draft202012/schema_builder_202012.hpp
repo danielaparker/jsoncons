@@ -32,6 +32,7 @@ namespace draft202012 {
     class schema_builder_202012 : public schema_builder<Json> 
     {
     public:
+        using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -44,8 +45,9 @@ namespace draft202012 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_202012(const uri_resolver<Json>& resolver) noexcept
-            : schema_builder<Json>(resolver)
+        schema_builder_202012(const schema_builder_factory_type& builder_factory, 
+            const uri_resolver<Json>& resolver) noexcept
+            : schema_builder<Json>(builder_factory, resolver)
         {
             init();
         }
@@ -138,16 +140,8 @@ namespace draft202012 {
                 case json_type::bool_value:
                 {
                     uri schema_path = new_context.get_absolute_uri();
-                    if (sch.template as<bool>())
-                    {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
-                            schema_path, sch.template as<bool>());
-                    }
-                    else
-                    {
-                        schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
-                          schema_path, false);
-                    }
+                    schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
+                        schema_path, sch.template as<bool>());
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
