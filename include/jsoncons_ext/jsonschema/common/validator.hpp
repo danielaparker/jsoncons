@@ -283,10 +283,6 @@ namespace jsonschema {
     private:
     };
 
-
-    template <class Json>
-    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
-
     template <class Json>
     class schema_validator : public validator_base<Json>
     {

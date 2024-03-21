@@ -14,12 +14,10 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json, class URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver, Json, std::string>::value, std::unique_ptr<schema_builder<Json>>>::type
-    make_schema_validator_factory(const Json& sch,
-        const URIResolver& resolver)
+    template <class Json>
+    std::unique_ptr<schema_builder<Json>> make_schema_builder_factory(const Json& sch, const uri_resolver<Json>& resolver)
     {
-        std::unique_ptr<schema_builder<Json>> validator_factory_ptr;
+        std::unique_ptr<schema_builder<Json>> builder_factory;
 
         if (sch.is_object())
         {
@@ -28,15 +26,15 @@ namespace jsonschema {
             { 
                 if (it->value() == "https://json-schema.org/draft/2020-12/schema")
                 {
-                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(resolver);
+                    builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(resolver);
                 }
                 else if (it->value() == "https://json-schema.org/draft/2019-09/schema")
                 {
-                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(resolver);
+                    builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(resolver);
                 }
                 else if (it->value() == "http://json-schema.org/draft-07/schema#")
                 {
-                    validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+                    builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
                 }
                 else
                 {
@@ -47,20 +45,30 @@ namespace jsonschema {
             }
             else 
             {
-                validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+                builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
             }
         }
         else if (sch.is_bool())
         {
-            validator_factory_ptr = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
+            builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(resolver);
         }
         else
         {
              JSONCONS_THROW(schema_error("Schema must be object or boolean"));
         }
-        return validator_factory_ptr;
+        return builder_factory;
     }  
 
+    template <class Json>
+    std::unique_ptr<document_schema_validator<Json>> make_document_schema_validator(const compilation_context& context,
+        const Json& sch, jsoncons::span<const std::string> keys, const uri_resolver<Json>& resolver)
+    {
+        auto schema_builder = make_schema_builder_factory(sch, resolver);
+        std::unordered_map<std::string,uri_wrapper> anchor_dict;
+        schema_builder->make_schema_validator(context, sch, keys, anchor_dict);
+        return schema_builder->get_schema();
+    }
+    
     template <class Json>
     struct default_uri_resolver
     {
@@ -83,7 +91,7 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
     {
-        auto schema_builder = make_schema_validator_factory(sch, resolver);
+        auto schema_builder = make_schema_builder_factory(sch, resolver);
 
         schema_builder->build_schema(sch, retrieval_uri);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -92,7 +100,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
     {
-        auto schema_builder = make_schema_validator_factory(sch, default_uri_resolver<Json>{});
+        auto schema_builder = make_schema_builder_factory(sch, default_uri_resolver<Json>{});
 
         schema_builder->build_schema(sch, retrieval_uri);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -102,7 +110,7 @@ namespace jsonschema {
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const URIResolver& resolver)
     {
-        auto schema_builder = make_schema_validator_factory(sch, resolver);
+        auto schema_builder = make_schema_builder_factory(sch, uri_resolver<Json>{ resolver });
 
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -111,7 +119,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
     {
-        auto schema_builder = make_schema_validator_factory(sch, default_uri_resolver<Json>{});
+        auto schema_builder = make_schema_builder_factory(sch, default_uri_resolver<Json>{});
 
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());

@@ -15,6 +15,13 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
+    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
+
+    template <class Json>
+    using document_schema_validator_factory = std::function<std::unique_ptr<document_schema_validator<Json>>(const compilation_context&,
+        const Json&, jsoncons::span<const std::string>, const uri_resolver<Json>&)>;
+
+    template <class Json>
     class schema_builder
     {
     public:
