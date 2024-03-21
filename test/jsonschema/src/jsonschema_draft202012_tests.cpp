@@ -55,7 +55,8 @@ namespace {
             ++count;
             try
             {
-                auto schema = jsonschema::make_schema(test_group.at("schema"), resolver);
+                auto schema = jsonschema::make_schema(test_group.at("schema"), resolver, 
+                    jsonschema::spec_version::draft202012);
                 jsonschema::json_validator<json> validator(schema);
 
                 int count_test = 0;
@@ -112,7 +113,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
           jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/cross-draft.json");
     }
 //#if 0

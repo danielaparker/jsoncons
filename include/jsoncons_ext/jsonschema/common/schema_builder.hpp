@@ -14,6 +14,24 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    enum class spec_version{draft7, draft201909, draft202012};
+    
+    inline
+    std::string to_string(spec_version version)
+    {
+        switch (version)
+        {
+            case spec_version::draft7:
+                return "http://json-schema.org/draft-07/schema#";
+            case spec_version::draft201909:
+                return "https://json-schema.org/draft/2019-09/schema";
+            case spec_version::draft202012:
+                return "https://json-schema.org/draft/2020-12/schema";
+            default:
+                return "unsupported";
+        }
+    }
+
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
@@ -21,7 +39,7 @@ namespace jsonschema {
     class schema_builder
     {
     public:
-        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json& sch, const uri_resolver<Json>& resolver)>;
+        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&, const uri_resolver<Json>&)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
