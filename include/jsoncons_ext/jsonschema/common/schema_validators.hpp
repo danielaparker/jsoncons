@@ -31,7 +31,7 @@ namespace jsonschema {
             : schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
         {
             if (schema_val_ == nullptr)
-                JSONCONS_THROW(schema_error("There is no schema_val schema to validate an instance against"));
+                JSONCONS_THROW(schema_error("There is no schema to validate an instance against"));
         }
 
         document_schema_validator(const document_schema_validator&) = delete;

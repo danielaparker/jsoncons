@@ -122,16 +122,11 @@ namespace draft202012 {
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependent_schemas_validator(context, sch, anchor_dict);});
         }
 
-        const char* schema_version() const noexcept final
-        {
-            return "https://json-schema.org/draft/2019-09/schema";
-        }
-
         schema_validator_type make_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
-            //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
+            //std::cout << "this->make_cross_draft_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
 
             schema_validator_type schema_validator_ptr;
 
@@ -204,7 +199,7 @@ namespace draft202012 {
                 for (const auto& def : it->value().object_range())
                 {
                     std::string sub_keys[] = { "definitions", def.key() };
-                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
+                    defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
                 }
                 known_keywords.insert("definitions");
             }
@@ -214,7 +209,7 @@ namespace draft202012 {
                 for (const auto& def : it->value().object_range())
                 {
                     std::string sub_keys[] = { "$defs", def.key() };
-                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
+                    defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
                 }
                 known_keywords.insert("$defs");
             }
@@ -266,21 +261,21 @@ namespace draft202012 {
             if (it != sch.object_range().end()) 
             {
                 std::string sub_keys[] = { "if" };
-                if_validator = make_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                if_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
             }
 
             it = sch.find("then");
             if (it != sch.object_range().end()) 
             {
                 std::string sub_keys[] = { "then" };
-                then_validator = make_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                then_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
             }
 
             it = sch.find("else");
             if (it != sch.object_range().end()) 
             {
                 std::string sub_keys[] = { "else" };
-                else_validator = make_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                else_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
             }
             if (if_validator || then_validator || else_validator)
             {
@@ -395,14 +390,14 @@ namespace draft202012 {
                 {
                     std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
 
-                    item_validators.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
+                    item_validators.emplace_back(this->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
                 }
 
                 auto it = parent.find("items");
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"items"};
-                    additional_items_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    additional_items_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict);
                 }
             }
 
@@ -418,7 +413,7 @@ namespace draft202012 {
             std::string sub_keys[] = {"items"};
 
             return jsoncons::make_unique<items_object_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, sub_keys, anchor_dict));
+                this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
                 
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
@@ -432,7 +427,7 @@ namespace draft202012 {
                 std::string sub_keys[] =
                 {"properties", prop.key()};
                 properties.emplace(std::make_pair(prop.key(), 
-                    make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
+                    this->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
 
             return jsoncons::make_unique<properties_validator<Json>>(std::move(schema_path), 
@@ -453,7 +448,7 @@ namespace draft202012 {
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
-                        make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
+                        this->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>( std::move(schema_path),
@@ -471,7 +466,7 @@ namespace draft202012 {
             schema_validator_type additional_properties;
 
             std::string sub_keys[] = {"additionalProperties"};
-            additional_properties = make_schema_validator(context, sch, sub_keys, anchor_dict);
+            additional_properties = this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
             return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_path),
                 std::move(properties), std::move(pattern_properties),

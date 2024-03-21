@@ -122,11 +122,6 @@ namespace draft201909 {
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependent_schemas_validator(context, sch, anchor_dict);});
         }
 
-        const char* schema_version() const noexcept final
-        {
-            return "https://json-schema.org/draft/2019-09/schema";
-        }
-
         schema_validator_type make_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) override
         {

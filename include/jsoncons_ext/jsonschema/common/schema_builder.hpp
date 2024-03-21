@@ -98,7 +98,7 @@ namespace jsonschema {
                             Json external_sch = resolver_(loc.base());
 
                             anchor_uri_map_type anchor_dict2;
-                            this->save_schema(make_schema_validator(compilation_context(uri_wrapper(loc.base())), 
+                            this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
                                 external_sch, {}, anchor_dict2));
                             ++loaded_count;
                         }
@@ -132,15 +132,13 @@ namespace jsonschema {
             }
         }
 
-        virtual const char* schema_version() const noexcept = 0;
-
         virtual compilation_context make_compilation_context(const compilation_context& parent,
             const Json& sch, jsoncons::span<const std::string> keys) const = 0;
 
         virtual schema_validator_type make_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
 
-        schema_validator_type make_embedded_schema_validator(const compilation_context& context, 
+        schema_validator_type make_cross_draft_schema_validator(const compilation_context& context, 
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
         {
             schema_validator_type schema_val = schema_validator_type{};
@@ -155,7 +153,17 @@ namespace jsonschema {
                         {
                             return make_schema_validator(context, sch, keys, anchor_dict);
                         }
-                        auto schema_builder = builder_factory_(sch, resolver_);
+                        else
+                        {
+                            auto schema_builder = builder_factory_(sch, resolver_);
+                            schema_builder->build_schema(sch);
+                            schema_val = schema_builder->get_schema();
+                            if (schema_val->id())
+                            {
+                                schema_validator<Json>* p = schema_val.get();
+                                this->insert_schema(uri_wrapper(*(schema_val->id())), p);
+                            }
+                        }
                     }
                     else
                     {
@@ -164,10 +172,9 @@ namespace jsonschema {
                     break;
                 }
                 case json_type::bool_value:
-                    uri schema_path = context.get_absolute_uri();
-                    schema_val = jsoncons::make_unique<boolean_schema_validator<Json>>( 
-                       schema_path, sch.template as<bool>());
-                    break;
+                {
+                    return make_schema_validator(context, sch, keys, anchor_dict);
+                }
                 default:
                     JSONCONS_THROW(schema_error("Schema must be object or boolean"));
             }
@@ -206,7 +213,7 @@ namespace jsonschema {
             uri schema_path = context.make_schema_path_with("not");
             std::string not_key[] = { "not" };
             return jsoncons::make_unique<not_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, not_key, anchor_dict));
+                make_cross_draft_schema_validator(context, sch, not_key, anchor_dict));
         }
 
         virtual std::unique_ptr<const_validator<Json>> make_const_validator(const compilation_context& context, 
@@ -554,7 +561,7 @@ namespace jsonschema {
             }
 
             return jsoncons::make_unique<contains_validator<Json>>( schema_path, 
-                make_schema_validator(context, sch, sub_keys, anchor_dict), std::move(max_contains), std::move(min_contains));
+                make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict), std::move(max_contains), std::move(min_contains));
         }
 
         virtual std::unique_ptr<unique_items_validator<Json>> make_unique_items_validator(const compilation_context& context, 
@@ -575,7 +582,7 @@ namespace jsonschema {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "allOf", std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
+                subschemas.emplace_back(make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<all_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
@@ -590,7 +597,7 @@ namespace jsonschema {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "anyOf", std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
+                subschemas.emplace_back(make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<any_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
@@ -605,7 +612,7 @@ namespace jsonschema {
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "oneOf", std::to_string(c++) };
-                subschemas.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
+                subschemas.emplace_back(make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
             }
             return jsoncons::make_unique<one_of_validator<Json>>(std::move(schema_path), std::move(subschemas));
         }
@@ -636,7 +643,7 @@ namespace jsonschema {
                     {
                         std::string sub_keys[] = {"dependencies"};
                         dependent_schemas.emplace(dep.key(),
-                            make_schema_validator(context, dep.value(), sub_keys, anchor_dict));
+                            make_cross_draft_schema_validator(context, dep.value(), sub_keys, anchor_dict));
                         break;
                     }
                     default:
@@ -657,7 +664,7 @@ namespace jsonschema {
             schema_validator_type property_names_schema_validator;
 
             std::string sub_keys[] = { "propertyNames"};
-            property_names_schema_validator = make_schema_validator(context, sch, sub_keys, anchor_dict);
+            property_names_schema_validator = make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
             return jsoncons::make_unique<property_names_validator<Json>>( std::move(schema_path),
                 std::move(property_names_schema_validator));
@@ -709,7 +716,7 @@ namespace jsonschema {
                     {
                         std::string sub_keys[] = {"dependentSchemas"};
                         dependent_schemas.emplace(dep.key(),
-                            make_schema_validator(context, dep.value(), sub_keys, anchor_dict));
+                            make_cross_draft_schema_validator(context, dep.value(), sub_keys, anchor_dict));
                         break;
                     }
                     default:
@@ -732,7 +739,7 @@ namespace jsonschema {
             std::string sub_keys[] = {"unevaluatedProperties"};
 
             return jsoncons::make_unique<unevaluated_properties_validator<Json>>( std::move(schema_path),
-                make_schema_validator(context, sch, sub_keys, anchor_dict));
+                make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
 
         virtual std::unique_ptr<unevaluated_items_validator<Json>> make_unevaluated_items_validator(
@@ -743,7 +750,7 @@ namespace jsonschema {
             std::string sub_keys[] = {"unevaluatedItems"};
 
             return jsoncons::make_unique<unevaluated_items_validator<Json>>( std::move(schema_path),
-                make_schema_validator(context, sch, sub_keys, anchor_dict));
+                make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
 
         void insert_schema(const uri_wrapper& identifier, schema_validator<Json>* s)
@@ -766,7 +773,7 @@ namespace jsonschema {
                 if (unresolved_refs != this->unresolved_refs_.end())
                 {
                     anchor_uri_map_type anchor_dict2;
-                    this->save_schema(make_schema_validator(compilation_context(new_uri), value, {}, anchor_dict2));
+                    this->save_schema(make_cross_draft_schema_validator(compilation_context(new_uri), value, {}, anchor_dict2));
                 }
                 else // no, nothing ref'd it, keep for later
                 {
@@ -807,7 +814,7 @@ namespace jsonschema {
                 {
                     auto& subsch = it2->second;
                     anchor_uri_map_type anchor_dict2;
-                    auto s = make_schema_validator(compilation_context(identifier), subsch, {}, anchor_dict2);
+                    auto s = make_cross_draft_schema_validator(compilation_context(identifier), subsch, {}, anchor_dict2);
                     this->unknown_keywords_.erase(it2);
                     auto orig = jsoncons::make_unique<ref_validator_type>(identifier.uri(), s.get());
                     this->save_schema(std::move(s));
