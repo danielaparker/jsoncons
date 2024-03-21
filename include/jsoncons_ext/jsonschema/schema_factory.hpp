@@ -48,15 +48,15 @@ namespace jsonschema {
                 auto it = sch.find("$schema");
                 if (it != sch.object_range().end())
                 { 
-                    if (it->value() == "https://json-schema.org/draft/2020-12/schema")
+                    if (it->value().as_string_view() == "https://json-schema.org/draft/2020-12/schema")
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, resolver);
                     }
-                    else if (it->value() == "https://json-schema.org/draft/2019-09/schema")
+                    else if (it->value().as_string_view() == "https://json-schema.org/draft/2019-09/schema")
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, resolver);
                     }
-                    else if (it->value() == "http://json-schema.org/draft-07/schema#")
+                    else if (it->value().as_string_view() == "http://json-schema.org/draft-07/schema#")
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, resolver);
                     }

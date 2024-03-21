@@ -47,7 +47,7 @@ namespace draft7 {
     public:
         schema_builder_7(const schema_builder_factory_type& builder_factory, 
             const uri_resolver<Json>& resolver) noexcept
-            : schema_builder<Json>(builder_factory, resolver)
+            : schema_builder<Json>("http://json-schema.org/draft-07/schema#", builder_factory, resolver)
         {
             init();
         }
