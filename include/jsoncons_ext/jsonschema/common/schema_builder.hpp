@@ -71,10 +71,10 @@ namespace jsonschema {
         evaluation_options options_;
         schema_validator_type root_;
 
-        // Owns all subschemas
+        // Owns external schemas
         std::vector<schema_validator_type> schemas_;
-    public:
         std::map<jsoncons::uri, schema_validator_pointer> schema_store_; 
+    public:
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
 
