@@ -79,7 +79,8 @@ namespace {
                             }
                         }
                     };
-                    validator.validate(test_case.at("data"), reporter);
+                    validator.validate(test_case.at("data"), reporter, 
+                        jsonschema::evaluation_options{}.require_format_validation(true));
                     if (errors == 0)
                     {
                         CHECK(test_case["valid"].as<bool>());
@@ -105,10 +106,15 @@ TEST_CASE("jsonschema draft7 tests")
 {
     SECTION("issues")
     {
+        //jsonschema_tests("./jsonschema/issues/draft7/issue-datetime.json");
         //jsonschema_tests("./jsonschema/issues/draft7/issue-dependencies.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/ref.json"); // *
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/format.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json");
+        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json"); // REVISIT
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json"); // REVISIT
     }
-//#if 0
+#if 0
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -227,5 +233,5 @@ TEST_CASE("jsonschema draft7 tests")
 
         CHECK_FALSE(validator.is_valid(instance));
     }
-//#endif
+#endif
 }

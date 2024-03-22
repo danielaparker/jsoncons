@@ -1,0 +1,166 @@
+an invalid date-time past leap second, UTC: "1998-12-31T23:59:61Z"
+
+an invalid date-time with leap second on a wrong minute, UTC: "1998-12-31T23:58:60Z"
+
+an invalid date-time with leap second on a wrong hour, UTC: "1998-12-31T22:59:60Z"
+
+enum class date_time_type {date_time,date,time};
+
+bool validate_date_time_rfc3339(const std::string& s, date_time_type type)
+{
+    enum class state_t {fullyear,month,mday,hour,minute,second,secfrac,z,offset_hour,offset_minute};
+
+    for (char c : s)
+    {
+        switch (state)
+        {
+            case state_t::hour:
+            {
+                if (piece_length < 2 && (c >= '0' && c <= '9'))
+                {
+                    piece_length++;
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else if (c == ':' && piece_length == 2 && (/*value >=0 && */ value <= 23))
+                {
+                    state = state_t::minute;
+                    value = 0;
+                    piece_length = 0;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            case state_t::minute:
+            {
+                if (piece_length < 2 && (c >= '0' && c <= '9'))
+                {
+                    piece_length++;
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 59))
+                {
+                    state = state_t::second;
+                    value = 0;
+                    piece_length = 0;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            case state_t::second:
+            {
+                if (piece_length < 2 && (c >= '0' && c <= '9'))
+                {
+                    piece_length++;
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else if (piece_length == 2 && (/*value >=0 && */value <= 60)) // 00-58, 00-59, 00-60 based on leap second rules
+                {
+                    switch (c)
+                    {
+                        case '.':
+                            value = 0;
+                            state = state_t::secfrac;
+                            break;
+                        case '+':
+                        case '-':
+                            value = 0;
+                            piece_length = 0;
+                            state = state_t::offset_hour;
+                            break;
+                        case 'Z':
+                        case 'z':
+                            state = state_t::z;
+                            break;
+                        default:
+                            return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            case state_t::secfrac:
+            {
+                if (c >= '0' && c <= '9')
+                {
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else
+                {
+                    switch (c)
+                    {
+                        case '+':
+                        case '-':
+                            value = 0;
+                            piece_length = 0;
+                            state = state_t::offset_hour;
+                            break;
+                        case 'Z':
+                        case 'z':
+                            state = state_t::z;
+                            break;
+                        default:
+                            return false;
+                    }
+                }
+                break;
+            }
+            case state_t::offset_hour:
+            {
+                if (piece_length < 2 && (c >= '0' && c <= '9'))
+                {
+                    piece_length++;
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 23))
+                {
+                    value = 0;
+                    piece_length = 0;
+                    state = state_t::offset_minute;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            case state_t::offset_minute:
+            {
+                if (piece_length < 2 && (c >= '0' && c <= '9'))
+                {
+                    piece_length++;
+                    value = value*10 + static_cast<std::size_t>(c - '0');
+                }
+                else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 59))
+                {
+                    value = 0;
+                    piece_length = 0;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            case state_t::z:
+                return false;
+        }
+    }
+
+    if (type == date_time_type::date)
+    {
+        return state == state_t::mday && piece_length == 2 && (mday >= 1 && mday <= days_in_month(year, month));
+    }
+    else
+    {
+        return state == state_t::offset_minute || state == state_t::z || state == state_t::secfrac;
+    }
+

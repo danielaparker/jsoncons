@@ -1,0 +1,25 @@
+[
+    {
+        "description": "validation of date-time strings",
+        "schema": { "format": "date-time" },
+        "tests": [
+            {
+                "description": "an invalid date-time past leap second, UTC",
+                "data": "1998-12-31T23:59:61Z",
+                "valid": false
+            },
+            {
+                "description": "an invalid date-time with leap second on a wrong minute, UTC",
+                "data": "1998-12-31T23:58:60Z",
+                "valid": false
+            },
+            {
+                "description": "an invalid date-time with leap second on a wrong hour, UTC",
+                "data": "1998-12-31T22:59:60Z",
+                "valid": false
+            }
+        ]
+    }
+]
+
+

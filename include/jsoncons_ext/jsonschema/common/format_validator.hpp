@@ -384,7 +384,7 @@ namespace jsonschema {
                 {
                     switch (c)
                     {
-                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             state = state_t::decbyte;
                             decbyte_count = 0;
                             digit_count = 1;
@@ -394,7 +394,7 @@ namespace jsonschema {
                             state = state_t::bindig;
                             digit_count = 0;
                             break;
-                        case 'o':
+                        case '0':
                             state = state_t::octdig;
                             digit_count = 0;
                             break;
@@ -618,7 +618,15 @@ namespace jsonschema {
         std::size_t year = 0;
         std::size_t month = 0;
         std::size_t mday = 0;
-        std::size_t value = 0;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        int secfrac = 0;
+        int offset_signum = 0;
+        std::size_t offset_hour = 0;
+        std::size_t offset_minute = 0;
+        
+        
         state_t state = (type == date_time_type::time) ? state_t::hour : state_t::fullyear;
 
         for (char c : s)
@@ -684,12 +692,11 @@ namespace jsonschema {
                     if (piece_length < 2 && (c >= '0' && c <= '9'))
                     {
                         piece_length++;
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        hour = hour*10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if (c == ':' && piece_length == 2 && (/*value >=0 && */ value <= 23))
+                    else if (c == ':' && piece_length == 2 && (/*hour >=0 && */ hour <= 23))
                     {
                         state = state_t::minute;
-                        value = 0;
                         piece_length = 0;
                     }
                     else
@@ -703,12 +710,11 @@ namespace jsonschema {
                     if (piece_length < 2 && (c >= '0' && c <= '9'))
                     {
                         piece_length++;
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        minute = minute*10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 59))
+                    else if (c == ':' && piece_length == 2 && (/*minute >=0 && */minute <= 59))
                     {
                         state = state_t::second;
-                        value = 0;
                         piece_length = 0;
                     }
                     else
@@ -722,19 +728,22 @@ namespace jsonschema {
                     if (piece_length < 2 && (c >= '0' && c <= '9'))
                     {
                         piece_length++;
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        second = second*10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if (piece_length == 2 && (/*value >=0 && */value <= 60)) // 00-58, 00-59, 00-60 based on leap second rules
+                    else if (piece_length == 2 && second <= 60) // 00-58, 00-59, 00-60 based on leap second rules
                     {
                         switch (c)
                         {
                             case '.':
-                                value = 0;
                                 state = state_t::secfrac;
                                 break;
                             case '+':
+                                offset_signum = 1;
+                                piece_length = 0;
+                                state = state_t::offset_hour;
+                                break;
                             case '-':
-                                value = 0;
+                                offset_signum = -1;
                                 piece_length = 0;
                                 state = state_t::offset_hour;
                                 break;
@@ -746,25 +755,25 @@ namespace jsonschema {
                                 return false;
                         }
                     }
-                    else
-                    {
-                        return false;
-                    }
                     break;
                 }
                 case state_t::secfrac:
                 {
                     if (c >= '0' && c <= '9')
                     {
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        secfrac = secfrac*10 + static_cast<std::size_t>(c - '0');
                     }
                     else
                     {
                         switch (c)
                         {
                             case '+':
+                                offset_signum = 1;
+                                piece_length = 0;
+                                state = state_t::offset_hour;
+                                break;
                             case '-':
-                                value = 0;
+                                offset_signum = -1;
                                 piece_length = 0;
                                 state = state_t::offset_hour;
                                 break;
@@ -783,11 +792,10 @@ namespace jsonschema {
                     if (piece_length < 2 && (c >= '0' && c <= '9'))
                     {
                         piece_length++;
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        offset_hour = offset_hour*10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 23))
+                    else if (c == ':' && piece_length == 2 && (/*offset_hour >=0 && */offset_hour <= 23))
                     {
-                        value = 0;
                         piece_length = 0;
                         state = state_t::offset_minute;
                     }
@@ -802,11 +810,10 @@ namespace jsonschema {
                     if (piece_length < 2 && (c >= '0' && c <= '9'))
                     {
                         piece_length++;
-                        value = value*10 + static_cast<std::size_t>(c - '0');
+                        offset_minute = offset_minute*10 + static_cast<std::size_t>(c - '0');
                     }
-                    else if (c == ':' && piece_length == 2 && (/*value >=0 && */value <= 59))
+                    else if (c == ':' && piece_length == 2 && (/*offset_minute >=0 && */offset_minute <= 59))
                     {
-                        value = 0;
                         piece_length = 0;
                     }
                     else
@@ -819,6 +826,38 @@ namespace jsonschema {
                     return false;
             }
         }
+        
+        if (offset_signum == -1)
+        {
+            hour += offset_hour;
+            minute += offset_minute;
+        }
+        else if (offset_signum == 1)
+        {
+            hour -= offset_hour;
+            minute -= offset_minute;
+        }
+        if (hour <= 0)
+        {
+            hour += 23;
+        }
+        if (minute <= 0)
+        {
+            minute += 60;
+        }
+
+        if (hour > 23 || minute > 59 || second > 60 || offset_hour > 23 || offset_minute > 59)
+        {
+            return false;
+        }
+        if (second == 60 && !(hour == 23 && minute == 59))
+        {
+            return false;
+        }
+        //if (second == 60 && offset_signum == -1 && !(offset_hour == 0 && offset_minute == 0))
+        //{
+        //    return false;
+        //}
 
         if (type == date_time_type::date)
         {
