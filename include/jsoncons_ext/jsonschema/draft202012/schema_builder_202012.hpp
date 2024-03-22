@@ -34,7 +34,6 @@ namespace draft202012 {
     public:
         using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using dynamic_ref_validator_type = dynamic_ref_validator<Json>;
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
