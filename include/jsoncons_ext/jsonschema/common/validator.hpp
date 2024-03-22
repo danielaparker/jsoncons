@@ -93,13 +93,17 @@ namespace jsonschema {
             }
         }
     };
+
+    enum class spec_version{draft7, draft201909, draft202012};
     
     class evaluation_options
     {
+        spec_version default_version_;
         bool require_format_validation_;
     public:
         evaluation_options()
-            : require_format_validation_(false)
+            : default_version_{spec_version::draft7}, 
+              require_format_validation_(false)
         {
         }
         
@@ -110,6 +114,16 @@ namespace jsonschema {
         evaluation_options& require_format_validation(bool value) 
         {
             require_format_validation_ = value;
+            return *this;
+        }
+        
+        spec_version default_version() const
+        {
+            return default_version_;
+        }
+        evaluation_options& default_version(spec_version version) 
+        {
+            default_version_ = version;
             return *this;
         }
     };

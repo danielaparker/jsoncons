@@ -14,24 +14,6 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    enum class spec_version{draft7, draft201909, draft202012};
-    
-    inline
-    std::string to_string(spec_version version)
-    {
-        switch (version)
-        {
-            case spec_version::draft7:
-                return "http://json-schema.org/draft-07/schema#";
-            case spec_version::draft201909:
-                return "https://json-schema.org/draft/2019-09/schema";
-            case spec_version::draft202012:
-                return "https://json-schema.org/draft/2020-12/schema";
-            default:
-                return "unsupported";
-        }
-    }
-
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
@@ -39,7 +21,8 @@ namespace jsonschema {
     class schema_builder
     {
     public:
-        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&, const uri_resolver<Json>&)>;
+        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&, 
+            const uri_resolver<Json>&, const evaluation_options&)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -51,6 +34,7 @@ namespace jsonschema {
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
         uri_resolver<Json> resolver_;
+        evaluation_options options_;
         schema_validator_type root_;
 
         // Owns all subschemas
@@ -62,8 +46,9 @@ namespace jsonschema {
 
     public:
 
-        schema_builder(const std::string& spec_version, const schema_builder_factory_type& builder_factory, uri_resolver<Json> resolver)
-            : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver)
+        schema_builder(const std::string& spec_version, const schema_builder_factory_type& builder_factory, 
+            uri_resolver<Json> resolver, evaluation_options options)
+            : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options))
         {
         }
 
@@ -89,6 +74,11 @@ namespace jsonschema {
         {
             anchor_uri_map_type anchor_dict;
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
+        }
+        
+        evaluation_options options() const
+        {
+            return options_;
         }
 
         std::unique_ptr<document_schema_validator<Json>> get_schema()
@@ -173,7 +163,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, resolver_);
+                            auto schema_builder = builder_factory_(sch, resolver_, options_);
                             schema_builder->build_schema(sch);
                             schema_val = schema_builder->get_schema();
                             if (schema_val->id())

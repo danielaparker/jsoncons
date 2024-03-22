@@ -56,7 +56,7 @@ namespace {
             try
             {
                 auto schema = jsonschema::make_schema(test_group.at("schema"), resolver, 
-                    jsonschema::spec_version::draft202012);
+                    jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft202012));
                 jsonschema::json_validator<json> validator(schema);
 
                 int count_test = 0;

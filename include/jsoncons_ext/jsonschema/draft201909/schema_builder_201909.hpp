@@ -46,8 +46,8 @@ namespace draft201909 {
 
     public:
         schema_builder_201909(const schema_builder_factory_type& builder_factory, 
-            const uri_resolver<Json>& resolver) noexcept
-            : schema_builder<Json>("https://json-schema.org/draft/2019-09/schema", builder_factory, resolver)
+            const uri_resolver<Json>& resolver, evaluation_options options) noexcept
+            : schema_builder<Json>("https://json-schema.org/draft/2019-09/schema", builder_factory, resolver, options)
         {
             init();
         }
@@ -65,8 +65,11 @@ namespace draft201909 {
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_content_encoding_validator(context, sch);});
             keyword_factory_map_.emplace("contentMediaType", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch);});
-            keyword_factory_map_.emplace("format", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_format_validator(context, sch);});
+            if (this->options().require_format_validation())
+            {
+                keyword_factory_map_.emplace("format", 
+                    [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_format_validator(context, sch);});
+            }
 #if defined(JSONCONS_HAS_STD_REGEX)
             keyword_factory_map_.emplace("pattern", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_pattern_validator(context, sch);});

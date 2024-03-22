@@ -55,7 +55,8 @@ namespace {
             try
             {
                 auto schema = jsonschema::make_schema(test_group.at("schema"), resolver, 
-                    jsonschema::spec_version::draft7);
+                    jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft7)
+                    .require_format_validation(true));
                 jsonschema::json_validator<json> validator(schema);
 
                 int count_test = 0;
@@ -114,7 +115,7 @@ TEST_CASE("jsonschema draft7 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json"); // REVISIT
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json"); // REVISIT
     }
-#if 0
+//#if 0
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -233,5 +234,5 @@ TEST_CASE("jsonschema draft7 tests")
 
         CHECK_FALSE(validator.is_valid(instance));
     }
-#endif
+//#endif
 }
