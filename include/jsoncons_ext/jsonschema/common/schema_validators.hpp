@@ -75,11 +75,10 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
             error_reporter& reporter, 
-            Json& patch, 
-            const evaluation_options& options) const 
+            Json& patch) const 
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
-            schema_val_->validate(context, instance, instance_location, results, reporter, patch, options);
+            schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
     };
 
@@ -139,8 +138,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
-            Json& /*patch*/, 
-            const evaluation_options& /*options*/) const final
+            Json& /*patch*/) const final
         {
             if (!value_)
             {
@@ -262,8 +260,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch, 
-            const evaluation_options& options) const final
+            Json& patch) const final
         {
             //std::cout << "object_schema_validator begin[" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
@@ -292,7 +289,7 @@ namespace jsonschema {
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
+                val->validate(this_context, instance, instance_location, local_results, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -301,7 +298,7 @@ namespace jsonschema {
             
             if (unevaluated_properties_val_)
             {
-                unevaluated_properties_val_->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
+                unevaluated_properties_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;
@@ -310,7 +307,7 @@ namespace jsonschema {
 
             if (unevaluated_items_val_)
             {
-                unevaluated_items_val_->validate(this_context, instance, instance_location, local_results, reporter, patch, options);
+                unevaluated_items_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
                     return;

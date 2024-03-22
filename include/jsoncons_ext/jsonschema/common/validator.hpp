@@ -152,10 +152,9 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch, 
-            const evaluation_options& options) const 
+            Json& patch) const 
         {
-            do_validate(context, instance, instance_location, results, reporter, patch, options);
+            do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
     private:
@@ -163,7 +162,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch, const evaluation_options& options) const = 0;
+            Json& patch) const = 0;
     };
 
     template <class Json>
@@ -246,8 +245,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch, 
-            const evaluation_options& options) const override
+            Json& patch) const override
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
@@ -261,7 +259,7 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch, options);
+            referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
     };
 

@@ -80,8 +80,7 @@ namespace {
                             }
                         }
                     };
-                    validator.validate(test_case.at("data"), reporter, 
-                        jsonschema::evaluation_options{}.require_format_validation(true));
+                    validator.validate(test_case.at("data"), reporter);
                     if (errors == 0)
                     {
                         CHECK(test_case["valid"].as<bool>());
