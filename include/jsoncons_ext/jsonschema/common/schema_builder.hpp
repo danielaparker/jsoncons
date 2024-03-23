@@ -55,10 +55,10 @@ namespace jsonschema {
     class schema_builder
     {
     public:
-        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&, 
-            const uri_resolver<Json>&, const evaluation_options&)>;
+        using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
+        using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
+            const uri_resolver<Json>&, const evaluation_options&,schema_store_type*)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_pointer = schema_validator<Json>*;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
         using ref_type = ref<Json>;
@@ -73,7 +73,7 @@ namespace jsonschema {
 
         // Owns external schemas
         std::vector<schema_validator_type> schemas_;
-        std::map<jsoncons::uri, schema_validator_pointer> schema_store_; 
+        schema_store_type* schema_store_ptr_;
     public:
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
@@ -81,9 +81,11 @@ namespace jsonschema {
     public:
 
         schema_builder(const std::string& spec_version, const schema_builder_factory_type& builder_factory, 
-            uri_resolver<Json> resolver, evaluation_options options)
-            : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options))
+            uri_resolver<Json> resolver, evaluation_options options, schema_store_type* schema_store_ptr)
+            : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
+              schema_store_ptr_(schema_store_ptr)
         {
+            JSONCONS_ASSERT(schema_store_ptr != nullptr);
         }
 
         virtual ~schema_builder() = default;
@@ -133,7 +135,7 @@ namespace jsonschema {
                 {
                     auto loc = unresolved_refs_[i].first;
                     //std::cout << "unresolved: " << loc.string() << "\n";
-                    if (schema_store_.find(loc) == schema_store_.end()) // registry for this file is empty
+                    if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
                     {
                         if (resolver_)
                         {
@@ -161,8 +163,8 @@ namespace jsonschema {
         {
             for (auto& ref : unresolved_refs_)
             {
-                auto it = schema_store_.find(ref.first);
-                if (it == schema_store_.end())
+                auto it = schema_store_ptr_->find(ref.first);
+                if (it == schema_store_ptr_->end())
                 {
                     JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
                 }
@@ -197,14 +199,9 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, resolver_, options_);
+                            auto schema_builder = builder_factory_(sch, resolver_, options_, schema_store_ptr_);
                             schema_builder->build_schema(sch);
                             schema_val = schema_builder->get_schema();
-                            if (schema_val->id())
-                            {
-                                schema_validator<Json>* p = schema_val.get();
-                                this->insert_schema(uri_wrapper(*(schema_val->id())), p);
-                            }
                         }
                     }
                     else
@@ -797,7 +794,7 @@ namespace jsonschema {
 
         void insert_schema(const uri_wrapper& identifier, schema_validator<Json>* s)
         {
-            this->schema_store_.emplace(identifier.uri(), s);
+            this->schema_store_ptr_->emplace(identifier.uri(), s);
         }
 
         void insert_unknown_keyword(const uri_wrapper& uri, 
@@ -837,8 +834,8 @@ namespace jsonschema {
         std::unique_ptr<ref_validator<Json>> get_or_create_reference(const uri_wrapper& identifier)
         {
             // a schema already exists
-            auto it = this->schema_store_.find(identifier.uri());
-            if (it != this->schema_store_.end())
+            auto it = this->schema_store_ptr_->find(identifier.uri());
+            if (it != this->schema_store_ptr_->end())
             {
                 return jsoncons::make_unique<ref_validator_type>(identifier.uri(), it->second);
             }

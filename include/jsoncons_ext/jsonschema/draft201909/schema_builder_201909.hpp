@@ -32,6 +32,7 @@ namespace draft201909 {
     class schema_builder_201909 : public schema_builder<Json> 
     {
     public:
+        using schema_store_type = typename schema_builder<Json>::schema_store_type;
         using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -45,8 +46,9 @@ namespace draft201909 {
 
     public:
         schema_builder_201909(const schema_builder_factory_type& builder_factory, 
-            const uri_resolver<Json>& resolver, evaluation_options options) noexcept
-            : schema_builder<Json>("https://json-schema.org/draft/2019-09/schema", builder_factory, resolver, options)
+            const uri_resolver<Json>& resolver, evaluation_options options, 
+            schema_store_type* schema_store_ptr) noexcept
+            : schema_builder<Json>("https://json-schema.org/draft/2019-09/schema", builder_factory, resolver, options, schema_store_ptr)
         {
             init();
         }
