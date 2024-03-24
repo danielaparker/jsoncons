@@ -112,7 +112,9 @@ TEST_CASE("jsonschema draft7 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/format.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json"); // REVISIT
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json"); // REVISIT
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date_time.json"); // REVISIT
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json"); // REVISIT
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json");
     }
 //#if 0
     SECTION("tests")
