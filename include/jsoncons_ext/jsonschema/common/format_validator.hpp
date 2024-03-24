@@ -623,9 +623,8 @@ namespace jsonschema {
         int second = 0;
         int secfrac = 0;
         int offset_signum = 0;
-        std::size_t offset_hour = 0;
-        std::size_t offset_minute = 0;
-        
+        int offset_hour = 0;
+        int offset_minute = 0;      
         
         state_t state = (type == date_time_type::time) ? state_t::hour : state_t::fullyear;
 
@@ -823,41 +822,56 @@ namespace jsonschema {
                     break;
                 }
                 case state_t::z:
+                    return false; // Nothing follows z
+                default:
                     return false;
             }
         }
         
+        switch (state)
+        {
+            case state_t::hour:
+            case state_t::minute:
+            case state_t::second:
+            case state_t::secfrac:
+                return false;
+            default:
+                break;
+        }
+        
+        if (offset_hour < 0 || offset_hour > 23)
+        {
+            return false;
+        }
+        if (offset_minute < 0 || offset_minute > 59)
+        {
+            return false;
+        }
         if (offset_signum == -1)
         {
-            hour += offset_hour;
-            minute += offset_minute;
+            offset_hour = -offset_hour;
+            offset_minute = -offset_minute;
         }
-        else if (offset_signum == 1)
+        auto day_minutes = hour * 60 + minute - (offset_hour * 60 + offset_minute);
+        if (day_minutes < 0)
+            day_minutes += 60 * 24;
+        hour = day_minutes % 24;
+        minute = day_minutes / 24;
+        
+        if (hour == 23 && minute == 59)
         {
-            hour -= offset_hour;
-            minute -= offset_minute;
+            if (second < 0 || second > 60)
+            {
+                return false;
+            }
         }
-        if (hour <= 0)
+        else
         {
-            hour += 23;
+            if (second < 0 || second > 59)
+            {
+                return false;
+            }
         }
-        if (minute <= 0)
-        {
-            minute += 60;
-        }
-
-        if (hour > 23 || minute > 59 || second > 60 || offset_hour > 23 || offset_minute > 59)
-        {
-            return false;
-        }
-        if (second == 60 && !(hour == 23 && minute == 59))
-        {
-            return false;
-        }
-        //if (second == 60 && offset_signum == -1 && !(offset_hour == 0 && offset_minute == 0))
-        //{
-        //    return false;
-        //}
 
         if (type == date_time_type::date)
         {
