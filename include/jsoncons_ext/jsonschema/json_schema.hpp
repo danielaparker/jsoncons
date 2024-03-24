@@ -54,7 +54,10 @@ namespace jsonschema {
             reporter_(e);
         }
     };
-
+    
+    template <class Json>
+    class json_validator;
+    
     template <class Json>
     class json_schema
     {
@@ -62,6 +65,8 @@ namespace jsonschema {
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
         schema_validator_type root_;
+        
+        friend class json_validator<Json>;
     public:
         json_schema(schema_validator_type&& root)
             : root_(std::move(root))
@@ -114,6 +119,32 @@ namespace jsonschema {
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
             return patch;
+        }
+
+        // Validate input JSON against a JSON Schema with a provided error reporter
+        template <class Reporter>
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,void>::type
+        validate(const Json& instance, Reporter&& reporter, Json& patch) const
+        {
+            jsonpointer::json_pointer instance_location("#");
+            patch = Json(json_array_arg);
+
+            error_reporter_adaptor adaptor(std::forward<Reporter>(reporter));
+            evaluation_context<Json> context;
+            evaluation_results results;
+            root_->validate(context, instance, instance_location, results, adaptor, patch);
+        }
+        
+    private:
+        // Validate input JSON against a JSON Schema with a provided error reporter
+        void validate2(const Json& instance, error_reporter& reporter, Json& patch) const
+        {
+            jsonpointer::json_pointer instance_location("#");
+            patch = Json(json_array_arg);
+
+            evaluation_context<Json> context;
+            evaluation_results results;
+            root_->validate(context, instance, instance_location, results, reporter, patch);
         }
     };
 

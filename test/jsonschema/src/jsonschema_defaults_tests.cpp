@@ -39,7 +39,50 @@ TEST_CASE("jsonschema defaults tests")
             json data = json::parse("{}");
 
             // will throw schema_error if JSON Schema loading fails 
-            jsonschema::json_schema<json> validator = jsonschema::make_schema(schema); 
+            jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema); 
+
+            // will throw a validation_error when a schema violation happens 
+            json patch = validator.validate(data); 
+
+            std::cout << "patch:\n" << pretty_print(patch) << "\n";
+
+            jsonpatch::apply_patch(data, patch);
+
+            json expected = json::parse(R"(
+            {"bar":"bad"}
+ )");
+
+            CHECK(data == expected);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+
+    }
+
+    SECTION("Legacy")
+    {
+        json schema = json::parse(R"(
+{
+    "properties": {
+        "bar": {
+            "type": "string",
+            "minLength": 4,
+            "default": "bad"
+        }
+    }
+}
+    )");
+
+        try
+        {
+            // Data
+            json data = json::parse("{}");
+
+            // will throw schema_error if JSON Schema loading fails 
+            auto sch = jsonschema::make_schema(schema); 
+            jsonschema::json_validator validator(sch);
 
             // will throw a validation_error when a schema violation happens 
             json patch = validator.validate(data); 

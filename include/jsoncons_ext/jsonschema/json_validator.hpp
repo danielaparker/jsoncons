@@ -46,11 +46,9 @@ namespace jsonschema {
         Json validate(const Json& instance) const
         {
             throwing_error_reporter reporter;
-            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            evaluation_results results;
-            root_->validate(instance, instance_location, results, reporter, patch);
+            root_->validate2(instance, reporter, patch);
             return patch;
         }
 
@@ -58,25 +56,20 @@ namespace jsonschema {
         bool is_valid(const Json& instance) const
         {
             fail_early_reporter reporter;
-            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            evaluation_results results;
-            root_->validate(instance, instance_location, results, reporter, patch);
+            root_->validate2(instance, reporter, patch);
             return reporter.error_count() == 0;
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
         typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
-        validate(const Json& instance, const Reporter& reporter) const
+        validate(const Json& instance, Reporter&& reporter) const
         {
-            jsonpointer::json_pointer instance_location("#");
             Json patch(json_array_arg);
 
-            error_reporter_adaptor adaptor(reporter);
-            evaluation_results results;
-            root_->validate(instance, instance_location, results, adaptor, patch);
+            //root_->validate(instance, std::forward<Reporter>(reporter), patch);
             return patch;
         }
     };

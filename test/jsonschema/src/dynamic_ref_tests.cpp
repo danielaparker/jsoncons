@@ -65,7 +65,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
                 throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
             }
         };
-    jsonschema::json_schema<json> validator = jsonschema::make_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> validator = jsonschema::make_json_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -152,7 +152,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
                 throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
             }
         };
-    jsonschema::json_schema<json> validator = jsonschema::make_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> validator = jsonschema::make_json_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -236,7 +236,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
 
     json schema = json::parse(schema_string);
 
-    jsonschema::json_schema<json> validator = jsonschema::make_schema(schema); 
+    jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema); 
 
     SECTION("/then/$defs/thingy is the final stop for the $dynamicRef")
     {

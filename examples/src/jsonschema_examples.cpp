@@ -80,7 +80,7 @@ void reporter_example()
     try
     {
         // Throws schema_error if JSON Schema loading fails
-        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema);
+        jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema);
 
         std::size_t error_count = 0;
         auto reporter = [&error_count](const jsonschema::validation_output& o)
@@ -140,7 +140,7 @@ void uriresolver_example()
     try
     {
         // Throws schema_error if JSON Schema loading fails
-        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema, resolver);
+        jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema, resolver);
 
         std::size_t error_count = 0;
         auto reporter = [&error_count](const jsonschema::validation_output& o)
@@ -181,7 +181,7 @@ void defaults_example()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema loading fails 
-        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema, resolver); 
+        jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema, resolver); 
 
         // will throw a validation_error when a schema violation happens 
         json patch = validator.validate(data); 
@@ -316,7 +316,7 @@ void validate_before_decode_example()
         json data = json::parse(test_data);
 
         // Throws schema_error if JSON Schema loading fails
-        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema);
+        jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema);
 
         // Test that input is valid before attempting to decode
         if (validator.is_valid(data))

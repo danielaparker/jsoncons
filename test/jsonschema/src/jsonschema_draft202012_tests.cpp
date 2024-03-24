@@ -55,7 +55,7 @@ namespace {
             ++count;
             try
             {
-                jsonschema::json_schema<json> validator = jsonschema::make_schema(test_group.at("schema"), resolver, 
+                jsonschema::json_schema<json> validator = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
                     jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft202012));
 
                 int count_test = 0;
