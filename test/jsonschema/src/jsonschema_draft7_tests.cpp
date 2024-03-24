@@ -1,4 +1,4 @@
-// Copyright 2013-2023 Daniel Parker
+// Copyright 2013-2024 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -54,7 +54,7 @@ namespace {
             ++count;
             try
             {
-                jsonschema::json_schema<json> validator = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
+                jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
                     jsonschema::json_schema_options{}.default_version(jsonschema::spec_version::draft7)
                     .require_format_validation(true));
 
@@ -79,7 +79,7 @@ namespace {
                             }
                         }
                     };
-                    validator.validate(test_case.at("data"), reporter);
+                    compiled.validate(test_case.at("data"), reporter);
                     if (errors == 0)
                     {
                         CHECK(test_case["valid"].as<bool>());
@@ -228,9 +228,9 @@ TEST_CASE("jsonschema draft7 tests")
     ]
  )");
 
-        jsonschema::json_schema<json> validator = jsoncons::jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<json> compiled = jsoncons::jsonschema::make_json_schema(schema);
 
-        CHECK_FALSE(validator.is_valid(instance));
+        CHECK_FALSE(compiled.is_valid(instance));
     }
 //#endif
 }

@@ -1,4 +1,4 @@
-// Copyright 2013-2023 Daniel Parker
+// Copyright 2013-2024 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -55,9 +55,9 @@ TEST_CASE("jsonschema validator tests")
 ]
         )");
 
-        jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
-        CHECK_FALSE(validator.is_valid(instance));
+        CHECK_FALSE(compiled.is_valid(instance));
     }
 }
 
