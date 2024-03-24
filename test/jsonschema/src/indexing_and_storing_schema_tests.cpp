@@ -61,7 +61,7 @@ TEST_CASE("jsonschema indexing and storing schema tests")
                 throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
             }
         };
-    auto sch = jsonschema::make_schema(schema_document, resolver); 
+    jsonschema::json_schema<json> validator = jsonschema::make_schema(schema_document, resolver); 
 
     SECTION("test 1")
     {

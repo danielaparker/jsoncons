@@ -23,43 +23,6 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class throwing_error_reporter : public error_reporter
-    {
-        void do_error(const validation_output& o) override
-        {
-            JSONCONS_THROW(validation_error(o.instance_location() + ": " + o.message()));
-        }
-    };
-
-    class fail_early_reporter : public error_reporter
-    {
-        void do_error(const validation_output&) override
-        {
-        }
-    public:
-        fail_early_reporter()
-            : error_reporter(true)
-        {
-        }
-    };
-
-    using error_reporter_t = std::function<void(const validation_output& o)>;
-
-    struct error_reporter_adaptor : public error_reporter
-    {
-        error_reporter_t reporter_;
-
-        error_reporter_adaptor(const error_reporter_t& reporter)
-            : reporter_(reporter)
-        {
-        }
-    private:
-        void do_error(const validation_output& e) override
-        {
-            reporter_(e);
-        }
-    };
-
     template <class Json>
     class json_validator
     {

@@ -65,7 +65,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
                 throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
             }
         };
-    auto sch = jsonschema::make_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> validator = jsonschema::make_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -81,8 +81,6 @@ TEST_CASE("jsonschema $recursiveRef tests")
 
             // Data
             json data = json::parse(data_string);
-
-            jsonschema::json_validator<json> validator(sch); 
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& /*o*/)
@@ -154,7 +152,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
                 throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
             }
         };
-    auto sch = jsonschema::make_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> validator = jsonschema::make_schema(strict_tree_schema, resolver); 
 
     SECTION("instance with misspelled field")
     {
@@ -170,8 +168,6 @@ TEST_CASE("jsonschema $dynamicRef tests")
 
             // Data
             json data = json::parse(data_string);
-
-            jsonschema::json_validator<json> validator(sch); 
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& /*o*/)
@@ -240,7 +236,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
 
     json schema = json::parse(schema_string);
 
-    auto sch = jsonschema::make_schema(schema); 
+    jsonschema::json_schema<json> validator = jsonschema::make_schema(schema); 
 
     SECTION("/then/$defs/thingy is the final stop for the $dynamicRef")
     {
@@ -250,8 +246,6 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
 
             // Data
             json data(jsoncons::null_type{});
-
-            jsonschema::json_validator<json> validator(sch); 
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& o)

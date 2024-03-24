@@ -55,8 +55,7 @@ TEST_CASE("jsonschema output format tests")
 ]
         )");
 
-        auto sch = jsonschema::make_schema(schema);
-        jsonschema::json_validator<json> validator(sch);
+        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema);
 
         auto reporter = [](const jsonschema::validation_output& o)
         {
@@ -163,8 +162,7 @@ TEST_CASE("jsonschema output format tests 2")
 }
 )");
 
-        auto sch = jsonschema::make_schema(schema);
-        jsonschema::json_validator<json> validator(sch);
+        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema);
 
         auto reporter = [](const jsonschema::validation_output& o)
         {

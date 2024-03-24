@@ -55,9 +55,8 @@ namespace {
             ++count;
             try
             {
-                auto schema = jsonschema::make_schema(test_group.at("schema"), resolver, 
+                jsonschema::json_schema<json> validator = jsonschema::make_schema(test_group.at("schema"), resolver, 
                     jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft201909));
-                jsonschema::json_validator<json> validator(schema);
 
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 

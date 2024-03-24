@@ -55,8 +55,7 @@ TEST_CASE("jsonschema validator tests")
 ]
         )");
 
-        auto sch = jsonschema::make_schema(schema);
-        jsonschema::json_validator<json> validator(sch);
+        jsonschema::json_schema<json> validator = jsonschema::make_schema(schema);
 
         CHECK_FALSE(validator.is_valid(instance));
     }

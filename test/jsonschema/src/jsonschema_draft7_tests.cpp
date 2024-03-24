@@ -54,10 +54,9 @@ namespace {
             ++count;
             try
             {
-                auto schema = jsonschema::make_schema(test_group.at("schema"), resolver, 
+                jsonschema::json_schema<json> validator = jsonschema::make_schema(test_group.at("schema"), resolver, 
                     jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft7)
                     .require_format_validation(true));
-                jsonschema::json_validator<json> validator(schema);
 
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
@@ -228,8 +227,7 @@ TEST_CASE("jsonschema draft7 tests")
     ]
  )");
 
-        auto sch = jsoncons::jsonschema::make_schema(schema);
-        jsoncons::jsonschema::json_validator<jsoncons::json> validator(sch);
+        jsonschema::json_schema<json> validator = jsoncons::jsonschema::make_schema(schema);
 
         CHECK_FALSE(validator.is_valid(instance));
     }
