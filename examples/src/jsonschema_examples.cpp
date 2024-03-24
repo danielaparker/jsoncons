@@ -184,7 +184,8 @@ void defaults_example()
         jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema, resolver); 
 
         // will throw a validation_error when a schema violation happens 
-        json patch = validator.validate(data); 
+        json patch;
+        validator.validate(data, patch); 
 
         std::cout << "Patch: " << patch << "\n";
 

@@ -42,7 +42,8 @@ TEST_CASE("jsonschema defaults tests")
             jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema); 
 
             // will throw a validation_error when a schema violation happens 
-            json patch = validator.validate(data); 
+            json patch;
+            validator.validate(data, patch); 
 
             std::cout << "patch:\n" << pretty_print(patch) << "\n";
 

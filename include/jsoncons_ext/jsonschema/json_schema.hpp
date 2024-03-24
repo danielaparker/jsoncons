@@ -108,7 +108,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,void>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
             jsonpointer::json_pointer instance_location("#");
@@ -118,7 +118,6 @@ namespace jsonschema {
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
-            return patch;
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
@@ -133,6 +132,18 @@ namespace jsonschema {
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
+        }
+
+        // Validate input JSON against a JSON Schema with a provided error reporter
+        void validate(const Json& instance, Json& patch) const
+        {
+            jsonpointer::json_pointer instance_location("#");
+            patch = Json(json_array_arg);
+
+            fail_early_reporter reporter;
+            evaluation_context<Json> context;
+            evaluation_results results;
+            root_->validate(context, instance, instance_location, results, reporter, patch);
         }
         
     private:

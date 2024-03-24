@@ -69,7 +69,7 @@ namespace jsonschema {
         {
             Json patch(json_array_arg);
 
-            //root_->validate(instance, std::forward<Reporter>(reporter), patch);
+            root_->validate2(instance, std::forward<Reporter>(reporter), patch);
             return patch;
         }
     };
