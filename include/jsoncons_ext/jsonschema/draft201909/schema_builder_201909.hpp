@@ -46,7 +46,7 @@ namespace draft201909 {
 
     public:
         schema_builder_201909(const schema_builder_factory_type& builder_factory, 
-            const uri_resolver<Json>& resolver, evaluation_options options, 
+            const uri_resolver<Json>& resolver, json_schema_options options, 
             schema_store_type* schema_store_ptr) noexcept
             : schema_builder<Json>("https://json-schema.org/draft/2019-09/schema", builder_factory, resolver, options, schema_store_ptr)
         {

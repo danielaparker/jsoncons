@@ -46,7 +46,7 @@ namespace draft7 {
 
     public:
         schema_builder_7(const schema_builder_factory_type& builder_factory, 
-            const uri_resolver<Json>& resolver, evaluation_options options, 
+            const uri_resolver<Json>& resolver, json_schema_options options, 
             schema_store_type* schema_store_ptr) 
             : schema_builder<Json>("http://json-schema.org/draft-07/schema#", builder_factory, resolver, options, schema_store_ptr)
         {

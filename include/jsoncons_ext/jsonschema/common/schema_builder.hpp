@@ -19,13 +19,13 @@ namespace jsonschema {
 
     enum class spec_version{draft7, draft201909, draft202012};
 
-    class evaluation_options
+    class json_schema_options
     {
         spec_version default_version_;
         bool require_format_validation_;
         bool compatibility_mode_;
     public:
-        evaluation_options()
+        json_schema_options()
             : default_version_{spec_version::draft7}, 
               require_format_validation_(false), compatibility_mode_(false)
         {
@@ -35,7 +35,7 @@ namespace jsonschema {
         {
             return require_format_validation_;
         }
-        evaluation_options& require_format_validation(bool value) 
+        json_schema_options& require_format_validation(bool value) 
         {
             require_format_validation_ = value;
             return *this;
@@ -45,7 +45,7 @@ namespace jsonschema {
         {
             return compatibility_mode_;
         }
-        evaluation_options& compatibility_mode(bool value) 
+        json_schema_options& compatibility_mode(bool value) 
         {
             compatibility_mode_ = value;
             return *this;
@@ -55,7 +55,7 @@ namespace jsonschema {
         {
             return default_version_;
         }
-        evaluation_options& default_version(spec_version version) 
+        json_schema_options& default_version(spec_version version) 
         {
             default_version_ = version;
             return *this;
@@ -68,7 +68,7 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const uri_resolver<Json>&, const evaluation_options&,schema_store_type*)>;
+            const uri_resolver<Json>&, const json_schema_options&,schema_store_type*)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
@@ -79,7 +79,7 @@ namespace jsonschema {
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
         uri_resolver<Json> resolver_;
-        evaluation_options options_;
+        json_schema_options options_;
         schema_validator_type root_;
 
         // Owns external schemas
@@ -92,7 +92,7 @@ namespace jsonschema {
     public:
 
         schema_builder(const std::string& spec_version, const schema_builder_factory_type& builder_factory, 
-            uri_resolver<Json> resolver, evaluation_options options, schema_store_type* schema_store_ptr)
+            uri_resolver<Json> resolver, json_schema_options options, schema_store_type* schema_store_ptr)
             : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr)
         {
@@ -123,7 +123,7 @@ namespace jsonschema {
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
         }
         
-        evaluation_options options() const
+        json_schema_options options() const
         {
             return options_;
         }

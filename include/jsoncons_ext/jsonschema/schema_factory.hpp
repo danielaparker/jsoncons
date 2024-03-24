@@ -47,7 +47,7 @@ namespace jsonschema {
         }
             
         std::unique_ptr<schema_builder<Json>> operator()(const Json& sch, const uri_resolver<Json>& resolver,
-            evaluation_options options, schema_store_type* schema_store_ptr) const
+            json_schema_options options, schema_store_type* schema_store_ptr) const
         {
             std::unique_ptr<schema_builder<Json>> builder_factory;
 
@@ -116,7 +116,7 @@ namespace jsonschema {
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,json_schema<Json>>::type
     make_json_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -129,7 +129,7 @@ namespace jsonschema {
 
     template <class Json>
     json_schema<Json> make_json_schema(const Json& sch, const std::string& retrieval_uri, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -143,7 +143,7 @@ namespace jsonschema {
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,json_schema<Json>>::type
     make_json_schema(const Json& sch, const URIResolver& resolver, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -156,7 +156,7 @@ namespace jsonschema {
 
     template <class Json>
     json_schema<Json> make_json_schema(const Json& sch, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -171,7 +171,7 @@ namespace jsonschema {
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -184,7 +184,7 @@ namespace jsonschema {
 
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -198,7 +198,7 @@ namespace jsonschema {
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& sch, const URIResolver& resolver, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
@@ -211,7 +211,7 @@ namespace jsonschema {
 
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, 
-        evaluation_options options = evaluation_options{})
+        json_schema_options options = json_schema_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 

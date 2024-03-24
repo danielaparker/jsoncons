@@ -56,7 +56,7 @@ namespace {
             try
             {
                 jsonschema::json_schema<json> validator = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
-                    jsonschema::evaluation_options{}.default_version(jsonschema::spec_version::draft202012));
+                    jsonschema::json_schema_options{}.default_version(jsonschema::spec_version::draft202012));
 
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
