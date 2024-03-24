@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_SCHEMA_FACTORY_HPP
+#ifndef JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
+#define JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
 #include <jsoncons_ext/jsonschema/draft7/schema_builder_7.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
