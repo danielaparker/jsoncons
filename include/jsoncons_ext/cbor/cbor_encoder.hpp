@@ -205,7 +205,7 @@ private:
             binary::native_to_big(static_cast<uint32_t>(length), 
                                   std::back_inserter(sink_));
         } 
-        else if (length <= 0xffffffffffffffff)
+        else if (uint64_t(length) <= 0xffffffffffffffff)
         {
             binary::native_to_big(static_cast<uint8_t>(0xbb), 
                                   std::back_inserter(sink_));
