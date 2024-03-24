@@ -23,10 +23,11 @@ namespace jsonschema {
     {
         spec_version default_version_;
         bool require_format_validation_;
+        bool compatibility_mode_;
     public:
         evaluation_options()
             : default_version_{spec_version::draft7}, 
-              require_format_validation_(false)
+              require_format_validation_(false), compatibility_mode_(false)
         {
         }
 
@@ -37,6 +38,16 @@ namespace jsonschema {
         evaluation_options& require_format_validation(bool value) 
         {
             require_format_validation_ = value;
+            return *this;
+        }
+
+        bool compatibility_mode() const
+        {
+            return compatibility_mode_;
+        }
+        evaluation_options& compatibility_mode(bool value) 
+        {
+            compatibility_mode_ = value;
             return *this;
         }
 

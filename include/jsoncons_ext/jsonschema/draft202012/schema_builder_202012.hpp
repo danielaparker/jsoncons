@@ -113,9 +113,12 @@ namespace draft202012 {
             keyword_factory_map_.emplace("anyOf", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_any_of_validator(context, sch, anchor_dict);});
             keyword_factory_map_.emplace("oneOf", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_one_of_validator(context, sch, anchor_dict);});
-            keyword_factory_map_.emplace("dependencies", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, anchor_dict);});
+                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_one_of_validator(context, sch, anchor_dict);});          
+            if (this->options().compatibility_mode())
+            {
+                keyword_factory_map_.emplace("dependencies", 
+                    [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, anchor_dict);});
+            }
             keyword_factory_map_.emplace("propertyNames", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_property_names_validator(context, sch, anchor_dict);});
             keyword_factory_map_.emplace("required", 
@@ -197,15 +200,18 @@ namespace draft202012 {
                 local_anchor_dict.emplace(value, context.get_absolute_uri2());
             }
 
-            it = sch.find("definitions");
-            if (it != sch.object_range().end()) 
+            if (this->options().compatibility_mode())
             {
-                for (const auto& def : it->value().object_range())
+                it = sch.find("definitions");
+                if (it != sch.object_range().end()) 
                 {
-                    std::string sub_keys[] = { "definitions", def.key() };
-                    defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
+                    for (const auto& def : it->value().object_range())
+                    {
+                        std::string sub_keys[] = { "definitions", def.key() };
+                        defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
+                    }
+                    known_keywords.insert("definitions");
                 }
-                known_keywords.insert("definitions");
             }
             it = sch.find("$defs");
             if (it != sch.object_range().end()) 

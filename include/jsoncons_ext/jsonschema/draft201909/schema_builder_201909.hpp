@@ -114,8 +114,11 @@ namespace draft201909 {
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_any_of_validator(context, sch, anchor_dict);});
             keyword_factory_map_.emplace("oneOf", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_one_of_validator(context, sch, anchor_dict);});
-            keyword_factory_map_.emplace("dependencies", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, anchor_dict);});
+            if (this->options().compatibility_mode())
+            {           
+                keyword_factory_map_.emplace("dependencies", 
+                    [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, anchor_dict);});
+            }
             keyword_factory_map_.emplace("propertyNames", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_property_names_validator(context, sch, anchor_dict);});
             keyword_factory_map_.emplace("required", 
@@ -187,17 +190,20 @@ namespace draft201909 {
             bool recursive_anchor = false;
             std::map<std::string,schema_validator_type> defs;
 
-            auto it = sch.find("definitions");
-            if (it != sch.object_range().end()) 
+            if (this->options().compatibility_mode())
             {
-                for (const auto& def : it->value().object_range())
+                auto it = sch.find("definitions");
+                if (it != sch.object_range().end()) 
                 {
-                    std::string sub_keys[] = { "definitions", def.key() };
-                    defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
+                    for (const auto& def : it->value().object_range())
+                    {
+                        std::string sub_keys[] = { "definitions", def.key() };
+                        defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
+                    }
+                    known_keywords.insert("definitions");
                 }
-                known_keywords.insert("definitions");
             }
-            it = sch.find("$defs");
+            auto it = sch.find("$defs");
             if (it != sch.object_range().end()) 
             {
                 for (const auto& def : it->value().object_range())
