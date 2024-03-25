@@ -12,7 +12,7 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 
 namespace jsoncons {
-namespace jsonschema { 
+namespace jsonschema {
 
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
