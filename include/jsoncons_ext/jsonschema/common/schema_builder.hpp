@@ -19,14 +19,14 @@ namespace jsonschema {
 
     enum class schema_dialect{draft7, draft201909, draft202012};
 
-    class evaluation_options
+    class evaluation_options 
     {
         schema_dialect default_version_;
         bool require_format_validation_;
         bool compatibility_mode_;
     public:
         evaluation_options()
-            : default_version_{schema_dialect::draft202012 },
+            : default_version_{schema_dialect::draft7}, 
               require_format_validation_(false), compatibility_mode_(false)
         {
         }
@@ -51,11 +51,11 @@ namespace jsonschema {
             return *this;
         }
 
-        schema_dialect default_version() const
+        schema_dialect default_dialect() const
         {
             return default_version_;
         }
-        evaluation_options& default_version(schema_dialect version) 
+        evaluation_options& default_dialect(schema_dialect version) 
         {
             default_version_ = version;
             return *this;
