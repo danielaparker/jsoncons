@@ -17,16 +17,33 @@ namespace jsonschema {
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
-    enum class schema_dialect{draft7, draft201909, draft202012};
+    struct schema
+    {
+        static std::string draft07() 
+        {
+            static std::string s{"http://json-schema.org/draft-07/schema#"};
+            return s;
+        }
+        static std::string draft201909() 
+        {
+            static std::string s{"https://json-schema.org/draft/2019-09/schema"};
+            return s;
+        }
+        static std::string draft202012() 
+        {
+            static std::string s{"https://json-schema.org/draft/2020-12/schema"};
+            return s;
+        }
+    };
 
     class evaluation_options
     {
-        schema_dialect default_version_;
+        std::string default_version_;
         bool require_format_validation_;
         bool compatibility_mode_;
     public:
         evaluation_options()
-            : default_version_{schema_dialect::draft7}, 
+            : default_version_{schema::draft07()}, 
               require_format_validation_(false), compatibility_mode_(false)
         {
         }
@@ -51,11 +68,11 @@ namespace jsonschema {
             return *this;
         }
 
-        schema_dialect default_dialect() const
+        const std::string& default_version() const
         {
             return default_version_;
         }
-        evaluation_options& default_dialect(schema_dialect version) 
+        evaluation_options& default_version(const std::string& version) 
         {
             default_version_ = version;
             return *this;
@@ -91,9 +108,9 @@ namespace jsonschema {
 
     public:
 
-        schema_builder(const std::string& schema_dialect, const schema_builder_factory_type& builder_factory, 
+        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory, 
             uri_resolver<Json> resolver, evaluation_options options, schema_store_type* schema_store_ptr)
-            : spec_version_(schema_dialect), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
+            : spec_version_(schema), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -106,7 +123,7 @@ namespace jsonschema {
             schemas_.emplace_back(std::move(schema));
         }
 
-        const std::string& schema_dialect() const
+        const std::string& schema() const
         {
             return spec_version_;
         }
@@ -204,7 +221,7 @@ namespace jsonschema {
                     auto it = sch.find("$schema");
                     if (it != sch.object_range().end())
                     {
-                        if (it->value().as_string_view() == schema_dialect())
+                        if (it->value().as_string_view() == schema())
                         {
                             return make_schema_validator(context, sch, keys, anchor_dict);
                         }

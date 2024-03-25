@@ -1,15 +1,19 @@
-### jsoncons::jsonschema::schema_dialect
+### jsoncons::jsonschema::schema
 
 ```cpp
 #include <jsoncons/jsonschema/jsonschema.hpp>
 
-enum class schema_dialect{draft7,draft201909,draft202012};
+struct schema;
 ```
-`schema_dialect` is used to refer to a version of JSON Schema (e.g. Draft 2020-12.)
 
-Value      |Definition
------------|-----------
-draft7|[JSON Schema Draft 7](https://json-schema.org/draft-07/json-schema-release-notes)
-draft201909|[JSON Schema Draft 2019-09](https://json-schema.org/draft/2019-09/release-notes)
-draft202012|[JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12/release-notes)
+Member functions
+
+    static std::string draft07();
+Returns "http://json-schema.org/draft-07/schema#".
+
+    static std::string draft201909();
+Returns "https://json-schema.org/draft/2019-09/schema".
+
+    static std::string draft202012(); 
+Returns "https://json-schema.org/draft/2020-12/schema".
 

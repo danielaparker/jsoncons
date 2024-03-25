@@ -19,15 +19,15 @@ namespace jsonschema {
     {
         Json operator()(const jsoncons::uri& uri)
         {
-            if (uri.string() == "https://json-schema.org/draft/2020-12/schema")
+            if (uri.string() == schema::draft202012())
             {
                 return jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema();
             }
-            else if (uri.string() == "https://json-schema.org/draft/2019-09/schema")
+            else if (uri.string() == schema::draft201909())
             {
                 return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
             }
-            else if (uri.string() == "http://json-schema.org/draft-07/schema#")
+            else if (uri.string() == schema::draft07())
             {
                 return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
             }
@@ -56,17 +56,17 @@ namespace jsonschema {
                 auto it = sch.find("$schema");
                 if (it != sch.object_range().end())
                 { 
-                    if (it->value().as_string_view() == "https://json-schema.org/draft/2020-12/schema")
+                    if (it->value().as_string_view() == schema::draft202012())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                             resolver, options, schema_store_ptr);
                     }
-                    else if (it->value().as_string_view() == "https://json-schema.org/draft/2019-09/schema")
+                    else if (it->value().as_string_view() == schema::draft201909())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             resolver, options, schema_store_ptr);
                     }
-                    else if (it->value().as_string_view() == "http://json-schema.org/draft-07/schema#")
+                    else if (it->value().as_string_view() == schema::draft07())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             resolver, options, schema_store_ptr);
@@ -80,23 +80,24 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    switch (options.default_dialect())
+                    if (options.default_version() == schema::draft07())
                     {
-                        case schema_dialect::draft7:
-                            builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
-                                resolver, options, schema_store_ptr);
-                            break;
-                        case schema_dialect::draft201909:
-                            builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                                resolver, options, schema_store_ptr);
-                            break;
-                        case schema_dialect::draft202012:
-                            builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
-                                resolver, options, schema_store_ptr);
-                            break;
-                        default:
-                            JSONCONS_THROW("Unsupported schema version");
-                            break;
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                            resolver, options, schema_store_ptr);
+                    }
+                    else if (options.default_version() == schema::draft201909())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                            resolver, options, schema_store_ptr);
+                    }
+                    else if (options.default_version() == schema::draft202012())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                            resolver, options, schema_store_ptr);
+                    }
+                    else
+                    {
+                        JSONCONS_THROW(schema_error("Unsupported schema version " + options.default_version()));
                     }
                 }
             }
