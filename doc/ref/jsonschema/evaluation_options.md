@@ -19,7 +19,7 @@ Constructs an `evaluation_options` with default values.
 
     schema_dialect default_dialect() const;
     evaluation_options& default_dialect(schema_dialect version); 
-Get or set a default [schema_dialect](spec_version.md). The default
+Get or set a default [schema_dialect](schema_dialect.md). The default
 dialect determines which version of JSON Schema is used if the `$schema` 
 keyword is not present in the top level of the JSON Schema document. 
 Defaults to `schema_dialect::draft202012`.
