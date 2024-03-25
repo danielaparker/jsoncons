@@ -80,7 +80,7 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    switch (options.default_version())
+                    switch (options.default_dialect())
                     {
                         case schema_dialect::draft7:
                             builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 

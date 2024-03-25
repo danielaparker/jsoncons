@@ -17,12 +17,12 @@ Constructs an `evaluation_options` with default values.
 
 #### Members
 
-    schema_dialect default_version() const;
-    evaluation_options& default_version(schema_dialect version); 
+    schema_dialect default_dialect() const;
+    evaluation_options& default_dialect(schema_dialect version); 
 Get or set a default [schema_dialect](spec_version.md). The default
-version determines which version of JSON Schema is used if the `$schema` keyword is not present in the 
-top level of the JSON Schema document. Defaults to
-`schema_dialect::draft202012`.
+dialect determines which version of JSON Schema is used if the `$schema` 
+keyword is not present in the top level of the JSON Schema document. 
+Defaults to `schema_dialect::draft202012`.
 
     bool compatibility_mode() const;
     evaluation_options& compatibility_mode(bool value); 
