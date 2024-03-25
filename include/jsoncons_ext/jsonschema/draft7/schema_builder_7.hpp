@@ -23,7 +23,7 @@
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
-
+ 
 namespace jsoncons {
 namespace jsonschema {
 namespace draft7 {

@@ -12,14 +12,14 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 
 namespace jsoncons {
-namespace jsonschema {
+namespace jsonschema { 
 
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     enum class schema_dialect{draft7, draft201909, draft202012};
 
-    class evaluation_options 
+    class evaluation_options
     {
         schema_dialect default_version_;
         bool require_format_validation_;

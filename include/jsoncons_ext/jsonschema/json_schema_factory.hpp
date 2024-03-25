@@ -80,7 +80,7 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    switch (options.default_version())
+                    switch (options.default_dialect())
                     {
                         case schema_dialect::draft7:
                             builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
@@ -170,11 +170,10 @@ namespace jsonschema {
     // Legacy
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver)
+    make_schema(const Json& sch, const std::string& retrieval_uri, const URIResolver& resolver, 
+        evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        evaluation_options options = evaluation_options{}.default_version(jsonschema::schema_dialect::draft7)
-                    .require_format_validation(true);
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, resolver, options, &schema_store);
@@ -184,11 +183,10 @@ namespace jsonschema {
     }
 
     template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri)
+    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, const std::string& retrieval_uri, 
+        evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        evaluation_options options = evaluation_options{}.default_version(jsonschema::schema_dialect::draft7)
-            .require_format_validation(true);
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
@@ -199,11 +197,10 @@ namespace jsonschema {
 
     template <class Json,class URIResolver>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
-    make_schema(const Json& sch, const URIResolver& resolver)
+    make_schema(const Json& sch, const URIResolver& resolver, 
+        evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        evaluation_options options = evaluation_options{}.default_version(jsonschema::schema_dialect::draft7)
-            .require_format_validation(true);
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, uri_resolver<Json>{ resolver }, options, &schema_store);
@@ -213,11 +210,10 @@ namespace jsonschema {
     }
 
     template <class Json>
-    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch)
+    std::shared_ptr<json_schema<Json>> make_schema(const Json& sch, 
+        evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        evaluation_options options = evaluation_options{}.default_version(jsonschema::schema_dialect::draft7)
-            .require_format_validation(true);
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
