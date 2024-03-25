@@ -26,7 +26,7 @@ namespace jsonschema {
         bool compatibility_mode_;
     public:
         json_schema_options()
-            : default_version_{spec_version::draft7}, 
+            : default_version_{spec_version::draft202012 },
               require_format_validation_(false), compatibility_mode_(false)
         {
         }
