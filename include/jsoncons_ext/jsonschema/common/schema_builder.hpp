@@ -17,16 +17,16 @@ namespace jsonschema {
     template <class Json>
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
-    enum class spec_version{draft7, draft201909, draft202012};
+    enum class schema_dialect{draft7, draft201909, draft202012};
 
-    class json_schema_options
+    class evaluation_options
     {
-        spec_version default_version_;
+        schema_dialect default_version_;
         bool require_format_validation_;
         bool compatibility_mode_;
     public:
-        json_schema_options()
-            : default_version_{spec_version::draft7}, 
+        evaluation_options()
+            : default_version_{schema_dialect::draft7}, 
               require_format_validation_(false), compatibility_mode_(false)
         {
         }
@@ -35,7 +35,7 @@ namespace jsonschema {
         {
             return require_format_validation_;
         }
-        json_schema_options& require_format_validation(bool value) 
+        evaluation_options& require_format_validation(bool value) 
         {
             require_format_validation_ = value;
             return *this;
@@ -45,17 +45,17 @@ namespace jsonschema {
         {
             return compatibility_mode_;
         }
-        json_schema_options& compatibility_mode(bool value) 
+        evaluation_options& compatibility_mode(bool value) 
         {
             compatibility_mode_ = value;
             return *this;
         }
 
-        spec_version default_version() const
+        schema_dialect default_version() const
         {
             return default_version_;
         }
-        json_schema_options& default_version(spec_version version) 
+        evaluation_options& default_version(schema_dialect version) 
         {
             default_version_ = version;
             return *this;
@@ -68,7 +68,7 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const uri_resolver<Json>&, const json_schema_options&,schema_store_type*)>;
+            const uri_resolver<Json>&, const evaluation_options&,schema_store_type*)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
@@ -79,7 +79,7 @@ namespace jsonschema {
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
         uri_resolver<Json> resolver_;
-        json_schema_options options_;
+        evaluation_options options_;
         schema_validator_type root_;
 
         // Owns external schemas
@@ -91,9 +91,9 @@ namespace jsonschema {
 
     public:
 
-        schema_builder(const std::string& spec_version, const schema_builder_factory_type& builder_factory, 
-            uri_resolver<Json> resolver, json_schema_options options, schema_store_type* schema_store_ptr)
-            : spec_version_(spec_version), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
+        schema_builder(const std::string& schema_dialect, const schema_builder_factory_type& builder_factory, 
+            uri_resolver<Json> resolver, evaluation_options options, schema_store_type* schema_store_ptr)
+            : spec_version_(schema_dialect), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -106,7 +106,7 @@ namespace jsonschema {
             schemas_.emplace_back(std::move(schema));
         }
 
-        const std::string& spec_version() const
+        const std::string& schema_dialect() const
         {
             return spec_version_;
         }
@@ -123,7 +123,7 @@ namespace jsonschema {
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
         }
         
-        json_schema_options options() const
+        evaluation_options options() const
         {
             return options_;
         }
@@ -204,7 +204,7 @@ namespace jsonschema {
                     auto it = sch.find("$schema");
                     if (it != sch.object_range().end())
                     {
-                        if (it->value().as_string_view() == spec_version())
+                        if (it->value().as_string_view() == schema_dialect())
                         {
                             return make_schema_validator(context, sch, keys, anchor_dict);
                         }
