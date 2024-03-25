@@ -250,14 +250,11 @@ namespace jsoncons { namespace jsonpointer {
           return tokens_.empty();
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use to_string()")
         string_type string() const
         {
             return to_string();
         }
-#endif
+
         string_type to_string() const
         {
             string_type buffer;

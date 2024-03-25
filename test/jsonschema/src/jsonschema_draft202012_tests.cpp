@@ -110,10 +110,6 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-dynamicRef.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedProperties.json");
         //jsonschema_tests("./jsonschema/issues/draft2020-12/issue-unevaluatedItems.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/cross-draft.json");
     }
 //#if 0
     SECTION("tests")
@@ -133,7 +129,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/default.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/defs.json");  
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/dynamicRef.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/enum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/exclusiveMaximum.json");
@@ -169,7 +165,6 @@ TEST_CASE("jsonschema draft2020-12 tests")
         
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
 
-/*
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/refRemote.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/required.json");
@@ -177,6 +172,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/type.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/uniqueItems.json"); 
+/*
         // format tests
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/date.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/format/date-time.json");

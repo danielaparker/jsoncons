@@ -264,7 +264,7 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            if (content_media_type_ == "application/Json")
+            if (content_media_type_ == "application/json")
             {
                 auto sv = instance.as_string_view();
                 json_string_reader reader(sv);
