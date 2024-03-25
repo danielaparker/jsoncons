@@ -55,7 +55,7 @@ namespace {
             try
             {
                 jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
-                    jsonschema::json_schema_options{}.default_version(jsonschema::spec_version::draft7)
+                    jsonschema::evaluation_options{}.default_version(jsonschema::schema_dialect::draft7)
                     .require_format_validation(true));
 
                 int count_test = 0;
