@@ -9,13 +9,13 @@ json_schema<Json> make_json_schema(const Json& sch,
 
 template <class Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch, 
-    const std::string& retrieval_uri,                                       (2)
-    evaluation_options options = evaluation_options{});                      
+    const URIResolver& resolver,                                            (2)
+    evaluation_options options = evaluation_options{});                     
 
 template <class Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch, 
-    const URIResolver& resolver,                                            (3)
-    evaluation_options options = evaluation_options{});                     
+    const std::string& retrieval_uri,                                       (3)
+    evaluation_options options = evaluation_options{});                      
 
 template <class Json>
 json_schema<Json> make_json_schema(const Json& sch, 
@@ -24,7 +24,7 @@ json_schema<Json> make_json_schema(const Json& sch,
     evaluation_options options = evaluation_options{});                      
 ```
 
-Returns a `shared_ptr` to a `json_schema<Json>`.
+Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
 
 #### Parameters
 
@@ -40,14 +40,22 @@ Returns a `shared_ptr` to a `json_schema<Json>`.
     Json fun(const jsoncons::uri& uri)   
     </pre></td>   
   </tr>
+  <tr>
+    <td><a href="evaluation_options.md">options</a></td>
+    <td>Evaluation options</td> 
+  </tr>
+  <tr>
+    <td>retrieval_uri</td>
+    <td>Optional retrieval URI</td> 
+  </tr>
 </table>
 
 #### Return value
 
-Returns a `shared_ptr` to a `json_schema<Json>`.
+Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
 
 #### Exceptions
 
-(1)-(2) Throws a [schema_error](schema_error.md) if JSON Schema loading fails.
+(1)-(4) Throws a [schema_error](schema_error.md) if JSON Schema loading fails.
 
 

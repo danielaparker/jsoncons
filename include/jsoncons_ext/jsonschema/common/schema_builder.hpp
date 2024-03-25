@@ -43,7 +43,7 @@ namespace jsonschema {
         bool compatibility_mode_;
     public:
         evaluation_options()
-            : default_version_{schema::draft07()}, 
+            : default_version_{schema::draft202012()}, 
               require_format_validation_(false), compatibility_mode_(false)
         {
         }

@@ -1,3 +1,15 @@
+0.174.0 preview (on master)
+---------------------------
+
+Core library enhancements
+
+- New `json_options` `line_splits` option that addresses issue #490
+
+jsonschema library enhancements
+
+- The jsonschema extension now supports Draft 2019-09 and Draft 2020-12
+in addition to Draft 07. 
+
 0.173.4
 -------
 
