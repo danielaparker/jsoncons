@@ -52,7 +52,7 @@ Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
 
 #### Return value
 
-Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
+Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
 
 #### Exceptions
 
