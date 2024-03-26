@@ -48,7 +48,7 @@ namespace jsonschema {
         uri schema_path_;
         jsonpointer::json_pointer instance_location_;
         std::string message_;
-        std::vector<validation_message> nested_errors_;
+        std::vector<validation_message> details_;
     public:
         validation_message(std::string keyword,
             jsonpointer::json_pointer eval_path,
@@ -68,13 +68,13 @@ namespace jsonschema {
             const uri& schema_path,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message,
-            const std::vector<validation_message>& nested_errors)
+            const std::vector<validation_message>& details)
             : keyword_(keyword),
               eval_path_(eval_path),
               schema_path_(schema_path),
               instance_location_(instance_location), 
               message_(message),
-              nested_errors_(nested_errors)
+              details_(details)
         {
         }
 
@@ -113,9 +113,9 @@ namespace jsonschema {
             return keyword_;
         }
 
-        const std::vector<validation_message>& nested_errors() const
+        const std::vector<validation_message>& details() const
         {
-            return nested_errors_;
+            return details_;
         }
     };
 

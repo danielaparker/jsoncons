@@ -251,7 +251,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
             auto reporter = [&](const jsonschema::validation_message& o)
             {
                 std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
-                for (const auto& err : o.nested_errors())
+                for (const auto& err : o.details())
                 {
                     std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 }

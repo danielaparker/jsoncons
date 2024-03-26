@@ -23,7 +23,6 @@
 namespace jsoncons {
 namespace jsonschema {
 
-
     class validation_output 
     {
         std::string keyword_;
@@ -96,12 +95,12 @@ namespace jsonschema {
         void do_error(const validation_message& m) override
         {
             std::vector<validation_output> nested_errors;
-            for (const auto& ne : m.nested_errors())
+            for (const auto& detail : m.details())
             {
-                nested_errors.emplace_back(validation_output(ne.keyword(),
-                    ne.schema_path().string(),
-                    ne.instance_location(),
-                    ne.message()));
+                nested_errors.emplace_back(validation_output(detail.keyword(),
+                    detail.schema_path().string(),
+                    detail.instance_location(),
+                    detail.message()));
             }
                 
             reporter_(validation_output(m.keyword(),

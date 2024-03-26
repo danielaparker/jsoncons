@@ -61,7 +61,7 @@ TEST_CASE("jsonschema output format tests")
         {
             std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
 
-            for (auto& item : o.nested_errors())
+            for (auto& item : o.details())
             {
                 std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
             }
@@ -85,7 +85,7 @@ TEST_CASE("jsonschema output format tests")
             else
             {
                 //std::cout << o.keyword() << ", " << o.instance_location().string() << ": " << o.message() << ", " << o.schema_path() << "\n";
-                //for (const auto& nested : o.nested_errors())
+                //for (const auto& nested : o.details())
                 //{
                 //    std::cout << "    " << nested.message() << "\n";
                 //}
@@ -168,7 +168,7 @@ TEST_CASE("jsonschema output format tests 2")
         {
             std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
 
-            for (auto& item : o.nested_errors())
+            for (auto& item : o.details())
             {
                 std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
             }

@@ -26,6 +26,6 @@ The absolute, dereferenced location of the validating keyword,
 expressed as an absolute URI using the canonical URI of the 
 relevant schema.
 
-    const std::vector<validation_message>& nested_errors() const
+    const std::vector<validation_message>& details() const
 Returns a list of nested errors
 
