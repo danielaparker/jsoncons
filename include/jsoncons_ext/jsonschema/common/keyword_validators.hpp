@@ -81,7 +81,7 @@ namespace jsonschema {
             evaluation_context<Json> this_context(context, this->keyword_name());
             if (schema_ptr == nullptr)
             {
-                reporter.error(validation_output(this->keyword_name(), 
+                reporter.error(validation_message(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_path(), 
                     instance_location, 
@@ -207,7 +207,7 @@ namespace jsonschema {
                 auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
-                    reporter.error(validation_output(this->keyword_name(),
+                    reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
                         instance_location, 
@@ -220,7 +220,7 @@ namespace jsonschema {
             }
             else if (!content_encoding_.empty())
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(),
                     instance_location, 
@@ -273,7 +273,7 @@ namespace jsonschema {
 
                 if (ec)
                 {
-                    reporter.error(validation_output(this->keyword_name(),
+                    reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
                         instance_location, 
@@ -368,7 +368,7 @@ namespace jsonschema {
                 message.append("\" does not match pattern \"");
                 message.append(pattern_string_);
                 message.append("\"");
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(),
                     instance_location, 
@@ -437,7 +437,7 @@ namespace jsonschema {
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length > max_length_)
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
                         instance_location, 
@@ -484,7 +484,7 @@ namespace jsonschema {
             {
                 std::string message("Expected maximum item count: " + std::to_string(max_items_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
                         instance_location, 
@@ -530,7 +530,7 @@ namespace jsonschema {
             {
                 std::string message("Expected maximum item count: " + std::to_string(min_items_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
                         instance_location, 
@@ -699,7 +699,7 @@ namespace jsonschema {
 
             if (are_unique_ && !array_has_unique_items(instance))
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -761,7 +761,7 @@ namespace jsonschema {
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length < min_length_) 
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -809,7 +809,7 @@ namespace jsonschema {
 
             if (local_reporter.errors.empty())
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -875,7 +875,7 @@ namespace jsonschema {
             }
             else 
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -938,7 +938,7 @@ namespace jsonschema {
             }
             else 
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1012,7 +1012,7 @@ namespace jsonschema {
             }
             else 
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1054,7 +1054,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<int64_t>() > value_.template as<int64_t>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1066,7 +1066,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<double>() > value_.template as<double>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1112,7 +1112,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<int64_t>() >= value_.template as<int64_t>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1124,7 +1124,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<double>() >= value_.template as<double>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1170,7 +1170,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<int64_t>() < value_.template as<int64_t>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1182,7 +1182,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<double>() < value_.template as<double>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1228,7 +1228,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<int64_t>() <= value_.template as<int64_t>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1240,7 +1240,7 @@ namespace jsonschema {
                 {
                     if (instance.template as<double>() <= value_.template as<double>())
                     {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
                             instance_location, 
@@ -1286,7 +1286,7 @@ namespace jsonschema {
             {
                 if (!is_multiple_of(value, static_cast<double>(value_)))
                 {
-                    reporter.error(validation_output(this->keyword_name(),
+                    reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
                         instance_location, 
@@ -1341,7 +1341,7 @@ namespace jsonschema {
             {
                 if(instance.find(key) == instance.object_range().end())
                 {
-                        reporter.error(validation_output(this->keyword_name(),
+                        reporter.error(validation_message(this->keyword_name(),
                                                          this_context.eval_path(),
                                                          this->schema_path(),
                                                          instance_location,
@@ -1389,7 +1389,7 @@ namespace jsonschema {
 
                 std::string message("Maximum properties: " + std::to_string(max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1430,7 +1430,7 @@ namespace jsonschema {
 
                 std::string message("Maximum properties: " + std::to_string(min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(),
                         this->schema_path(),
                         instance_location,
@@ -1527,7 +1527,7 @@ namespace jsonschema {
 
             if (!in_range)
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1567,7 +1567,7 @@ namespace jsonschema {
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
 
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1681,7 +1681,7 @@ namespace jsonschema {
                         {
                             if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
                             {
-                                reporter.error(validation_output(this->keyword_name(),
+                                reporter.error(validation_message(this->keyword_name(),
                                     this_context.eval_path(), 
                                     this->schema_path(), 
                                     instance_location, 
@@ -1724,7 +1724,7 @@ namespace jsonschema {
                 }
                 ss << ", found " << instance.type();
 
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 
@@ -1993,7 +1993,7 @@ namespace jsonschema {
                         additional_properties_->validate(prop_context, prop.value() , pointer, results, local_reporter, patch);
                         if (!local_reporter.errors.empty())
                         {
-                            reporter.error(validation_output(this->keyword_name(),
+                            reporter.error(validation_message(this->keyword_name(),
                                 this_context.eval_path(), 
                                 additional_properties_->schema_path().string(),
                                 instance_location, 
@@ -2235,7 +2235,7 @@ namespace jsonschema {
             {
                 std::string message("Expected maxContains: " + std::to_string(max_value_));
                 message.append(", actual: " + std::to_string(count));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
                         instance_location, 
@@ -2269,7 +2269,7 @@ namespace jsonschema {
             {
                 std::string message("Expected minContains: " + std::to_string(min_value_));
                 message.append(", actual: " + std::to_string(count));
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
                         instance_location, 
@@ -2359,7 +2359,7 @@ namespace jsonschema {
             }
             else if (contains_count == 0)
             {
-                reporter.error(validation_output(this->keyword_name(),
+                reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
                     instance_location, 

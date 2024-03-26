@@ -142,7 +142,7 @@ namespace jsonschema {
         {
             if (!value_)
             {
-                reporter.error(validation_output("false", 
+                reporter.error(validation_message("false", 
                     context.eval_path(),
                     this->schema_path(), 
                     instance_location, 

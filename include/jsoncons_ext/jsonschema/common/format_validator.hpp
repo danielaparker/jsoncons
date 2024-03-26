@@ -898,7 +898,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_output("date",
+            reporter.error(validation_message("date",
                 eval_path,
                 schema_path, 
                 instance_location, 
@@ -914,7 +914,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            reporter.error(validation_output("time", 
+            reporter.error(validation_message("time", 
                 eval_path,
                 schema_path, 
                 instance_location, 
@@ -930,7 +930,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_output("date-time", 
+            reporter.error(validation_message("date-time", 
                 eval_path,  
                 schema_path,
                 instance_location, 
@@ -946,7 +946,7 @@ namespace jsonschema {
     {
         if (!validate_email_rfc5322(value))        
         {
-            reporter.error(validation_output("email", 
+            reporter.error(validation_message("email", 
                 eval_path, 
                 schema_path, 
                 instance_location, 
@@ -962,7 +962,7 @@ namespace jsonschema {
     {
         if (!validate_hostname_rfc1034(value))
         {
-            reporter.error(validation_output("hostname", 
+            reporter.error(validation_message("hostname", 
                 eval_path, 
                 schema_path, 
                 instance_location, 
@@ -978,7 +978,7 @@ namespace jsonschema {
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            reporter.error(validation_output("ipv4", 
+            reporter.error(validation_message("ipv4", 
                 eval_path, 
                 schema_path, 
                 instance_location, 
@@ -994,7 +994,7 @@ namespace jsonschema {
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            reporter.error(validation_output("ipv6", 
+            reporter.error(validation_message("ipv6", 
                 eval_path, 
                 schema_path, 
                 instance_location, 
@@ -1015,7 +1015,7 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            reporter.error(validation_output("pattern", 
+            reporter.error(validation_message("pattern", 
                 eval_path, 
                 schema_path, 
                 instance_location, 

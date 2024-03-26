@@ -64,7 +64,7 @@ namespace {
                     //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     std::size_t errors = 0;
-                    auto reporter = [&](const jsonschema::validation_output& o)
+                    auto reporter = [&](const jsonschema::validation_message& o)
                     {
                         ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());

@@ -20,7 +20,7 @@ namespace jsonschema {
 
     class throwing_error_reporter : public error_reporter
     {
-        void do_error(const validation_output& o) override
+        void do_error(const validation_message& o) override
         {
             JSONCONS_THROW(validation_error(o.instance_location().string() + ": " + o.message()));
         }
@@ -28,7 +28,7 @@ namespace jsonschema {
 
     class fail_early_reporter : public error_reporter
     {
-        void do_error(const validation_output&) override
+        void do_error(const validation_message&) override
         {
         }
     public:
@@ -38,7 +38,7 @@ namespace jsonschema {
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_output& o)>;
+    using error_reporter_t = std::function<void(const validation_message& o)>;
 
     struct error_reporter_adaptor : public error_reporter
     {
@@ -49,7 +49,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_error(const validation_output& e) override
+        void do_error(const validation_message& e) override
         {
             reporter_(e);
         }
@@ -108,7 +108,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_message>::value,void>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
             jsonpointer::json_pointer instance_location("#");
@@ -122,7 +122,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_message>::value,void>::type
         validate(const Json& instance, Reporter&& reporter, Json& patch) const
         {
             jsonpointer::json_pointer instance_location("#");

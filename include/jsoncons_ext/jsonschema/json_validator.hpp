@@ -23,6 +23,95 @@
 namespace jsoncons {
 namespace jsonschema {
 
+
+    class validation_output 
+    {
+        std::string keyword_;
+        std::string schema_path_;
+        jsonpointer::json_pointer instance_location_;
+        std::string message_;
+        std::vector<validation_output> nested_errors_;
+    public:
+        validation_output(std::string keyword,
+            std::string schema_path,
+            jsonpointer::json_pointer instance_location,
+            std::string message)
+            : keyword_(std::move(keyword)), 
+              schema_path_(std::move(schema_path)),
+              instance_location_(std::move(instance_location)),
+              message_(std::move(message))
+        {
+        }
+
+        validation_output(const std::string& keyword,
+            const std::string& schema_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message,
+            const std::vector<validation_output>& nested_errors)
+            : keyword_(keyword),
+              schema_path_(schema_path),
+              instance_location_(instance_location), 
+              message_(message),
+              nested_errors_(nested_errors)
+        {
+        }
+
+        const jsonpointer::json_pointer& instance_location() const
+        {
+            return instance_location_;
+        }
+
+        const std::string& message() const
+        {
+            return message_;
+        }
+
+        const std::string& schema_path() const
+        {
+            return schema_path_;
+        }
+
+        const std::string& keyword() const
+        {
+            return keyword_;
+        }
+
+        const std::vector<validation_output>& nested_errors() const
+        {
+            return nested_errors_;
+        }
+    };
+
+    struct validation_message_to_validation_output_adaptor : public error_reporter
+    {
+        using validation_output_reporter_t = std::function<void(const validation_output& o)>;
+
+        validation_output_reporter_t reporter_;
+
+        validation_message_to_validation_output_adaptor(const validation_output_reporter_t& reporter)
+            : reporter_(reporter)
+        {
+        }
+    private:
+        void do_error(const validation_message& m) override
+        {
+            std::vector<validation_output> nested_errors;
+            for (const auto& ne : m.nested_errors())
+            {
+                nested_errors.emplace_back(validation_output(ne.keyword(),
+                    ne.schema_path().string(),
+                    ne.instance_location(),
+                    ne.message()));
+            }
+                
+            reporter_(validation_output(m.keyword(),
+                m.schema_path().string(),
+                m.instance_location(),
+                m.message(),
+                std::move(nested_errors)));
+        }
+    };
+
     template <class Json>
     class json_validator
     {
@@ -69,7 +158,9 @@ namespace jsonschema {
         {
             Json patch(json_array_arg);
 
-            root_->validate2(instance, std::forward<Reporter>(reporter), patch);
+            validation_message_to_validation_output_adaptor adaptor(reporter);
+
+            root_->validate2(instance, adaptor, patch);
             return patch;
         }
     };

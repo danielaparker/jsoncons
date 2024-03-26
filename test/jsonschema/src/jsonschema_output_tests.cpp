@@ -57,7 +57,7 @@ TEST_CASE("jsonschema output format tests")
 
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
-        auto reporter = [](const jsonschema::validation_output& o)
+        auto reporter = [](const jsonschema::validation_message& o)
         {
             std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
 
@@ -164,7 +164,7 @@ TEST_CASE("jsonschema output format tests 2")
 
         jsonschema::json_schema<json> validator = jsonschema::make_json_schema(schema);
 
-        auto reporter = [](const jsonschema::validation_output& o)
+        auto reporter = [](const jsonschema::validation_message& o)
         {
             std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
 

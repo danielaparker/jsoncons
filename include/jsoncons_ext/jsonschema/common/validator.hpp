@@ -30,7 +30,7 @@ namespace jsonschema {
 
         virtual ~error_reporter() = default;
 
-        void error(const validation_output& o)
+        void error(const validation_message& o)
         {
             ++error_count_;
             do_error(o);
@@ -47,16 +47,16 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_error(const validation_output& /* e */) = 0;
+        virtual void do_error(const validation_message& /* e */) = 0;
     };
 
 
     struct collecting_error_reporter : public error_reporter
     {
-        std::vector<validation_output> errors;
+        std::vector<validation_message> errors;
 
     private:
-        void do_error(const validation_output& o) final
+        void do_error(const validation_message& o) final
         {
             errors.push_back(o);
         }
@@ -217,7 +217,7 @@ namespace jsonschema {
 
             if (!referred_schema_)
             {
-                reporter.error(validation_output(this->keyword_name(), 
+                reporter.error(validation_message(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_path(), 
                     instance_location, 

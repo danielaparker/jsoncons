@@ -83,7 +83,7 @@ void reporter_example()
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& o)
         {
             ++error_count;
             std::cout << o.instance_location().string() << ": " << o.message() << "\n";
@@ -110,7 +110,7 @@ json resolver(const jsoncons::uri& uri)
 
     std::fstream is(pathname.c_str());
     if (!is)
-        throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
+        throw jsonschema::schema_error("Could not open " + uri.base().string() + " for schema loading\n");
 
     return json::parse(is);        
 }
@@ -143,7 +143,7 @@ void uriresolver_example()
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& o)
         {
             ++error_count;
             std::cout << o.instance_location().string() << ": " << o.message() << "\n";
@@ -164,15 +164,15 @@ void defaults_example()
 {
     // JSON Schema
     json schema = json::parse(R"(
-
-"properties": {
+{
+    "properties": {
     "bar": {
         "type": "string",
         "minLength": 4,
         "default": "bad"
     }
+    }
 }
-
 )");
 
     try
