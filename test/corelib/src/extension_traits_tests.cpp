@@ -15,6 +15,8 @@
 #endif
 #include <catch/catch.hpp>
 
+namespace extension_traits = jsoncons::extension_traits;
+
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
@@ -28,6 +30,26 @@ TEST_CASE("extension_traits tests")
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
         CHECK(jsoncons::extension_traits::is_propagating_allocator<std::pmr::polymorphic_allocator<char>>::value);
 #endif
+    }
+}
+
+TEST_CASE("extension_traits function object tests")
+{
+    SECTION("is_unary_function_object")
+    {
+        CHECK_FALSE(extension_traits::is_unary_function_object<std::string,int>::value);
+    }
+    SECTION("is_unary_function_object_exact")
+    {
+        CHECK_FALSE(extension_traits::is_unary_function_object_exact<std::string, int, int>::value);
+    }
+    SECTION("is_binary_function_object")
+    {
+        CHECK_FALSE(extension_traits::is_binary_function_object<std::string, int, int>::value);
+    }
+    SECTION("is_unary_function_object_exact")
+    {
+        CHECK_FALSE(extension_traits::is_binary_function_object_exact<std::string, int, int, int>::value);
     }
 }
 

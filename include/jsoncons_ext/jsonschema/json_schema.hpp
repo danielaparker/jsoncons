@@ -108,7 +108,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_message>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
             jsonpointer::json_pointer instance_location("#");
@@ -122,7 +122,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object_exact<Reporter,void,validation_message>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
         validate(const Json& instance, Reporter&& reporter, Json& patch) const
         {
             jsonpointer::json_pointer instance_location("#");
@@ -144,6 +144,21 @@ namespace jsonschema {
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, reporter, patch);
+        }
+
+        // Validate input JSON against a JSON Schema with a provided error reporter
+        void validate(const Json& instance, json_visitor& visitor) const
+        {
+            jsonpointer::json_pointer instance_location("#");
+            Json patch{json_array_arg};
+
+            validation_report report{visitor};
+            evaluation_context<Json> context;
+            evaluation_results results;
+            report.begin_report();
+            error_reporter_adaptor adaptor(report);
+            root_->validate(context, instance, instance_location, results, adaptor, patch);
+            report.end_report();
         }
         
     private:

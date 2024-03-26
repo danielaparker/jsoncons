@@ -94,10 +94,10 @@ namespace jsonschema {
     
     class validation_report
     {
-        json_stream_encoder* encoder_ptr_;
+        json_visitor* visitor_ptr;
     public:
-        validation_report(json_stream_encoder& encoder)
-            : encoder_ptr_(std::addressof(encoder))
+        validation_report(json_visitor& visitor)
+            : visitor_ptr(std::addressof(visitor))
         {
         }
     
@@ -108,22 +108,22 @@ namespace jsonschema {
         
         void write_error(const validation_message& message)
         {
-            encoder_ptr_->begin_object();
+            visitor_ptr->begin_object();
 
-            encoder_ptr_->key("valid");
-            encoder_ptr_->bool_value(false);
+            visitor_ptr->key("valid");
+            visitor_ptr->bool_value(false);
 
-            encoder_ptr_->key("evaluationPath");
-            encoder_ptr_->string_value(message.eval_path().string());
+            visitor_ptr->key("evaluationPath");
+            visitor_ptr->string_value(message.eval_path().string());
 
-            encoder_ptr_->key("schemaLocation");
-            encoder_ptr_->string_value(message.schema_location().string());
+            visitor_ptr->key("schemaLocation");
+            visitor_ptr->string_value(message.schema_location().string());
 
-            encoder_ptr_->key("instanceLocation");
-            encoder_ptr_->string_value(message.instance_location().string());
+            visitor_ptr->key("instanceLocation");
+            visitor_ptr->string_value(message.instance_location().string());
 
-            encoder_ptr_->key("error");
-            encoder_ptr_->string_value(message.message());
+            visitor_ptr->key("error");
+            visitor_ptr->string_value(message.message());
 
             if (!message.details().empty())
             {
@@ -133,17 +133,17 @@ namespace jsonschema {
                 }
             }
 
-            encoder_ptr_->end_object();
+            visitor_ptr->end_object();
         }
     
         void begin_report()
         {
-            encoder_ptr_->begin_array();
+            visitor_ptr->begin_array();
         }
     
         void end_report()
         {
-            encoder_ptr_->end_array();
+            visitor_ptr->end_array();
         }
     };
 

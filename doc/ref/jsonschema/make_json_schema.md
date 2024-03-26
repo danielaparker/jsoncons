@@ -5,23 +5,23 @@
 
 template <class Json>
 json_schema<Json> make_json_schema(const Json& sch, 
-    evaluation_options options = evaluation_options{});                     (1)
+    evaluation_options options = evaluation_options{});        (1)
 
 template <class Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch, 
-    const URIResolver& resolver,                                            (2)
-    evaluation_options options = evaluation_options{});                     
+    const URIResolver& resolver,                               (2)
+    evaluation_options options = evaluation_options{});        
 
 template <class Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch, 
-    const std::string& retrieval_uri,                                       (3)
-    evaluation_options options = evaluation_options{});                      
+    const std::string& retrieval_uri,                          (3)
+    evaluation_options options = evaluation_options{});         
 
 template <class Json>
 json_schema<Json> make_json_schema(const Json& sch, 
-    const std::string& retrieval_uri,                                       (4)
+    const std::string& retrieval_uri,                          (4)
     const URIResolver& resolver, 
-    evaluation_options options = evaluation_options{});                      
+    evaluation_options options = evaluation_options{});         
 ```
 
 Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
@@ -58,4 +58,158 @@ Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Sc
 
 (1)-(4) Throws a [schema_error](schema_error.md) if JSON Schema loading fails.
 
+### Examples
+
+#### Draft 2020-12 example (from the JSON Schema Test Suite)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    json schema = json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://test.json-schema.org/typical-dynamic-resolution/root",
+    "$ref": "list",
+    "$defs": {
+        "foo": {
+            "$dynamicAnchor": "items",
+            "type": "string"
+        },
+        "list": {
+            "$id": "list",
+            "type": "array",
+            "items": { "$dynamicRef": "#items" },
+            "$defs": {
+              "items": {
+                  "$comment": "This is only needed to satisfy the bookending requirement",
+                  "$dynamicAnchor": "items"
+              }
+            }
+        }
+    }
+}
+)");
+
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+    json data = json::parse(R"(["foo", 42])");
+
+    jsoncons::json_stream_encoder encoder(std::cout);
+    compiled.validate(data, encoder);
+}
+```
+
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/$ref/items/1/$dynamicRef/type",
+        "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
+        "instanceLocation": "/1",
+        "error": "Expected 1 string, found uint64"
+    }
+]
+```
+
+#### Draft 2019-09 example (from the JSON Schema Test Suite)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    json schema = json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "properties": {
+        "foo": { "type": "string" }
+    },
+    "allOf": [
+        {
+            "properties": {
+                "bar": { "type": "string" }
+            }
+        }
+    ],
+    "unevaluatedProperties": false
+}
+)");
+
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+    json data = json::parse(R"({"foo": "foo","bar": "bar","baz": "baz"})");
+
+    jsoncons::json_stream_encoder encoder(std::cout);
+    compiled.validate(data, encoder);
+}
+```
+
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/unevaluatedProperties",
+        "schemaLocation": "#/unevaluatedProperties",
+        "instanceLocation": "",
+        "error": "False schema always fails"
+    }
+]
+```
+
+#### Draft 07 example (from the JSON Schema Test Suite)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    json schema = json::parse(R"(
+{
+    "items": [{}],
+    "additionalItems": {"type": "integer"}
+}
+)");
+
+    // Need to supply default version because schema does not have $schema keyword  
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema,
+        jsonschema::evaluation_options{}.default_version(jsonschema::schema::draft07()));
+
+    json data = json::parse(R"([ null, 2, 3, "foo" ])");
+
+    jsoncons::json_stream_encoder encoder(std::cout);
+    compiled.validate(data, encoder);
+}
+```
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/type",
+        "schemaLocation": "#/additionalItems",
+        "instanceLocation": "/3",
+        "error": "Expected 1 integer, found string"
+    }
+]
+```
 
