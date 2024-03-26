@@ -27,13 +27,13 @@ namespace jsonschema {
     {
         std::string keyword_;
         std::string schema_path_;
-        jsonpointer::json_pointer instance_location_;
+        std::string instance_location_;
         std::string message_;
         std::vector<validation_output> nested_errors_;
     public:
         validation_output(std::string keyword,
             std::string schema_path,
-            jsonpointer::json_pointer instance_location,
+            std::string instance_location,
             std::string message)
             : keyword_(std::move(keyword)), 
               schema_path_(std::move(schema_path)),
@@ -44,7 +44,7 @@ namespace jsonschema {
 
         validation_output(const std::string& keyword,
             const std::string& schema_path,
-            const jsonpointer::json_pointer& instance_location,
+            const std::string& instance_location,
             const std::string& message,
             const std::vector<validation_output>& nested_errors)
             : keyword_(keyword),
@@ -55,7 +55,7 @@ namespace jsonschema {
         {
         }
 
-        const jsonpointer::json_pointer& instance_location() const
+        const std::string& instance_location() const
         {
             return instance_location_;
         }
@@ -98,14 +98,14 @@ namespace jsonschema {
             for (const auto& detail : m.details())
             {
                 nested_errors.emplace_back(validation_output(detail.keyword(),
-                    detail.schema_path().string(),
-                    detail.instance_location(),
+                    detail.schema_location().string(),
+                    detail.instance_location().string(),
                     detail.message()));
             }
                 
             reporter_(validation_output(m.keyword(),
-                m.schema_path().string(),
-                m.instance_location(),
+                m.schema_location().string(),
+                m.instance_location().string(),
                 m.message(),
                 std::move(nested_errors)));
         }

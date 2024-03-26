@@ -143,9 +143,9 @@ namespace draft201909 {
             {
                 case json_type::bool_value:
                 {
-                    uri schema_path = new_context.get_absolute_uri();
+                    uri schema_location = new_context.get_absolute_uri();
                     schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
-                        schema_path, sch.template as<bool>());
+                        schema_location, sch.template as<bool>());
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
@@ -367,7 +367,7 @@ namespace draft201909 {
             std::vector<schema_validator_type> item_validators;
             schema_validator_type additional_items_validator = nullptr;
 
-            uri schema_path{context.make_schema_path_with("items")};
+            uri schema_location{context.make_schema_path_with("items")};
 
             if (sch.type() == json_type::array_value) 
             {
@@ -387,25 +387,25 @@ namespace draft201909 {
                 }
             }
 
-            return jsoncons::make_unique<items_array_validator<Json>>( schema_path, 
+            return jsoncons::make_unique<items_array_validator<Json>>( schema_location, 
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
         std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
             const Json& /* parent */, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_path{context.make_schema_path_with("items")};
+            uri schema_location{context.make_schema_path_with("items")};
 
             std::string sub_keys[] = {"items"};
 
-            return jsoncons::make_unique<items_object_validator<Json>>( schema_path, 
+            return jsoncons::make_unique<items_object_validator<Json>>( schema_location, 
                 make_schema_validator(context, sch, sub_keys, anchor_dict));
         }
                 
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_path = context.get_absolute_uri();
+            uri schema_location = context.get_absolute_uri();
             std::map<std::string, schema_validator_type> properties;
 
             for (const auto& prop : sch.object_range())
@@ -416,7 +416,7 @@ namespace draft201909 {
                     make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
 
-            return jsoncons::make_unique<properties_validator<Json>>(std::move(schema_path), 
+            return jsoncons::make_unique<properties_validator<Json>>(std::move(schema_location), 
                 std::move(properties));
         }
 
@@ -425,7 +425,7 @@ namespace draft201909 {
         std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator( const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_path = context.get_absolute_uri();
+            uri schema_location = context.get_absolute_uri();
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             
             for (const auto& prop : sch.object_range())
@@ -437,7 +437,7 @@ namespace draft201909 {
                         make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
 
-            return jsoncons::make_unique<pattern_properties_validator<Json>>( std::move(schema_path),
+            return jsoncons::make_unique<pattern_properties_validator<Json>>( std::move(schema_location),
                 std::move(pattern_properties));
         }
 #endif       
@@ -447,14 +447,14 @@ namespace draft201909 {
             std::unique_ptr<properties_validator<Json>>&& properties, std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties,
             anchor_uri_map_type& anchor_dict)
         {
-            uri schema_path = context.get_absolute_uri();
+            uri schema_location = context.get_absolute_uri();
             std::vector<keyword_validator_type> validators;
             schema_validator_type additional_properties;
 
             std::string sub_keys[] = {"additionalProperties"};
             additional_properties = make_schema_validator(context, sch, sub_keys, anchor_dict);
 
-            return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_path),
+            return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_location),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
         }

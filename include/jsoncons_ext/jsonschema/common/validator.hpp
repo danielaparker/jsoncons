@@ -12,6 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
+#include <jsoncons_ext/jsonschema/validation_message.hpp>
 #include <unordered_set>
 
 namespace jsoncons {
@@ -111,7 +112,7 @@ namespace jsonschema {
     public:
         virtual ~validator_base() = default;
 
-        virtual const uri& schema_path() const = 0;
+        virtual const uri& schema_location() const = 0;
 
         void validate(const evaluation_context<Json>& context,
             const Json& instance, 
@@ -144,12 +145,12 @@ namespace jsonschema {
     class keyword_validator_base : public keyword_validator<Json>
     {
         std::string keyword_name_;
-        uri schema_path_;
+        uri schema_location_;
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        keyword_validator_base(const std::string& keyword_name, const uri& schema_path)
-            : keyword_name_(keyword_name), schema_path_(schema_path)
+        keyword_validator_base(const std::string& keyword_name, const uri& schema_location)
+            : keyword_name_(keyword_name), schema_location_(schema_location)
         {
         }
 
@@ -163,9 +164,9 @@ namespace jsonschema {
             return keyword_name_;
         }
 
-        const uri& schema_path() const override
+        const uri& schema_location() const override
         {
-            return schema_path_;
+            return schema_location_;
         }
     };
 
@@ -179,21 +180,21 @@ namespace jsonschema {
 
     public:
         ref_validator(const ref_validator& other)
-            : keyword_validator_base<Json>(other.keyword_name(), other.schema_path()),
+            : keyword_validator_base<Json>(other.keyword_name(), other.schema_location()),
                   referred_schema_{other.referred_schema_}
         {
         }
         
-        ref_validator(const uri& schema_path) 
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_{nullptr}
+        ref_validator(const uri& schema_location) 
+            : keyword_validator_base<Json>("$ref", schema_location), referred_schema_{nullptr}
         {
-            //std::cout << "ref_validator: " << this->schema_path().string() << "\n";
+            //std::cout << "ref_validator: " << this->schema_location().string() << "\n";
         }
 
-        ref_validator(const uri& schema_path, const schema_validator<Json>* referred_schema)
-            : keyword_validator_base<Json>("$ref", schema_path), referred_schema_(referred_schema) 
+        ref_validator(const uri& schema_location, const schema_validator<Json>* referred_schema)
+            : keyword_validator_base<Json>("$ref", schema_location), referred_schema_(referred_schema) 
         {
-            //std::cout << "ref_validator2: " << this->schema_path().string() << "\n";
+            //std::cout << "ref_validator2: " << this->schema_location().string() << "\n";
         }
 
         const schema_validator<Json>* referred_schema() const {return referred_schema_;}
@@ -202,7 +203,7 @@ namespace jsonschema {
 
         uri get_base_uri() const
         {
-            return this->schema_path();
+            return this->schema_location();
         }
 
     private:
@@ -219,9 +220,9 @@ namespace jsonschema {
             {
                 reporter.error(validation_message(this->keyword_name(), 
                     this_context.eval_path(),
-                    this->schema_path(), 
+                    this->schema_location(), 
                     instance_location, 
-                    "Unresolved schema reference " + this->schema_path().string()));
+                    "Unresolved schema reference " + this->schema_location().string()));
                 return;
             }
 
@@ -233,11 +234,11 @@ namespace jsonschema {
     class keyword_base 
     {
         std::string keyword_name_;
-        uri schema_path_;
+        uri schema_location_;
     public:
 
-        keyword_base(const std::string& keyword_name, const uri& schema_path)
-            : keyword_name_(keyword_name), schema_path_(schema_path)
+        keyword_base(const std::string& keyword_name, const uri& schema_location)
+            : keyword_name_(keyword_name), schema_location_(schema_location)
         {
         }
 
@@ -253,9 +254,9 @@ namespace jsonschema {
             return keyword_name_;
         }
 
-        const uri& schema_path() const 
+        const uri& schema_location() const 
         {
-            return schema_path_;
+            return schema_location_;
         }
 
     private:

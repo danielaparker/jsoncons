@@ -83,10 +83,10 @@ void reporter_example()
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_message& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& message)
         {
             ++error_count;
-            std::cout << o.instance_location().string() << ": " << o.message() << "\n";
+            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
 
         // Will call reporter for each schema violation
@@ -143,10 +143,10 @@ void uriresolver_example()
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_message& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& message)
         {
             ++error_count;
-            std::cout << o.instance_location().string() << ": " << o.message() << "\n";
+            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
 
         // Will call reporter for each schema violation
