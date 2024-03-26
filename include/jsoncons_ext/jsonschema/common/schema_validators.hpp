@@ -145,7 +145,7 @@ namespace jsonschema {
                 reporter.error(validation_output("false", 
                     context.eval_path(),
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "False schema always fails"));
             }
         }

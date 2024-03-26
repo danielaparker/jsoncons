@@ -220,7 +220,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Unresolved schema reference " + this->schema_path().string()));
                 return;
             }

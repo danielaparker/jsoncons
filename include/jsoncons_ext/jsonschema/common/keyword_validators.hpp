@@ -84,7 +84,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Unresolved schema reference " + this->schema_path().string()));
                 return;
             }
@@ -210,7 +210,7 @@ namespace jsonschema {
                     reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
-                        instance_location.to_string(), 
+                        instance_location, 
                         "Content is not a base64 string"));
                     if (reporter.fail_early())
                     {
@@ -223,7 +223,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(),
-                    instance_location.to_string(), 
+                    instance_location, 
                     "unable to check for contentEncoding '" + content_encoding_ + "'"));
                 if (reporter.fail_early())
                 {
@@ -276,7 +276,7 @@ namespace jsonschema {
                     reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::string("Content is not JSON: ") + ec.message()));
                 }
             }
@@ -371,7 +371,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(),
-                    instance_location.to_string(), 
+                    instance_location, 
                     std::move(message)));
                 if (reporter.fail_early())
                 {
@@ -440,7 +440,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(), 
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::string("Expected maxLength: ") + std::to_string(max_length_)
                     + ", actual: " + std::to_string(length)));
                 if (reporter.fail_early())
@@ -487,7 +487,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::move(message)));
                 if (reporter.fail_early())
                 {
@@ -533,7 +533,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::move(message)));
                 if (reporter.fail_early())
                 {
@@ -702,7 +702,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Array items are not unique"));
                 if (reporter.fail_early())
                 {
@@ -764,7 +764,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     std::string("Expected minLength: ") + std::to_string(min_length_)
                                           + ", actual: " + std::to_string(length)));
                 if (reporter.fail_early())
@@ -812,7 +812,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Instance must not be valid against schema"));
             }
             else
@@ -878,7 +878,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "No schema matched, but at least one of them is required to match", 
                     local_reporter.errors));
             }
@@ -941,7 +941,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "No schema matched, but exactly one of them is required to match", 
                     local_reporter.errors));
             }
@@ -1015,7 +1015,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "No schema matched, but all of them are required to match", 
                     local_reporter.errors));
             }
@@ -1057,7 +1057,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1069,7 +1069,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1115,7 +1115,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1127,7 +1127,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1173,7 +1173,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1185,7 +1185,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1231,7 +1231,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1243,7 +1243,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                             this_context.eval_path(), 
                             this->schema_path(), 
-                            instance_location.to_string(), 
+                            instance_location, 
                             instance.template as<std::string>() + message_));
                     }
                     break;
@@ -1289,7 +1289,7 @@ namespace jsonschema {
                     reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
-                        instance_location.to_string(), 
+                        instance_location, 
                         instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
                 }
             }
@@ -1344,7 +1344,7 @@ namespace jsonschema {
                         reporter.error(validation_output(this->keyword_name(),
                                                          this_context.eval_path(),
                                                          this->schema_path(),
-                                                         instance_location.to_string(),
+                                                         instance_location,
                                                          "Required property \"" + key + "\" not found"));
                         if(reporter.fail_early())
                     {
@@ -1392,7 +1392,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     std::move(message)));
             }           
         }
@@ -1433,7 +1433,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(),
                         this->schema_path(),
-                        instance_location.to_string(),
+                        instance_location,
                         std::move(message)));
             }
             
@@ -1530,7 +1530,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     instance.template as<std::string>() + " is not a valid enum value"));
                 if (reporter.fail_early())
                 {
@@ -1570,7 +1570,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Instance is not const"));
             }
         }
@@ -1684,7 +1684,7 @@ namespace jsonschema {
                                 reporter.error(validation_output(this->keyword_name(),
                                     this_context.eval_path(), 
                                     this->schema_path(), 
-                                    instance_location.to_string(), 
+                                    instance_location, 
                                     "Instance is not an integer"));
                                 if (reporter.fail_early())
                                 {
@@ -1727,7 +1727,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     ss.str()));
                 if (reporter.fail_early())
                 {
@@ -1996,7 +1996,7 @@ namespace jsonschema {
                             reporter.error(validation_output(this->keyword_name(),
                                 this_context.eval_path(), 
                                 additional_properties_->schema_path().string(),
-                                instance_location.to_string(), 
+                                instance_location, 
                                 "Additional prop \"" + prop.key() + "\" found but was invalid."));
                             if (reporter.fail_early())
                             {
@@ -2238,7 +2238,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::move(message)));
             }
         }
@@ -2272,7 +2272,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
-                        instance_location.to_string(), 
+                        instance_location, 
                         std::move(message)));
             }
         }
@@ -2362,7 +2362,7 @@ namespace jsonschema {
                 reporter.error(validation_output(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_path(), 
-                    instance_location.to_string(), 
+                    instance_location, 
                     "Expected at least one array item to match \"contains\" schema", 
                     local_reporter.errors));
                 if (reporter.fail_early())
