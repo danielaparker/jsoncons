@@ -59,11 +59,11 @@ TEST_CASE("jsonschema output format tests")
 
         auto reporter = [](const jsonschema::validation_message& o)
         {
-            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+            std::cout << o.keyword() << ", " << o.eval_path().string() << ", " << o.schema_location().string() << "\n";
 
             for (auto& item : o.details())
             {
-                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+                std::cout << "    " << item.keyword() << ", " << item.eval_path().string()  << ", " << item.schema_location().string() << "\n";
             }
 /*
             if (o.keyword() == "minItems")
@@ -166,11 +166,11 @@ TEST_CASE("jsonschema output format tests 2")
 
         auto reporter = [](const jsonschema::validation_message& o)
         {
-            std::cout << o.keyword() << ", " << o.keyword_location() << ", " << o.absolute_keyword_location() << "\n";
+            std::cout << o.keyword() << ", " << o.eval_path().string() << ", " << o.schema_location().string() << "\n";
 
             for (auto& item : o.details())
             {
-                std::cout << "    " << item.keyword() << ", " << item.keyword_location()  << ", " << item.absolute_keyword_location() << "\n";
+                std::cout << "    " << item.keyword() << ", " << item.eval_path().string()  << ", " << item.schema_location().string() << "\n";
             }
         };
         validator.validate(instance, reporter);
