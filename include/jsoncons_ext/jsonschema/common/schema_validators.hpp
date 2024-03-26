@@ -262,7 +262,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "object_schema_validator begin[" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "object_schema_validator begin[" << context.eval_path().string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results)
             //{
@@ -325,7 +325,7 @@ namespace jsonschema {
                 results.merge(std::move(local_results.evaluated_items));
             }
             
-            //std::cout << "object_schema_validator end[" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "object_schema_validator end[" << context.eval_path().string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results)
             //{

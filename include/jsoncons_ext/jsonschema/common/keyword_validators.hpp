@@ -126,7 +126,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const override
         {
-            //std::cout << "dynamic_ref_validator [" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "dynamic_ref_validator [" << context.eval_path().string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results)
             //{
@@ -846,7 +846,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "any_of_validator.do_validate " << context.eval_path().to_string() << ", " << instance << "\n";
+            //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
             collecting_error_reporter local_reporter;
 
@@ -909,7 +909,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "any_of_validator.do_validate " << context.eval_path().to_string() << ", " << instance << "\n";
+            //std::cout << "any_of_validator.do_validate " << context.eval_path().string() << ", " << instance << "\n";
 
             collecting_error_reporter local_reporter;
 
@@ -972,7 +972,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << this->keyword_name() << " [" << context.eval_path().to_string() << ", " << this->schema_path().string() << "]\n";
+            //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_path().string() << "]\n";
 
             evaluation_results local_results1;
             collecting_error_reporter local_reporter;
@@ -1631,7 +1631,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& /*patch*/) const final
         {
-            //std::cout << "type_validator.do_validate " << context.eval_path().to_string() << instance << "\n";
+            //std::cout << "type_validator.do_validate " << context.eval_path().string() << instance << "\n";
             //for (auto& type : expected_types_ )
             //{
             //    std::cout << "    " << to_string(type) << "\n";
@@ -1761,7 +1761,7 @@ namespace jsonschema {
             Json& patch,
             std::unordered_set<std::string>& all_properties) const 
         {
-            //std::cout << "properties_validator begin[" << context.eval_path().to_string() << "," << this->schema_path().string() << "]\n";
+            //std::cout << "properties_validator begin[" << context.eval_path().string() << "," << this->schema_path().string() << "]\n";
             if (!instance.is_object())
             {
                 return;
@@ -1818,7 +1818,7 @@ namespace jsonschema {
                     }
                 }
             }
-            //std::cout << "properties_validator end[" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "properties_validator end[" << context.eval_path().string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results)
             //{
@@ -2476,7 +2476,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << "unevaluated_properties_validator [" << context.eval_path().to_string() << "," << this->schema_path().string() << "]";
+            //std::cout << "unevaluated_properties_validator [" << context.eval_path().string() << "," << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results.evaluated_properties_)
             //{
@@ -2537,7 +2537,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            //std::cout << this->keyword_name() << " [" << context.eval_path().to_string() << ", " << this->schema_path().string() << "]";
+            //std::cout << this->keyword_name() << " [" << context.eval_path().string() << ", " << this->schema_path().string() << "]";
             //std::cout << "results:\n";
             //for (const auto& s : results.evaluated_items)
             //{
