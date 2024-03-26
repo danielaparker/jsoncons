@@ -22,7 +22,7 @@ namespace jsonschema {
     {
         void do_error(const validation_output& o) override
         {
-            JSONCONS_THROW(validation_error(o.instance_location() + ": " + o.message()));
+            JSONCONS_THROW(validation_error(o.instance_location().string() + ": " + o.message()));
         }
     };
 

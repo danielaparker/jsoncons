@@ -84,7 +84,7 @@ TEST_CASE("jsonschema output format tests")
             }
             else
             {
-                //std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.schema_path() << "\n";
+                //std::cout << o.keyword() << ", " << o.instance_location().string() << ": " << o.message() << ", " << o.schema_path() << "\n";
                 //for (const auto& nested : o.nested_errors())
                 //{
                 //    std::cout << "    " << nested.message() << "\n";

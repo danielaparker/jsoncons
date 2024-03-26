@@ -72,10 +72,10 @@ namespace {
                         {
                             std::cout << "  File: " << fpath << "\n";
                             std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
-                            std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
+                            std::cout << "  Failed: " << o.instance_location().string() << ": " << o.message() << "\n";
                             for (const auto& err : o.nested_errors())
                             {
-                                std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                                std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                             }
                         }
                     };

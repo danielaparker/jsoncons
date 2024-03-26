@@ -85,10 +85,10 @@ TEST_CASE("jsonschema $recursiveRef tests")
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& /*o*/)
             {
-                //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location() << ": " << o.message() << "\n";
+                //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 //for (const auto& err : o.nested_errors())
                 //{
-                    //std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                    //std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 //}
                 ++error_count;
             };
@@ -172,10 +172,10 @@ TEST_CASE("jsonschema $dynamicRef tests")
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& /*o*/)
             {
-                //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location() << ": " << o.message() << "\n";
+                //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 //for (const auto& err : o.nested_errors())
                 //{
-                    //std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                    //std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 //}
                 ++error_count;
             };
@@ -250,10 +250,10 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_output& o)
             {
-                std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location() << ": " << o.message() << "\n";
+                std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_path: " << o.schema_path().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 for (const auto& err : o.nested_errors())
                 {
-                    std::cout << "  Nested error: " << err.instance_location() << ": " << err.message() << "\n";
+                    std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                 }
                 ++error_count;
             };
