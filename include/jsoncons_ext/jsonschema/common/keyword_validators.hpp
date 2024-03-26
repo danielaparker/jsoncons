@@ -482,8 +482,8 @@ namespace jsonschema {
 
             if (instance.size() > max_items_)
             {
-                std::string message("Expected maximum item count: " + std::to_string(max_items_));
-                message.append(", found: " + std::to_string(instance.size()));
+                std::string message("Maximum number of items is " + std::to_string(max_items_));
+                message.append(" but found: " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
@@ -528,8 +528,8 @@ namespace jsonschema {
 
             if (instance.size() < min_items_)
             {
-                std::string message("Expected maximum item count: " + std::to_string(min_items_));
-                message.append(", found: " + std::to_string(instance.size()));
+                std::string message("Minimum number of items is " + std::to_string(min_items_));
+                message.append(" but found: " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
@@ -2233,8 +2233,8 @@ namespace jsonschema {
 
             if (count > max_value_)
             {
-                std::string message("Expected maxContains: " + std::to_string(max_value_));
-                message.append(", actual: " + std::to_string(count));
+                std::string message("A schema can match a contains constraint at most " + std::to_string(max_value_) + " times");
+                message.append(" but it matched " + std::to_string(count) + " times.");
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
@@ -2267,8 +2267,8 @@ namespace jsonschema {
 
             if (count < min_value_)
             {
-                std::string message("Expected minContains: " + std::to_string(min_value_));
-                message.append(", actual: " + std::to_string(count));
+                std::string message("A schema must match a contains constraint at least " + std::to_string(min_value_) + " times");
+                message.append(" but it matched " + std::to_string(count) + " times.");
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_path(),
