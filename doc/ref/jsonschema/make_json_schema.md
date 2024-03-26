@@ -108,15 +108,18 @@ int main()
 
 Output:
 ```json
-[
-    {
-        "valid": false,
-        "evaluationPath": "/$ref/items/1/$dynamicRef/type",
-        "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
-        "instanceLocation": "/1",
-        "error": "Expected 1 string, found uint64"
-    }
-]
+{
+    "valid": false,
+    "details": [
+        {
+            "valid": false,
+            "evaluationPath": "/$ref/items/1/$dynamicRef/type",
+            "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
+            "instanceLocation": "/1",
+            "error": "Expected 1 string, found uint64"
+        }
+    ]
+}
 ```
 
 #### Draft 2019-09 example (from the JSON Schema Test Suite)
@@ -160,15 +163,18 @@ int main()
 
 Output:
 ```json
-[
-    {
-        "valid": false,
-        "evaluationPath": "/unevaluatedProperties",
-        "schemaLocation": "#/unevaluatedProperties",
-        "instanceLocation": "",
-        "error": "False schema always fails"
-    }
-]
+{
+    "valid": false,
+    "details": [
+        {
+            "valid": false,
+            "evaluationPath": "/unevaluatedProperties",
+            "schemaLocation": "#/unevaluatedProperties",
+            "instanceLocation": "",
+            "error": "False schema always fails"
+        }
+    ]
+}
 ```
 
 #### Draft 07 example (from the JSON Schema Test Suite)
@@ -202,14 +208,17 @@ int main()
 ```
 Output:
 ```json
-[
-    {
-        "valid": false,
-        "evaluationPath": "/type",
-        "schemaLocation": "#/additionalItems",
-        "instanceLocation": "/3",
-        "error": "Expected 1 integer, found string"
-    }
-]
+{
+    "valid": false,
+    "details": [
+        {
+            "valid": false,
+            "evaluationPath": "/type",
+            "schemaLocation": "#/additionalItems",
+            "instanceLocation": "/3",
+            "error": "Expected 1 integer, found string"
+        }
+    ]
+}
 ```
 

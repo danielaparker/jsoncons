@@ -91,61 +91,6 @@ namespace jsonschema {
         }
     };
     
-    
-    class validation_report
-    {
-        json_visitor* visitor_ptr;
-    public:
-        validation_report(json_visitor& visitor)
-            : visitor_ptr(std::addressof(visitor))
-        {
-        }
-    
-        void operator()(const validation_message& message)
-        {
-            write_error(message);
-        }
-        
-        void write_error(const validation_message& message)
-        {
-            visitor_ptr->begin_object();
-
-            visitor_ptr->key("valid");
-            visitor_ptr->bool_value(false);
-
-            visitor_ptr->key("evaluationPath");
-            visitor_ptr->string_value(message.eval_path().string());
-
-            visitor_ptr->key("schemaLocation");
-            visitor_ptr->string_value(message.schema_location().string());
-
-            visitor_ptr->key("instanceLocation");
-            visitor_ptr->string_value(message.instance_location().string());
-
-            visitor_ptr->key("error");
-            visitor_ptr->string_value(message.message());
-
-            if (!message.details().empty())
-            {
-                for (const auto& detail : message.details())
-                {
-                    write_error(detail);
-                }
-            }
-
-            visitor_ptr->end_object();
-        }
-    
-        void begin_report()
-        {
-            visitor_ptr->begin_array();
-        }
-    
-        void end_report()
-        {
-            visitor_ptr->end_array();
-        }
-    };
 
 } // namespace jsonschema
 } // namespace jsoncons
