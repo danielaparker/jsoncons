@@ -22,18 +22,11 @@ public:
 private:
     basic_json_visitor<char_type>* destination_;
 
-    // noncopyable 
-    basic_json_filter(const basic_json_filter&) = delete;
-    basic_json_filter& operator=(const basic_json_filter&) = delete;
 public:
     basic_json_filter(basic_json_visitor<char_type>& visitor)
         : destination_(std::addressof(visitor))
     {
     }
-
-    // moveable
-    basic_json_filter(basic_json_filter&&) = default;
-    basic_json_filter& operator=(basic_json_filter&&) = default;
 
     basic_json_visitor<char_type>& destination()
     {

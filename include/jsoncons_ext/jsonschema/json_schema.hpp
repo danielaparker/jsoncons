@@ -8,12 +8,10 @@
 #define JSONCONS_JSONSCHEMA_JSON_SCHEMA_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
-#include <unordered_set>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -54,95 +52,7 @@ namespace jsonschema {
             reporter_(e);
         }
     };
-    
-    
-    class report_filter : public json_filter
-    {
-    private:
-        int level_;
-    public:
-        report_filter(json_visitor& visitor)
-            : json_filter(visitor), 
-              level_(0)
-        {
-        }
-    
-    private:
-        bool visit_begin_object(semantic_tag tag, 
-            const ser_context& context,
-            std::error_code& ec) override
-        {
-            if (level_ == 0)
-            {
-                this->destination().key("valid");
-                this->destination().bool_value(false);
-                this->destination().key("details");
-                this->destination().begin_array();
-            }
-            ++level_;
-            return this->destination().begin_object(tag, context, ec);
-        }
-
-        bool visit_end_object(const ser_context& context, std::error_code& ec) override
-        {
-            bool result = this->destination().end_object(context, ec);
-            --level_;
-            if (level_ == 0)
-            {
-                this->destination().end_array();
-            }
-            return result;
-        }
-    };
-
-    class validation_report
-    {
-        json_visitor* visitor_ptr;
-    public:
-        validation_report(json_visitor& visitor)
-            : visitor_ptr(std::addressof(visitor))
-        {
-        }
-
-        void operator()(const validation_message& message)
-        {
-            write_error(message);
-        }
-
-        void write_error(const validation_message& message)
-        {
-            visitor_ptr->begin_object();
-
-            visitor_ptr->key("valid");
-            visitor_ptr->bool_value(false);
-
-            visitor_ptr->key("evaluationPath");
-            visitor_ptr->string_value(message.eval_path().string());
-
-            visitor_ptr->key("schemaLocation");
-            visitor_ptr->string_value(message.schema_location().string());
-
-            visitor_ptr->key("instanceLocation");
-            visitor_ptr->string_value(message.instance_location().string());
-
-            visitor_ptr->key("error");
-            visitor_ptr->string_value(message.message());
-
-            if (!message.details().empty())
-            {
-                visitor_ptr->key("details");
-                visitor_ptr->begin_array();
-                for (const auto& detail : message.details())
-                {
-                    write_error(detail);
-                }
-                visitor_ptr->end_array();
-            }
-
-            visitor_ptr->end_object();
-        }
-    };
-    
+        
     template <class Json>
     class json_validator;
     
@@ -237,17 +147,17 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a provided error reporter
         void validate(const Json& instance, json_visitor& visitor) const
         {
-            visitor.begin_object();
+            visitor.begin_array();
             jsonpointer::json_pointer instance_location("#");
             Json patch{json_array_arg};
 
-            report_filter filter(visitor);
-            validation_report report{filter};
+            validation_message_to_json_adaptor report{ visitor };
             evaluation_context<Json> context;
             evaluation_results results;
             error_reporter_adaptor adaptor(report);
             root_->validate(context, instance, instance_location, results, adaptor, patch);
-            visitor.end_object();
+            visitor.end_array();
+            visitor.flush();
         }
         
     private:

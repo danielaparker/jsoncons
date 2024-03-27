@@ -44,18 +44,15 @@ TEST_CASE("jsonschema validation report tests")
     SECTION("Test 1")
     {
         json expected = json::parse(R"(
-{
-    "details": [
-        {
-            "error": "False schema always fails",
-            "evaluationPath": "/properties/fails",
-            "instanceLocation": "/fails",
-            "schemaLocation": "https://test.com/schema#/properties/fails",
-            "valid": false
-        }
-    ],
-    "valid": false
-}
+[
+    {
+        "error": "False schema always fails",
+        "evaluationPath": "/properties/fails",
+        "instanceLocation": "/fails",
+        "schemaLocation": "https://test.com/schema#/properties/fails",
+        "valid": false
+    }
+]
         )");
 
         jsoncons::json_decoder<json> decoder;    
@@ -67,23 +64,35 @@ TEST_CASE("jsonschema validation report tests")
         
         json output = decoder.get_result();
         CHECK(expected == output);
-        //std::cout << pretty_print(output) << "\n";
     }
     SECTION("Test 1")
     {
         json expected = json::parse(R"(
-{
-    "details": [
-        {
-            "error": "False schema always fails",
-            "evaluationPath": "/properties/fails",
-            "instanceLocation": "/fails",
-            "schemaLocation": "https://test.com/schema#/properties/fails",
-            "valid": false
-        }
-    ],
-    "valid": false
-}
+[
+    {
+        "details": [
+            {
+                "error": "Instance is not an integer",
+                "evaluationPath": "/properties/multi/allOf/0/$ref/type",
+                "instanceLocation": "/multi",
+                "schemaLocation": "https://test.com/schema#/$defs/integer",
+                "valid": false
+            },
+            {
+                "error": "3.5 is less than minimum 5",
+                "evaluationPath": "/properties/multi/allOf/1/$ref/minimum",
+                "instanceLocation": "/multi",
+                "schemaLocation": "https://test.com/schema#/$defs/minimum/minimum",
+                "valid": false
+            }
+        ],
+        "error": "No schema matched, but all of them are required to match",
+        "evaluationPath": "/properties/multi/allOf",
+        "instanceLocation": "/multi",
+        "schemaLocation": "https://test.com/schema#/properties/multi/allOf",
+        "valid": false
+    }
+]
         )");
 
         jsoncons::json_decoder<json> decoder;    
@@ -94,8 +103,8 @@ TEST_CASE("jsonschema validation report tests")
         compiled.validate(data, decoder);
 
         json output = decoder.get_result();
-        //CHECK(expected == output);
-        std::cout << pretty_print(output) << "\n";
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
     }
 }
 
