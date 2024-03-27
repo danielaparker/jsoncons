@@ -514,10 +514,10 @@ public:
         const ser_context& context,
         std::error_code& ec)
     {
-        switch (ev.event_kind())
+        switch (ev.event_type())
         {
             case staj_event_type::key:
-                return visitor.string_value(string_view_type(ev.value_.string_data_,ev.length_), context);
+                return visitor.string_value(string_view_type(ev.value_.string_data_,ev.length_), ev.tag(), context);
             case staj_event_type::begin_array:
                 return visitor.begin_array(ev.tag(), context);
             case staj_event_type::end_array:
