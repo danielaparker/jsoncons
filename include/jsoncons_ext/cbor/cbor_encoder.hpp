@@ -291,7 +291,7 @@ private:
             binary::native_to_big(static_cast<uint32_t>(length), 
                                   std::back_inserter(sink_));
         } 
-        else if (length <= 0xffffffffffffffff)
+        else if (uint64_t(length) <= 0xffffffffffffffff)
         {
             binary::native_to_big(static_cast<uint8_t>(0x9b), 
                                   std::back_inserter(sink_));
@@ -411,7 +411,7 @@ private:
             binary::native_to_big(static_cast<uint32_t>(length), 
                                             std::back_inserter(sink_));
         }
-        else if (length <= 0xffffffffffffffff)
+        else if (uint64_t(length) <= 0xffffffffffffffff)
         {
             binary::native_to_big(static_cast<uint8_t>(0x7b), 
                                             std::back_inserter(sink_));
@@ -474,7 +474,7 @@ private:
             binary::native_to_big(static_cast<uint32_t>(length), 
                                   std::back_inserter(sink_));
         }
-        else if (length <= 0xffffffffffffffff)
+        else if (uint64_t(length) <= 0xffffffffffffffff)
         {
             binary::native_to_big(static_cast<uint8_t>(0x5b), 
                                   std::back_inserter(sink_));
