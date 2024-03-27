@@ -69,5 +69,33 @@ TEST_CASE("jsonschema validation report tests")
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
+    SECTION("Test 1")
+    {
+        json expected = json::parse(R"(
+{
+    "details": [
+        {
+            "error": "False schema always fails",
+            "evaluationPath": "/properties/fails",
+            "instanceLocation": "/fails",
+            "schemaLocation": "https://test.com/schema#/properties/fails",
+            "valid": false
+        }
+    ],
+    "valid": false
+}
+        )");
+
+        jsoncons::json_decoder<json> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+        json data = json::parse(R"({"multi":3.5})");
+
+        compiled.validate(data, decoder);
+
+        json output = decoder.get_result();
+        //CHECK(expected == output);
+        std::cout << pretty_print(output) << "\n";
+    }
 }
 
