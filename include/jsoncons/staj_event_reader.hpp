@@ -220,7 +220,7 @@ namespace jsoncons {
             {
                 if (index_ != 0)
                 {
-                    more = send_value_event(event(), visitor, context, ec);
+                    more = event().send_value_event(visitor, context, ec);
                     while (more && is_typed_array())
                     {
                         if (index_ < data_.size())
@@ -355,7 +355,7 @@ namespace jsoncons {
             }
             else
             {
-                more = send_value_event(event(), visitor, context, ec);
+                more = event().send_value_event(visitor, context, ec);
             }
             return more;
         }
