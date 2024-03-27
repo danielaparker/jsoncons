@@ -152,7 +152,7 @@ namespace cbor {
             return event_receiver_.is_typed_array();
         }
 
-        const basic_item_event<char_type>& current() const override
+        const basic_staj_event<char_type>& current() const override
         {
             return event_receiver_.event();
         }

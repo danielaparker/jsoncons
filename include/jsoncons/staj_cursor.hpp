@@ -220,7 +220,7 @@ public:
         {
             if (index_ != 0)
             {
-                more = send_json_event(event(), visitor, context, ec);
+                more = event().send_json_event(visitor, context, ec);
                 while (more && is_typed_array())
                 {
                     if (index_ < data_.size())
@@ -355,7 +355,7 @@ public:
         }
         else
         {
-            more = send_json_event(event(), visitor, context, ec);
+            more = event().send_json_event(visitor, context, ec);
         }
         return more;
     }

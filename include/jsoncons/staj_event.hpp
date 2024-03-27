@@ -25,6 +25,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/value_converter.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 
 namespace jsoncons {
 
@@ -470,44 +471,81 @@ private:
                 return bool();
         }
     }
-
-    friend bool send_json_event(const basic_staj_event<CharT>& ev,
-        basic_json_visitor<CharT>& visitor,
+public:
+    bool send_json_event(basic_json_visitor<CharT>& visitor,
         const ser_context& context,
-        std::error_code& ec)
+        std::error_code& ec) const
     {
-        switch (ev.event_type())
+        switch (event_type())
         {
             case staj_event_type::begin_array:
-                return visitor.begin_array(ev.tag(), context);
+                return visitor.begin_array(tag(), context);
             case staj_event_type::end_array:
                 return visitor.end_array(context);
             case staj_event_type::begin_object:
-                return visitor.begin_object(ev.tag(), context, ec);
+                return visitor.begin_object(tag(), context, ec);
             case staj_event_type::end_object:
                 return visitor.end_object(context, ec);
             case staj_event_type::key:
-                return visitor.key(string_view_type(ev.value_.string_data_,ev.length_), context);
+                return visitor.key(string_view_type(value_.string_data_,length_), context);
             case staj_event_type::string_value:
-                return visitor.string_value(string_view_type(ev.value_.string_data_,ev.length_), ev.tag(), context);
+                return visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
             case staj_event_type::byte_string_value:
-                return visitor.byte_string_value(byte_string_view(ev.value_.byte_string_data_,ev.length_), ev.tag(), context);
+                return visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
             case staj_event_type::null_value:
-                return visitor.null_value(ev.tag(), context);
+                return visitor.null_value(tag(), context);
             case staj_event_type::bool_value:
-                return visitor.bool_value(ev.value_.bool_value_, ev.tag(), context);
+                return visitor.bool_value(value_.bool_value_, tag(), context);
             case staj_event_type::int64_value:
-                return visitor.int64_value(ev.value_.int64_value_, ev.tag(), context);
+                return visitor.int64_value(value_.int64_value_, tag(), context);
             case staj_event_type::uint64_value:
-                return visitor.uint64_value(ev.value_.uint64_value_, ev.tag(), context);
+                return visitor.uint64_value(value_.uint64_value_, tag(), context);
             case staj_event_type::half_value:
-                return visitor.half_value(ev.value_.half_value_, ev.tag(), context);
+                return visitor.half_value(value_.half_value_, tag(), context);
             case staj_event_type::double_value:
-                return visitor.double_value(ev.value_.double_value_, ev.tag(), context);
+                return visitor.double_value(value_.double_value_, tag(), context);
             default:
                 return false;
         }
     }
+    
+    bool send_value_event(basic_item_event_visitor<CharT>& visitor,
+        const ser_context& context,
+        std::error_code& ec) const
+    {
+        switch (event_type())
+        {
+            case staj_event_type::key:
+                return visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+            case staj_event_type::begin_array:
+                return visitor.begin_array(tag(), context);
+            case staj_event_type::end_array:
+                return visitor.end_array(context);
+            case staj_event_type::begin_object:
+                return visitor.begin_object(tag(), context, ec);
+            case staj_event_type::end_object:
+                return visitor.end_object(context, ec);
+            case staj_event_type::string_value:
+                return visitor.string_value(string_view_type(value_.string_data_,length_), tag(), context);
+            case staj_event_type::byte_string_value:
+                return visitor.byte_string_value(byte_string_view(value_.byte_string_data_,length_), tag(), context);
+            case staj_event_type::null_value:
+                return visitor.null_value(tag(), context);
+            case staj_event_type::bool_value:
+                return visitor.bool_value(value_.bool_value_, tag(), context);
+            case staj_event_type::int64_value:
+                return visitor.int64_value(value_.int64_value_, tag(), context);
+            case staj_event_type::uint64_value:
+                return visitor.uint64_value(value_.uint64_value_, tag(), context);
+            case staj_event_type::half_value:
+                return visitor.half_value(value_.half_value_, tag(), context);
+            case staj_event_type::double_value:
+                return visitor.double_value(value_.double_value_, tag(), context);
+            default:
+                return false;
+        }
+    }
+
 };
 
 } // namespace jsoncons
