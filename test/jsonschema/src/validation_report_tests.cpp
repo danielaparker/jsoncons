@@ -13,6 +13,7 @@
 #include <regex>
 
 using jsoncons::json;
+using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema validation report tests")
@@ -43,66 +44,67 @@ TEST_CASE("jsonschema validation report tests")
 
     SECTION("Test 1")
     {
-        json expected = json::parse(R"(
+        ojson expected = ojson::parse(R"(
 [
     {
-        "error": "False schema always fails",
+        "valid": false,
         "evaluationPath": "/properties/fails",
-        "instanceLocation": "/fails",
         "schemaLocation": "https://test.com/schema#/properties/fails",
-        "valid": false
+        "instanceLocation": "/fails",
+        "error": "False schema always fails"
     }
 ]
         )");
 
-        jsoncons::json_decoder<json> decoder;    
+        jsoncons::json_decoder<ojson> decoder;    
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
     
         json data = json::parse(R"({"fails":"value"})");
     
         compiled.validate(data, decoder);
         
-        json output = decoder.get_result();
+        ojson output = decoder.get_result();
         CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
     }
     SECTION("Test 1")
     {
-        json expected = json::parse(R"(
+        ojson expected = ojson::parse(R"(
 [
     {
+        "valid": false,
+        "evaluationPath": "/properties/multi/allOf",
+        "schemaLocation": "https://test.com/schema#/properties/multi/allOf",
+        "instanceLocation": "/multi",
+        "error": "No schema matched, but all of them are required to match",
         "details": [
             {
-                "error": "Instance is not an integer",
+                "valid": false,
                 "evaluationPath": "/properties/multi/allOf/0/$ref/type",
-                "instanceLocation": "/multi",
                 "schemaLocation": "https://test.com/schema#/$defs/integer",
-                "valid": false
+                "instanceLocation": "/multi",
+                "error": "Instance is not an integer"
             },
             {
-                "error": "3.5 is less than minimum 5",
+                "valid": false,
                 "evaluationPath": "/properties/multi/allOf/1/$ref/minimum",
-                "instanceLocation": "/multi",
                 "schemaLocation": "https://test.com/schema#/$defs/minimum/minimum",
-                "valid": false
+                "instanceLocation": "/multi",
+                "error": "3.5 is less than minimum 5"
             }
-        ],
-        "error": "No schema matched, but all of them are required to match",
-        "evaluationPath": "/properties/multi/allOf",
-        "instanceLocation": "/multi",
-        "schemaLocation": "https://test.com/schema#/properties/multi/allOf",
-        "valid": false
+        ]
     }
 ]
         )");
 
-        jsoncons::json_decoder<json> decoder;    
+        jsoncons::json_decoder<ojson> decoder;    
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         json data = json::parse(R"({"multi":3.5})");
 
         compiled.validate(data, decoder);
 
-        json output = decoder.get_result();
+        ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
