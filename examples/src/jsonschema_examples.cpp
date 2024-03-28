@@ -10,7 +10,8 @@
 
 // for brevity
 using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; 
+using jsoncons::ojson;
+namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch; 
 
 void reporter_example() 
@@ -345,6 +346,94 @@ void validate_before_decode_example()
 
 #endif // JSONCONS_HAS_STD_VARIANT
 
+void draft_201212_example()
+{
+    json schema = json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://test.json-schema.org/typical-dynamic-resolution/root",
+    "$ref": "list",
+    "$defs": {
+        "foo": {
+            "$dynamicAnchor": "items",
+            "type": "string"
+        },
+        "list": {
+            "$id": "list",
+            "type": "array",
+            "items": { "$dynamicRef": "#items" },
+            "$defs": {
+              "items": {
+                  "$comment": "This is only needed to satisfy the bookending requirement",
+                  "$dynamicAnchor": "items"
+              }
+            }
+        }
+    }
+}
+)");
+
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+    json data = json::parse(R"(["foo", 42])");
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
+}
+
+void draft_201909_example()
+{
+    json schema = json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "properties": {
+        "foo": { "type": "string" }
+    },
+    "allOf": [
+        {
+            "properties": {
+                "bar": { "type": "string" }
+            }
+        }
+    ],
+    "unevaluatedProperties": false
+}
+)");
+
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+    json data = json::parse(R"({"foo": "foo","bar": "bar","baz": "baz"})");
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
+}
+
+void draft_07_example()
+{
+    json schema = json::parse(R"(
+{
+    "items": [{}],
+    "additionalItems": {"type": "integer"}
+}
+)");
+
+    // Need to supply default version because schema does not have $schema keyword  
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema,
+        jsonschema::evaluation_options{}.default_version(jsonschema::schema::draft07()));
+
+    json data = json::parse(R"([ null, 2, 3, "foo" ])");
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
+}
+
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
@@ -356,7 +445,9 @@ int main()
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
 #endif
-
+    draft_201212_example();
+    draft_201909_example();
+    draft_07_example();
     std::cout << "\n";
 }
 

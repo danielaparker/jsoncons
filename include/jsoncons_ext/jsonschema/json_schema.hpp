@@ -144,7 +144,7 @@ namespace jsonschema {
             root_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        // Validate input JSON against a JSON Schema with a provided error reporter
+        // Validate input JSON against a JSON Schema with a provided json_visitor
         void validate(const Json& instance, json_visitor& visitor) const
         {
             visitor.begin_array();
