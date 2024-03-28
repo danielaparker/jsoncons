@@ -101,8 +101,10 @@ int main()
 
     json data = json::parse(R"(["foo", 42])");
 
-    jsoncons::json_stream_encoder encoder(std::cout);
-    compiled.validate(data, encoder);
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
 }
 ```
 
@@ -156,8 +158,10 @@ int main()
 
     json data = json::parse(R"({"foo": "foo","bar": "bar","baz": "baz"})");
 
-    jsoncons::json_stream_encoder encoder(std::cout);
-    compiled.validate(data, encoder);
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
 }
 ```
 
@@ -202,8 +206,10 @@ int main()
 
     json data = json::parse(R"([ null, 2, 3, "foo" ])");
 
-    jsoncons::json_stream_encoder encoder(std::cout);
-    compiled.validate(data, encoder);
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
 }
 ```
 Output:
