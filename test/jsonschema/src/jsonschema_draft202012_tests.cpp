@@ -140,6 +140,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
 #endif
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/if-then-else.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/infinite-loop-detection.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/items.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/maximum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/maxItems.json");
@@ -161,15 +162,15 @@ TEST_CASE("jsonschema draft2020-12 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/propertyNames.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/ref.json"); 
 
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
-        
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
-
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/refRemote.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/required.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/type.json");
+
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedProperties.json");
+        
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/unevaluatedItems.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/uniqueItems.json"); 
 /*

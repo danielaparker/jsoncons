@@ -111,6 +111,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-ref.json");
         //jsonschema_tests("./jsonschema/issues/draft2019-09/issue-recursiveRef.json");
     }
+//#if 0
     SECTION("tests")
     {
 
@@ -141,6 +142,8 @@ TEST_CASE("jsonschema draft2019-09 tests")
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/if-then-else.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/items.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/infinite-loop-detection.json"); 
+        
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/maximum.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/maxItems.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/maxLength.json");
@@ -155,8 +158,6 @@ TEST_CASE("jsonschema draft2019-09 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/oneOf.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/recursiveRef.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedProperties.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedItems.json");
 
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/pattern.json");
@@ -172,6 +173,9 @@ TEST_CASE("jsonschema draft2019-09 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/required.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/type.json");
+
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedProperties.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/unevaluatedItems.json");
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/uniqueItems.json"); 
 /*      // format tests
@@ -196,4 +200,5 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/uri-template.json");
 */
     }
+//#endif    
 }
