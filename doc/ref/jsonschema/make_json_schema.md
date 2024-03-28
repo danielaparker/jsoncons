@@ -116,7 +116,7 @@ Output:
         "evaluationPath": "/$ref/items/1/$dynamicRef/type",
         "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
         "instanceLocation": "/1",
-        "error": "Expected 1 string, found uint64"
+        "error": "Expected 1 string, found integer"
     }
 ]
 ```

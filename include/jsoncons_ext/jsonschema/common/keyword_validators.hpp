@@ -76,7 +76,7 @@ namespace jsonschema {
                 }
             }
 
-            //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+            //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
 
             evaluation_context<Json> this_context(context, this->keyword_name());
             if (schema_ptr == nullptr)
@@ -163,7 +163,7 @@ namespace jsonschema {
             
             //assert(schema_ptr != tentative_target_);
 
-            //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.to_string() << "\n";
+            //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
 
             schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
         }
@@ -1722,7 +1722,7 @@ namespace jsonschema {
                         ss << to_string(expected_types_[i]);
                         //std::cout << ", " << i << ". expected " << to_string(expected_types_[i]);
                 }
-                ss << ", found " << instance.type();
+                ss << ", found " << to_schema_type(instance.type());
 
                 reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
@@ -1735,6 +1735,47 @@ namespace jsonschema {
                 }
             }
             //std::cout << "\n";
+        }
+        
+        std::string to_schema_type(json_type type) const
+        {
+            switch (type)
+            {
+                case json_type::null_value:
+                {
+                    return "null";
+                }
+                case json_type::bool_value:
+                {
+                    return "boolean";
+                }
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                {
+                    return "integer";
+                }
+                case json_type::half_value:
+                case json_type::double_value:
+                {
+                    return "number";
+                }
+                case json_type::string_value:
+                {
+                    return "string";
+                }
+                case json_type::array_value:
+                {
+                    return "array";
+                }
+                case json_type::object_value:
+                {
+                    return "object";
+                }
+                default:
+                {
+                    return "unsupported type";
+                }
+            }
         }
     };
 
@@ -1843,7 +1884,7 @@ namespace jsonschema {
         {
             Json j;
             j.try_emplace("op", "add"); 
-            j.try_emplace("path", instance_location.to_string()); 
+            j.try_emplace("path", instance_location.string()); 
             j.try_emplace("value", std::forward<Json>(default_value)); 
             patch.push_back(std::move(j));
         }
