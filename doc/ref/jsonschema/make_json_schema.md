@@ -219,3 +219,60 @@ Output:
 ]
 ```
 
+#### Cross draft example
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    json schema = json::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/schema",
+    "$defs": {
+        "foo": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "$id": "schema/foo",
+            "definitions" : {
+                "bar" : {
+                    "type" : "string"
+                }               
+            }
+        }       
+    },
+    "properties" : {
+        "thing" : {
+            "$ref" : "schema/foo#/definitions/bar"
+        }
+    }
+}
+)");
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+    json data = json::parse(R"({"thing" : 10})");
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n\n";
+}
+```
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/properties/thing/$ref/type",
+        "schemaLocation": "https://example.com/schema/foo#/definitions/bar",
+        "instanceLocation": "/thing",
+        "error": "Expected 1 string, found integer"
+    }
+]
+```
+

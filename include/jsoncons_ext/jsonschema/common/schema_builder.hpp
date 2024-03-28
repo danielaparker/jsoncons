@@ -87,7 +87,7 @@ namespace jsonschema {
         std::unique_ptr<document_schema_validator<Json>> get_schema()
         {                        
             //std::cout << "schema_store:\n";
-            //for (auto& member : schema_store_)
+            //for (auto& member : *schema_store_ptr_)
             //{
             //    std::cout << "    " << member.first.string() << "\n";
             //}
@@ -167,7 +167,7 @@ namespace jsonschema {
                         else
                         {
                             auto schema_builder = builder_factory_(sch, resolver_, options_, schema_store_ptr_);
-                            schema_builder->build_schema(sch);
+                            schema_builder->build_schema(sch, context.get_absolute_uri().string());
                             schema_val = schema_builder->get_schema();
                         }
                     }
