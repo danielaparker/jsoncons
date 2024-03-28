@@ -647,21 +647,39 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            if (items_val_)
+            if (instance.size() > 0 && items_val_)
             {
-                size_t index = 0;
-                for (const auto& item : instance.array_range()) 
+                if (items_val_->always_fails())
                 {
-                    evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                    evaluation_context<Json> item_context{this_context, std::size_t(0), evaluation_flags{}};
                     jsonpointer::json_pointer pointer(instance_location);
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    items_val_->validate(item_context, item, pointer, results, reporter, patch);
-                    if (context.require_evaluated_items() && errors == reporter.error_count())
+                    pointer /= std::size_t(0);
+                    reporter.error(validation_message(this->keyword_name(),
+                        item_context.eval_path(), 
+                        this->schema_location(), 
+                        pointer,
+                        "Item at index '0' but the schema does not allow any items."));
+                    if (reporter.fail_early())
                     {
-                        results.evaluated_items.insert(index);
+                        return;
                     }
-                    ++index;
+                }
+                else
+                {
+                    size_t index = 0;
+                    for (const auto& item : instance.array_range()) 
+                    {
+                        evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= index;
+                        std::size_t errors = reporter.error_count();
+                        items_val_->validate(item_context, item, pointer, results, reporter, patch);
+                        if (context.require_evaluated_items() && errors == reporter.error_count())
+                        {
+                            results.evaluated_items.insert(index);
+                        }
+                        ++index;
+                    }
                 }
             }
         }
