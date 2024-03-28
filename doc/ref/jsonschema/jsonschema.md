@@ -2,6 +2,9 @@
 
 The jsonschema extension implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) specification for validating input JSON. (since 0.160.0)
 
+For a preview of our upcoming support for Drafts 2019-09 and 2020-12, see [make_json_schema](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonschema/make_json_schema.md),
+which is currently supported on master.
+
 ### Compliance level
 
 The jsoncons implementation passes all [draft 7 required tests](https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/master/tests/draft7).
