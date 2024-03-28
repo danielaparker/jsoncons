@@ -273,6 +273,8 @@ namespace jsonschema {
         schema_validator()
         {}
 
+        virtual bool always_fails() const = 0;
+        
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
         virtual bool recursive_anchor() const = 0;

@@ -68,6 +68,11 @@ namespace jsonschema {
         {
             return schema_val_->get_schema_for_dynamic_anchor(anchor);
         }
+
+        bool always_fails() const final
+        {
+            return schema_val_->always_fails();
+        }
         
     private:
         void do_validate(const evaluation_context<Json>& context, 
@@ -130,6 +135,11 @@ namespace jsonschema {
         const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& /*anchor*/) const final
         {
             return nullptr;
+        }
+
+        bool always_fails() const final
+        {
+            return !value_;
         }
 
     private:
@@ -252,6 +262,11 @@ namespace jsonschema {
         const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
+        }
+
+        bool always_fails() const final
+        {
+            return false;
         }
 
     private:

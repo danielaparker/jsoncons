@@ -341,10 +341,6 @@ namespace draft202012 {
                 {
                     validators.emplace_back(make_prefix_items_validator(context, it->value(), sch, local_anchor_dict));
                 } 
-                else if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
-                {
-                    validators.emplace_back(make_items_object_validator(context, it->value(), local_anchor_dict));
-                }
             }
             else
             {
@@ -353,7 +349,7 @@ namespace draft202012 {
                 {
                     if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
                     {
-                        validators.emplace_back(make_items_object_validator(context, it->value(), local_anchor_dict));
+                        validators.emplace_back(make_items_validator(context, it->value(), local_anchor_dict));
                     }
                 }
             }
@@ -390,8 +386,8 @@ namespace draft202012 {
         std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
-            std::vector<schema_validator_type> item_validators;
-            schema_validator_type additional_items_validator;
+            std::vector<schema_validator_type> prefix_item_validators;
+            schema_validator_type items_validator;
 
             uri schema_location{context.make_schema_path_with("prefixItems")};
 
@@ -402,29 +398,29 @@ namespace draft202012 {
                 {
                     std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
 
-                    item_validators.emplace_back(this->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
+                    prefix_item_validators.emplace_back(this->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
                 }
 
                 auto it = parent.find("items");
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"items"};
-                    additional_items_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    items_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict);
                 }
             }
 
             return jsoncons::make_unique<prefix_items_validator<Json>>( schema_location,  
-                std::move(item_validators), std::move(additional_items_validator));
+                std::move(prefix_item_validators), std::move(items_validator));
         }
 
-        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
+        std::unique_ptr<items_validator<Json>> make_items_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_location{context.make_schema_path_with("items")};
 
             std::string sub_keys[] = {"items"};
 
-            return jsoncons::make_unique<items_object_validator<Json>>( schema_location, 
+            return jsoncons::make_unique<items_validator<Json>>( schema_location, 
                 this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
                 

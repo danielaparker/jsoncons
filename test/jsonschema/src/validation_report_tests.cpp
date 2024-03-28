@@ -67,7 +67,7 @@ TEST_CASE("jsonschema validation report tests")
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
-    SECTION("Test 1")
+    SECTION("Test 2")
     {
         ojson expected = ojson::parse(R"(
 [
@@ -107,6 +107,50 @@ TEST_CASE("jsonschema validation report tests")
         ojson output = decoder.get_result();
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema prefixItems and items report tests")
+{
+    json schema = json::parse(R"(
+{
+  "type": "array",
+  "prefixItems": [
+    { "type": "number" },
+    { "type": "string" },
+    { "enum": ["Street", "Avenue", "Boulevard"] },
+    { "enum": ["NW", "NE", "SW", "SE"] }
+  ],
+  "items": false
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/prefixItems/4",
+        "schemaLocation": "#/prefixItems",
+        "instanceLocation": "/4",
+        "error": "Extra item at index '4' but the schema does not allow extra items."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+            [1600, "Pennsylvania", "Avenue", "NW", "Washington"]
+        )");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        //CHECK(expected == output);
+        std::cout << pretty_print(output) << "\n";
     }
 }
 

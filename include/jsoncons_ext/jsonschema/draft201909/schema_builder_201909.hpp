@@ -341,7 +341,7 @@ namespace draft201909 {
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(make_items_object_validator(context, sch, it->value(), anchor_dict));
+                    validators.emplace_back(make_items_validator(context, sch, it->value(), anchor_dict));
                 }
             }
 
@@ -391,14 +391,14 @@ namespace draft201909 {
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
-        std::unique_ptr<items_object_validator<Json>> make_items_object_validator(const compilation_context& context, 
+        std::unique_ptr<items_validator<Json>> make_items_validator(const compilation_context& context, 
             const Json& /* parent */, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             uri schema_location{context.make_schema_path_with("items")};
 
             std::string sub_keys[] = {"items"};
 
-            return jsoncons::make_unique<items_object_validator<Json>>( schema_location, 
+            return jsoncons::make_unique<items_validator<Json>>( schema_location, 
                 make_schema_validator(context, sch, sub_keys, anchor_dict));
         }
                 

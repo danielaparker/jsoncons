@@ -616,15 +616,16 @@ namespace jsonschema {
         }
     };
 
+    // 202012
     template <class Json>
-    class items_object_validator : public keyword_validator_base<Json>
+    class items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
         schema_validator_type items_val_;
     public:
-        items_object_validator(const uri& schema_location, 
+        items_validator(const uri& schema_location, 
             schema_validator_type&& items_val)
             : keyword_validator_base<Json>("items", schema_location), 
               items_val_(std::move(items_val))
@@ -2469,24 +2470,42 @@ namespace jsonschema {
                 ++it;
                 ++index;
             }
-            if (items_val_)
+            if (it != end_it && items_val_)
             {
-                while (it != end_it)
+                if (items_val_->always_fails())
                 {
                     evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                     jsonpointer::json_pointer pointer(instance_location);
                     pointer /= index;
-                    if (items_val_)
+                    reporter.error(validation_message(this->keyword_name(),
+                        item_context.eval_path(), 
+                        this->schema_location(), 
+                        pointer,
+                        "Extra item at index '" + std::to_string(index) + "' but the schema does not allow extra items."));
+                    if (reporter.fail_early())
                     {
-                        std::size_t errors = reporter.error_count();
-                        items_val_->validate(item_context, *it, pointer, results, reporter, patch);
-                        if (context.require_evaluated_items() && errors == reporter.error_count())
-                        {
-                            results.evaluated_items.insert(index);
-                        }
+                        return;
                     }
-                    ++it;
-                    ++index;
+                }
+                else
+                {
+                    while (it != end_it)
+                    {
+                        evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= index;
+                        if (items_val_)
+                        {
+                            std::size_t errors = reporter.error_count();
+                            items_val_->validate(item_context, *it, pointer, results, reporter, patch);
+                            if (context.require_evaluated_items() && errors == reporter.error_count())
+                            {
+                                results.evaluated_items.insert(index);
+                            }
+                        }
+                        ++it;
+                        ++index;
+                    }
                 }
             }
         }
