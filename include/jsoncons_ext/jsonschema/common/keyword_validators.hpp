@@ -546,78 +546,6 @@ namespace jsonschema {
     // items
 
     template <class Json>
-    class items_array_validator : public keyword_validator_base<Json>
-    {
-        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
-        using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
-
-        std::vector<schema_validator_type> item_validators_;
-        schema_validator_type additional_items_val_;
-    public:
-        items_array_validator(const uri& schema_location, 
-            std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_val)
-            : keyword_validator_base<Json>("items", schema_location), 
-              item_validators_(std::move(item_validators)), 
-              additional_items_val_(std::move(additional_items_val))
-        {
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter,
-            Json& patch) const final
-        {
-            if (!instance.is_array())
-            {
-                return;
-            }
-
-            size_t index = 0;
-            auto validator_it = item_validators_.cbegin();
-
-            evaluation_context<Json> this_context(context, this->keyword_name());
-            
-            for (const auto& item : instance.array_range()) 
-            {
-                jsonpointer::json_pointer pointer(instance_location);
-
-                if (validator_it != item_validators_.cend())
-                {
-                    evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    (*validator_it)->validate(item_context, item, pointer, results, reporter, patch);
-                    if (context.require_evaluated_items() && errors == reporter.error_count())
-                    {
-                        results.evaluated_items.insert(index);
-                    }
-                    ++validator_it;
-                    ++index;
-                }
-                else if (additional_items_val_ != nullptr)
-                {
-                    pointer /= index;
-                    std::size_t errors = reporter.error_count();
-                    additional_items_val_->validate(context, item, pointer, results, reporter, patch);
-                    if (context.require_evaluated_items() && errors == reporter.error_count())
-                    {
-                        results.evaluated_items.insert(index);
-                    }
-                    ++index;
-                }
-                else
-                    break;
-
-            }
-        }
-    };
-
-    // 202012
-    template <class Json>
     class items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2439,15 +2367,15 @@ namespace jsonschema {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
-        std::vector<schema_validator_type> prefix_items_validators_;
+        std::vector<schema_validator_type> prefix_item_validators_;
         schema_validator_type items_val_;
     public:
-        prefix_items_validator(const uri& schema_location, 
-            std::vector<schema_validator_type>&& item_validators,
-            schema_validator_type&& additional_items_val)
-            : keyword_validator_base<Json>("prefixItems", schema_location), 
-              prefix_items_validators_(std::move(item_validators)), 
-              items_val_(std::move(additional_items_val))
+        prefix_items_validator(const std::string& keyword_name, const uri& schema_location, 
+            std::vector<schema_validator_type>&& prefix_item_validators,
+            schema_validator_type&& items_val)
+            : keyword_validator_base<Json>(keyword_name, schema_location), 
+              prefix_item_validators_(std::move(prefix_item_validators)), 
+              items_val_(std::move(items_val))
         {
         }
 
@@ -2469,7 +2397,7 @@ namespace jsonschema {
             auto end_it = instance.array_range().cend();
         
             evaluation_context<Json> this_context(context, this->keyword_name());
-            for (const auto& val : prefix_items_validators_) 
+            for (const auto& val : prefix_item_validators_) 
             {
                 if (it == end_it)
                 {

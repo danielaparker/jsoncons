@@ -737,6 +737,47 @@ namespace jsonschema {
                 std::move(dependent_schemas));
         }
 
+        std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator_07(const compilation_context& context, 
+            const Json& parent, const Json& sch, anchor_uri_map_type& anchor_dict)
+        {
+            std::vector<schema_validator_type> item_validators;
+            schema_validator_type additional_items_validator = nullptr;
+
+            uri schema_location{context.make_schema_path_with("items")};
+
+            if (sch.type() == json_type::array_value) 
+            {
+                size_t c = 0;
+                for (const auto& subsch : sch.array_range())
+                {
+                    std::string sub_keys[] = {"items", std::to_string(c++)};
+
+                    item_validators.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
+                }
+
+                auto it = parent.find("additionalItems");
+                if (it != parent.object_range().end()) 
+                {
+                    std::string sub_keys[] = {"additionalItems"};
+                    additional_items_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                }
+            }
+
+            return jsoncons::make_unique<prefix_items_validator<Json>>("items", schema_location, 
+                std::move(item_validators), std::move(additional_items_validator));
+        }
+
+        std::unique_ptr<items_validator<Json>> make_items_validator(const compilation_context& context, 
+            const Json& sch, anchor_uri_map_type& anchor_dict)
+        {
+            uri schema_location{context.make_schema_path_with("items")};
+
+            std::string sub_keys[] = {"items"};
+
+            return jsoncons::make_unique<items_validator<Json>>( schema_location, 
+                this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
+        }
+
         virtual std::unique_ptr<unevaluated_properties_validator<Json>> make_unevaluated_properties_validator(
             const compilation_context& context, const Json& sch, anchor_uri_map_type& anchor_dict)
         {

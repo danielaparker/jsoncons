@@ -314,57 +314,16 @@ namespace draft7 {
 
                 if (it->value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(make_items_array_validator(context, sch, it->value(), anchor_dict));
+                    validators.emplace_back(this->make_prefix_items_validator_07(context, sch, it->value(), anchor_dict));
                 } 
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(make_items_object_validator(context, it->value(), anchor_dict));
+                    validators.emplace_back(this->make_items_validator(context, it->value(), anchor_dict));
                 }
             }
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
-        }
-
-        std::unique_ptr<items_array_validator<Json>> make_items_array_validator(const compilation_context& context,
-            const Json& parent, const Json& sch, anchor_uri_map_type& anchor_dict)
-        {
-            std::vector<schema_validator_type> item_validators;
-            schema_validator_type additional_items_validator = nullptr;
-
-            uri schema_location{context.make_schema_path_with("items")};
-
-            if (sch.type() == json_type::array_value) 
-            {
-                size_t c = 0;
-                for (const auto& subsch : sch.array_range())
-                {
-                    std::string sub_keys[] = {"items", std::to_string(c++)};
-
-                    item_validators.emplace_back(make_schema_validator(context, subsch, sub_keys, anchor_dict));
-                }
-
-                auto it = parent.find("additionalItems");
-                if (it != parent.object_range().end()) 
-                {
-                    std::string sub_keys[] = {"additionalItems"};
-                    additional_items_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
-                }
-            }
-
-            return jsoncons::make_unique<items_array_validator<Json>>( schema_location, 
-                std::move(item_validators), std::move(additional_items_validator));
-        }
-
-        std::unique_ptr<items_validator<Json>> make_items_object_validator(const compilation_context& context,
-            const Json& sch, anchor_uri_map_type& anchor_dict)
-        {
-            uri schema_location{context.make_schema_path_with("items")};
-
-            std::string sub_keys[] = {"items"};
-
-            return jsoncons::make_unique<items_validator<Json>>( schema_location, 
-                make_schema_validator(context, sch, sub_keys, anchor_dict));
         }
         
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
