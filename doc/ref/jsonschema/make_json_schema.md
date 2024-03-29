@@ -39,7 +39,7 @@ Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
     <pre>
     Json fun(const jsoncons::uri& uri)   
     </pre>
-    If unable to resolve the resource, the finction should return `Json::null()`.
+    If unable to resolve the resource, it should return `Json::null()`.
     </td>   
   </tr>
   <tr>
