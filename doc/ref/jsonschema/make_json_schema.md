@@ -24,7 +24,7 @@ json_schema<Json> make_json_schema(const Json& sch,
     evaluation_options options = evaluation_options{});         
 ```
 
-Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
+Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
 
 #### Parameters
 
@@ -54,7 +54,7 @@ Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
 
 #### Return value
 
-Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
+A [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema document.
 
 #### Exceptions
 
