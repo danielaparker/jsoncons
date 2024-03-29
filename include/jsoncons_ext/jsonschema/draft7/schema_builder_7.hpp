@@ -276,7 +276,7 @@ namespace draft7 {
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
             {
-                properties = make_properties_validator(context, it->value(), anchor_dict);
+                properties = this->make_properties_validator(context, it->value(), anchor_dict);
             }
             std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
 
@@ -291,7 +291,7 @@ namespace draft7 {
             it = sch.find("additionalProperties");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(make_additional_properties_validator(context, it->value(), 
+                validators.emplace_back(this->make_additional_properties_validator(context, it->value(), 
                     std::move(properties), std::move(pattern_properties), anchor_dict));
             }
             else
@@ -325,24 +325,6 @@ namespace draft7 {
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
         }
-        
-        std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
-            const Json& sch, anchor_uri_map_type& anchor_dict)
-        {
-            uri schema_location = context.get_absolute_uri();
-            std::map<std::string, schema_validator_type> properties;
-
-            for (const auto& prop : sch.object_range())
-            {
-                std::string sub_keys[] =
-                {"properties", prop.key()};
-                properties.emplace(std::make_pair(prop.key(), 
-                    make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
-            }
-
-            return jsoncons::make_unique<properties_validator<Json>>(
-                                                                     std::move(schema_location), std::move(properties));
-        }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
                 
@@ -366,25 +348,6 @@ namespace draft7 {
         }
 #endif
        
-
-        std::unique_ptr<additional_properties_validator<Json>> make_additional_properties_validator(
-            const compilation_context& context, const Json& sch, 
-            std::unique_ptr<properties_validator<Json>>&& properties, 
-            std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties, 
-            anchor_uri_map_type& anchor_dict)
-        {
-            uri schema_location = context.get_absolute_uri();
-            std::vector<keyword_validator_type> validators;
-            schema_validator_type additional_properties;
-
-            std::string sub_keys[] = {"additionalProperties"};
-            additional_properties = make_schema_validator(context, sch, sub_keys, anchor_dict);
-
-            return jsoncons::make_unique<additional_properties_validator<Json>>( std::move(schema_location),
-                std::move(properties), std::move(pattern_properties),
-                std::move(additional_properties));
-        }
-
     private:
 
         compilation_context make_compilation_context(const compilation_context& parent, 
