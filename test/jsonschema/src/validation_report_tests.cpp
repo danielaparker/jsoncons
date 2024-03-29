@@ -197,3 +197,61 @@ TEST_CASE("jsonschema additionalProperties output tests")
     }
 }
 
+TEST_CASE("jsonschema unevaluatedProperties output tests")
+{
+    json schema = json::parse(R"(
+{
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string" }
+      },
+      "required": ["street_address", "city", "state"]
+    }
+  ],
+
+  "properties": {
+    "type": { "enum": ["residential", "business"] }
+  },
+  "required": ["type"],
+  "unevaluatedProperties": false
+}    
+)");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/unevaluatedProperties/something that doesn't belong",
+        "schemaLocation": "#",
+        "instanceLocation": "/something that doesn't belong",
+        "error": "Unevaluated property 'something that doesn't belong' but the schema does not allow unevaluated properties."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+{
+  "street_address": "1600 Pennsylvania Avenue NW",
+  "city": "Washington",
+  "state": "DC",
+  "type": "business",
+  "something that doesn't belong": "hi!"
+}
+        )");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+    }
+}
+
