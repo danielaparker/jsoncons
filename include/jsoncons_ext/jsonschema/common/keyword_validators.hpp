@@ -2624,6 +2624,13 @@ namespace jsonschema {
                         }
                     }
                 }
+                else if (validator_->always_suceeds())
+                {
+                    for (std::size_t index = 0; index < instance.size(); ++index) 
+                    {
+                        results.evaluated_items.insert(index);
+                    }
+                }
                 else
                 {
                     std::size_t index = 0;

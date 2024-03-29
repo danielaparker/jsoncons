@@ -73,6 +73,11 @@ namespace jsonschema {
         {
             return schema_val_->always_fails();
         }
+
+        bool always_suceeds() const final
+        {
+            return schema_val_->always_suceeds();
+        }
         
     private:
         void do_validate(const evaluation_context<Json>& context, 
@@ -140,6 +145,11 @@ namespace jsonschema {
         bool always_fails() const final
         {
             return !value_;
+        }
+
+        bool always_suceeds() const final
+        {
+            return value_;
         }
 
     private:
@@ -265,6 +275,11 @@ namespace jsonschema {
         }
 
         bool always_fails() const final
+        {
+            return false;
+        }
+
+        bool always_suceeds() const final
         {
             return false;
         }
