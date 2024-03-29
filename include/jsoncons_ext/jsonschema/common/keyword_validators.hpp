@@ -1747,7 +1747,7 @@ namespace jsonschema {
             evaluation_results& results, 
             error_reporter& reporter, 
             Json& patch,
-            std::unordered_set<std::string>& all_properties) const 
+            std::unordered_set<std::string>& allowed_properties) const 
         {
             //std::cout << "properties_validator begin[" << context.eval_path().string() << "," << this->schema_location().string() << "]\n";
             if (!instance.is_object())
@@ -1778,7 +1778,7 @@ namespace jsonschema {
                 {
                     std::size_t errors = reporter.error_count();
                     properties_it->second->validate(prop_context, prop.value() , pointer, results, reporter, patch);
-                    all_properties.insert(prop.key());
+                    allowed_properties.insert(prop.key());
                     if (context.require_evaluated_properties() && errors == reporter.error_count())
                     {
                         results.evaluated_properties.insert(prop.key());
@@ -1823,8 +1823,8 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::unordered_set<std::string> all_properties;
-            validate(context, instance, instance_location, results, reporter, patch, all_properties);
+            std::unordered_set<std::string> allowed_properties;
+            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
 
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
@@ -1859,7 +1859,7 @@ namespace jsonschema {
             evaluation_results& results, 
             error_reporter& reporter, 
             Json& patch,
-            std::unordered_set<std::string>& all_properties) const 
+            std::unordered_set<std::string>& allowed_properties) const 
         {
             if (!instance.is_object())
             {
@@ -1876,7 +1876,7 @@ namespace jsonschema {
                 for (auto& schema_pp : pattern_properties_)
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
-                        all_properties.insert(prop.key());
+                        allowed_properties.insert(prop.key());
                         std::size_t errors = reporter.error_count();
                         schema_pp.second->validate(prop_context, prop.value() , pointer, results, reporter, patch);
                         if (context.require_evaluated_properties() && errors == reporter.error_count())
@@ -1896,8 +1896,8 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            std::unordered_set<std::string> all_properties;
-            validate(context, instance, instance_location, results, reporter, patch, all_properties);
+            std::unordered_set<std::string> allowed_properties;
+            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
     };
 
@@ -1939,11 +1939,11 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            std::unordered_set<std::string> all_properties;
+            std::unordered_set<std::string> allowed_properties;
 
             if (properties_)
             {
-                properties_->validate(this_context, instance, instance_location, results, reporter, patch, all_properties);
+                properties_->validate(this_context, instance, instance_location, results, reporter, patch, allowed_properties);
                 if (reporter.fail_early())
                 {
                     return;
@@ -1952,52 +1952,75 @@ namespace jsonschema {
 
             if (pattern_properties_)
             {
-                pattern_properties_->validate(this_context, instance, instance_location, results, reporter, patch, all_properties);
+                pattern_properties_->validate(this_context, instance, instance_location, results, reporter, patch, allowed_properties);
                 if (reporter.fail_early())
                 {
                     return;
                 }
             }
 
-            for (const auto& prop : instance.object_range()) 
+            if (instance.size() > 0 && additional_properties_)
             {
-                evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
-
-                jsonpointer::json_pointer pointer(instance_location);
-                pointer /= prop.key();
-
-                auto properties_it = all_properties.find(prop.key());
-
-                // check if it is in "properties"
-                if (properties_it == all_properties.end()) 
+                if (additional_properties_->always_fails())
                 {
-                    // finally, check "additionalProperties" 
-                    //std::cout << "additional_properties_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
-                    if (additional_properties_) 
+                    for (const auto& prop : instance.object_range()) 
                     {
-                        //std::cout << " !!!additionalProperties!!!";
-                        collecting_error_reporter local_reporter;
-
-                        additional_properties_->validate(prop_context, prop.value() , pointer, results, local_reporter, patch);
-                        if (!local_reporter.errors.empty())
+                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= prop.key();
+                        // check if it is in "properties"
+                        auto properties_it = allowed_properties.find(prop.key());
+                        if (properties_it == allowed_properties.end()) 
                         {
                             reporter.error(validation_message(this->keyword_name(),
-                                this_context.eval_path(), 
-                                additional_properties_->schema_location().string(),
-                                instance_location, 
-                                "Additional prop \"" + prop.key() + "\" found but was invalid."));
-                            if (reporter.fail_early())
-                            {
-                                return;
-                            }
-                        }
-                        else if (context.require_evaluated_properties())
-                        {
-                            results.evaluated_properties.insert(prop.key());
+                                prop_context.eval_path(), 
+                                this->schema_location(), 
+                                pointer,
+                                "Additional property '" + prop.key() + "' but the schema does not allow additional properties."));
+                            break;
                         }
                     }
                 }
-                //std::cout << "\n";
+                else
+                {
+                    for (const auto& prop : instance.object_range()) 
+                    {
+                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= prop.key();
+
+                        // check if it is in "properties"
+                        auto properties_it = allowed_properties.find(prop.key());
+                        if (properties_it == allowed_properties.end()) 
+                        {
+                            // finally, check "additionalProperties" 
+                            //std::cout << "additional_properties_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
+                            
+                            //std::cout << " !!!additionalProperties!!!";
+                            collecting_error_reporter local_reporter;
+
+                            additional_properties_->validate(prop_context, prop.value() , pointer, results, local_reporter, patch);
+                            if (!local_reporter.errors.empty())
+                            {
+                                reporter.error(validation_message(this->keyword_name(),
+                                    this_context.eval_path(), 
+                                    additional_properties_->schema_location().string(),
+                                    instance_location, 
+                                    "Additional property \"" + prop.key() + "\" found but was invalid."));
+                                if (reporter.fail_early())
+                                {
+                                    return;
+                                }
+                            }
+                            else if (context.require_evaluated_properties())
+                            {
+                                results.evaluated_properties.insert(prop.key());
+                            }
+                            
+                        }
+                        //std::cout << "\n";
+                    }
+                }
             }
         }
     };
@@ -2584,4 +2607,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_KEYWORDS_HPP
+#endif // JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
