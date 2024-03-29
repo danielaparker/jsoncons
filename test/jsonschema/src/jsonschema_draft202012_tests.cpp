@@ -114,6 +114,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
     }
     SECTION("more_tests")
     {
+        // unevaluated-tests.json is from https://github.com/networknt/json-schema-validator/tree/master/src/test/resources/schema/unevaluatedTests
         jsonschema_tests("./jsonschema/more_tests/draft2020-12/unevaluated-tests.json");
     }
 //#if 0

@@ -7,6 +7,11 @@ template <class Json>
 class json_schema
 ```
 
+A `json_schema` represents the compiled form of a JSON Schema document.
+A `json_schema` is immutable and thread-safe.
+
+The class satisfies the requirements of MoveConstructible and MoveAssignable, but not CopyConstructible or CopyAssignable.
+
 #### Member functions
 
     bool is_valid(const Json& instance) const;  (1)
