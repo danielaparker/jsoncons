@@ -2624,7 +2624,7 @@ namespace jsonschema {
                         }
                     }
                 }
-                else if (validator_->always_suceeds())
+                else if (validator_->always_succeeds())
                 {
                     for (std::size_t index = 0; index < instance.size(); ++index) 
                     {

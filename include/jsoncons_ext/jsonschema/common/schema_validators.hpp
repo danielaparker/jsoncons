@@ -74,9 +74,9 @@ namespace jsonschema {
             return schema_val_->always_fails();
         }
 
-        bool always_suceeds() const final
+        bool always_succeeds() const final
         {
-            return schema_val_->always_suceeds();
+            return schema_val_->always_succeeds();
         }
         
     private:
@@ -147,7 +147,7 @@ namespace jsonschema {
             return !value_;
         }
 
-        bool always_suceeds() const final
+        bool always_succeeds() const final
         {
             return value_;
         }
@@ -279,7 +279,7 @@ namespace jsonschema {
             return false;
         }
 
-        bool always_suceeds() const final
+        bool always_succeeds() const final
         {
             return false;
         }

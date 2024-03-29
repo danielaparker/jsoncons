@@ -275,7 +275,7 @@ namespace jsonschema {
 
         virtual bool always_fails() const = 0;
 
-        virtual bool always_suceeds() const = 0;
+        virtual bool always_succeeds() const = 0;
         
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
