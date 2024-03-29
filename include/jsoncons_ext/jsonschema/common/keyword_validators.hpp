@@ -1620,7 +1620,7 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            bool is_type_found = false;
+            bool is_type_found = expected_types_.empty();
 
             auto end = expected_types_.end();
             for (auto it = expected_types_.begin(); it != end && !is_type_found; ++it)
