@@ -1783,15 +1783,14 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
-
-                jsonpointer::json_pointer prop_location = instance_location / prop.key();
-
                 auto properties_it = properties_.find(prop.key());
 
                 // check if it is in "properties"
                 if (properties_it != properties_.end()) 
                 {
+                    evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                    jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
                     std::size_t errors = reporter.error_count();
                     properties_it->second->validate(prop_context, prop.value() , prop_location, results, reporter, patch);
                     allowed_properties.insert(prop.key());
@@ -2014,13 +2013,13 @@ namespace jsonschema {
                 {
                     for (const auto& prop : instance.object_range()) 
                     {
-                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
-                        jsonpointer::json_pointer prop_location = instance_location / prop.key();
-
                         // check if it is in "allowed properties"
                         auto properties_it = allowed_properties.find(prop.key());
                         if (properties_it == allowed_properties.end()) 
                         {
+                            evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                            jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
                             // finally, check "additionalProperties" 
                             //std::cout << "additional_properties_validator a_prop_or_pattern_matched " << a_prop_or_pattern_matched << ", " << bool(additional_properties_);
                             
@@ -2493,10 +2492,10 @@ namespace jsonschema {
                 {
                     while (it != end_it)
                     {
-                        evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
-                        jsonpointer::json_pointer item_location = instance_location / index;
                         if (items_val_)
                         {
+                            evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                            jsonpointer::json_pointer item_location = instance_location / index;
                             std::size_t errors = reporter.error_count();
                             items_val_->validate(item_context, *it, item_location, results, reporter, patch);
                             if (errors == reporter.error_count())
@@ -2559,13 +2558,13 @@ namespace jsonschema {
                 {
                     for (const auto& prop : instance.object_range()) 
                     {
-                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
-                        jsonpointer::json_pointer prop_location = instance_location / prop.key();
-
                         // check if it is in "evaluated_properties"
                         auto prop_it = results.evaluated_properties.find(prop.key());
                         if (prop_it == results.evaluated_properties.end()) 
                         {
+                            evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                            jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
                             reporter.error(validation_message(this->keyword_name(),
                                 prop_context.eval_path(), 
                                 this->schema_location(), 
