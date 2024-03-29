@@ -1421,23 +1421,25 @@ namespace jsonschema {
             if (if_val_) 
             {
                 collecting_error_reporter local_reporter;
-
-                if_val_->validate(this_context, instance, instance_location, results, local_reporter, patch);
-                std::cout << "if: evaluated properties\n";
-                for (auto& item : results.evaluated_properties)
-                {
-                    std::cout << "  " << item << "\n";
-                }
+                evaluation_results local_results;
+                
+                if_val_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
+                //std::cout << "if: evaluated properties\n";
+                //for (auto& item : results.evaluated_properties)
+                //{
+                //    std::cout << "  " << item << "\n";
+                //}
                 if (local_reporter.errors.empty()) 
                 {
+                    results.merge(local_results);
                     if (then_val_)
                     {
                         then_val_->validate(this_context, instance, instance_location, results, reporter, patch);
-                        std::cout << "then: evaluated properties\n";
-                        for (auto& item : results.evaluated_properties)
-                        {
-                            std::cout << "  " << item << "\n";
-                        }
+                        //std::cout << "then: evaluated properties\n";
+                        //for (auto& item : results.evaluated_properties)
+                        //{
+                        //    std::cout << "  " << item << "\n";
+                        //}
                     }
                 } 
                 else 
@@ -1445,11 +1447,11 @@ namespace jsonschema {
                     if (else_val_)
                     {
                         else_val_->validate(this_context, instance, instance_location, results, reporter, patch);
-                        std::cout << "else: evaluated properties\n";
-                        for (auto& item : results.evaluated_properties)
-                        {
-                            std::cout << "  " << item << "\n";
-                        }
+                        //std::cout << "else: evaluated properties\n";
+                        //for (auto& item : results.evaluated_properties)
+                        //{
+                        //    std::cout << "  " << item << "\n";
+                        //}
                     }
                 }
             }
