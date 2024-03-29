@@ -594,9 +594,12 @@ namespace jsonschema {
                 }
                 else if (items_val_->always_succeeds())
                 {
-                    for (std::size_t index = 0; index < instance.size(); ++ index)
+                    if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        for (std::size_t index = 0; index < instance.size(); ++ index)
+                        {
+                            results.evaluated_items.insert(index);
+                        }
                     }
                 }
                 else
@@ -1990,11 +1993,9 @@ namespace jsonschema {
                 }
                 else if (additional_properties_->always_succeeds())
                 {
-                    for (const auto& prop : instance.object_range()) 
+                    if (context.require_evaluated_properties())
                     {
-                        // check if it is in "allowed properties"
-                        auto properties_it = allowed_properties.find(prop.key());
-                        if (properties_it == allowed_properties.end()) 
+                        for (const auto& prop : instance.object_range()) 
                         {
                             results.evaluated_properties.insert(prop.key());
                         }
@@ -2571,9 +2572,12 @@ namespace jsonschema {
                 }
                 else if (validator_->always_succeeds())
                 {
-                    for (const auto& prop : instance.object_range()) 
+                    if (context.require_evaluated_properties())
                     {
-                        results.evaluated_properties.insert(prop.key());
+                        for (const auto& prop : instance.object_range()) 
+                        {
+                            results.evaluated_properties.insert(prop.key());
+                        }
                     }
                 }
                 else
@@ -2589,7 +2593,10 @@ namespace jsonschema {
                             validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
                             if (reporter.error_count() == error_count)
                             {
-                                results.evaluated_properties.insert(prop.key());
+                                if (context.require_evaluated_properties())
+                                {
+                                    results.evaluated_properties.insert(prop.key());
+                                }
                             }
                         }
                     }
@@ -2661,9 +2668,12 @@ namespace jsonschema {
                 }
                 else if (validator_->always_succeeds())
                 {
-                    for (std::size_t index = 0; index < instance.size(); ++index) 
+                    if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        for (std::size_t index = 0; index < instance.size(); ++index) 
+                        {
+                            results.evaluated_items.insert(index);
+                        }
                     }
                 }
                 else
@@ -2683,7 +2693,10 @@ namespace jsonschema {
                             validator_->validate(item_context, item, pointer, results, reporter, patch);
                             if (reporter.error_count() == error_count)
                             {
-                                results.evaluated_items.insert(index);
+                                if (context.require_evaluated_items())
+                                {
+                                    results.evaluated_items.insert(index);
+                                }
                             }
                         }
                         ++index;

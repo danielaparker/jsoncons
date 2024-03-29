@@ -471,7 +471,7 @@ void cross_schema_example()
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
-/*
+
     reporter_example();
     uriresolver_example();
     defaults_example();
@@ -479,7 +479,7 @@ int main()
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
 #endif
-*/
+
     draft_201212_example();
     draft_201909_example();
     draft_07_example();
