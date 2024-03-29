@@ -2541,6 +2541,13 @@ namespace jsonschema {
                         }
                     }
                 }
+                else if (validator_->always_succeeds())
+                {
+                    for (const auto& prop : instance.object_range()) 
+                    {
+                        results.evaluated_properties.insert(prop.key());
+                    }
+                }
                 else
                 {
                     for (const auto& prop : instance.object_range()) 
