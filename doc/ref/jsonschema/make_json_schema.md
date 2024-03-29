@@ -41,12 +41,12 @@ Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
     </pre></td>   
   </tr>
   <tr>
-    <td><a href="evaluation_options.md">options</a></td>
-    <td>Evaluation options</td> 
-  </tr>
-  <tr>
     <td>retrieval_uri</td>
     <td>Optional retrieval URI</td> 
+  </tr>
+  <tr>
+    <td><a href="evaluation_options.md">options</a></td>
+    <td>Evaluation options</td> 
   </tr>
 </table>
 
