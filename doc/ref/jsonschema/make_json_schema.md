@@ -167,10 +167,10 @@ Output:
 [
     {
         "valid": false,
-        "evaluationPath": "/unevaluatedProperties",
-        "schemaLocation": "#/unevaluatedProperties",
-        "instanceLocation": "",
-        "error": "False schema always fails"
+        "evaluationPath": "/unevaluatedProperties/baz",
+        "schemaLocation": "#",
+        "instanceLocation": "/baz",
+        "error": "Unevaluated property 'baz' but the schema does not allow unevaluated properties."
     }
 ]
 ```
@@ -211,7 +211,7 @@ Output:
 [
     {
         "valid": false,
-        "evaluationPath": "/type",
+        "evaluationPath": "/items/3/type",
         "schemaLocation": "#/additionalItems",
         "instanceLocation": "/3",
         "error": "Expected 1 integer, found string"

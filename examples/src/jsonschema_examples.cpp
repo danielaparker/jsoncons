@@ -479,10 +479,11 @@ int main()
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
 #endif
+*/
     draft_201212_example();
     draft_201909_example();
     draft_07_example();
-*/    
+    
     cross_schema_example();
     
     std::cout << "\n";

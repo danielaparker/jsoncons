@@ -2603,24 +2603,49 @@ namespace jsonschema {
             if (validator_)
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
-
-                std::size_t index = 0;
-                for (const auto& item : instance.array_range()) 
+                if (validator_->always_fails())
                 {
-                    auto item_it = results.evaluated_items.find(index);
-
-                    // check if it is in "results"
-                    if (item_it == results.evaluated_items.end()) 
+                    for (std::size_t index = 0; index < instance.size(); ++index) 
                     {
-                        //std::cout << "Not in evaluated properties: " << item.key() << "\n";
-                        std::size_t error_count = reporter.error_count();
-                        validator_->validate(this_context, item, instance_location, results, reporter, patch);
-                        if (reporter.error_count() == error_count)
+                        // check if it is in "evaluated_items"
+                        auto item_it = results.evaluated_items.find(index);
+                        if (item_it == results.evaluated_items.end()) 
                         {
-                            results.evaluated_items.insert(index);
+                            evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                            jsonpointer::json_pointer pointer(instance_location);
+                            pointer /= index;
+                            //std::cout << "Not in evaluated properties: " << item.key() << "\n";
+                            reporter.error(validation_message(this->keyword_name(),
+                                item_context.eval_path(), 
+                                this->schema_location(), 
+                                pointer,
+                                "Unevaluated item at index '" + std::to_string(index) + "' but the schema does not allow unevaluated items."));
+                            break;
                         }
                     }
-                    ++index;
+                }
+                else
+                {
+                    std::size_t index = 0;
+                    for (const auto& item : instance.array_range())
+                    {
+                        // check if it is in "evaluated_items"
+                        auto item_it = results.evaluated_items.find(index);
+                        if (item_it == results.evaluated_items.end()) 
+                        {
+                            evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                            jsonpointer::json_pointer pointer(instance_location);
+                            pointer /= index;
+                            //std::cout << "Not in evaluated properties: " << item.key() << "\n";
+                            std::size_t error_count = reporter.error_count();
+                            validator_->validate(item_context, item, pointer, results, reporter, patch);
+                            if (reporter.error_count() == error_count)
+                            {
+                                results.evaluated_items.insert(index);
+                            }
+                        }
+                        ++index;
+                    }
                 }
             }
         }

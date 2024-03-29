@@ -255,3 +255,43 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
     }
 }
 
+TEST_CASE("jsonschema unevaluatedItems output tests")
+{
+    json schema = json::parse(R"(
+{
+  "prefixItems": [
+    { "type": "string" }, { "type": "number" }
+  ],
+  "unevaluatedItems": false
+}
+)");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/unevaluatedProperties/2",
+        "schemaLocation": "#",
+        "instanceLocation": "/2",
+        "error": "Unevaluated item at index '2' but the schema does not allow unevaluated items."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+["foo", 42, null]
+        )");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        //CHECK(expected == output);
+        std::cout << pretty_print(output) << "\n";
+    }
+}
+
