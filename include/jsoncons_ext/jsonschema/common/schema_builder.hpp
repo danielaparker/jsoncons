@@ -123,10 +123,18 @@ namespace jsonschema {
                         {
                             Json external_sch = resolver_(loc.base());
 
-                            anchor_uri_map_type anchor_dict2;
-                            this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
-                                external_sch, {}, anchor_dict2));
-                            ++loaded_count;
+                            if (external_sch.is_object() || external_sch.is_bool())
+                            {
+                                anchor_uri_map_type anchor_dict2;
+                                this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
+                                    external_sch, {}, anchor_dict2));
+                                ++loaded_count;
+                            }
+                            else
+                            {
+                                JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
+
+                            }
                         }
                         else
                         {

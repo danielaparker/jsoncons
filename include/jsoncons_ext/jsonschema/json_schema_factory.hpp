@@ -17,9 +17,9 @@ namespace jsonschema {
     template <class Json>
     struct default_uri_resolver
     {
-        Json operator()(const jsoncons::uri& uri)
+        Json operator()(const jsoncons::uri& /*uri*/)
         {
-            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.string()));
+            return Json::null();
         }
     };
 
