@@ -116,7 +116,7 @@ Output:
         "evaluationPath": "/$ref/items/1/$dynamicRef/type",
         "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
         "instanceLocation": "/1",
-        "error": "Expected 1 string, found integer"
+        "error": "Expected string, found integer"
     }
 ]
 ```
@@ -214,7 +214,7 @@ Output:
         "evaluationPath": "/items/3/type",
         "schemaLocation": "#/additionalItems",
         "instanceLocation": "/3",
-        "error": "Expected 1 integer, found string"
+        "error": "Expected string, found integer"
     }
 ]
 ```
@@ -271,7 +271,7 @@ Output:
         "evaluationPath": "/properties/thing/$ref/type",
         "schemaLocation": "https://example.com/schema/foo#/definitions/bar",
         "instanceLocation": "/thing",
-        "error": "Expected 1 string, found integer"
+        "error": "Expected string, found integer"
     }
 ]
 ```

@@ -1660,19 +1660,10 @@ namespace jsonschema {
                     case json_schema_type::integer:
                         if (instance.is_number())
                         {
-                            if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
+                            if (instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>()))
                             {
-                                reporter.error(validation_message(this->keyword_name(),
-                                    this_context.eval_path(), 
-                                    this->schema_location(), 
-                                    instance_location, 
-                                    "Instance is not an integer"));
-                                if (reporter.fail_early())
-                                {
-                                    return;
-                                }
+                                is_type_found = true;
                             }
-                            is_type_found = true;
                         }
                         break;
                     case json_schema_type::number:
@@ -1688,34 +1679,28 @@ namespace jsonschema {
 
             if (!is_type_found)
             {
-                std::ostringstream ss;
-                ss << "Expected " << expected_types_.size() << " ";
+                std::string message = "Expected ";
                 for (std::size_t i = 0; i < expected_types_.size(); ++i)
                 {
                         if (i > 0)
                         { 
-                            ss << ", ";
+                            message.append(", ");
                             if (i+1 == expected_types_.size())
                             { 
-                                ss << "or ";
+                                message.append("or ");
                             }
                         }
-                        ss << to_string(expected_types_[i]);
-                        //std::cout << ", " << i << ". expected " << to_string(expected_types_[i]);
+                        message.append(to_string(expected_types_[i]));
                 }
-                ss << ", found " << to_schema_type(instance.type());
+                message.append(", found ");
+                message.append(to_schema_type(instance.type()));
 
                 reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    ss.str()));
-                if (reporter.fail_early())
-                {
-                    return;
-                }
+                    message));
             }
-            //std::cout << "\n";
         }
         
         std::string to_schema_type(json_type type) const
