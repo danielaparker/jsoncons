@@ -101,7 +101,7 @@ void reporter_example()
     }
 }
 
-// Until 0.173.0, use jsoncons::uri (deprecated in 0.173.0)
+// Until 0.174.0, throw instead of returning json::null() 
 json resolver(const jsoncons::uri& uri)
 {
     std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
@@ -110,10 +110,8 @@ json resolver(const jsoncons::uri& uri)
     pathname += std::string(uri.path());
 
     std::fstream is(pathname.c_str());
-    if (!is)
-        throw jsonschema::schema_error("Could not open " + uri.base().string() + " for schema loading\n");
 
-    return json::parse(is);        
+    return !is ? json::null() : json::parse(is);        
 }
 
 void uriresolver_example()

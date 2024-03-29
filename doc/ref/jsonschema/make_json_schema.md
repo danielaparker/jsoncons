@@ -38,7 +38,9 @@ Returns a `json_schema<Json>` that represents a compiled JSON Schema document.
     <td>A function object with the signature of <code>resolver</code> being equivalent to 
     <pre>
     Json fun(const jsoncons::uri& uri)   
-    </pre></td>   
+    </pre>
+    Returns `Json::null()` if it doesn't know how to load the resource at `uri`.
+    </td>   
   </tr>
   <tr>
     <td>retrieval_uri</td>
