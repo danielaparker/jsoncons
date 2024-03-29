@@ -1,49 +1,66 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://example.com/derived",
+  "title": "Person",
+  "type": "object",
+  "if": {
+    "properties": {
+      "firstName": {
+        "type": "string",
+        "description": "The person's first name."
+      },
+      "age": {
+        "description": "Age in years which must be equal to or greater than zero.",
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "required": [
+      "firstName"
+    ]
+  },
+  "then": {
+    "properties": {
+      "lastName": {
+        "type": "string",
+        "description": "The person's last name."
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "surName": {
+        "type": "string",
+        "description": "The person's sur name."
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}
 
-    "$ref": "/baseSchema",
+{"age": 18,"surName": "Sur Name"}
 
-    "$defs": {
-        "derived": {
-            "$dynamicAnchor": "addons",
-            "properties": {
-                "bar": { "type": "string" }
-            }
-        },
-        "baseSchema": {
-            "$id": "/baseSchema",
+Fail - else schema with one unevaluated property
 
-            "$comment": "unevaluatedProperties comes first so it's more likely to catch bugs with implementations that are sensitive to keyword ordering",
-            "unevaluatedProperties": false,
-            "type": "object",
-            "properties": {
-                "foo": { "type": "string" }
-            },
-            "$dynamicRef": "#addons",
+if: age
+else: age, surName
 
-            "$defs": {
-                "defaultAddons": {
-                    "$comment": "Needed to satisfy the bookending requirement",
-                    "$dynamicAnchor": "addons"
-                }
-            }
+void do_validate(const evaluation_context<Json>& context,const Json& instance,const jsonpointer::json_pointer& instance_location,evaluation_results& results,error_reporter& reporter,Json& patch) const final
+{
+    evaluation_context<Json> this_context(context, this->keyword_name());
+    if (if_val_) 
+    {
+        collecting_error_reporter local_reporter;
+
+        if_val_->validate(this_context, instance, instance_location, results, local_reporter, patch);
+        if (local_reporter.errors.empty()) 
+        {
+            if (then_val_)
+                then_val_->validate(this_context, instance, instance_location, results, reporter, patch);
+        } 
+        else 
+        {
+            if (else_val_)
+                else_val_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
     }
 }
 
-"with no unevaluated properties"
-    {
-        "foo": "foo",
-        "bar": "bar"
-    }
-
-dynamic_ref_validator [/$ref,https://example.com/baseSchema]match_dynamic_anchor addons, https://example.com/baseSchema, id: https://example.com/baseSchema
-match_dynamic_anchor addons, https://example.com/baseSchema#/properties/foo, id:
-match_dynamic_anchor addons, https://example.com/baseSchema#addons, id:
-Match found https://example.com/baseSchema#addons
-match_dynamic_anchor addons, https://example.com/derived, id: https://example.com/derived
-match_dynamic_anchor addons, https://example.com/baseSchema, id: https://example.com/baseSchema
-match_dynamic_anchor addons, https://example.com/baseSchema#/properties/foo, id:
-match_dynamic_anchor addons, https://example.com/baseSchema#addons, id:
-Match found https://example.com/baseSchema#addons
