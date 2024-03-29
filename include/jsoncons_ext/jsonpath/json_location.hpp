@@ -861,6 +861,69 @@ namespace jsonpath {
         return buffer;
     }
 
+    template<class Json>
+    void assign(Json& root_value, const basic_json_location<typename Json::char_type>& location, Json&& value)
+    {
+        Json* p_current = std::addressof(root_value);
+        bool found = false;
+
+        std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
+        for (std::size_t i = 0; i < location.size(); ++i)
+        {
+            const auto& element = location[i];
+            if (element.has_name())
+            {
+                if (p_current->is_object())
+                {
+                    auto it = p_current->find(element.name());
+                    if (it != p_current->object_range().end())
+                    {
+                        p_current = std::addressof(it->value());
+                        if (i == last)
+                        {
+                            found = true;
+                        }
+                    }
+                    else
+                    {
+                        if (i == last)
+                        {
+                            p_current->try_emplace(element.name(), std::forward<Json>(value));
+                        }
+                        else
+                        {
+                            auto result = p_current->try_emplace(element.name(), Json{});
+                            p_current = std::addressof(result.first->value());
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else // if (element.has_index())
+            {
+                if (p_current->is_array() && element.index() < p_current->size())
+                {
+                    p_current = std::addressof(p_current->at(element.index()));
+                    if (i == last)
+                    {
+                        found = true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        if (found)
+        {
+            *p_current = std::forward<Json>(value);
+        }
+    }
+
     using json_location = basic_json_location<char>;
     using wjson_location = basic_json_location<wchar_t>;
     using path_element = basic_path_element<char,std::allocator<char>>;
