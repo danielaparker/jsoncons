@@ -592,6 +592,13 @@ namespace jsonschema {
                         return;
                     }
                 }
+                else if (items_val_->always_succeeds())
+                {
+                    for (std::size_t index = 0; index < instance.size(); ++ index)
+                    {
+                        results.evaluated_items.insert(index);
+                    }
+                }
                 else
                 {
                     size_t index = 0;
@@ -1968,7 +1975,7 @@ namespace jsonschema {
                         evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
                         jsonpointer::json_pointer pointer(instance_location);
                         pointer /= prop.key();
-                        // check if it is in "properties"
+                        // check if it is in "allowed properties"
                         auto properties_it = allowed_properties.find(prop.key());
                         if (properties_it == allowed_properties.end()) 
                         {
@@ -1981,6 +1988,18 @@ namespace jsonschema {
                         }
                     }
                 }
+                else if (additional_properties_->always_succeeds())
+                {
+                    for (const auto& prop : instance.object_range()) 
+                    {
+                        // check if it is in "allowed properties"
+                        auto properties_it = allowed_properties.find(prop.key());
+                        if (properties_it == allowed_properties.end()) 
+                        {
+                            results.evaluated_properties.insert(prop.key());
+                        }
+                    }
+                }
                 else
                 {
                     for (const auto& prop : instance.object_range()) 
@@ -1989,7 +2008,7 @@ namespace jsonschema {
                         jsonpointer::json_pointer pointer(instance_location);
                         pointer /= prop.key();
 
-                        // check if it is in "properties"
+                        // check if it is in "allowed properties"
                         auto properties_it = allowed_properties.find(prop.key());
                         if (properties_it == allowed_properties.end()) 
                         {
@@ -2454,6 +2473,15 @@ namespace jsonschema {
                     if (reporter.fail_early())
                     {
                         return;
+                    }
+                }
+                else if (items_val_->always_fails())
+                {
+                    while (it != end_it)
+                    {
+                        results.evaluated_items.insert(index);
+                        ++it;
+                        ++index;
                     }
                 }
                 else
