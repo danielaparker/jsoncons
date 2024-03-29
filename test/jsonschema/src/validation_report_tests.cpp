@@ -110,7 +110,7 @@ TEST_CASE("jsonschema validation report tests")
     }
 }
 
-TEST_CASE("jsonschema prefixItems and items report tests")
+TEST_CASE("jsonschema prefixItems report tests")
 {
     json schema = json::parse(R"(
 {
@@ -149,8 +149,51 @@ TEST_CASE("jsonschema prefixItems and items report tests")
         compiled.validate(data, decoder);
         
         ojson output = decoder.get_result();
-        //CHECK(expected == output);
-        std::cout << pretty_print(output) << "\n";
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema additionalProperties output tests")
+{
+    json schema = json::parse(R"(
+{
+  "type": "object",
+  "properties": {
+    "number": { "type": "number" },
+    "street_name": { "type": "string" },
+    "street_type": { "enum": ["Street", "Avenue", "Boulevard"] }
+  },
+  "additionalProperties": false
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/additionalProperties/direction",
+        "schemaLocation": "#",
+        "instanceLocation": "/direction",
+        "error": "Additional property 'direction' but the schema does not allow additional properties."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+{ "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
+)");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
     }
 }
 
