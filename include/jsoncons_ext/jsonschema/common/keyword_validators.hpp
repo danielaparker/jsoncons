@@ -1959,7 +1959,7 @@ namespace jsonschema {
                 }
             }
 
-            if (instance.size() > 0 && additional_properties_)
+            if (additional_properties_)
             {
                 if (additional_properties_->always_fails())
                 {
@@ -2520,20 +2520,42 @@ namespace jsonschema {
             if (validator_)
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
-
-                for (const auto& prop : instance.object_range()) 
+                if (validator_->always_fails())
                 {
-                    auto prop_it = results.evaluated_properties.find(prop.key());
-
-                    // check if it is in "results"
-                    if (prop_it == results.evaluated_properties.end()) 
+                    for (const auto& prop : instance.object_range()) 
                     {
-                        //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
-                        std::size_t error_count = reporter.error_count();
-                        validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
-                        if (reporter.error_count() == error_count)
+                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                        jsonpointer::json_pointer pointer(instance_location);
+                        pointer /= prop.key();
+
+                        // check if it is in "evaluated_properties"
+                        auto prop_it = results.evaluated_properties.find(prop.key());
+                        if (prop_it == results.evaluated_properties.end()) 
                         {
-                            results.evaluated_properties.insert(prop.key());
+                            reporter.error(validation_message(this->keyword_name(),
+                                prop_context.eval_path(), 
+                                this->schema_location(), 
+                                pointer,
+                                "Unevaluated property '" + prop.key() + "' but the schema does not allow unevaluated properties."));
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (const auto& prop : instance.object_range()) 
+                    {
+                        // check if it is in "evaluated_properties"
+                        auto prop_it = results.evaluated_properties.find(prop.key());
+                        if (prop_it == results.evaluated_properties.end()) 
+                        {
+                            //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
+                            std::size_t error_count = reporter.error_count();
+                            validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
+                            if (reporter.error_count() == error_count)
+                            {
+                                results.evaluated_properties.insert(prop.key());
+                            }
                         }
                     }
                 }
