@@ -36,8 +36,9 @@ namespace jsonschema {
         schema_builder_factory_type builder_factory_;
         uri_resolver<Json> resolver_;
         evaluation_options options_;
-        schema_validator_type root_;
-
+        std::map<jsoncons::uri,Json> preloaded_schemas_; 
+        schema_validator_type root_;       
+        
         // Owns external schemas
         std::vector<schema_validator_type> schemas_;
         schema_store_type* schema_store_ptr_;
@@ -56,6 +57,11 @@ namespace jsonschema {
         }
 
         virtual ~schema_builder() = default;
+        
+        void preload_schema(const jsoncons::uri& uri, const Json& sch)
+        {
+            preloaded_schemas_.emplace(uri.base(), sch);
+        }
 
         void save_schema(schema_validator_type&& schema)
         {
@@ -92,7 +98,8 @@ namespace jsonschema {
             //    std::cout << "    " << member.first.string() << "\n";
             //}
 
-            // load all external schemas that have not already been loaded
+            // load all external schemas that have not already been loaded           
+            
             std::size_t loaded_count = 0;
             do
             {
@@ -104,7 +111,15 @@ namespace jsonschema {
                     //std::cout << "unresolved: " << loc.string() << "\n";
                     if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
                     {
-                        if (resolver_)
+                        auto it = preloaded_schemas_.find(loc.base());
+                        if (it != preloaded_schemas_.end())
+                        {
+                            anchor_uri_map_type anchor_dict2;
+                            this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(it->first)), 
+                                it->second, {}, anchor_dict2));
+                            ++loaded_count;
+                        }
+                        else if (resolver_)
                         {
                             Json external_sch = resolver_(loc.base());
 

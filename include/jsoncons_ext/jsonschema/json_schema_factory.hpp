@@ -19,19 +19,6 @@ namespace jsonschema {
     {
         Json operator()(const jsoncons::uri& uri)
         {
-            if (uri.string() == schema::draft202012())
-            {
-                return jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema();
-            }
-            else if (uri.string() == schema::draft201909())
-            {
-                return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
-            }
-            else if (uri.string() == schema::draft07())
-            {
-                return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
-            }
-
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + uri.string()));
         }
     };
@@ -66,7 +53,7 @@ namespace jsonschema {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             resolver, options, schema_store_ptr);
                     }
-                    else if (it->value().as_string_view() == schema::draft07())
+                    else if (it->value().as_string_view() == schema::draft7())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             resolver, options, schema_store_ptr);
@@ -80,7 +67,7 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema::draft07())
+                    if (options.default_version() == schema::draft7())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             resolver, options, schema_store_ptr);
@@ -123,6 +110,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, resolver, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch, retrieval_uri);
         return json_schema<Json>(schema_builder->get_schema());
@@ -136,6 +126,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch, retrieval_uri);
         return json_schema<Json>(schema_builder->get_schema());
@@ -150,6 +143,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, uri_resolver<Json>{ resolver }, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch);
         return json_schema<Json>(schema_builder->get_schema());
@@ -163,6 +159,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch);
         return json_schema<Json>(schema_builder->get_schema());
@@ -178,6 +177,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, resolver, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch, retrieval_uri);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -191,6 +193,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch, retrieval_uri);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -205,6 +210,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, uri_resolver<Json>{ resolver }, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
@@ -218,6 +226,9 @@ namespace jsonschema {
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, default_uri_resolver<Json>{}, options, &schema_store);
+        schema_builder->preload_schema(schema::draft202012(), jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft201909(), jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema());
+        schema_builder->preload_schema(schema::draft7(), jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema());
 
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());

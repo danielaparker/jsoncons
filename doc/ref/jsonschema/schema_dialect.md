@@ -8,7 +8,7 @@ struct schema;
 
 Member functions
 
-    static std::string draft07();
+    static std::string draft7();
 Returns "http://json-schema.org/draft-07/schema#".
 
     static std::string draft201909();

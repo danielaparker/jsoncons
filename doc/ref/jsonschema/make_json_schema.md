@@ -196,7 +196,7 @@ int main()
 
     // Need to supply default version because schema does not have $schema keyword  
     jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema,
-        jsonschema::evaluation_options{}.default_version(jsonschema::schema::draft07()));
+        jsonschema::evaluation_options{}.default_version(jsonschema::schema::draft7()));
 
     json data = json::parse(R"([ null, 2, 3, "foo" ])");
 
