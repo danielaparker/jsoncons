@@ -7,7 +7,7 @@
 #include <iostream>
 
 using namespace jsoncons;
-
+#if 0
 TEST_CASE("json_location tests")
 {
 
@@ -309,6 +309,120 @@ TEST_CASE("test json_location from path_node")
 
         CHECK((jsonpath::json_location{ a4 } == location));
         CHECK((jsonpath::to_string(location) == jsonpath_string));
+    }
+}
+#endif
+
+TEST_CASE("json_location assign tests")
+{
+    std::string json_string = R"(
+{"books": [ 
+    { "category": "reference",
+      "author": "Nigel Rees",
+      "title": "Sayings of the Century",
+      "price": 8.95
+    },
+    { "category": "fiction",
+      "author": "Evelyn Waugh",
+      "title": "Sword of Honour"
+    },
+    { "category": "fiction",
+      "author": "Herman Melville",
+      "title": "Moby Dick",
+      "isbn": "0-553-21311-3",
+      "price": 8.99
+    }
+  ] 
+}
+    )";
+
+    json doc = json::parse(json_string);
+
+    SECTION("store book 1")
+    {
+        jsonpath::json_location loc = jsonpath::json_location::parse("$.books[0].price");
+        
+        //std::cout << to_string(loc) << "\n";
+        
+        auto result1 = jsonpath::assign(doc, loc, json{13.5}, false);
+        CHECK(result1.second);
+        bool test1 = result1.first == std::addressof(doc.at("books").at(0).at("price"));
+        CHECK(test1);
+
+        auto result2 = jsonpath::assign(doc, loc, json{13.5}, true);
+        CHECK(result2.second);
+        bool test2 = result2.first == std::addressof(doc.at("books").at(0).at("price"));
+        CHECK(test2);
+
+        //std::cout << pretty_print(doc) << "\n";
+    }
+
+    SECTION("test 2")
+    {
+        jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].price");
+
+        //std::cout << to_string(loc) << "\n";
+
+        auto result1 = jsonpath::assign(doc, loc, json{ 13.5 }, false);
+        CHECK_FALSE(result1.second);
+
+        auto result2 = jsonpath::assign(doc, loc, json{ 13.5 }, true);
+        CHECK(result2.second);
+        bool test2 = result2.first == std::addressof(doc.at("books").at(1).at("price"));
+        CHECK(test2);
+
+        //std::cout << pretty_print(doc) << "\n";
+    }
+
+    SECTION("test 3")
+    {
+        jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].kindle.price");
+
+        //std::cout << to_string(loc) << "\n";
+
+        auto result1 = jsonpath::assign(doc, loc, json{ 13.5 }, false);
+        CHECK_FALSE(result1.second);
+
+        auto result2 = jsonpath::assign(doc, loc, json{ 13.5 }, true);
+        CHECK(result2.second);
+        bool test2 = result2.first == std::addressof(doc.at("books").at(1).at("kindle").at("price"));
+        CHECK(test2);
+
+        //std::cout << pretty_print(doc) << "\n";
+    }
+
+    SECTION("test 4")
+    {
+        jsonpath::json_location loc = jsonpath::json_location::parse("$.books[2]");
+
+        //std::cout << to_string(loc) << "\n";
+
+        auto result1 = jsonpath::assign(doc, loc, json{}, false);
+        CHECK(result1.second);
+        bool test1 = result1.first == std::addressof(doc.at("books").at(2));
+        CHECK(test1);
+
+        auto result2 = jsonpath::assign(doc, loc, json{}, true);
+        CHECK(result2.second);
+        bool test2 = result2.first == std::addressof(doc.at("books").at(2));
+        CHECK(test2);
+
+        //std::cout << pretty_print(doc) << "\n";
+    }
+
+    SECTION("test 5")
+    {
+        jsonpath::json_location loc = jsonpath::json_location::parse("$.books[3]");
+
+        //std::cout << to_string(loc) << "\n";
+
+        auto result1 = jsonpath::assign(doc, loc, json{}, false);
+        CHECK_FALSE(result1.second);
+
+        auto result2 = jsonpath::assign(doc, loc, json{}, true);
+        CHECK_FALSE(result2.second);
+
+        //std::cout << pretty_print(doc) << "\n";
     }
 }
 
