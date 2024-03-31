@@ -862,7 +862,8 @@ namespace jsonpath {
     }
 
     template<class Json>
-    void assign(Json& root_value, const basic_json_location<typename Json::char_type>& location, Json&& value)
+    std::pair<Json*,bool> assign(Json& root_value, const basic_json_location<typename Json::char_type>& location, Json&& value,
+        bool create_if_missing=false)
     {
         Json* p_current = std::addressof(root_value);
         bool found = false;
@@ -886,14 +887,19 @@ namespace jsonpath {
                     }
                     else
                     {
-                        if (i == last)
+                        if (create_if_missing)
                         {
-                            p_current->try_emplace(element.name(), std::forward<Json>(value));
-                        }
-                        else
-                        {
-                            auto result = p_current->try_emplace(element.name(), Json{});
-                            p_current = std::addressof(result.first->value());
+                            if (i == last)
+                            {
+                                auto result = p_current->try_emplace(element.name(), std::forward<Json>(value));
+                                p_current = std::addressof(result.first->value());
+                                found = true;
+                            }
+                            else
+                            {
+                                auto result = p_current->try_emplace(element.name(), Json{});
+                                p_current = std::addressof(result.first->value());
+                            }
                         }
                     }
                 }
@@ -909,6 +915,7 @@ namespace jsonpath {
                     p_current = std::addressof(p_current->at(element.index()));
                     if (i == last)
                     {
+                        *p_current = std::forward<Json>(value);
                         found = true;
                     }
                 }
@@ -920,7 +927,11 @@ namespace jsonpath {
         }
         if (found)
         {
-            *p_current = std::forward<Json>(value);
+            return std::make_pair(p_current,true);
+        }
+        else
+        {
+            return std::make_pair(p_current, false);
         }
     }
 
