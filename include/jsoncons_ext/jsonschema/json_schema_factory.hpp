@@ -214,6 +214,7 @@ namespace jsonschema {
         schema_builder_factory<Json> builder_factory{};
         auto schema_builder = builder_factory(sch, options, &schema_store);
         schema_builder->add_schema_resolver(meta_resolver<Json>);
+        schema_builder->add_schema_resolver(resolver);
 
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
