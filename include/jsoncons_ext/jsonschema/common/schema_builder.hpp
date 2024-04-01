@@ -24,7 +24,7 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const uri_resolver<Json>&, const evaluation_options&,schema_store_type*)>;
+            const evaluation_options&,schema_store_type*)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
@@ -34,9 +34,8 @@ namespace jsonschema {
     private:
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
-        uri_resolver<Json> resolver_;
+        std::vector<uri_resolver<Json>> resolvers_;
         evaluation_options options_;
-        std::map<jsoncons::uri,Json> preloaded_schemas_; 
         schema_validator_type root_;       
         
         // Owns external schemas
@@ -48,9 +47,9 @@ namespace jsonschema {
 
     public:
 
-        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory, 
-            uri_resolver<Json> resolver, evaluation_options options, schema_store_type* schema_store_ptr)
-            : spec_version_(schema), builder_factory_(builder_factory), resolver_(resolver), options_(std::move(options)),
+        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
+            evaluation_options options, schema_store_type* schema_store_ptr)
+            : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -58,9 +57,9 @@ namespace jsonschema {
 
         virtual ~schema_builder() = default;
         
-        void preload_schema(const jsoncons::uri& uri, const Json& sch)
+        void add_resolver(const uri_resolver<Json>& resolver)
         {
-            preloaded_schemas_.emplace(uri.base(), sch);
+            resolvers_.push_back(resolver);
         }
 
         void save_schema(schema_validator_type&& schema)
@@ -111,17 +110,10 @@ namespace jsonschema {
                     //std::cout << "unresolved: " << loc.string() << "\n";
                     if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
                     {
-                        auto it = preloaded_schemas_.find(loc.base());
-                        if (it != preloaded_schemas_.end())
+                        bool found = false;
+                        for (auto it = resolvers_.begin(); it != resolvers_.end() && !found; ++it)
                         {
-                            anchor_uri_map_type anchor_dict2;
-                            this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(it->first)), 
-                                it->second, {}, anchor_dict2));
-                            ++loaded_count;
-                        }
-                        else if (resolver_)
-                        {
-                            Json external_sch = resolver_(loc.base());
+                            Json external_sch = (*it)(loc.base());
 
                             if (external_sch.is_object() || external_sch.is_bool())
                             {
@@ -129,16 +121,12 @@ namespace jsonschema {
                                 this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
                                     external_sch, {}, anchor_dict2));
                                 ++loaded_count;
-                            }
-                            else
-                            {
-                                JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
-
+                                found = true;
                             }
                         }
-                        else
+                        if (!found)
                         {
-                            JSONCONS_THROW(schema_error("External schema reference '" + loc.base().string() + "' needs to be loaded, but no resolver provided"));
+                            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
                         }
                     }
                 }
@@ -296,7 +284,11 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, resolver_, options_, schema_store_ptr_);
+                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_);
+                            for (const auto& resolver : resolvers_)
+                            {
+                                schema_builder->add_resolver(resolver);
+                            }
                             schema_builder->build_schema(sch, context.get_absolute_uri().string());
                             schema_val = schema_builder->get_schema();
                         }
