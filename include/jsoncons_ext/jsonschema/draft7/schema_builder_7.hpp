@@ -147,8 +147,6 @@ namespace draft7 {
                 }
                 case json_type::object_value:
                 {
-                    std::set<std::string> known_keywords;
-
                     auto it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
@@ -163,14 +161,12 @@ namespace draft7 {
                                 std::string sub_keys[] = { "definitions", def.key() };
                                 defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                             }
-                            known_keywords.insert("definitions");
                         }
 
                         Json default_value{ jsoncons::null_type() };
                         uri_wrapper relative(it->value().template as<std::string>()); 
                         auto id = relative.resolve(uri_wrapper{ context.get_absolute_uri() });
                         validators.push_back(this->get_or_create_reference(id));
-                        known_keywords.insert("$ref");
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
                             new_context.get_absolute_uri(), context.id(),
                             std::move(validators), std::move(defs), std::move(default_value));
@@ -185,7 +181,7 @@ namespace draft7 {
                         this->insert_schema(uri, p);
                         for (const auto& item : sch.object_range())
                         {
-                            if (known_keywords.find(item.key()) == known_keywords.end())
+                            if (known_keywords().find(item.key()) == known_keywords().end())
                             {
                                 this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                             }
@@ -207,7 +203,6 @@ namespace draft7 {
             jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
-            std::set<std::string> known_keywords;
             std::map<std::string,schema_validator_type> defs;
 
             auto it = sch.find("definitions");
@@ -218,14 +213,12 @@ namespace draft7 {
                     std::string sub_keys[] = { "definitions", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
                 }
-                known_keywords.insert("definitions");
             }
 
             it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
                 default_value = it->value();
-                known_keywords.insert("default");
             }
 
             for (const auto& key_value : sch.object_range())
@@ -403,7 +396,55 @@ namespace draft7 {
 */
             return compilation_context(new_uris, id);
         }
-
+    private:
+        static const std::unordered_set<std::string>& known_keywords()
+        {
+            static std::unordered_set<std::string> keywords{
+                "$id",                 
+                "$ref",                
+                "additionalItems",     
+                "additionalProperties",
+                "allOf",               
+                "anyOf",               
+                "const",               
+                "contains",            
+                "contentEncoding",     
+                "contentMediaType",    
+                "default",    
+                "definitions",         
+                "dependencies",        
+                "enum",                
+                "exclusiveMaximum",
+                "exclusiveMaximum",
+                "exclusiveMinimum",
+                "exclusiveMinimum",
+                "if",
+                "then",
+                "else",        
+                "items",               
+                "maximum",             
+                "maxItems",            
+                "maxLength",           
+                "maxProperties",       
+                "minimum",             
+                "minItems",            
+                "minLength",           
+                "minProperties",       
+                "multipleOf",          
+                "not",                 
+                "oneOf",               
+                "pattern",             
+                "patternProperties",   
+                "properties",          
+                "propertyNames",       
+                "readOnly",            
+                "required",            
+                "type",                
+                "uniqueItems",         
+                "writeOnly"           
+            };
+            return keywords;
+        }
     };
 
 } // namespace draft7

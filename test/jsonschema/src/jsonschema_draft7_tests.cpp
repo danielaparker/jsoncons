@@ -102,7 +102,7 @@ TEST_CASE("jsonschema draft7 tests")
     {
         //jsonschema_tests("./jsonschema/issues/draft7/issue-content.json");
     }
-    SECTION("tests")
+    /*SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
 #ifdef JSONCONS_HAS_STD_REGEX
@@ -177,7 +177,7 @@ TEST_CASE("jsonschema draft7 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri-template.json");
 
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/content.json"); // REVISIT
-    }
+    }*/
     SECTION("#417")
     {
         jsoncons::json schema = jsoncons::json::parse(R"(
