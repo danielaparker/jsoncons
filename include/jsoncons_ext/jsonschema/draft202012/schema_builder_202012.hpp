@@ -155,20 +155,19 @@ namespace draft202012 {
                 }
                 case json_type::object_value:
                 {
-                    std::set<std::string> known_keywords;
-
                     schema_validator_ptr = make_object_schema_validator(new_context, sch, anchor_dict);
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 
                         this->insert_schema(uri, p);
-                        for (const auto& item : sch.object_range())
+                        /*for (const auto& item : sch.object_range())
                         {
-                            if (known_keywords.find(item.key()) == known_keywords.end())
+                            if (known_keywords().find(item.key()) == known_keywords().end())
                             {
+                                std::cout << "  " << item.key() << "\n";
                                 this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                             }
-                        }
+                        }*/
                     }          
                     break;
                 }
@@ -188,7 +187,6 @@ namespace draft202012 {
             std::vector<keyword_validator_type> validators;
             std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
             std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;
-            std::set<std::string> known_keywords;
             jsoncons::optional<jsoncons::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
             anchor_uri_map_type local_anchor_dict;
@@ -212,7 +210,6 @@ namespace draft202012 {
                         std::string sub_keys[] = { "definitions", def.key() };
                         defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
                     }
-                    known_keywords.insert("definitions");
                 }
             }
             it = sch.find("$defs");
@@ -223,14 +220,12 @@ namespace draft202012 {
                     std::string sub_keys[] = { "$defs", def.key() };
                     defs.emplace(def.key(), this->make_cross_draft_schema_validator(context, def.value(), sub_keys, local_anchor_dict));
                 }
-                known_keywords.insert("$defs");
             }
 
             it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
                 default_value = it->value();
-                known_keywords.insert("default");
             }
 
             it = sch.find("$ref");
@@ -527,6 +522,65 @@ namespace draft202012 {
             return compilation_context(new_uris, id);
         }
 
+    private:
+        static const std::unordered_set<std::string>& known_keywords()
+        {
+            static std::unordered_set<std::string> keywords{
+                "$anchor",       
+                "$dynamicAnchor",
+                "$dynamicRef",   
+                "$id",                 
+                "$ref",                
+                "additionalItems",     
+                "additionalProperties",
+                "allOf",               
+                "anyOf",               
+                "const",               
+                "contains",            
+                "contentEncoding",     
+                "contentMediaType",    
+                "default",    
+                "$defs",
+                "dependencies", 
+                "dependentRequired",           
+                "dependentSchemas",    
+                "description",        
+                "enum",                
+                "exclusiveMaximum",
+                "exclusiveMaximum",
+                "exclusiveMinimum",
+                "exclusiveMinimum",
+                "if",
+                "then",
+                "else",        
+                "items",               
+                "maximum",             
+                "maxItems",            
+                "maxLength",           
+                "maxProperties",       
+                "minimum",             
+                "minItems",            
+                "minLength",           
+                "minProperties",       
+                "multipleOf",          
+                "not",                 
+                "oneOf",               
+                "pattern",             
+                "patternProperties",   
+                "prefixItems",    
+                "properties",          
+                "propertyNames",       
+                "readOnly",            
+                "required", 
+                "title",               
+                "type",                
+                "uniqueItems",         
+                "unevaluatedItems",
+                "unevaluatedProperties",        
+                "writeOnly"           
+            };
+            return keywords;
+        }
     };
 
 } // namespace draft202012
