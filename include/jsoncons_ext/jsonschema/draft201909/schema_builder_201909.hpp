@@ -162,13 +162,13 @@ namespace draft201909 {
                     for (const auto& uri : new_context.uris()) 
                     { 
                         this->insert_schema(uri, p);
-                        for (const auto& item : sch.object_range())
+                        /*for (const auto& item : sch.object_range())
                         {
                             if (known_keywords.find(item.key()) == known_keywords.end())
                             {
                                 this->insert_unknown_keyword(uri, item.key(), item.value()); // save unknown keywords for later reference
                             }
-                        }
+                        }*/
                     }          
                     break;
                 }

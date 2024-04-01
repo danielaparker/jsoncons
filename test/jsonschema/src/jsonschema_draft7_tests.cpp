@@ -18,22 +18,17 @@ namespace {
 
     json resolver(const jsoncons::uri& uri)
     {
-        if (uri.path() == "/draft-07/schema") 
-        {
-            return jsoncons::jsonschema::draft7::schema_draft7<json>::get_schema();
-        }
-        else
-        {
-            //std::cout << uri.string() << ", " << uri.path() << "\n";
-            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
-            pathname += std::string(uri.path());
+        //std::cout << uri.string() << ", " << uri.path() << "\n";
+        std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
+        pathname += std::string(uri.path());
 
-            std::fstream is(pathname.c_str());
-            if (!is)
-                throw jsonschema::schema_error("Could not open " + pathname + " for schema loading\n");
-
-            return json::parse(is);
+        std::fstream is(pathname.c_str());
+        if (!is)
+        {
+            return json::null();
         }
+
+        return json::parse(is);
     }
 
     void jsonschema_tests(const std::string& fpath)

@@ -18,23 +18,17 @@ namespace {
  
     json resolver(const jsoncons::uri& uri)
     {
-        if (uri.string() == "https://json-schema.org/draft/2019-09/schema") 
-        {
-            //JSONCONS_THROW(jsonschema::schema_error(std::string("Don't currently support ") + "https://json-schema.org/draft/2019-09/schema"));
-            return jsoncons::jsonschema::draft201909::schema_draft201909<json>::get_schema();
-        }
-        else
-        {
-            //std::cout << uri.string() << ", " << uri.path() << "\n";
-            std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
-            pathname += std::string(uri.path());
+        //std::cout << uri.string() << ", " << uri.path() << "\n";
+        std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";
+        pathname += std::string(uri.path());
 
-            std::fstream is(pathname.c_str());
-            if (!is)
-                throw jsonschema::schema_error("Could not open " + pathname + " for schema loading\n");
-
-            return json::parse(is);
+        std::fstream is(pathname.c_str());
+        if (!is)
+        {
+            return json::null();
         }
+
+        return json::parse(is);
     }
 
     void jsonschema_tests(const std::string& fpath)

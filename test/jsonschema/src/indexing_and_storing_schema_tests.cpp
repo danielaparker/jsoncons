@@ -58,7 +58,7 @@ TEST_CASE("jsonschema indexing and storing schema tests")
             }
             else
             {
-                throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
+                return json::null();
             }
         };
     jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema_document, resolver); 

@@ -62,7 +62,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
             }
             else
             {
-                throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
+                return json::null();
             }
         };
     jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
@@ -149,7 +149,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
             }
             else
             {
-                throw jsonschema::schema_error("Could not resolve " + uri.string() + "\n");
+                return json::null();
             }
         };
     jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
