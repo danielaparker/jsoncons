@@ -16,7 +16,7 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <class Json>
-    using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
+    using schema_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
     class schema_builder
@@ -34,7 +34,7 @@ namespace jsonschema {
     private:
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
-        std::vector<uri_resolver<Json>> resolvers_;
+        std::vector<schema_resolver<Json>> resolvers_;
         evaluation_options options_;
         schema_validator_type root_;       
         
@@ -57,7 +57,7 @@ namespace jsonschema {
 
         virtual ~schema_builder() = default;
         
-        void add_resolver(const uri_resolver<Json>& resolver)
+        void add_schema_resolver(const schema_resolver<Json>& resolver)
         {
             resolvers_.push_back(resolver);
         }
@@ -287,7 +287,7 @@ namespace jsonschema {
                             auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_);
                             for (const auto& resolver : resolvers_)
                             {
-                                schema_builder->add_resolver(resolver);
+                                schema_builder->add_schema_resolver(resolver);
                             }
                             schema_builder->build_schema(sch, context.get_absolute_uri().string());
                             schema_val = schema_builder->get_schema();
