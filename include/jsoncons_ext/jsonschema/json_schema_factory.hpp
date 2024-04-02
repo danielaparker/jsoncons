@@ -27,7 +27,7 @@ namespace jsonschema {
         }
             
         std::unique_ptr<schema_builder<Json>> operator()(const Json& sch, 
-            evaluation_options options, schema_store_type* schema_store_ptr,
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<json>>& resolvers) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
@@ -37,7 +37,7 @@ namespace jsonschema {
                 auto it = sch.find("$schema");
                 if (it != sch.object_range().end())
                 { 
-                    builder = get_builder(it->value().as_string_view(), sch, options, schema_store_ptr, resolvers);
+                    builder = get_builder(it->value().as_string_view(), options, schema_store_ptr, resolvers);
                     if (!builder)
                     {
                         std::string message("Unsupported schema version ");
@@ -47,27 +47,27 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema_dialect::draft202012())
+                    if (options.default_version() == schema_version::draft202012())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema_dialect::draft201909())
+                    else if (options.default_version() == schema_version::draft201909())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema_dialect::draft7())
+                    else if (options.default_version() == schema_version::draft7())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema_dialect::draft6())
+                    else if (options.default_version() == schema_version::draft6())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema_dialect::draft4())
+                    else if (options.default_version() == schema_version::draft4())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
@@ -91,32 +91,32 @@ namespace jsonschema {
         }
 
         std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& schema_id,
-            const Json& sch, evaluation_options options, schema_store_type* schema_store_ptr,
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<json>>& resolvers) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
 
-            if (schema_id == schema_dialect::draft202012())
+            if (schema_id == schema_version::draft202012())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (schema_id == schema_dialect::draft201909())
+            else if (schema_id == schema_version::draft201909())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (schema_id == schema_dialect::draft7())
+            else if (schema_id == schema_version::draft7())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (schema_id == schema_dialect::draft6())
+            else if (schema_id == schema_version::draft6())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (schema_id == schema_dialect::draft4())
+            else if (schema_id == schema_version::draft4())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
@@ -128,23 +128,23 @@ namespace jsonschema {
     template <class Json>
     Json meta_resolver(const jsoncons::uri& uri)
     {
-        if (uri.base() == schema_dialect::draft202012())
+        if (uri.base() == schema_version::draft202012())
         {
             return jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema();
         }
-        else if (uri.base() == schema_dialect::draft201909())
+        else if (uri.base() == schema_version::draft201909())
         {
             return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
         }
-        else if (uri.base() == schema_dialect::draft7())
+        else if (uri.base() == schema_version::draft7())
         {
             return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
         }
-        else if (uri.base() == schema_dialect::draft6())
+        else if (uri.base() == schema_version::draft6())
         {
             return jsoncons::jsonschema::draft6::schema_draft6<Json>::get_schema();
         }
-        else if (uri.base() == schema_dialect::draft4())
+        else if (uri.base() == schema_version::draft4())
         {
             return jsoncons::jsonschema::draft4::schema_draft4<Json>::get_schema();
         }

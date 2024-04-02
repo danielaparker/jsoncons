@@ -50,7 +50,7 @@ namespace {
             try
             {
                 jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
-                    jsonschema::evaluation_options{}.default_version(jsonschema::schema_dialect::draft202012())
+                    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012())
                                                     .compatibility_mode(true));
 
                 int count_test = 0;

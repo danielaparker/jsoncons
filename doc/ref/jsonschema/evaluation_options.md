@@ -19,10 +19,10 @@ Constructs an `evaluation_options` with default values.
 
     const std::string& default_version() const;
     evaluation_options& default_version(const std::string& version); 
-Get or set a default [schema dialect](schema_dialect.md). The default
-schema dialect determines which version of JSON Schema is used if the `$schema` 
+Get or set a default [schema version](schema_version.md). The default
+version determines the schema dialect that is used if the `$schema` 
 keyword is not present in the top level of the JSON Schema document. 
-Defaults to `schema_dialect::draft202012()`.
+Defaults to `schema_version::draft202012()`.
 
     bool compatibility_mode() const;
     evaluation_options& compatibility_mode(bool value); 

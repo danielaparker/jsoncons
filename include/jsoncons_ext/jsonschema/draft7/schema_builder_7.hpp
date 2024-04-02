@@ -48,7 +48,7 @@ namespace draft7 {
         schema_builder_7(const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<json>>& resolvers) 
-            : schema_builder<Json>(schema_dialect::draft7(), builder_factory, options, schema_store_ptr, resolvers)
+            : schema_builder<Json>(schema_version::draft7(), builder_factory, options, schema_store_ptr, resolvers)
         {
             init();
         }

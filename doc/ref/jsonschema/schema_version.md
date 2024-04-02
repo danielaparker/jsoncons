@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons/jsonschema/jsonschema.hpp>
 
-struct schema_dialect;
+struct schema_version;
 ```
 
 Member functions
