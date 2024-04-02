@@ -22,7 +22,7 @@ Constructs an `evaluation_options` with default values.
 Get or set a default [schema dialect](schema_dialect.md). The default
 schema dialect determines which version of JSON Schema is used if the `$schema` 
 keyword is not present in the top level of the JSON Schema document. 
-Defaults to `schema::draft202012()`.
+Defaults to `schema_dialect::draft202012()`.
 
     bool compatibility_mode() const;
     evaluation_options& compatibility_mode(bool value); 

@@ -30,36 +30,36 @@ namespace jsonschema {
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<json>>& resolvers) const
         {
-            std::unique_ptr<schema_builder<Json>> builder_factory;
+            std::unique_ptr<schema_builder<Json>> builder;
 
             if (sch.is_object())
             {
                 auto it = sch.find("$schema");
                 if (it != sch.object_range().end())
                 { 
-                    if (it->value().as_string_view() == schema::draft202012())
+                    if (it->value().as_string_view() == schema_dialect::draft202012())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (it->value().as_string_view() == schema::draft201909())
+                    else if (it->value().as_string_view() == schema_dialect::draft201909())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (it->value().as_string_view() == schema::draft7())
+                    else if (it->value().as_string_view() == schema_dialect::draft7())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (it->value().as_string_view() == schema::draft6())
+                    else if (it->value().as_string_view() == schema_dialect::draft6())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (it->value().as_string_view() == schema::draft4())
+                    else if (it->value().as_string_view() == schema_dialect::draft4())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
                     else
@@ -71,29 +71,29 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema::draft202012())
+                    if (options.default_version() == schema_dialect::draft202012())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema::draft201909())
+                    else if (options.default_version() == schema_dialect::draft201909())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema::draft7())
+                    else if (options.default_version() == schema_dialect::draft7())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema::draft6())
+                    else if (options.default_version() == schema_dialect::draft6())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
-                    else if (options.default_version() == schema::draft4())
+                    else if (options.default_version() == schema_dialect::draft4())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                             options, schema_store_ptr, resolvers);
                     }
                     else
@@ -104,37 +104,70 @@ namespace jsonschema {
             }
             else if (sch.is_bool())
             {
-                builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
             else
             {
                  JSONCONS_THROW(schema_error("Schema must be object or boolean"));
             }
-            return builder_factory;
+            return builder;
         }
+/*
+        std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& sch) const
+        {
+            std::unique_ptr<schema_builder<Json>> builder;
+
+            if (sch == schema_dialect::draft202012())
+            {
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (sch == schema_dialect::draft201909())
+            {
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (sch == schema_dialect::draft7())
+            {
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (sch == schema_dialect::draft6())
+            {
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (sch == schema_dialect::draft4())
+            {
+                builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            return builder;
+        }
+*/
     };
 
     template <class Json>
     Json meta_resolver(const jsoncons::uri& uri)
     {
-        if (uri.base() == schema::draft202012())
+        if (uri.base() == schema_dialect::draft202012())
         {
             return jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema();
         }
-        else if (uri.base() == schema::draft201909())
+        else if (uri.base() == schema_dialect::draft201909())
         {
             return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
         }
-        else if (uri.base() == schema::draft7())
+        else if (uri.base() == schema_dialect::draft7())
         {
             return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
         }
-        else if (uri.base() == schema::draft6())
+        else if (uri.base() == schema_dialect::draft6())
         {
             return jsoncons::jsonschema::draft6::schema_draft6<Json>::get_schema();
         }
-        else if (uri.base() == schema::draft4())
+        else if (uri.base() == schema_dialect::draft4())
         {
             return jsoncons::jsonschema::draft4::schema_draft4<Json>::get_schema();
         }
