@@ -231,8 +231,9 @@ namespace jsonschema {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         schema_store_type schema_store; 
         schema_builder_factory<Json> builder_factory{};
-        auto schema_builder = builder_factory(sch, options, &schema_store);
-        schema_builder->add_schema_resolver(meta_resolver<Json>);
+
+        std::vector<schema_resolver<Json>> resolvers = {{meta_resolver<Json>}};
+        auto schema_builder = builder_factory(sch, options, &schema_store, resolvers);
 
         schema_builder->build_schema(sch);
         return json_schema<Json>(schema_builder->get_schema());
