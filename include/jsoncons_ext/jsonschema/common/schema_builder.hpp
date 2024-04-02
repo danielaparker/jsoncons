@@ -24,7 +24,7 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const evaluation_options&,schema_store_type*)>;
+            const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<json>>&)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
@@ -48,19 +48,15 @@ namespace jsonschema {
     public:
 
         schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
-            evaluation_options options, schema_store_type* schema_store_ptr)
+            evaluation_options options, schema_store_type* schema_store_ptr,
+            const std::vector<schema_resolver<json>>& resolvers)
             : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
-              schema_store_ptr_(schema_store_ptr)
+              schema_store_ptr_(schema_store_ptr), resolvers_(resolvers)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
         }
 
         virtual ~schema_builder() = default;
-        
-        void add_schema_resolver(const schema_resolver<Json>& resolver)
-        {
-            resolvers_.push_back(resolver);
-        }
 
         void save_schema(schema_validator_type&& schema)
         {
@@ -284,11 +280,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_);
-                            for (const auto& resolver : resolvers_)
-                            {
-                                schema_builder->add_schema_resolver(resolver);
-                            }
+                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_, resolvers_);
                             schema_builder->build_schema(sch, context.get_absolute_uri().string());
                             schema_val = schema_builder->get_schema();
                         }
