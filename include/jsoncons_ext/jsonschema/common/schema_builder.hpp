@@ -34,13 +34,14 @@ namespace jsonschema {
     private:
         std::string spec_version_;
         schema_builder_factory_type builder_factory_;
-        std::vector<schema_resolver<Json>> resolvers_;
         evaluation_options options_;
+        schema_store_type* schema_store_ptr_;
+        std::vector<schema_resolver<Json>> resolvers_;
+
         schema_validator_type root_;       
         
         // Owns external schemas
         std::vector<schema_validator_type> schemas_;
-        schema_store_type* schema_store_ptr_;
     public:
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
