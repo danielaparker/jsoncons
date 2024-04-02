@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 #define JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
+#include <jsoncons_ext/jsonschema/draft4/schema_builder_4.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_builder_7.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
@@ -49,6 +50,11 @@ namespace jsonschema {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr);
                     }
+                    else if (it->value().as_string_view() == schema::draft4())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                            options, schema_store_ptr);
+                    }
                     else
                     {
                         std::string message("Unsupported schema version ");
@@ -58,7 +64,12 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema::draft7())
+                    if (options.default_version() == schema::draft4())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                            options, schema_store_ptr);
+                    }
+                    else if (options.default_version() == schema::draft7())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr);
@@ -106,6 +117,10 @@ namespace jsonschema {
         else if (uri.base() == schema::draft7())
         {
             return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+        }
+        else if (uri.base() == schema::draft4())
+        {
+            return jsoncons::jsonschema::draft4::schema_draft4<Json>::get_schema();
         }
         else
         {
