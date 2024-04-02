@@ -37,32 +37,8 @@ namespace jsonschema {
                 auto it = sch.find("$schema");
                 if (it != sch.object_range().end())
                 { 
-                    if (it->value().as_string_view() == schema_dialect::draft202012())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (it->value().as_string_view() == schema_dialect::draft201909())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (it->value().as_string_view() == schema_dialect::draft7())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (it->value().as_string_view() == schema_dialect::draft6())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (it->value().as_string_view() == schema_dialect::draft4())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else
+                    builder = get_builder(it->value().as_string_view(), sch, options, schema_store_ptr, resolvers);
+                    if (!builder)
                     {
                         std::string message("Unsupported schema version ");
                         message.append(it->value().template as<std::string>());
@@ -113,39 +89,40 @@ namespace jsonschema {
             }
             return builder;
         }
-/*
-        std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& sch) const
+
+        std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& schema_id,
+            const Json& sch, evaluation_options options, schema_store_type* schema_store_ptr,
+            const std::vector<schema_resolver<json>>& resolvers) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
 
-            if (sch == schema_dialect::draft202012())
+            if (schema_id == schema_dialect::draft202012())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (sch == schema_dialect::draft201909())
+            else if (schema_id == schema_dialect::draft201909())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (sch == schema_dialect::draft7())
+            else if (schema_id == schema_dialect::draft7())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (sch == schema_dialect::draft6())
+            else if (schema_id == schema_dialect::draft6())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
-            else if (sch == schema_dialect::draft4())
+            else if (schema_id == schema_dialect::draft4())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
             return builder;
         }
-*/
     };
 
     template <class Json>
