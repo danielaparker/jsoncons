@@ -19,6 +19,11 @@ namespace jsonschema {
             static std::string s{"http://json-schema.org/draft-04/schema#"};
             return s;
         }
+        static std::string draft6() 
+        {
+            static std::string s{"http://json-schema.org/draft-06/schema#"};
+            return s;
+        }
         static std::string draft7() 
         {
             static std::string s{"http://json-schema.org/draft-07/schema#"};

@@ -8,6 +8,7 @@
 #define JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
 #include <jsoncons_ext/jsonschema/draft4/schema_builder_4.hpp>
+#include <jsoncons_ext/jsonschema/draft6/schema_builder_6.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_builder_7.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
@@ -50,6 +51,11 @@ namespace jsonschema {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
                             options, schema_store_ptr);
                     }
+                    else if (it->value().as_string_view() == schema::draft6())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                            options, schema_store_ptr);
+                    }
                     else if (it->value().as_string_view() == schema::draft4())
                     {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
@@ -64,14 +70,9 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema::draft4())
+                    if (options.default_version() == schema::draft202012())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
-                            options, schema_store_ptr);
-                    }
-                    else if (options.default_version() == schema::draft7())
-                    {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
                             options, schema_store_ptr);
                     }
                     else if (options.default_version() == schema::draft201909())
@@ -79,9 +80,19 @@ namespace jsonschema {
                         builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
                             options, schema_store_ptr);
                     }
-                    else if (options.default_version() == schema::draft202012())
+                    else if (options.default_version() == schema::draft7())
                     {
-                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                            options, schema_store_ptr);
+                    }
+                    else if (options.default_version() == schema::draft6())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                            options, schema_store_ptr);
+                    }
+                    else if (options.default_version() == schema::draft4())
+                    {
+                        builder_factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                             options, schema_store_ptr);
                     }
                     else
@@ -117,6 +128,10 @@ namespace jsonschema {
         else if (uri.base() == schema::draft7())
         {
             return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
+        }
+        else if (uri.base() == schema::draft6())
+        {
+            return jsoncons::jsonschema::draft6::schema_draft6<Json>::get_schema();
         }
         else if (uri.base() == schema::draft4())
         {
