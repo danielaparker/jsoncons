@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::schema
+### jsoncons::jsonschema::schema_version
 
 ```cpp
 #include <jsoncons/jsonschema/jsonschema.hpp>
