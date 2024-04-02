@@ -221,37 +221,6 @@ namespace draft4 {
                     }
                 }
             }
-
-            schema_validator_type if_validator;
-            schema_validator_type then_validator;
-            schema_validator_type else_validator;
-
-            it = sch.find("if");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "if" };
-                if_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
-            }
-
-            it = sch.find("then");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "then" };
-                then_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
-            }
-
-            it = sch.find("else");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "else" };
-                else_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
-            }
-            if (if_validator || then_validator || else_validator)
-            {
-                validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                    context.get_absolute_uri().string(),
-                    std::move(if_validator), std::move(then_validator), std::move(else_validator)));
-            }
             
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
