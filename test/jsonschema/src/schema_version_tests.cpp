@@ -17,9 +17,9 @@ namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema version tests")
 {
-    json schema_04 = json::parse(R"(
+    json schema_03 = json::parse(R"(
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-03/schema#",
     "description": "A product from Acme's catalog",
     "properties": {
       "id": {
@@ -83,9 +83,9 @@ TEST_CASE("jsonschema version tests")
   }
       )");
 
-    SECTION("test 4")
+    SECTION("test 3")
     {
-        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_04), "Unsupported schema version http://json-schema.org/draft-04/schema#");
+        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_03), "Unsupported schema version http://json-schema.org/draft-03/schema#");
     }
 
     SECTION("test 7")

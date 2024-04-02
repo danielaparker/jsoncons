@@ -83,7 +83,7 @@ TEST_CASE("jsonschema validation report tests")
                 "evaluationPath": "/properties/multi/allOf/0/$ref/type",
                 "schemaLocation": "https://test.com/schema#/$defs/integer",
                 "instanceLocation": "/multi",
-                "error": "Instance is not an integer"
+                "error": "Expected integer, found number"
             },
             {
                 "valid": false,
@@ -290,8 +290,8 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
         compiled.validate(data, decoder);
         
         ojson output = decoder.get_result();
-        //CHECK(expected == output);
-        std::cout << pretty_print(output) << "\n";
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
     }
 }
 

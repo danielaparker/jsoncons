@@ -100,9 +100,12 @@ add_executable(unit_tests
                jsonpointer/src/jsonpointer_flatten_tests.cpp
                jsonpointer/src/jsonpointer_tests.cpp
                jsonschema/src/format_validator_tests.cpp
+               jsonschema/src/validation_report_tests.cpp
                jsonschema/src/dynamic_ref_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_output_tests.cpp
+               jsonschema/src/jsonschema_draft4_tests.cpp
+               jsonschema/src/jsonschema_draft6_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
                jsonschema/src/jsonschema_draft201909_tests.cpp
                jsonschema/src/jsonschema_draft202012_tests.cpp

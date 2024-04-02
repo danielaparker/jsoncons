@@ -180,7 +180,7 @@ TEST_CASE("jsonschema draft6 tests")
         jsoncons::json schema = jsoncons::json::parse(R"(
     {
       "$id": "https://example.com/polygon",
-      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$schema": "http://json-schema.org/draft-06/schema#",
       "unknown-keyword": {
         "point": {
           "type": "object",
