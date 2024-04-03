@@ -933,19 +933,19 @@ namespace jsoncons {
             }
         public:
             array_storage(const array& val, semantic_tag tag)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), small_string_length_(0), tag_(tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), small_string_length_(0), tag_(tag), ptr_(nullptr)
             {
                 create(val.get_allocator(), val);
             }
 
             array_storage(array&& val, semantic_tag tag)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), small_string_length_(0), tag_(tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array_value)), small_string_length_(0), tag_(tag), ptr_(nullptr)
             {
                 create(val.get_allocator(), std::move(val));
             }
 
             array_storage(const array_storage& other)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 create(other.ptr_->get_allocator(), *(other.ptr_));
             }
@@ -968,13 +968,13 @@ namespace jsoncons {
             }
 
             array_storage(const array_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 create(array_allocator(alloc), *(other.ptr_));
             }
 
             array_storage(array_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), small_string_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 if (other.get_allocator() == alloc)
                 {
