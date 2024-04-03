@@ -902,7 +902,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a RFC 3339 date string"));
+                "'" + value + "' is not a RFC 3339 date string."));
         }
     }
 
@@ -918,7 +918,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a RFC 3339 time string"));
+                "'" + value + "' is not a RFC 3339 time string."));
         }
     }
 
@@ -934,7 +934,7 @@ namespace jsonschema {
                 eval_path,  
                 schema_location,
                 instance_location, 
-                "\"" + value + "\" is not a RFC 3339 date-time string"));
+                "'" + value + "' is not a RFC 3339 date-time string."));
         }
     }
 
@@ -950,7 +950,7 @@ namespace jsonschema {
                 eval_path, 
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a valid email address as defined by RFC 5322"));
+                "'" + value + "' is not a valid email address as defined by RFC 5322."));
         }
     } 
 
@@ -966,7 +966,7 @@ namespace jsonschema {
                 eval_path, 
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A"));
+                "'" + value + "' is not a valid hostname as defined by RFC 3986 Appendix A."));
         }
     } 
 
@@ -982,7 +982,7 @@ namespace jsonschema {
                 eval_path, 
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673"));
+                "'" + value + "' is not a valid IPv4 address as defined by RFC 2673."));
         }
     } 
 
@@ -998,7 +998,7 @@ namespace jsonschema {
                 eval_path, 
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373"));
+                "'" + value + "' is not a valid IPv6 address as defined by RFC 2373."));
         }
     } 
 
@@ -1019,7 +1019,7 @@ namespace jsonschema {
                 eval_path, 
                 schema_location, 
                 instance_location, 
-                "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what()));
+                "'" + value + "' is not a valid ECMAScript regular expression. " + e.what()));
         }
 #endif
     } 
