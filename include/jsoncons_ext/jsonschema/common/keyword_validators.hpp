@@ -363,11 +363,11 @@ namespace jsonschema {
             auto s = instance.template as<std::string>();
             if (!std::regex_search(s, regex_))
             {
-                std::string message("String \"");
+                std::string message("String '");
                 message.append(s);
-                message.append("\" does not match pattern \"");
+                message.append("' does not match pattern '");
                 message.append(pattern_string_);
-                message.append("\"");
+                message.append("'.");
                 reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_location(),
@@ -1303,7 +1303,7 @@ namespace jsonschema {
                                                          this_context.eval_path(),
                                                          this->schema_location(),
                                                          instance_location,
-                                                         "Required property \"" + key + "\" not found"));
+                                                         "Required property '" + key + "' not found."));
                         if(reporter.fail_early())
                     {
                             return;
@@ -1510,7 +1510,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    instance.template as<std::string>() + " is not a valid enum value"));
+                    "'" + instance.template as<std::string>() + "' is not a valid enum value."));
                 if (reporter.fail_early())
                 {
                     return;
@@ -1994,7 +1994,7 @@ namespace jsonschema {
                                 prop_context.eval_path(), 
                                 this->schema_location(), 
                                 prop_location,
-                                "Additional property '" + prop.key() + "' but the schema does not allow additional properties."));
+                                "Additional property '" + prop.key() + "' not allowed by schema."));
                             break;
                         }
                     }
@@ -2033,7 +2033,7 @@ namespace jsonschema {
                                     this_context.eval_path(), 
                                     additional_properties_->schema_location().string(),
                                     instance_location, 
-                                    "Additional property \"" + prop.key() + "\" found but was invalid."));
+                                    "Additional property '" + prop.key() + "' found but was invalid."));
                                 if (reporter.fail_early())
                                 {
                                     return;
@@ -2396,7 +2396,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    "Expected at least one array item to match \"contains\" schema", 
+                    "Expected at least one array item to match 'contains' schema.",
                     local_reporter.errors));
                 if (reporter.fail_early())
                 {
