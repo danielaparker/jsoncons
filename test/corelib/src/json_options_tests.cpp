@@ -26,21 +26,105 @@ TEST_CASE("test_default_nan_replacement")
     CHECK(os.str() == expected);
 }
 
-TEST_CASE("test_write_nan_replacement")
+TEST_CASE("test inf_to_num")
 {
     json j;
     j["field1"] = std::sqrt(-1.0);
     j["field2"] = 1.79e308 * 1000;
     j["field3"] = -1.79e308 * 1000;
 
-    json_options options;
-    options.inf_to_num("1e9999");
+    SECTION("inf_to_num")
+    {
+        json_options options;
+        options.inf_to_num("1e9999");
 
-    std::ostringstream os;
-    os << print(j, options);
-    std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
+        std::ostringstream os;
+        os << print(j, options);
+        std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
 
-    CHECK(os.str() == expected);
+        CHECK(os.str() == expected);
+    }
+}
+
+TEST_CASE("object: nan_to_str, inf_to_str, neginf_to_str test")
+{
+    json j;
+    j["field1"] = std::sqrt(-1.0);
+    j["field2"] = 1.79e308 * 1000;
+    j["field3"] = -1.79e308 * 1000;
+
+    SECTION("pretty_print nan_to_str, inf_to_str, neginf_to_str")
+    {
+        json_options options;
+        options.nan_to_str("NaN")
+               .inf_to_str("Inf")
+               .neginf_to_str("NegInf")
+               .line_splits(line_split_kind::same_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        //std::cout << os.str() << "\n";
+        std::string expected = R"({"field1": "NaN", "field2": "Inf", "field3": "NegInf"})";
+        CHECK(os.str() == expected);
+    }
+
+    SECTION("print nan_to_str, inf_to_str, neginf_to_str")
+    {
+        json_options options;
+        options.nan_to_str("NaN")
+            .inf_to_str("Inf")
+            .inf_to_str("NegInf");
+
+        std::ostringstream os;
+        os << print(j, options);
+
+        //std::cout << os.str() << "\n";
+        std::string expected = R"({"field1":"NaN","field2":"NegInf","field3":"-NegInf"})";
+        CHECK(os.str() == expected);
+    }
+}
+
+TEST_CASE("array: nan_to_str, inf_to_str, neginf_to_str test")
+{
+    json j(json_array_arg);
+    j.push_back(std::sqrt(-1.0));
+    j.push_back(1.79e308 * 1000);
+    j.push_back(-1.79e308 * 1000);
+
+    SECTION("pretty_print nan_to_str, inf_to_str, neginf_to_str")
+    {
+        json_options options;
+        options.nan_to_str("NaN")
+               .inf_to_str("Inf")
+               .neginf_to_str("NegInf")
+               .line_splits(line_split_kind::same_line);
+
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        //std::cout << os.str() << "\n";
+        std::string expected = R"(["NaN", "Inf", "NegInf"])";
+
+        CHECK(os.str() == expected);
+    }
+
+    SECTION("print nan_to_str, inf_to_str, neginf_to_str")
+    {
+        json_options options;
+        options.nan_to_str("NaN")
+            .inf_to_str("Inf")
+            .inf_to_str("NegInf");
+
+        std::ostringstream os;
+        os << print(j, options);
+
+        //std::cout << os.str() << "\n";
+        std::string expected = R"(["NaN","NegInf","-NegInf"])";
+
+        CHECK(os.str() == expected);
+    }
 }
 
 TEST_CASE("test_read_write_read_nan_replacement")
@@ -57,7 +141,7 @@ TEST_CASE("test_read_write_read_nan_replacement")
     std::ostringstream os;
     os << pretty_print(j, options);
 
-    std::cout << os.str() << "\n\n";
+    //std::cout << os.str() << "\n\n";
     json j2 = json::parse(os.str(),options);
 
     json expected;
