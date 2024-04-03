@@ -177,7 +177,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
         "evaluationPath": "/additionalProperties/direction",
         "schemaLocation": "#",
         "instanceLocation": "/direction",
-        "error": "Additional property 'direction' but the schema does not allow additional properties."
+        "error": "Additional property 'direction' not allowed by schema."
     }
 ]
         )");
