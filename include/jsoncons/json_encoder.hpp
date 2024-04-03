@@ -419,12 +419,12 @@ namespace detail {
 
     private:
         // Implementing methods
-        void visit_flush() override
+        void visit_flush() final
         {
             sink_.flush();
         }
 
-        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
@@ -492,7 +492,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_end_object(const ser_context&, std::error_code&) override
+        bool visit_end_object(const ser_context&, std::error_code&) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             --nesting_depth_;
@@ -510,7 +510,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
@@ -584,7 +584,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_end_array(const ser_context&, std::error_code&) override
+        bool visit_end_array(const ser_context&, std::error_code&) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             --nesting_depth_;
@@ -601,7 +601,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+        bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             if (stack_.back().count() > 0)
@@ -633,7 +633,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty()) 
             {
@@ -654,7 +654,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) final
         {
             if (!stack_.empty()) 
             {
@@ -667,7 +667,15 @@ namespace detail {
                     break_line();
                 }
             }
+            
+            write_string(sv, tag, context, ec);
 
+            end_value();
+            return true;
+        }
+
+        bool write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
+        {
             switch (tag)
             {
                 case semantic_tag::bigint:
@@ -693,14 +701,13 @@ namespace detail {
                 }
             }
 
-            end_value();
             return true;
         }
 
         bool visit_byte_string(const byte_string_view& b, 
                                   semantic_tag tag,
                                   const ser_context&,
-                                  std::error_code&) override
+                                  std::error_code&) final
         {
             if (!stack_.empty()) 
             {
@@ -773,7 +780,7 @@ namespace detail {
         bool visit_double(double value, 
                              semantic_tag,
                              const ser_context& context,
-                             std::error_code& ec) override
+                             std::error_code& ec) final
         {
             if (!stack_.empty()) 
             {
@@ -798,7 +805,7 @@ namespace detail {
                     }
                     else if (options_.enable_nan_to_str())
                     {
-                        visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -815,7 +822,7 @@ namespace detail {
                     }
                     else if (options_.enable_inf_to_str())
                     {
-                        visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -832,7 +839,7 @@ namespace detail {
                     }
                     else if (options_.enable_neginf_to_str())
                     {
-                        visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -854,7 +861,7 @@ namespace detail {
         bool visit_int64(int64_t value, 
                             semantic_tag,
                             const ser_context&,
-                            std::error_code&) override
+                            std::error_code&) final
         {
             if (!stack_.empty()) 
             {
@@ -876,7 +883,7 @@ namespace detail {
         bool visit_uint64(uint64_t value, 
                              semantic_tag, 
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code&) final
         {
             if (!stack_.empty()) 
             {
@@ -895,7 +902,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty()) 
             {
@@ -1163,12 +1170,12 @@ namespace detail {
 
     private:
         // Implementing methods
-        void visit_flush() override
+        void visit_flush() final
         {
             sink_.flush();
         }
 
-        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
@@ -1185,7 +1192,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_end_object(const ser_context&, std::error_code&) override
+        bool visit_end_object(const ser_context&, std::error_code&) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             --nesting_depth_;
@@ -1201,7 +1208,7 @@ namespace detail {
         }
 
 
-        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) final
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
@@ -1217,7 +1224,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_end_array(const ser_context&, std::error_code&) override
+        bool visit_end_array(const ser_context&, std::error_code&) final
         {
             JSONCONS_ASSERT(!stack_.empty());
             --nesting_depth_;
@@ -1231,7 +1238,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+        bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().count() > 0)
             {
@@ -1245,7 +1252,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1322,7 +1329,7 @@ namespace detail {
             }
         }
 
-        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1360,10 +1367,38 @@ namespace detail {
             return true;
         }
 
+        bool write_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) 
+        {
+            switch (tag)
+            {
+                case semantic_tag::bigint:
+                    write_bigint_value(sv);
+                    break;
+                case semantic_tag::bigdec:
+                {
+                    // output lossless number
+                    if (options_.bigint_format() == bigint_chars_format::number)
+                    {
+                        write_bigint_value(sv);
+                        break;
+            }
+            JSONCONS_FALLTHROUGH;
+        }
+                default:
+                {
+                    sink_.push_back('\"');
+                    jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
+                    sink_.push_back('\"');
+                    break;
+                }
+            }
+            return true;
+        }
+
         bool visit_byte_string(const byte_string_view& b, 
                                   semantic_tag tag,
                                   const ser_context&,
-                                  std::error_code&) override
+                                  std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1429,7 +1464,7 @@ namespace detail {
         bool visit_double(double value, 
                              semantic_tag,
                              const ser_context& context,
-                             std::error_code& ec) override
+                             std::error_code& ec) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1446,7 +1481,7 @@ namespace detail {
                     }
                     else if (options_.enable_nan_to_str())
                     {
-                        visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -1461,7 +1496,7 @@ namespace detail {
                     }
                     else if (options_.enable_inf_to_str())
                     {
-                        visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -1476,7 +1511,7 @@ namespace detail {
                     }
                     else if (options_.enable_neginf_to_str())
                     {
-                        visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                        write_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                     }
                     else
                     {
@@ -1499,7 +1534,7 @@ namespace detail {
         bool visit_int64(int64_t value, 
                             semantic_tag,
                             const ser_context&,
-                            std::error_code&) override
+                            std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1516,7 +1551,7 @@ namespace detail {
         bool visit_uint64(uint64_t value, 
                              semantic_tag, 
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
@@ -1530,7 +1565,7 @@ namespace detail {
             return true;
         }
 
-        bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) final
         {
             if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
             {
