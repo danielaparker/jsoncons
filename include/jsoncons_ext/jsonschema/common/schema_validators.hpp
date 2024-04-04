@@ -170,7 +170,7 @@ namespace jsonschema {
             }
         }
     };
-
+ 
     template <class Json>
     class object_schema_validator : public schema_validator<Json>
     {

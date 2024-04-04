@@ -24,7 +24,8 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<json>>&)>;
+            const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<json>>&,
+            const std::unordered_map<std::string,bool>&)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using ref_validator_type = ref_validator<Json>;
@@ -37,6 +38,7 @@ namespace jsonschema {
         evaluation_options options_;
         schema_store_type* schema_store_ptr_;
         std::vector<schema_resolver<Json>> resolvers_;
+        std::unordered_map<std::string,bool> vocabulary_;
 
         schema_validator_type root_;       
         
@@ -57,8 +59,20 @@ namespace jsonschema {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
         }
 
+        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
+            evaluation_options options, schema_store_type* schema_store_ptr,
+            const std::vector<schema_resolver<json>>& resolvers,
+            const std::unordered_map<std::string,bool>& vocabulary)
+            : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
+              schema_store_ptr_(schema_store_ptr), resolvers_(resolvers), vocabulary_(vocabulary)
+        {
+            JSONCONS_ASSERT(schema_store_ptr != nullptr);
+        }
+
         virtual ~schema_builder() = default;
 
+        const std::unordered_map<std::string,bool>& vocabulary() const {return vocabulary_;}
+        
         void save_schema(schema_validator_type&& schema)
         {
             schemas_.emplace_back(std::move(schema));
@@ -281,7 +295,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_, resolvers_);
+                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_, resolvers_, vocabulary_);
                             schema_builder->build_schema(sch, context.get_absolute_uri().string());
                             schema_val = schema_builder->get_schema();
                         }
