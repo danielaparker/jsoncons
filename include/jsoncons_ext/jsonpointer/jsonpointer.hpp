@@ -95,7 +95,7 @@ namespace jsoncons { namespace jsonpointer {
             auto jp = parse(s, ec);
             if (ec)
             {
-                throw jsonpointer_error(ec);
+                JSONCONS_THROW(jsonpointer_error(ec));
             }
             tokens_ = std::move(jp.tokens_);
         }

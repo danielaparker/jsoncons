@@ -620,6 +620,14 @@ namespace jsonschema {
             {
                 format_check = regex_check;
             } 
+            //else if (format == "json-pointer") 
+            //{
+            //    format_check = jsonpointer_check;
+            //} 
+            //else if (format == "uri") 
+            //{
+            //    format_check = uri_check;
+            //} 
             else
             {
                 // Not supported - ignore

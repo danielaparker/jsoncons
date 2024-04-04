@@ -891,6 +891,43 @@ namespace jsonschema {
         error_reporter& reporter)>;
 
     inline
+    void uri_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
+        const jsonpointer::json_pointer& instance_location, 
+        const std::string& str,
+        error_reporter& reporter)
+    {
+        std::error_code ec;
+        uri::parse(str, ec);
+        if (ec)
+        {
+            reporter.error(validation_message("uri",
+                eval_path,
+                schema_location, 
+                instance_location, 
+                "'" + str + "' is not a valid URI."));
+        }
+    }
+
+    inline
+    void jsonpointer_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
+        const jsonpointer::json_pointer& instance_location, 
+        const std::string& str,
+        error_reporter& reporter)
+    {
+        std::error_code ec;
+        jsonpointer::json_pointer::parse(str, ec);
+        if (ec)
+        {
+            reporter.error(validation_message("json-pointer",
+                eval_path,
+                schema_location, 
+                instance_location, 
+                "'" + str + "' is not a valid JSONPointer."));
+        }
+    }
+
+    
+    inline
     void rfc3339_date_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                             const jsonpointer::json_pointer& instance_location, 
                             const std::string& value,

@@ -18,6 +18,56 @@
 
 namespace jsoncons { 
 
+    enum class uri_errc 
+    {
+        success = 0,
+        invalid_uri = 1,
+    };
+
+
+    class uri_error_category_impl
+       : public std::error_category
+    {
+    public:
+        const char* name() const noexcept override
+        {
+            return "jsoncons/uri";
+        }
+        std::string message(int ev) const override
+        {
+            switch (static_cast<uri_errc>(ev))
+            {
+                case uri_errc::invalid_uri:
+                    return "Invalid URI";
+                default:
+                    return "Unknown uri error";
+            }
+        }
+    };
+
+    inline
+    const std::error_category& uri_error_category()
+    {
+      static uri_error_category_impl instance;
+      return instance;
+    }
+    
+    inline 
+    std::error_code make_error_code(uri_errc result)
+    {
+        return std::error_code(static_cast<int>(result),uri_error_category());
+    }
+}
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::uri_errc> : public true_type
+    {
+    };
+}
+
+namespace jsoncons {
+
     struct uri_fragment_part_t
     {
         explicit uri_fragment_part_t() = default; 
@@ -76,7 +126,12 @@ namespace jsoncons {
 
         /*explicit*/ uri(const std::string& uri)
         {
-            *this = parse(uri);
+            std::error_code ec;
+            *this = parse(uri, ec);
+            if (ec)
+            {
+                JSONCONS_THROW(std::system_error(ec));
+            }
         }
 
         uri(jsoncons::string_view scheme,
@@ -470,30 +525,7 @@ namespace jsoncons {
             }
             return decoded;
         }
-
-    private:
-        enum class parse_state {expect_scheme,
-                                expect_first_slash,
-                                expect_second_slash,
-                                expect_authority,
-                                expect_host_ipv6,
-                                expect_userinfo,
-                                expect_host,
-                                expect_port,
-                                expect_path,
-                                expect_query,
-                                expect_fragment};
-
-        uri(const std::string& uri, part_type scheme, part_type userinfo, 
-            part_type host, part_type port, part_type path, 
-            part_type query, part_type fragment)
-            : uri_string_(uri), scheme_(scheme), userinfo_(userinfo), 
-              host_(host), port_(port), path_(path), 
-              query_(query), fragment_(fragment)
-        {
-        }
-
-        static uri parse(const std::string& s)
+        static uri parse(const std::string& s, std::error_code& ec)
         {
             part_type scheme;
             part_type userinfo;
@@ -697,11 +729,33 @@ namespace jsoncons {
                     fragment = std::make_pair(start,s.size());
                     break;
                 default:
-                    JSONCONS_THROW(std::invalid_argument("Invalid uri"));
+                    ec = uri_errc::invalid_uri;
                     break;
             }
 
             return uri(s, scheme, userinfo, host, port, path, query, fragment);
+        }
+
+    private:
+        enum class parse_state {expect_scheme,
+                                expect_first_slash,
+                                expect_second_slash,
+                                expect_authority,
+                                expect_host_ipv6,
+                                expect_userinfo,
+                                expect_host,
+                                expect_port,
+                                expect_path,
+                                expect_query,
+                                expect_fragment};
+
+        uri(const std::string& uri, part_type scheme, part_type userinfo, 
+            part_type host, part_type port, part_type path, 
+            part_type query, part_type fragment)
+            : uri_string_(uri), scheme_(scheme), userinfo_(userinfo), 
+              host_(host), port_(port), path_(path), 
+              query_(query), fragment_(fragment)
+        {
         }
 
         static std::string remove_dot_segments(const jsoncons::string_view& input)
