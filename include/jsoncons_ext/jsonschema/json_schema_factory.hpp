@@ -121,6 +121,52 @@ namespace jsonschema {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
                     options, schema_store_ptr, resolvers);
             }
+            else
+            { 
+                builder = get_builder_from_meta_schema(schema_id, options, schema_store_ptr, resolvers);
+            }
+            return builder;
+        }
+        
+        std::unique_ptr<schema_builder<Json>> get_builder_from_meta_schema(const jsoncons::string_view& schema_id,
+            const evaluation_options& options, schema_store_type* schema_store_ptr,
+            const std::vector<schema_resolver<json>>& resolvers) const
+        {
+            std::unique_ptr<schema_builder<Json>> builder;
+
+            bool found = false;
+            jsoncons::uri uri{ std::string(schema_id) };
+            for (auto it = resolvers.begin(); it != resolvers.end() && !found; ++it)
+            {
+                Json sch = (*it)(uri.base());
+                if (sch.is_object())
+                {
+                    std::unordered_map<std::string,bool> vocabulary;
+                    auto vocab_it = sch.find("$vocabulary");
+                    if (vocab_it != sch.object_range().end())
+                    {
+                        const auto& vocab = vocab_it->value();
+                        if (vocab.is_object())
+                        {
+                            for (const auto& member : vocab.object_range())
+                            {
+                                vocabulary.emplace(member.key(), member.value().as_bool());
+                            }
+                        }
+                    }
+                    for (const auto& member : vocabulary)
+                    {
+                        std::cout << member.first << ", " << member.second << "\n";
+                    }
+                    auto schema_it = sch.find("$schema");
+                    if (schema_it != sch.object_range().end())
+                    {
+                        builder = get_builder(schema_it->value().as_string_view(), options, schema_store_ptr, resolvers);
+                        found = true;
+                    }
+                }
+            }
+            
             return builder;
         }
     };
