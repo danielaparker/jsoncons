@@ -81,6 +81,10 @@ namespace draft202012 {
             static std::string id = "https://json-schema.org/draft/2020-12/vocab/content";
             return id;
         }
+        
+        bool include_applicator_;
+        bool include_validation_;
+        bool include_unevaluated_;
 
     public:
         schema_builder_202012(const schema_builder_factory_type& builder_factory, 
@@ -88,8 +92,27 @@ namespace draft202012 {
             const std::vector<schema_resolver<json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary) 
             : schema_builder<Json>(schema_version::draft202012(), 
-                builder_factory, options, schema_store_ptr, resolvers, vocabulary)
+                builder_factory, options, schema_store_ptr, resolvers, vocabulary),
+                include_applicator_(true), include_unevaluated_(true), include_validation_(true)
         {
+            if (!vocabulary.empty())
+            {
+                auto it = vocabulary.find(applicator_id());
+                if (it == vocabulary.end() || !(it->second))
+                {
+                    include_applicator_ = false;
+                }
+                it = vocabulary.find(unevaluated_id());
+                if (it == vocabulary.end() || !(it->second))
+                {
+                    include_unevaluated_ = false;
+                }
+                it = vocabulary.find(validation_id());
+                if (it == vocabulary.end() || !(it->second))
+                {
+                    include_validation_ = false;
+                }
+            }
             init();
         }
 
@@ -289,134 +312,139 @@ namespace draft202012 {
                 validators.push_back(std::move(orig));
             }
 
-            // Applicator keywords
-            
-            for (const auto& key_value : sch.object_range())
+            if (include_applicator_)
             {
-                auto factory_it = applicator_factory_map_.find(key_value.key());
-                if (factory_it != applicator_factory_map_.end())
+                for (const auto& key_value : sch.object_range())
                 {
-                    auto validator = factory_it->second(context, key_value.value(), sch, local_anchor_dict);
-                    if (validator)
-                    {   
-                        validators.emplace_back(std::move(validator));
+                    auto factory_it = applicator_factory_map_.find(key_value.key());
+                    if (factory_it != applicator_factory_map_.end())
+                    {
+                        auto validator = factory_it->second(context, key_value.value(), sch, local_anchor_dict);
+                        if (validator)
+                        {   
+                            validators.emplace_back(std::move(validator));
+                        }
                     }
                 }
-            }
 
-            schema_validator_type if_validator;
-            schema_validator_type then_validator;
-            schema_validator_type else_validator;
+                schema_validator_type if_validator;
+                schema_validator_type then_validator;
+                schema_validator_type else_validator;
 
-            it = sch.find("if");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "if" };
-                if_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
-            }
-
-            it = sch.find("then");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "then" };
-                then_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
-            }
-
-            it = sch.find("else");
-            if (it != sch.object_range().end()) 
-            {
-                std::string sub_keys[] = { "else" };
-                else_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
-            }
-            if (if_validator || then_validator || else_validator)
-            {
-                validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                    context.get_absolute_uri().string(),
-                    std::move(if_validator), std::move(then_validator), std::move(else_validator)));
-            }
-            // Object validators
-
-            std::unique_ptr<properties_validator<Json>> properties;
-            it = sch.find("properties");
-            if (it != sch.object_range().end()) 
-            {
-                properties = this->make_properties_validator(context, it->value(), local_anchor_dict);
-            }
-            std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
-
-    #if defined(JSONCONS_HAS_STD_REGEX)
-            it = sch.find("patternProperties");
-            if (it != sch.object_range().end())
-            {
-                pattern_properties = make_pattern_properties_validator(context, it->value(), local_anchor_dict);
-            }
-    #endif
-
-            it = sch.find("additionalProperties");
-            if (it != sch.object_range().end()) 
-            {
-                validators.emplace_back(this->make_additional_properties_validator(context, it->value(), 
-                    std::move(properties), std::move(pattern_properties), local_anchor_dict));
-            }
-            else
-            {
-                if (properties)
-                {
-                    validators.emplace_back(std::move(properties));
-                }
-#if defined(JSONCONS_HAS_STD_REGEX)
-                if (pattern_properties)
-                {
-                    validators.emplace_back(std::move(pattern_properties));
-                }
-#endif
-            }
-
-            it = sch.find("prefixItems");
-            if (it != sch.object_range().end()) 
-            {
-
-                if (it->value().type() == json_type::array_value) 
-                {
-                    validators.emplace_back(make_prefix_items_validator(context, it->value(), sch, local_anchor_dict));
-                } 
-            }
-            else
-            {
-                it = sch.find("items");
+                it = sch.find("if");
                 if (it != sch.object_range().end()) 
                 {
-                    if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
+                    std::string sub_keys[] = { "if" };
+                    if_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                }
+
+                it = sch.find("then");
+                if (it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "then" };
+                    then_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                }
+
+                it = sch.find("else");
+                if (it != sch.object_range().end()) 
+                {
+                    std::string sub_keys[] = { "else" };
+                    else_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, local_anchor_dict);
+                }
+                if (if_validator || then_validator || else_validator)
+                {
+                    validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
+                        context.get_absolute_uri().string(),
+                        std::move(if_validator), std::move(then_validator), std::move(else_validator)));
+                }
+                // Object validators
+
+                std::unique_ptr<properties_validator<Json>> properties;
+                it = sch.find("properties");
+                if (it != sch.object_range().end()) 
+                {
+                    properties = this->make_properties_validator(context, it->value(), local_anchor_dict);
+                }
+                std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
+
+        #if defined(JSONCONS_HAS_STD_REGEX)
+                it = sch.find("patternProperties");
+                if (it != sch.object_range().end())
+                {
+                    pattern_properties = make_pattern_properties_validator(context, it->value(), local_anchor_dict);
+                }
+        #endif
+
+                it = sch.find("additionalProperties");
+                if (it != sch.object_range().end()) 
+                {
+                    validators.emplace_back(this->make_additional_properties_validator(context, it->value(), 
+                        std::move(properties), std::move(pattern_properties), local_anchor_dict));
+                }
+                else
+                {
+                    if (properties)
                     {
-                        validators.emplace_back(this->make_items_validator(context, it->value(), local_anchor_dict));
+                        validators.emplace_back(std::move(properties));
+                    }
+    #if defined(JSONCONS_HAS_STD_REGEX)
+                    if (pattern_properties)
+                    {
+                        validators.emplace_back(std::move(pattern_properties));
+                    }
+    #endif
+                }
+
+                it = sch.find("prefixItems");
+                if (it != sch.object_range().end()) 
+                {
+
+                    if (it->value().type() == json_type::array_value) 
+                    {
+                        validators.emplace_back(make_prefix_items_validator(context, it->value(), sch, local_anchor_dict));
+                    } 
+                }
+                else
+                {
+                    it = sch.find("items");
+                    if (it != sch.object_range().end()) 
+                    {
+                        if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
+                        {
+                            validators.emplace_back(this->make_items_validator(context, it->value(), local_anchor_dict));
+                        }
                     }
                 }
             }
 
-            // Validation keywords
-            for (const auto& key_value : sch.object_range())
+            if (include_validation_)
             {
-                auto factory_it = validation_factory_map_.find(key_value.key());
-                if (factory_it != validation_factory_map_.end())
+                for (const auto& key_value : sch.object_range())
                 {
-                    auto validator = factory_it->second(context, key_value.value(), sch, local_anchor_dict);
-                    if (validator)
-                    {   
-                        validators.emplace_back(std::move(validator));
+                    auto factory_it = validation_factory_map_.find(key_value.key());
+                    if (factory_it != validation_factory_map_.end())
+                    {
+                        auto validator = factory_it->second(context, key_value.value(), sch, local_anchor_dict);
+                        if (validator)
+                        {   
+                            validators.emplace_back(std::move(validator));
+                        }
                     }
                 }
             }
             
-            // Unevaluated            
-            it = sch.find("unevaluatedProperties");
-            if (it != sch.object_range().end()) 
+            if (include_unevaluated_)
             {
-                unevaluated_properties_val = this->make_unevaluated_properties_validator(context, it->value(), local_anchor_dict);
-            }
-            it = sch.find("unevaluatedItems");
-            if (it != sch.object_range().end()) 
-            {
-                unevaluated_items_val = this->make_unevaluated_items_validator(context, it->value(), local_anchor_dict);
+                it = sch.find("unevaluatedProperties");
+                if (it != sch.object_range().end()) 
+                {
+                    unevaluated_properties_val = this->make_unevaluated_properties_validator(context, it->value(), local_anchor_dict);
+                }
+                it = sch.find("unevaluatedItems");
+                if (it != sch.object_range().end()) 
+                {
+                    unevaluated_items_val = this->make_unevaluated_items_validator(context, it->value(), local_anchor_dict);
+                }
             }
 
             if (!id)

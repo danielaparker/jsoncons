@@ -12,29 +12,29 @@
             }
         },
         "tests": [
-            /*{
+            {
                 "description": "applicator vocabulary still works",
                 "data": {
                     "badProperty": "this property should not exist"
                 },
                 "valid": false
-            },*/
+            },
             {
                 "description": "no validation: valid number",
                 "data": {
                     "numberProperty": 20
                 },
                 "valid": true
-            }/*,
+            },
             {
                 "description": "no validation: invalid number, but it still validates",
                 "data": {
                     "numberProperty": 1
                 },
                 "valid": true
-            }*/
+            }
         ]
-    }/*,
+    },
     {
         "description": "ignore unrecognized optional vocabulary",
         "schema": {
@@ -53,5 +53,5 @@
                 "valid": true
             }
         ]
-    }*/
+    }
 ]
