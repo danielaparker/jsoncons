@@ -241,11 +241,13 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         std::string content_media_type_;
+        std::string content_encoding_;
 
     public:
-        content_media_type_validator(const uri& schema_location, const std::string& content_media_type)
+        content_media_type_validator(const uri& schema_location, const std::string& content_media_type,
+            const std::string& content_encoding)
             : keyword_validator_base<Json>("contentMediaType", schema_location), 
-              content_media_type_(content_media_type)
+              content_media_type_(content_media_type), content_encoding_(content_encoding)
         {
         }
 
@@ -261,13 +263,24 @@ namespace jsonschema {
             {
                 return;
             }
+            
+            std::string str = instance.as_string();
+            if (content_encoding_ == "base64")
+            {
+                std::string content;
+                auto retval = jsoncons::decode_base64(str.begin(), str.end(), content);
+                if (retval.ec != jsoncons::conv_errc::success)
+                {
+                    return;
+                }
+                str = std::move(content);
+            }
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
             if (content_media_type_ == "application/json")
             {
-                auto sv = instance.as_string_view();
-                json_string_reader reader(sv);
+                json_string_reader reader(str);
                 std::error_code ec;
                 reader.read(ec);
 

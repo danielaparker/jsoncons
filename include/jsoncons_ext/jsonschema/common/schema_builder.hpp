@@ -554,7 +554,7 @@ namespace jsonschema {
         }
 
         virtual std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const compilation_context& context, 
-            const Json& sch)
+            const Json& sch, const Json& parent)
         {
             uri schema_location = context.make_schema_path_with("contentMediaType");
             if (!sch.is_string())
@@ -562,8 +562,22 @@ namespace jsonschema {
                 std::string message("contentMediaType must be a string");
                 JSONCONS_THROW(schema_error(message));
             }
+            
+            std::string content_encoding;
+            auto it = parent.find("contentEncoding");
+            if (it != parent.object_range().end())
+            {
+                if (!it->value().is_string())
+                {
+                    std::string message("contentEncoding must be a string");
+                    JSONCONS_THROW(schema_error(message));
+                }
+
+                content_encoding = it->value().as_string();
+            }
+            
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_media_type_validator<Json>>( schema_location, value);
+            return jsoncons::make_unique<content_media_type_validator<Json>>( schema_location, value, content_encoding);
         }
 
         virtual std::unique_ptr<format_validator<Json>> make_format_validator(const compilation_context& context, 

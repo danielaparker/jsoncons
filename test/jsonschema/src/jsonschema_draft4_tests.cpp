@@ -166,8 +166,6 @@ TEST_CASE("jsonschema draft4 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft4/optional/format/uri.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft4/optional/format/uri-reference.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft4/optional/format/uri-template.json");
-
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft4/optional/content.json"); // REVISIT
     }
     SECTION("#417")
     {

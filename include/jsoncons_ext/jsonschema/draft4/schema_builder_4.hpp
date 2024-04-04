@@ -65,7 +65,7 @@ namespace draft4 {
             keyword_factory_map_.emplace("contentEncoding", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_content_encoding_validator(context, sch);});
             keyword_factory_map_.emplace("contentMediaType", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch);});
+                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch, parent);});
             if (this->options().require_format_validation())
             {
                 keyword_factory_map_.emplace("format", 

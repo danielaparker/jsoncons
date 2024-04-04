@@ -52,11 +52,11 @@
             "contentEncoding": "base64"
         },
         "tests": [
-            /*{
+            {
                 "description": "a valid base64-encoded JSON document",
                 "data": "eyJmb28iOiAiYmFyIn0K",
                 "valid": true
-            },*/
+            },
             {
                 "description": "a validly-encoded invalid JSON document",
                 "data": "ezp9Cg==",
