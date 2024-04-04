@@ -56,7 +56,7 @@ namespace jsonschema {
                     else if (options.default_version() == schema_version::draft201909())
                     {
                         builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
+                            options, schema_store_ptr, resolvers, vocabulary);
                     }
                     else if (options.default_version() == schema_version::draft7())
                     {
@@ -106,7 +106,7 @@ namespace jsonschema {
             else if (schema_id == schema_version::draft201909())
             {
                 builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                    options, schema_store_ptr, resolvers);
+                    options, schema_store_ptr, resolvers, vocabulary);
             }
             else if (schema_id == schema_version::draft7())
             {
