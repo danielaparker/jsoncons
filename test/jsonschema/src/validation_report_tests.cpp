@@ -175,7 +175,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "",
+        "schemaLocation": "#",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -228,7 +228,7 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/something that doesn't belong",
-        "schemaLocation": "",
+        "schemaLocation": "#",
         "instanceLocation": "/something that doesn't belong",
         "error": "Unevaluated property 'something that doesn't belong' but the schema does not allow unevaluated properties."
     }
@@ -273,7 +273,7 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/2",
-        "schemaLocation": "",
+        "schemaLocation": "#",
         "instanceLocation": "/2",
         "error": "Unevaluated item at index '2' but the schema does not allow unevaluated items."
     }
