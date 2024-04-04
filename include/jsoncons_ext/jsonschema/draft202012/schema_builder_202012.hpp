@@ -83,8 +83,8 @@ namespace draft202012 {
         }
         
         bool include_applicator_;
-        bool include_validation_;
         bool include_unevaluated_;
+        bool include_validation_;
 
     public:
         schema_builder_202012(const schema_builder_factory_type& builder_factory, 
