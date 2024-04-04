@@ -82,7 +82,7 @@ namespace jsonschema {
         Json validate(const Json& instance) const
         {
             throwing_error_reporter reporter;
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
             evaluation_context<Json> context;
@@ -95,7 +95,7 @@ namespace jsonschema {
         bool is_valid(const Json& instance) const
         {
             fail_early_reporter reporter;
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
             evaluation_context<Json> context;
@@ -109,7 +109,7 @@ namespace jsonschema {
         typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
@@ -123,7 +123,7 @@ namespace jsonschema {
         typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
         validate(const Json& instance, Reporter&& reporter, Json& patch) const
         {
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
             error_reporter_adaptor adaptor(std::forward<Reporter>(reporter));
@@ -135,7 +135,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a provided error reporter
         void validate(const Json& instance, Json& patch) const
         {
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
             fail_early_reporter reporter;
@@ -148,7 +148,7 @@ namespace jsonschema {
         void validate(const Json& instance, json_visitor& visitor) const
         {
             visitor.begin_array();
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             Json patch{json_array_arg};
 
             validation_message_to_json_adaptor report{ visitor };
@@ -164,7 +164,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a provided error reporter
         void validate2(const Json& instance, error_reporter& reporter, Json& patch) const
         {
-            jsonpointer::json_pointer instance_location("#");
+            jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
             evaluation_context<Json> context;

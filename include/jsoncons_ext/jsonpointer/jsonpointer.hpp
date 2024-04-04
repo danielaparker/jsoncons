@@ -116,7 +116,7 @@ namespace jsoncons { namespace jsonpointer {
         static basic_json_pointer parse(const string_view_type& input, std::error_code& ec)
         {
             std::vector<string_type> tokens;
-            if (input.empty() || (input[0] == '#' && input.size() == 1))
+            if (input.empty())
             {
                 return basic_json_pointer<CharT>();
             }
@@ -181,6 +181,11 @@ namespace jsoncons { namespace jsonpointer {
                             break;
                     }
                     ++p;
+            }
+            if (state == jsonpointer::detail::pointer_state::escaped)
+            {
+                ec = jsonpointer_errc::expected_0_or_1;
+                return basic_json_pointer();
             }
             if (state == jsonpointer::detail::pointer_state::new_token || state == jsonpointer::detail::pointer_state::part)
             {

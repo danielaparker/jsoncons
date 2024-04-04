@@ -559,5 +559,30 @@ TEST_CASE("jsonpointer get with stateful allocator")
     check_get(example,"/ ", custom_json(7));
     check_get(example,"/m~0n", custom_json(8));
 }
-
 #endif
+
+TEST_CASE("jsonpointer JSON Schema tests")
+{
+    SECTION("not a valid JSON-pointer (~ not escaped)")
+    {
+        std::error_code ec;
+        auto jsonp = jsonpointer::json_pointer::parse("/foo/bar~", ec);
+        CHECK(ec);
+    }
+    SECTION("not a valid JSON-pointer (URI Fragment Identifier) #1")
+    {
+        std::error_code ec;
+        auto jsonp = jsonpointer::json_pointer::parse("#", ec);
+        std::cout << jsonp.string() << "\n";
+        CHECK(ec);
+    }
+    SECTION("not a valid JSON-pointer (some escaped, but not all) #1")
+    {
+        std::error_code ec;
+        auto jsonp = jsonpointer::json_pointer::parse("/~0~", ec);
+        std::cout << jsonp.string() << "\n";
+        CHECK(ec);
+    }
+}
+
+

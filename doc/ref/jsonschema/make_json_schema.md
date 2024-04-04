@@ -170,7 +170,7 @@ Output:
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/baz",
-        "schemaLocation": "#",
+        "schemaLocation": "",
         "instanceLocation": "/baz",
         "error": "Unevaluated property 'baz' but the schema does not allow unevaluated properties."
     }
