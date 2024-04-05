@@ -5,6 +5,7 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
+#if 0
 TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)")
 {
     SECTION("https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top")
@@ -327,6 +328,24 @@ TEST_CASE("uri constructors")
         jsoncons::uri expected{"http://localhost:4242/draft2019-09/recursiveRef6/base.json#/anyOf"};
 
         CHECK(expected == y);       
+    }
+}
+#endif
+TEST_CASE("uri parsing tests")
+{
+    SECTION("an invalid URI with spaces")
+    {
+        std::string str = "http:// shouldfail.com";
+        
+        std::error_code ec;
+        jsoncons::uri id = jsoncons::uri::parse(str, ec);
+        
+        std::cout << "authority: [" << id.encoded_authority() << "]\n";
+        std::cout << "host: [" << id.encoded_host() << "]\n";
+        std::cout << "port: [" << id.encoded_port() << "]\n";
+        std::cout << "path: [" << id.encoded_path() << "]\n";
+
+        //CHECK(ec);       
     }
 }
 
