@@ -10,10 +10,11 @@ The jsoncons implementation passes all [draft 7 required tests](https://github.c
 
 In addition, the validator understands the following optional [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
 
+#00FF00
+
 |                      | Draft 7            |
 |----------------------|--------------------|
-| date                 | #00ff00 |
-| time                 | #00ff00 |
+| date                 | #00FF00 |
 | date-time            | #00ff00 |
 | email                | #00ff00 |
 | hostname             | #00ff00 |
@@ -21,6 +22,7 @@ In addition, the validator understands the following optional [format types](htt
 | ipv6                 | #00ff00 |
 | json-pointer         | #00ff00 |
 | regex                | #00ff00 |
+| time                 | #00ff00 |
 
 Any other format type is ignored.
 
