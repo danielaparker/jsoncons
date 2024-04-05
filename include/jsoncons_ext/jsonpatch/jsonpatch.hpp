@@ -298,6 +298,12 @@ namespace detail {
 template <class Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec)
 {
+    if (!patch.is_array())
+    {
+        ec = jsonpatch_errc::invalid_patch;
+        return;
+    }
+
     using char_type = typename Json::char_type;
     using string_type = std::basic_string<char_type>;
     using json_pointer_type = jsonpointer::basic_json_pointer<char_type>;
@@ -305,7 +311,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
    jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);
    std::error_code local_ec;
 
-    // Validate
+    // Validate  
      
     for (const auto& operation : patch.array_range())
     {
