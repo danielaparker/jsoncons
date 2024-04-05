@@ -914,9 +914,41 @@ namespace jsoncons {
             }
         }
 
-        static bool is_escaped(const char* s, std::size_t length)
+        static bool is_pct_encoded(const char* s, std::size_t length)
         {
             return length < 3 ? false : s[0] == '%' && is_hex(s[1]) && is_hex(s[2]);
+        }
+        
+        // sub-delims    = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+        static bool is_sub_delim(char c)
+        {
+            switch (c)
+            {
+                case '!':
+                    return true;
+                case '$':
+                    return true;
+                case '&':
+                    return true;
+                case '\'':
+                    return true;
+                case '(':
+                    return true;
+                case ')':
+                    return true;
+                case '*':
+                    return true;
+                case '+':
+                    return true;
+                case ',':
+                    return true;
+                case ';':
+                    return true;
+                case '=':
+                    return true;
+                default:
+                    return false;
+            }
         }
 
     public:
@@ -941,7 +973,7 @@ namespace jsoncons {
                         break;
                     default:
                     {
-                        bool escaped = is_escaped(sv.data()+i,3);
+                        bool escaped = is_pct_encoded(sv.data()+i,3);
                         if (!is_unreserved(ch) && !is_punct(ch) && !escaped)
                         {
                             encoded.push_back('%');
@@ -1006,7 +1038,7 @@ namespace jsoncons {
             {
                 char ch = sv[i];
 
-                bool escaped = is_escaped(sv.data()+i,3);
+                bool escaped = is_pct_encoded(sv.data()+i,3);
                 if (!is_unreserved(ch) && !is_punct(ch) && !escaped)
                 {
                     encoded.push_back('%');
@@ -1056,7 +1088,7 @@ namespace jsoncons {
             {
                 char ch = sv[i];
 
-                bool escaped = is_escaped(sv.data()+i,3);
+                bool escaped = is_pct_encoded(sv.data()+i,3);
                 if (!is_unreserved(ch) && !is_reserved(ch) && !escaped)
                 {
                     encoded.push_back('%');
@@ -1098,71 +1130,19 @@ namespace jsoncons {
         // rel_segment   = 1*( unreserved | escaped | ";" | "@" | "&" | "=" | "+" | "$" | "," )
         static bool is_rel_segment(char c, const char* s, std::size_t length)
         {
-            return is_unreserved(c) || is_escaped(s,length) || c == ';' || c == '@' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
+            return is_unreserved(c) || is_pct_encoded(s,length) || c == ';' || c == '@' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
         }
 
         // userinfo      = *( unreserved | escaped | ";" | ":" | "&" | "=" | "+" | "$" | "," )
 
         static bool is_userinfo(char c, const char* s, std::size_t length)
         {
-            return is_unreserved(c) || is_escaped(s,length) || c == ';' || c == ':' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
+            return is_unreserved(c) || is_pct_encoded(s,length) || c == ';' || c == ':' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
         }
 
         static bool is_pchar(char c, const char* s, std::size_t length)
         {
-            return is_unreserved(c) || is_escaped(s,length) || c == ':' || c == '@' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
-        }
-        
-        // domainlabel   = alphanum | alphanum *( alphanum | "-" ) alphanum
-        static bool validate_domainlabel(jsoncons::string_view sv)
-        {
-            if (sv.empty())
-            {
-                return false;
-            }
-            if (!is_alphanum(sv[0]))
-            {
-                return false;
-            }
-            std::size_t last = sv.size() - 1;
-            for (std::size_t i = 1; i < last; ++i)
-            {
-                if (!(is_alphanum(sv[i]) || sv[i] == '-'))
-                {
-                    return false;
-                }
-            }
-            if (!is_alphanum(sv[last]))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        // toplabel   = alphanum | alphanum *( alphanum | "-" ) alphanum
-        static bool validate_toplabel(jsoncons::string_view sv)
-        {
-            if (sv.empty())
-            {
-                return false;
-            }
-            if (!is_alpha(sv[0]))
-            {
-                return false;
-            }
-            std::size_t last = sv.size() - 1;
-            for (std::size_t i = 1; i < last; ++i)
-            {
-                if (!(is_alphanum(sv[i]) || sv[i] == '-'))
-                {
-                    return false;
-                }
-            }
-            if (!is_alphanum(sv[last]))
-            {
-                return false;
-            }
-            return true;
+            return is_unreserved(c) || is_pct_encoded(s,length) || is_sub_delim(c) || c == ':' || c == '@';
         }
     };
 

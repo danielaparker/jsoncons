@@ -195,7 +195,7 @@ TEST_CASE("jsonschema draft2019-09 tests")
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/uri-template.json");
 */
 
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft201909/optional/content.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/content.json");
     }
 //#endif    
 }
