@@ -1,16 +1,16 @@
 ### jsonschema extension
 
-The jsonschema extension implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) specification for validating input JSON. (since 0.160.0)
+The jsonschema extension implements Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification)
+(since 0.174.0).
 
-A preview of our upcoming support for Drafts 2019-09 and 2020-12 is available on master branch, see [make_json_schema](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonschema/make_json_schema.md).
+### Compliance 
 
-### Compliance level
+#### Keywords
 
-The jsoncons implementation passes all [draft 7 required tests](https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/master/tests/draft7).
+The jsoncons implementation passes all required tests in the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite/) for the keywords below.
 
-In addition, the validator understands the following optional [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
-| Keyword                    | Draft 4 | Draft 6 | Draft 7 | Draft 2019-09 | Draft 2020-12 |
-|:---------------------------|:-------:|:-------:|:-------:|:-------------:|:-------------:|
+| Keyword                    | Draft 4   | Draft 6   | Draft 7   | Draft 2019-09 | Draft 2020-12 |
+|:--------------------------:|:---------:|:---------:|:---------:|:---------:|:---------:|
 | $anchor                    |           |           |           | &#x1F7E2; | &#x1F7E2; |
 | $defs                      |           |           |           | &#x1F7E2; | &#x1F7E2; |
 | $dynamicAnchor             |           |           |           |           | &#x1F7E2; |
@@ -28,7 +28,6 @@ In addition, the validator understands the following optional [format types](htt
 | contains                   |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | contentEncoding            |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | contentMediaType           |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
-| contentSchema              |           |           |           | &#x1F7E2; | &#x1F7E2; |
 | definitions                | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |           |           |
 | dependencies               | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |           |           |
 | dependentRequired          |           |           |           | &#x1F7E2; | &#x1F7E2; |
@@ -64,25 +63,32 @@ In addition, the validator understands the following optional [format types](htt
 | unevaluatedProperties      |           |           |           | &#x1F7E2; | &#x1F7E2; |
 | uniqueItems                | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 
-|                      | Draft 7            |
-|----------------------|--------------------|
-| date                 |  &#x1F7E2; |
-| date-time            |  &#x1F7E2; |
-| email                |  &#x1F7E2; |
-| hostname             |  &#x1F7E2; |
-| ipv4                 |  &#x1F7E2; |
-| ipv6                 |  &#x1F7E2; |
-| json-pointer         |  &#x1F7E2; |
-| regex                |  &#x1F7E2; |
-| time                 |  &#x1F7E1; |
+#### Format
+
+The implementation understands the following [formats](https://json-schema.org/understanding-json-schema/reference/string.html#format):
+
+| Format        | Draft 4   | Draft 6   | Draft 7   | Draft 2019-09 | Draft 2020-12 |
+|:-------------:|:---------:|:---------:|:---------:|:---------:|:---------:|
+| date          |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| date-time     | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| email         | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| hostname      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| ipv4          | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| ipv6          | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| json-pointer  |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| regex         | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| time          |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 
 Any other format type is ignored.
+
+By default, since Draft 2019-09, format is no longer an assertion. It can be configured to be an assertion 
+by setting the evaluation option `require_format_validation` to `true` 
 
 ### Classes
 <table border="0">
   <tr>
-    <td><a href="json_validator.md">json_validator</a></td>
-    <td>JSON Schema validator.</td> 
+    <td><a href="json_schema.md">json_schema</a></td>
+    <td>A <code>json_schema</code> represents the compiled form of a JSON Schema document.</td> 
   </tr>
 </table>
 
@@ -90,8 +96,8 @@ Any other format type is ignored.
 
 <table border="0">
   <tr>
-    <td><a href="make_schema.md">make_schema</a></td>
-    <td>Loads a JSON Schema and returns a shared pointer to a <code>json_schema</code>. 
+    <td><a href="make_json_schema.md">make_json_schema</a></td>
+    <td>Processes a JSON Schema document and returns the compiled form as a <code>json_schema</code>. 
   </tr>
 </table>
   
@@ -100,7 +106,7 @@ Any other format type is ignored.
 The JSON Schema Specification includes the ["default" keyword](https://json-schema.org/understanding-json-schema/reference/generic.html)  
 for specifying a default value, but doesn't prescribe how implementations should use it during validation.
 Some implementations ignore the default keyword, others support updating the input JSON to fill in a default value 
-for a missing key/value pair. This implementation returns a JSONPatch document that may be further applied to the input JSON to add the
+for a missing key/value pair. This implementation outputs a JSONPatch document that may be further applied to the input JSON to add the
 missing key/value pairs.
   
 ### Examples
@@ -192,19 +198,17 @@ int main()
     try
     {
         // Throws schema_error if JSON Schema loading fails
-        auto sch = jsonschema::make_schema(schema);
+        json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& o)
         {
             ++error_count;
             std::cout << o.instance_location() << ": " << o.message() << "\n";
         };
 
-        jsonschema::json_validator<json> validator(sch);
-
         // Will call reporter for each schema violation
-        validator.validate(data, reporter);
+        compiled.validate(data, reporter);
 
         std::cout << "\nError count: " << error_count << "\n\n";
     }
@@ -299,19 +303,17 @@ int main()
     try
     {
        // Throws schema_error if JSON Schema loading fails
-       auto sch = jsonschema::make_schema(schema, resolver);
+       json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
        std::size_t error_count = 0;
-       auto reporter = [&error_count](const jsonschema::validation_output& o)
+       auto reporter = [&error_count](const jsonschema::validation_message& o)
        {
            ++error_count;
             std::cout << o.instance_location() << ": " << o.message() << "\n";
        };
 
-       jsonschema::json_validator<json> validator(sch);
-
        // Will call reporter for each schema violation
-       validator.validate(data, reporter);
+       compiled.validate(data, reporter);
 
        std::cout << "\nError count: " << error_count << "\n\n";
     }
@@ -458,12 +460,10 @@ int main()
         json data = json::parse(test_data);
 
         // Throws schema_error if JSON Schema loading fails
-        auto sch = jsonschema::make_schema(schema);
-
-        jsonschema::json_validator<json> validator(sch);
+        json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         // Test that input is valid before attempting to decode
-        if (validator.is_valid(data))
+        if (compiled.is_valid(data))
         {
             const ns::job_properties v = data.as<ns::job_properties>(); 
 
@@ -473,7 +473,7 @@ int main()
 
             // Verify that output is valid
             json test = json::parse(output);
-            assert(validator.is_valid(test));
+            assert(compiled.is_valid(test));
         }
         else
         {
@@ -532,12 +532,11 @@ int main()
     try
     {
        // will throw schema_error if JSON Schema loading fails 
-       auto sch = jsonschema::make_schema(schema); 
-
-       jsonschema::json_validator<json> validator(sch); 
+       json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 
        // will throw a validation_error on first encountered schema violation 
-       json patch = validator.validate(data); 
+       json patch;
+       compiled.validate(data, patch); 
 
        std::cout << "Patch: " << patch << "\n";
 
