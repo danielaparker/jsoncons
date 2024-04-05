@@ -42,7 +42,6 @@ namespace draft201909 {
         using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type&)>;
 
-        std::unordered_map<std::string,keyword_factory_type> applicator_factory_map_;
         std::unordered_map<std::string,keyword_factory_type> validation_factory_map_;
 
         static const std::string& core_id()
@@ -122,11 +121,6 @@ namespace draft201909 {
 
         void init()
         {
-            applicator_factory_map_.emplace("propertyNames", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_property_names_validator(context, sch, anchor_dict);});
-            applicator_factory_map_.emplace("dependentSchemas", 
-                [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type& anchor_dict){return this->make_dependent_schemas_validator(context, sch, anchor_dict);});
-
             validation_factory_map_.emplace("type", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_type_validator(context, sch);});
 /*
@@ -312,20 +306,19 @@ namespace draft201909 {
             }
             
             if (include_applicator_)
-            {
-                for (const auto& key_value : sch.object_range())
+            {               
+                it = sch.find("propertyNames");
+                if (it != sch.object_range().end()) 
                 {
-                    auto factory_it = applicator_factory_map_.find(key_value.key());
-                    if (factory_it != applicator_factory_map_.end())
-                    {
-                        auto validator = factory_it->second(context, key_value.value(), sch, anchor_dict);
-                        if (validator)
-                        {   
-                            validators.emplace_back(std::move(validator));
-                        }
-                    }
+                    validators.emplace_back(this->make_property_names_validator(context, it->value(), anchor_dict));
                 }
-    
+
+                it = sch.find("dependentSchemas");
+                if (it != sch.object_range().end()) 
+                {
+                    validators.emplace_back(this->make_dependent_schemas_validator(context, it->value(), anchor_dict));
+                }
+                
                 schema_validator_type if_validator;
                 schema_validator_type then_validator;
                 schema_validator_type else_validator;
