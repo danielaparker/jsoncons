@@ -83,6 +83,7 @@ namespace draft202012 {
         bool include_applicator_;
         bool include_unevaluated_;
         bool include_validation_;
+        bool include_format_;
 
     public:
         schema_builder_202012(const schema_builder_factory_type& builder_factory, 
@@ -91,7 +92,7 @@ namespace draft202012 {
             const std::unordered_map<std::string,bool>& vocabulary) 
             : schema_builder<Json>(schema_version::draft202012(), 
                 builder_factory, options, schema_store_ptr, resolvers, vocabulary),
-                include_applicator_(true), include_unevaluated_(true), include_validation_(true)
+                include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
             if (!vocabulary.empty())
             {
@@ -109,6 +110,11 @@ namespace draft202012 {
                 if (it == vocabulary.end() || !(it->second))
                 {
                     include_validation_ = false;
+                }
+                it = vocabulary.find(format_annotation_id());
+                if (it == vocabulary.end() || !(it->second))
+                {
+                    include_format_ = false;
                 }
             }
             init();
@@ -130,11 +136,6 @@ namespace draft202012 {
             validation_factory_map_.emplace("contentMediaType", 
                 [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch, parent);});
 */                
-            if (this->options().require_format_validation())
-            {
-                validation_factory_map_.emplace("format", 
-                    [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_format_validator(context, sch);});
-            }
 #if defined(JSONCONS_HAS_STD_REGEX)
             validation_factory_map_.emplace("pattern", 
                 [&](const compilation_context& context, const Json& sch, const Json&, anchor_uri_map_type&){return this->make_pattern_validator(context, sch);});
@@ -422,6 +423,14 @@ namespace draft202012 {
                             validators.emplace_back(std::move(validator));
                         }
                     }
+                }
+            }
+
+            if (include_format_)
+            {
+                if (this->options().require_format_validation())
+                {
+                    validators.emplace_back(this->make_format_validator(context, sch));
                 }
             }
             
