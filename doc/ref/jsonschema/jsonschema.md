@@ -9,6 +9,60 @@ A preview of our upcoming support for Drafts 2019-09 and 2020-12 is available on
 The jsoncons implementation passes all [draft 7 required tests](https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/master/tests/draft7).
 
 In addition, the validator understands the following optional [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
+| Keyword                    | Draft 4 | Draft 6 | Draft 7 | Draft 2019-09 | Draft 2020-12 |
+|:---------------------------|:-------:|:-------:|:-------:|:-------------:|:-------------:|
+| $anchor                    |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| $defs                      |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| $dynamicAnchor             |           |           |           |           | &#x1F7E2; |
+| $dynamicRef                |           |           |           |           | &#x1F7E2; |
+| $id                        | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| $recursiveAnchor           |           |           |           | &#x1F7E2; |           |
+| $recursiveRef              |           |           |           | &#x1F7E2; |           |
+| $ref                       | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| $vocabulary                |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| additionalItems            | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| additionalProperties       | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| allOf                      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| anyOf                      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| const                      |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| contains                   |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| contentEncoding            |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| contentMediaType           |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| contentSchema              |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| definitions                | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |           |           |
+| dependencies               | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |           |           |
+| dependentRequired          |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| dependentSchemas           |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| enum                       | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| exclusiveMaximum (boolean) | &#x1F7E2; |           |           |           |           |
+| exclusiveMaximum (numeric) |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| exclusiveMinimum (boolean) | &#x1F7E2; |           |           |           |           |
+| exclusiveMinimum (numeric) |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| if-then-else               |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| items                      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| maxContains                |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| minContains                |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| maximum                    | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| maxItems                   | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| maxLength                  | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| maxProperties              | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| minimum                    | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| minItems                   | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| minLength                  | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| minProperties              | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| multipleOf                 | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| not                        | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| oneOf                      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| pattern                    | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| patternProperties          | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| prefixItems                |           |           |           |           | &#x1F7E2; |
+| properties                 | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| propertyNames              |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| required                   | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| type                       | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| unevaluatedItems           |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| unevaluatedProperties      |           |           |           | &#x1F7E2; | &#x1F7E2; |
+| uniqueItems                | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 
 |                      | Draft 7            |
 |----------------------|--------------------|
