@@ -12,14 +12,15 @@ In addition, the validator understands the following optional [format types](htt
 
 |                      | Draft 7            |
 |----------------------|--------------------|
-| date                 | <em>&#x2713;</em> |
-| time                 | <em>&#x2713;</em> |
-| date-time            | <em>&#x2713;</em> |
-| email                | <em>&#x2713;</em> |
-| hostname             | <em>&#x2713;</em> |
-| ipv4                 | <em>&#x2713;</em> |
-| ipv6                 | <em>&#x2713;</em> |
-| regex                | <em>&#x2713;</em> |
+| date                 | #00ff00 |
+| time                 | #00ff00 |
+| date-time            | #00ff00 |
+| email                | #00ff00 |
+| hostname             | #00ff00 |
+| ipv4                 | #00ff00 |
+| ipv6                 | #00ff00 |
+| json-pointer         | #00ff00 |
+| regex                | #00ff00 |
 
 Any other format type is ignored.
 
