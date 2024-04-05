@@ -20,7 +20,7 @@ In addition, the validator understands the following optional [format types](htt
 | ipv6                 |  &#x1F7E2; |
 | json-pointer         |  &#x1F7E2; |
 | regex                |  &#x1F7E2; |
-| time                 |  &#x1F7E2; |
+| time                 |  &#x1F7E1; |
 
 Any other format type is ignored.
 
