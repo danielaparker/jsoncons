@@ -12,8 +12,8 @@ In addition, the validator understands the following optional [format types](htt
 
 |                      | Draft 7            |
 |----------------------|--------------------|
-| date                 |  🟢 |
-| date-time            |  🟢 |
+| date                 |  &#x1F7E2; |
+| date-time            |  &#x01F7E2; |
 | email                |  🟢 |
 | hostname             |  🟢 |
 | ipv4                 |  🟢 |
