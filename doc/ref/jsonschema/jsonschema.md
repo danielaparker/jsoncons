@@ -19,7 +19,7 @@ In addition, the validator understands the following optional [format types](htt
 |                      | Draft 7            |
 |----------------------|--------------------|
 | date                 | `#00FF00` |
-| date-time            | #00ff00 |
+| date-time            |  🟢 |
 | email                | #00ff00 |
 | hostname             | #00ff00 |
 | ipv4                 | #00ff00 |
