@@ -165,7 +165,7 @@ TEST_CASE("jsonschema draft6 tests")
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/ipv6.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/iri.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/iri-reference.json");
-        //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/json-pointer.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/json-pointer.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/regex.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft6/optional/format/relative-json-pointer.json");
  
