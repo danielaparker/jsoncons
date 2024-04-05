@@ -1136,6 +1136,7 @@ namespace jsoncons {
             {
                 return false;
             }
+            return true;
         }
 
         // toplabel   = alphanum | alphanum *( alphanum | "-" ) alphanum
@@ -1161,6 +1162,7 @@ namespace jsoncons {
             {
                 return false;
             }
+            return true;
         }
     };
 

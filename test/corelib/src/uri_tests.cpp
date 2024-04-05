@@ -5,7 +5,7 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-#if 0
+//#if 0
 TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)")
 {
     SECTION("https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top")
@@ -139,7 +139,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
 
         jsoncons::uri relative("#/defs/bar");
         jsoncons::uri new_uri = relative.resolve(uri);
-        std::cout << "new_uri: " << new_uri.string() << "\n"; 
+        //std::cout << "new_uri: " << new_uri.string() << "\n"; 
     }
 }
 
@@ -330,20 +330,22 @@ TEST_CASE("uri constructors")
         CHECK(expected == y);       
     }
 }
-#endif
+//#endif
+
 TEST_CASE("uri parsing tests")
 {
     SECTION("an invalid URI with spaces")
     {
-        std::string str = "http:// shouldfail.com";
+        std::string str = "http://shouldfail.com";
         
         std::error_code ec;
         jsoncons::uri id = jsoncons::uri::parse(str, ec);
         
-        std::cout << "authority: [" << id.encoded_authority() << "]\n";
+        /*std::cout << "authority: [" << id.encoded_authority() << "]\n";
         std::cout << "host: [" << id.encoded_host() << "]\n";
         std::cout << "port: [" << id.encoded_port() << "]\n";
         std::cout << "path: [" << id.encoded_path() << "]\n";
+        */
 
         //CHECK(ec);       
     }
