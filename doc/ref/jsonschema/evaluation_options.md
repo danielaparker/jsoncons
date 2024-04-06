@@ -8,7 +8,7 @@ class evaluation_options;
 
 <br>
 
-Specifies options for evaluating JSON Schema documents.
+Allows configuration of JSON Schema evaluation.
 
 #### Constructors
 

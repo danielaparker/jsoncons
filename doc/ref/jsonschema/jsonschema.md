@@ -90,6 +90,14 @@ by setting the evaluation option `require_format_validation` to `true`
     <td><a href="json_schema.md">json_schema</a></td>
     <td>A <code>json_schema</code> represents the compiled form of a JSON Schema document.</td> 
   </tr>
+  <tr>
+    <td><a href="evaluation_options.md">evaluation_options</a></td>
+    <td>Specifies options for evaluating JSON Schema documents.</td> 
+  </tr>
+  <tr>
+    <td><a href="validation_message.md"></a></td>
+    <td>Allows configuration of JSON Schema evaluation.</td> 
+  </tr>
 </table>
 
 ### Functions
@@ -201,10 +209,10 @@ int main()
         json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_message& o)
+        auto reporter = [&error_count](const jsonschema::validation_message& msg)
         {
             ++error_count;
-            std::cout << o.instance_location() << ": " << o.message() << "\n";
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
         };
 
         // Will call reporter for each schema violation
@@ -306,10 +314,10 @@ int main()
        json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
        std::size_t error_count = 0;
-       auto reporter = [&error_count](const jsonschema::validation_message& o)
+       auto reporter = [&error_count](const jsonschema::validation_message& msg)
        {
            ++error_count;
-            std::cout << o.instance_location() << ": " << o.message() << "\n";
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
        };
 
        // Will call reporter for each schema violation
