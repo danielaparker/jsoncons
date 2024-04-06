@@ -34,9 +34,9 @@ The jsoncons implementation passes all required tests in the [JSON Schema Test S
 | dependentSchemas           |           |           |           | &#x1F7E2; | &#x1F7E2; |
 | enum                       | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | exclusiveMaximum (boolean) | &#x1F7E2; |           |           |           |           |
-| exclusiveMaximum (numeric) |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| exclusiveMaximum           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | exclusiveMinimum (boolean) | &#x1F7E2; |           |           |           |           |
-| exclusiveMinimum (numeric) |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
+| exclusiveMinimum           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | if-then-else               |           |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | items                      | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | maxContains                |           |           |           | &#x1F7E2; | &#x1F7E2; |
