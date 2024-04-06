@@ -28,7 +28,7 @@ namespace jsonschema {
             
         std::unique_ptr<schema_builder<Json>> operator()(const Json& sch, 
             const evaluation_options& options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<json>>& resolvers,
+            const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
@@ -93,7 +93,7 @@ namespace jsonschema {
 
         std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& schema_id,
             const evaluation_options& options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<json>>& resolvers,
+            const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
@@ -132,7 +132,7 @@ namespace jsonschema {
         
         std::unique_ptr<schema_builder<Json>> get_builder_from_meta_schema(const jsoncons::string_view& schema_id,
             const evaluation_options& options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<json>>& resolvers) const
+            const std::vector<schema_resolver<Json>>& resolvers) const
         {
             std::unique_ptr<schema_builder<Json>> builder;
 

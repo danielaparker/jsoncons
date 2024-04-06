@@ -24,7 +24,7 @@ namespace jsonschema {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
-            const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<json>>&,
+            const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<Json>>&,
             const std::unordered_map<std::string,bool>&)>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
@@ -52,7 +52,7 @@ namespace jsonschema {
 
         schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<json>>& resolvers)
+            const std::vector<schema_resolver<Json>>& resolvers)
             : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers)
         {
@@ -61,7 +61,7 @@ namespace jsonschema {
 
         schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<json>>& resolvers,
+            const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary)
             : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers), vocabulary_(vocabulary)
