@@ -110,8 +110,12 @@ json resolver(const jsoncons::uri& uri)
     pathname += std::string(uri.path());
 
     std::fstream is(pathname.c_str());
+    if (!is)
+    {
+        return json::null();
+    }
 
-    return !is ? json::null() : json::parse(is);        
+    return json::parse(is);        
 }
 
 void uriresolver_example()
@@ -122,7 +126,7 @@ void uriresolver_example()
     "$id": "http://localhost:1234/object",
     "type": "object",
     "properties": {
-        "name": {"$ref": "name.json#/definitions/orNull"}
+        "name": {"$ref": "name.json#/$defs/orNull"}
     }
 }
     )");
@@ -470,9 +474,9 @@ int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 
-    reporter_example();
+    //reporter_example();
     uriresolver_example();
-    defaults_example();
+    /*defaults_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
@@ -483,7 +487,7 @@ int main()
     draft_07_example();
     
     cross_schema_example();
-    
+*/    
     std::cout << "\n";
 }
 

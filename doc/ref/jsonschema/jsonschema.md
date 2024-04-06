@@ -229,8 +229,8 @@ int main()
 
 Output:
 ```
-#/vegetables/1/veggieLike: Expected boolean, found string
-#/vegetables/3: Required key "veggieLike" not found
+/vegetables/1/veggieLike: Expected boolean, found string
+/vegetables/3: Required property 'veggieLike' not found.
 
 Error count: 2
 ```
@@ -281,7 +281,9 @@ json resolver(const jsoncons::uri& uri)
 
     std::fstream is(pathname.c_str());
     if (!is)
-        throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
+    {
+        return json::null();
+    }
 
     return json::parse(is);        
 }
@@ -294,7 +296,7 @@ int main()
     "$id": "http://localhost:1234/object",
     "type": "object",
     "properties": {
-        "name": {"$ref": "name.json#/definitions/orNull"}
+        "name": {"$ref": "name.json#/$defs/orNull"}
     }
 }
     )");
@@ -333,7 +335,7 @@ int main()
 ```
 Output:
 ```
-#/name: No rule matched, but one of them is required to match
+/name: Expected string, found object
 
 Error count: 1
 ```
