@@ -350,6 +350,8 @@ int main()
 ```
 Output:
 ```
+uri: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name-defs.json
+
 /name: No schema matched, but at least one of them is required to match
     Expected null, found object
     Expected string, found object
