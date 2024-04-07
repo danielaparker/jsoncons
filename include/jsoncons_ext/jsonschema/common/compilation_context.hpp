@@ -19,7 +19,7 @@ namespace jsonschema {
 
     class compilation_context
     {
-        uri_wrapper absolute_uri_;
+        uri_wrapper base_uri_;
         std::vector<uri_wrapper> uris_;
         jsoncons::optional<uri> id_;
     public:
@@ -29,7 +29,7 @@ namespace jsonschema {
         }
 
         explicit compilation_context(const uri_wrapper& retrieval_uri)
-            : absolute_uri_(retrieval_uri), 
+            : base_uri_(retrieval_uri), 
               uris_(std::vector<uri_wrapper>{{retrieval_uri}})
         {
         }
@@ -37,13 +37,13 @@ namespace jsonschema {
         explicit compilation_context(const std::vector<uri_wrapper>& uris)
             : uris_(uris)
         {
-            absolute_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
+            base_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
         }
 
         explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id)
             : uris_(uris), id_(id)
         {
-            absolute_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
+            base_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
         }
 
         const std::vector<uri_wrapper>& uris() const {return uris_;}
@@ -55,12 +55,12 @@ namespace jsonschema {
 
         const uri_wrapper& get_absolute_uri2() const
         {
-            return absolute_uri_;
+            return base_uri_;
         }
 
         uri get_base_uri() const
         {
-            return absolute_uri_.uri();
+            return base_uri_.uri();
         }
 
         std::string make_schema_path_with(const std::string& keyword) const
