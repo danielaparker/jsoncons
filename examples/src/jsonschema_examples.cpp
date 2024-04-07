@@ -479,13 +479,13 @@ int main()
     validate_before_decode_example();
 #endif
     defaults_example();
-/*
+
     draft_201212_example();
     draft_201909_example();
     draft_07_example();
     
     cross_schema_example();
-*/    
+    
     std::cout << "\n";
 }
 
