@@ -109,7 +109,7 @@ namespace jsonschema {
             //}
 
             // load all external schemas that have not already been loaded           
-
+            // new unresolved refs may be added to the end as earlier ones are resolved
             for (std::size_t i = 0; i < unresolved_refs_.size(); ++i)
             {
                 auto loc = unresolved_refs_[i].first;
@@ -129,9 +129,17 @@ namespace jsonschema {
                             found = true;
                         }
                     }
-                    if (!found)
+                    if (found)
                     {
-                        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
+                        // Try resolving again
+                        if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) 
+                        {
+                            JSONCONS_THROW(jsonschema::schema_error("Unresolved reference '" + loc.string() + "'"));
+                        }
+                    }
+                    else
+                    {
+                        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema '" + loc.base().string() + "'" ));
                     }
                 }
             }
