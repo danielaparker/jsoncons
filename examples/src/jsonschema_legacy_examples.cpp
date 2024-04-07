@@ -149,6 +149,10 @@ void uriresolver_example()
         {
             ++error_count;
             std::cout << o.instance_location() << ": " << o.message() << "\n";
+            for (const auto& detail : o.nested_errors())
+            {
+                std::cout << "    "  << detail.message() << "\n";
+            }
         };
 
         jsonschema::json_validator<json> validator(sch);
@@ -168,12 +172,13 @@ void defaults_example()
 {
     // JSON Schema
     json schema = json::parse(R"(
-
-"properties": {
-    "bar": {
-        "type": "string",
-        "minLength": 4,
-        "default": "bad"
+{
+    "properties": {
+        "bar": {
+            "type": "string",
+            "minLength": 4,
+            "default": "bad"
+        }
     }
 }
 

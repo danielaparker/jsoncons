@@ -166,11 +166,11 @@ void defaults_example()
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-    "bar": {
-        "type": "string",
-        "minLength": 4,
-        "default": "bad"
-    }
+        "bar": {
+            "type": "string",
+            "minLength": 4,
+            "default": "bad"
+        }
     }
 }
 )");
