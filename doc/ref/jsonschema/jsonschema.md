@@ -139,13 +139,13 @@ that writes to a `json_visitor` is invoked.
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
 // for brevity
-using jsoncons::json;
+using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema; 
 
 int main() 
 {
     // JSON Schema
-    json schema = json::parse(R"(
+    ojson schema = ojson::parse(R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -183,7 +183,7 @@ int main()
     )");
 
     // Data
-    json data = json::parse(R"(
+    ojson data = ojson::parse(R"(
 {
   "fruits": [ "apple", "orange", "pear" ],
   "vegetables": [
@@ -209,7 +209,7 @@ int main()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
 
         auto reporter = [](const jsonschema::validation_message& message)
         {
@@ -363,47 +363,18 @@ This example illustrates decoding data that validates against "oneOf"
 into a `std::variant`.
 
 ```cpp
-#include <variant> // This example requires C++17
-#include <iostream>
-#include <cassert>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema.hpp>
-
 // for brevity
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema; 
 
-namespace ns {
-
-    struct os_properties {
-        std::string command;
-    };
-
-    struct db_properties {
-        std::string query;
-    };
-
-    struct api_properties {
-        std::string target;
-    };
-
-    struct job_properties {
-        std::string name;
-        std::variant<os_properties,db_properties,api_properties> run;
-    };
-
-} // namespace ns
-
-JSONCONS_N_MEMBER_TRAITS(ns::os_properties, 1, command)
-JSONCONS_N_MEMBER_TRAITS(ns::db_properties, 1, query)
-JSONCONS_N_MEMBER_TRAITS(ns::api_properties, 1, target)
-JSONCONS_N_MEMBER_TRAITS(ns::job_properties, 2, name, run)
-
-std::string test_schema = R"(
+int main()
+{ 
+    json schema = json::parse(R"(
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "job",
   "description": "job properties json schema",
-  "definitions": {
+  "$defs": {
     "os_properties": {
       "type": "object",
       "properties": {
@@ -455,60 +426,15 @@ std::string test_schema = R"(
       "type": "object",
       "oneOf": [
 
-        { "$ref": "#/definitions/os_properties" },
-        { "$ref": "#/definitions/db_properties" },
-        { "$ref": "#/definitions/api_properties" }
+        { "$ref": "#/$defs/os_properties" },
+        { "$ref": "#/$defs/db_properties" },
+        { "$ref": "#/$defs/api_properties" }
 
       ]
     }
   },
   "required": [ "name", "run" ],
   "additionalProperties":  false
-}
-)";
-
-std::string test_data = R"(
-{
-    "name": "testing flow", 
-    "run" : {
-            "command": "some command"    
-            }
-}
-
-)";
-
-int main() 
-{
-    try
-    {
-        json schema = json::parse(test_schema);
-        json data = json::parse(test_data);
-
-        // Throws schema_error if JSON Schema compilation fails
-        json_schema<json> compiled = jsonschema::make_json_schema(schema);
-
-        // Test that input is valid before attempting to decode
-        if (compiled.is_valid(data))
-        {
-            const ns::job_properties v = data.as<ns::job_properties>(); 
-
-            std::string output;
-            jsoncons::encode_json(v, output, indenting::indent);
-            std::cout << output << std::endl;
-
-            // Verify that output is valid
-            json test = json::parse(output);
-            assert(compiled.is_valid(test));
-        }
-        else
-        {
-            std::cout << "Invalid input\n";
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << '\n';
-    }
 }
 ```
 Output:
@@ -538,42 +464,42 @@ namespace jsonpatch = jsoncons::jsonpatch;
 
 int main() 
 {
-    // JSON Schema
     json schema = json::parse(R"(
 {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-        "bar": {
-            "type": "string",
-            "minLength": 4,
-            "default": "bad"
-        }
+    "bar": {
+        "type": "string",
+        "minLength": 4,
+        "default": "bad"
+    }
     }
 }
-    )");
-
-    // Data
-    json data = json::parse("{}");
+)");
 
     try
     {
-       // will throw schema_error if JSON Schema compilation fails 
-       json_schema<json> compiled = jsonschema::make_json_schema(schema); 
+        // Data
+        json data = json::parse("{}");
 
-       // will throw a validation_error on first encountered schema violation 
-       json patch;
-       compiled.validate(data, patch); 
+        // will throw schema_error if JSON Schema compilation fails 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
 
-       std::cout << "Patch: " << patch << "\n";
+        // will throw a validation_error when a schema violation happens 
+        json patch;
+        compiled.validate(data, patch); 
 
-       std::cout << "Original data: " << data << "\n";
+        std::cout << "Patch: " << patch << "\n";
 
-       jsonpatch::apply_patch(data, patch);
+        std::cout << "Original data: " << data << "\n";
 
-       std::cout << "Patched data: " << data << "\n\n";
+        jsonpatch::apply_patch(data, patch);
+
+        std::cout << "Patched data: " << data << "\n\n";
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << '\n';
+        std::cout << e.what() << "\n";
     }
 }
 ```

@@ -14,10 +14,9 @@ using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch; 
 
-void reporter_example() 
+void write_to_json_visitor_example() 
 {
-    // JSON Schema
-    json schema = json::parse(R"(
+    ojson schema = ojson::parse(R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -55,7 +54,7 @@ void reporter_example()
     )");
 
     // Data
-    json data = json::parse(R"(
+    ojson data = ojson::parse(R"(
 {
   "fruits": [ "apple", "orange", "pear" ],
   "vegetables": [
@@ -81,7 +80,7 @@ void reporter_example()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
 
         auto reporter = [](const jsonschema::validation_message& message)
         {
@@ -163,7 +162,6 @@ void uriresolver_example()
 
 void defaults_example() 
 {
-    // JSON Schema
     json schema = json::parse(R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -474,14 +472,14 @@ int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 
-    reporter_example();
+    write_to_json_visitor_example();
     uriresolver_example();
-    /*defaults_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
 #endif
-
+    defaults_example();
+/*
     draft_201212_example();
     draft_201909_example();
     draft_07_example();
