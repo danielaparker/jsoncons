@@ -114,7 +114,7 @@ by setting the evaluation option `require_format_validation` to `true`
   
 ### Default values
   
-The JSON Schema Specification includes the ["default" keyword](https://json-schema.org/understanding-json-schema/reference/generic.html)  
+The JSON Schema Specification includes the ["default" keyword](https://json-schema.org/understanding-json-schema/reference/generic.html)
 for specifying a default value, but doesn't prescribe how implementations should use it during validation.
 Some implementations ignore the default keyword, others support updating the input JSON to fill in a default value 
 for a missing key/value pair. This implementation outputs a JSONPatch document that may be further applied to the input JSON to add the
