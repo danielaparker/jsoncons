@@ -130,7 +130,7 @@ namespace draft7 {
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
-            //std::cout << "make_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
+            //std::cout << "make_schema_validator " << context.get_base_uri().string() << ", " << new_context.get_base_uri().string() << "\n\n";
 
             schema_validator_type schema_validator_ptr;
 
@@ -138,7 +138,7 @@ namespace draft7 {
             {
                 case json_type::bool_value:
                 {
-                    uri schema_location = new_context.get_absolute_uri();
+                    uri schema_location = new_context.get_base_uri();
                     schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
                         schema_location, sch.template as<bool>());
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -168,10 +168,10 @@ namespace draft7 {
 
                         Json default_value{ jsoncons::null_type() };
                         uri_wrapper relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(uri_wrapper{ context.get_absolute_uri() });
+                        auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
                         validators.push_back(this->get_or_create_reference(id));
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
-                            new_context.get_absolute_uri(), context.id(),
+                            new_context.get_base_uri(), context.id(),
                             std::move(validators), std::move(defs), std::move(default_value));
                     }
                     else
@@ -193,7 +193,7 @@ namespace draft7 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_absolute_uri().string() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_base_uri().string() + ", expected: boolean or object"));
                     break;
             }
             
@@ -264,7 +264,7 @@ namespace draft7 {
             if (if_validator || then_validator || else_validator)
             {
                 validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                    context.get_absolute_uri().string(),
+                    context.get_base_uri().string(),
                     std::move(if_validator), std::move(then_validator), std::move(else_validator)));
             }
             
@@ -318,7 +318,7 @@ namespace draft7 {
                     validators.emplace_back(this->make_items_validator(context, it->value(), anchor_dict));
                 }
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
         }
 
@@ -327,7 +327,7 @@ namespace draft7 {
         std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_location = context.get_absolute_uri();
+            uri schema_location = context.get_base_uri();
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             
             for (const auto& prop : sch.object_range())
@@ -375,7 +375,7 @@ namespace draft7 {
                 if (it != sch.object_range().end()) 
                 {
                     uri_wrapper relative(it->value().template as<std::string>()); 
-                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_absolute_uri() });
+                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
                     id = new_uri.uri();
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
@@ -391,7 +391,7 @@ namespace draft7 {
                 new_uris.emplace_back("#");
             }
 /*
-            std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            std::cout << "Absolute URI: " << parent.get_base_uri().string() << "\n";
             for (const auto& uri : new_uris)
             {
                 std::cout << "    " << uri.string() << "\n";

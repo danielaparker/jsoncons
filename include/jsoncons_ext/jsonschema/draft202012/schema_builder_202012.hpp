@@ -194,7 +194,7 @@ namespace draft202012 {
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
-            //std::cout << "this->make_cross_draft_schema_validator " << context.get_absolute_uri().string() << ", " << new_context.get_absolute_uri().string() << "\n\n";
+            //std::cout << "this->make_cross_draft_schema_validator " << context.get_base_uri().string() << ", " << new_context.get_base_uri().string() << "\n\n";
 
             schema_validator_type schema_validator_ptr;
 
@@ -202,7 +202,7 @@ namespace draft202012 {
             {
                 case json_type::bool_value:
                 {
-                    uri schema_location = new_context.get_absolute_uri();
+                    uri schema_location = new_context.get_base_uri();
                     schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
                         schema_location, sch.template as<bool>());
                     schema_validator<Json>* p = schema_validator_ptr.get();
@@ -231,7 +231,7 @@ namespace draft202012 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_absolute_uri().string() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_base_uri().string() + ", expected: boolean or object"));
                     break;
             }
             
@@ -347,7 +347,7 @@ namespace draft202012 {
                 if (if_validator || then_validator || else_validator)
                 {
                     validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                        context.get_absolute_uri().string(),
+                        context.get_base_uri().string(),
                         std::move(if_validator), std::move(then_validator), std::move(else_validator)));
                 }
                 // Object validators
@@ -461,7 +461,7 @@ namespace draft202012 {
             {
                 anchor_schema_map.emplace(member.first, this->get_or_create_reference(member.second));
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_absolute_uri(), std::move(id),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
                 std::move(validators), std::move(unevaluated_properties_val), std::move(unevaluated_items_val), 
                 std::move(defs), std::move(default_value), std::move(dynamic_anchor), std::move(anchor_schema_map));
         }
@@ -501,7 +501,7 @@ namespace draft202012 {
         std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator( const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_location = context.get_absolute_uri();
+            uri schema_location = context.get_base_uri();
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             
             for (const auto& prop : sch.object_range())
@@ -601,7 +601,7 @@ namespace draft202012 {
                 }
             }
 
-            //std::cout << "Absolute URI: " << parent.get_absolute_uri().string() << "\n";
+            //std::cout << "Absolute URI: " << parent.get_base_uri().string() << "\n";
             //for (const auto& uri : new_uris)
             //{
             //    std::cout << "    " << uri.string() << "\n";

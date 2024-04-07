@@ -53,11 +53,6 @@ namespace jsonschema {
             return id_;
         }
 
-        const uri& get_absolute_uri() const
-        {
-            return absolute_uri_.uri();
-        }
-
         const uri_wrapper& get_absolute_uri2() const
         {
             return absolute_uri_;
