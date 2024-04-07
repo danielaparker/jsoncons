@@ -109,7 +109,7 @@ namespace jsonschema {
             //}
 
             // load all external schemas that have not already been loaded           
-            
+
             std::size_t loaded_count = 0;
             do
             {
@@ -129,7 +129,7 @@ namespace jsonschema {
                             if (external_sch.is_object() || external_sch.is_bool())
                             {
                                 anchor_uri_map_type anchor_dict2;
-                                this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc)), 
+                                this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
                                     external_sch, {}, anchor_dict2));
                                 ++loaded_count;
                                 found = true;
