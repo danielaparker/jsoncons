@@ -43,6 +43,6 @@ Returns a `shared_ptr` to a `json_schema<Json>`.
 
 #### Exceptions
 
-(1)-(2) Throws a [schema_error](schema_error.md) if JSON Schema loading fails.
+(1)-(2) Throws a [schema_error](schema_error.md) if JSON Schema compilation fails.
 
 

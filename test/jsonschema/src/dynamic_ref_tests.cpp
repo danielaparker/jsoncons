@@ -77,7 +77,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
 
         try
         {
-            // will throw schema_error if JSON Schema loading fails 
+            // will throw schema_error if JSON Schema compilation fails 
 
             // Data
             json data = json::parse(data_string);
@@ -164,7 +164,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
 
         try
         {
-            // will throw schema_error if JSON Schema loading fails 
+            // will throw schema_error if JSON Schema compilation fails 
 
             // Data
             json data = json::parse(data_string);
@@ -242,7 +242,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
     {
         try
         {
-            // will throw schema_error if JSON Schema loading fails 
+            // will throw schema_error if JSON Schema compilation fails 
 
             // Data
             json data(jsoncons::null_type{});

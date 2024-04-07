@@ -38,7 +38,7 @@ TEST_CASE("jsonschema defaults tests")
             // Data
             json data = json::parse("{}");
 
-            // will throw schema_error if JSON Schema loading fails 
+            // will throw schema_error if JSON Schema compilation fails 
             jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 
             // will throw a validation_error when a schema violation happens 
@@ -81,7 +81,7 @@ TEST_CASE("jsonschema defaults tests")
             // Data
             json data = json::parse("{}");
 
-            // will throw schema_error if JSON Schema loading fails 
+            // will throw schema_error if JSON Schema compilation fails 
             auto sch = jsonschema::make_schema(schema); 
             jsonschema::json_validator<json> validator(sch);
 

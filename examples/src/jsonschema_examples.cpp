@@ -20,7 +20,7 @@ void reporter_example()
     json schema = json::parse(R"(
 {
   "$id": "https://example.com/arrays.schema.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "A representation of a person, company, organization, or place",
   "type": "object",
   "properties": {
@@ -32,10 +32,10 @@ void reporter_example()
     },
     "vegetables": {
       "type": "array",
-      "items": { "$ref": "#/definitions/veggie" }
+      "items": { "$ref": "#/$defs/veggie" }
     }
   },
-  "definitions": {
+  "$defs": {
     "veggie": {
       "type": "object",
       "required": [ "veggieName", "veggieLike" ],
@@ -80,20 +80,18 @@ void reporter_example()
 
     try
     {
-        // Throws schema_error if JSON Schema loading fails
+        // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
-        std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& message)
         {
-            ++error_count;
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
 
-        // Will call reporter for each schema violation
-        compiled.validate(data, reporter);
-
-        std::cout << "\nError count: " << error_count << "\n\n";
+        jsoncons::json_decoder<ojson> decoder;
+        compiled.validate(data, decoder);
+        ojson assertions = decoder.get_result();
+        std::cout << pretty_print(assertions) << "\n";
     }
     catch (const std::exception& e)
     {
@@ -101,7 +99,7 @@ void reporter_example()
     }
 }
 
-// Until 0.174.0, throw instead of returning json::null() 
+// Until 0.174.0, throw a `schema_error` instead of returning json::null() 
 json resolver(const jsoncons::uri& uri)
 {
     std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
@@ -120,13 +118,13 @@ json resolver(const jsoncons::uri& uri)
 
 void uriresolver_example()
 { 
-    // JSON Schema
     json schema = json::parse(R"(
 {
-    "$id": "http://localhost:1234/object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "http://localhost:1234/draft2020-12/object",
     "type": "object",
     "properties": {
-        "name": {"$ref": "name.json#/$defs/orNull"}
+        "name": {"$ref": "name-defs.json#/$defs/orNull"}
     }
 }
     )");
@@ -142,20 +140,20 @@ void uriresolver_example()
 
     try
     {
-        // Throws schema_error if JSON Schema loading fails
+        // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& message)
         {
-            ++error_count;
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
+            for (const auto& detail : message.details())
+            {
+                std::cout << "    "  << detail.message() << "\n";
+            }
         };
 
         // Will call reporter for each schema violation
         compiled.validate(data, reporter);
-
-        std::cout << "\nError count: " << error_count << "\n\n";
     }
     catch (const std::exception& e)
     {
@@ -168,6 +166,7 @@ void defaults_example()
     // JSON Schema
     json schema = json::parse(R"(
 {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
     "bar": {
         "type": "string",
@@ -183,7 +182,7 @@ void defaults_example()
         // Data
         json data = json::parse("{}");
 
-        // will throw schema_error if JSON Schema loading fails 
+        // will throw schema_error if JSON Schema compilation fails 
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
 
         // will throw a validation_error when a schema violation happens 
@@ -236,9 +235,10 @@ namespace ns {
 
 std::string test_schema = R"(
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "job",
   "description": "job properties json schema",
-  "definitions": {
+  "$defs": {
     "os_properties": {
       "type": "object",
       "properties": {
@@ -290,9 +290,9 @@ std::string test_schema = R"(
       "type": "object",
       "oneOf": [
 
-        { "$ref": "#/definitions/os_properties" },
-        { "$ref": "#/definitions/db_properties" },
-        { "$ref": "#/definitions/api_properties" }
+        { "$ref": "#/$defs/os_properties" },
+        { "$ref": "#/$defs/db_properties" },
+        { "$ref": "#/$defs/api_properties" }
 
       ]
     }
@@ -319,7 +319,7 @@ void validate_before_decode_example()
         json schema = json::parse(test_schema);
         json data = json::parse(test_data);
 
-        // Throws schema_error if JSON Schema loading fails
+        // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
 
         // Test that input is valid before attempting to decode
@@ -474,7 +474,7 @@ int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 
-    //reporter_example();
+    reporter_example();
     uriresolver_example();
     /*defaults_example();
 

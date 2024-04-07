@@ -26,7 +26,7 @@ The class satisfies the requirements of MoveConstructible and MoveAssignable, bu
     template <class Reporter>
     void validate(const Json& instance, const Reporter& reporter, Json& patch) const;  (5)
 
-    void validate(const Json& instance, json_visitor& visitor) const;  (6)
+    void validate(const Json& instance, json_visitor<Json>& visitor) const;  (6)
 
 (1) Validates input JSON against a JSON Schema and returns false upon the 
 first schema violation.

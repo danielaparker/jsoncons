@@ -58,7 +58,7 @@ A [json_schema<Json>](json_schema.md) that represents a compiled JSON Schema doc
 
 #### Exceptions
 
-(1)-(4) Throws a [schema_error](schema_error.md) if JSON Schema loading fails.
+(1)-(4) Throws a [schema_error](schema_error.md) if JSON Schema compilation fails.
 
 ### Examples
 
