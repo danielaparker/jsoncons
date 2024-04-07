@@ -110,38 +110,31 @@ namespace jsonschema {
 
             // load all external schemas that have not already been loaded           
 
-            std::size_t loaded_count = 0;
-            do
+            for (std::size_t i = 0; i < unresolved_refs_.size(); ++i)
             {
-                loaded_count = 0;
-
-                for (std::size_t i = unresolved_refs_.size(); i-- > 0; )
+                auto loc = unresolved_refs_[i].first;
+                //std::cout << "unresolved: " << loc.string() << "\n";
+                if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
                 {
-                    auto loc = unresolved_refs_[i].first;
-                    //std::cout << "unresolved: " << loc.string() << "\n";
-                    if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
+                    bool found = false;
+                    for (auto it = resolvers_.begin(); it != resolvers_.end() && !found; ++it)
                     {
-                        bool found = false;
-                        for (auto it = resolvers_.begin(); it != resolvers_.end() && !found; ++it)
-                        {
-                            Json external_sch = (*it)(loc.base());
+                        Json external_sch = (*it)(loc.base());
 
-                            if (external_sch.is_object() || external_sch.is_bool())
-                            {
-                                anchor_uri_map_type anchor_dict2;
-                                this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
-                                    external_sch, {}, anchor_dict2));
-                                ++loaded_count;
-                                found = true;
-                            }
-                        }
-                        if (!found)
+                        if (external_sch.is_object() || external_sch.is_bool())
                         {
-                            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
+                            anchor_uri_map_type anchor_dict2;
+                            this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
+                                external_sch, {}, anchor_dict2));
+                            found = true;
                         }
                     }
+                    if (!found)
+                    {
+                        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + loc.base().string()));
+                    }
                 }
-            } while (loaded_count > 0);
+            }
 
             resolve_references();
 
