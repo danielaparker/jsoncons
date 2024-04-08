@@ -531,10 +531,6 @@ namespace draft201909 {
                 }
             }
 
-            if (new_uris.empty())
-            {
-                new_uris.emplace_back("#");
-            }
 /*
             std::cout << "Absolute URI: " << parent.get_base_uri().string() << "\n";
             for (const auto& uri : new_uris)

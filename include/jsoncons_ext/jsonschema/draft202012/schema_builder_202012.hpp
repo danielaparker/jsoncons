@@ -256,7 +256,7 @@ namespace draft202012 {
                 std::string value = it->value().template as<std::string>();
                 jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
                 dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
-                local_anchor_dict.emplace(value, context.get_absolute_uri2());
+                local_anchor_dict.emplace(value, context.get_base_uri());
             }
 
             if (this->options().compatibility_mode())
@@ -563,10 +563,6 @@ namespace draft202012 {
                     {
                         new_uris.emplace_back(new_uri); 
                     }
-                }
-                if (new_uris.empty())
-                {
-                    new_uris.emplace_back("#");
                 }
                 it = sch.find("$anchor"); 
                 if (it != sch.object_range().end()) 

@@ -13,6 +13,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
+#include <random>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -37,13 +38,21 @@ namespace jsonschema {
         explicit compilation_context(const std::vector<uri_wrapper>& uris)
             : uris_(uris)
         {
-            base_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
+            if (uris_.empty())
+            {
+                uris_.push_back(uri_wrapper{"#"});
+            }
+            base_uri_ = uris_.back();
         }
 
         explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id)
             : uris_(uris), id_(id)
         {
-            base_uri_ = !uris.empty() ? uris.back() : uri_wrapper{ "#" };
+            if (uris_.empty())
+            {
+                uris_.push_back(uri_wrapper{"#"});
+            }
+            base_uri_ = uris_.back();
         }
 
         const std::vector<uri_wrapper>& uris() const {return uris_;}
@@ -51,11 +60,6 @@ namespace jsonschema {
         const jsoncons::optional<uri>& id() const
         {
             return id_;
-        }
-
-        const uri_wrapper& get_absolute_uri2() const
-        {
-            return base_uri_;
         }
 
         uri get_base_uri() const
@@ -73,6 +77,17 @@ namespace jsonschema {
                 }
             }
             return "#";
+        }
+        
+        static jsoncons::uri make_random_uri()
+        {
+            std::random_device dev;
+            std::mt19937 gen{ dev() };
+            std::uniform_int_distribution<std::mt19937::result_type> dist(1, 10000);
+
+            std::string str = "https:://jsoncons.com/" + std::to_string(dist(gen));
+            jsoncons::uri uri{str};
+            return uri;
         }
     };
 
