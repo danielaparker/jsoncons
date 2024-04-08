@@ -112,7 +112,7 @@ json resolver(const jsoncons::uri& uri)
 
     std::fstream is(pathname.c_str());
     if (!is)
-        throw jsonschema::schema_error("Could not open " + uri.base().string() + " for schema loading\n");
+        throw jsonschema::schema_error("Could not open " + uri.string() + " for schema loading\n");
 
     return json::parse(is);        
 }
