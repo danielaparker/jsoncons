@@ -62,7 +62,6 @@ namespace jsonschema {
             return builder;
         }
 
-        template <class Json>
         std::unique_ptr<schema_builder<Json>> get_default_schema_builder(const evaluation_options& options, 
             schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers,
