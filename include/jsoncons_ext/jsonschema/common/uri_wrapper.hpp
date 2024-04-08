@@ -20,22 +20,44 @@ namespace jsonschema {
     {
         jsoncons::uri uri_;
         std::string identifier_;
+        bool has_plain_name_fragment_;
     public:
         uri_wrapper()
+            : has_plain_name_fragment_(false)
         {
         }
 
         explicit uri_wrapper(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
-            identifier_ = uri_.fragment();
+            if (!uri_.encoded_fragment().empty())
+            {
+                identifier_ = uri_.fragment();
+                std::error_code ec;
+                jsonpointer::json_pointer::parse(identifier_, ec);
+                has_plain_name_fragment_ = ec ? true : false;
+            }
+            else
+            {
+                has_plain_name_fragment_ = false;
+            }
         }
 
         explicit uri_wrapper(const uri& uri)
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
-            identifier_ = uri_.fragment();
+            if (!uri_.encoded_fragment().empty())
+            {
+                identifier_ = uri_.fragment();
+                std::error_code ec;
+                jsonpointer::json_pointer::parse(identifier_, ec);
+                has_plain_name_fragment_ = ec ? true : false;
+            }
+            else
+            {
+                has_plain_name_fragment_ = false;
+            }
         }
 
         const jsoncons::uri& uri() const
@@ -50,14 +72,7 @@ namespace jsonschema {
 
         bool has_plain_name_fragment() const
         {
-            if (!has_fragment())
-            {
-                return false;
-            }
-            std::string identifier = uri_.fragment();
-            std::error_code ec;
-            jsonpointer::json_pointer::parse(identifier, ec);
-            return ec ? true : false;
+            return has_plain_name_fragment_;
         }
 
         jsoncons::uri base() const
