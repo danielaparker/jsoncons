@@ -157,7 +157,7 @@ namespace jsonschema {
     struct evaluation_results
     {
         std::unordered_set<std::string> evaluated_properties;
-        std::unordered_set<std::size_t> evaluated_items;
+        range_collection evaluated_items;
 
         void merge(const evaluation_results& results)
         {
@@ -165,9 +165,9 @@ namespace jsonschema {
             {
                 evaluated_properties.insert(name);
             }
-            for (auto index : results.evaluated_items)
+            for (auto index_range : results.evaluated_items)
             {
-                evaluated_items.insert(index);
+                evaluated_items.push_back(index_range);
             }
         }
         void merge(std::unordered_set<std::string>&& properties)
@@ -177,11 +177,11 @@ namespace jsonschema {
                 evaluated_properties.insert(std::move(name));
             }
         }
-        void merge(const std::unordered_set<std::size_t>& items)
+        void merge(const range_collection& ranges)
         {
-            for (auto index : items)
+            for (auto index_range : ranges)
             {
-                evaluated_items.insert(index);
+                evaluated_items.push_back(index_range);
             }
         }
     };
