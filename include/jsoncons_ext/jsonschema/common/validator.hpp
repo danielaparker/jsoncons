@@ -104,6 +104,11 @@ namespace jsonschema {
         range_collection()
         {
         }
+        range_collection(const range_collection& other) = default;
+        range_collection(range_collection&& other) = default;
+
+        range_collection& operator=(const range_collection& other) = default;
+        range_collection& operator=(range_collection&& other) = default;
         
         std::size_t size() const
         {
@@ -125,18 +130,9 @@ namespace jsonschema {
             return ranges_.cend();
         }
         
-        void push_back(range index_range)
+        void insert(range index_range)
         {
             ranges_.push_back(index_range);
-        }
-        
-        void append(const range_collection& collection)
-        {
-            std::size_t length = collection.size();
-            for (std::size_t i = 0; i < length; ++i)
-            {
-                ranges_.push_back(collection[i]);
-            }
         }
     
         bool contains(std::size_t index) const
@@ -167,7 +163,7 @@ namespace jsonschema {
             }
             for (auto index_range : results.evaluated_items)
             {
-                evaluated_items.push_back(index_range);
+                evaluated_items.insert(index_range);
             }
         }
         void merge(std::unordered_set<std::string>&& properties)
@@ -181,7 +177,7 @@ namespace jsonschema {
         {
             for (auto index_range : ranges)
             {
-                evaluated_items.push_back(index_range);
+                evaluated_items.insert(index_range);
             }
         }
     };

@@ -17,9 +17,9 @@ using jsoncons::jsonschema::range_collection;
 TEST_CASE("jsonschema range collection tests")
 {
     range_collection ranges;
-    ranges.push_back(range{0,5});
-    ranges.push_back(range{10,15});
-    ranges.push_back(range{7,8});
+    ranges.insert(range{0,5});
+    ranges.insert(range{10,15});
+    ranges.insert(range{7,8});
 
     SECTION("test 1")
     {
@@ -44,7 +44,7 @@ TEST_CASE("jsonschema range collection tests")
         range_collection coll2;
         for (auto range : ranges)
         {
-            coll2.push_back(range);
+            coll2.insert(range);
         }
     }
 }

@@ -643,7 +643,7 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.push_back(range{0,instance.size()});
+                        results.evaluated_items.insert(range{0,instance.size()});
                     }
                 }
                 else
@@ -669,19 +669,19 @@ namespace jsonschema {
                         }
                         else
                         {
-                            if (context.require_evaluated_items() && start < end)
+                            if (start < end)
                             {
-                                results.evaluated_items.push_back(range{start, end});
+                                results.evaluated_items.insert(range{start, end});
                                 start = end;
                             }
                         }
                         ++index;
                     }
-                }
-                if (context.require_evaluated_items() && start < end)
-                {
-                    results.evaluated_items.push_back(range{start, end});
-                    start = end;
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
+                    }
                 }
             }
         }
@@ -2473,17 +2473,17 @@ namespace jsonschema {
                 }
                 else
                 {
-                    if (context.require_evaluated_items() && start < end)
+                    if (start < end)
                     {
-                        results.evaluated_items.push_back(range{start, end});
+                        results.evaluated_items.insert(range{start, end});
                         start = end;
                     }
                 }
                 ++index;
             }
-            if (context.require_evaluated_items() && start < end)
+            if (start < end)
             {
-                results.evaluated_items.push_back(range{start, end});
+                results.evaluated_items.insert(range{start, end});
                 start = end;
             }
             
@@ -2573,13 +2573,18 @@ namespace jsonschema {
                 }
                 else
                 {
-                    if (context.require_evaluated_items() && start < end)
+                    if (start < end)
                     {
-                        results.evaluated_items.push_back(range{start, end});
+                        results.evaluated_items.insert(range{start, end});
                         start = end;
                     }
                 }
 
+            }
+            if (start < end)
+            {
+                results.evaluated_items.insert(range{start, end});
+                start = end;
             }
             if (data_index < instance.size() && items_val_)
             {
@@ -2599,7 +2604,7 @@ namespace jsonschema {
                 }
                 else if (items_val_->always_succeeds())
                 {
-                    results.evaluated_items.push_back(range{0,instance.size()});
+                    results.evaluated_items.insert(range{0,instance.size()});
                 }
                 else
                 {
@@ -2625,13 +2630,18 @@ namespace jsonschema {
                             }
                             else
                             {
-                                if (context.require_evaluated_items() && start < end)
+                                if (start < end)
                                 {
-                                    results.evaluated_items.push_back(range{start, end});
+                                    results.evaluated_items.insert(range{start, end});
                                     start = end;
                                 }
                             }
                         }
+                    }
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
                     }
                 }
             }
@@ -2777,7 +2787,7 @@ namespace jsonschema {
                     for (std::size_t index = 0; index < instance.size(); ++index) 
                     {
                         // check if it is in "evaluated_items"
-                        if (results.evaluated_items.contains(index)) 
+                        if (!results.evaluated_items.contains(index)) 
                         {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
@@ -2795,7 +2805,7 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.push_back(range{0,instance.size()});
+                        results.evaluated_items.insert(range{0,instance.size()});
                     }
                 }
                 else
@@ -2806,8 +2816,7 @@ namespace jsonschema {
                     for (const auto& item : instance.array_range())
                     {
                         // check if it is in "evaluated_items"
-                        auto item_it = results.evaluated_items.find(index);
-                        if (item_it == results.evaluated_items.end()) 
+                        if (!results.evaluated_items.contains(index))
                         {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
@@ -2827,18 +2836,18 @@ namespace jsonschema {
                             }
                             else
                             {
-                                if (context.require_evaluated_items() && start < end)
+                                if (start < end)
                                 {
-                                    results.evaluated_items.push_back(range{start, end});
+                                    results.evaluated_items.insert(range{start, end});
                                     start = end;
                                 }
                             }
                         }
                         ++index;
                     }
-                    if (context.require_evaluated_items() && start < end)
+                    if (start < end)
                     {
-                        results.evaluated_items.push_back(range{start, end});
+                        results.evaluated_items.insert(range{start, end});
                         start = end;
                     }
                 }
