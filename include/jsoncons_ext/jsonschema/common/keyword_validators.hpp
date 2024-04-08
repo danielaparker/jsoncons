@@ -592,10 +592,9 @@ namespace jsonschema {
             {
                 if (items_val_->always_fails())
                 {
-                    evaluation_context<Json> item_context{this_context, std::size_t(0), evaluation_flags{}};
                     jsonpointer::json_pointer item_location = instance_location / 0;
                     reporter.error(validation_message(this->keyword_name(),
-                        item_context.eval_path(), 
+                        this_context.eval_path(), 
                         this->schema_location(), 
                         item_location,
                         "Item at index '0' but the schema does not allow any items."));
@@ -619,10 +618,9 @@ namespace jsonschema {
                     size_t index = 0;
                     for (const auto& item : instance.array_range()) 
                     {
-                        evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                         jsonpointer::json_pointer item_location = instance_location / index;
                         std::size_t errors = reporter.error_count();
-                        items_val_->validate(item_context, item, item_location, results, reporter, patch);
+                        items_val_->validate(this_context, item, item_location, results, reporter, patch);
                         if (errors == reporter.error_count())
                         {
                             if (context.require_evaluated_items())
@@ -2450,77 +2448,67 @@ namespace jsonschema {
                 return;
             }
         
-            size_t index = 0;
-            auto it = instance.array_range().cbegin();
-            auto end_it = instance.array_range().cend();
+            size_t data_index = 0;
         
-            evaluation_context<Json> this_context(context, this->keyword_name());
-            for (const auto& val : prefix_item_validators_) 
+            evaluation_context<Json> prefix_items_context(context, this->keyword_name());
+            for (std::size_t schema_index=0; 
+                  schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
+                  ++schema_index, ++data_index) 
             {
-                if (it == end_it)
-                {
-                    break;
-                }
-                jsonpointer::json_pointer item_location = instance_location / index;
-        
-                evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
+                auto& val = prefix_item_validators_[schema_index];
+                evaluation_context<Json> item_context{prefix_items_context, schema_index, evaluation_flags{}};
+                jsonpointer::json_pointer item_location = instance_location / data_index;
                 std::size_t errors = reporter.error_count();
-                val->validate(item_context, *it, item_location, results, reporter, patch);
+                val->validate(item_context, instance[data_index], item_location, results, reporter, patch);
                 if (errors == reporter.error_count())
                 {
                     if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        results.evaluated_items.insert(data_index);
                     }
                 }
-                ++it;
-                ++index;
             }
-            if (it != end_it && items_val_)
+            if (data_index < instance.size() && items_val_)
             {
+                evaluation_context<Json> items_context(context, "items");
                 if (items_val_->always_fails())
                 {
-                    evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
-                    jsonpointer::json_pointer item_location = instance_location / index;
+                    jsonpointer::json_pointer item_location = instance_location / data_index;
                     reporter.error(validation_message(this->keyword_name(),
-                        item_context.eval_path(), 
+                        items_context.eval_path(), 
                         this->schema_location(), 
                         item_location,
-                        "Extra item at index '" + std::to_string(index) + "' but the schema does not allow extra items."));
+                        "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."));
                     if (reporter.fail_early())
                     {
                         return;
                     }
                 }
-                else if (items_val_->always_fails())
+                else if (items_val_->always_succeeds())
                 {
-                    while (it != end_it)
+                    while (data_index < instance.size())
                     {
-                        results.evaluated_items.insert(index);
-                        ++it;
-                        ++index;
+                        results.evaluated_items.insert(data_index);
+                        ++data_index;
                     }
                 }
                 else
                 {
-                    while (it != end_it)
+                    for (; data_index < instance.size(); ++data_index)
                     {
                         if (items_val_)
                         {
-                            evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
-                            jsonpointer::json_pointer item_location = instance_location / index;
+                            jsonpointer::json_pointer item_location = instance_location / data_index;
                             std::size_t errors = reporter.error_count();
-                            items_val_->validate(item_context, *it, item_location, results, reporter, patch);
+                            items_val_->validate(items_context, instance[data_index], item_location, results, reporter, patch);
                             if (errors == reporter.error_count())
                             {
                                 if (context.require_evaluated_items())
                                 {
-                                    results.evaluated_items.insert(index);
+                                    results.evaluated_items.insert(data_index);
                                 }
                             }
                         }
-                        ++it;
-                        ++index;
                     }
                 }
             }

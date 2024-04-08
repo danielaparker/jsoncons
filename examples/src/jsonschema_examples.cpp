@@ -89,8 +89,8 @@ void write_to_json_visitor_example()
 
         jsoncons::json_decoder<ojson> decoder;
         compiled.validate(data, decoder);
-        ojson assertions = decoder.get_result();
-        std::cout << pretty_print(assertions) << "\n";
+        ojson output = decoder.get_result();
+        std::cout << pretty_print(output) << "\n";
     }
     catch (const std::exception& e)
     {

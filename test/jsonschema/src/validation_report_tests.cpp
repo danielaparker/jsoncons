@@ -131,7 +131,7 @@ TEST_CASE("jsonschema prefixItems report tests")
 [
     {
         "valid": false,
-        "evaluationPath": "/prefixItems/4",
+        "evaluationPath": "/items",
         "schemaLocation": "#/prefixItems",
         "instanceLocation": "/4",
         "error": "Extra item at index '4' but the schema does not allow extra items."
@@ -290,6 +290,153 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
         compiled.validate(data, decoder);
         
         ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema items output tests")
+{
+   std::string schema_string = R"(
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "path": {
+      "description": "A JSON Pointer path.",
+      "type": "string"
+    }
+  },
+  "id": "https://json.schemastore.org/json-patch.json",
+  "items": {
+    "oneOf": [
+      {
+        "additionalProperties": false,
+        "required": ["value", "op", "path"],
+        "properties": {
+          "path": {
+            "$ref": "#/definitions/path"
+          },
+          "op": {
+            "description": "The operation to perform.",
+            "type": "string",
+            "enum": ["add", "replace", "test"]
+          },
+          "value": {
+            "description": "The value to add, replace or test."
+          }
+        }
+      },
+      {
+        "additionalProperties": false,
+        "required": ["op", "path"],
+        "properties": {
+          "path": {
+            "$ref": "#/definitions/path"
+          },
+          "op": {
+            "description": "The operation to perform.",
+            "type": "string",
+            "enum": ["remove"]
+          }
+        }
+      },
+      {
+        "additionalProperties": false,
+        "required": ["from", "op", "path"],
+        "properties": {
+          "path": {
+            "$ref": "#/definitions/path"
+          },
+          "op": {
+            "description": "The operation to perform.",
+            "type": "string",
+            "enum": ["move", "copy"]
+          },
+          "from": {
+            "$ref": "#/definitions/path",
+            "description": "A JSON Pointer path pointing to the location to move/copy from."
+          }
+        }
+      }
+    ]
+  },
+  "title": "JSON schema for JSONPatch files",
+  "type": "array"
+}
+)";
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/items/oneOf",
+        "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf",
+        "instanceLocation": "/0",
+        "error": "No schema matched, but exactly one of them is required to match",
+        "details": [
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/0/additionalProperties/properties/op/enum",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/0/properties/op/enum",
+                "instanceLocation": "/0/op",
+                "error": "'invalid_op' is not a valid enum value."
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/1/additionalProperties/properties/op/enum",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1/properties/op/enum",
+                "instanceLocation": "/0/op",
+                "error": "'invalid_op' is not a valid enum value."
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/1/additionalProperties/value",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1",
+                "instanceLocation": "/0/value",
+                "error": "Additional property 'value' not allowed by schema."
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/2/required",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/required",
+                "instanceLocation": "/0",
+                "error": "Required property 'from' not found."
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/2/additionalProperties/properties/op/enum",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/properties/op/enum",
+                "instanceLocation": "/0/op",
+                "error": "'invalid_op' is not a valid enum value."
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/items/oneOf/2/additionalProperties/value",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2",
+                "instanceLocation": "/0/value",
+                "error": "Additional property 'value' not allowed by schema."
+            }
+        ]
+    }
+]
+        )");
+
+ std::string data_string = R"(
+[
+    {
+        "op": "invalid_op",
+        "path": "/biscuits/1",
+        "value":{"name":"Ginger Nut" }
+    }
+]
+        )";   
+        auto schema_ = jsoncons::ojson::parse(schema_string);
+        auto data_ = jsoncons::ojson::parse(data_string);
+        auto compiled = jsoncons::jsonschema::make_json_schema(schema_);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        compiled.validate(data_, decoder);
+        auto output = decoder.get_result();        
         CHECK(expected == output);
         //std::cout << pretty_print(output) << "\n";
     }
