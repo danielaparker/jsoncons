@@ -937,14 +937,15 @@ namespace jsonschema {
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
-        std::unique_ptr<items_validator<Json>> make_items_validator(const compilation_context& context, 
+        std::unique_ptr<items_validator<Json>> make_items_validator(const std::string& keyword_name,
+            const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            uri schema_location{context.make_schema_path_with("items")};
+            uri schema_location{context.make_schema_path_with(keyword_name)};
 
-            std::string sub_keys[] = {"items"};
+            std::string sub_keys[] = {keyword_name};
 
-            return jsoncons::make_unique<items_validator<Json>>( schema_location, 
+            return jsoncons::make_unique<items_validator<Json>>(keyword_name, schema_location, 
                 this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
 

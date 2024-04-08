@@ -404,7 +404,7 @@ namespace draft202012 {
                     {
                         if (it->value().type() == json_type::object_value || it->value().type() == json_type::bool_value)
                         {
-                            validators.emplace_back(this->make_items_validator(context, it->value(), local_anchor_dict));
+                            validators.emplace_back(this->make_items_validator("items", context, it->value(), local_anchor_dict));
                         }
                     }
                 }

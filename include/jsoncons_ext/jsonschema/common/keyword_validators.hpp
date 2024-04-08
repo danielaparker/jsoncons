@@ -566,9 +566,9 @@ namespace jsonschema {
 
         schema_validator_type items_val_;
     public:
-        items_validator(const uri& schema_location, 
+        items_validator(const std::string& keyword_name, const uri& schema_location, 
             schema_validator_type&& items_val)
-            : keyword_validator_base<Json>("items", schema_location), 
+            : keyword_validator_base<Json>(keyword_name, schema_location), 
               items_val_(std::move(items_val))
         {
         }

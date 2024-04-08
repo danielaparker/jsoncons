@@ -315,7 +315,7 @@ namespace draft7 {
                 else if (it->value().type() == json_type::object_value ||
                            it->value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(this->make_items_validator(context, it->value(), anchor_dict));
+                    validators.emplace_back(this->make_items_validator("items", context, it->value(), anchor_dict));
                 }
             }
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
