@@ -2049,7 +2049,7 @@ namespace jsonschema {
                         {
                             reporter.error(validation_message(this->keyword_name(),
                                 prop_context.eval_path(), 
-                                this->schema_location(), 
+                                additional_properties_->schema_location(), 
                                 prop_location,
                                 "Additional property '" + prop.key() + "' not allowed by schema."));
                             break;

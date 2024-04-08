@@ -495,7 +495,7 @@ TEST_CASE("jsonschema more output tests")
     {
         "valid": false,
         "evaluationPath": "/items/$ref/additionalProperties/z",
-        "schemaLocation": "https://example.com/polygon#/$defs/point", // Expect "https://example.com/polygon#/$defs/point/additionalProperties/false"
+        "schemaLocation": "https://example.com/polygon#/$defs/point/additionalProperties",
         "instanceLocation": "/1/z",
         "error": "Additional property 'z' not allowed by schema."
     }
@@ -520,8 +520,8 @@ TEST_CASE("jsonschema more output tests")
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         compiled.validate(data, decoder);
         auto output = decoder.get_result();        
-        //CHECK(expected == output);
-        std::cout << pretty_print(output) << "\n";
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
     }
 }
 
