@@ -48,68 +48,12 @@ namespace jsonschema {
                 }
                 else 
                 {
-                    if (options.default_version() == schema_version::draft202012())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
-                            options, schema_store_ptr, resolvers, vocabulary);
-                    }
-                    else if (options.default_version() == schema_version::draft201909())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                            options, schema_store_ptr, resolvers, vocabulary);
-                    }
-                    else if (options.default_version() == schema_version::draft7())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (options.default_version() == schema_version::draft6())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else if (options.default_version() == schema_version::draft4())
-                    {
-                        builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
-                            options, schema_store_ptr, resolvers);
-                    }
-                    else
-                    {
-                        JSONCONS_THROW(schema_error("Unsupported schema version " + options.default_version()));
-                    }
+                    builder = get_default_schema_builder(options, schema_store_ptr, resolvers, vocabulary);
                 }
             }
             else if (sch.is_bool())
             {
-                if (options.default_version() == schema_version::draft202012())
-                {
-                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
-                        options, schema_store_ptr, resolvers, vocabulary);
-                }
-                else if (options.default_version() == schema_version::draft201909())
-                {
-                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
-                        options, schema_store_ptr, resolvers, vocabulary);
-                }
-                else if (options.default_version() == schema_version::draft7())
-                {
-                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
-                        options, schema_store_ptr, resolvers);
-                }
-                else if (options.default_version() == schema_version::draft6())
-                {
-                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
-                        options, schema_store_ptr, resolvers);
-                }
-                else if (options.default_version() == schema_version::draft4())
-                {
-                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
-                        options, schema_store_ptr, resolvers);
-                }
-                else
-                {
-                    JSONCONS_THROW(schema_error("Unsupported schema version " + options.default_version()));
-                }
+                builder = get_default_schema_builder(options, schema_store_ptr, resolvers, vocabulary);
             }
             else
             {
@@ -118,6 +62,43 @@ namespace jsonschema {
             return builder;
         }
 
+        template <class Json>
+        std::unique_ptr<schema_builder<Json>> get_default_schema_builder(const evaluation_options& options, 
+            schema_store_type* schema_store_ptr,
+            const std::vector<schema_resolver<Json>>& resolvers,
+            const std::unordered_map<std::string,bool>& vocabulary) const
+        {
+            if (options.default_version() == schema_version::draft202012())
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                    options, schema_store_ptr, resolvers, vocabulary);
+            }
+            else if (options.default_version() == schema_version::draft201909())
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                    options, schema_store_ptr, resolvers, vocabulary);
+            }
+            else if (options.default_version() == schema_version::draft7())
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (options.default_version() == schema_version::draft6())
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else if (options.default_version() == schema_version::draft4())
+            {
+                return jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                    options, schema_store_ptr, resolvers);
+            }
+            else
+            {
+                JSONCONS_THROW(schema_error("Unsupported schema version " + options.default_version()));
+            }
+        }
+        
         std::unique_ptr<schema_builder<Json>> get_builder(const jsoncons::string_view& schema_id,
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers,
@@ -290,6 +271,8 @@ namespace jsonschema {
         schema_builder->build_schema(sch);
         return json_schema<Json>(schema_builder->get_schema());
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
     
     // Legacy
     template <class Json,class URIResolver>
@@ -361,6 +344,7 @@ namespace jsonschema {
         schema_builder->build_schema(sch);
         return std::make_shared<json_schema<Json>>(schema_builder->get_schema());
     }
+#endif    
 
 } // namespace jsonschema
 } // namespace jsoncons

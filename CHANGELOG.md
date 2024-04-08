@@ -1,14 +1,32 @@
 0.174.0 preview (on master)
 ---------------------------
 
+Defect fixes:
+
+- Fixed issue #499 with `nan_to_str`, `inf_to_str` and `neginf_to_str`
+
 Core library enhancements
 
 - New `json_options` `line_splits` option that addresses issue #490
 
+jsonpath library enhancements
+
+- New function `jsonpath::add` analagous to `jsonpointer::add`,
+  but for normalized paths. 
+
 jsonschema library enhancements
 
-- The jsonschema extension now supports Draft 2019-09 and Draft 2020-12
+- The jsonschema extension now supports Drafts 4, 6, 2019-09 and 2020-12
 in addition to Draft 07. 
+
+    - New function `make_json_schema` that returns a representation of 
+      a compiled JSON Schema document.
+
+    - New class `validation_message`
+
+    - The legacy function `make_schema` and classes `json_validator` and
+      `validation_output` remain for backward compatibility, but have been 
+      deprecated.
 
 0.173.4
 -------

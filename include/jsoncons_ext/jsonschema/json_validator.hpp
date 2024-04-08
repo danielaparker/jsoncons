@@ -23,7 +23,9 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class validation_output 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+class validation_output 
     {
         std::string keyword_;
         std::string schema_path_;
@@ -163,6 +165,8 @@ namespace jsonschema {
             return patch;
         }
     };
+    
+#endif    
 
 } // namespace jsonschema
 } // namespace jsoncons
