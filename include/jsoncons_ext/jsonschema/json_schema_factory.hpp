@@ -81,8 +81,35 @@ namespace jsonschema {
             }
             else if (sch.is_bool())
             {
-                builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
-                    options, schema_store_ptr, resolvers);
+                if (options.default_version() == schema_version::draft202012())
+                {
+                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_builder_202012<Json>>(*this, 
+                        options, schema_store_ptr, resolvers, vocabulary);
+                }
+                else if (options.default_version() == schema_version::draft201909())
+                {
+                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_builder_201909<Json>>(*this, 
+                        options, schema_store_ptr, resolvers, vocabulary);
+                }
+                else if (options.default_version() == schema_version::draft7())
+                {
+                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_builder_7<Json>>(*this, 
+                        options, schema_store_ptr, resolvers);
+                }
+                else if (options.default_version() == schema_version::draft6())
+                {
+                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_builder_6<Json>>(*this, 
+                        options, schema_store_ptr, resolvers);
+                }
+                else if (options.default_version() == schema_version::draft4())
+                {
+                    builder = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_builder_4<Json>>(*this, 
+                        options, schema_store_ptr, resolvers);
+                }
+                else
+                {
+                    JSONCONS_THROW(schema_error("Unsupported schema version " + options.default_version()));
+                }
             }
             else
             {
