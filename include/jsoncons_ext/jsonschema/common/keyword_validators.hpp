@@ -603,12 +603,12 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type items_val_;
+        schema_validator_type schema_val_;
     public:
         items_validator(const std::string& keyword_name, const uri& schema_location, 
-            schema_validator_type&& items_val)
+            schema_validator_type&& schema_val)
             : keyword_validator_base<Json>(keyword_name, schema_location), 
-              items_val_(std::move(items_val))
+              schema_val_(std::move(schema_val))
         {
         }
 
@@ -627,9 +627,9 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            if (instance.size() > 0 && items_val_)
+            if (instance.size() > 0 && schema_val_)
             {
-                if (items_val_->always_fails())
+                if (schema_val_->always_fails())
                 {
                     jsonpointer::json_pointer item_location = instance_location / 0;
                     reporter.error(validation_message(this->keyword_name(),
@@ -637,12 +637,9 @@ namespace jsonschema {
                         this->schema_location(), 
                         item_location,
                         "Item at index '0' but the schema does not allow any items."));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else if (items_val_->always_succeeds())
+                else if (schema_val_->always_succeeds())
                 {
                     if (context.require_evaluated_items())
                     {
@@ -659,7 +656,7 @@ namespace jsonschema {
                     {
                         jsonpointer::json_pointer item_location = instance_location / index;
                         std::size_t errors = reporter.error_count();
-                        items_val_->validate(this_context, item, item_location, results, reporter, patch);
+                        schema_val_->validate(this_context, item, item_location, results, reporter, patch);
                         if (errors == reporter.error_count())
                         {
                             if (context.require_evaluated_items())
@@ -791,14 +788,24 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type rule_;
+        schema_validator_type schema_val_;
 
     public:
         not_validator(const uri& schema_location,
-            schema_validator_type&& rule)
+            schema_validator_type&& schema_val)
             : keyword_validator_base<Json>("not", schema_location), 
-              rule_(std::move(rule))
+              schema_val_(std::move(schema_val))
         {
+        }
+
+        bool always_fails() const final
+        {
+            return schema_val_ ? schema_val_->always_succeeds() : false;;
+        }          
+
+        bool always_succeeds() const final
+        {
+            return schema_val_ ? schema_val_->always_fails() : false;;
         }
 
     private:
@@ -813,7 +820,7 @@ namespace jsonschema {
 
             evaluation_results local_results;
             collecting_error_reporter local_reporter;
-            rule_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
+            schema_val_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
 
             if (local_reporter.errors.empty())
             {
@@ -2197,14 +2204,14 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type property_names_schema_validator_;
+        schema_validator_type schema_val_;
 
     public:
         property_names_validator(const uri& schema_location,
-            schema_validator_type&& property_names_schema_validator
+            schema_validator_type&& schema_val
         )
             : keyword_validator_base<Json>("propertyNames", schema_location), 
-                property_names_schema_validator_{ std::move(property_names_schema_validator) }
+                schema_val_{ std::move(schema_val) }
         {
         }
 
@@ -2223,15 +2230,31 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            for (const auto& prop : instance.object_range()) 
+            if (instance.size() > 0 && schema_val_)
             {
-                jsonpointer::json_pointer prop_location = instance_location / prop.key();
-
-                if (property_names_schema_validator_)
+                if (schema_val_->always_fails())
                 {
-                    property_names_schema_validator_->validate(this_context, prop.key() , instance_location, results, reporter, patch);
+                    jsonpointer::json_pointer item_location = instance_location / 0;
+                    reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        item_location,
+                        "Instance has properties but the schema does not allow any property names."));
+                    return;
                 }
-                // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
+                else if (schema_val_->always_succeeds())
+                {
+                    return;
+                }
+                else
+                {
+                    for (const auto& prop : instance.object_range()) 
+                    {
+                        jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
+                        schema_val_->validate(this_context, prop.key() , instance_location, results, reporter, patch);
+                    }
+                }
             }
         }
     };
@@ -2560,14 +2583,13 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type validator_;
+        schema_validator_type schema_val_;
 
     public:
         unevaluated_properties_validator(const uri& schema_location,
-            schema_validator_type&& val
-        )
+            schema_validator_type&& schema_val)
             : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_location)), 
-              validator_(std::move(val))
+              schema_val_(std::move(schema_val))
         {
         }
 
@@ -2591,10 +2613,10 @@ namespace jsonschema {
                 return;
             }
 
-            if (validator_)
+            if (schema_val_)
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
-                if (validator_->always_fails())
+                if (schema_val_->always_fails())
                 {
                     for (const auto& prop : instance.object_range()) 
                     {
@@ -2614,7 +2636,7 @@ namespace jsonschema {
                         }
                     }
                 }
-                else if (validator_->always_succeeds())
+                else if (schema_val_->always_succeeds())
                 {
                     if (context.require_evaluated_properties())
                     {
@@ -2634,7 +2656,7 @@ namespace jsonschema {
                         {
                             //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
                             std::size_t error_count = reporter.error_count();
-                            validator_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
+                            schema_val_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
                             if (reporter.error_count() == error_count)
                             {
                                 if (context.require_evaluated_properties())
@@ -2655,14 +2677,14 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
 
-        schema_validator_type validator_;
+        schema_validator_type schema_val_;
 
     public:
         unevaluated_items_validator(const uri& schema_location,
-            schema_validator_type&& val
+            schema_validator_type&& schema_val
         )
             : keyword_validator_base<Json>("unevaluatedProperties", std::move(schema_location)), 
-              validator_(std::move(val))
+              schema_val_(std::move(schema_val))
         {
         }
 
@@ -2686,10 +2708,10 @@ namespace jsonschema {
                 return;
             }
 
-            if (validator_)
+            if (schema_val_)
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
-                if (validator_->always_fails())
+                if (schema_val_->always_fails())
                 {
                     for (std::size_t index = 0; index < instance.size(); ++index) 
                     {
@@ -2709,7 +2731,7 @@ namespace jsonschema {
                         }
                     }
                 }
-                else if (validator_->always_succeeds())
+                else if (schema_val_->always_succeeds())
                 {
                     if (context.require_evaluated_items())
                     {
@@ -2732,7 +2754,7 @@ namespace jsonschema {
                             jsonpointer::json_pointer item_location = instance_location / index;
                             //std::cout << "Not in evaluated properties: " << item.key() << "\n";
                             std::size_t error_count = reporter.error_count();
-                            validator_->validate(item_context, item, item_location, results, reporter, patch);
+                            schema_val_->validate(item_context, item, item_location, results, reporter, patch);
                             if (reporter.error_count() == error_count)
                             {
                                 if (context.require_evaluated_items())
