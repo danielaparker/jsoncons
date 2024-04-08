@@ -62,11 +62,98 @@ namespace jsonschema {
             errors.push_back(o);
         }
     };
+
+    class range
+    {
+        std::size_t start_;
+        std::size_t end_;
+    public:
+        range()
+            : start_(0), end_(0)
+        {
+        }
+    
+        range(std::size_t start, std::size_t end)
+            : start_(start), end_(end)
+        {
+        }
+        
+        std::size_t start() const
+        {
+            return start_;
+        }
+    
+        std::size_t end() const
+        {
+            return end_;
+        }
+        
+        bool contains(std::size_t index) const
+        {
+            return index >= start_ && index < end_; 
+        }
+    };
+    
+    class range_collection
+    {
+        std::vector<range> ranges_;
+    public:    
+        using const_iterator = std::vector<range>::const_iterator;
+        using value_type = range;
+        
+        range_collection()
+        {
+        }
+        range_collection(const range_collection& other) = default;
+        range_collection(range_collection&& other) = default;
+
+        range_collection& operator=(const range_collection& other) = default;
+        range_collection& operator=(range_collection&& other) = default;
+        
+        std::size_t size() const
+        {
+            return ranges_.size();
+        }
+    
+        range operator[](std::size_t index) const
+        {
+            return ranges_[index];
+        }
+        
+        const_iterator begin() const
+        {
+            return ranges_.cbegin();
+        }
+
+        const_iterator end() const
+        {
+            return ranges_.cend();
+        }
+        
+        void insert(range index_range)
+        {
+            ranges_.push_back(index_range);
+        }
+    
+        bool contains(std::size_t index) const
+        {
+            bool found = false;
+            std::size_t length = ranges_.size();
+            for (std::size_t i = 0; i < length && !found; ++i)
+            {
+                if (ranges_[i].contains(index))
+                {
+                    found = true;
+                }
+            }
+            return found;
+        }
+    };
     
     struct evaluation_results
     {
         std::unordered_set<std::string> evaluated_properties;
-        std::unordered_set<std::size_t> evaluated_items;
+        range_collection evaluated_items;
 
         void merge(const evaluation_results& results)
         {
@@ -74,9 +161,9 @@ namespace jsonschema {
             {
                 evaluated_properties.insert(name);
             }
-            for (auto index : results.evaluated_items)
+            for (auto index_range : results.evaluated_items)
             {
-                evaluated_items.insert(index);
+                evaluated_items.insert(index_range);
             }
         }
         void merge(std::unordered_set<std::string>&& properties)
@@ -86,11 +173,11 @@ namespace jsonschema {
                 evaluated_properties.insert(std::move(name));
             }
         }
-        void merge(const std::unordered_set<std::size_t>& items)
+        void merge(const range_collection& ranges)
         {
-            for (auto index : items)
+            for (auto index_range : ranges)
             {
-                evaluated_items.insert(index);
+                evaluated_items.insert(index_range);
             }
         }
     };

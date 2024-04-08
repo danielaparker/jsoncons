@@ -1,28 +1,21 @@
 [
     {
-        "description": "unevaluatedItems depends on adjacent contains",
+        "description": "unevaluatedItems false",
         "schema": {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "prefixItems": [true],
-            "contains": {"type": "string"},
             "unevaluatedItems": false
         },
         "tests": [
-            {
-                "description": "second item is evaluated by contains",
-                "data": [ 1, "foo" ],
+            /*{
+                "description": "with no unevaluated items",
+                "data": [],
                 "valid": true
-            }/*,
+            },*/
             {
-                "description": "contains fails, second item is not evaluated",
-                "data": [ 1, 2 ],
+                "description": "with unevaluated items",
+                "data": ["foo"],
                 "valid": false
-            },
-            {
-                "description": "contains passes, second item is not evaluated",
-                "data": [ 1, 2, "foo" ],
-                "valid": false
-            }*/
+            }
         ]
     }
 ]

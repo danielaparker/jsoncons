@@ -643,15 +643,14 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        for (std::size_t index = 0; index < instance.size(); ++ index)
-                        {
-                            results.evaluated_items.insert(index);
-                        }
+                        results.evaluated_items.insert(range{0,instance.size()});
                     }
                 }
                 else
                 {
                     size_t index = 0;
+                    size_t start = 0;
+                    size_t end = 0;
                     for (const auto& item : instance.array_range()) 
                     {
                         jsonpointer::json_pointer item_location = instance_location / index;
@@ -661,10 +660,27 @@ namespace jsonschema {
                         {
                             if (context.require_evaluated_items())
                             {
-                                results.evaluated_items.insert(index);
+                                if (end == start)
+                                {
+                                    start = end = index;
+                                }
+                                ++end;
+                            }
+                        }
+                        else
+                        {
+                            if (start < end)
+                            {
+                                results.evaluated_items.insert(range{start, end});
+                                start = end;
                             }
                         }
                         ++index;
+                    }
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
                     }
                 }
             }
@@ -2437,6 +2453,8 @@ namespace jsonschema {
             collecting_error_reporter local_reporter;
 
             std::size_t index = 0;
+            size_t start = 0;
+            size_t end = 0;
             for (const auto& item : instance.array_range()) 
             {
                 std::size_t errors = local_reporter.errors.size();
@@ -2445,11 +2463,28 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(index);
+                        if (end == start)
+                        {
+                            start = end = index;
+                        }
+                        ++end;
                     }
                     ++contains_count;
                 }
+                else
+                {
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
+                    }
+                }
                 ++index;
+            }
+            if (start < end)
+            {
+                results.evaluated_items.insert(range{start, end});
+                start = end;
             }
             
             if (max_contains_ || min_contains_)
@@ -2513,6 +2548,9 @@ namespace jsonschema {
             size_t data_index = 0;
         
             evaluation_context<Json> prefix_items_context(context, this->keyword_name());
+
+            size_t start = 0;
+            size_t end = 0;
             for (std::size_t schema_index=0; 
                   schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
                   ++schema_index, ++data_index) 
@@ -2526,9 +2564,27 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        results.evaluated_items.insert(data_index);
+                        if (end == start)
+                        {
+                            start = end = data_index;
+                        }
+                        ++end;
                     }
                 }
+                else
+                {
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
+                    }
+                }
+
+            }
+            if (start < end)
+            {
+                results.evaluated_items.insert(range{start, end});
+                start = end;
             }
             if (data_index < instance.size() && items_val_)
             {
@@ -2548,14 +2604,12 @@ namespace jsonschema {
                 }
                 else if (items_val_->always_succeeds())
                 {
-                    while (data_index < instance.size())
-                    {
-                        results.evaluated_items.insert(data_index);
-                        ++data_index;
-                    }
+                    results.evaluated_items.insert(range{0,instance.size()});
                 }
                 else
                 {
+                    start = 0;
+                    end = 0;
                     for (; data_index < instance.size(); ++data_index)
                     {
                         if (items_val_)
@@ -2567,10 +2621,27 @@ namespace jsonschema {
                             {
                                 if (context.require_evaluated_items())
                                 {
-                                    results.evaluated_items.insert(data_index);
+                                    if (end == start)
+                                    {
+                                        start = end = data_index;
+                                    }
+                                    ++end;
+                                }
+                            }
+                            else
+                            {
+                                if (start < end)
+                                {
+                                    results.evaluated_items.insert(range{start, end});
+                                    start = end;
                                 }
                             }
                         }
+                    }
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
                     }
                 }
             }
@@ -2716,8 +2787,7 @@ namespace jsonschema {
                     for (std::size_t index = 0; index < instance.size(); ++index) 
                     {
                         // check if it is in "evaluated_items"
-                        auto item_it = results.evaluated_items.find(index);
-                        if (item_it == results.evaluated_items.end()) 
+                        if (!results.evaluated_items.contains(index)) 
                         {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
@@ -2735,20 +2805,18 @@ namespace jsonschema {
                 {
                     if (context.require_evaluated_items())
                     {
-                        for (std::size_t index = 0; index < instance.size(); ++index) 
-                        {
-                            results.evaluated_items.insert(index);
-                        }
+                        results.evaluated_items.insert(range{0,instance.size()});
                     }
                 }
                 else
                 {
                     std::size_t index = 0;
+                    size_t start = 0;
+                    size_t end = 0;
                     for (const auto& item : instance.array_range())
                     {
                         // check if it is in "evaluated_items"
-                        auto item_it = results.evaluated_items.find(index);
-                        if (item_it == results.evaluated_items.end()) 
+                        if (!results.evaluated_items.contains(index))
                         {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
@@ -2759,11 +2827,28 @@ namespace jsonschema {
                             {
                                 if (context.require_evaluated_items())
                                 {
-                                    results.evaluated_items.insert(index);
+                                    if (end == start)
+                                    {
+                                        start = end = index;
+                                    }
+                                    ++end;
+                                }
+                            }
+                            else
+                            {
+                                if (start < end)
+                                {
+                                    results.evaluated_items.insert(range{start, end});
+                                    start = end;
                                 }
                             }
                         }
                         ++index;
+                    }
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
                     }
                 }
             }
