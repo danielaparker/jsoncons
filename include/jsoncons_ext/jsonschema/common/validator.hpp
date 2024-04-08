@@ -139,6 +139,16 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         virtual const std::string& keyword_name() const = 0;
+
+        virtual bool always_fails() const 
+        {
+            return false;
+        }          
+
+        virtual bool always_succeeds() const
+        {
+            return false;
+        }
     };
 
     template <class Json>

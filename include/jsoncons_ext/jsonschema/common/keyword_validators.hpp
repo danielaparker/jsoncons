@@ -28,6 +28,45 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    template <class Json>
+    class schema_keyword_validator : public keyword_validator_base<Json>
+    {
+    public:
+        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+
+        schema_validator_type schema_val_;
+    public:
+        schema_keyword_validator(const std::string& keyword_name, const uri& schema_location,
+            schema_validator_type&& schema_val)
+            : keyword_validator_base<Json>(keyword_name, schema_location), schema_val_(std::move(schema_val))
+        {}
+
+        bool always_fails() const final
+        {
+            return schema_val_ ? schema_val_->always_fails() : false;;
+        }          
+
+        bool always_succeeds() const final
+        {
+            return schema_val_ ? schema_val_->always_succeeds() : false;;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const override
+        {
+            if (schema_val_)
+            {
+                schema_val_->validate(context, instance, instance_location, results, reporter, patch);
+            }
+        }
+    };
+    
     template<class Json>
     class recursive_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
@@ -2424,11 +2463,11 @@ namespace jsonschema {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
 
         std::vector<schema_validator_type> prefix_item_validators_;
-        schema_validator_type items_val_;
+        keyword_validator_type items_val_;
     public:
         prefix_items_validator(const std::string& keyword_name, const uri& schema_location, 
             std::vector<schema_validator_type>&& prefix_item_validators,
-            schema_validator_type&& items_val)
+            keyword_validator_type&& items_val)
             : keyword_validator_base<Json>(keyword_name, schema_location), 
               prefix_item_validators_(std::move(prefix_item_validators)), 
               items_val_(std::move(items_val))

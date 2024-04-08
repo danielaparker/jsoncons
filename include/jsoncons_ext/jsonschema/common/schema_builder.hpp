@@ -911,7 +911,7 @@ namespace jsonschema {
             const Json& parent, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             std::vector<schema_validator_type> item_validators;
-            schema_validator_type additional_items_validator = nullptr;
+            keyword_validator_type additional_items_validator = nullptr;
 
             uri schema_location{context.make_schema_path_with("items")};
 
@@ -929,7 +929,8 @@ namespace jsonschema {
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"additionalItems"};
-                    additional_items_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    additional_items_validator = this->make_schema_keyword_validator("additionalItems", context,
+                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
                 }
             }
 
@@ -937,6 +938,14 @@ namespace jsonschema {
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
+        keyword_validator_type make_schema_keyword_validator(const std::string& keyword_name,
+            const compilation_context& context, schema_validator_type&& schema_val)
+        {
+            uri schema_location{context.make_schema_path_with(keyword_name)};
+            return jsoncons::make_unique<schema_keyword_validator<Json>>(keyword_name, schema_location, 
+                std::move(schema_val));
+        }
+        
         std::unique_ptr<items_validator<Json>> make_items_validator(const std::string& keyword_name,
             const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)

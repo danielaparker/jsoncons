@@ -470,7 +470,7 @@ namespace draft202012 {
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             std::vector<schema_validator_type> prefix_item_validators;
-            schema_validator_type items_validator;
+            keyword_validator_type items_validator;
 
             uri schema_location{context.make_schema_path_with("prefixItems")};
 
@@ -488,7 +488,8 @@ namespace draft202012 {
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"items"};
-                    items_validator = this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    items_validator = this->make_schema_keyword_validator("items", context,
+                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
                 }
             }
 
