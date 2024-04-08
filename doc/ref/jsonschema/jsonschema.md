@@ -4,7 +4,7 @@ The documentation below describes the new features for the jsonschema extension 
 For releases 0.173.4 and earlier, please refer to [jsonschema](https://github.com/danielaparker/jsoncons/tree/main).
 
 The jsonschema extension implements Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification)
-(since 0.174.0).
+(since 0.174.0, not yet released).
 
 ### Classes
 <table border="0">
