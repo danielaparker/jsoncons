@@ -961,6 +961,58 @@ void remove_selected_books_in_one_step()
     std::cout << jsoncons::pretty_print(doc) << "\n\n";
 }
 
+// since 0.174.0
+void replace_example()
+{
+    std::string json_string = R"(
+{"books": [ 
+    { "category": "reference",
+      "author": "Nigel Rees",
+      "title": "Sayings of the Century",
+      "price": 8.95
+    },
+    { "category": "fiction",
+      "author": "Evelyn Waugh",
+      "title": "Sword of Honour"
+    },
+    { "category": "fiction",
+      "author": "Herman Melville",
+      "title": "Moby Dick",
+      "isbn": "0-553-21311-3"
+    }
+  ] 
+}
+    )";
+
+    json doc = json::parse(json_string);
+
+    json new_price{13.0}; 
+
+    jsonpath::json_location loc0 = jsonpath::json_location::parse("$.books[0].price");
+    auto result0 = jsonpath::replace(doc, loc0, new_price);
+    assert(result0.second);
+    assert(result0.first == std::addressof(doc.at("books").at(0).at("price")));
+    assert(doc.at("books").at(0).at("price") == new_price);
+    
+    jsonpath::json_location loc1 = jsonpath::json_location::parse("$.books[1].price");
+    auto result1 = jsonpath::replace(doc, loc1, new_price);
+    assert(!result1.second);
+    
+    // create_if_missing is true
+    result1 = jsonpath::replace(doc, loc1, new_price, true);
+    assert(result1.second);
+    assert(result1.first == std::addressof(doc.at("books").at(1).at("price")));
+    assert(doc.at("books").at(1).at("price") == new_price);
+
+    jsonpath::json_location loc2 = jsonpath::json_location::parse("$.books[2].kindle.price");
+    auto result2 = jsonpath::replace(doc, loc2, new_price, true);
+    assert(result2.second);
+    assert(result2.first == std::addressof(doc.at("books").at(2).at("kindle").at("price")));
+    assert(doc.at("books").at(2).at("kindle").at("price") == new_price);
+    
+    std::cout << pretty_print(doc) << "\n\n";
+}
+
 void convert_normalized_path_to_json_pointer()
 {
     std::string json_string = R"(
@@ -1036,7 +1088,7 @@ int main()
 {
     std::cout << "\nJsonPath examples\n\n";
 
-    jsonpath_complex_examples();
+    /*jsonpath_complex_examples();
     jsonpath_union();
     flatten_and_unflatten();
     more_json_query_examples();
@@ -1072,8 +1124,10 @@ int main()
 
     convert_normalized_path_to_json_pointer();
 
-    remove_selected_books_in_one_step();
+    remove_selected_books_in_one_step();*/
 
+    replace_example();
+    
     std::cout << "\n";
 }
 

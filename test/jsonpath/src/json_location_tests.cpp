@@ -341,15 +341,16 @@ TEST_CASE("json_location replace tests")
     SECTION("store book 1")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[0].price");
-        
+        json new_value{13.0}; 
         //std::cout << to_string(loc) << "\n";
         
-        auto result1 = jsonpath::replace(doc, loc, json{13.5}, false);
+        auto result1 = jsonpath::replace(doc, loc, new_value, false);
         CHECK(result1.second);
         bool test1 = result1.first == std::addressof(doc.at("books").at(0).at("price"));
         CHECK(test1);
+        CHECK(doc.at("books").at(0).at("price") == new_value);
 
-        auto result2 = jsonpath::replace(doc, loc, json{13.5}, true);
+        auto result2 = jsonpath::replace(doc, loc, new_value, true);
         CHECK(result2.second);
         bool test2 = result2.first == std::addressof(doc.at("books").at(0).at("price"));
         CHECK(test2);
@@ -360,17 +361,19 @@ TEST_CASE("json_location replace tests")
     SECTION("test 2")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].price");
+        json new_value{13.0}; 
 
         //std::cout << to_string(loc) << "\n";
 
-        auto result1 = jsonpath::replace(doc, loc, json{ 13.5 }, false);
+        auto result1 = jsonpath::replace(doc, loc, new_value, false);
         CHECK_FALSE(result1.second);
         //std::cout << pretty_print(doc) << "\n";
 
-        auto result2 = jsonpath::replace(doc, loc, json{ 13.5 }, true);
+        auto result2 = jsonpath::replace(doc, loc, new_value, true);
         CHECK(result2.second);
         bool test2 = result2.first == std::addressof(doc.at("books").at(1).at("price"));
         CHECK(test2);
+        CHECK(doc.at("books").at(1).at("price") == new_value);
 
         //std::cout << pretty_print(doc) << "\n";
     }
@@ -378,17 +381,19 @@ TEST_CASE("json_location replace tests")
     SECTION("test 3")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[1].kindle.price");
+        json new_value{13.0}; 
 
         //std::cout << pretty_print(doc) << "\n";
 
-        auto result1 = jsonpath::replace(doc, loc, json{ 13.5 }, false);
+        auto result1 = jsonpath::replace(doc, loc, new_value, false);
         CHECK_FALSE(result1.second);
         //std::cout << pretty_print(doc) << "\n";
 
-        auto result2 = jsonpath::replace(doc, loc, json{ 13.5 }, true);
+        auto result2 = jsonpath::replace(doc, loc, new_value, true);
         CHECK(result2.second);
         bool test2 = result2.first == std::addressof(doc.at("books").at(1).at("kindle").at("price"));
         CHECK(test2);
+        CHECK(doc.at("books").at(1).at("kindle").at("price") == new_value);
 
         //std::cout << pretty_print(doc) << "\n";
     }
@@ -396,19 +401,22 @@ TEST_CASE("json_location replace tests")
     SECTION("test 4")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[2]");
+        json new_value{}; 
 
         //std::cout << to_string(loc) << "\n";
 
-        auto result1 = jsonpath::replace(doc, loc, json{}, false);
+        auto result1 = jsonpath::replace(doc, loc, new_value, false);
         CHECK(result1.second);
         bool test1 = result1.first == std::addressof(doc.at("books").at(2));
         CHECK(test1);
         //std::cout << pretty_print(doc) << "\n";
+        CHECK(doc.at("books").at(2) == new_value);
 
-        auto result2 = jsonpath::replace(doc, loc, json{}, true);
+        auto result2 = jsonpath::replace(doc, loc, new_value, true);
         CHECK(result2.second);
         bool test2 = result2.first == std::addressof(doc.at("books").at(2));
         CHECK(test2);
+        CHECK(doc.at("books").at(2) == new_value);
 
         //std::cout << pretty_print(doc) << "\n";
     }
@@ -416,13 +424,14 @@ TEST_CASE("json_location replace tests")
     SECTION("test 5")
     {
         jsonpath::json_location loc = jsonpath::json_location::parse("$.books[3]");
+        json new_value{}; 
 
         //std::cout << to_string(loc) << "\n";
 
-        auto result1 = jsonpath::replace(doc, loc, json{}, false);
+        auto result1 = jsonpath::replace(doc, loc, new_value, false);
         CHECK_FALSE(result1.second);
 
-        auto result2 = jsonpath::replace(doc, loc, json{}, true);
+        auto result2 = jsonpath::replace(doc, loc, new_value, true);
         CHECK_FALSE(result2.second);
 
         //std::cout << pretty_print(doc) << "\n";

@@ -90,6 +90,13 @@ using the dot notation.
 
 #### Non-member functions
 
+<table border="0">
+  <tr>
+    <td><a href="replace.md">replace</a></td>
+    <td>Replace a value in a JSON document with a new value at a specified location</td> 
+  </tr>
+</table>
+
     template<class Json>
     Json* get(Json& root_value, const basic_json_location<Json::char_type>& location)
 Returns a pointer to a JSON value at the specified `location` in the `root_value`.
@@ -101,14 +108,6 @@ Removes a single node at the specified location. Returns the number of nodes rem
     template<class Json>
     std::size_t remove(Json& root_value, const jsoncons::basic_string_view<Json::char_type>& path_string);
 Removes the nodes matched by the specified JSONPath expression. Returns the number of nodes removed.
-
-    template<class Json>
-    std::pair<Json*,bool> replace(Json& root_value, const basic_json_location<Json::char_type>& location, 
-        Json&& value, bool create_if_missing = false);   (since 0.174.0)
-Attempts to assign a value at the specified location. If `create_if_missing` is true, creates key-object pairs 
-when an object key is missing. Returns a `std::pair<Json*,bool>`, the bool component is `true`
-if the assignment took place and `false` if not, if `true`, the `Json*` component points to the value that
-was assigned or inserted. 
 
     template <class CharT, class Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 
