@@ -1,7 +1,5 @@
 ### jsoncons::jsonpath::replace
 
-Replace a `json` element or member.
-
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
