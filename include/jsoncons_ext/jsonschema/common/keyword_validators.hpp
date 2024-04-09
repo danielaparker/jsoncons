@@ -2013,13 +2013,11 @@ namespace jsonschema {
                 return;
             }
 
-            evaluation_context<Json> this_context(context, this->keyword_name());
-
             std::unordered_set<std::string> allowed_properties;
 
             if (properties_)
             {
-                properties_->validate(this_context, instance, instance_location, results, reporter, patch, allowed_properties);
+                properties_->validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
                 if (reporter.fail_early())
                 {
                     return;
@@ -2028,7 +2026,7 @@ namespace jsonschema {
 
             if (pattern_properties_)
             {
-                pattern_properties_->validate(this_context, instance, instance_location, results, reporter, patch, allowed_properties);
+                pattern_properties_->validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
                 if (reporter.fail_early())
                 {
                     return;
@@ -2037,6 +2035,7 @@ namespace jsonschema {
 
             if (additional_properties_)
             {
+                evaluation_context<Json> this_context(context, this->keyword_name());
                 if (additional_properties_->always_fails())
                 {
                     for (const auto& prop : instance.object_range()) 

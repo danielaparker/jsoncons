@@ -377,14 +377,14 @@ TEST_CASE("jsonschema items output tests")
         "details": [
             {
                 "valid": false,
-                "evaluationPath": "/items/oneOf/0/additionalProperties/properties/op/enum",
+                "evaluationPath": "/items/oneOf/0/properties/op/enum",
                 "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/0/properties/op/enum",
                 "instanceLocation": "/0/op",
                 "error": "'invalid_op' is not a valid enum value."
             },
             {
                 "valid": false,
-                "evaluationPath": "/items/oneOf/1/additionalProperties/properties/op/enum",
+                "evaluationPath": "/items/oneOf/1/properties/op/enum",
                 "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1/properties/op/enum",
                 "instanceLocation": "/0/op",
                 "error": "'invalid_op' is not a valid enum value."
@@ -405,7 +405,7 @@ TEST_CASE("jsonschema items output tests")
             },
             {
                 "valid": false,
-                "evaluationPath": "/items/oneOf/2/additionalProperties/properties/op/enum",
+                "evaluationPath": "/items/oneOf/2/properties/op/enum",
                 "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/properties/op/enum",
                 "instanceLocation": "/0/op",
                 "error": "'invalid_op' is not a valid enum value."
@@ -606,7 +606,7 @@ TEST_CASE("jsonschema more output tests 2")
             },
             {
                 "valid": false,
-                "evaluationPath": "/oneOf/1/additionalProperties/properties/membershipType/const",
+                "evaluationPath": "/oneOf/1/properties/membershipType/const",
                 "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf/1/properties/membershipType/const",
                 "instanceLocation": "/membershipType",
                 "error": "Instance is not const"
