@@ -862,7 +862,7 @@ namespace jsonpath {
     }
 
     template<class Json>
-    std::pair<Json*,bool> add(Json& root_value, const basic_json_location<typename Json::char_type>& location, Json&& value,
+    std::pair<Json*,bool> replace(Json& root_value, const basic_json_location<typename Json::char_type>& location, Json&& value,
         bool create_if_missing=false)
     {
         Json* p_current = std::addressof(root_value);
@@ -880,6 +880,7 @@ namespace jsonpath {
                     p_current = std::addressof(it->value());
                     if (i == last)
                     {
+                        *p_current = std::forward<Json>(value);
                         found = true;
                     }
                 }
@@ -911,11 +912,6 @@ namespace jsonpath {
                         *p_current = std::forward<Json>(value);
                         found = true;
                     }
-                }
-                else if (element.index() == p_current->size() && i == last)
-                {
-                    p_current = std::addressof(p_current->emplace_back(std::forward<Json>(value)));
-                    found = true;
                 }
                 else
                 {

@@ -103,7 +103,7 @@ Removes a single node at the specified location. Returns the number of nodes rem
 Removes the nodes matched by the specified JSONPath expression. Returns the number of nodes removed.
 
     template<class Json>
-    std::pair<Json*,bool> add(Json& root_value, const basic_json_location<Json::char_type>& location, 
+    std::pair<Json*,bool> replace(Json& root_value, const basic_json_location<Json::char_type>& location, 
         Json&& value, bool create_if_missing = false);   (since 0.174.0)
 Attempts to assign a value at the specified location. If `create_if_missing` is true, creates key-object pairs 
 when an object key is missing. Returns a `std::pair<Json*,bool>`, the bool component is `true`
