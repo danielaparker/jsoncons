@@ -240,14 +240,14 @@ Output:
 [
     {
         "valid": false,
-        "evaluationPath": "/properties/vegetables/items/1/$ref/properties/veggieLike/type",
+        "evaluationPath": "/properties/vegetables/items/$ref/properties/veggieLike/type",
         "schemaLocation": "https://example.com/arrays.schema.json#/$defs/veggie/properties/veggieLike",
         "instanceLocation": "/vegetables/1/veggieLike",
         "error": "Expected boolean, found string"
     },
     {
         "valid": false,
-        "evaluationPath": "/properties/vegetables/items/3/$ref/required",
+        "evaluationPath": "/properties/vegetables/items/$ref/required",
         "schemaLocation": "https://example.com/arrays.schema.json#/$defs/veggie/required",
         "instanceLocation": "/vegetables/3",
         "error": "Required property 'veggieLike' not found."

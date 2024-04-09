@@ -115,7 +115,7 @@ Output:
 [
     {
         "valid": false,
-        "evaluationPath": "/$ref/items/1/$dynamicRef/type",
+        "evaluationPath": "/$ref/items/$dynamicRef/type",
         "schemaLocation": "https://test.json-schema.org/typical-dynamic-resolution/root#items",
         "instanceLocation": "/1",
         "error": "Expected string, found integer"
@@ -170,7 +170,7 @@ Output:
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/baz",
-        "schemaLocation": "",
+        "schemaLocation": "#",
         "instanceLocation": "/baz",
         "error": "Unevaluated property 'baz' but the schema does not allow unevaluated properties."
     }
@@ -213,10 +213,10 @@ Output:
 [
     {
         "valid": false,
-        "evaluationPath": "/items/3/type",
+        "evaluationPath": "/items/type",
         "schemaLocation": "#/additionalItems",
         "instanceLocation": "/3",
-        "error": "Expected string, found integer"
+        "error": "Expected integer, found string"
     }
 ]
 ```
