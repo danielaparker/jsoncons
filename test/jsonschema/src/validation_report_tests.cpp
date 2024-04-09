@@ -15,7 +15,7 @@
 using jsoncons::json;
 using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
-#if 0
+
 TEST_CASE("jsonschema validation report tests")
 {
     json schema = json::parse(R"(
@@ -175,7 +175,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#",
+        "schemaLocation": "#/additionalProperties",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -392,7 +392,7 @@ TEST_CASE("jsonschema items output tests")
             {
                 "valid": false,
                 "evaluationPath": "/items/oneOf/1/additionalProperties/value",
-                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1/additionalProperties/false",
                 "instanceLocation": "/0/value",
                 "error": "Additional property 'value' not allowed by schema."
             },
@@ -413,7 +413,7 @@ TEST_CASE("jsonschema items output tests")
             {
                 "valid": false,
                 "evaluationPath": "/items/oneOf/2/additionalProperties/value",
-                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/additionalProperties/false",
                 "instanceLocation": "/0/value",
                 "error": "Additional property 'value' not allowed by schema."
             }
@@ -441,7 +441,7 @@ TEST_CASE("jsonschema items output tests")
         //std::cout << pretty_print(output) << "\n";
     }
 }
-#endif
+
 TEST_CASE("jsonschema more output tests")
 {
     json schema = json::parse(R"(
@@ -495,7 +495,7 @@ TEST_CASE("jsonschema more output tests")
     {
         "valid": false,
         "evaluationPath": "/items/$ref/additionalProperties/z",
-        "schemaLocation": "https://example.com/polygon#/$defs/point/additionalProperties",
+        "schemaLocation": "https://example.com/polygon#/$defs/point/additionalProperties/false",
         "instanceLocation": "/1/z",
         "error": "Additional property 'z' not allowed by schema."
     }
@@ -516,6 +516,113 @@ TEST_CASE("jsonschema more output tests")
 ]
         )");
             
+        auto compiled = jsoncons::jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        compiled.validate(data, decoder);
+        auto output = decoder.get_result();        
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema more output tests 2")
+{
+    json schema = json::parse(R"(
+{
+  "$id":"http://schemarepo.org/schemas/user.json",
+  "$schema":"http://json-schema.org/draft-07/schema#",
+  "type":"object",
+  "definitions":{
+    "min18":{
+      "type":"integer",
+      "minimum":18
+    },
+    "username":{
+      "type":"string",
+      "minLength":8
+    },
+    "member":{
+      "type":"object",
+      "properties":{
+        "age":{"$ref":"#/definitions/min18"},
+        "username":{"$ref":"#/definitions/username"}
+      }
+    },
+    "membershipTypes":{"enum":["admin","user"]}
+  },
+  "oneOf":[
+    {
+      "properties":{
+        "member":{"$ref":"#/definitions/member"},
+        "membershipType":{"$ref":"#/definitions/membershipTypes"}
+      }
+    },
+    {
+      "properties":{
+        "membershipType":{"const":"guest"},
+        "firstName":{"type":"string"},
+        "lastName":{"type":"string"}
+      },
+      "additionalProperties":false
+    }
+  ]
+}
+        )");
+
+    SECTION("With ref")
+    {
+        json data = json::parse(R"(
+{
+  "member":{
+      "age":5,  // doesn't meet minimum
+      "username":"aName"  // doesn't meet minLength
+  },
+  "membershipType":"user"
+}
+        )");
+            
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/oneOf",
+        "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf",
+        "instanceLocation": "",
+        "error": "No schema matched, but exactly one of them is required to match",
+        "details": [
+            {
+                "valid": false,
+                "evaluationPath": "/oneOf/0/properties/member/$ref/properties/age/$ref/minimum",
+                "schemaLocation": "http://schemarepo.org/schemas/user.json#/definitions/min18/minimum",
+                "instanceLocation": "/member/age",
+                "error": "5 is less than minimum 18"
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/oneOf/0/properties/member/$ref/properties/username/$ref/minLength",
+                "schemaLocation": "http://schemarepo.org/schemas/user.json#/definitions/username/minLength",
+                "instanceLocation": "/member/username",
+                "error": "Expected minLength: 8, actual: 5"
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/oneOf/1/additionalProperties/properties/membershipType/const",
+                "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf/1/properties/membershipType/const",
+                "instanceLocation": "/membershipType",
+                "error": "Instance is not const"
+            },
+            {
+                "valid": false,
+                "evaluationPath": "/oneOf/1/additionalProperties/member",
+                "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf/1/additionalProperties/false",
+                "instanceLocation": "/member",
+                "error": "Additional property 'member' not allowed by schema."
+            }
+        ]
+    }
+]
+        )");           
+
         auto compiled = jsoncons::jsonschema::make_json_schema(schema);
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         compiled.validate(data, decoder);

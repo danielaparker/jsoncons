@@ -138,7 +138,7 @@ namespace draft7 {
             {
                 case json_type::bool_value:
                 {
-                    uri schema_location = new_context.get_base_uri();
+                    uri schema_location = sch.template as<bool>() ? new_context.make_schema_path_with("true") : new_context.make_schema_path_with("false");
                     schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
                         schema_location, sch.template as<bool>());
                     schema_validator<Json>* p = schema_validator_ptr.get();

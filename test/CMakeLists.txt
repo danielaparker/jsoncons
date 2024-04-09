@@ -103,7 +103,6 @@ add_executable(unit_tests
                jsonschema/src/validation_report_tests.cpp
                jsonschema/src/dynamic_ref_tests.cpp
                jsonschema/src/jsonschema_defaults_tests.cpp
-               jsonschema/src/jsonschema_output_tests.cpp
                jsonschema/src/jsonschema_draft4_tests.cpp
                jsonschema/src/jsonschema_draft6_tests.cpp
                jsonschema/src/jsonschema_draft7_tests.cpp
