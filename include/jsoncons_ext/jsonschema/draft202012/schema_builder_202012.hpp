@@ -202,9 +202,7 @@ namespace draft202012 {
             {
                 case json_type::bool_value:
                 {
-                    uri schema_location = new_context.get_base_uri();
-                    schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
-                        schema_location, sch.template as<bool>());
+                    schema_validator_ptr = this->make_boolean_schema(new_context, sch);
                     schema_validator<Json>* p = schema_validator_ptr.get();
                     for (const auto& uri : new_context.uris()) 
                     { 

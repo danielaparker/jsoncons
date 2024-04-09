@@ -49,7 +49,7 @@ TEST_CASE("jsonschema validation report tests")
     {
         "valid": false,
         "evaluationPath": "/properties/fails",
-        "schemaLocation": "https://test.com/schema#/properties/fails",
+        "schemaLocation": "https://test.com/schema#/properties/fails/false",
         "instanceLocation": "/fails",
         "error": "False schema always fails"
     }
@@ -175,7 +175,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#/additionalProperties",
+        "schemaLocation": "#/additionalProperties/false",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }

@@ -99,6 +99,15 @@ namespace jsonschema {
         {
             return options_;
         }
+        
+        schema_validator_type make_boolean_schema(const compilation_context& context, const Json& sch)
+        {
+            uri schema_location = sch.template as<bool>() ? context.make_schema_path_with("true") : context.make_schema_path_with("false");
+            schema_validator_type schema_validator_ptr = jsoncons::make_unique<boolean_schema_validator<Json>>( 
+                schema_location, sch.template as<bool>());
+
+            return schema_validator_ptr;
+        }
 
         std::unique_ptr<document_schema_validator<Json>> get_schema()
         {                        
