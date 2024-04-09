@@ -11,7 +11,7 @@ Core library enhancements
 
 jsonpath library enhancements
 
-- New function `jsonpath::add` analagous to `jsonpointer::add`,
+- New function `jsonpath::replace` analagous to `jsonpointer::replace`,
   but for normalized paths. 
 
 jsonschema library enhancements
