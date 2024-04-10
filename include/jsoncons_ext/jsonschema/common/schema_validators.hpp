@@ -189,6 +189,8 @@ namespace jsonschema {
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
         anchor_schema_map_type anchor_dict_;
+        bool always_succeeds_;
+        bool always_fails_;
 
     public:
         object_schema_validator(const uri& schema_location, 
@@ -201,7 +203,8 @@ namespace jsonschema {
               validators_(std::move(validators)),
               defs_(std::move(defs)),
               default_value_(std::move(default_value)),
-              recursive_anchor_(false)
+              recursive_anchor_(false),
+              always_succeeds_(false), always_fails_(false) 
         {
         }
         object_schema_validator(const uri& schema_location, 
@@ -218,7 +221,8 @@ namespace jsonschema {
               unevaluated_items_val_(std::move(unevaluated_items_val)),
               defs_(std::move(defs)),
               default_value_(std::move(default_value)),
-              recursive_anchor_(recursive_anchor)
+              recursive_anchor_(recursive_anchor),
+              always_succeeds_(false), always_fails_(false)
         {
         }
         object_schema_validator(const uri& schema_location, 
@@ -239,8 +243,32 @@ namespace jsonschema {
               default_value_(std::move(default_value)),
               recursive_anchor_(false),
               dynamic_anchor_(std::move(dynamic_anchor)),
-              anchor_dict_(std::move(anchor_dict))
+              anchor_dict_(std::move(anchor_dict)),
+              always_succeeds_(false), always_fails_(false)
         {
+        }
+        
+        // Called after all references have been resolved
+        void init() final
+        {
+            if (!(unevaluated_properties_val_ || unevaluated_items_val_))
+            {
+                std::size_t always_fails_count = 0;
+                std::size_t always_succeeds_count = 0;
+                for (const auto& val : validators_)
+                {
+                    if (val->always_fails())
+                    {
+                        ++always_fails_count;
+                    }
+                    if (val->always_succeeds())
+                    {
+                        ++always_succeeds_count;
+                    }
+                }
+                always_succeeds_ = always_succeeds_count == validators_.size(); // empty schema always succeeds
+                always_fails_ = validators_.size() > 0 && (always_fails_count == validators_.size()); 
+            }
         }
 
         jsoncons::optional<Json> get_default_value() const override
@@ -276,12 +304,12 @@ namespace jsonschema {
 
         bool always_fails() const final
         {
-            return false;
+            return always_fails_;
         }
 
         bool always_succeeds() const final
         {
-            return false;
+            return always_succeeds_;
         }
 
     private:

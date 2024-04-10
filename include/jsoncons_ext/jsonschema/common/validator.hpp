@@ -370,6 +370,10 @@ namespace jsonschema {
         schema_validator()
         {}
 
+        virtual void init()
+        {
+        }
+
         virtual bool always_fails() const = 0;
 
         virtual bool always_succeeds() const = 0;
