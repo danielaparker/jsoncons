@@ -90,7 +90,7 @@ TEST_CASE("jsonschema validation report tests")
                 "evaluationPath": "/properties/multi/allOf/1/$ref/minimum",
                 "schemaLocation": "https://test.com/schema#/$defs/minimum/minimum",
                 "instanceLocation": "/multi",
-                "error": "3.5 is less than minimum 5"
+                "error": "Minimum value is 5 but found 3.5"
             }
         ]
     }
@@ -511,14 +511,14 @@ TEST_CASE("jsonschema more output tests 2")
                 "evaluationPath": "/oneOf/0/properties/member/$ref/properties/age/$ref/minimum",
                 "schemaLocation": "http://schemarepo.org/schemas/user.json#/definitions/min18/minimum",
                 "instanceLocation": "/member/age",
-                "error": "5 is less than minimum 18"
+                "error": "Minimum value is 18 but found 5"
             },
             {
                 "valid": false,
                 "evaluationPath": "/oneOf/0/properties/member/$ref/properties/username/$ref/minLength",
                 "schemaLocation": "http://schemarepo.org/schemas/user.json#/definitions/username/minLength",
                 "instanceLocation": "/member/username",
-                "error": "Expected minLength: 8, actual: 5"
+                "error": "Number of characters must be at least 8"
             },
             {
                 "valid": false,
@@ -652,7 +652,7 @@ TEST_CASE("jsonschema more output tests")
         "evaluationPath": "/minItems",
         "schemaLocation": "https://example.com/polygon#/minItems",
         "instanceLocation": "",
-        "error": "Minimum number of items is 3 but found: 2"
+        "error": "Minimum number of items is 3 but found 2"
     }
 ]
         )");

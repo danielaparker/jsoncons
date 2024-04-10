@@ -255,6 +255,61 @@ Output:
 ]
 ```
 
+#### Format
+
+Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
+by setting the evaluation option `require_format_validation` to `true` 
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+using jsoncons::ojson;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    std::string schema_str = R"(
+{ "$schema": "https://json-schema.org/draft/2020-12/schema", "$id" : "/test_schema", "type" : "object", "properties" : { "Date": { "type": "string", "format" : "date-time" } }, "required" : ["Date"] , "unevaluatedProperties" : false }
+)";
+    json schema = json::parse(schema_str);
+    std::cout << pretty_print(schema) << "\n\n";
+
+    auto compiled = jsoncons::jsonschema::make_json_schema(schema,
+        jsonschema::evaluation_options{}.require_format_validation(true));
+
+    std::string data_str = R"(
+{ "Date" : "2024-03-19T26:34:56Z" }
+)";
+    json data = json::parse(data_str);
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    std::cout << pretty_print(decoder.get_result()) << "\n";
+}
+```
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/properties/Date/format",
+        "schemaLocation": "/test_schema#/properties/Date/format",
+        "instanceLocation": "/Date",
+        "error": "'2024-03-19T26:34:56Z' is not a RFC 3339 date-time string."
+    },
+    {
+        "valid": false,
+        "evaluationPath": "/unevaluatedProperties/Date",
+        "schemaLocation": "/test_schema",
+        "instanceLocation": "/Date",
+        "error": "Unevaluated property 'Date' but the schema does not allow unevaluated properties."
+    }
+]
+```
+
 <div id="eg2"/>
 
 #### Using a URIResolver to resolve references to schemas defined in external files

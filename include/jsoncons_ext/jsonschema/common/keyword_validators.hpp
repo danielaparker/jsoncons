@@ -493,8 +493,7 @@ namespace jsonschema {
                         this_context.eval_path(), 
                         this->schema_location(), 
                         instance_location, 
-                        std::string("Expected maxLength: ") + std::to_string(max_length_)
-                    + ", actual: " + std::to_string(length)));
+                        std::string("Number of characters must be at most ") + std::to_string(max_length_)));
                 if (reporter.fail_early())
                 {
                     return;
@@ -535,7 +534,7 @@ namespace jsonschema {
             if (instance.size() > max_items_)
             {
                 std::string message("Maximum number of items is " + std::to_string(max_items_));
-                message.append(" but found: " + std::to_string(instance.size()));
+                message.append(" but found " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_location(),
@@ -581,7 +580,7 @@ namespace jsonschema {
             if (instance.size() < min_items_)
             {
                 std::string message("Minimum number of items is " + std::to_string(min_items_));
-                message.append(" but found: " + std::to_string(instance.size()));
+                message.append(" but found " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(), 
                         this->schema_location(),
@@ -786,8 +785,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    std::string("Expected minLength: ") + std::to_string(min_length_)
-                                          + ", actual: " + std::to_string(length)));
+                    std::string("Number of characters must be at least ") + std::to_string(min_length_)));
                 if (reporter.fail_early())
                 {
                     return;
@@ -1064,7 +1062,7 @@ namespace jsonschema {
     public:
         maximum_validator(const uri& schema_location, const Json& value)
             : keyword_validator_base<Json>("maximum", schema_location), value_(value),
-              message_{" is greater than maximum " + value.template as<std::string>()}
+              message_{"Maximum value is " + value.template as<std::string>() + " but found"}
         {
         }
 
@@ -1089,7 +1087,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1101,7 +1099,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1122,7 +1120,7 @@ namespace jsonschema {
     public:
         exclusive_maximum_validator(const uri& schema_location, const Json& value)
             : keyword_validator_base<Json>("exclusiveMaximum", schema_location), value_(value),
-              message_{" is no less than exclusiveMaximum " + value.template as<std::string>()}
+              message_{"Exclusive maximum value is " + value.template as<std::string>() + " but found "}
         {
         }
 
@@ -1147,7 +1145,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1159,7 +1157,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1180,7 +1178,7 @@ namespace jsonschema {
     public:
         minimum_validator(const uri& schema_location, const Json& value)
             : keyword_validator_base<Json>("minimum", schema_location), value_(value),
-              message_{" is less than minimum " + value.template as<std::string>()}
+              message_{"Minimum value is " + value.template as<std::string>() + " but found "}
         {
         }
 
@@ -1205,7 +1203,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1217,7 +1215,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1238,7 +1236,7 @@ namespace jsonschema {
     public:
         exclusive_minimum_validator(const uri& schema_location, const Json& value)
             : keyword_validator_base<Json>("exclusiveMinimum", schema_location), value_(value),
-              message_{" is no greater than exclusiveMinimum " + value.template as<std::string>()}
+              message_{"Exclusive minimum value is " + value.template as<std::string>() + " but found "}
         {
         }
 
@@ -1263,7 +1261,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1275,7 +1273,7 @@ namespace jsonschema {
                             this_context.eval_path(), 
                             this->schema_location(), 
                             instance_location, 
-                            instance.template as<std::string>() + message_));
+                            message_ + instance.template as<std::string>()));
                     }
                     break;
                 }
@@ -1418,8 +1416,8 @@ namespace jsonschema {
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
 
-                std::string message("Maximum properties: " + std::to_string(max_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
+                std::string message("Maximum number of properties is " + std::to_string(max_properties_));
+                message.append(" but found " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_location(), 
@@ -1459,8 +1457,8 @@ namespace jsonschema {
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
 
-                std::string message("Maximum properties: " + std::to_string(min_properties_));
-                message.append(", found: " + std::to_string(instance.size()));
+                std::string message("Minimum number of properties is " + std::to_string(min_properties_));
+                message.append(" but found " + std::to_string(instance.size()));
                 reporter.error(validation_message(this->keyword_name(),
                         this_context.eval_path(),
                         this->schema_location(),
