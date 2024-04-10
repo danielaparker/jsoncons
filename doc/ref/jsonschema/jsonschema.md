@@ -301,7 +301,8 @@ int main()
 
     jsoncons::json_decoder<ojson> decoder;
     compiled.validate(data, decoder);
-    std::cout << pretty_print(decoder.get_result()) << "\n";
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n";
 }
 ```
 Output:
@@ -446,8 +447,8 @@ using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema; 
 
 int main()
-{ 
-    json schema = json::parse(R"(
+{
+    std::string schema_str = R"(
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "job",
@@ -513,6 +514,48 @@ int main()
   },
   "required": [ "name", "run" ],
   "additionalProperties":  false
+}
+    )";
+    
+    std::string data_str = R"(
+{
+    "name": "testing flow", 
+    "run" : {
+        "command": "some command"    
+    }
+}
+    
+    )";
+    try
+    {
+        json schema = json::parse(schema_str);
+        json data = json::parse(data_str);
+
+        // Throws schema_error if JSON Schema compilation fails
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+        // Test that input is valid before attempting to decode
+        if (compiled.is_valid(data))
+        {
+            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse data_str 
+
+            std::string output;
+            jsoncons::encode_json_pretty(v, output);
+            std::cout << output << std::endl;
+
+            // Verify that output is valid
+            json test = json::parse(output);
+            assert(compiled.is_valid(test));
+        }
+        else
+        {
+            std::cout << "Invalid input\n";
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << '\n';
+    }
 }
 ```
 Output:
