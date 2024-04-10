@@ -12,10 +12,16 @@ Allows configuration of JSON Schema evaluation.
 
 #### Constructors
 
-    evaluation_options()
+    evaluation_options();
 Constructs an `evaluation_options` with default values. 
 
-#### Members
+    evaluation_options(const evaluation_options& other);
+Copy constructor
+
+#### Member functions
+
+    evaluation_options& operator=(const evaluation_options& other);
+Assignment operator
 
     const std::string& default_version() const;
     evaluation_options& default_version(const std::string& version); 
@@ -33,4 +39,9 @@ and 2020-12 implementations support the Draft 7 "definitions" and
     bool require_format_validation() const;
     evaluation_options& require_format_validation(bool value); 
 Determines whether `format` is an assertion. The default is `false`. 
+
+#### Non-member functions
+
+    bool operator==(const evaluation_options& lhs, const evaluation_options& rhs) const;
+Checks if the contents of `lhs` and `rhs` are equal.
 

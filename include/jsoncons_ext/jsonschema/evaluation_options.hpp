@@ -97,6 +97,13 @@ namespace jsonschema {
             default_version_ = version;
             return *this;
         }
+
+        friend bool operator==(const evaluation_options& lhs, const evaluation_options& rhs) const
+        {
+            return lhs.default_version_ == rhs.default_version_
+                && lhs.require_format_validation_ = rhs.require_format_validation_
+                && lhs.compatibility_mode_ = rhs.compatibility_mode_;
+        }
     };
 
 } // namespace jsonschema
