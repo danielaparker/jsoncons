@@ -42,6 +42,6 @@ Determines whether `format` is an assertion. The default is `false`.
 
 #### Non-member functions
 
-    bool operator==(const evaluation_options& lhs, const evaluation_options& rhs) const;
+    bool operator==(const evaluation_options& lhs, const evaluation_options& rhs);
 Checks if the contents of `lhs` and `rhs` are equal.
 
