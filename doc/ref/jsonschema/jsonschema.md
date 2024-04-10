@@ -113,7 +113,7 @@ The implementation understands the following [formats](https://json-schema.org/u
 
 Any other format type is ignored.
 
-By default, since Draft 2019-09, format is no longer an assertion. It can be configured to be an assertion 
+Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
 by setting the evaluation option `require_format_validation` to `true` 
   
 ### Default values
@@ -130,9 +130,10 @@ The example schemas are from [JSON Schema Miscellaneous Examples](https://json-s
 the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and user contributions.
 
 [Arrays of things](#eg1)  
-[Using a URIResolver to resolve references to schemas defined in external files](#eg2)  
-[Validate before decoding JSON into C++ class objects](#eg3)  
-[Default values](#eg4)  
+[Format validation](#eg2)  
+[Using a URIResolver to resolve references to schemas defined in external files](#eg3)  
+[Validate before decoding JSON into C++ class objects](#eg4)  
+[Default values](#eg5)  
 
  <div id="eg1"/>
 
@@ -255,10 +256,12 @@ Output:
 ]
 ```
 
-#### Format
+<div id="eg2"/>
 
-Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
-by setting the evaluation option `require_format_validation` to `true` 
+#### Format validation
+
+Since Draft 2019-09, format validation is disabled by default, but may be enabled by setting the 
+evaluation option `require_format_validation` to `true`. 
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -271,19 +274,30 @@ namespace jsonschema = jsoncons::jsonschema;
 
 int main()
 {
-    std::string schema_str = R"(
-{ "$schema": "https://json-schema.org/draft/2020-12/schema", "$id" : "/test_schema", "type" : "object", "properties" : { "Date": { "type": "string", "format" : "date-time" } }, "required" : ["Date"] , "unevaluatedProperties" : false }
-)";
-    json schema = json::parse(schema_str);
-    std::cout << pretty_print(schema) << "\n\n";
+    json schema = json::parse(R"(
+{
+    "$id": "/test_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "Date": {
+            "format": "date-time",
+            "type": "string"
+        }
+    },
+    "required": [
+        "Date"
+    ],
+    "type": "object",
+    "unevaluatedProperties": false
+}
+    )");
 
     auto compiled = jsoncons::jsonschema::make_json_schema(schema,
         jsonschema::evaluation_options{}.require_format_validation(true));
 
-    std::string data_str = R"(
+    json data = json::parse(R"(
 { "Date" : "2024-03-19T26:34:56Z" }
-)";
-    json data = json::parse(data_str);
+    )");
 
     jsoncons::json_decoder<ojson> decoder;
     compiled.validate(data, decoder);
@@ -310,7 +324,7 @@ Output:
 ]
 ```
 
-<div id="eg2"/>
+<div id="eg3"/>
 
 #### Using a URIResolver to resolve references to schemas defined in external files
 
@@ -419,7 +433,7 @@ uri: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name
     Expected string, found object
 ```
 
-<div id="eg3"/>
+<div id="eg4"/>
 
 #### Validate before decoding JSON into C++ class objects 
 
@@ -511,7 +525,7 @@ Output:
 }
 ```
 
-<div id="eg4"/>
+<div id="eg5"/>
 
 #### Default values
 

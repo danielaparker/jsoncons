@@ -468,6 +468,38 @@ void cross_schema_example()
     std::cout << pretty_print(output) << "\n\n";
 }
 
+void optional_format_example()
+{
+    json schema = json::parse(R"(
+{
+    "$id": "/test_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "Date": {
+            "format": "date-time",
+            "type": "string"
+        }
+    },
+    "required": [
+        "Date"
+    ],
+    "type": "object",
+    "unevaluatedProperties": false
+}
+    )");
+
+    auto compiled = jsoncons::jsonschema::make_json_schema(schema,
+        jsonschema::evaluation_options{}.require_format_validation(true));
+
+    json data = json::parse(R"(
+{ "Date" : "2024-03-19T26:34:56Z" }
+    )");
+
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    std::cout << pretty_print(decoder.get_result()) << "\n";
+}
+
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
@@ -485,6 +517,7 @@ int main()
     draft_07_example();
     
     cross_schema_example();
+    optional_format_example();    
     
     std::cout << "\n";
 }
