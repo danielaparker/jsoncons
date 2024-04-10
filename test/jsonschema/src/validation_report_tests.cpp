@@ -49,7 +49,7 @@ TEST_CASE("jsonschema validation report tests")
     {
         "valid": false,
         "evaluationPath": "/properties/fails",
-        "schemaLocation": "https://test.com/schema#/properties/fails/false",
+        "schemaLocation": "https://test.com/schema#/properties/fails",
         "instanceLocation": "/fails",
         "error": "False schema always fails"
     }
@@ -175,7 +175,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#/additionalProperties/false",
+        "schemaLocation": "#/additionalProperties",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -392,7 +392,7 @@ TEST_CASE("jsonschema items output tests")
             {
                 "valid": false,
                 "evaluationPath": "/items/oneOf/1/additionalProperties/value",
-                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1/additionalProperties/false",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/1/additionalProperties",
                 "instanceLocation": "/0/value",
                 "error": "Additional property 'value' not allowed by schema."
             },
@@ -413,7 +413,7 @@ TEST_CASE("jsonschema items output tests")
             {
                 "valid": false,
                 "evaluationPath": "/items/oneOf/2/additionalProperties/value",
-                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/additionalProperties/false",
+                "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf/2/additionalProperties",
                 "instanceLocation": "/0/value",
                 "error": "Additional property 'value' not allowed by schema."
             }
@@ -441,90 +441,6 @@ TEST_CASE("jsonschema items output tests")
         //std::cout << pretty_print(output) << "\n";
     }
 }
-
-TEST_CASE("jsonschema more output tests")
-{
-    json schema = json::parse(R"(
-{
-"$id": "https://example.com/polygon",
-"$schema": "http://json-schema.org/draft-07/schema#",
-"$defs": {
-"point": {
-  "type": "object",
-  "properties": {
-    "x": { "type": "number" },
-    "y": { "type": "number" }
-  },
-  "additionalProperties": false,
-  "required": [ "x", "y" ]
-}
-},
-"type": "array",
-"items": { "$ref": "#/$defs/point" },
-"minItems": 3,
-"maxItems": 1
-}
-
-    )");
-    
-    SECTION("Test 1")
-    {
-        ojson expected = ojson::parse(R"(
-[
-    {
-        "valid": false,
-        "evaluationPath": "/maxItems",
-        "schemaLocation": "https://example.com/polygon#/maxItems",
-        "instanceLocation": "",
-        "error": "Maximum number of items is 1 but found: 2"
-    },
-    {
-        "valid": false,
-        "evaluationPath": "/minItems",
-        "schemaLocation": "https://example.com/polygon#/minItems",
-        "instanceLocation": "",
-        "error": "Minimum number of items is 3 but found: 2"
-    },
-    {
-        "valid": false,
-        "evaluationPath": "/items/$ref/required",
-        "schemaLocation": "https://example.com/polygon#/$defs/point/required",
-        "instanceLocation": "/1",
-        "error": "Required property 'y' not found."
-    },
-    {
-        "valid": false,
-        "evaluationPath": "/items/$ref/additionalProperties/z",
-        "schemaLocation": "https://example.com/polygon#/$defs/point/additionalProperties/false",
-        "instanceLocation": "/1/z",
-        "error": "Additional property 'z' not allowed by schema."
-    }
-]
-        )");
-
-
-        json data = json::parse(R"(
-[
-  {
-    "x": 2.5,
-    "y": 1.3
-  },
-  {
-    "x": 1,
-    "z": 6.7
-  }
-]
-        )");
-            
-        auto compiled = jsoncons::jsonschema::make_json_schema(schema);
-        jsoncons::json_decoder<jsoncons::ojson> decoder;
-        compiled.validate(data, decoder);
-        auto output = decoder.get_result();        
-        CHECK(expected == output);
-        //std::cout << pretty_print(output) << "\n";
-    }
-}
-
 TEST_CASE("jsonschema more output tests 2")
 {
     json schema = json::parse(R"(
@@ -614,7 +530,7 @@ TEST_CASE("jsonschema more output tests 2")
             {
                 "valid": false,
                 "evaluationPath": "/oneOf/1/additionalProperties/member",
-                "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf/1/additionalProperties/false",
+                "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf/1/additionalProperties",
                 "instanceLocation": "/member",
                 "error": "Additional property 'member' not allowed by schema."
             }
@@ -623,6 +539,138 @@ TEST_CASE("jsonschema more output tests 2")
 ]
         )");           
 
+        auto compiled = jsoncons::jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        compiled.validate(data, decoder);
+        auto output = decoder.get_result();        
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema more output tests 3")
+{
+    json schema = json::parse(R"(
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "example-schema",
+  "type": "object",
+  "title": "foo object schema",
+  "properties": {
+    "foo": {
+      "title": "foo's title",
+      "description": "foo's description",
+      "type": "string",
+      "pattern": "^foo ",
+      "minLength": 10
+    }
+  },
+  "required": [ "foo" ],
+  "additionalProperties": false
+}
+    )");
+
+    SECTION("With ref")
+    {
+        json data = json::parse(R"(
+{
+  "baz": 42
+}
+        )");
+            
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/additionalProperties/baz",
+        "schemaLocation": "/example-schema#/additionalProperties",
+        "instanceLocation": "/baz",
+        "error": "Additional property 'baz' not allowed by schema."
+    },
+    {
+        "valid": false,
+        "evaluationPath": "/required",
+        "schemaLocation": "/example-schema#/required",
+        "instanceLocation": "",
+        "error": "Required property 'foo' not found."
+    }
+]
+        )");           
+
+        auto compiled = jsoncons::jsonschema::make_json_schema(schema);
+        jsoncons::json_decoder<jsoncons::ojson> decoder;
+        compiled.validate(data, decoder);
+        auto output = decoder.get_result();        
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema more output tests")
+{
+    json schema = json::parse(R"(
+{
+  "$id": "https://example.com/polygon",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "point": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": false,
+      "required": [ "x", "y" ]
+    }
+  },
+  "type": "array",
+  "items": { "$ref": "#/$defs/point" },
+  "minItems": 3
+}
+    )");
+    
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/items/$ref/additionalProperties/z",
+        "schemaLocation": "https://example.com/polygon#/$defs/point/additionalProperties",
+        "instanceLocation": "/1/z",
+        "error": "Additional property 'z' not allowed by schema."
+    },
+    {
+        "valid": false,
+        "evaluationPath": "/items/$ref/required",
+        "schemaLocation": "https://example.com/polygon#/$defs/point/required",
+        "instanceLocation": "/1",
+        "error": "Required property 'y' not found."
+    },
+    {
+        "valid": false,
+        "evaluationPath": "/minItems",
+        "schemaLocation": "https://example.com/polygon#/minItems",
+        "instanceLocation": "",
+        "error": "Minimum number of items is 3 but found: 2"
+    }
+]
+        )");
+
+
+        json data = json::parse(R"(
+[
+  {
+    "x": 2.5,
+    "y": 1.3
+  },
+  {
+    "x": 1,
+    "z": 6.7
+  }
+]
+        )");
+            
         auto compiled = jsoncons::jsonschema::make_json_schema(schema);
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         compiled.validate(data, decoder);
