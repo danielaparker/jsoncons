@@ -1,11 +1,11 @@
 ### jsoncons::jsonpath::jsonpath_expression::evaluate
 
 ```cpp
-Json evaluate(reference root_value, result_options options = result_options()); (1)
+Json evaluate(reference root, result_options options = result_options()); (1)
 ```
 ```cpp
 template <class BinaryOp>
-void evaluate(reference root_value, BinaryOp op, 
+void evaluate(reference root, BinaryOp op, 
               result_options options = result_options());  (2)
 ```
 
@@ -21,8 +21,8 @@ Note: This function is kept for backwards compatability. New code should use the
 
 <table>
   <tr>
-    <td>root_value</td>
-    <td>JSON value</td> 
+    <td>root</td>
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td><code>op</code></td>
@@ -85,9 +85,9 @@ int main()
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
 
     std::ifstream is(/*path_to_books_file*/);
-    json root_value = json::parse(is);
+    json root = json::parse(is);
 
-    json result = expr.evaluate(root_value);
+    json result = expr.evaluate(root);
     std::cout << pretty_print(result) << "\n\n";
 }
 ```
@@ -112,14 +112,14 @@ int main()
     auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
 
     std::ifstream is(/*path_to_books_file*/);
-    json root_value = json::parse(is);
+    json root = json::parse(is);
 
     auto callback = [](const std::string& path, const json& val)
     {
        std::cout << path << ": " << val << "\n";
     };
 
-    expr.evaluate(root_value, callback, jsonpath::result_options::path);
+    expr.evaluate(root, callback, jsonpath::result_options::path);
 }
 ```
 Output:

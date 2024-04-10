@@ -13,7 +13,7 @@ bool contains(const Json& root, const StringSource& location_str);
 <table>
   <tr>
     <td>root</td>
-    <td>JSON value</td> 
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td>location</td>

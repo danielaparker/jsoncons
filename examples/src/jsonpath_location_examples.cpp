@@ -243,13 +243,13 @@ int main()
 {
     std::cout << "\njsonpath location examples\n\n";
 
-    remove_selected_books();
+    //remove_selected_books();
 
-    convert_normalized_path_to_json_pointer();
+    //convert_normalized_path_to_json_pointer();
 
     remove_selected_books_in_one_step();
 
-    replace_example();
+    //replace_example();
     
     std::cout << "\n";
 }

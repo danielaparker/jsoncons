@@ -4,8 +4,8 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template<class Json>
-std::pair<Json*,bool> replace(Json& target, 
-    const basic_json_location<typename Json::char_type>& location, 
+std::pair<Json*,bool> replace(Json& root, 
+    const basic_json_location<Json::char_type>& location, 
     const Json& new_value,
     bool create_if_missing=false)
 ```
@@ -15,8 +15,8 @@ Replace a JSON value in a JSON document at a specified location.
 #### Parameters
 <table>
   <tr>
-    <td>target</td>
-    <td>JSON value</td> 
+    <td>root</td>
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td>location</td>
@@ -35,7 +35,7 @@ Replace a JSON value in a JSON document at a specified location.
 #### Return value
 
 Returns a `std::pair<Json*,bool>`. If the replacement succeeded, the bool component is `true`, and
-the `Json*` component points to the new value in the `target`. If the replacement succeeded, the bool component is `false`.
+the `Json*` component points to the new value in the `root`. If the replacement succeeded, the bool component is `false`.
 
 #### Exceptions
 

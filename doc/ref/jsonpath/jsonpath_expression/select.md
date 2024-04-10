@@ -1,12 +1,12 @@
 ### jsoncons::jsonpath::jsonpath_expression::select
 
 ```cpp
-Json select(const_reference root_value, result_options options = result_options()); (1) (since 0.172.0)
+Json select(const_reference root, result_options options = result_options()); (1) (since 0.172.0)
 ```
 
 ```cpp
 template <class BinaryOp>
-void select(const_reference root_value, BinaryOp op, 
+void select(const_reference root, BinaryOp op, 
     result_options options = result_options());                                     (2) (since 0.172.0)
 ```
 
@@ -19,8 +19,8 @@ callback repeatedly with the results.
 
 <table>
   <tr>
-    <td>root_value</td>
-    <td>JSON value</td> 
+    <td>root</td>
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td><code>op</code></td>
@@ -93,7 +93,7 @@ int main()
         }
     };
 
-    expr.select(root_value, op);
+    expr.select(root, op);
 }
 ```
 Output:

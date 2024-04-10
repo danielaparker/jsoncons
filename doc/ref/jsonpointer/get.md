@@ -60,7 +60,7 @@ Json& get(Json& root,
 <table>
   <tr>
     <td>root</td>
-    <td>JSON value</td> 
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td>location</td>

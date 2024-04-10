@@ -56,8 +56,8 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
     {
         int count = 0;
 
-        const json root_value = json::parse(input);
-        const json original = root_value;
+        const json root = json::parse(input);
+        const json original = root;
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -69,18 +69,18 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
             }
         };
 
-        expr.evaluate(root_value, op);
+        expr.evaluate(root, op);
 
         CHECK(count == 1);
-        CHECK(root_value == original);
+        CHECK(root == original);
     }
 
     SECTION("evaluate with std::error_code")
     {
         int count = 0;
 
-        const json root_value = json::parse(input);
-        const json original = root_value;
+        const json root = json::parse(input);
+        const json original = root;
 
         std::error_code ec;
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]", ec);
@@ -94,10 +94,10 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
             }
         };
 
-        expr.evaluate(root_value, op);
+        expr.evaluate(root, op);
 
         CHECK(count == 1);
-        CHECK(root_value == original);
+        CHECK(root == original);
     }
 }
 
@@ -138,7 +138,7 @@ TEST_CASE("jsonpath_expression::select tests")
     {
         int count = 0;
 
-        const json root_value = json::parse(input);
+        const json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -151,7 +151,7 @@ TEST_CASE("jsonpath_expression::select tests")
             }
         };
 
-        expr.select(root_value, op);
+        expr.select(root, op);
 
         CHECK(count == 1);
     }
@@ -192,11 +192,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
         REQUIRE(paths.size() == 4);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
@@ -207,11 +207,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 8);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
@@ -231,11 +231,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations, nodups, sort_descending")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','category','title','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 8);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
@@ -255,11 +255,11 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations, sort_descending")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','category','title','title']");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value, jsonpath::result_options::sort_descending);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root, jsonpath::result_options::sort_descending);
 
         REQUIRE(paths.size() == 16);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][3]['title']");
@@ -321,7 +321,7 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("Update in place")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -333,19 +333,19 @@ TEST_CASE("jsonpath_expression::update tests")
             }
         };
 
-        expr.update(root_value, op);
+        expr.update(root, op);
 
-        CHECK(root_value["books"][3].contains("price"));
-        CHECK(root_value["books"][3].at("price") == 140);
+        CHECK(root["books"][3].contains("price"));
+        CHECK(root["books"][3].at("price") == 140);
     }
 
     SECTION("Return locations of selected values")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
-        std::vector<jsonpath::json_location> paths = expr.select_paths(root_value);
+        std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
         REQUIRE(paths.size() == 4);
         CHECK(jsonpath::to_string(paths[0]) == "$['books'][0]");
@@ -360,7 +360,7 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("update default sort order")
     {
-        json root_value = json::parse(input);
+        json root = json::parse(input);
 
         auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
 
@@ -370,7 +370,7 @@ TEST_CASE("jsonpath_expression::update tests")
             path_nodes.push_back(base_node);
         };
 
-        expr.update(root_value, callback2);
+        expr.update(root, callback2);
 
         REQUIRE(path_nodes.size() == 4);
         CHECK(path_nodes[0].index() == 3);

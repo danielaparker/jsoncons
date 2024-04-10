@@ -1,7 +1,7 @@
 ### jsoncons::jsonpath::jsonpath_expression::select
 
 ```cpp
-std::vector<basic_json_location<char_type>> select_paths(const_reference root_value,
+std::vector<basic_json_location<char_type>> select_paths(const_reference root,
     result_options options = result_options::nodups | result_options::sort);                                                 (1) (since 0.172.0)
 ```
 
@@ -12,8 +12,8 @@ locations of the selected values in the root value.
 
 <table>
   <tr>
-    <td>root_value</td>
-    <td>JSON value</td> 
+    <td>root</td>
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td><code>options</code> (since 0.161.0)</td>

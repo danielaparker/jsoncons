@@ -721,11 +721,11 @@ namespace jsonpath {
     };
 
     template<class Json>
-    std::size_t remove(Json& root_value, const basic_json_location<typename Json::char_type>& location)
+    std::size_t remove(Json& root, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
 
-        Json* p_current = std::addressof(root_value);
+        Json* p_current = std::addressof(root);
 
         std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
         for (std::size_t i = 0; i < location.size(); ++i)
@@ -782,9 +782,9 @@ namespace jsonpath {
     }
 
     template<class Json>
-    Json* get(Json& root_value, const basic_json_location<typename Json::char_type>& location)
+    Json* get(Json& root, const basic_json_location<typename Json::char_type>& location)
     {
-        Json* p_current = std::addressof(root_value);
+        Json* p_current = std::addressof(root);
         bool found = false;
 
         std::size_t last = location.size() == 0 ? 0 : location.size() - 1;
@@ -862,10 +862,10 @@ namespace jsonpath {
     }
 
     template<class Json>
-    std::pair<Json*,bool> replace(Json& root_value, const basic_json_location<typename Json::char_type>& location, const Json& value,
+    std::pair<Json*,bool> replace(Json& root, const basic_json_location<typename Json::char_type>& location, const Json& value,
         bool create_if_missing=false)
     {
-        Json* p_current = std::addressof(root_value);
+        Json* p_current = std::addressof(root);
         bool found = false;
 
         std::size_t last = location.size() == 0 ? 0 : location.size() - 1;

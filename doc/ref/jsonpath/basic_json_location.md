@@ -93,21 +93,17 @@ using the dot notation.
 <table border="0">
   <tr>
     <td><a href="replace.md">replace</a></td>
-    <td>Replace a value in a JSON document with a new value at a specified location</td> 
+    <td>Replace a value in a JSON document at a specified location with a new value</td> 
+  </tr>
+  <tr>
+    <td><a href="get.md">get</a></td>
+    <td>Returns a pointer to a JSON value in a JSON document at a specified location</td> 
+  </tr>
+  <tr>
+    <td><a href="remove.md">remove</a></td>
+    <td>Remove a JSON node from a JSON document at a specified location</td> 
   </tr>
 </table>
-
-    template<class Json>
-    Json* get(Json& root_value, const basic_json_location<Json::char_type>& location)
-Returns a pointer to a JSON value at the specified `location` in the `root_value`.
-
-    template<class Json>
-    std::size_t remove(Json& root_value, const basic_json_location<Json::char_type>& location);
-Removes a single node at the specified location. Returns the number of nodes removed (0 or 1).
-
-    template<class Json>
-    std::size_t remove(Json& root_value, const jsoncons::basic_string_view<Json::char_type>& path_string);
-Removes the nodes matched by the specified JSONPath expression. Returns the number of nodes removed.
 
     template <class CharT, class Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 

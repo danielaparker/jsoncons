@@ -2,7 +2,7 @@
 
 ```cpp
 template <class BinaryOp>
-void update(reference root_value, BinaryOp op);                                   (1) (since 0.172.0)
+void update(reference root, BinaryOp op);                                   (1) (since 0.172.0)
 ```
 
 (1) Evaluates the root value against the compiled JSONPath expression and calls a provided
@@ -12,8 +12,8 @@ callback repeatedly with the results.
 
 <table>
   <tr>
-    <td>root_value</td>
-    <td>JSON value</td> 
+    <td>root</td>
+    <td>Root JSON value</td> 
   </tr>
   <tr>
     <td><code>op</code></td>
