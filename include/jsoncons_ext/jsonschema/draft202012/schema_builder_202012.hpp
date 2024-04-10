@@ -428,7 +428,11 @@ namespace draft202012 {
             {
                 if (this->options().require_format_validation())
                 {
-                    validators.emplace_back(this->make_format_validator(context, sch));
+                    it = sch.find("format");
+                    if (it != sch.object_range().end()) 
+                    {
+                        validators.emplace_back(this->make_format_validator(context, it->value()));
+                    }
                 }
             }
             
