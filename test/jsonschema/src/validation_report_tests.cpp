@@ -680,3 +680,89 @@ TEST_CASE("jsonschema more output tests")
     }
 }
 
+TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
+{
+    json schema = json::parse(R"(
+{
+  "type": "object",
+  "properties": {
+    "number": { "type": "number" },
+    "street_name": { "type": "string" },
+    "street_type": { "enum": ["Street", "Avenue", "Boulevard"] }
+  },
+  "additionalProperties": {"not" : true}
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/additionalProperties/direction",
+        "schemaLocation": "#/additionalProperties",
+        "instanceLocation": "/direction",
+        "error": "Additional property 'direction' not allowed by schema."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+{ "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
+)");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
+{
+    json schema = json::parse(R"(
+{
+  "type": "object",
+  "properties": {
+    "number": { "type": "number" },
+    "street_name": { "type": "string" },
+    "street_type": { "enum": ["Street", "Avenue", "Boulevard"] }
+  },
+  "additionalProperties": {"not" : {}}
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/additionalProperties/direction",
+        "schemaLocation": "#/additionalProperties",
+        "instanceLocation": "/direction",
+        "error": "Additional property 'direction' not allowed by schema."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+{ "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
+)");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+

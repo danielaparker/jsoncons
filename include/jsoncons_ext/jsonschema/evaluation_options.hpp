@@ -52,6 +52,21 @@ namespace jsonschema {
               require_format_validation_(false), compatibility_mode_(false)
         {
         }
+            
+        evaluation_options(const evaluation_options& other)
+            : default_version_(other.default_version_),
+              require_format_validation_(other.require_format_validation_),
+              compatibility_mode_(other.compatibility_mode_) 
+        {
+        }
+
+        evaluation_options& operator=(const evaluation_options& other)
+        {
+            default_version_ = other.default_version_;
+            require_format_validation_ = other.require_format_validation_;
+            compatibility_mode_ = other.compatibility_mode_;
+            return *this;
+        }
 
         bool require_format_validation() const
         {
@@ -81,6 +96,13 @@ namespace jsonschema {
         {
             default_version_ = version;
             return *this;
+        }
+
+        friend bool operator==(const evaluation_options& lhs, const evaluation_options& rhs) 
+        {
+            return lhs.default_version_ == rhs.default_version_
+                && lhs.require_format_validation_ == rhs.require_format_validation_
+                && lhs.compatibility_mode_ == rhs.compatibility_mode_;
         }
     };
 
