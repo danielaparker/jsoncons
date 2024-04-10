@@ -154,10 +154,6 @@ namespace jsonschema {
             }
 
             resolve_references();
-            for (auto& member : *schema_store_ptr_)
-            {
-                member.second->init();
-            }
 
             return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schemas_));
         }

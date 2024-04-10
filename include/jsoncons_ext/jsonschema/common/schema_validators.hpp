@@ -206,6 +206,7 @@ namespace jsonschema {
               recursive_anchor_(false),
               always_succeeds_(false), always_fails_(false) 
         {
+            init();
         }
         object_schema_validator(const uri& schema_location, 
             const jsoncons::optional<jsoncons::uri>& id,
@@ -224,6 +225,7 @@ namespace jsonschema {
               recursive_anchor_(recursive_anchor),
               always_succeeds_(false), always_fails_(false)
         {
+            init();
         }
         object_schema_validator(const uri& schema_location, 
             const jsoncons::optional<jsoncons::uri>& id,
@@ -246,29 +248,7 @@ namespace jsonschema {
               anchor_dict_(std::move(anchor_dict)),
               always_succeeds_(false), always_fails_(false)
         {
-        }
-        
-        // Called after all references have been resolved
-        void init() final
-        {
-            if (!(unevaluated_properties_val_ || unevaluated_items_val_))
-            {
-                std::size_t always_fails_count = 0;
-                std::size_t always_succeeds_count = 0;
-                for (const auto& val : validators_)
-                {
-                    if (val->always_fails())
-                    {
-                        ++always_fails_count;
-                    }
-                    if (val->always_succeeds())
-                    {
-                        ++always_succeeds_count;
-                    }
-                }
-                always_succeeds_ = always_succeeds_count == validators_.size(); // empty schema always succeeds
-                always_fails_ = validators_.size() > 0 && (always_fails_count == validators_.size()); 
-            }
+            init();
         }
 
         jsoncons::optional<Json> get_default_value() const override
@@ -313,6 +293,28 @@ namespace jsonschema {
         }
 
     private:
+
+        void init()
+        {
+            if (!(unevaluated_properties_val_ || unevaluated_items_val_))
+            {
+                std::size_t always_fails_count = 0;
+                std::size_t always_succeeds_count = 0;
+                for (const auto& val : validators_)
+                {
+                    if (val->always_fails())
+                    {
+                        ++always_fails_count;
+                    }
+                    if (val->always_succeeds())
+                    {
+                        ++always_succeeds_count;
+                    }
+                }
+                always_succeeds_ = always_succeeds_count == validators_.size(); // empty schema always succeeds
+                always_fails_ = validators_.size() > 0 && (always_fails_count == validators_.size()); 
+            }
+        }
 
         void do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
