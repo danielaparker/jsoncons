@@ -31,7 +31,8 @@ namespace {
         return json::parse(is);
     }
 
-    void jsonschema_tests(const std::string& fpath)
+    void jsonschema_tests(const std::string& fpath,
+        jsonschema::evaluation_options options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()))
     {
         std::fstream is(fpath);
         if (!is)
@@ -50,7 +51,7 @@ namespace {
             try
             {
                 jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
-                    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()));
+                    options);
 
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
@@ -173,11 +174,18 @@ TEST_CASE("jsonschema draft2019-09 tests")
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/uniqueItems.json"); 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/vocabulary.json");
-        /*      // format tests
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/date.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/date-time.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/dependencies-compatibility.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()).
+                compatibility_mode(true));
+        // format tests
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/date.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()).
+                require_format_validation(true));
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/date-time.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()).
+                require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/ecmascript-regex.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/email.json");
+        /*jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/email.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/hostname.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/idn-email.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/idn-hostname.json");
