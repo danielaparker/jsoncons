@@ -373,7 +373,7 @@ TEST_CASE("jsonschema items output tests")
         "evaluationPath": "/items/oneOf",
         "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf",
         "instanceLocation": "/0",
-        "error": "No schema matched, but exactly one of them is required to match",
+        "error": "Expected exactly one matching schema, but found no matching schemas",
         "details": [
             {
                 "valid": false,
@@ -504,7 +504,7 @@ TEST_CASE("jsonschema more output tests 2")
         "evaluationPath": "/oneOf",
         "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf",
         "instanceLocation": "",
-        "error": "No schema matched, but exactly one of them is required to match",
+        "error": "Expected exactly one matching schema, but found no matching schemas",
         "details": [
             {
                 "valid": false,
@@ -756,6 +756,65 @@ TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
     
         json data = json::parse(R"(
 { "number": 1600, "street_name": "Pennsylvania", "street_type": "Avenue", "direction": "NW" }
+)");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema with 'oneOf' output tests")
+{
+    json schema = json::parse(R"(
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/test_schema",
+  "type": "object",
+  "properties": {
+    "One": {
+      "type": "string"
+    },
+    "Two" : {
+      "type": "string"
+    }
+  },
+  "oneOf" : [
+    {
+      "required" : ["One"]
+    },
+    {
+      "required" : ["Two"]
+    }
+  ],
+  "unevaluatedProperties" : false
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/oneOf",
+        "schemaLocation": "/test_schema#/oneOf",
+        "instanceLocation": "",
+        "error": "Expected exactly one matching schema, but found 2 matching schemas at indices 0,1"
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+{
+    "One" : "test",
+    "Two" : "test"
+}
 )");
     
         compiled.validate(data, decoder);

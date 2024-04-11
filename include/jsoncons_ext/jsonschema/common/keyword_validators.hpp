@@ -1,4 +1,5 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2024 Daniel oneOf
+// Parker
 // 
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -945,7 +946,7 @@ namespace jsonschema {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
             evaluation_results local_results1;
-            std::size_t count = 0;
+            std::vector<std::size_t> indices;
             for (std::size_t i = 0; i < validators_.size(); ++i) 
             {
                 evaluation_results local_results2;
@@ -956,22 +957,40 @@ namespace jsonschema {
                 if (errors == local_reporter.errors.size())
                 {
                     local_results1.merge(local_results2);
-                    ++count;
+                    indices.push_back(i);
                 }
                 //std::cout << "success: " << i << " " << success << "\n";
             }
 
-            if (count == 1)
+            
+            if (indices.size() == 1)
             {
                 results.merge(local_results1);
             }
             else 
             {
+                std::string message;
+                if (indices.size() == 0)
+                {
+                    message = "Expected exactly one matching schema, but found no matching schemas";
+                }
+                else
+                {
+                    message = "Expected exactly one matching schema, but found " + std::to_string(indices.size()) + " matching schemas at indices ";
+                    for (std::size_t i = 0; i < indices.size(); ++i)
+                    {
+                        if (i > 0)
+                        {
+                            message.push_back(',');
+                        }
+                        message.append(std::to_string(i));
+                    }
+                }
                 reporter.error(validation_message(this->keyword_name(),
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    "No schema matched, but exactly one of them is required to match", 
+                    message, 
                     local_reporter.errors));
             }
         }
