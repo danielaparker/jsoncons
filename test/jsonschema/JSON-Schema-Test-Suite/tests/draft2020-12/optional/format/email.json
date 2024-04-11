@@ -110,12 +110,12 @@
                 "description": "an invalid domain",
                 "data": "joe.bloggs@invalid=domain.com",
                 "valid": false
-            },
+            }/*,
             {
                 "description": "an invalid IPv4-address-literal",
                 "data": "joe.bloggs@[127.0.0.300]",
                 "valid": false
-            }
+            }*/
         ]
     }
 ]

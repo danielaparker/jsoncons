@@ -185,8 +185,10 @@ TEST_CASE("jsonschema draft2019-09 tests")
             jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()).
                 require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/ecmascript-regex.json");
-        /*jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/email.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/hostname.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/email.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft201909()).
+                require_format_validation(true));
+        /*jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/hostname.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/idn-email.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/idn-hostname.json");
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2019-09/optional/format/ipv4.json");

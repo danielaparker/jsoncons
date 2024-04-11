@@ -24,6 +24,22 @@
 namespace jsoncons {
 namespace jsonschema {
 
+
+    inline bool is_digit(char c)
+    {
+        return c >= '0' && c <= '9';
+    }
+    
+    inline bool is_vchar(char c)
+    {
+        return c >= 0x21 && c <= 0x7E;        
+    }
+    
+    inline bool is_alpha(char c)
+    {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+    }
+    
     inline
     bool is_atext( char c)
     {
@@ -50,27 +66,31 @@ namespace jsonschema {
             case '~':
                 return true;
             default:
-                return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+                return is_digit(c) || is_alpha(c);
         }
     }
 
     inline
     bool is_dtext( char c)
     {
-        return (c >= 33 && c <= 90) || (c >= 94 && c <= 126);
+        return (c >= 33 && c <= 90) || (c >= 94 && c <= 126); 
     }
+    
+    
 
     //  RFC 5322, section 3.4.1
     inline
     bool validate_email_rfc5322(const std::string& s)
     {
-        enum class state_t {local_part,atom,dot_atom,quoted_string,amp,domain};
+        enum class state_t {local_part,atom,dot_atom,quoted_string,amp,domain,domain_name,domain_literal,done};
 
         state_t state = state_t::local_part;
         std::size_t part_length = 0;
 
-        for (char c : s)
+        std::size_t length = s.size();
+        for (std::size_t i = 0; i < length; ++i)
         {
+            char c = s[i];
             switch (state)
             {
                 case state_t::local_part:
@@ -148,20 +168,68 @@ namespace jsonschema {
                 }
                 case state_t::domain:
                 {
-                    if (is_dtext(c))
+                    switch (c)
                     {
-                        ++part_length;
+                        case '[':
+                            state = state_t::domain_literal;
+                            break;
+                        default:
+                            if (is_digit(c) || is_alpha(c))
+                            {
+                                state = state_t::domain_name;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                            break;
                     }
-                    else
+                    break;
+                }
+                case state_t::domain_literal:
+                {
+                    switch (c)
                     {
-                        return false;
+                        case ']':
+                            state = state_t::done;
+                            break;
+                        default:
+                            if (!is_dtext(c))
+                            {
+                                return false;
+                            }
+                            break;
+                    }
+                    break;
+                }
+                case state_t::domain_name:
+                {
+                    switch (c)
+                    {
+                        case '.':
+                            if (part_length == 0)
+                            {
+                                return false;
+                            }
+                            part_length = 0;
+                            break;
+                        default:
+                        {
+                            if (is_digit(c) || is_alpha(c) || c == '-')
+                            {
+                                ++part_length;
+                            }
+                            else
+                                return false;
+                        }
+                        break;
                     }
                     break;
                 }
             }
         }
 
-        return state == state_t::domain && part_length > 0;
+        return state == state_t::domain_name || state == state_t::done;
     }
 
     // RFC 2673, Section 3.2
