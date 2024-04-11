@@ -76,7 +76,7 @@ TEST_CASE("jsonschema validation report tests")
         "evaluationPath": "/properties/multi/allOf",
         "schemaLocation": "https://test.com/schema#/properties/multi/allOf",
         "instanceLocation": "/multi",
-        "error": "No schema matched, but all of them are required to match",
+        "error": "Must be valid against all schemas, but found unmatched schemas",
         "details": [
             {
                 "valid": false,
@@ -373,7 +373,7 @@ TEST_CASE("jsonschema items output tests")
         "evaluationPath": "/items/oneOf",
         "schemaLocation": "https://json.schemastore.org/json-patch.json#/items/oneOf",
         "instanceLocation": "/0",
-        "error": "Expected exactly one matching schema, but found no matching schemas",
+        "error": "Must be valid against exactly one schema, but found no matching schemas",
         "details": [
             {
                 "valid": false,
@@ -422,7 +422,7 @@ TEST_CASE("jsonschema items output tests")
 ]
         )");
 
- std::string data_string = R"(
+        std::string data_string = R"(
 [
     {
         "op": "invalid_op",
@@ -504,7 +504,7 @@ TEST_CASE("jsonschema more output tests 2")
         "evaluationPath": "/oneOf",
         "schemaLocation": "http://schemarepo.org/schemas/user.json#/oneOf",
         "instanceLocation": "",
-        "error": "Expected exactly one matching schema, but found no matching schemas",
+        "error": "Must be valid against exactly one schema, but found no matching schemas",
         "details": [
             {
                 "valid": false,
@@ -802,7 +802,7 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
         "evaluationPath": "/oneOf",
         "schemaLocation": "/test_schema#/oneOf",
         "instanceLocation": "",
-        "error": "Expected exactly one matching schema, but found 2 matching schemas at indices 0,1"
+        "error": "Must be valid against exactly one schema, but found 2 matching schemas at indices 0,1"
     }
 ]
         )");

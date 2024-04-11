@@ -909,7 +909,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    "No schema matched, but at least one of them is required to match", 
+                    "Must be valid against at least one schema, but found no matching schemas", 
                     local_reporter.errors));
             }
         }
@@ -972,11 +972,11 @@ namespace jsonschema {
                 std::string message;
                 if (indices.size() == 0)
                 {
-                    message = "Expected exactly one matching schema, but found no matching schemas";
+                    message = "Must be valid against exactly one schema, but found no matching schemas";
                 }
                 else
                 {
-                    message = "Expected exactly one matching schema, but found " + std::to_string(indices.size()) + " matching schemas at indices ";
+                    message = "Must be valid against exactly one schema, but found " + std::to_string(indices.size()) + " matching schemas at indices ";
                     for (std::size_t i = 0; i < indices.size(); ++i)
                     {
                         if (i > 0)
@@ -1064,7 +1064,7 @@ namespace jsonschema {
                     this_context.eval_path(), 
                     this->schema_location(), 
                     instance_location, 
-                    "No schema matched, but all of them are required to match", 
+                    "Must be valid against all schemas, but found unmatched schemas", 
                     local_reporter.errors));
             }
         }
