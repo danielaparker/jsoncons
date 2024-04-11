@@ -226,6 +226,8 @@ namespace jsonschema {
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
