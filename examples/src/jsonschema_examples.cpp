@@ -231,7 +231,10 @@ namespace ns {
     JSONCONS_N_MEMBER_TRAITS(ns::api_properties, 1, target)
     JSONCONS_N_MEMBER_TRAITS(ns::job_properties, 2, name, run)
 
-std::string test_schema = R"(
+
+void validate_before_decode_example() 
+{
+    std::string schema_str = R"(
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "job",
@@ -298,24 +301,21 @@ std::string test_schema = R"(
   "required": [ "name", "run" ],
   "additionalProperties":  false
 }
-)";
-
-std::string test_data = R"(
+    )";
+    
+    std::string data_str = R"(
 {
     "name": "testing flow", 
     "run" : {
-            "command": "some command"    
-            }
+        "command": "some command"    
+    }
 }
-
-)";
-
-void validate_before_decode_example() 
-{
+    
+    )";
     try
     {
-        json schema = json::parse(test_schema);
-        json data = json::parse(test_data);
+        json schema = json::parse(schema_str);
+        json data = json::parse(data_str);
 
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
@@ -323,7 +323,7 @@ void validate_before_decode_example()
         // Test that input is valid before attempting to decode
         if (compiled.is_valid(data))
         {
-            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse test_data 
+            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse data_str 
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
@@ -472,7 +472,7 @@ void optional_format_example()
 {
     json schema = json::parse(R"(
 {
-    "$id": "/test_schema",
+    "$id": "/schema_str",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "Date": {
@@ -497,7 +497,8 @@ void optional_format_example()
 
     jsoncons::json_decoder<ojson> decoder;
     compiled.validate(data, decoder);
-    std::cout << pretty_print(decoder.get_result()) << "\n";
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n";
 }
 
 int main()
@@ -511,13 +512,13 @@ int main()
     validate_before_decode_example();
 #endif
     defaults_example();
+    optional_format_example();
 
     draft_201212_example();
     draft_201909_example();
     draft_07_example();
     
     cross_schema_example();
-    optional_format_example();    
     
     std::cout << "\n";
 }
