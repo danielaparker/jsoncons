@@ -229,7 +229,7 @@ namespace draft202012 {
                     break;
                 }
                 default:
-                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_context.get_base_uri().string() + ", expected: boolean or object"));
+                    JSONCONS_THROW(schema_error(new_context.get_base_uri().string() + ": Invalid JSON-type for a schema, expected: boolean or object"));
                     break;
             }
             
@@ -474,7 +474,7 @@ namespace draft202012 {
             std::vector<schema_validator_type> prefix_item_validators;
             keyword_validator_type items_validator;
 
-            uri schema_location{context.make_schema_path_with("prefixItems")};
+            uri schema_location{context.make_schema_location("prefixItems")};
 
             if (sch.type() == json_type::array_value) 
             {
@@ -552,10 +552,11 @@ namespace draft202012 {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    uri_wrapper relative(it->value().template as<std::string>()); 
+                    std::string str = it->value().template as<std::string>();
+                    uri_wrapper relative(str); 
                     if (relative.has_fragment())
                     {
-                        JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
+                        JSONCONS_THROW(schema_error(str + ": Draft 2019-09 does not allow $id with fragment"));
                     }
                     uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
                     id = new_uri.uri();

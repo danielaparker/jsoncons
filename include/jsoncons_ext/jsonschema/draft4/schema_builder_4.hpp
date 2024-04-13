@@ -300,7 +300,7 @@ namespace draft4 {
         std::unique_ptr<keyword_validator<Json>> make_maximum_validator_4(const compilation_context& context, 
             const Json& sch, const Json& parent)
         {
-            uri schema_location = context.make_schema_path_with("maximum");
+            uri schema_location = context.make_schema_location("maximum");
             if (!sch.is_number())
             {
                 std::string message("maximum must be a number value");
@@ -330,7 +330,7 @@ namespace draft4 {
         virtual std::unique_ptr<keyword_validator<Json>> make_minimum_validator_4(const compilation_context& context, 
             const Json& sch, const Json& parent)
         {
-            uri schema_location = context.make_schema_path_with("minimum");
+            uri schema_location = context.make_schema_location("minimum");
 
             if (!sch.is_number())
             {

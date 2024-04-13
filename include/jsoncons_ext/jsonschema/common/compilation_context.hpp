@@ -67,7 +67,7 @@ namespace jsonschema {
             return base_uri_.uri();
         }
 
-        std::string make_schema_path_with(const std::string& keyword) const
+        std::string make_schema_location(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
