@@ -67,16 +67,16 @@ namespace jsonschema {
             return base_uri_.uri();
         }
 
-        std::string make_schema_location(const std::string& keyword) const
+        jsoncons::uri make_schema_location(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
                 if (!it->has_plain_name_fragment())
                 {
-                    return it->append(keyword).string();
+                    return it->append(keyword).uri();
                 }
             }
-            return "#";
+            return uri{"#"};
         }
         
         static jsoncons::uri make_random_uri()
