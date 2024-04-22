@@ -4,7 +4,7 @@ Since 0.174.0, the jsonschema extension implements Drafts 4, 6, 7, 2019-9 and 20
 Previous versions supported Draft 7.
 
 The documentation below describes the new features for the jsonschema extension since 0.174.0.
-For releases 0.173.4 and earlier, please refer to [jsonschema](https://github.com/danielaparker/jsoncons/tree/main).
+For earlier releases, please refer to [jsonschema (until 0.174.0)](https://github.com/danielaparker/jsoncons/tree/main).
 
 
 ### Classes
