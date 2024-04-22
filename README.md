@@ -43,7 +43,7 @@ old names but continues to support many of them. The deprecated names can be sup
 - [mergepatch](doc/ref/mergepatch/mergepatch.md) implements the IETF standard [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JSONPath expressions.
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
-- [jsonschema](doc/ref/jsonschema/jsonschema.md) implements Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification). (since 0.174.0)
+- [jsonschema](doc/ref/jsonschema/jsonschema.md) implements Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification) (since 0.174.0)
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 - [ubjson](doc/ref/ubjson/ubjson.md) implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 
