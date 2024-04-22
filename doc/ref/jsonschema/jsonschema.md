@@ -25,6 +25,10 @@ For releases 0.173.4 and earlier, please refer to [jsonschema](https://github.co
     <td><a href="schema_version.md">schema_version</a></td>
     <td>Supported JSON Schema dialects.</td> 
   </tr>
+  <tr>
+    <td><a href="json_validator.md">json_validator</a></td>
+    <td>JSON Schema validator. Deprecated (since 0.174.0)</td> 
+  </tr>
 </table>
 
 ### Functions
@@ -32,8 +36,13 @@ For releases 0.173.4 and earlier, please refer to [jsonschema](https://github.co
 <table border="0">
   <tr>
     <td><a href="make_json_schema.md">make_json_schema</a></td>
-    <td>Processes a JSON Schema document and returns the compiled form as a <code>json_schema</code>. 
+    <td>Processes a JSON Schema document and returns the compiled form as a <code>json_schema</code> (since 0.174.0). 
   </tr>
+  <tr>
+    <td><a href="make_schema.md">make_schema</a></td>
+    <td>Loads a JSON Schema and returns a shared pointer to a <code>json_schema</code>. Deprecated (since 0.174.0)
+  </tr>
+
 </table>
 
 ### Compliance 
