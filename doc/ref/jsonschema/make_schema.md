@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::make_schema
+### jsoncons::jsonschema::make_schema: deprecated (since 0.174.0)
 
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>

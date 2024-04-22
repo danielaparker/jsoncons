@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::json_validator
+### jsoncons::jsonschema::json_validator: deprecated (since 0.174.0)
 
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
