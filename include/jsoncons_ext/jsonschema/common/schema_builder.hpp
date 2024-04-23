@@ -34,6 +34,7 @@ namespace jsonschema {
 
     private:
         std::string spec_version_;
+        Json sch_;
         schema_builder_factory_type builder_factory_;
         evaluation_options options_;
         schema_store_type* schema_store_ptr_;
@@ -43,27 +44,27 @@ namespace jsonschema {
         schema_validator_type root_;       
         
         // Owns external schemas
-        std::vector<schema_validator_type> schemas_;
+        std::vector<schema_validator_type> schema_validators_;
     public:
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
 
     public:
 
-        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
+        schema_builder(const std::string& version, const Json& sch, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers)
-            : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), sch_(sch), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
         }
 
-        schema_builder(const std::string& schema, const schema_builder_factory_type& builder_factory,
+        schema_builder(const std::string& version, const Json& sch, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary)
-            : spec_version_(schema), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), sch_(sch), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers), vocabulary_(vocabulary)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -75,7 +76,7 @@ namespace jsonschema {
         
         void save_schema(schema_validator_type&& schema)
         {
-            schemas_.emplace_back(std::move(schema));
+            schema_validators_.emplace_back(std::move(schema));
         }
 
         const std::string& schema() const
@@ -83,16 +84,16 @@ namespace jsonschema {
             return spec_version_;
         }
         
-        void build_schema(const Json& sch) 
+        void build_schema() 
         {
             anchor_uri_map_type anchor_dict;
-            root_ = make_schema_validator(compilation_context{}, sch, {}, anchor_dict);
+            root_ = make_schema_validator(compilation_context{}, sch_, {}, anchor_dict);
         }
 
-        void build_schema(const Json& sch, const std::string& retrieval_uri) 
+        void build_schema(const std::string& retrieval_uri) 
         {
             anchor_uri_map_type anchor_dict;
-            root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch, {}, anchor_dict);
+            root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), sch_, {}, anchor_dict);
         }
         
         evaluation_options options() const
@@ -155,7 +156,7 @@ namespace jsonschema {
 
             resolve_references();
 
-            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schemas_));
+            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schema_validators_));
         }
 
         void resolve_references()
@@ -306,7 +307,7 @@ namespace jsonschema {
                         else
                         {
                             auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_, resolvers_, vocabulary_);
-                            schema_builder->build_schema(sch, context.get_base_uri().string());
+                            schema_builder->build_schema(context.get_base_uri().string());
                             schema_val = schema_builder->get_schema();
                         }
                     }
