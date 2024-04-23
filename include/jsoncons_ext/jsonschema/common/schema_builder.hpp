@@ -51,20 +51,20 @@ namespace jsonschema {
 
     public:
 
-        schema_builder(const std::string& version, const Json& sch, const schema_builder_factory_type& builder_factory,
+        schema_builder(const std::string& version, Json&& sch, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers)
-            : spec_version_(version), sch_(sch), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), sch_(std::move(sch)), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
         }
 
-        schema_builder(const std::string& version, const Json& sch, const schema_builder_factory_type& builder_factory,
+        schema_builder(const std::string& version, Json&& sch, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary)
-            : spec_version_(version), sch_(sch), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), sch_(std::move(sch)), builder_factory_(builder_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolvers_(resolvers), vocabulary_(vocabulary)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -109,8 +109,13 @@ namespace jsonschema {
 
             return schema_validator_ptr;
         }
-
-        std::unique_ptr<document_schema_validator<Json>> get_schema()
+        
+        Json&& get_schema()
+        {     
+            return std::move(sch_);                   
+        }
+        
+        std::unique_ptr<document_schema_validator<Json>> get_schema_validator()
         {                        
             //std::cout << "schema_store:\n";
             //for (auto& member : *schema_store_ptr_)
@@ -135,7 +140,7 @@ namespace jsonschema {
                         {
                             anchor_uri_map_type anchor_dict2;
                             this->save_schema(make_cross_draft_schema_validator(compilation_context(uri_wrapper(loc.base())), 
-                                external_sch, {}, anchor_dict2));
+                                std::move(external_sch), {}, anchor_dict2));
                             found = true;
                         }
                     }
@@ -290,36 +295,36 @@ namespace jsonschema {
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
 
         schema_validator_type make_cross_draft_schema_validator(const compilation_context& context, 
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
+            Json sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
         {
             schema_validator_type schema_val = schema_validator_type{};
-            switch (sch.type())
+            switch (std::move(sch).type())
             {
                 case json_type::object_value:
                 {
-                    auto it = sch.find("$schema");
-                    if (it != sch.object_range().end())
+                    auto it = std::move(sch).find("$schema");
+                    if (it != std::move(sch).object_range().end())
                     {
                         if (it->value().as_string_view() == schema())
                         {
-                            return make_schema_validator(context, sch, keys, anchor_dict);
+                            return make_schema_validator(context, std::move(sch), keys, anchor_dict);
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(sch, options_, schema_store_ptr_, resolvers_, vocabulary_);
+                            auto schema_builder = builder_factory_(std::move(sch), options_, schema_store_ptr_, resolvers_, vocabulary_);
                             schema_builder->build_schema(context.get_base_uri().string());
-                            schema_val = schema_builder->get_schema();
+                            schema_val = schema_builder->get_schema_validator();
                         }
                     }
                     else
                     {
-                        return make_schema_validator(context, sch, keys, anchor_dict);
+                        return make_schema_validator(context, std::move(sch), keys, anchor_dict);
                     }
                     break;
                 }
                 case json_type::bool_value:
                 {
-                    return make_schema_validator(context, sch, keys, anchor_dict);
+                    return make_schema_validator(context, std::move(sch), keys, anchor_dict);
                 }
                 default:
                     JSONCONS_THROW(schema_error("Schema must be object or boolean"));

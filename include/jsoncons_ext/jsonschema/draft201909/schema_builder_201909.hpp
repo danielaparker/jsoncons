@@ -86,12 +86,12 @@ namespace draft201909 {
         bool include_format_;
 
     public:
-        schema_builder_201909(const Json& sch, const schema_builder_factory_type& builder_factory, 
+        schema_builder_201909(Json&& sch, const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<schema_resolver<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
             : schema_builder<Json>(schema_version::draft201909(), 
-                sch, builder_factory, options, schema_store_ptr, resolvers, vocabulary),
+                std::move(sch), builder_factory, options, schema_store_ptr, resolvers, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
             if (!vocabulary.empty())
