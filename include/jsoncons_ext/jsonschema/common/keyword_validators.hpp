@@ -2887,8 +2887,6 @@ namespace jsonschema {
 
             evaluation_context<Json> prefix_items_context(context, this->keyword_name());
 
-            size_t start = 0;
-            size_t end = 0;
             for (std::size_t schema_index=0; 
                   schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
                   ++schema_index, ++data_index) 
@@ -2897,37 +2895,18 @@ namespace jsonschema {
                 evaluation_context<Json> item_context{prefix_items_context, schema_index, evaluation_flags{}};
                 jsonpointer::json_pointer item_location = instance_location / data_index;
                 val->walk(item_context, schema, instance[data_index], item_location, reporter);
-                if (start < end)
-                {
-                    start = end;
-                }
-            }
-            if (start < end)
-            {
-                start = end;
             }
             if (data_index < instance.size() && items_val_)
             {
                 evaluation_context<Json> items_context(context, "items");
-                start = 0;
-                end = 0;
                 for (; data_index < instance.size(); ++data_index)
                 {
                     if (items_val_)
                     {
                         jsonpointer::json_pointer item_location = instance_location / data_index;
                         items_val_->walk(items_context, schema, instance[data_index], item_location, reporter);
-                        if (start < end)
-                        {
-                            start = end;
-                        }
                     }
                 }
-                if (start < end)
-                {
-                    start = end;
-                }
-                
             }
         }
     };
