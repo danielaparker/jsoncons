@@ -59,11 +59,20 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             if (schema_val_)
             {
                 schema_val_->validate(context, instance, instance_location, results, reporter, patch);
+            }
+        }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            if (schema_val_) 
+            {
+                schema_val_->walk(context, schema, instance, instance_location, reporter);
             }
         }
     };
@@ -96,7 +105,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             auto rit = context.dynamic_scope().rbegin();
             auto rend = context.dynamic_scope().rend();
@@ -132,6 +141,37 @@ namespace jsonschema {
 
             schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
         }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            auto rit = context.dynamic_scope().rbegin();
+            auto rend = context.dynamic_scope().rend();
+
+            const schema_validator<Json>* schema_ptr = tentative_target_; 
+
+            JSONCONS_ASSERT(schema_ptr != nullptr);
+
+            if (schema_ptr->recursive_anchor())
+            {
+                while (rit != rend)
+                {
+                    if ((*rit)->recursive_anchor())
+                    {
+                        schema_ptr = *rit; 
+                    }
+                    ++rit;
+                }
+            }
+
+            //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
+
+            if (schema_ptr)
+            {
+                evaluation_context<Json> this_context(context, this->keyword_name());
+                schema_ptr->walk(this_context, schema, instance, instance_location, reporter);
+            }
+        }
     };
 
     template <class Json>
@@ -166,7 +206,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             //std::cout << "dynamic_ref_validator [" << context.eval_path().string() << "," << this->schema_location().string() << "]";
             //std::cout << "results:\n";
@@ -183,7 +223,6 @@ namespace jsonschema {
 
             const schema_validator<Json> *schema_ptr = tentative_target_;
 
-            evaluation_context<Json> this_context(context, this->keyword_name());
             JSONCONS_ASSERT(schema_ptr != nullptr);
 
             if (value_.has_plain_name_fragment() && schema_ptr->dynamic_anchor())
@@ -207,7 +246,35 @@ namespace jsonschema {
 
             //std::cout << "dynamic_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
 
+            evaluation_context<Json> this_context(context, this->keyword_name());
             schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
+        }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            auto rit = context.dynamic_scope().rbegin();
+            auto rend = context.dynamic_scope().rend();
+
+            const schema_validator<Json> *schema_ptr = tentative_target_;
+
+            JSONCONS_ASSERT(schema_ptr != nullptr);
+
+            if (value_.has_plain_name_fragment() && schema_ptr->dynamic_anchor())
+            {
+                while (rit != rend)
+                {
+                    auto p = (*rit)->get_schema_for_dynamic_anchor(schema_ptr->dynamic_anchor()->fragment()); 
+                    if (p != nullptr) 
+                    {
+                        schema_ptr = p;
+                    }
+                    ++rit;
+                }
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+            schema_ptr->walk(this_context, schema, instance, instance_location, reporter);
         }
     };
 
@@ -697,10 +764,22 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const Json& schema, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
-            reporter(this->keyword_name(), schema, this->schema_location(), instance, instance_location);
+            if (!instance.is_array())
+            {
+                return;
+            }
+
+            std::error_code ec;
+            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
+            if (ec)
+            {
+                return;
+            }
+            
+            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
 
             if (schema_val_) 
             {
@@ -708,7 +787,7 @@ namespace jsonschema {
                 for (const auto& item : instance.array_range()) 
                 {
                     jsonpointer::json_pointer item_location = instance_location / index;
-                    schema_val_->walk(schema, item, item_location, reporter);
+                    schema_val_->walk(context, schema, item, item_location, reporter);
                     ++index;
                 }
             }
@@ -1981,10 +2060,21 @@ namespace jsonschema {
             validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
 
-        void do_walk(const Json& schema, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
-            reporter(this->keyword_name(), schema, this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return;
+            }
+
+            std::error_code ec;
+            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
+            if (ec)
+            {
+                return;
+            }
+            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
 
             for (const auto& prop : instance.object_range()) 
             {
@@ -1993,7 +2083,7 @@ namespace jsonschema {
                 if (prop_it != properties_.end()) 
                 {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
-                    prop_it->second->walk(schema, prop.value(), prop_location, reporter);
+                    prop_it->second->walk(context, schema, prop.value(), prop_location, reporter);
                 }
             }
         }
@@ -2603,6 +2693,45 @@ namespace jsonschema {
                 }
             }
         }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+
+            if (!schema_validator_) 
+            {
+                return;
+            }
+
+            std::error_code ec;
+            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
+            if (!ec)
+            {
+                reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            std::size_t index = 0;
+            for (const auto& item : instance.array_range()) 
+            {
+                schema_validator_->walk(this_context, schema, item, instance_location, reporter);
+                ++index;
+            }
+
+            if (max_contains_)
+            {
+                max_contains_->walk(this_context, schema, instance, instance_location, reporter);
+            }
+            if (min_contains_)
+            {
+                min_contains_->walk(this_context, schema, instance, instance_location, reporter);
+            }
+        }
     };
 
     template <class Json>
@@ -2736,6 +2865,70 @@ namespace jsonschema {
                         start = end;
                     }
                 }
+            }
+        }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+            std::error_code ec;
+            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
+            if (ec)
+            {
+                return;
+            }
+
+            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+
+            size_t data_index = 0;
+
+            evaluation_context<Json> prefix_items_context(context, this->keyword_name());
+
+            size_t start = 0;
+            size_t end = 0;
+            for (std::size_t schema_index=0; 
+                  schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
+                  ++schema_index, ++data_index) 
+            {
+                auto& val = prefix_item_validators_[schema_index];
+                evaluation_context<Json> item_context{prefix_items_context, schema_index, evaluation_flags{}};
+                jsonpointer::json_pointer item_location = instance_location / data_index;
+                val->walk(item_context, schema, instance[data_index], item_location, reporter);
+                if (start < end)
+                {
+                    start = end;
+                }
+            }
+            if (start < end)
+            {
+                start = end;
+            }
+            if (data_index < instance.size() && items_val_)
+            {
+                evaluation_context<Json> items_context(context, "items");
+                start = 0;
+                end = 0;
+                for (; data_index < instance.size(); ++data_index)
+                {
+                    if (items_val_)
+                    {
+                        jsonpointer::json_pointer item_location = instance_location / data_index;
+                        items_val_->walk(items_context, schema, instance[data_index], item_location, reporter);
+                        if (start < end)
+                        {
+                            start = end;
+                        }
+                    }
+                }
+                if (start < end)
+                {
+                    start = end;
+                }
+                
             }
         }
     };

@@ -92,10 +92,11 @@ namespace jsonschema {
             schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
-            schema_val_->walk(schema, instance, instance_location, reporter);
+            JSONCONS_ASSERT(schema_val_ != nullptr);
+            schema_val_->walk(context, schema, instance, instance_location, reporter);
         }
     };
 
@@ -178,7 +179,7 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const Json& /*schema*/, const Json& /*instance*/, 
+        void do_walk(const evaluation_context<Json>& /*context*/, const Json& /*schema*/, const Json& /*instance*/,
             const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final {}
     };
  
@@ -342,7 +343,6 @@ namespace jsonschema {
             //}
             //std::cout << "\n";
           
-            
             evaluation_results local_results;
 
             evaluation_flags flags = context.eval_flags();
@@ -406,13 +406,23 @@ namespace jsonschema {
             //std::cout << "\n";
         }
 
-        void do_walk(const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
+            evaluation_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->walk(schema, instance, instance_location, reporter);
+                val->walk(this_context, schema, instance, instance_location, reporter);
+            }
+            if (unevaluated_properties_val_)
+            {
+                unevaluated_properties_val_->walk(this_context, schema, instance, instance_location, reporter);
+            }
+
+            if (unevaluated_items_val_)
+            {
+                unevaluated_items_val_->walk(this_context, schema, instance, instance_location, reporter);
             }
         }
     };

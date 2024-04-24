@@ -166,7 +166,7 @@ namespace jsonschema {
         {
             jsonpointer::json_pointer instance_location{};
 
-            root_->walk(sch_, instance, instance_location, reporter);
+            root_->walk(evaluation_context<Json>{}, sch_, instance, instance_location, reporter);
         }
         
     private:

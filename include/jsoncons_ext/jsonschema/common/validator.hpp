@@ -222,11 +222,11 @@ namespace jsonschema {
             do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        void walk(const Json& schema,
+        void walk(const evaluation_context<Json>& context, const Json& schema,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
         {
-            do_walk(schema, instance, instance_location, reporter);
+            do_walk(context, schema, instance, instance_location, reporter);
         }
 
     private:
@@ -236,7 +236,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const = 0;
 
-        virtual void do_walk(const Json& schema, const Json& instance, 
+        virtual void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const = 0;
     };
 
@@ -289,7 +289,7 @@ namespace jsonschema {
             return schema_location_;
         }
 
-        void do_walk(const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& /*context*/, const Json& schema, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
             std::error_code ec;
@@ -361,15 +361,22 @@ namespace jsonschema {
             referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const Json& /*schema*/, const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final 
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
+            if (referred_schema_)
+            {
+                evaluation_context<Json> this_context(context, this->keyword_name());
+                referred_schema_->walk(this_context, schema, instance, instance_location, reporter);
+            }
         }
     };
 
     template <class Json>
     class keyword_base 
     {
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
+
         std::string keyword_name_;
         uri schema_location_;
     public:
@@ -396,7 +403,16 @@ namespace jsonschema {
             return schema_location_;
         }
 
-    private:
+        void walk(const evaluation_context<Json>& /*context*/, const Json& schema, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const
+        {
+            std::error_code ec;
+            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
+            if (!ec)
+            {
+                reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+            }
+        }
     };
 
     template <class Json>

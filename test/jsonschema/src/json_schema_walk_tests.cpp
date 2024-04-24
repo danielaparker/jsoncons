@@ -61,8 +61,8 @@ TEST_CASE("jsonschema walk tests")
 }
     )";
 
-    json schema = json::parse(schema_string);
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
+    ojson schema = ojson::parse(schema_string);
+    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema); 
 
     SECTION("walk")
     {
@@ -91,17 +91,19 @@ TEST_CASE("jsonschema walk tests")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data = json::parse(data_string);
+            ojson data = ojson::parse(data_string);
 
             auto reporter = [&](const std::string& keyword,
-                const json& schema, const jsoncons::uri& schema_location,
-                const json& /*instance*/, const jsoncons::jsonpointer::json_pointer& /*instance_location*/)
+                const ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location)
             {
-                std::cout << keyword << "\n";
-                if (keyword == "type")
+                if (keyword == "type" && schema.is_object())
                 {
-                    std::cout << "    schema location: " << schema_location.string() << "\n ";
-                    std::cout << "    " << schema << "\n";
+                    auto it = schema.find("type");
+                    if (it != schema.object_range().end())
+                    {
+                        std::cout << instance_location.string() << ": " << it->value() << "\n";
+                    }
                 }
             };
             compiled.walk(data, reporter);
