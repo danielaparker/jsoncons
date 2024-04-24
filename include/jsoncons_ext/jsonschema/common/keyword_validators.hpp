@@ -696,6 +696,23 @@ namespace jsonschema {
                 }
             }
         }
+
+        void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        {
+            reporter(this->keyword_name(), schema, this->schema_location(), instance, instance_location);
+
+            if (schema_val_) 
+            {
+                size_t index = 0;
+                for (const auto& item : instance.array_range()) 
+                {
+                    jsonpointer::json_pointer item_location = instance_location / index;
+                    schema_val_->walk(schema, item, item_location, reporter);
+                    ++index;
+                }
+            }
+        }
     };
 
     // items
@@ -1903,16 +1920,16 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                auto properties_it = properties_.find(prop.key());
+                auto prop_it = properties_.find(prop.key());
 
                 // check if it is in "properties"
-                if (properties_it != properties_.end()) 
+                if (prop_it != properties_.end()) 
                 {
                     evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                     std::size_t errors = reporter.error_count();
-                    properties_it->second->validate(prop_context, prop.value() , prop_location, results, reporter, patch);
+                    prop_it->second->validate(prop_context, prop.value(), prop_location, results, reporter, patch);
                     allowed_properties.insert(prop.key());
                     if (errors == reporter.error_count())
                     {
@@ -1962,6 +1979,23 @@ namespace jsonschema {
         {
             std::unordered_set<std::string> allowed_properties;
             validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
+        }
+
+        void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        {
+            reporter(this->keyword_name(), schema, this->schema_location(), instance, instance_location);
+
+            for (const auto& prop : instance.object_range()) 
+            {
+                auto prop_it = properties_.find(prop.key());
+
+                if (prop_it != properties_.end()) 
+                {
+                    jsonpointer::json_pointer prop_location = instance_location / prop.key();
+                    prop_it->second->walk(schema, prop.value(), prop_location, reporter);
+                }
+            }
         }
 
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
@@ -2109,8 +2143,8 @@ namespace jsonschema {
                         evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
                         jsonpointer::json_pointer prop_location = instance_location / prop.key();
                         // check if it is in "allowed properties"
-                        auto properties_it = allowed_properties.find(prop.key());
-                        if (properties_it == allowed_properties.end()) 
+                        auto prop_it = allowed_properties.find(prop.key());
+                        if (prop_it == allowed_properties.end()) 
                         {
                             reporter.error(validation_message(this->keyword_name(),
                                 prop_context.eval_path(), 
@@ -2136,8 +2170,8 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "allowed properties"
-                        auto properties_it = allowed_properties.find(prop.key());
-                        if (properties_it == allowed_properties.end()) 
+                        auto prop_it = allowed_properties.find(prop.key());
+                        if (prop_it == allowed_properties.end()) 
                         {
                             evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
                             jsonpointer::json_pointer prop_location = instance_location / prop.key();

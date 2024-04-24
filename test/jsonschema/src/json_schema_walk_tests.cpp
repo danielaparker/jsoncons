@@ -94,10 +94,15 @@ TEST_CASE("jsonschema walk tests")
             json data = json::parse(data_string);
 
             auto reporter = [&](const std::string& keyword,
-                const json& /*schema*/, const jsoncons::uri& /*schema_location*/,
+                const json& schema, const jsoncons::uri& schema_location,
                 const json& /*instance*/, const jsoncons::jsonpointer::json_pointer& /*instance_location*/)
             {
                 std::cout << keyword << "\n";
+                if (keyword == "type")
+                {
+                    std::cout << "    schema location: " << schema_location.string() << "\n ";
+                    std::cout << "    " << schema << "\n";
+                }
             };
             compiled.walk(data, reporter);
         }
