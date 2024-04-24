@@ -2639,7 +2639,7 @@ namespace jsonschema {
             for (const auto& item : instance.array_range()) 
             {
                 std::size_t errors = local_reporter.errors.size();
-                schema_validator_->validate(this_context, item, instance_location, results, local_reporter, patch);
+                schema_validator_->validate(this_context, item, instance_location / index, results, local_reporter, patch);
                 if (errors == local_reporter.errors.size())
                 {
                     if (context.require_evaluated_items())
@@ -2716,11 +2716,10 @@ namespace jsonschema {
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            std::size_t index = 0;
-            for (const auto& item : instance.array_range()) 
+            
+            for (std::size_t index = 0; index < instance.size(); ++index)
             {
-                schema_validator_->walk(this_context, schema, item, instance_location, reporter);
-                ++index;
+                schema_validator_->walk(this_context, schema, instance.at(index), instance_location / index, reporter);
             }
 
             if (max_contains_)
