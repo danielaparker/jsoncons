@@ -17,6 +17,14 @@
 
 namespace jsoncons {
 namespace jsonschema {
+    
+    template <class Json>
+    struct json_schema_traits    
+    {
+        using info_reporter_type = std::function<void(const std::string& keyword,
+            const Json& schema, const uri& schema_location,
+            const Json& instance, const jsonpointer::json_pointer& instance_location)>;      
+    };
 
     // Interface for validation error handlers
     class error_reporter
@@ -50,7 +58,6 @@ namespace jsonschema {
     private:
         virtual void do_error(const validation_message& /* e */) = 0;
     };
-
 
     struct collecting_error_reporter : public error_reporter
     {
@@ -197,6 +204,10 @@ namespace jsonschema {
     class validator_base 
     {
     public:
+        using info_reporter_type = std::function<void(const std::string& keyword,
+            const Json& schema, const uri& schema_location,
+            const Json& instance, const jsonpointer::json_pointer& instance_location)>;
+
         virtual ~validator_base() = default;
 
         virtual const uri& schema_location() const = 0;
@@ -211,12 +222,22 @@ namespace jsonschema {
             do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
+        void walk(const Json& schema,
+            const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
+        {
+            do_walk(schema, instance, instance_location, reporter);
+        }
+
     private:
         virtual void do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
             Json& patch) const = 0;
+
+        virtual void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const = 0;
     };
 
     template <class Json>
@@ -241,6 +262,8 @@ namespace jsonschema {
     template <class Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
+
         std::string keyword_name_;
         uri schema_location_;
     public:
@@ -256,14 +279,20 @@ namespace jsonschema {
         keyword_validator_base& operator=(const keyword_validator_base&) = delete;
         keyword_validator_base& operator=(keyword_validator_base&&) = default;
 
-        const std::string& keyword_name() const override
+        const std::string& keyword_name() const final
         {
             return keyword_name_;
         }
 
-        const uri& schema_location() const override
+        const uri& schema_location() const final
         {
             return schema_location_;
+        }
+
+        void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
+        {
+            reporter(this->keyword_name(), schema, this->schema_location(), instance, instance_location);
         }
     };
 
@@ -272,6 +301,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         const schema_validator<Json>* referred_schema_;
 
@@ -309,7 +339,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
-            Json& patch) const override
+            Json& patch) const final
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
@@ -324,6 +354,11 @@ namespace jsonschema {
             }
 
             referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
+        }
+
+        void do_walk(const Json& /*schema*/, const Json& /*instance*/, 
+            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final 
+        {
         }
     };
 

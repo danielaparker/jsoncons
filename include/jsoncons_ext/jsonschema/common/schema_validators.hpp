@@ -23,6 +23,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
         std::vector<schema_validator_type> schemas_;
@@ -90,6 +91,12 @@ namespace jsonschema {
             JSONCONS_ASSERT(schema_val_ != nullptr);
             schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
+
+        void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        {
+            schema_val_->walk(schema, instance, instance_location, reporter);
+        }
     };
 
     template <class Json>
@@ -98,6 +105,7 @@ namespace jsonschema {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         uri schema_location_;
         bool value_;
@@ -169,6 +177,9 @@ namespace jsonschema {
                     "False schema always fails"));
             }
         }
+
+        void do_walk(const Json& /*schema*/, const Json& /*instance*/, 
+            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final {}
     };
  
     template <class Json>
@@ -178,6 +189,7 @@ namespace jsonschema {
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using anchor_schema_map_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         uri schema_location_;
         jsoncons::optional<jsoncons::uri> id_;
@@ -392,6 +404,16 @@ namespace jsonschema {
             //    std::cout << "    " << s << "\n";
             //}
             //std::cout << "\n";
+        }
+
+        void do_walk(const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        {
+            for (auto& val : validators_)
+            {               
+                //std::cout << "    " << val->keyword_name() << "\n";
+                val->walk(schema, instance, instance_location, reporter);
+            }
         }
     };
 

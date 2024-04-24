@@ -1,5 +1,4 @@
-// Copyright 2013-2024 Daniel oneOf
-// Parker
+// Copyright 2013-2024 Daniel Parker
 // 
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,6 +34,7 @@ namespace jsonschema {
     public:
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
     public:
@@ -73,6 +73,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         const schema_validator<Json> *tentative_target_; 
 
@@ -138,6 +139,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         uri_wrapper value_;
         const schema_validator<Json>* tentative_target_;
@@ -215,6 +217,7 @@ namespace jsonschema {
     class content_encoding_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::string content_encoding_;
 
@@ -279,6 +282,7 @@ namespace jsonschema {
     class content_media_type_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::string content_media_type_;
         std::string content_encoding_;
@@ -342,6 +346,7 @@ namespace jsonschema {
     class format_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         format_checker format_check_;
 
@@ -386,6 +391,7 @@ namespace jsonschema {
     class pattern_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::string pattern_string_;
         std::regex regex_;
@@ -438,6 +444,7 @@ namespace jsonschema {
     class pattern_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
     public:
         pattern_validator(const uri& schema_location)
@@ -463,6 +470,7 @@ namespace jsonschema {
     class max_length_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t max_length_;
     public:
@@ -509,6 +517,7 @@ namespace jsonschema {
     class max_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t max_items_;
     public:
@@ -555,6 +564,7 @@ namespace jsonschema {
     class min_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t min_items_;
     public:
@@ -602,6 +612,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
     public:
@@ -695,6 +706,7 @@ namespace jsonschema {
     class unique_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         bool are_unique_;
     public:
@@ -754,6 +766,7 @@ namespace jsonschema {
     class min_length_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t min_length_;
 
@@ -802,6 +815,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
 
@@ -857,6 +871,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<schema_validator_type> validators_;
 
@@ -920,6 +935,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<schema_validator_type> validators_;
 
@@ -1001,6 +1017,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<schema_validator_type> validators_;
 
@@ -1074,6 +1091,7 @@ namespace jsonschema {
     class maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
         std::string message_;
@@ -1132,6 +1150,7 @@ namespace jsonschema {
     class exclusive_maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
         std::string message_;
@@ -1190,6 +1209,7 @@ namespace jsonschema {
     class minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
         std::string message_;
@@ -1248,6 +1268,7 @@ namespace jsonschema {
     class exclusive_minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
         std::string message_;
@@ -1306,6 +1327,7 @@ namespace jsonschema {
     class multiple_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         double value_;
 
@@ -1355,6 +1377,7 @@ namespace jsonschema {
     class required_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<std::string> items_;
 
@@ -1410,6 +1433,7 @@ namespace jsonschema {
     class max_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t max_properties_;
     public:
@@ -1452,6 +1476,7 @@ namespace jsonschema {
     class min_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t min_properties_;
     public:
@@ -1493,6 +1518,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type if_val_;
         schema_validator_type then_val_;
@@ -1565,6 +1591,7 @@ namespace jsonschema {
     class enum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
 
@@ -1615,6 +1642,7 @@ namespace jsonschema {
     class const_validator : public keyword_validator_base<Json>
     {        
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         Json value_;
 
@@ -1676,6 +1704,7 @@ namespace jsonschema {
     class type_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<json_schema_type> expected_types_;
 
@@ -1838,6 +1867,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::map<std::string, schema_validator_type> properties_;
     public:
@@ -1893,7 +1923,7 @@ namespace jsonschema {
                     }
                 }
             }
-                // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
+            // Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
 
             // reverse search
             for (auto const& prop : properties_) 
@@ -1949,6 +1979,8 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
+
         std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties_;
 
     public:
@@ -2015,6 +2047,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::unique_ptr<properties_validator<Json>> properties_; 
         std::unique_ptr<pattern_properties_validator<Json>> pattern_properties_;
@@ -2146,6 +2179,8 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
+
         std::map<std::string, keyword_validator_type> dependent_required_;
 
     public:
@@ -2190,6 +2225,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::map<std::string, schema_validator_type> dependent_schemas_;
 
@@ -2235,6 +2271,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
 
@@ -2296,6 +2333,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::map<std::string, keyword_validator_type> dependent_required_;
         std::map<std::string, schema_validator_type> dependent_schemas_;
@@ -2354,6 +2392,7 @@ namespace jsonschema {
     class max_contains_keyword : public keyword_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t max_value_;
     public:
@@ -2388,6 +2427,7 @@ namespace jsonschema {
     class min_contains_keyword : public keyword_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::size_t min_value_;
     public:
@@ -2421,6 +2461,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_validator_;
         std::unique_ptr<max_contains_keyword<Json>> max_contains_;
@@ -2535,6 +2576,7 @@ namespace jsonschema {
     {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<schema_validator_type> prefix_item_validators_;
         keyword_validator_type items_val_;
@@ -2669,6 +2711,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
 
@@ -2763,6 +2806,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         schema_validator_type schema_val_;
 

@@ -11,7 +11,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/validator.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -52,7 +52,7 @@ namespace jsonschema {
             reporter_(e);
         }
     };
-        
+       
     template <class Json>
     class json_validator;
     
@@ -159,6 +159,14 @@ namespace jsonschema {
             root_->validate(context, instance, instance_location, results, adaptor, patch);
             visitor.end_array();
             visitor.flush();
+        }
+        
+        template <class Reporter>
+        void walk(const Json& instance, const Reporter& reporter) const
+        {
+            jsonpointer::json_pointer instance_location{};
+
+            root_->walk(sch_, instance, instance_location, reporter);
         }
         
     private:

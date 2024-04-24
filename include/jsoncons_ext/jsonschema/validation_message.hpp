@@ -11,7 +11,6 @@
 #include <jsoncons/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/json_schema.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
