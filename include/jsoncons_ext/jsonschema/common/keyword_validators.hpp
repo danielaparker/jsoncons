@@ -67,12 +67,12 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
             if (schema_val_) 
             {
-                schema_val_->walk(context, schema, instance, instance_location, reporter);
+                schema_val_->walk(context, instance, instance_location, reporter);
             }
         }
     };
@@ -142,7 +142,7 @@ namespace jsonschema {
             schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
             auto rit = context.dynamic_scope().rbegin();
@@ -169,7 +169,7 @@ namespace jsonschema {
             if (schema_ptr)
             {
                 evaluation_context<Json> this_context(context, this->keyword_name());
-                schema_ptr->walk(this_context, schema, instance, instance_location, reporter);
+                schema_ptr->walk(this_context, instance, instance_location, reporter);
             }
         }
     };
@@ -250,7 +250,7 @@ namespace jsonschema {
             schema_ptr->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
             auto rit = context.dynamic_scope().rbegin();
@@ -274,7 +274,7 @@ namespace jsonschema {
             }
 
             evaluation_context<Json> this_context(context, this->keyword_name());
-            schema_ptr->walk(this_context, schema, instance, instance_location, reporter);
+            schema_ptr->walk(this_context, instance, instance_location, reporter);
         }
     };
 
@@ -764,7 +764,7 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
             if (!instance.is_array())
@@ -772,14 +772,7 @@ namespace jsonschema {
                 return;
             }
 
-            std::error_code ec;
-            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
-            if (ec)
-            {
-                return;
-            }
-            
-            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
 
             if (schema_val_) 
             {
@@ -787,7 +780,7 @@ namespace jsonschema {
                 for (const auto& item : instance.array_range()) 
                 {
                     jsonpointer::json_pointer item_location = instance_location / index;
-                    schema_val_->walk(context, schema, item, item_location, reporter);
+                    schema_val_->walk(context, item, item_location, reporter);
                     ++index;
                 }
             }
@@ -1682,22 +1675,22 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
             if (if_val_) 
             {
                 evaluation_context<Json> if_context(context, "if");
-                if_val_->walk(if_context, schema, instance, instance_location, reporter);
+                if_val_->walk(if_context, instance, instance_location, reporter);
                 if (then_val_)
                 {
                     evaluation_context<Json> then_context(context, "then");
-                    then_val_->walk(then_context, schema, instance, instance_location, reporter);
+                    then_val_->walk(then_context, instance, instance_location, reporter);
                 }
                 if (else_val_)
                 {
                     evaluation_context<Json> else_context(context, "else");
-                    else_val_->walk(else_context, schema, instance, instance_location, reporter);
+                    else_val_->walk(else_context, instance, instance_location, reporter);
                 }
             }
         }
@@ -2082,7 +2075,7 @@ namespace jsonschema {
             validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
             if (!instance.is_object())
@@ -2090,13 +2083,7 @@ namespace jsonschema {
                 return;
             }
 
-            std::error_code ec;
-            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
-            if (ec)
-            {
-                return;
-            }
-            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
 
             for (const auto& prop : instance.object_range()) 
             {
@@ -2105,7 +2092,7 @@ namespace jsonschema {
                 if (prop_it != properties_.end()) 
                 {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
-                    prop_it->second->walk(context, schema, prop.value(), prop_location, reporter);
+                    prop_it->second->walk(context, prop.value(), prop_location, reporter);
                 }
             }
         }
@@ -2716,7 +2703,7 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
             if (!instance.is_array())
@@ -2729,28 +2716,23 @@ namespace jsonschema {
                 return;
             }
 
-            std::error_code ec;
-            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
-            if (!ec)
-            {
-                reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
-            }
+            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
             
             for (std::size_t index = 0; index < instance.size(); ++index)
             {
-                schema_validator_->walk(this_context, schema, instance.at(index), instance_location / index, reporter);
+                schema_validator_->walk(this_context, instance.at(index), instance_location / index, reporter);
             }
 
             if (max_contains_)
             {
-                max_contains_->walk(this_context, schema, instance, instance_location, reporter);
+                max_contains_->walk(this_context, instance, instance_location, reporter);
             }
             if (min_contains_)
             {
-                min_contains_->walk(this_context, schema, instance, instance_location, reporter);
+                min_contains_->walk(this_context, instance, instance_location, reporter);
             }
         }
     };
@@ -2889,21 +2871,15 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
             if (!instance.is_array())
             {
                 return;
             }
-            std::error_code ec;
-            const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
-            if (ec)
-            {
-                return;
-            }
 
-            reporter(this->keyword_name(), result, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
 
             size_t data_index = 0;
 
@@ -2916,7 +2892,7 @@ namespace jsonschema {
                 auto& val = prefix_item_validators_[schema_index];
                 evaluation_context<Json> item_context{prefix_items_context, schema_index, evaluation_flags{}};
                 jsonpointer::json_pointer item_location = instance_location / data_index;
-                val->walk(item_context, schema, instance[data_index], item_location, reporter);
+                val->walk(item_context, instance[data_index], item_location, reporter);
             }
             if (data_index < instance.size() && items_val_)
             {
@@ -2926,7 +2902,7 @@ namespace jsonschema {
                     if (items_val_)
                     {
                         jsonpointer::json_pointer item_location = instance_location / data_index;
-                        items_val_->walk(items_context, schema, instance[data_index], item_location, reporter);
+                        items_val_->walk(items_context, instance[data_index], item_location, reporter);
                     }
                 }
             }

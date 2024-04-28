@@ -85,7 +85,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
         {
-            do_walk(context, *root_schema_, instance, instance_location, reporter);
+            do_walk(context, instance, instance_location, reporter);
         }
         
     private:
@@ -100,11 +100,11 @@ namespace jsonschema {
             schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& /*schema*/, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
-            schema_val_->walk(context, *root_schema_, instance, instance_location, reporter);
+            schema_val_->walk(context, instance, instance_location, reporter);
         }
     };
 
@@ -187,7 +187,7 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& /*context*/, const Json& /*schema*/, const Json& /*instance*/,
+        void do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/,
             const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final {}
     };
  
@@ -414,33 +414,23 @@ namespace jsonschema {
             //std::cout << "\n";
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {           
-            if (id_)
-            {
-                std::cout << "id: " << (*id_).string() << "\n";
-                std::cout << "  schema: " << schema << "\n";
-            }
-            else
-            {
-                std::cout << "id:\n";
-                std::cout << "  schema: " << schema << "\n";
-            }
             evaluation_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->walk(this_context, schema, instance, instance_location, reporter);
+                val->walk(this_context, instance, instance_location, reporter);
             }
             if (unevaluated_properties_val_)
             {
-                unevaluated_properties_val_->walk(this_context, schema, instance, instance_location, reporter);
+                unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter);
             }
 
             if (unevaluated_items_val_)
             {
-                unevaluated_items_val_->walk(this_context, schema, instance, instance_location, reporter);
+                unevaluated_items_val_->walk(this_context, instance, instance_location, reporter);
             }
         }
     };
