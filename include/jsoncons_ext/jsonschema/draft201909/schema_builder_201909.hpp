@@ -443,7 +443,7 @@ namespace draft201909 {
                 }
             }
             
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), sch, std::move(id),
                 std::move(validators), std::move(unevaluated_properties_val), std::move(unevaluated_items_val), 
                 std::move(defs), std::move(default_value), recursive_anchor);
         }

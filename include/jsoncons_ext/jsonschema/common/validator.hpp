@@ -292,6 +292,9 @@ namespace jsonschema {
         void do_walk(const evaluation_context<Json>& /*context*/, const Json& schema, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
+            std::cout << this->keyword_name() << "\n";
+            std::cout << "  " << schema << "\n";
+            std::cout << "  " << this->schema_location().string() << "\n";
             std::error_code ec;
             const Json& result = jsonpointer::get(schema, this->schema_location().fragment(), ec);
             if (!ec)

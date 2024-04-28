@@ -169,7 +169,7 @@ namespace draft7 {
                         auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
                         validators.push_back(this->get_or_create_reference(id));
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
-                            new_context.get_base_uri(), context.id(),
+                            new_context.get_base_uri(), sch, context.id(),
                             std::move(validators), std::move(defs), std::move(default_value));
                     }
                     else
@@ -316,7 +316,7 @@ namespace draft7 {
                     validators.emplace_back(this->make_items_validator("items", context, it->value(), anchor_dict));
                 }
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), sch, std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
         }
 

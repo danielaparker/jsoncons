@@ -1640,13 +1640,13 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const final
         {
-            evaluation_context<Json> this_context(context, this->keyword_name());
             if (if_val_) 
             {
                 collecting_error_reporter local_reporter;
                 evaluation_results local_results;
                 
-                if_val_->validate(this_context, instance, instance_location, local_results, local_reporter, patch);
+                evaluation_context<Json> if_context(context, "if");
+                if_val_->validate(if_context, instance, instance_location, local_results, local_reporter, patch);
                 //std::cout << "if: evaluated properties\n";
                 //for (auto& item : results.evaluated_properties)
                 //{
@@ -1657,7 +1657,8 @@ namespace jsonschema {
                     results.merge(local_results);
                     if (then_val_)
                     {
-                        then_val_->validate(this_context, instance, instance_location, results, reporter, patch);
+                        evaluation_context<Json> then_context(context, "then");
+                        then_val_->validate(then_context, instance, instance_location, results, reporter, patch);
                         //std::cout << "then: evaluated properties\n";
                         //for (auto& item : results.evaluated_properties)
                         //{
@@ -1669,13 +1670,34 @@ namespace jsonschema {
                 {
                     if (else_val_)
                     {
-                        else_val_->validate(this_context, instance, instance_location, results, reporter, patch);
+                        evaluation_context<Json> else_context(context, "else");
+                        else_val_->validate(else_context, instance, instance_location, results, reporter, patch);
                         //std::cout << "else: evaluated properties\n";
                         //for (auto& item : results.evaluated_properties)
                         //{
                         //    std::cout << "  " << item << "\n";
                         //}
                     }
+                }
+            }
+        }
+
+        void do_walk(const evaluation_context<Json>& context, const Json& schema, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        {
+            if (if_val_) 
+            {
+                evaluation_context<Json> if_context(context, "if");
+                if_val_->walk(if_context, schema, instance, instance_location, reporter);
+                if (then_val_)
+                {
+                    evaluation_context<Json> then_context(context, "then");
+                    then_val_->walk(then_context, schema, instance, instance_location, reporter);
+                }
+                if (else_val_)
+                {
+                    evaluation_context<Json> else_context(context, "else");
+                    else_val_->walk(else_context, schema, instance, instance_location, reporter);
                 }
             }
         }

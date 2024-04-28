@@ -193,6 +193,7 @@ namespace jsonschema {
         using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         uri schema_location_;
+        Json sch_;
         jsoncons::optional<jsoncons::uri> id_;
         std::vector<keyword_validator_type> validators_; 
         std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val_;
@@ -206,12 +207,13 @@ namespace jsonschema {
         bool always_fails_;
 
     public:
-        object_schema_validator(const uri& schema_location, 
-            const jsoncons::optional<jsoncons::uri>& id,
+        object_schema_validator(const uri& schema_location,
+            Json sch, const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value)
             : schema_location_(schema_location),
+              sch_(std::move(sch)),
               id_(id),
               validators_(std::move(validators)),
               defs_(std::move(defs)),
@@ -222,13 +224,14 @@ namespace jsonschema {
             init();
         }
         object_schema_validator(const uri& schema_location, 
-            const jsoncons::optional<jsoncons::uri>& id,
+            Json sch, const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators,
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value, bool recursive_anchor)
             : schema_location_(schema_location),
+              sch_(std::move(sch)),
               id_(id),
               validators_(std::move(validators)),
               unevaluated_properties_val_(std::move(unevaluated_properties_val)),
@@ -241,7 +244,7 @@ namespace jsonschema {
             init();
         }
         object_schema_validator(const uri& schema_location, 
-            const jsoncons::optional<jsoncons::uri>& id,
+            Json sch, const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
@@ -250,6 +253,7 @@ namespace jsonschema {
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
             anchor_schema_map_type&& anchor_dict)
             : schema_location_(schema_location),
+              sch_(std::move(sch)),
               id_(std::move(id)),
               validators_(std::move(validators)),
               unevaluated_properties_val_(std::move(unevaluated_properties_val)),
@@ -413,16 +417,16 @@ namespace jsonschema {
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->walk(this_context, schema, instance, instance_location, reporter);
+                val->walk(this_context, id_ ? sch_ : schema, instance, instance_location, reporter);
             }
             if (unevaluated_properties_val_)
             {
-                unevaluated_properties_val_->walk(this_context, schema, instance, instance_location, reporter);
+                unevaluated_properties_val_->walk(this_context, id_ ? sch_ : schema, instance, instance_location, reporter);
             }
 
             if (unevaluated_items_val_)
             {
-                unevaluated_items_val_->walk(this_context, schema, instance, instance_location, reporter);
+                unevaluated_items_val_->walk(this_context, id_ ? sch_ : schema, instance, instance_location, reporter);
             }
         }
     };
