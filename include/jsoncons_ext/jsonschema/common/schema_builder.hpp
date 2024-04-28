@@ -112,11 +112,6 @@ namespace jsonschema {
             return schema_validator_ptr;
         }
         
-        std::unique_ptr<Json>&& get_schema()
-        {     
-            return std::move(root_schema_);                   
-        }
-        
         std::unique_ptr<document_schema_validator<Json>> get_schema_validator()
         {                        
             //std::cout << "schema_store:\n";
@@ -163,7 +158,7 @@ namespace jsonschema {
 
             resolve_references();
 
-            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_), std::move(schema_validators_));
+            return jsoncons::make_unique<document_schema_validator<Json>>(std::move(root_schema_), std::move(root_), std::move(schema_validators_));
         }
 
         void resolve_references()

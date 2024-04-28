@@ -220,7 +220,7 @@ namespace jsonschema {
         auto schema_builder = builder_factory(std::move(sch), options, &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema(retrieval_uri);
-        return json_schema<Json>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return json_schema<Json>(schema_builder->get_schema_validator());
     }
 
     template <class Json>
@@ -236,7 +236,7 @@ namespace jsonschema {
         auto schema_builder = builder_factory(std::move(sch), options, &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema(retrieval_uri);
-        return json_schema<Json>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return json_schema<Json>(schema_builder->get_schema_validator());
     }
 
     template <class Json,class URIResolver>
@@ -253,7 +253,7 @@ namespace jsonschema {
         auto schema_builder = builder_factory(std::move(sch), options, &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema();
-        return json_schema<Json>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return json_schema<Json>(schema_builder->get_schema_validator());
     }
 
     template <class Json>
@@ -269,7 +269,7 @@ namespace jsonschema {
         auto schema_builder = builder_factory(std::move(sch), options, &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema();
-        return json_schema<Json>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return json_schema<Json>(schema_builder->get_schema_validator());
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -290,7 +290,7 @@ namespace jsonschema {
             &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema(retrieval_uri);
-        return std::make_shared<json_schema<Json>>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return std::make_shared<json_schema<Json>>(schema_builder->get_schema_validator());
     }
 
     template <class Json>
@@ -307,7 +307,7 @@ namespace jsonschema {
             &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema(retrieval_uri);
-        return std::make_shared<json_schema<Json>>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return std::make_shared<json_schema<Json>>(schema_builder->get_schema_validator());
     }
 
     template <class Json,class URIResolver>
@@ -325,7 +325,7 @@ namespace jsonschema {
             &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema();
-        return std::make_shared<json_schema<Json>>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return std::make_shared<json_schema<Json>>(schema_builder->get_schema_validator());
     }
 
     template <class Json>
@@ -342,7 +342,7 @@ namespace jsonschema {
             &schema_store, resolvers, vocabulary);
 
         schema_builder->build_schema();
-        return std::make_shared<json_schema<Json>>(schema_builder->get_schema(), schema_builder->get_schema_validator());
+        return std::make_shared<json_schema<Json>>(schema_builder->get_schema_validator());
     }
 #endif    
 

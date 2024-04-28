@@ -11,7 +11,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
-#include <jsoncons_ext/jsonschema/common/validator.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -60,15 +60,15 @@ namespace jsonschema {
     class json_schema
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using document_schema_validator_type = std::unique_ptr<document_schema_validator<Json>>;
 
         std::unique_ptr<Json> root_schema_;
-        schema_validator_type root_;
+        document_schema_validator_type root_;
         
         friend class json_validator<Json>;
     public:
-        json_schema(std::unique_ptr<Json>&& sch, schema_validator_type&& root)
-            : root_schema_(std::move(sch)), root_(std::move(root))
+        json_schema(document_schema_validator_type&& root)
+            : root_(std::move(root))
         {
             if (root_ == nullptr)
                 JSONCONS_THROW(schema_error("There is no root schema to validate an instance against"));
