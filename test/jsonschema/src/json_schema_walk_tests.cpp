@@ -16,7 +16,7 @@
 using jsoncons::json;
 using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
-#if 0
+//#if 0
 TEST_CASE("jsonschema walk tests")
 {
     std::string schema_string = R"(
@@ -126,7 +126,7 @@ TEST_CASE("jsonschema walk tests")
         //std::cout << pretty_print(result) << "\n";
     }
 } 
-#endif
+//#endif
 //#if 0
 TEST_CASE("jsonschema with $dynamicRef walk test")
 {

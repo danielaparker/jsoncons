@@ -62,13 +62,13 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
 
-        Json sch_;
+        std::unique_ptr<Json> root_schema_;
         schema_validator_type root_;
         
         friend class json_validator<Json>;
     public:
-        json_schema(Json&& sch, schema_validator_type&& root)
-            : sch_(std::move(sch)), root_(std::move(root))
+        json_schema(std::unique_ptr<Json>&& sch, schema_validator_type&& root)
+            : root_schema_(std::move(sch)), root_(std::move(root))
         {
             if (root_ == nullptr)
                 JSONCONS_THROW(schema_error("There is no root schema to validate an instance against"));
@@ -166,7 +166,7 @@ namespace jsonschema {
         {
             jsonpointer::json_pointer instance_location{};
 
-            root_->walk(evaluation_context<Json>{}, sch_, instance, instance_location, reporter);
+            root_->walk(evaluation_context<Json>{}, *root_schema_, instance, instance_location, reporter);
         }
         
     private:
