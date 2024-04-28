@@ -80,6 +80,13 @@ namespace jsonschema {
         {
             return schema_val_->always_succeeds();
         }
+
+        void walk(const evaluation_context<Json>& context, 
+            const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
+        {
+            do_walk(context, *root_schema_, instance, instance_location, reporter);
+        }
         
     private:
         void do_validate(const evaluation_context<Json>& context, 

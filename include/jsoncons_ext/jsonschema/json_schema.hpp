@@ -62,7 +62,6 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using document_schema_validator_type = std::unique_ptr<document_schema_validator<Json>>;
 
-        std::unique_ptr<Json> root_schema_;
         document_schema_validator_type root_;
         
         friend class json_validator<Json>;
@@ -166,7 +165,7 @@ namespace jsonschema {
         {
             jsonpointer::json_pointer instance_location{};
 
-            root_->walk(evaluation_context<Json>{}, *root_schema_, instance, instance_location, reporter);
+            root_->walk(evaluation_context<Json>{}, instance, instance_location, reporter);
         }
         
     private:
