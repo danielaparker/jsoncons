@@ -236,7 +236,10 @@ namespace jsonschema {
             Json& patch) const = 0;
 
         virtual walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const = 0;
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const
+        {
+            return walk_result::advance;
+        }
     };
 
     template <class Json>
