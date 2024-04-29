@@ -81,11 +81,11 @@ namespace jsonschema {
             return schema_val_->always_succeeds();
         }
 
-        void walk(const evaluation_context<Json>& context, 
+        walk_result walk(const evaluation_context<Json>& context, 
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
         {
-            do_walk(context, instance, instance_location, reporter);
+            return do_walk(context, instance, instance_location, reporter);
         }
         
     private:
@@ -100,11 +100,11 @@ namespace jsonschema {
             schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
-            schema_val_->walk(context, instance, instance_location, reporter);
+            return schema_val_->walk(context, instance, instance_location, reporter);
         }
     };
 
@@ -191,8 +191,11 @@ namespace jsonschema {
             }
         }
 
-        void do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/,
-            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final {}
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/,
+            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const final 
+        {
+            return walk_result::advance;
+        }
     };
  
     template <class Json>
@@ -422,24 +425,37 @@ namespace jsonschema {
             //std::cout << "\n";
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {           
             evaluation_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->walk(this_context, instance, instance_location, reporter);
+                walk_result result = val->walk(this_context, instance, instance_location, reporter);
+                if (result == walk_result::stop)
+                {
+                    return result;
+                }
             }
             if (unevaluated_properties_val_)
             {
-                unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter);
+                walk_result result = unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter);
+                if (result == walk_result::stop)
+                {
+                    return result;
+                }
             }
 
             if (unevaluated_items_val_)
             {
-                unevaluated_items_val_->walk(this_context, instance, instance_location, reporter);
+                walk_result result = unevaluated_items_val_->walk(this_context, instance, instance_location, reporter);
+                if (result == walk_result::stop)
+                {
+                    return result;
+                }
             }
+            return walk_result::advance;
         }
     };
 

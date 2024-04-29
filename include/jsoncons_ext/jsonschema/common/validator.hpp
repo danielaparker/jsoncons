@@ -18,10 +18,12 @@
 namespace jsoncons {
 namespace jsonschema {
     
+    enum walk_result {stop, advance};
+
     template <class Json>
     struct json_schema_traits    
     {
-        using info_reporter_type = std::function<void(const std::string& keyword,
+        using info_reporter_type = std::function<walk_result(const std::string& keyword,
             const Json& schema, const uri& schema_location,
             const Json& instance, const jsonpointer::json_pointer& instance_location)>;      
     };
@@ -204,9 +206,7 @@ namespace jsonschema {
     class validator_base 
     {
     public:
-        using info_reporter_type = std::function<void(const std::string& keyword,
-            const Json& schema, const uri& schema_location,
-            const Json& instance, const jsonpointer::json_pointer& instance_location)>;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         virtual ~validator_base() = default;
 
@@ -222,10 +222,10 @@ namespace jsonschema {
             do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        void walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
         {
-            do_walk(context, instance, instance_location, reporter);
+            return do_walk(context, instance, instance_location, reporter);
         }
 
     private:
@@ -235,7 +235,7 @@ namespace jsonschema {
             error_reporter& reporter, 
             Json& patch) const = 0;
 
-        virtual void do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        virtual walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const = 0;
     };
 
@@ -295,10 +295,10 @@ namespace jsonschema {
             return schema_location_;
         }
 
-        void do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
-            reporter(this->keyword_name(), schema(), this->schema_location(), instance, instance_location);
+            return reporter(this->keyword_name(), schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -362,14 +362,15 @@ namespace jsonschema {
             referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
-        void do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
         {
-            if (referred_schema_)
+            if (!referred_schema_)
             {
-                evaluation_context<Json> this_context(context, this->keyword_name());
-                referred_schema_->walk(this_context, instance, instance_location, reporter);
+                return walk_result::advance;
             }
+            evaluation_context<Json> this_context(context, this->keyword_name());
+            return referred_schema_->walk(this_context, instance, instance_location, reporter);           
         }
     };
 
@@ -410,10 +411,10 @@ namespace jsonschema {
             return schema_location_;
         }
 
-        void walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result walk(const evaluation_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const
         {
-            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 

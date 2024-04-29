@@ -161,11 +161,11 @@ namespace jsonschema {
         }
         
         template <class Reporter>
-        void walk(const Json& instance, const Reporter& reporter) const
+        walk_result walk(const Json& instance, const Reporter& reporter) const
         {
             jsonpointer::json_pointer instance_location{};
 
-            root_->walk(evaluation_context<Json>{}, instance, instance_location, reporter);
+            return root_->walk(evaluation_context<Json>{}, instance, instance_location, reporter);
         }
         
     private:

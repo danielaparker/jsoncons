@@ -109,7 +109,7 @@ TEST_CASE("jsonschema walk tests")
         ojson result(jsoncons::json_object_arg);
         auto reporter = [&](const std::string& keyword,
             const ojson& schema, const jsoncons::uri& /*schema_location*/,
-            const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location)
+            const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
         {
             if (keyword == "type" && schema.is_object())
             {
@@ -120,6 +120,7 @@ TEST_CASE("jsonschema walk tests")
                     //std::cout << instance_location.string() << ": " << it->value() << "\n";
                 }
             }
+            return jsonschema::walk_result::advance;
         };
         compiled.walk(data, reporter);
         CHECK(expected == result);
@@ -184,7 +185,7 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
 
             auto reporter = [&](const std::string& keyword,
                 const ojson& schema, const jsoncons::uri& /*schema_location*/,
-                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location)
+                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
             {
                 std::cout << keyword << "\n";
                 if (keyword == "type" && schema.is_object())
@@ -195,6 +196,7 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
                         std::cout << instance_location.string() << ": " << it->value() << "\n";
                     }
                 }
+                return jsonschema::walk_result::advance;
             };
             compiled.walk(data, reporter);
         }
