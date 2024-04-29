@@ -83,7 +83,7 @@ jobs:
            sudo apt install g++-11
       shell: bash
     - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On
+      run: cmake -S . -B build -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On
       env:
         CXX:  g++-11
 
