@@ -89,6 +89,7 @@ namespace jsonschema {
         void build_schema() 
         {
             anchor_uri_map_type anchor_dict;
+
             root_ = make_schema_validator(compilation_context{}, *root_schema_, {}, anchor_dict);
         }
 
@@ -292,7 +293,7 @@ namespace jsonschema {
             const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict) = 0;
 
         schema_validator_type make_cross_draft_schema_validator(const compilation_context& context, 
-            Json sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
+            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
         {
             schema_validator_type schema_val = schema_validator_type{};
             switch (std::move(sch).type())
@@ -941,8 +942,8 @@ namespace jsonschema {
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"additionalItems"};
-                    additional_items_validator = this->make_schema_keyword_validator(parent, "additionalItems", context,
-                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
+                    additional_items_validator = this->make_schema_keyword_validator("additionalItems", context,
+                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict), parent);
                 }
             }
 
@@ -950,11 +951,11 @@ namespace jsonschema {
                 std::move(item_validators), std::move(additional_items_validator));
         }
 
-        keyword_validator_type make_schema_keyword_validator(const Json& schema, const std::string& keyword_name,
-            const compilation_context& context, schema_validator_type&& schema_val)
+        keyword_validator_type make_schema_keyword_validator(const std::string& keyword_name,
+            const compilation_context& context, schema_validator_type&& schema_val, const Json& parent)
         {
             uri schema_location{context.make_schema_location(keyword_name)};
-            return jsoncons::make_unique<schema_keyword_validator<Json>>(keyword_name, schema, schema_location,
+            return jsoncons::make_unique<schema_keyword_validator<Json>>(keyword_name, parent, schema_location,
                 std::move(schema_val));
         }
         

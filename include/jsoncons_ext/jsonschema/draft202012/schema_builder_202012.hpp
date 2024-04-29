@@ -491,8 +491,8 @@ namespace draft202012 {
                 if (it != parent.object_range().end()) 
                 {
                     std::string sub_keys[] = {"items"};
-                    items_validator = this->make_schema_keyword_validator(parent, "items", context,
-                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
+                    items_validator = this->make_schema_keyword_validator("items", context,
+                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict), parent);
                 }
             }
 

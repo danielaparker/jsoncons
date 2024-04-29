@@ -283,6 +283,12 @@ namespace jsonschema {
         {
             return keyword_name_;
         }
+        
+        const Json& schema() const
+        {
+            JSONCONS_ASSERT(schema_ptr_ != nullptr);
+            return *schema_ptr_;
+        }           
 
         const uri& schema_location() const final
         {
@@ -292,7 +298,7 @@ namespace jsonschema {
         void do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
-            reporter(this->keyword_name(), *schema_ptr_, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -394,6 +400,11 @@ namespace jsonschema {
             return keyword_name_;
         }
 
+        const Json& schema() const
+        {
+            return *schema_ptr_;
+        }
+
         const uri& schema_location() const 
         {
             return schema_location_;
@@ -402,7 +413,7 @@ namespace jsonschema {
         void walk(const evaluation_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const
         {
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 

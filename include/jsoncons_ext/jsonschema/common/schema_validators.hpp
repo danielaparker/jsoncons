@@ -124,6 +124,10 @@ namespace jsonschema {
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
 
     public:
+        boolean_schema_validator(const boolean_schema_validator&) = delete;
+        boolean_schema_validator& operator=(const boolean_schema_validator&) = delete;
+        boolean_schema_validator(boolean_schema_validator&&) = default;
+        boolean_schema_validator& operator=(boolean_schema_validator&&) = default;
         boolean_schema_validator(const uri& schema_location, bool value)
             : schema_location_(schema_location), value_(value)
         {
@@ -214,6 +218,10 @@ namespace jsonschema {
         bool always_fails_;
 
     public:
+        object_schema_validator(const object_schema_validator&) = delete;
+        object_schema_validator& operator=(const object_schema_validator&) = delete;
+        object_schema_validator(object_schema_validator&&) = default;
+        object_schema_validator& operator=(object_schema_validator&&) = default;
         object_schema_validator(const uri& schema_location,
             const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 

@@ -683,7 +683,7 @@ namespace jsonschema {
 
         schema_validator_type schema_val_;
     public:
-        items_validator(const std::string& keyword_name, const Json schema, const uri& schema_location, 
+        items_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location, 
             schema_validator_type&& schema_val)
             : keyword_validator_base<Json>(keyword_name, schema, schema_location), 
               schema_val_(std::move(schema_val))
@@ -772,7 +772,7 @@ namespace jsonschema {
                 return;
             }
 
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
 
             if (schema_val_) 
             {
@@ -1982,6 +1982,11 @@ namespace jsonschema {
 
         std::map<std::string, schema_validator_type> properties_;
     public:
+        properties_validator(const properties_validator&) = delete;
+        properties_validator& operator=(const properties_validator&) = delete;
+        properties_validator(properties_validator&&) = default;
+        properties_validator& operator=(properties_validator&&) = default;
+
         properties_validator(const Json& schema, const uri& schema_location,
             std::map<std::string, schema_validator_type>&& properties
         )
@@ -2083,7 +2088,7 @@ namespace jsonschema {
                 return;
             }
 
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
 
             for (const auto& prop : instance.object_range()) 
             {
@@ -2716,7 +2721,7 @@ namespace jsonschema {
                 return;
             }
 
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
 
             evaluation_context<Json> this_context(context, this->keyword_name());
 
@@ -2879,7 +2884,7 @@ namespace jsonschema {
                 return;
             }
 
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
 
             size_t data_index = 0;
 
