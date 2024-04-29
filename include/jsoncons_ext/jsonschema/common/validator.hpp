@@ -264,12 +264,13 @@ namespace jsonschema {
         using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::string keyword_name_;
+        const Json* schema_ptr_;
         uri schema_location_;
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        keyword_validator_base(const std::string& keyword_name, const uri& schema_location)
-            : keyword_name_(keyword_name), schema_location_(schema_location)
+        keyword_validator_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
+            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
         {
         }
 
@@ -291,7 +292,7 @@ namespace jsonschema {
         void do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
         {
-            reporter(this->keyword_name(), Json{}, this->schema_location(), instance, instance_location);
+            reporter(this->keyword_name(), *schema_ptr_, this->schema_location(), instance, instance_location);
         }
     };
 
@@ -305,20 +306,20 @@ namespace jsonschema {
         const schema_validator<Json>* referred_schema_;
 
     public:
-        ref_validator(const ref_validator& other)
-            : keyword_validator_base<Json>(other.keyword_name(), other.schema_location()),
+        ref_validator(const Json& schema, const ref_validator& other)
+            : keyword_validator_base<Json>(other.keyword_name(), schema, other.schema_location()),
                   referred_schema_{other.referred_schema_}
         {
         }
         
-        ref_validator(const uri& schema_location) 
-            : keyword_validator_base<Json>("$ref", schema_location), referred_schema_{nullptr}
+        ref_validator(const Json& schema, const uri& schema_location) 
+            : keyword_validator_base<Json>("$ref", schema, schema_location), referred_schema_{nullptr}
         {
             //std::cout << "ref_validator: " << this->schema_location().string() << "\n";
         }
 
-        ref_validator(const uri& schema_location, const schema_validator<Json>* referred_schema)
-            : keyword_validator_base<Json>("$ref", schema_location), referred_schema_(referred_schema) 
+        ref_validator(const Json& schema, const uri& schema_location, const schema_validator<Json>* referred_schema)
+            : keyword_validator_base<Json>("$ref", schema, schema_location), referred_schema_(referred_schema)
         {
             //std::cout << "ref_validator2: " << this->schema_location().string() << "\n";
         }
@@ -372,11 +373,12 @@ namespace jsonschema {
         using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::string keyword_name_;
+        const Json* schema_ptr_;
         uri schema_location_;
     public:
 
-        keyword_base(const std::string& keyword_name, const uri& schema_location)
-            : keyword_name_(keyword_name), schema_location_(schema_location)
+        keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
+            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
         {
         }
 
