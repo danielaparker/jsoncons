@@ -136,7 +136,7 @@ protected:
     basic_json_options_common(const basic_json_options_common&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;
     basic_json_options_common(basic_json_options_common&&) = default;
-    basic_json_options_common& operator=(basic_json_options_common&&) = default;
+    //basic_json_options_common& operator=(basic_json_options_common&&) = default;
 
 public:
 
