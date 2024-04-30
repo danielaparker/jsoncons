@@ -2315,7 +2315,6 @@ namespace jsonschema {
         {
         }
 
-#if defined(JSONCONS_HAS_STD_REGEX)
         void validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, 
             evaluation_results& results, 
@@ -2323,6 +2322,14 @@ namespace jsonschema {
             Json& patch,
             std::unordered_set<std::string>& allowed_properties) const 
         {
+            (void)context;
+            (void)instance;
+            (void)instance_location;
+            (void)results;
+            (void)reporter;
+            (void)patch;
+            (void)allowed_properties;
+#if defined(JSONCONS_HAS_STD_REGEX)
             if (!instance.is_object())
             {
                 return;
@@ -2335,6 +2342,7 @@ namespace jsonschema {
 
                 // check all matching "patternProperties"
                 for (auto& schema_pp : pattern_properties_)
+                {
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
                         allowed_properties.insert(prop.key());
@@ -2348,6 +2356,7 @@ namespace jsonschema {
                             }
                         }
                     }
+                }
             }
 #endif
         }
@@ -2364,10 +2373,41 @@ namespace jsonschema {
             validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return walk_result::advance;
+            }
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+            (void)context;
+#if defined(JSONCONS_HAS_STD_REGEX)
+            evaluation_context<Json> this_context(context, this->keyword_name());
+            for (const auto& prop : instance.object_range()) 
+            {
+                evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
+                // check all matching "patternProperties"
+                for (auto& schema_pp : pattern_properties_)
+                {
+                    if (std::regex_search(prop.key(), schema_pp.first)) 
+                    {
+                        result = schema_pp.second->walk(prop_context, prop.value() , prop_location, reporter);
+                        if (result == walk_result::stop)
+                        {
+                            return result;
+                        }
+                    }
+                }
+            }
+#endif
+            return walk_result::advance;
         }
     };
 
