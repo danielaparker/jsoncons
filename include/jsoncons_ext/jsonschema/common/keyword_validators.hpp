@@ -343,6 +343,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // contentMediaType
@@ -407,6 +413,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // format 
@@ -450,6 +462,12 @@ namespace jsonschema {
                     return;
                 }
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -507,6 +525,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 #else
     template <class Json>
@@ -529,6 +553,12 @@ namespace jsonschema {
             error_reporter&,
             Json& /*patch*/) const final
         {
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 #endif
@@ -578,6 +608,12 @@ namespace jsonschema {
                 }
             }          
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // maxItems
@@ -625,6 +661,12 @@ namespace jsonschema {
                 }
             }          
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // minItems
@@ -671,6 +713,12 @@ namespace jsonschema {
                     return;
                 }
             }          
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -858,6 +906,12 @@ namespace jsonschema {
             }
             return true; // elements are unique
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // minLength
@@ -905,6 +959,12 @@ namespace jsonschema {
                     return;
                 }
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -963,6 +1023,12 @@ namespace jsonschema {
             {
                 results.merge(local_results);
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1027,6 +1093,12 @@ namespace jsonschema {
                     "Must be valid against at least one schema, but found no matching schemas", 
                     local_reporter.errors));
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1110,6 +1182,12 @@ namespace jsonschema {
                     local_reporter.errors));
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -1185,6 +1263,12 @@ namespace jsonschema {
                     local_reporter.errors));
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -1243,6 +1327,12 @@ namespace jsonschema {
                 default:
                     break;
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1303,6 +1393,12 @@ namespace jsonschema {
                     break;
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -1361,6 +1457,12 @@ namespace jsonschema {
                 default:
                     break;
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1421,6 +1523,12 @@ namespace jsonschema {
                     break;
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -1470,6 +1578,12 @@ namespace jsonschema {
             double rem = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
             return std::fabs(rem) < std::fabs(eps);
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1525,6 +1639,12 @@ namespace jsonschema {
             }
             
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // maxProperties
@@ -1568,6 +1688,12 @@ namespace jsonschema {
                     std::move(message)));
             }           
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // minProperties
@@ -1610,6 +1736,12 @@ namespace jsonschema {
                         std::move(message)));
             }
             
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1771,6 +1903,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     // const_validator
@@ -1807,6 +1945,12 @@ namespace jsonschema {
                     instance_location, 
                     "Instance is not const"));
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -1996,6 +2140,12 @@ namespace jsonschema {
                     return "unsupported type";
                 }
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -2213,6 +2363,12 @@ namespace jsonschema {
             std::unordered_set<std::string> allowed_properties;
             validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -2345,6 +2501,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -2391,6 +2553,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -2436,6 +2604,12 @@ namespace jsonschema {
                     dep.second->validate(this_context, instance, prop_location, results, reporter, patch); // validate
                 }
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -2499,6 +2673,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -2559,6 +2739,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -2591,6 +2777,12 @@ namespace jsonschema {
                         instance_location, 
                         std::move(message)));
             }
+        }
+
+        walk_result walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -2626,6 +2818,12 @@ namespace jsonschema {
                         instance_location, 
                         std::move(message)));
             }
+        }
+
+        walk_result walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
@@ -3071,6 +3269,12 @@ namespace jsonschema {
                 }
             }
         }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
     };
 
     template <class Json>
@@ -3184,6 +3388,12 @@ namespace jsonschema {
                     }
                 }
             }
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 

@@ -183,22 +183,30 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
             // Data
             ojson data = ojson::parse(data_string);
 
+            ojson expected = ojson::parse(R"(      
+{
+    "" : "null"
+}
+            )");
+
+            ojson result(jsoncons::json_object_arg);
             auto reporter = [&](const std::string& keyword,
                 const ojson& schema, const jsoncons::uri& /*schema_location*/,
                 const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
             {
-                std::cout << keyword << "\n";
                 if (keyword == "type" && schema.is_object())
                 {
                     auto it = schema.find("type");
                     if (it != schema.object_range().end())
                     {
-                        std::cout << instance_location.string() << ": " << it->value() << "\n";
+                        result.try_emplace(instance_location.string(), it->value());
+                        //std::cout << instance_location.string() << ": " << it->value() << "\n";
                     }
                 }
                 return jsonschema::walk_result::advance;
             };
             compiled.walk(data, reporter);
+            CHECK(expected == result);
         }
         catch (const std::exception& e)
         {

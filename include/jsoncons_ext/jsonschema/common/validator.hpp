@@ -294,12 +294,6 @@ namespace jsonschema {
         {
             return schema_location_;
         }
-
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const override 
-        {
-            return reporter(this->keyword_name(), schema(), this->schema_location(), instance, instance_location);
-        }
     };
 
     template <class Json>
