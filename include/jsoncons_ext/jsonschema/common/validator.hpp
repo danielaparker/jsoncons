@@ -208,7 +208,7 @@ namespace jsonschema {
     public:
         using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
-        virtual ~validator_base() = default;
+        virtual ~validator_base2() = default;
 
         walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
