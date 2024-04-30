@@ -165,7 +165,7 @@ bool is_base16(const CharT* s, std::size_t length)
     integer_chars_state state = integer_chars_state::initial;
 
     const CharT* end = s + length; 
-    while (s < end)
+    for (;s < end; ++s)
     {
         switch(state)
         {
