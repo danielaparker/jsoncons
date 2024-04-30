@@ -2554,10 +2554,36 @@ namespace jsonschema {
             }
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return walk_result::advance;
+            }
+
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            for (const auto& dep : dependent_required_) 
+            {
+                auto prop = instance.find(dep.first);
+                if (prop != instance.object_range().end()) 
+                {
+                    // if dependency-prop is present in instance
+                    result = dep.second->walk(this_context, instance, instance_location / dep.first, reporter); 
+                    if (result == walk_result::stop)
+                    {
+                        return result;
+                    }
+                }
+            }
+            return walk_result::advance;
         }
     };
 
@@ -2606,10 +2632,35 @@ namespace jsonschema {
             }
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return walk_result::advance;
+            }
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            for (const auto& dep : dependent_schemas_) 
+            {
+                auto prop = instance.find(dep.first);
+                if (prop != instance.object_range().end()) 
+                {
+                    // if dependency-prop is present in instance
+                    result = dep.second->walk(this_context, instance, instance_location / dep.first, reporter);
+                    if (result == walk_result::stop)
+                    {
+                        return result;
+                    }
+                }
+            }
+            return walk_result::advance;
         }
     };
 

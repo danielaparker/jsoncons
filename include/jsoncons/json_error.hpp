@@ -51,11 +51,11 @@ namespace jsoncons {
        : public std::error_category
     {
     public:
-        const char* name() const noexcept override
+        const char* name() const noexcept final
         {
             return "jsoncons/json";
         }
-        std::string message(int ev) const override
+        std::string message(int ev) const final
         {
             switch (static_cast<json_errc>(ev))
             {

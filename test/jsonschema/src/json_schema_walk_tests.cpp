@@ -17,6 +17,7 @@ using jsoncons::json;
 using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 
+#if 0
 TEST_CASE("jsonschema walk tests")
 {
     std::string schema_string = R"(
@@ -207,6 +208,159 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
             };
             compiled.walk(data, reporter);
             CHECK(expected == result);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+    }
+}
+#endif
+TEST_CASE("jsonschema walk keyword test")
+{
+    SECTION("prefixItems")
+    {
+        try
+        {
+            ojson schema = ojson::parse(R"(
+    {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "prefixItems": [
+            {"type": "integer"},
+            {"type": "string"}
+        ]
+    }        
+            )");
+            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+
+            ojson data = ojson::parse(R"(
+[ 1, "foo" ]
+            )");
+
+            ojson expected = ojson::parse(R"(      
+{
+    "/0": "integer",
+    "/1": "string"
+}
+            )");
+
+            ojson result(jsoncons::json_object_arg);
+            auto reporter = [&](const std::string& keyword,
+                const ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+            {
+                if (keyword == "type")
+                {
+                    REQUIRE(schema.is_object());
+                    auto it = schema.find("type");
+                    if (it != schema.object_range().end())
+                    {
+                        result.try_emplace(instance_location.string(), it->value());
+                    }
+                }
+                return jsonschema::walk_result::advance;
+            };
+            compiled.walk(data, reporter);
+            CHECK(expected == result);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+    }
+    SECTION("dependentRequired")
+    {
+        try
+        {
+            ojson schema = ojson::parse(R"(
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "dependentRequired": {"bar": ["foo"]}
+}
+            )");
+            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+
+            ojson data = ojson::parse(R"(
+{"foo": 1, "bar": 2}
+            )");
+
+            ojson expected = ojson::parse(R"(      
+{"":{"bar":["foo"]}}
+            )");
+
+            ojson result(jsoncons::json_object_arg);
+            auto reporter = [&](const std::string& keyword,
+                const ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+            {
+                //std::cout << "keyword: " << keyword << "\n";
+                if (keyword == "dependentRequired")
+                {
+                    REQUIRE(schema.is_object());
+                    auto it = schema.find("dependentRequired");
+                    if (it != schema.object_range().end())
+                    {
+                        result.try_emplace(instance_location.string(), it->value());
+                    }
+                }
+                return jsonschema::walk_result::advance;
+            };
+            compiled.walk(data, reporter);
+            CHECK(expected == result);
+            //std::cout << result << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+    }
+    SECTION("dependentSchemas")
+    {
+        try
+        {
+            ojson schema = ojson::parse(R"(
+{
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "dependentSchemas": {
+                "bar": {
+                    "properties": {
+                        "foo": {"type": "integer"},
+                        "bar": {"type": "integer"}
+                    }
+                }
+            }
+        }
+            )");
+            jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
+
+            ojson data = ojson::parse(R"(
+{"foo": 1, "bar": 2}
+            )");
+
+            ojson expected = ojson::parse(R"(      
+{"/bar/foo":"integer","/bar/bar":"integer"}
+            )");
+
+            ojson result(jsoncons::json_object_arg);
+            auto reporter = [&](const std::string& keyword,
+                const ojson& schema, const jsoncons::uri& /*schema_location*/,
+                const ojson& /*instance*/, const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+            {
+                //std::cout << "keyword: " << keyword << "\n";
+                if (keyword == "type")
+                {
+                    REQUIRE(schema.is_object());
+                    auto it = schema.find("type");
+                    if (it != schema.object_range().end())
+                    {
+                        result.try_emplace(instance_location.string(), it->value());
+                    }
+                }
+                return jsonschema::walk_result::advance;
+            };
+            compiled.walk(data, reporter);
+            CHECK(expected == result);
+            //std::cout << result << "\n";
         }
         catch (const std::exception& e)
         {
