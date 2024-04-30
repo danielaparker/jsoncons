@@ -167,7 +167,7 @@ namespace jsonschema {
 
             //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
 
-            if (schema_ptr)
+            if (schema_ptr == nullptr)
             {
                 return walk_result::advance;
             }

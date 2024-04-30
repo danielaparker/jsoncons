@@ -203,25 +203,6 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class validator_base2 
-    {
-    public:
-        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
-
-        virtual ~validator_base2() = default;
-
-        walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const 
-        {
-            return do_walk(context, instance, instance_location, reporter);
-        }
-
-    private:
-        virtual walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const = 0;
-    };
-
-    template <class Json>
     class validator_base 
     {
     public:
@@ -255,11 +236,8 @@ namespace jsonschema {
             Json& patch) const = 0;
 
         virtual walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const
-        {
-            return walk_result::advance;
-        }
-    };
+            const jsonpointer::json_pointer& /*instance_location*/, const info_reporter_type& /*reporter*/) const = 0;
+   };
 
     template <class Json>
     class keyword_validator : public validator_base<Json> 
