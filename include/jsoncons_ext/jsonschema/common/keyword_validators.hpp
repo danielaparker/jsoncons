@@ -2725,10 +2725,33 @@ namespace jsonschema {
             }
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return walk_result::advance;
+            }
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            if (instance.size() > 0 && schema_val_)
+            {
+                for (const auto& prop : instance.object_range()) 
+                {
+                    result = schema_val_->walk(this_context, prop.key(), instance_location / prop.key(), reporter);
+                    if (result == walk_result::stop)
+                    {
+                        return result;
+                    }
+                }
+            }
+            return walk_result::advance;
         }
     };
 
