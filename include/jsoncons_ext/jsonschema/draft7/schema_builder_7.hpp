@@ -412,8 +412,6 @@ namespace draft7 {
                 "dependencies",        
                 "enum",                
                 "exclusiveMaximum",
-                "exclusiveMaximum",
-                "exclusiveMinimum",
                 "exclusiveMinimum",
                 "if",
                 "then",

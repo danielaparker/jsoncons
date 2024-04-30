@@ -379,8 +379,6 @@ namespace draft6 {
                 "dependencies",        
                 "enum",                
                 "exclusiveMaximum",
-                "exclusiveMaximum",
-                "exclusiveMinimum",
                 "exclusiveMinimum",
                 "items",               
                 "maximum",             

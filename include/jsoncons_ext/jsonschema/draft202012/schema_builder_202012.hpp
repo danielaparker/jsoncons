@@ -636,8 +636,6 @@ namespace draft202012 {
                 "description",        
                 "enum",                
                 "exclusiveMaximum",
-                "exclusiveMaximum",
-                "exclusiveMinimum",
                 "exclusiveMinimum",
                 "if",
                 "then",
