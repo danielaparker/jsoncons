@@ -2244,20 +2244,9 @@ namespace jsonschema {
             //std::cout << "\n";
         }
 
-    private:
-
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter, 
-            Json& patch) const final
-        {
-            std::unordered_set<std::string> allowed_properties;
-            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
-        }
-
-        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter,
+            std::unordered_set<std::string>& allowed_properties) const
         {
             if (!instance.is_object())
             {
@@ -2278,6 +2267,7 @@ namespace jsonschema {
                 {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
                     result = prop_it->second->walk(context, prop.value(), prop_location, reporter);
+                    allowed_properties.insert(prop.key());
                     if (result == walk_result::stop)
                     {
                         return result;
@@ -2285,6 +2275,25 @@ namespace jsonschema {
                 }
             }
             return walk_result::advance;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            std::unordered_set<std::string> allowed_properties;
+            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final 
+        {
+            std::unordered_set<std::string> allowed_properties;
+            return walk(context, instance, instance_location, reporter, allowed_properties);
         }
 
         void update_patch(Json& patch, const jsonpointer::json_pointer& instance_location, Json&& default_value) const
@@ -2361,20 +2370,9 @@ namespace jsonschema {
 #endif
         }
 
-    private:
-
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter, 
-            Json& patch) const final
-        {
-            std::unordered_set<std::string> allowed_properties;
-            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
-        }
-
-        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        walk_result walk(const evaluation_context<Json>& context, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter,
+            std::unordered_set<std::string>& allowed_properties) const
         {
             if (!instance.is_object())
             {
@@ -2398,6 +2396,7 @@ namespace jsonschema {
                 {
                     if (std::regex_search(prop.key(), schema_pp.first)) 
                     {
+                        allowed_properties.insert(prop.key());
                         result = schema_pp.second->walk(prop_context, prop.value() , prop_location, reporter);
                         if (result == walk_result::stop)
                         {
@@ -2408,6 +2407,25 @@ namespace jsonschema {
             }
 #endif
             return walk_result::advance;
+        }
+
+    private:
+
+        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter, 
+            Json& patch) const final
+        {
+            std::unordered_set<std::string> allowed_properties;
+            validate(context, instance, instance_location, results, reporter, patch, allowed_properties);
+        }
+
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
+        {
+            std::unordered_set<std::string> allowed_properties;
+            return walk(context,instance, instance_location, reporter, allowed_properties);
         }
     };
 
@@ -2542,10 +2560,59 @@ namespace jsonschema {
             }
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (!instance.is_object())
+            {
+                return walk_result::advance;
+            }
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+
+            std::unordered_set<std::string> allowed_properties;
+            if (properties_)
+            {
+                result = properties_->walk(context, instance, instance_location, reporter, allowed_properties);
+                if (result == walk_result::stop)
+                {
+                    return result;
+                }
+            }
+
+            if (pattern_properties_)
+            {
+                result = pattern_properties_->walk(context, instance, instance_location, reporter, allowed_properties);
+                if (result == walk_result::stop)
+                {
+                    return result;
+                }
+            }
+
+            if (additional_properties_)
+            {
+                evaluation_context<Json> this_context(context, this->keyword_name());
+                for (const auto& prop : instance.object_range()) 
+                {
+                    // check if it is in "allowed properties"
+                    auto prop_it = allowed_properties.find(prop.key());
+                    if (prop_it == allowed_properties.end()) 
+                    {
+                        evaluation_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
+                        jsonpointer::json_pointer prop_location = instance_location / prop.key();
+
+                        result = additional_properties_->walk(prop_context, prop.value() , prop_location, reporter);
+                        if (result == walk_result::stop)
+                        {
+                            return result;
+                        }
+                    }
+                }
+            }
+            return walk_result::advance;
         }
     };
 
