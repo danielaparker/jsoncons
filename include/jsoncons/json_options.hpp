@@ -371,9 +371,10 @@ public:
         : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(std::move(other.err_handler_))
     {
     }
-
+protected:
     basic_json_decode_options& operator=(const basic_json_decode_options&) = default;
-
+    basic_json_decode_options& operator=(basic_json_decode_options&&) = default;
+public:
     bool lossless_number() const 
     {
         return lossless_number_;
@@ -470,9 +471,10 @@ public:
           new_line_chars_(std::move(other.new_line_chars_))
     {
     }
-
+protected:
     basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
-
+    basic_json_encode_options& operator=(basic_json_encode_options&&) = default;
+public:
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
     bigint_chars_format bigint_format() const  {return bigint_format_;}

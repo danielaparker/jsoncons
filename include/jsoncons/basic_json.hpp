@@ -3224,7 +3224,7 @@ namespace jsoncons {
         static
          typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
             parse(const Source& source, 
-              const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+              const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             json_decoder<basic_json> decoder;
             basic_json_parser<char_type> parser(options);
@@ -3250,7 +3250,7 @@ namespace jsoncons {
         static
          typename std::enable_if<extension_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
             parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const Source& source, 
-              const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+              const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
             basic_json_parser<char_type,TempAllocator> parser(options, alloc_set.get_temp_allocator());
@@ -3273,14 +3273,14 @@ namespace jsoncons {
         }
 
         static basic_json parse(const char_type* source, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+            const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             return parse(jsoncons::basic_string_view<char_type>(source), options);
         }
 
         template <class TempAllocator>
         static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, const char_type* source, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>())
+            const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
             return parse(alloc_set, jsoncons::basic_string_view<char_type>(source), options);
         }
@@ -3301,7 +3301,7 @@ namespace jsoncons {
         // from stream
 
         static basic_json parse(std::basic_istream<char_type>& is, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+            const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder;
             basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options);
@@ -3316,7 +3316,7 @@ namespace jsoncons {
 
         template <class TempAllocator>
         static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, std::basic_istream<char_type>& is, 
-            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+            const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
             basic_json_reader<char_type,stream_source<char_type>,Allocator> reader(is, decoder, options, alloc_set.get_temp_allocator());
@@ -3333,7 +3333,7 @@ namespace jsoncons {
 
         template <class InputIt>
         static basic_json parse(InputIt first, InputIt last, 
-                                const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+                                const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder;
             basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),
@@ -3349,7 +3349,7 @@ namespace jsoncons {
 
         template <class InputIt, class TempAllocator>
         static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, InputIt first, InputIt last, 
-                                const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>())
+                                const basic_json_decode_options<char_type>& options = basic_json_options<CharT>())
         {
             json_decoder<basic_json> decoder(alloc_set.get_allocator(), alloc_set.get_temp_allocator());
             basic_json_reader<char_type,iterator_source<InputIt>,Allocator> reader(iterator_source<InputIt>(std::forward<InputIt>(first),
@@ -3883,7 +3883,7 @@ namespace jsoncons {
         template <class CharContainer>
         typename std::enable_if<extension_traits::is_back_insertable_char_container<CharContainer>::value>::type
         dump(CharContainer& cont,
-             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>(),
+             const basic_json_encode_options<char_type>& options = basic_json_options<CharT>(),
              indenting indent = indenting::no_indent) const
         {
             std::error_code ec;
@@ -3897,7 +3897,7 @@ namespace jsoncons {
         template <class CharContainer>
         typename std::enable_if<extension_traits::is_back_insertable_char_container<CharContainer>::value>::type
         dump_pretty(CharContainer& cont,
-            const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+            const basic_json_encode_options<char_type>& options = basic_json_options<CharT>()) const
         {
             std::error_code ec;
             dump_pretty(cont, options, ec);
@@ -3908,7 +3908,7 @@ namespace jsoncons {
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-            const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>(),
+            const basic_json_encode_options<char_type>& options = basic_json_options<CharT>(),
             indenting indent = indenting::no_indent) const
         {
             std::error_code ec;
@@ -3938,7 +3938,7 @@ namespace jsoncons {
         }
 
         void dump_pretty(std::basic_ostream<char_type>& os, 
-            const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+            const basic_json_encode_options<char_type>& options = basic_json_options<CharT>()) const
         {
             std::error_code ec;
             dump_pretty(os, options, ec);
