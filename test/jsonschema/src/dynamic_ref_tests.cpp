@@ -83,7 +83,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
             json data = json::parse(data_string);
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& /*o*/)
+            auto listener = [&](const jsonschema::validation_message& /*o*/)
             {
                 //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_location: " << o.schema_location().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 //for (const auto& err : o.nested_errors())
@@ -92,7 +92,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
                 //}
                 ++error_count;
             };
-            compiled.validate(data, reporter);
+            compiled.validate(data, listener);
             CHECK(error_count > 0);
             //std::cout << "error_count: " << error_count << "\n";
         }
@@ -170,7 +170,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
             json data = json::parse(data_string);
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& /*o*/)
+            auto listener = [&](const jsonschema::validation_message& /*o*/)
             {
                 //std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_location: " << o.schema_location().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 //for (const auto& err : o.nested_errors())
@@ -179,7 +179,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
                 //}
                 ++error_count;
             };
-            compiled.validate(data, reporter);
+            compiled.validate(data, listener);
             CHECK(error_count > 0);
             //std::cout << "error_count: " << error_count << "\n";
         }
@@ -248,7 +248,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
             json data(jsoncons::null_type{});
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& o)
+            auto listener = [&](const jsonschema::validation_message& o)
             {
                 std::cout << "  Failed: " << "eval_path: " << o.eval_path().string() << ", schema_location: " << o.schema_location().string() << ", " << o.instance_location().string() << ": " << o.message() << "\n";
                 for (const auto& err : o.details())
@@ -257,7 +257,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
                 }
                 ++error_count;
             };
-            compiled.validate(data, reporter);
+            compiled.validate(data, listener);
             CHECK(error_count == 0);
             //std::cout << "error_count: " << error_count << "\n";
         }

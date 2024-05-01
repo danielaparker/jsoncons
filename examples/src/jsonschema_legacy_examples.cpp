@@ -83,7 +83,7 @@ void reporter_example()
         auto sch = jsonschema::make_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto listener = [&error_count](const jsonschema::validation_output& o)
         {
             ++error_count;
             std::cout << o.instance_location() << ": " << o.message() << "\n";
@@ -91,8 +91,8 @@ void reporter_example()
 
         jsonschema::json_validator<json> validator(sch);
 
-        // Will call reporter for each schema violation
-        validator.validate(data, reporter);
+        // Will call listener for each schema violation
+        validator.validate(data, listener);
 
         std::cout << "\nError count: " << error_count << "\n\n";
     }
@@ -145,7 +145,7 @@ void uriresolver_example()
         auto sch = jsonschema::make_schema(schema, resolver);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto listener = [&error_count](const jsonschema::validation_output& o)
         {
             ++error_count;
             std::cout << o.instance_location() << ": " << o.message() << "\n";
@@ -157,8 +157,8 @@ void uriresolver_example()
 
         jsonschema::json_validator<json> validator(sch);
 
-        // Will call reporter for each schema violation
-        validator.validate(data, reporter);
+        // Will call listener for each schema violation
+        validator.validate(data, listener);
 
         std::cout << "\nError count: " << error_count << "\n\n";
     }

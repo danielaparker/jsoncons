@@ -42,8 +42,8 @@ namespace jsonschema {
     {
         error_reporter_t reporter_;
 
-        error_reporter_adaptor(const error_reporter_t& reporter)
-            : reporter_(reporter)
+        error_reporter_adaptor(const error_reporter_t& listener)
+            : reporter_(listener)
         {
         }
     private:
@@ -78,70 +78,70 @@ namespace jsonschema {
         json_schema& operator=(const json_schema&) = delete;
         json_schema& operator=(json_schema&&) = default;
 
-        // Validate input JSON against a JSON Schema with a default throwing error reporter
+        // Validate input JSON against a JSON Schema with a default throwing error listener
         Json validate(const Json& instance) const
         {
-            throwing_error_reporter reporter;
+            throwing_error_reporter listener;
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
             evaluation_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
+            root_->validate(context, instance, instance_location, results, listener, patch);
             return patch;
         }
 
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_reporter reporter;
+            fail_early_reporter listener;
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
             evaluation_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
-            return reporter.error_count() == 0;
+            root_->validate(context, instance, instance_location, results, listener, patch);
+            return listener.error_count() == 0;
         }
 
-        // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
-        validate(const Json& instance, const Reporter& reporter) const
+        // Validate input JSON against a JSON Schema with a provided error listener
+        template <class MsgListener>
+        typename std::enable_if<extension_traits::is_unary_function_object<MsgListener,validation_message>::value,void>::type
+        validate(const Json& instance, const MsgListener& listener) const
         {
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
-            error_reporter_adaptor adaptor(reporter);
+            error_reporter_adaptor adaptor(listener);
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
         }
 
-        // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_message>::value,void>::type
-        validate(const Json& instance, Reporter&& reporter, Json& patch) const
+        // Validate input JSON against a JSON Schema with a provided error listener
+        template <class MsgListener>
+        typename std::enable_if<extension_traits::is_unary_function_object<MsgListener,validation_message>::value,void>::type
+        validate(const Json& instance, MsgListener&& listener, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
-            error_reporter_adaptor adaptor(std::forward<Reporter>(reporter));
+            error_reporter_adaptor adaptor(std::forward<MsgListener>(listener));
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, adaptor, patch);
         }
 
-        // Validate input JSON against a JSON Schema with a provided error reporter
+        // Validate input JSON against a JSON Schema with a provided error listener
         void validate(const Json& instance, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
-            fail_early_reporter reporter;
+            fail_early_reporter listener;
             evaluation_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
+            root_->validate(context, instance, instance_location, results, listener, patch);
         }
 
         // Validate input JSON against a JSON Schema with a provided json_visitor
@@ -160,24 +160,24 @@ namespace jsonschema {
             visitor.flush();
         }
         
-        template <class Reporter>
-        walk_result walk(const Json& instance, const Reporter& reporter) const
+        template <class MsgListener>
+        walk_result walk(const Json& instance, const MsgListener& listener) const
         {
             jsonpointer::json_pointer instance_location{};
 
-            return root_->walk(evaluation_context<Json>{}, instance, instance_location, reporter);
+            return root_->walk(evaluation_context<Json>{}, instance, instance_location, listener);
         }
         
     private:
-        // Validate input JSON against a JSON Schema with a provided error reporter
-        void validate2(const Json& instance, error_reporter& reporter, Json& patch) const
+        // Validate input JSON against a JSON Schema with a provided error listener
+        void validate2(const Json& instance, error_reporter& listener, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
             evaluation_context<Json> context;
             evaluation_results results;
-            root_->validate(context, instance, instance_location, results, reporter, patch);
+            root_->validate(context, instance, instance_location, results, listener, patch);
         }
     };
 

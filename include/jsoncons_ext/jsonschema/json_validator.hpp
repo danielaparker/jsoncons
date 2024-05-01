@@ -89,8 +89,8 @@ class validation_output
 
         validation_output_reporter_t reporter_;
 
-        validation_message_to_validation_output_adaptor(const validation_output_reporter_t& reporter)
-            : reporter_(reporter)
+        validation_message_to_validation_output_adaptor(const validation_output_reporter_t& listener)
+            : reporter_(listener)
         {
         }
     private:
@@ -132,34 +132,34 @@ class validation_output
 
         ~json_validator() = default;
 
-        // Validate input JSON against a JSON Schema with a default throwing error reporter
+        // Validate input JSON against a JSON Schema with a default throwing error listener
         Json validate(const Json& instance) const
         {
-            throwing_error_reporter reporter;
+            throwing_error_reporter listener;
             Json patch(json_array_arg);
 
-            root_->validate2(instance, reporter, patch);
+            root_->validate2(instance, listener, patch);
             return patch;
         }
 
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_reporter reporter;
+            fail_early_reporter listener;
             Json patch(json_array_arg);
 
-            root_->validate2(instance, reporter, patch);
-            return reporter.error_count() == 0;
+            root_->validate2(instance, listener, patch);
+            return listener.error_count() == 0;
         }
 
-        // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class Reporter>
-        typename std::enable_if<extension_traits::is_unary_function_object<Reporter,validation_output>::value,Json>::type
-        validate(const Json& instance, Reporter&& reporter) const
+        // Validate input JSON against a JSON Schema with a provided error listener
+        template <class MsgListener>
+        typename std::enable_if<extension_traits::is_unary_function_object<MsgListener,validation_output>::value,Json>::type
+        validate(const Json& instance, MsgListener&& listener) const
         {
             Json patch(json_array_arg);
 
-            validation_message_to_validation_output_adaptor adaptor(reporter);
+            validation_message_to_validation_output_adaptor adaptor(listener);
 
             root_->validate2(instance, adaptor, patch);
             return patch;

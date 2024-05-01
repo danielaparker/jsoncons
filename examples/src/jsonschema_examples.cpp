@@ -82,7 +82,7 @@ void write_to_json_visitor_example()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
 
-        auto reporter = [](const jsonschema::validation_message& message)
+        auto listener = [](const jsonschema::validation_message& message)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
@@ -142,7 +142,7 @@ void uriresolver_example()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& message)
+        auto listener = [](const jsonschema::validation_message& message)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
             for (const auto& detail : message.details())
@@ -151,8 +151,8 @@ void uriresolver_example()
             }
         };
 
-        // Will call reporter for each schema violation
-        compiled.validate(data, reporter);
+        // Will call listener for each schema violation
+        compiled.validate(data, listener);
     }
     catch (const std::exception& e)
     {
@@ -571,7 +571,7 @@ void walk_example() // since 0.175.0
     // Data
     ojson data = ojson::parse(data_string);
 
-    auto reporter = [](const std::string& keyword,
+    auto listener = [](const std::string& keyword,
         const ojson& subschema, 
         const jsoncons::uri& /*schema_location*/,
         const ojson& /*instance*/, 
@@ -588,7 +588,7 @@ void walk_example() // since 0.175.0
             }
             return jsonschema::walk_result::advance;
         };
-    compiled.walk(data, reporter);
+    compiled.walk(data, listener);
 }
 
 int main()

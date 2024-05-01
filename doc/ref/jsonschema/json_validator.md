@@ -17,16 +17,16 @@ class json_validator
 
     Json validate(const Json& instance) const;  (2)
 
-    template <class Reporter>
-    Json validate(const Json& instance, const Reporter& reporter) const;  (3)
+    template <class MsgListener>
+    Json validate(const Json& instance, const MsgListener& listener) const;  (3)
 
 (1) Validates input JSON against a JSON Schema and returns false upon the 
 first schema violation.
 
-(2) Validates input JSON against a JSON Schema with a default error reporter
+(2) Validates input JSON against a JSON Schema with a default error listener
 that throws upon the first schema violation.
 
-(3) Validates input JSON against a JSON Schema with a provided error reporter
+(3) Validates input JSON against a JSON Schema with a provided error listener
 that is called for each schema violation.
 
 #### Parameters
@@ -37,7 +37,7 @@ that is called for each schema violation.
     <td>Input Json</td> 
   </tr>
   <tr>
-    <td>reporter</td>
+    <td>listener</td>
     <td>A function object with signature equivalent to 
     <pre>
            void fun(const validation_output& o)</pre>
@@ -57,5 +57,5 @@ schema.
 
 (2) Throws a [validation_error](validation_error.md) for the first schema violation.
 
-(3) `reporter` is called for each schema violation
+(3) `listener` is called for each schema violation
 

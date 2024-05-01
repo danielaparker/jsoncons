@@ -20,28 +20,28 @@ The class satisfies the requirements of MoveConstructible and MoveAssignable, bu
 
     void validate(const Json& instance, Json& patch) const;  (3)
 
-    template <class Reporter>
-    void validate(const Json& instance, const Reporter& reporter) const;  (4)
+    template <class MsgListener>
+    void validate(const Json& instance, const MsgListener& listener) const;  (4)
 
-    template <class Reporter>
-    void validate(const Json& instance, const Reporter& reporter, Json& patch) const;  (5)
+    template <class MsgListener>
+    void validate(const Json& instance, const MsgListener& listener, Json& patch) const;  (5)
 
     void validate(const Json& instance, json_visitor<Json>& visitor) const;  (6)
 
 (1) Validates input JSON against a JSON Schema and returns false upon the 
 first schema violation.
 
-(2) Validates input JSON against a JSON Schema with a default error reporter
+(2) Validates input JSON against a JSON Schema with a default error listener
 that throws upon the first schema violation.
 
-(3) Validates input JSON against a JSON Schema with a default error reporter
+(3) Validates input JSON against a JSON Schema with a default error listener
 that throws upon the first schema violation. Writes a JSONPatch document to the output
 parameter.
 
-(4) Validates input JSON against a JSON Schema with a provided error reporter
+(4) Validates input JSON against a JSON Schema with a provided error listener
 that is called for each schema violation. 
 
-(5) Validates input JSON against a JSON Schema with a provided error reporter
+(5) Validates input JSON against a JSON Schema with a provided error listener
 that is called for each schema violation. Writes a JSONPatch document to the output
 parameter.
 
@@ -56,7 +56,7 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
     <td>Input Json</td> 
   </tr>
   <tr>
-    <td>reporter</td>
+    <td>listener</td>
     <td>A function object with signature equivalent to 
     <pre>
            void fun(const validation_output& o)</pre>
@@ -85,5 +85,5 @@ schema.</td>
 
 (2) - (3) Throws a [validation_error](validation_error.md) for the first schema violation.
 
-(4) - (5) `reporter` is called for each schema violation
+(4) - (5) `listener` is called for each schema violation
 
