@@ -14,7 +14,7 @@ using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch; 
 
-void write_to_json_visitor_example() 
+void write_to_reporter_example() 
 {
     ojson schema = ojson::parse(R"(
 {
@@ -86,6 +86,82 @@ void write_to_json_visitor_example()
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
+
+        compiled.validate(data, reporter);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+
+void write_to_json_visitor_example() 
+{
+    ojson schema = ojson::parse(R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of a person, company, organization, or place",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/veggie" }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [ "veggieName", "veggieLike" ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )");
+
+    // Data
+    ojson data = ojson::parse(R"(
+{
+  "fruits": [ "apple", "orange", "pear" ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": "false"
+    },
+    {
+      "veggieName": "carrot",
+      "veggieLike": false
+    },
+    {
+      "veggieName": "Swiss Chard"
+    }
+  ]
+}
+   )");
+
+    try
+    {
+        // Throws schema_error if JSON Schema compilation fails
+        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
 
         jsoncons::json_decoder<ojson> decoder;
         compiled.validate(data, decoder);
@@ -595,7 +671,8 @@ int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 
-    write_to_json_visitor_example();
+    write_to_reporter_example();
+    /*write_to_json_visitor_example();
     uriresolver_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
@@ -611,7 +688,7 @@ int main()
     cross_schema_example();
     
     walk_example();
-    
+    */
     std::cout << "\n";
 }
 

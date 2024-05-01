@@ -66,3 +66,210 @@ None.
 
 (1) - (2) Throws a [validation_error](../validation_error.md) for the first schema violation.
 
+### Examples
+
+#### Validate using callback function
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    json schema = json::parse(R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of a person, company, organization, or place",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/veggie" }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [ "veggieName", "veggieLike" ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )");
+
+    // Data
+    json data = json::parse(R"(
+{
+  "fruits": [ "apple", "orange", "pear" ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": "false"
+    },
+    {
+      "veggieName": "carrot",
+      "veggieLike": false
+    },
+    {
+      "veggieName": "Swiss Chard"
+    }
+  ]
+}
+   )");
+
+    try
+    {
+        // Throws schema_error if JSON Schema compilation fails
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+
+        auto reporter = [](const jsonschema::validation_message& message)
+            {
+                std::cout << message.instance_location().string() << ": " << message.message() << "\n";
+            };
+
+        compiled.validate(data, reporter);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+Output:
+```
+/vegetables/1/veggieLike: Expected boolean, found string
+/vegetables/3: Required property 'veggieLike' not found.
+```
+
+#### Validate with output to `json_visitor`
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+
+using jsoncons::ojson;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    ojson schema = ojson::parse(R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of a person, company, organization, or place",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/veggie" }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [ "veggieName", "veggieLike" ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )");
+
+    // Data
+    ojson data = ojson::parse(R"(
+{
+  "fruits": [ "apple", "orange", "pear" ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": "false"
+    },
+    {
+      "veggieName": "carrot",
+      "veggieLike": false
+    },
+    {
+      "veggieName": "Swiss Chard"
+    }
+  ]
+}
+   )");
+
+    try
+    {
+        // Throws schema_error if JSON Schema compilation fails
+        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
+
+        jsoncons::json_decoder<ojson> decoder;
+        compiled.validate(data, decoder);
+        ojson output = decoder.get_result();
+        std::cout << pretty_print(output) << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+```
+Output:
+```json
+[
+    {
+        "valid": false,
+        "evaluationPath": "/properties/vegetables/items/$ref/properties/veggieLike/type",
+        "schemaLocation": "https://example.com/arrays.schema.json#/$defs/veggie/properties/veggieLike",
+        "instanceLocation": "/vegetables/1/veggieLike",
+        "error": "Expected boolean, found string"
+    },
+    {
+        "valid": false,
+        "evaluationPath": "/properties/vegetables/items/$ref/required",
+        "schemaLocation": "https://example.com/arrays.schema.json#/$defs/veggie/required",
+        "instanceLocation": "/vegetables/3",
+        "error": "Required property 'veggieLike' not found."
+    }
+]
+```
