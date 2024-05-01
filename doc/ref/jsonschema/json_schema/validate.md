@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::json_schema::validate
+### jsoncons::jsonschema::json_schema<Json>::validate
 
 ```cpp
 void validate(const Json& instance) const;  (1)

@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::json_schema::walk
+### jsoncons::jsonschema::json_schema<Json>::walk
 
 ```cpp
 template <class WalkReporter>

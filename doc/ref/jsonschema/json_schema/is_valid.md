@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::json_schema::is_valid
+### jsoncons::jsonschema::json_schema<Json>::is_valid
 
 ```cpp
 bool is_valid(const Json& instance) const;
