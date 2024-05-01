@@ -501,6 +501,96 @@ void optional_format_example()
     std::cout << pretty_print(output) << "\n";
 }
 
+void walk_example() // since 0.175.0
+{
+    std::string schema_string = R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of a person, company, organization, or place",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/veggie"
+      }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [
+        "veggieName",
+        "veggieLike"
+      ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )";
+
+    ojson schema = ojson::parse(schema_string);
+    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+
+    std::string data_string = R"(
+{
+  "fruits": [
+    "apple",
+    "orange",
+    "pear"
+  ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": false
+    }
+  ]
+}
+    )";
+
+    // Data
+    ojson data = ojson::parse(data_string);
+
+    auto reporter = [](const std::string& keyword,
+        const ojson& subschema, 
+        const jsoncons::uri& /*schema_location*/,
+        const ojson& /*instance*/, 
+        const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+        {
+            if (keyword == "type")
+            {
+                assert(subschema.is_object());
+                auto it = subschema.find("type");
+                if (it != subschema.object_range().end())
+                {
+                    std::cout << instance_location.string() << ": " << it->value() << "\n";
+                }
+            }
+            return jsonschema::walk_result::advance;
+        };
+    compiled.walk(data, reporter);
+}
+
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
@@ -519,6 +609,8 @@ int main()
     draft_07_example();
     
     cross_schema_example();
+    
+    walk_example();
     
     std::cout << "\n";
 }

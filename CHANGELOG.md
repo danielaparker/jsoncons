@@ -1,3 +1,10 @@
+0.174.0 preview (master) 
+-------
+
+jsonschema library enhancements
+
+- New `json_schema` member function `walk` for walking through the schema.
+
 0.174.0 
 -------
 
