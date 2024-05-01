@@ -229,7 +229,7 @@ int main()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
 
-        auto listener = [](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& message)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
@@ -417,7 +417,7 @@ int main()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto listener = [](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& message)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
             for (const auto& detail : message.details())
@@ -426,8 +426,8 @@ int main()
             }
         };
 
-        // Will call listener for each schema violation
-        compiled.validate(data, listener);
+        // Will call reporter for each schema violation
+        compiled.validate(data, reporter);
     }
     catch (const std::exception& e)
     {

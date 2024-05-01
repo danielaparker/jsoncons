@@ -23,7 +23,7 @@ namespace jsonschema {
     template <class Json>
     struct json_schema_traits    
     {
-        using walk_listener_type = std::function<walk_result(const std::string& keyword,
+        using walk_reporter_type = std::function<walk_result(const std::string& keyword,
             const Json& schema, const uri& schema_location,
             const Json& instance, const jsonpointer::json_pointer& instance_location)>;      
     };
@@ -206,7 +206,7 @@ namespace jsonschema {
     class validator_base 
     {
     public:
-        using walk_listener_type = typename json_schema_traits<Json>::walk_listener_type;
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         virtual ~validator_base() = default;
 
@@ -216,27 +216,27 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& listener, 
+            error_listener& reporter, 
             Json& patch) const 
         {
-            do_validate(context, instance, instance_location, results, listener, patch);
+            do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
         walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_listener_type& listener) const 
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
         {
-            return do_walk(context, instance, instance_location, listener);
+            return do_walk(context, instance, instance_location, reporter);
         }
 
     private:
         virtual void do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& listener, 
+            error_listener& reporter, 
             Json& patch) const = 0;
 
         virtual walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/, const walk_listener_type& /*listener*/) const = 0;
+            const jsonpointer::json_pointer& /*instance_location*/, const walk_reporter_type& /*reporter*/) const = 0;
    };
 
     template <class Json>
@@ -261,7 +261,7 @@ namespace jsonschema {
     template <class Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
-        using walk_listener_type = typename json_schema_traits<Json>::walk_listener_type;
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         std::string keyword_name_;
         const Json* schema_ptr_;
@@ -301,7 +301,7 @@ namespace jsonschema {
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
-        using walk_listener_type = typename json_schema_traits<Json>::walk_listener_type;
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         const schema_validator<Json>* referred_schema_;
 
@@ -338,14 +338,14 @@ namespace jsonschema {
         void do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& listener, 
+            error_listener& reporter, 
             Json& patch) const final
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
             if (!referred_schema_)
             {
-                listener.error(validation_message(this->keyword_name(), 
+                reporter.error(validation_message(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_location(), 
                     instance_location, 
@@ -353,25 +353,25 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(this_context, instance, instance_location, results, listener, patch);
+            referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
         walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_listener_type& listener) const final 
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final 
         {
             if (!referred_schema_)
             {
                 return walk_result::advance;
             }
             evaluation_context<Json> this_context(context, this->keyword_name());
-            return referred_schema_->walk(this_context, instance, instance_location, listener);           
+            return referred_schema_->walk(this_context, instance, instance_location, reporter);           
         }
     };
 
     template <class Json>
     class keyword_base 
     {
-        using walk_listener_type = typename json_schema_traits<Json>::walk_listener_type;
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         std::string keyword_name_;
         const Json* schema_ptr_;
@@ -406,9 +406,9 @@ namespace jsonschema {
         }
 
         walk_result walk(const evaluation_context<Json>& /*context*/, const Json& instance,
-            const jsonpointer::json_pointer& instance_location, const walk_listener_type& listener) const
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const
         {
-            return listener(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 

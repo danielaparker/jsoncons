@@ -59,7 +59,7 @@ namespace {
                     //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     std::size_t errors = 0;
-                    auto listener = [&](const jsonschema::validation_message& o)
+                    auto reporter = [&](const jsonschema::validation_message& o)
                     {
                         ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());
@@ -74,7 +74,7 @@ namespace {
                             }
                         }
                     };
-                    compiled.validate(test_case.at("data"), listener);
+                    compiled.validate(test_case.at("data"), reporter);
                     if (errors == 0)
                     {
                         CHECK(test_case["valid"].as<bool>());

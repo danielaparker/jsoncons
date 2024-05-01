@@ -958,19 +958,19 @@ namespace jsonschema {
         const uri& schema_location,
         const jsonpointer::json_pointer& instance_location, 
         const std::string&, 
-        error_listener& listener)>;
+        error_listener& reporter)>;
 
     inline
     void uri_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
         const jsonpointer::json_pointer& instance_location, 
         const std::string& str,
-        error_listener& listener)
+        error_listener& reporter)
     {
         std::error_code ec;
         uri::parse(str, ec);
         if (ec)
         {
-            listener.error(validation_message("uri",
+            reporter.error(validation_message("uri",
                 eval_path,
                 schema_location, 
                 instance_location, 
@@ -982,13 +982,13 @@ namespace jsonschema {
     void jsonpointer_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
         const jsonpointer::json_pointer& instance_location, 
         const std::string& str,
-        error_listener& listener)
+        error_listener& reporter)
     {
         std::error_code ec;
         jsonpointer::json_pointer::parse(str, ec);
         if (ec)
         {
-            listener.error(validation_message("json-pointer",
+            reporter.error(validation_message("json-pointer",
                 eval_path,
                 schema_location, 
                 instance_location, 
@@ -1001,11 +1001,11 @@ namespace jsonschema {
     void rfc3339_date_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                             const jsonpointer::json_pointer& instance_location, 
                             const std::string& value,
-                            error_listener& listener)
+                            error_listener& reporter)
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            listener.error(validation_message("date",
+            reporter.error(validation_message("date",
                 eval_path,
                 schema_location, 
                 instance_location, 
@@ -1017,11 +1017,11 @@ namespace jsonschema {
     void rfc3339_time_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                             const jsonpointer::json_pointer& instance_location, 
                             const std::string &value,
-                            error_listener& listener)
+                            error_listener& reporter)
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            listener.error(validation_message("time", 
+            reporter.error(validation_message("time", 
                 eval_path,
                 schema_location, 
                 instance_location, 
@@ -1033,11 +1033,11 @@ namespace jsonschema {
     void rfc3339_date_time_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                                  const jsonpointer::json_pointer& instance_location, 
                                  const std::string &value,
-                                 error_listener& listener)
+                                 error_listener& reporter)
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            listener.error(validation_message("date-time", 
+            reporter.error(validation_message("date-time", 
                 eval_path,  
                 schema_location,
                 instance_location, 
@@ -1049,11 +1049,11 @@ namespace jsonschema {
     void email_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                      const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
-                     error_listener& listener) 
+                     error_listener& reporter) 
     {
         if (!validate_email_rfc5322(value))        
         {
-            listener.error(validation_message("email", 
+            reporter.error(validation_message("email", 
                 eval_path, 
                 schema_location, 
                 instance_location, 
@@ -1065,11 +1065,11 @@ namespace jsonschema {
     void hostname_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                         const jsonpointer::json_pointer& instance_location, 
                         const std::string& value,
-                        error_listener& listener) 
+                        error_listener& reporter) 
     {
         if (!validate_hostname_rfc1034(value))
         {
-            listener.error(validation_message("hostname", 
+            reporter.error(validation_message("hostname", 
                 eval_path, 
                 schema_location, 
                 instance_location, 
@@ -1081,11 +1081,11 @@ namespace jsonschema {
     void ipv4_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                     const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
-                    error_listener& listener) 
+                    error_listener& reporter) 
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            listener.error(validation_message("ipv4", 
+            reporter.error(validation_message("ipv4", 
                 eval_path, 
                 schema_location, 
                 instance_location, 
@@ -1097,11 +1097,11 @@ namespace jsonschema {
     void ipv6_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                     const jsonpointer::json_pointer& instance_location, 
                     const std::string& value,
-                    error_listener& listener) 
+                    error_listener& reporter) 
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            listener.error(validation_message("ipv6", 
+            reporter.error(validation_message("ipv6", 
                 eval_path, 
                 schema_location, 
                 instance_location, 
@@ -1113,7 +1113,7 @@ namespace jsonschema {
     void regex_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
                      const jsonpointer::json_pointer& instance_location, 
                      const std::string& value,
-                     error_listener& listener) 
+                     error_listener& reporter) 
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
         try 
@@ -1122,7 +1122,7 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            listener.error(validation_message("pattern", 
+            reporter.error(validation_message("pattern", 
                 eval_path, 
                 schema_location, 
                 instance_location, 
