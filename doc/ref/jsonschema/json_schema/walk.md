@@ -5,7 +5,7 @@ template <class WalkReporter>
 walk_result walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
 ```
 
-Walks through a JSON schema.
+Walks through a JSON schema to collect information.
 
 #### Parameters
 
