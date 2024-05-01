@@ -21,7 +21,7 @@ Walks through a JSON schema to collect information.
            walk_result fun(const std::string& keyword,
             const Json& schema, const uri& schema_location,
             const Json& instance, const jsonpointer::json_pointer& instance_location)</pre>
-that returns a [walk_result](../walk_result.md) to indicate whether to continue or stop.
+that returns a <a href="../walk_result.md">walk_result</a> to indicate whether to continue or stop.
 </td> 
   </tr>
 </table>
