@@ -149,7 +149,7 @@ the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test
 
 #### Three ways of validating
 
-This example illustrates the use of three overloads of the `validate` function, which throw,
+This example illustrates the use of three overloads of the `validate` function that throw,
 invoke a callback function, and write to a `json_visitor`.
 
 ```cpp
