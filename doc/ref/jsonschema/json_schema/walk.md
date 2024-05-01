@@ -1,52 +1,11 @@
-### jsoncons::jsonschema::json_schema
+### jsoncons::jsonschema::json_schema::walk
 
 ```cpp
-#include <jsoncons_ext/jsonschema/jsonschema.hpp>
-
-template <class Json>
-class json_schema
+template <class WalkReporter>
+walk_result walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
 ```
 
-A `json_schema` represents the compiled form of a JSON Schema document.
-A `json_schema` is immutable and thread-safe.
-
-The class satisfies the requirements of MoveConstructible and MoveAssignable, but not CopyConstructible or CopyAssignable.
-
-#### Member functions
-
-    bool is_valid(const Json& instance) const;  (1)
-
-    void validate(const Json& instance) const;  (2)
-
-    void validate(const Json& instance, Json& patch) const;  (3)
-
-    template <class MsgReporter>
-    void validate(const Json& instance, const MsgReporter& reporter) const;  (4)
-
-    template <class MsgReporter>
-    void validate(const Json& instance, const MsgReporter& reporter, Json& patch) const;  (5)
-
-    void validate(const Json& instance, json_visitor<Json>& visitor) const;  (6)
-
-(1) Validates input JSON against a JSON Schema and returns false upon the 
-first schema violation.
-
-(2) Validates input JSON against a JSON Schema with a default error reporter
-that throws upon the first schema violation.
-
-(3) Validates input JSON against a JSON Schema with a default error reporter
-that throws upon the first schema violation. Writes a JSONPatch document to the output
-parameter.
-
-(4) Validates input JSON against a JSON Schema with a provided error reporter
-that is called for each schema violation. 
-
-(5) Validates input JSON against a JSON Schema with a provided error reporter
-that is called for each schema violation. Writes a JSONPatch document to the output
-parameter.
-
-(6) Validates input JSON against a JSON Schema and writes the validation messages
-to a [json_visitor](../corelib/basic_json_visitor.md).
+Walks through a JSON schema.
 
 #### Parameters
 
@@ -59,31 +18,134 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
     <td>reporter</td>
     <td>A function object with signature equivalent to 
     <pre>
-           void fun(const validation_message& o)</pre>
-which accepts an argument of type <a href="validation_message.md">validation_message</a>.</td> 
-  </tr>
-  <tr>
-    <td>patch</td>
-    <td>A JSONPatch document that may be applied to the input JSON
-to fill in missing properties that have "default" values in the
-schema.</td> 
-  </tr>
-  <tr>
-    <td>visitor</td>
-    <td>A [json_visitor](../corelib/basic_json_visitor.md) that receives JSON events 
-    corresponding to an array of validation messages.</td> 
+           walk_result fun(const std::string& keyword,
+            const Json& schema, const uri& schema_location,
+            const Json& instance, const jsonpointer::json_pointer& instance_location)</pre>
+</td> 
   </tr>
 </table>
 
 #### Return value
  
-(1) `true` if the instance is valid, otherwise `false` 
-
-(2) - (5) None.
+[walk_result](../walk_result.md)
 
 #### Exceptions
 
-(2) - (3) Throws a [validation_error](validation_error.md) for the first schema violation.
+None
 
-(4) - (5) `reporter` is called for each schema violation
+### Examples
 
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
+#include <cassert>
+
+using jsoncons::ojson;
+namespace jsonschema = jsoncons::jsonschema;
+
+int main()
+{
+    std::string schema_string = R"(
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of a person, company, organization, or place",
+  "type": "object",
+  "properties": {
+    "fruits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vegetables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/veggie"
+      }
+    }
+  },
+  "$defs": {
+    "veggie": {
+      "type": "object",
+      "required": [
+        "veggieName",
+        "veggieLike"
+      ],
+      "properties": {
+        "veggieName": {
+          "type": "string",
+          "description": "The name of the vegetable."
+        },
+        "veggieLike": {
+          "type": "boolean",
+          "description": "Do I like this vegetable?"
+        }
+      }
+    }
+  }
+}
+    )";
+
+    ojson schema = ojson::parse(schema_string);
+    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+
+    std::string data_string = R"(
+{
+  "fruits": [
+    "apple",
+    "orange",
+    "pear"
+  ],
+  "vegetables": [
+    {
+      "veggieName": "potato",
+      "veggieLike": true
+    },
+    {
+      "veggieName": "broccoli",
+      "veggieLike": false
+    }
+  ]
+}
+    )";
+
+    // Data
+    ojson data = ojson::parse(data_string);
+
+    auto reporter = [](const std::string& keyword,
+        const ojson& subschema, 
+        const jsoncons::uri& /*schema_location*/,
+        const ojson& /*instance*/, 
+        const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
+        {
+            if (keyword == "type")
+            {
+                assert(subschema.is_object());
+                auto it = subschema.find("type");
+                if (it != subschema.object_range().end())
+                {
+                    std::cout << instance_location.string() << ": " << it->value() << "\n";
+                }
+            }
+            return jsonschema::walk_result::advance;
+        };
+    compiled.walk(data, reporter);
+}
+```
+Output:
+```
+/fruits/0: "string"
+/fruits/1: "string"
+/fruits/2: "string"
+/fruits: "array"
+/vegetables/0/veggieName: "string"
+/vegetables/0/veggieLike: "boolean"
+/vegetables/0: "object"
+/vegetables/1/veggieName: "string"
+/vegetables/1/veggieLike: "boolean"
+/vegetables/1: "object"
+/vegetables: "array"
+: "object"
+```

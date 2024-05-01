@@ -18,7 +18,7 @@
 namespace jsoncons {
 namespace jsonschema {
     
-    enum walk_result {stop, advance};
+    enum class walk_result {advance, stop};
 
     template <class Json>
     struct json_schema_traits    
