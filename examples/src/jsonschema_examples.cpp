@@ -14,9 +14,9 @@ using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch; 
 
-void validate_using_reporter_example() 
+void validate_three_ways() 
 {
-    ojson schema = ojson::parse(R"(
+    std::string schema_str = R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -51,10 +51,9 @@ void validate_using_reporter_example()
     }
   }
 }
-    )");
+  )";
 
-    // Data
-    ojson data = ojson::parse(R"(
+    std::string data_str = R"(
 {
   "fruits": [ "apple", "orange", "pear" ],
   "vegetables": [
@@ -75,103 +74,34 @@ void validate_using_reporter_example()
     }
   ]
 }
-   )");
+    )";
 
+    ojson schema = ojson::parse(schema_str);
+    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+    ojson data = ojson::parse(data_str);
+        
+    std::cout << "\n(1) Validate using exceptions\n";
     try
     {
-        // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
-
-        auto reporter = [](const jsonschema::validation_message& message)
+        compiled.validate(data);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+    
+    std::cout << "\n(2) Validate using reporter callback\n";
+    auto reporter = [](const jsonschema::validation_message& message)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
-
-        compiled.validate(data, reporter);
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "\n";
-    }
-}
-
-void write_to_json_visitor_example() 
-{
-    ojson schema = ojson::parse(R"(
-{
-  "$id": "https://example.com/arrays.schema.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "A representation of a person, company, organization, or place",
-  "type": "object",
-  "properties": {
-    "fruits": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "vegetables": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/veggie" }
-    }
-  },
-  "$defs": {
-    "veggie": {
-      "type": "object",
-      "required": [ "veggieName", "veggieLike" ],
-      "properties": {
-        "veggieName": {
-          "type": "string",
-          "description": "The name of the vegetable."
-        },
-        "veggieLike": {
-          "type": "boolean",
-          "description": "Do I like this vegetable?"
-        }
-      }
-    }
-  }
-}
-    )");
-
-    // Data
-    ojson data = ojson::parse(R"(
-{
-  "fruits": [ "apple", "orange", "pear" ],
-  "vegetables": [
-    {
-      "veggieName": "potato",
-      "veggieLike": true
-    },
-    {
-      "veggieName": "broccoli",
-      "veggieLike": "false"
-    },
-    {
-      "veggieName": "carrot",
-      "veggieLike": false
-    },
-    {
-      "veggieName": "Swiss Chard"
-    }
-  ]
-}
-   )");
-
-    try
-    {
-        // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
-
-        jsoncons::json_decoder<ojson> decoder;
-        compiled.validate(data, decoder);
-        ojson output = decoder.get_result();
-        std::cout << pretty_print(output) << "\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "\n";
-    }
+    compiled.validate(data, reporter);
+    
+    std::cout << "\n(3) Validate outputting to json_vistor\n";
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n";
 }
 
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
@@ -579,7 +509,7 @@ void optional_format_example()
 
 void walk_example() // since 0.175.0
 {
-    std::string schema_string = R"(
+    std::string schema_str = R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -621,10 +551,10 @@ void walk_example() // since 0.175.0
 }
     )";
 
-    ojson schema = ojson::parse(schema_string);
+    ojson schema = ojson::parse(schema_str);
     jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
 
-    std::string data_string = R"(
+    std::string data_str = R"(
 {
   "fruits": [
     "apple",
@@ -645,7 +575,7 @@ void walk_example() // since 0.175.0
     )";
 
     // Data
-    ojson data = ojson::parse(data_string);
+    ojson data = ojson::parse(data_str);
 
     auto reporter = [](const std::string& keyword,
         const ojson& schema, 
@@ -670,9 +600,8 @@ void walk_example() // since 0.175.0
 int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
-
-    validate_using_reporter_example();
-    write_to_json_visitor_example();
+    validate_three_ways();
+    std::cout << "\n";
     uriresolver_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)

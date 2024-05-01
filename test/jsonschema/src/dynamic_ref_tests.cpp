@@ -19,7 +19,7 @@ namespace jsonpatch = jsoncons::jsonpatch;
 
 TEST_CASE("jsonschema $recursiveRef tests")
 {
-    std::string tree_schema_string = R"(
+    std::string tree_schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "https://example.com/tree",
@@ -38,7 +38,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
 }
     )";
 
-    std::string strict_tree_schema_string = R"(
+    std::string strict_tree_schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "https://example.com/strict-tree",
@@ -49,9 +49,9 @@ TEST_CASE("jsonschema $recursiveRef tests")
 }
     )";
 
-    json tree_schema = json::parse(tree_schema_string);
+    json tree_schema = json::parse(tree_schema_str);
 
-    json strict_tree_schema = json::parse(strict_tree_schema_string);
+    json strict_tree_schema = json::parse(strict_tree_schema_str);
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
@@ -69,7 +69,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
 
     SECTION("instance with misspelled field")
     {
-        std::string data_string = R"(
+        std::string data_str = R"(
 {
     "children": [ { "daat": 1 } ]
 }
@@ -80,7 +80,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data = json::parse(data_string);
+            json data = json::parse(data_str);
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_message& /*o*/)
@@ -106,7 +106,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
 
 TEST_CASE("jsonschema $dynamicRef tests")
 {
-    std::string tree_schema_string = R"(
+    std::string tree_schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://example.com/tree",
@@ -125,7 +125,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
 }
     )";
 
-    std::string strict_tree_schema_string = R"(
+    std::string strict_tree_schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://example.com/strict-tree",
@@ -136,9 +136,9 @@ TEST_CASE("jsonschema $dynamicRef tests")
 }
     )";
 
-    json tree_schema = json::parse(tree_schema_string);
+    json tree_schema = json::parse(tree_schema_str);
 
-    json strict_tree_schema = json::parse(strict_tree_schema_string);
+    json strict_tree_schema = json::parse(strict_tree_schema_str);
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
@@ -156,7 +156,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
 
     SECTION("instance with misspelled field")
     {
-        std::string data_string = R"(
+        std::string data_str = R"(
 {
     "children": [ { "daat": 1 } ]
 }
@@ -167,7 +167,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
             // will throw schema_error if JSON Schema compilation fails 
 
             // Data
-            json data = json::parse(data_string);
+            json data = json::parse(data_str);
 
             std::size_t error_count = 0;
             auto reporter = [&](const jsonschema::validation_message& /*o*/)
@@ -193,7 +193,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
 
 TEST_CASE("jsonschema $dynamicRef tests 2")
 {
-    std::string schema_string = R"(
+    std::string schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
@@ -234,7 +234,7 @@ TEST_CASE("jsonschema $dynamicRef tests 2")
 }
     )";
 
-    json schema = json::parse(schema_string);
+    json schema = json::parse(schema_str);
 
     jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 

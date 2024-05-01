@@ -48,7 +48,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 int main()
 {
-    std::string schema_string = R"(
+    std::string schema_str = R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -90,10 +90,10 @@ int main()
 }
     )";
 
-    ojson schema = ojson::parse(schema_string);
+    ojson schema = ojson::parse(schema_str);
     jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
 
-    std::string data_string = R"(
+    std::string data_str = R"(
 {
   "fruits": [
     "apple",
@@ -114,7 +114,7 @@ int main()
     )";
 
     // Data
-    ojson data = ojson::parse(data_string);
+    ojson data = ojson::parse(data_str);
 
     auto reporter = [](const std::string& keyword,
         const ojson& schema, 

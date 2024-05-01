@@ -19,7 +19,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 TEST_CASE("jsonschema walk tests")
 {
-    std::string schema_string = R"(
+    std::string schema_str = R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -61,12 +61,12 @@ TEST_CASE("jsonschema walk tests")
 }
     )";
 
-    ojson schema = ojson::parse(schema_string);
+    ojson schema = ojson::parse(schema_str);
     jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     SECTION("walk")
     {
-        std::string data_string = R"(
+        std::string data_str = R"(
 {
   "fruits": [
     "apple",
@@ -87,7 +87,7 @@ TEST_CASE("jsonschema walk tests")
         )";
 
         // Data
-        ojson data = ojson::parse(data_string);
+        ojson data = ojson::parse(data_str);
  
         ojson expected = ojson::parse(R"(      
 {
@@ -130,7 +130,7 @@ TEST_CASE("jsonschema walk tests")
 
 TEST_CASE("jsonschema with $dynamicRef walk test")
 {
-    std::string schema_string = R"(
+    std::string schema_str = R"(
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
@@ -171,17 +171,17 @@ TEST_CASE("jsonschema with $dynamicRef walk test")
 }
     )";
 
-    ojson schema = ojson::parse(schema_string);
+    ojson schema = ojson::parse(schema_str);
     jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema)); 
 
     SECTION("walk")
     {
-        std::string data_string = R"(null)";
+        std::string data_str = R"(null)";
 
         try
         {
             // Data
-            ojson data = ojson::parse(data_string);
+            ojson data = ojson::parse(data_str);
 
             ojson expected = ojson::parse(R"(      
 {

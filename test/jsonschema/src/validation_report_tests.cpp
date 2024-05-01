@@ -342,7 +342,7 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
 
 TEST_CASE("jsonschema items output tests")
 {
-   std::string schema_string = R"(
+   std::string schema_str = R"(
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
@@ -467,7 +467,7 @@ TEST_CASE("jsonschema items output tests")
 ]
         )");
 
-        std::string data_string = R"(
+        std::string data_str = R"(
 [
     {
         "op": "invalid_op",
@@ -476,8 +476,8 @@ TEST_CASE("jsonschema items output tests")
     }
 ]
         )";   
-        auto schema_ = jsoncons::ojson::parse(schema_string);
-        auto data_ = jsoncons::ojson::parse(data_string);
+        auto schema_ = jsoncons::ojson::parse(schema_str);
+        auto data_ = jsoncons::ojson::parse(data_str);
         auto compiled = jsoncons::jsonschema::make_json_schema(schema_);
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         compiled.validate(data_, decoder);
