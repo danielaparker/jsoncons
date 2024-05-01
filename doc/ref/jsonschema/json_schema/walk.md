@@ -2,7 +2,7 @@
 
 ```cpp
 template <class WalkReporter>
-walk_result walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
+void walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
 ```
 
 Walks through a JSON schema to collect information.
@@ -27,7 +27,7 @@ Walks through a JSON schema to collect information.
 
 #### Return value
  
-[walk_result](../walk_result.md)
+None
 
 #### Exceptions
 
