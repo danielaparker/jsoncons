@@ -83,7 +83,7 @@ class validation_output
         }
     };
 
-    struct validation_message_to_validation_output_adaptor : public assertion_reporter
+    struct validation_message_to_validation_output_adaptor : public error_listener
     {
         using validation_output_reporter_t = std::function<void(const validation_output& o)>;
 
@@ -135,7 +135,7 @@ class validation_output
         // Validate input JSON against a JSON Schema with a default throwing error listener
         Json validate(const Json& instance) const
         {
-            throwing_error_reporter listener;
+            throwing_error_listener listener;
             Json patch(json_array_arg);
 
             root_->validate2(instance, listener, patch);
@@ -145,7 +145,7 @@ class validation_output
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_reporter listener;
+            fail_early_listener listener;
             Json patch(json_array_arg);
 
             root_->validate2(instance, listener, patch);

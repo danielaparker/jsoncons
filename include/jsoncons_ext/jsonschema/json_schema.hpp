@@ -16,7 +16,7 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class throwing_error_reporter : public assertion_reporter
+    class throwing_error_listener : public error_listener
     {
         void do_error(const validation_message& o) override
         {
@@ -24,21 +24,21 @@ namespace jsonschema {
         }
     };
 
-    class fail_early_reporter : public assertion_reporter
+    class fail_early_listener : public error_listener
     {
         void do_error(const validation_message&) override
         {
         }
     public:
-        fail_early_reporter()
-            : assertion_reporter(true)
+        fail_early_listener()
+            : error_listener(true)
         {
         }
     };
 
     using error_reporter_t = std::function<void(const validation_message& o)>;
 
-    struct error_reporter_adaptor : public assertion_reporter
+    struct error_reporter_adaptor : public error_listener
     {
         error_reporter_t reporter_;
 
@@ -81,7 +81,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a default throwing error listener
         Json validate(const Json& instance) const
         {
-            throwing_error_reporter listener;
+            throwing_error_listener listener;
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
@@ -94,7 +94,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_reporter listener;
+            fail_early_listener listener;
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
@@ -138,7 +138,7 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
-            fail_early_reporter listener;
+            fail_early_listener listener;
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, listener, patch);
@@ -170,7 +170,7 @@ namespace jsonschema {
         
     private:
         // Validate input JSON against a JSON Schema with a provided error listener
-        void validate2(const Json& instance, assertion_reporter& listener, Json& patch) const
+        void validate2(const Json& instance, error_listener& listener, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
