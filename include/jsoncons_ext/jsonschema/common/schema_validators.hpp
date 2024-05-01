@@ -93,7 +93,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
-            error_reporter& listener, 
+            assertion_reporter& listener, 
             Json& patch) const 
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
@@ -178,7 +178,7 @@ namespace jsonschema {
         void do_validate(const evaluation_context<Json>& context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_reporter& listener, 
+            assertion_reporter& listener, 
             Json& /*patch*/) const final
         {
             if (!value_)
@@ -351,7 +351,7 @@ namespace jsonschema {
         void do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_reporter& listener, 
+            assertion_reporter& listener, 
             Json& patch) const final
         {
             //std::cout << "object_schema_validator begin[" << context.eval_path().string() << "," << this->schema_location().string() << "]";

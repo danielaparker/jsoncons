@@ -16,7 +16,7 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    class throwing_error_reporter : public error_reporter
+    class throwing_error_reporter : public assertion_reporter
     {
         void do_error(const validation_message& o) override
         {
@@ -24,21 +24,21 @@ namespace jsonschema {
         }
     };
 
-    class fail_early_reporter : public error_reporter
+    class fail_early_reporter : public assertion_reporter
     {
         void do_error(const validation_message&) override
         {
         }
     public:
         fail_early_reporter()
-            : error_reporter(true)
+            : assertion_reporter(true)
         {
         }
     };
 
     using error_reporter_t = std::function<void(const validation_message& o)>;
 
-    struct error_reporter_adaptor : public error_reporter
+    struct error_reporter_adaptor : public assertion_reporter
     {
         error_reporter_t reporter_;
 
@@ -170,7 +170,7 @@ namespace jsonschema {
         
     private:
         // Validate input JSON against a JSON Schema with a provided error listener
-        void validate2(const Json& instance, error_reporter& listener, Json& patch) const
+        void validate2(const Json& instance, assertion_reporter& listener, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
