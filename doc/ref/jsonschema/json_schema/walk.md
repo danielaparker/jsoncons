@@ -35,6 +35,8 @@ None
 
 ### Examples
 
+#### Construct a type tree based on a JSON Schema and an instance
+
 ```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
@@ -149,3 +151,6 @@ Output:
 /vegetables: "array"
 : "object"
 ```
+
+The type tree shows the allowable types for the data values as specifed in the schema.
+No validation of the data is performed during its construction.
