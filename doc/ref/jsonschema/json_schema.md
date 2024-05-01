@@ -60,7 +60,7 @@ to a [json_visitor](../corelib/basic_json_visitor.md).
     <td>A function object with signature equivalent to 
     <pre>
            void fun(const validation_message& o)</pre>
-which accepts an argument of type <a href="validation_output.md">validation_message</a>.</td> 
+which accepts an argument of type <a href="validation_message.md">validation_message</a>.</td> 
   </tr>
   <tr>
     <td>patch</td>
