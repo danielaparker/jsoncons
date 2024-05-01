@@ -139,7 +139,7 @@ missing key/value pairs.
 The example schemas are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html),
 the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and user contributions.
 
-[Arrays of things](#eg1)  
+[Three ways of validating](#eg1)  
 [Format validation](#eg2)  
 [Using a URIResolver to resolve references to schemas defined in external files](#eg3)  
 [Validate before decoding JSON into C++ class objects](#eg4)  
@@ -147,23 +147,21 @@ the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test
 
  <div id="eg1"/>
 
-#### Arrays of things
+#### Three ways of validating
 
-This example calls the `validate` function with a `json_decoder<ojson>` argument, so the overload 
-that writes to a `json_visitor` is invoked. 
+This example illustrates the use of three overloads of the `validate` function, which throw,
+invoke a callback function, and write to a `json_visitor`.
 
 ```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <iostream>
 
-// for brevity
 using jsoncons::ojson;
-namespace jsonschema = jsoncons::jsonschema; 
+namespace jsonschema = jsoncons::jsonschema;
 
-int main() 
-{
-    // JSON Schema
-    ojson schema = ojson::parse(R"(
+int main()
+    std::string schema_str = R"(
 {
   "$id": "https://example.com/arrays.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -198,10 +196,9 @@ int main()
     }
   }
 }
-    )");
+  )";
 
-    // Data
-    ojson data = ojson::parse(R"(
+    std::string data_str = R"(
 {
   "fruits": [ "apple", "orange", "pear" ],
   "vegetables": [
@@ -222,32 +219,46 @@ int main()
     }
   ]
 }
-   )");
+    )";
 
+    ojson schema = ojson::parse(schema_str);
+    jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(std::move(schema));
+    ojson data = ojson::parse(data_str);
+        
+    std::cout << "\n(1) Validate using exceptions\n";
     try
     {
-        // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<ojson> compiled = jsonschema::make_json_schema(schema);
-
-        auto reporter = [](const jsonschema::validation_message& message)
-        {
-            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
-        };
-
-        jsoncons::json_decoder<ojson> decoder;
-        compiled.validate(data, decoder);
-        ojson output = decoder.get_result();
-        std::cout << pretty_print(output) << "\n";
+        compiled.validate(data);
     }
     catch (const std::exception& e)
     {
         std::cout << e.what() << "\n";
     }
+    
+    std::cout << "\n(2) Validate using reporter callback\n";
+    auto reporter = [](const jsonschema::validation_message& message)
+        {
+            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
+        };
+    compiled.validate(data, reporter);
+    
+    std::cout << "\n(3) Validate outputting to a json decoder\n";
+    jsoncons::json_decoder<ojson> decoder;
+    compiled.validate(data, decoder);
+    ojson output = decoder.get_result();
+    std::cout << pretty_print(output) << "\n";
 }
 ```
-
 Output:
 ```
+(1) Validate using exceptions
+/vegetables/1/veggieLike: Expected boolean, found string
+
+(2) Validate using reporter callback
+/vegetables/1/veggieLike: Expected boolean, found string
+/vegetables/3: Required property 'veggieLike' not found.
+
+(3) Validate outputting to a json decoder
 [
     {
         "valid": false,

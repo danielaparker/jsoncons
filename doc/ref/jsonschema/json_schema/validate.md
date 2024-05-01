@@ -158,7 +158,7 @@ int main()
         };
     compiled.validate(data, reporter);
     
-    std::cout << "\n(3) Validate outputting to json_vistor\n";
+    std::cout << "\n(3) Validate outputting to a json decoder\n";
     jsoncons::json_decoder<ojson> decoder;
     compiled.validate(data, decoder);
     ojson output = decoder.get_result();
@@ -174,7 +174,7 @@ Output:
 /vegetables/1/veggieLike: Expected boolean, found string
 /vegetables/3: Required property 'veggieLike' not found.
 
-(3) Validate outputting to json_vistor
+(3) Validate outputting to a json decoder
 [
     {
         "valid": false,

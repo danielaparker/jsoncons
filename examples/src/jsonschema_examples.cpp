@@ -97,7 +97,7 @@ void validate_three_ways()
         };
     compiled.validate(data, reporter);
     
-    std::cout << "\n(3) Validate outputting to json_vistor\n";
+    std::cout << "\n(3) Validate outputting to a json decoder\n";
     jsoncons::json_decoder<ojson> decoder;
     compiled.validate(data, decoder);
     ojson output = decoder.get_result();
