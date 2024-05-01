@@ -473,7 +473,7 @@ namespace draft202012 {
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
             std::vector<schema_validator_type> prefix_item_validators;
-            keyword_validator_type items_validator;
+            std::unique_ptr<items_keyword<Json>> items_val;
 
             uri schema_location{context.make_schema_location("prefixItems")};
 
@@ -490,14 +490,16 @@ namespace draft202012 {
                 auto it = parent.find("items");
                 if (it != parent.object_range().end()) 
                 {
-                    std::string sub_keys[] = {"items"};
-                    items_validator = this->make_schema_keyword_validator("items", context,
-                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict), parent);
+                    uri items_location{context.make_schema_location("items")};
+                    std::string sub_keys[] = { "additionalItems" };
+
+                    items_val = jsoncons::make_unique<items_keyword<Json>>("items", parent, items_location,
+                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
                 }
             }
 
             return jsoncons::make_unique<prefix_items_validator<Json>>("prefixItems", parent, schema_location,  
-                std::move(prefix_item_validators), std::move(items_validator));
+                std::move(prefix_item_validators), std::move(items_val));
         }
 
 #if defined(JSONCONS_HAS_STD_REGEX)

@@ -27,56 +27,6 @@
 
 namespace jsoncons {
 namespace jsonschema {
-
-    template <class Json>
-    class schema_keyword_validator : public keyword_validator_base<Json>
-    {
-    public:
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
-
-        schema_validator_type schema_val_;
-    public:
-        schema_keyword_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location,
-            schema_validator_type&& schema_val)
-            : keyword_validator_base<Json>(keyword_name, schema, schema_location), schema_val_(std::move(schema_val))
-        {}
-
-        bool always_fails() const final
-        {
-            return schema_val_ ? schema_val_->always_fails() : false;;
-        }          
-
-        bool always_succeeds() const final
-        {
-            return schema_val_ ? schema_val_->always_succeeds() : false;;
-        }
-
-    private:
-
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& results, 
-            error_reporter& reporter, 
-            Json& patch) const final
-        {
-            if (schema_val_)
-            {
-                schema_val_->validate(context, instance, instance_location, results, reporter, patch);
-            }
-        }
-
-        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter) const final
-        {
-            if (!schema_val_)
-            {
-                return walk_result::advance;
-            }
-            return schema_val_->walk(context, instance, instance_location, reporter);
-        }
-    };
     
     template<class Json>
     class recursive_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
@@ -3173,6 +3123,120 @@ namespace jsonschema {
     };
 
     template <class Json>
+    class items_keyword : public keyword_base<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
+        using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
+
+        schema_validator_type items_val_;
+    public:
+        items_keyword(const std::string& keyword_name, const Json& schema, const uri& schema_location, schema_validator_type&& items_val)
+            : keyword_base<Json>(keyword_name, schema, schema_location), items_val_(std::move(items_val))
+        {
+        }
+
+        void validate(const evaluation_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& results, 
+            error_reporter& reporter,
+            Json& patch,
+            std::size_t data_index) const 
+        {
+            if (!instance.is_array())
+            {
+                return;
+            }
+            if (data_index < instance.size() && items_val_)
+            {
+                evaluation_context<Json> items_context(context, this->keyword_name());
+                if (items_val_->always_fails())
+                {
+                    jsonpointer::json_pointer item_location = instance_location / data_index;
+                    reporter.error(validation_message(this->keyword_name(),
+                        items_context.eval_path(), 
+                        this->schema_location(), 
+                        item_location,
+                        "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
+                else if (items_val_->always_succeeds())
+                {
+                    results.evaluated_items.insert(range{0,instance.size()});
+                }
+                else
+                {
+                    std::size_t start = 0;
+                    std::size_t end = 0;
+                    for (; data_index < instance.size(); ++data_index)
+                    {
+                        jsonpointer::json_pointer item_location = instance_location / data_index;
+                        std::size_t errors = reporter.error_count();
+                        items_val_->validate(items_context, instance[data_index], item_location, results, reporter, patch);
+                        if (errors == reporter.error_count())
+                        {
+                            if (context.require_evaluated_items())
+                            {
+                                if (end == start)
+                                {
+                                    start = end = data_index;
+                                }
+                                ++end;
+                            }
+                        }
+                        else
+                        {
+                            if (start < end)
+                            {
+                                results.evaluated_items.insert(range{start, end});
+                                start = end;
+                            }
+                        }
+                    }
+                    
+                    if (start < end)
+                    {
+                        results.evaluated_items.insert(range{start, end});
+                        start = end;
+                    }
+                }
+            }
+        }
+
+        walk_result walk(const evaluation_context<Json>& context, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const info_reporter_type& reporter,
+            std::size_t data_index) const
+        {
+            if (!instance.is_array())
+            {
+                return walk_result::advance;
+            }
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::stop)
+            {
+                return result;
+            }
+            if (data_index < instance.size() && items_val_)
+            {
+                evaluation_context<Json> items_context(context, this->keyword_name());
+                for (; data_index < instance.size(); ++data_index)
+                {
+                    jsonpointer::json_pointer item_location = instance_location / data_index;
+                    result = items_val_->walk(items_context, instance[data_index], item_location, reporter);
+                    if (result == walk_result::stop)
+                    {
+                        return result;
+                    }
+                }
+            }
+            return walk_result::advance;
+        }
+    };
+
+    template <class Json>
     class prefix_items_validator : public keyword_validator_base<Json>
     {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -3180,11 +3244,11 @@ namespace jsonschema {
         using info_reporter_type = typename json_schema_traits<Json>::info_reporter_type;
 
         std::vector<schema_validator_type> prefix_item_validators_;
-        keyword_validator_type items_val_;
+        std::unique_ptr<items_keyword<Json>> items_val_;
     public:
         prefix_items_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location, 
             std::vector<schema_validator_type>&& prefix_item_validators,
-            keyword_validator_type&& items_val)
+            std::unique_ptr<items_keyword<Json>>&& items_val)
             : keyword_validator_base<Json>(keyword_name, schema, schema_location), 
               prefix_item_validators_(std::move(prefix_item_validators)), 
               items_val_(std::move(items_val))
@@ -3243,66 +3307,11 @@ namespace jsonschema {
             if (start < end)
             {
                 results.evaluated_items.insert(range{start, end});
-                start = end;
             }
+            
             if (data_index < instance.size() && items_val_)
             {
-                evaluation_context<Json> items_context(context, "items");
-                if (items_val_->always_fails())
-                {
-                    jsonpointer::json_pointer item_location = instance_location / data_index;
-                    reporter.error(validation_message(this->keyword_name(),
-                        items_context.eval_path(), 
-                        this->schema_location(), 
-                        item_location,
-                        "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."));
-                    if (reporter.fail_early())
-                    {
-                        return;
-                    }
-                }
-                else if (items_val_->always_succeeds())
-                {
-                    results.evaluated_items.insert(range{0,instance.size()});
-                }
-                else
-                {
-                    start = 0;
-                    end = 0;
-                    for (; data_index < instance.size(); ++data_index)
-                    {
-                        if (items_val_)
-                        {
-                            jsonpointer::json_pointer item_location = instance_location / data_index;
-                            std::size_t errors = reporter.error_count();
-                            items_val_->validate(items_context, instance[data_index], item_location, results, reporter, patch);
-                            if (errors == reporter.error_count())
-                            {
-                                if (context.require_evaluated_items())
-                                {
-                                    if (end == start)
-                                    {
-                                        start = end = data_index;
-                                    }
-                                    ++end;
-                                }
-                            }
-                            else
-                            {
-                                if (start < end)
-                                {
-                                    results.evaluated_items.insert(range{start, end});
-                                    start = end;
-                                }
-                            }
-                        }
-                    }
-                    if (start < end)
-                    {
-                        results.evaluated_items.insert(range{start, end});
-                        start = end;
-                    }
-                }
+                items_val_->validate(context, instance, instance_location, results, reporter, patch, data_index);
             }
         }
 
@@ -3337,21 +3346,10 @@ namespace jsonschema {
                     return result;
                 }
             }
+
             if (data_index < instance.size() && items_val_)
             {
-                evaluation_context<Json> items_context(context, "items");
-                for (; data_index < instance.size(); ++data_index)
-                {
-                    if (items_val_)
-                    {
-                        jsonpointer::json_pointer item_location = instance_location / data_index;
-                        result = items_val_->walk(items_context, instance[data_index], item_location, reporter);
-                        if (result == walk_result::stop)
-                        {
-                            return result;
-                        }
-                    }
-                }
+                items_val_->walk(context, instance, instance_location, reporter, data_index);
             }
             return walk_result::advance;
         }
