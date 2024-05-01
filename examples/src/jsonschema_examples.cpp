@@ -14,7 +14,7 @@ using jsoncons::ojson;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch; 
 
-void write_to_reporter_example() 
+void validate_using_reporter_example() 
 {
     ojson schema = ojson::parse(R"(
 {
@@ -671,8 +671,8 @@ int main()
 {
     std::cout << "\nJSON Schema Examples\n\n";
 
-    write_to_reporter_example();
-    /*write_to_json_visitor_example();
+    validate_using_reporter_example();
+    write_to_json_visitor_example();
     uriresolver_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
@@ -688,7 +688,7 @@ int main()
     cross_schema_example();
     
     walk_example();
-    */
+    
     std::cout << "\n";
 }
 
