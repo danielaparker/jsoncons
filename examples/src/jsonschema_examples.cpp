@@ -572,16 +572,16 @@ void walk_example() // since 0.175.0
     ojson data = ojson::parse(data_string);
 
     auto reporter = [](const std::string& keyword,
-        const ojson& subschema, 
+        const ojson& schema, 
         const jsoncons::uri& /*schema_location*/,
         const ojson& /*instance*/, 
         const jsoncons::jsonpointer::json_pointer& instance_location) -> jsonschema::walk_result
         {
             if (keyword == "type")
             {
-                assert(subschema.is_object());
-                auto it = subschema.find("type");
-                if (it != subschema.object_range().end())
+                assert(schema.is_object());
+                auto it = schema.find("type");
+                if (it != schema.object_range().end())
                 {
                     std::cout << instance_location.string() << ": " << it->value() << "\n";
                 }
