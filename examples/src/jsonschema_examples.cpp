@@ -315,15 +315,15 @@ void validate_before_decode_example()
     try
     {
         json schema = json::parse(schema_str);
-        json data = json::parse(data_str);
 
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(std::move(schema));
 
         // Test that input is valid before attempting to decode
+        json data = json::parse(data_str);
         if (compiled.is_valid(data))
         {
-            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse data_str 
+            const ns::job_properties v = data.as<ns::job_properties>(); 
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
