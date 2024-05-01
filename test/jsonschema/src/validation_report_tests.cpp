@@ -132,7 +132,52 @@ TEST_CASE("jsonschema prefixItems report tests")
     {
         "valid": false,
         "evaluationPath": "/items",
-        "schemaLocation": "#/prefixItems",
+        "schemaLocation": "#/items",
+        "instanceLocation": "/4",
+        "error": "Extra item at index '4' but the schema does not allow extra items."
+    }
+]
+        )");
+
+        jsoncons::json_decoder<ojson> decoder;    
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema);
+    
+        json data = json::parse(R"(
+            [1600, "Pennsylvania", "Avenue", "NW", "Washington"]
+        )");
+    
+        compiled.validate(data, decoder);
+        
+        ojson output = decoder.get_result();
+        CHECK(expected == output);
+        //std::cout << pretty_print(output) << "\n";
+    }
+}
+
+TEST_CASE("jsonschema items-additionalItems report tests")
+{
+    json schema = json::parse(R"(
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "array",
+  "items": [
+    { "type": "number" },
+    { "type": "string" },
+    { "enum": ["Street", "Avenue", "Boulevard"] },
+    { "enum": ["NW", "NE", "SW", "SE"] }
+  ],
+  "additionalItems": false
+}
+    )");
+
+    SECTION("Test 1")
+    {
+        ojson expected = ojson::parse(R"(
+[
+    {
+        "valid": false,
+        "evaluationPath": "/additionalItems",
+        "schemaLocation": "#/additionalItems",
         "instanceLocation": "/4",
         "error": "Extra item at index '4' but the schema does not allow extra items."
     }
@@ -824,4 +869,3 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
         //std::cout << pretty_print(output) << "\n";
     }
 }
-
