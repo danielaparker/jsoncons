@@ -12,6 +12,7 @@ template <class MsgReporter>
 void validate(const Json& instance, const MsgReporter& reporter, Json& patch) const;  (4)
 
 void validate(const Json& instance, json_visitor<Json>& visitor) const;  (5)
+```
 
 (1) Validates input JSON against a JSON Schema with a default error reporter
 that throws upon the first schema violation.
