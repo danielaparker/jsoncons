@@ -4,10 +4,13 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template<class Json>
-Json* get(Json& root, const basic_json_location<Json::char_type>& location); 
+Json* get(Json& root, const basic_json_location<Json::char_type>& location);                   (until 0.175.0)
+
+template<class Json>
+std::pair<Json*,bool> get(Json& root, const basic_json_location<Json::char_type>& location);   (since 0.175.0)
 ```
 
-Returns a pointer to a JSON value in a JSON document at a specified location.
+Gets a pointer to a JSON value in a JSON document at a specified location.
 
 #### Parameters
 <table>
@@ -23,7 +26,11 @@ Returns a pointer to a JSON value in a JSON document at a specified location.
 
 #### Return value
 
-Returns a pointer to the selected item, or null if not found. 
+Until 0.175.0, returns a pointer to the selected item, or null if not found. 
+
+Since 0.175.0, returns a `std::pair<Json*,bool>`. If the get operation succeeded, the bool component is `true`, and
+the `Json*` component points to the value in the `root`. If the get operation failed, the bool component is `false`.
+
 
 ### Exceptions
 

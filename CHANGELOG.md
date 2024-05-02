@@ -1,7 +1,17 @@
 0.175.0
 -------
 
-Changes to new jsonschema classes and functions introduced in 0.174.0:
+This release contains two breaking changes to recently added
+features.
+
+Change to jsonpath::get function
+
+- The return value for `jsonpath::get` has been changed from a
+pointer to the selected JSON value, or null if not found, to a
+`std::pair<Json*,bool>`, where the bool component indicates 
+whether the value was found.
+
+Change to new jsonschema classes and functions introduced in 0.174.0:
 
 - The overload of `json_schema<Json>::validate` that takes a callback
 must now be passed a lambda that returns `walk_result::advance` or 
@@ -10,7 +20,7 @@ must now be passed a lambda that returns `walk_result::advance` or
 Note that this change does not affect the legacy pre-0.174.0 jsonschema
 classes and functions (`make_schema`, `json_validator`). 
 
-Enhancements to jsonschema library:
+Enhancement to jsonschema library:
 
 - New `json_schema` member function `walk` for walking through the schema.
 
