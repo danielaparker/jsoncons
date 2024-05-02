@@ -85,7 +85,7 @@ class validation_output
 
     struct validation_message_to_validation_output_adaptor : public error_listener
     {
-        using validation_output_reporter_t = std::function<void(const validation_output& o)>;
+        using validation_output_reporter_t = std::function<void(const validation_output& msg)>;
 
         validation_output_reporter_t reporter_;
 

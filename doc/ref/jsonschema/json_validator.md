@@ -40,7 +40,7 @@ that is called for each schema violation.
     <td>reporter</td>
     <td>A function object with signature equivalent to 
     <pre>
-           void fun(const validation_output& o)</pre>
+           void fun(const validation_output& msg)</pre>
 which accepts an argument of type <a href="validation_output.md">validation_output</a>.</td> 
   </tr>
 </table>

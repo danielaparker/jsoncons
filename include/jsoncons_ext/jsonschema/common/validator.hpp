@@ -41,10 +41,10 @@ namespace jsonschema {
 
         virtual ~error_listener() = default;
 
-        void error(const validation_message& o)
+        void error(const validation_message& msg)
         {
             ++error_count_;
-            do_error(o);
+            do_error(msg);
         }
 
         std::size_t error_count() const
@@ -66,9 +66,9 @@ namespace jsonschema {
         std::vector<validation_message> errors;
 
     private:
-        void do_error(const validation_message& o) final
+        void do_error(const validation_message& msg) final
         {
-            errors.push_back(o);
+            errors.push_back(msg);
         }
     };
 

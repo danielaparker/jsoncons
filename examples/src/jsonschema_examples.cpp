@@ -91,9 +91,9 @@ void validate_three_ways()
     }
     
     std::cout << "\n(2) Validate using reporter callback\n";
-    auto reporter = [](const jsonschema::validation_message& message)
+    auto reporter = [](const jsonschema::validation_message& msg)
         {
-            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
         };
     compiled.validate(data, reporter);
     
@@ -148,10 +148,10 @@ void uriresolver_example()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& msg)
         {
-            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
-            for (const auto& detail : message.details())
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
+            for (const auto& detail : msg.details())
             {
                 std::cout << "    "  << detail.message() << "\n";
             }

@@ -59,7 +59,7 @@ namespace {
                     //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     std::size_t errors = 0;
-                    auto reporter = [&](const jsonschema::validation_message& o) -> jsonschema::walk_result
+                    auto reporter = [&](const jsonschema::validation_message& o)
                     {
                         ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());
@@ -67,8 +67,8 @@ namespace {
                         {
                             std::cout << "  File: " << fpath << "\n";
                             std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
-                            std::cout << "  Failed: " << o.instance_location().string() << ": " << o.message() << "\n";
-                            for (const auto& err : o.details())
+                            std::cout << "  Failed: " << msg.instance_location().string() << ": " << msg.message() << "\n";
+                            for (const auto& err : msg.details())
                             {
                                 std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                             }

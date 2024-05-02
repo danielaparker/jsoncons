@@ -236,7 +236,7 @@ int main()
     }
     
     std::cout << "\n(2) Validate using reporter callback\n";
-    auto reporter = [](const jsonschema::validation_message& message)
+    auto reporter = [](const jsonschema::validation_message& msg)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
@@ -428,7 +428,7 @@ int main()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& message)
+        auto reporter = [](const jsonschema::validation_message& msg)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
             for (const auto& detail : message.details())
