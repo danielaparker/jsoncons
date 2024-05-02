@@ -1082,10 +1082,28 @@ namespace jsonschema {
             return walk_result::advance;
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::abort)
+            {
+                return result;
+            }
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
+            {
+                evaluation_context<Json> item_context(this_context, i);
+
+                result = validators_[i]->walk(item_context, instance, instance_location, reporter);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
+            }
+
+            return walk_result::advance;
         }
     };
 
@@ -1179,10 +1197,29 @@ namespace jsonschema {
             return walk_result::advance;
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::abort)
+            {
+                return result;
+            }
+
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
+            {
+                evaluation_context<Json> item_context(this_context, i);
+
+                result = validators_[i]->walk(item_context, instance, instance_location, reporter);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
+            }
+
+            return walk_result::advance;
         }
     };
 
@@ -1269,10 +1306,28 @@ namespace jsonschema {
             return walk_result::advance;
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& instance,
+        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance,
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
         {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            walk_result result = reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+            if (result == walk_result::abort)
+            {
+                return result;
+            }
+            evaluation_context<Json> this_context(context, this->keyword_name());
+
+            for (std::size_t i = 0; i < validators_.size(); ++i) 
+            {
+                evaluation_context<Json> item_context(this_context, i);
+
+                result = validators_[i]->walk(item_context, instance, instance_location, reporter);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
+            }
+
+            return walk_result::advance;
         }
     };
 
