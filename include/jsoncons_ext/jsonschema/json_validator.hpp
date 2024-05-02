@@ -83,13 +83,13 @@ class validation_output
         }
     };
 
-    struct validation_message_to_validation_output_adaptor : public error_reporter
+    struct validation_message_to_validation_output : public error_reporter
     {
         using validation_output_reporter_t = std::function<void(const validation_output& msg)>;
 
         validation_output_reporter_t reporter_;
 
-        validation_message_to_validation_output_adaptor(const validation_output_reporter_t& reporter)
+        validation_message_to_validation_output(const validation_output_reporter_t& reporter)
             : reporter_(reporter)
         {
         }
@@ -161,7 +161,7 @@ class validation_output
         {
             Json patch(json_array_arg);
 
-            validation_message_to_validation_output_adaptor adaptor(reporter);
+            validation_message_to_validation_output adaptor(reporter);
 
             root_->validate2(instance, adaptor, patch);
             return patch;
