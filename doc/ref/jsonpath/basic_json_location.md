@@ -155,7 +155,11 @@ The examples below uses the sample data file `books.json`,
 jsonpath::json_location loc;
 loc.append("store").append("book").append(1);
 
-json* ptr = jsonpath::get(doc, loc);    
+auto result = jsonpath::get(doc, loc);   // since 0.175.0   
+if (result.second)
+{
+    std::cout << *(result.first) << "\n";
+}
 ```
                         
 #### Convert a JSONPath normalized path into a JSONPointer                        

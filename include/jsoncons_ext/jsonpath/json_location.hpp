@@ -782,7 +782,7 @@ namespace jsonpath {
     }
 
     template<class Json>
-    Json* get(Json& root, const basic_json_location<typename Json::char_type>& location)
+    std::pair<Json*,bool> get(Json& root, const basic_json_location<typename Json::char_type>& location)
     {
         Json* p_current = std::addressof(root);
         bool found = false;
@@ -830,7 +830,7 @@ namespace jsonpath {
                 }
             }
         }
-        return found ? p_current : nullptr;
+        return std::make_pair(p_current,found);
     }
 
     template <class CharT, class Allocator = std::allocator<CharT>>

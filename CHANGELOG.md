@@ -1,7 +1,16 @@
-0.175.0 preview (master) 
+0.175.0
 -------
 
-jsonschema library enhancements
+Changes to new jsonschema classes and functions introduced in 0.174.0:
+
+- The overload of `json_schema<Json>::validate` that takes a callback
+must now be passed a lambda that returns `walk_result::advance` or 
+`walk_result::abort`. This supports early exit from validation.  
+
+Note that this change does not affect the legacy pre-0.174.0 jsonschema
+classes and functions (`make_schema`, `json_validator`). 
+
+Enhancements to jsonschema library:
 
 - New `json_schema` member function `walk` for walking through the schema.
 

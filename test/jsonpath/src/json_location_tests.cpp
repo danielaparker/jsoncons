@@ -215,10 +215,10 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(1);
 
-        json* p_json = jsonpath::get(doc, loc);
+        auto result = jsonpath::get(doc, loc);
 
-        CHECK_FALSE(p_json == nullptr);
-        CHECK(*p_json == doc.at("store").at("book").at(1));
+        CHECK(result.second);
+        CHECK(*result.first == doc.at("store").at("book").at(1));
     }
 
     SECTION("store book 2")
@@ -226,10 +226,10 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(2);
 
-        json* p_json = jsonpath::get(doc, loc);
+        auto result = jsonpath::get(doc, loc);
 
-        CHECK_FALSE(p_json == nullptr);
-        CHECK(*p_json == doc.at("store").at("book").at(2));
+        CHECK(result.second);
+        CHECK(*result.first == doc.at("store").at("book").at(2));
     }
 
     SECTION("store book 3")
@@ -237,9 +237,9 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(3);
 
-        json* p_json = jsonpath::get(doc, loc);
+        auto result = jsonpath::get(doc, loc);
 
-        CHECK(p_json == nullptr);
+        CHECK(result == nullptr);
     }
 
     SECTION("store")
@@ -247,9 +247,9 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store");
 
-        json* p_json = jsonpath::get(doc, loc);
-        CHECK_FALSE(p_json == nullptr);
-        CHECK(*p_json == doc.at("store"));
+        auto result = jsonpath::get(doc, loc);
+        CHECK(result.second);
+        CHECK(*result.first == doc.at("store"));
     }
 
     SECTION("store book")
@@ -257,9 +257,9 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("book");
 
-        json* p_json = jsonpath::get(doc, loc);
-        CHECK_FALSE(p_json == nullptr);
-        CHECK(*p_json == doc.at("store").at("book"));
+        auto result = jsonpath::get(doc, loc);
+        CHECK(result.second);
+        CHECK(*result.first == doc.at("store").at("book"));
     }
 
     SECTION("store lost&found")
@@ -267,8 +267,8 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("lost&found");
 
-        json* p_json = jsonpath::get(doc, loc);
-        CHECK(p_json == nullptr);
+        auto result = jsonpath::get(doc, loc);
+        CHECK(result == nullptr);
     }
 
     SECTION("store book 2 price")
@@ -276,10 +276,10 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append("book").append(2).append("price");
 
-        json* p_json = jsonpath::get(doc, loc);
+        auto result = jsonpath::get(doc, loc);
 
-        CHECK_FALSE(p_json == nullptr);
-        CHECK(*p_json == doc.at("store").at("book").at(2).at("price"));
+        CHECK(result.second);
+        CHECK(*result.first == doc.at("store").at("book").at(2).at("price"));
     }
 
     SECTION("store 0")
@@ -287,9 +287,9 @@ TEST_CASE("json_location select tests")
         jsonpath::json_location loc;
         loc.append("store").append(0);
 
-        json* p_json = jsonpath::get(doc, loc);
+        auto result = jsonpath::get(doc, loc);
 
-        CHECK(p_json == nullptr);
+        CHECK(result == nullptr);
     }
 }
 
