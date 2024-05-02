@@ -106,7 +106,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class MsgReporter>
-        typename std::enable_if<extension_traits::is_unary_function_object<MsgReporter,validation_message>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<MsgReporter,walk_result,validation_message>::value,void>::type
         validate(const Json& instance, const MsgReporter& reporter) const
         {
             jsonpointer::json_pointer instance_location{};
@@ -120,7 +120,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class MsgReporter>
-        typename std::enable_if<extension_traits::is_unary_function_object<MsgReporter,validation_message>::value,void>::type
+        typename std::enable_if<extension_traits::is_unary_function_object_exact<MsgReporter,walk_result,validation_message>::value,void>::type
         validate(const Json& instance, MsgReporter&& reporter, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};

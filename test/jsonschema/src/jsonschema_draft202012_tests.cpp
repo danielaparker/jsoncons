@@ -59,7 +59,7 @@ namespace {
                     //std::cout << "  Test case " << count << "." << count_test << ": " << test_case["description"] << "\n";
                     ++count_test;
                     std::size_t errors = 0;
-                    auto reporter = [&](const jsonschema::validation_message& o)
+                    auto reporter = [&](const jsonschema::validation_message& o) -> jsonschema::walk_result
                     {
                         ++errors;
                         CHECK_FALSE(test_case["valid"].as<bool>());
@@ -73,6 +73,7 @@ namespace {
                                 std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
                             }
                         }
+                        return jsonschema::walk_result::advance;
                     };
                     compiled.validate(test_case.at("data"), reporter);
                     if (errors == 0)
