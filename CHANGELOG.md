@@ -9,7 +9,7 @@ Change to jsonpath::get function
 - The return value for `jsonpath::get` has been changed from a
 pointer to the selected JSON value, or null if not found, to a
 `std::pair<Json*,bool>`, where the bool component indicates 
-whether the value was found.
+whether the get operation succeeded.
 
 Change to new jsonschema classes and functions introduced in 0.174.0:
 
