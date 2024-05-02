@@ -18,7 +18,7 @@
 namespace jsoncons {
 namespace jsonschema {
     
-    enum class walk_result {advance, stop};
+    enum class walk_result {advance, abort};
 
     template <class Json>
     struct json_schema_traits    
@@ -41,10 +41,10 @@ namespace jsonschema {
 
         virtual ~error_listener() = default;
 
-        void error(const validation_message& msg)
+        walk_result error(const validation_message& msg)
         {
             ++error_count_;
-            do_error(msg);
+            return do_error(msg);
         }
 
         std::size_t error_count() const
@@ -58,7 +58,7 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_error(const validation_message& /* e */) = 0;
+        virtual walk_result do_error(const validation_message& /* e */) = 0;
     };
 
     struct collecting_error_listener : public error_listener
@@ -66,9 +66,10 @@ namespace jsonschema {
         std::vector<validation_message> errors;
 
     private:
-        void do_error(const validation_message& msg) final
+        walk_result do_error(const validation_message& msg) final
         {
             errors.push_back(msg);
+            return walk_result::advance;
         }
     };
 
@@ -212,14 +213,14 @@ namespace jsonschema {
 
         virtual const uri& schema_location() const = 0;
 
-        void validate(const evaluation_context<Json>& context,
+        walk_result validate(const evaluation_context<Json>& context,
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_listener& reporter, 
             Json& patch) const 
         {
-            do_validate(context, instance, instance_location, results, reporter, patch);
+            return do_validate(context, instance, instance_location, results, reporter, patch);
         }
 
         walk_result walk(const evaluation_context<Json>& context, const Json& instance, 
@@ -229,7 +230,7 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+        virtual walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_listener& reporter, 
@@ -335,7 +336,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_listener& reporter, 
@@ -345,15 +346,14 @@ namespace jsonschema {
 
             if (!referred_schema_)
             {
-                reporter.error(validation_message(this->keyword_name(), 
+                return reporter.error(validation_message(this->keyword_name(), 
                     this_context.eval_path(),
                     this->schema_location(), 
                     instance_location, 
                     "Unresolved schema reference " + this->schema_location().string()));
-                return;
             }
 
-            referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
+            return referred_schema_->validate(this_context, instance, instance_location, results, reporter, patch);
         }
 
         walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 

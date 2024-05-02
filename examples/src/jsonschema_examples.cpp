@@ -91,9 +91,10 @@ void validate_three_ways()
     }
     
     std::cout << "\n(2) Validate using reporter callback\n";
-    auto reporter = [](const jsonschema::validation_message& msg)
+    auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
             std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
+            return jsonschema::walk_result::advance;
         };
     compiled.validate(data, reporter);
     
@@ -148,13 +149,14 @@ void uriresolver_example()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& msg)
+        auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
             std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
             for (const auto& detail : msg.details())
             {
                 std::cout << "    "  << detail.message() << "\n";
             }
+            return jsonschema::walk_result::advance;
         };
 
         // Will call reporter for each schema violation
@@ -577,7 +579,7 @@ void walk_example() // since 0.175.0
     // Data
     ojson data = ojson::parse(data_str);
 
-    auto reporter = [](const std::string& keyword,
+    auto reporter = [](const std::string& keyword, 
         const ojson& schema, 
         const jsoncons::uri& /*schema_location*/,
         const ojson& /*instance*/, 

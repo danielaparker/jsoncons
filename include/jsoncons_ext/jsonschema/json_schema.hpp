@@ -16,9 +16,58 @@
 namespace jsoncons {
 namespace jsonschema {
 
+    class validation_message_to_json_events 
+    {
+        json_visitor* visitor_ptr_;
+    public:
+        validation_message_to_json_events(json_visitor& visitor)
+            : visitor_ptr_(std::addressof(visitor))
+        {
+        }
+
+        walk_result operator()(const validation_message& message)
+        {
+            write_error(message);
+            return walk_result::advance;
+        }
+
+        void write_error(const validation_message& message)
+        {
+            visitor_ptr_->begin_object();
+
+            visitor_ptr_->key("valid");
+            visitor_ptr_->bool_value(false);
+
+            visitor_ptr_->key("evaluationPath");
+            visitor_ptr_->string_value(message.eval_path().string());
+
+            visitor_ptr_->key("schemaLocation");
+            visitor_ptr_->string_value(message.schema_location().string());
+
+            visitor_ptr_->key("instanceLocation");
+            visitor_ptr_->string_value(message.instance_location().string());
+
+            visitor_ptr_->key("error");
+            visitor_ptr_->string_value(message.message());
+
+            if (!message.details().empty())
+            {
+                visitor_ptr_->key("details");
+                visitor_ptr_->begin_array();
+                for (const auto& detail : message.details())
+                {
+                    write_error(detail);
+                }
+                visitor_ptr_->end_array();
+            }
+
+            visitor_ptr_->end_object();
+        }
+    };
+
     class throwing_error_listener : public error_listener
     {
-        void do_error(const validation_message& msg) override
+        walk_result do_error(const validation_message& msg) override
         {
             JSONCONS_THROW(validation_error(msg.instance_location().string() + ": " + msg.message()));
         }
@@ -26,8 +75,9 @@ namespace jsonschema {
 
     class fail_early_listener : public error_listener
     {
-        void do_error(const validation_message&) override
+        walk_result do_error(const validation_message&) override
         {
+            return walk_result::abort;
         }
     public:
         fail_early_listener()
@@ -36,7 +86,7 @@ namespace jsonschema {
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_message& msg)>;
+    using error_reporter_t = std::function<walk_result(const validation_message& msg)>;
 
     struct error_reporter_adaptor : public error_listener
     {
@@ -47,9 +97,9 @@ namespace jsonschema {
         {
         }
     private:
-        void do_error(const validation_message& e) override
+        walk_result do_error(const validation_message& e) override
         {
-            reporter_(e);
+            return reporter_(e);
         }
     };
        
@@ -151,11 +201,11 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location{};
             Json patch{json_array_arg};
 
-            validation_message_to_json_adaptor report{ visitor };
+            validation_message_to_json_events adaptor{ visitor };
             evaluation_context<Json> context;
             evaluation_results results;
-            error_reporter_adaptor adaptor(report);
-            root_->validate(context, instance, instance_location, results, adaptor, patch);
+            error_reporter_adaptor reporter(adaptor);
+            root_->validate(context, instance, instance_location, results, reporter, patch);
             visitor.end_array();
             visitor.flush();
         }

@@ -89,7 +89,7 @@ namespace jsonschema {
         }
         
     private:
-        void do_validate(const evaluation_context<Json>& context, 
+        walk_result do_validate(const evaluation_context<Json>& context, 
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
@@ -97,7 +97,7 @@ namespace jsonschema {
             Json& patch) const 
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
-            schema_val_->validate(context, instance, instance_location, results, reporter, patch);
+            return schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
         walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
@@ -175,7 +175,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const evaluation_context<Json>& context, const Json&, 
+        walk_result do_validate(const evaluation_context<Json>& context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_listener& reporter, 
@@ -189,6 +189,7 @@ namespace jsonschema {
                     instance_location, 
                     "False schema always fails"));
             }
+            return walk_result::advance;
         }
 
         walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/,
@@ -348,7 +349,7 @@ namespace jsonschema {
             }
         }
 
-        void do_validate(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_listener& reporter, 
@@ -380,28 +381,40 @@ namespace jsonschema {
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
-                val->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                walk_result result = val->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
-                    return;
+                    return walk_result::advance;
                 }
             }
             
             if (unevaluated_properties_val_)
             {
-                unevaluated_properties_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                walk_result result = unevaluated_properties_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
-                    return;
+                    return walk_result::advance;
                 }
             }
 
             if (unevaluated_items_val_)
             {
-                unevaluated_items_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                walk_result result = unevaluated_items_val_->validate(this_context, instance, instance_location, local_results, reporter, patch);
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
                 if (reporter.error_count() > 0 && reporter.fail_early())
                 {
-                    return;
+                    return walk_result::advance;
                 }
             }
 
@@ -423,6 +436,7 @@ namespace jsonschema {
             //    std::cout << "    " << s << "\n";
             //}
             //std::cout << "\n";
+            return walk_result::advance;
         }
 
         walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
@@ -433,7 +447,7 @@ namespace jsonschema {
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
                 walk_result result = val->walk(this_context, instance, instance_location, reporter);
-                if (result == walk_result::stop)
+                if (result == walk_result::abort)
                 {
                     return result;
                 }
@@ -441,7 +455,7 @@ namespace jsonschema {
             if (unevaluated_properties_val_)
             {
                 walk_result result = unevaluated_properties_val_->walk(this_context, instance, instance_location, reporter);
-                if (result == walk_result::stop)
+                if (result == walk_result::abort)
                 {
                     return result;
                 }
@@ -450,7 +464,7 @@ namespace jsonschema {
             if (unevaluated_items_val_)
             {
                 walk_result result = unevaluated_items_val_->walk(this_context, instance, instance_location, reporter);
-                if (result == walk_result::stop)
+                if (result == walk_result::abort)
                 {
                     return result;
                 }

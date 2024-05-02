@@ -3,7 +3,7 @@
 ```cpp
 enum class walk_result {
    advance,
-   stop
+   abort
 };
 ```
 

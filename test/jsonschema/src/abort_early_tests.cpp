@@ -80,17 +80,43 @@ TEST_CASE("jsonschema stop early tests")
 
     SECTION("test 1")
     {
-        std::map<std::string,std::string> results;
+        std::string expected_str = R"(
+{
+    "/vegetables/1/veggieLike": "Expected boolean, found string",
+    "/vegetables/3": "Required property 'veggieLike' not found."
+}
+        )";
+
+        ojson expected = ojson::parse(expected_str);
+        ojson results{ jsoncons::json_object_arg };
         auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_result
             {
-                results.emplace(message.instance_location().string(), message.message());
-                return jsonschema::walk_result::stop;
+                results.try_emplace(message.instance_location().string(), message.message());
+                return jsonschema::walk_result::advance;
             };
         compiled.validate(data, reporter);
-        for (const auto& member : results)
-        {
-            std::cout << member.first << ": " << member.second << "\n";
-        }
+        CHECK(expected == results);
+        //std::cout << pretty_print(results) << "\n";
+    }
+
+    SECTION("test 2")
+    {
+        std::string expected_str = R"(
+{
+    "/vegetables/1/veggieLike": "Expected boolean, found string"
+}
+        )";
+
+        ojson expected = ojson::parse(expected_str);
+        ojson results{jsoncons::json_object_arg};
+        auto reporter = [&](const jsonschema::validation_message& message) -> jsonschema::walk_result
+            {
+                results.try_emplace(message.instance_location().string(), message.message());
+                return jsonschema::walk_result::abort;
+            };
+        compiled.validate(data, reporter);
+        CHECK(expected == results);
+        //std::cout << pretty_print(results) << "\n";
     }
 }
 

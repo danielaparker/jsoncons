@@ -94,7 +94,7 @@ class validation_output
         {
         }
     private:
-        void do_error(const validation_message& m) override
+        walk_result do_error(const validation_message& m) override
         {
             std::vector<validation_output> nested_errors;
             for (const auto& detail : m.details())
@@ -110,6 +110,8 @@ class validation_output
                 m.instance_location().string(),
                 m.message(),
                 std::move(nested_errors)));
+
+            return walk_result::advance;
         }
     };
 
