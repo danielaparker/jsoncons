@@ -18,9 +18,9 @@ namespace jsonschema {
 
     class throwing_error_listener : public error_listener
     {
-        void do_error(const validation_message& o) override
+        void do_error(const validation_message& msg) override
         {
-            JSONCONS_THROW(validation_error(o.instance_location().string() + ": " + o.message()));
+            JSONCONS_THROW(validation_error(msg.instance_location().string() + ": " + msg.message()));
         }
     };
 
@@ -36,7 +36,7 @@ namespace jsonschema {
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_message& o)>;
+    using error_reporter_t = std::function<void(const validation_message& msg)>;
 
     struct error_reporter_adaptor : public error_listener
     {

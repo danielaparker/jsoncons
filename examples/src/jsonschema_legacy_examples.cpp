@@ -83,10 +83,10 @@ void reporter_example()
         auto sch = jsonschema::make_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto reporter = [&error_count](const jsonschema::validation_output& msg)
         {
             ++error_count;
-            std::cout << o.instance_location() << ": " << o.message() << "\n";
+            std::cout << msg.instance_location() << ": " << msg.message() << "\n";
         };
 
         jsonschema::json_validator<json> validator(sch);
@@ -145,11 +145,11 @@ void uriresolver_example()
         auto sch = jsonschema::make_schema(schema, resolver);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_output& o)
+        auto reporter = [&error_count](const jsonschema::validation_output& msg)
         {
             ++error_count;
-            std::cout << o.instance_location() << ": " << o.message() << "\n";
-            for (const auto& detail : o.nested_errors())
+            std::cout << msg.instance_location() << ": " << msg.message() << "\n";
+            for (const auto& detail : msg.nested_errors())
             {
                 std::cout << "    "  << detail.message() << "\n";
             }

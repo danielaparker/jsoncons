@@ -42,7 +42,7 @@ to a [json_visitor](../../corelib/basic_json_visitor.md).
     <td>reporter</td>
     <td>A function object with signature equivalent to 
     <pre>
-           void fun(const validation_message& o)</pre>
+           void fun(const validation_message& msg)</pre>
 which accepts an argument of type <a href="../validation_message.md">validation_message</a>.</td> 
   </tr>
   <tr>
@@ -152,7 +152,7 @@ int main()
     }
     
     std::cout << "\n(2) Validate using reporter callback\n";
-    auto reporter = [](const jsonschema::validation_message& message)
+    auto reporter = [](const jsonschema::validation_message& msg)
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
         };
