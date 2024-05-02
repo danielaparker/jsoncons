@@ -83,7 +83,7 @@ class validation_output
         }
     };
 
-    struct validation_message_to_validation_output_adaptor : public error_listener
+    struct validation_message_to_validation_output_adaptor : public error_reporter
     {
         using validation_output_reporter_t = std::function<void(const validation_output& msg)>;
 
@@ -147,7 +147,7 @@ class validation_output
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_listener reporter;
+            fail_early_reporter reporter;
             Json patch(json_array_arg);
 
             root_->validate2(instance, reporter, patch);

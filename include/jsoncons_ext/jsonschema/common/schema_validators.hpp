@@ -93,7 +93,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& patch) const 
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
@@ -178,7 +178,7 @@ namespace jsonschema {
         walk_result do_validate(const evaluation_context<Json>& context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& /*patch*/) const final
         {
             if (!value_)
@@ -352,7 +352,7 @@ namespace jsonschema {
         walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& patch) const final
         {
             //std::cout << "object_schema_validator begin[" << context.eval_path().string() << "," << this->schema_location().string() << "]";
@@ -386,10 +386,6 @@ namespace jsonschema {
                 {
                     return result;
                 }
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return walk_result::advance;
-                }
             }
             
             if (unevaluated_properties_val_)
@@ -399,10 +395,6 @@ namespace jsonschema {
                 {
                     return result;
                 }
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return walk_result::advance;
-                }
             }
 
             if (unevaluated_items_val_)
@@ -411,10 +403,6 @@ namespace jsonschema {
                 if (result == walk_result::abort)
                 {
                     return result;
-                }
-                if (reporter.error_count() > 0 && reporter.fail_early())
-                {
-                    return walk_result::advance;
                 }
             }
 

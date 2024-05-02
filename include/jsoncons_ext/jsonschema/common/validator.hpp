@@ -29,17 +29,16 @@ namespace jsonschema {
     };
 
     // Interface for validation error handlers
-    class error_listener
+    class error_reporter
     {
-        bool fail_early_;
         std::size_t error_count_;
     public:
-        error_listener(bool fail_early = false)
-            : fail_early_(fail_early), error_count_(0)
+        error_reporter()
+            : error_count_(0)
         {
         }
 
-        virtual ~error_listener() = default;
+        virtual ~error_reporter() = default;
 
         walk_result error(const validation_message& msg)
         {
@@ -52,16 +51,11 @@ namespace jsonschema {
             return error_count_;
         }
 
-        bool fail_early() const
-        {
-            return fail_early_;
-        }
-
     private:
         virtual walk_result do_error(const validation_message& /* e */) = 0;
     };
 
-    struct collecting_error_listener : public error_listener
+    struct collecting_error_listener : public error_reporter
     {
         std::vector<validation_message> errors;
 
@@ -217,7 +211,7 @@ namespace jsonschema {
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& patch) const 
         {
             return do_validate(context, instance, instance_location, results, reporter, patch);
@@ -233,7 +227,7 @@ namespace jsonschema {
         virtual walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& patch) const = 0;
 
         virtual walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/, 
@@ -339,7 +333,7 @@ namespace jsonschema {
         walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
-            error_listener& reporter, 
+            error_reporter& reporter, 
             Json& patch) const final
         {
             evaluation_context<Json> this_context(context, this->keyword_name());

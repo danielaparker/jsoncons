@@ -65,30 +65,25 @@ namespace jsonschema {
         }
     };
 
-    class throwing_error_listener : public error_listener
+    class throwing_error_listener : public error_reporter
     {
         walk_result do_error(const validation_message& msg) override
         {
             JSONCONS_THROW(validation_error(msg.instance_location().string() + ": " + msg.message()));
         }
     };
-
-    class fail_early_listener : public error_listener
+  
+    class fail_early_reporter : public error_reporter
     {
         walk_result do_error(const validation_message&) override
         {
             return walk_result::abort;
         }
-    public:
-        fail_early_listener()
-            : error_listener(true)
-        {
-        }
     };
 
     using error_reporter_t = std::function<walk_result(const validation_message& msg)>;
 
-    struct error_reporter_adaptor : public error_listener
+    struct error_reporter_adaptor : public error_reporter
     {
         error_reporter_t reporter_;
 
@@ -144,7 +139,7 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema 
         bool is_valid(const Json& instance) const
         {
-            fail_early_listener reporter;
+            fail_early_reporter reporter;
             jsonpointer::json_pointer instance_location{};
             Json patch(json_array_arg);
 
@@ -188,7 +183,7 @@ namespace jsonschema {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
 
-            fail_early_listener reporter;
+            fail_early_reporter reporter;
             evaluation_context<Json> context;
             evaluation_results results;
             root_->validate(context, instance, instance_location, results, reporter, patch);
@@ -220,7 +215,7 @@ namespace jsonschema {
         
     private:
         // Validate input JSON against a JSON Schema with a provided error reporter
-        void validate2(const Json& instance, error_listener& reporter, Json& patch) const
+        void validate2(const Json& instance, error_reporter& reporter, Json& patch) const
         {
             jsonpointer::json_pointer instance_location{};
             patch = Json(json_array_arg);
