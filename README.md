@@ -51,7 +51,7 @@ old names but continues to support many of them. The deprecated names can be sup
 
 _"Apache Kvrocks consistently utilizes jsoncons to offer support for JSON data structures to users. We find the development experience with jsoncons outstanding!"_
 
-_"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
+_"I have been using your library in my native language – R – and have created an R package making it easy for (a) JMESpath and JSONpath queries on JSON strings or R objects and (b) for other R developers to link to your library."_
 
 _"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript"_
 
@@ -61,7 +61,7 @@ _"the JSONPath feature of this library, it's great"_
 
 _"We use JMESPath implementation quite extensively"_ 
 
-_"We love your JSON Schema validator. We are using it in our data modelling tool to parse JSON Schema files"_
+_"We love your JSON Schema validator. We are using it in ER/Studio our data modelling tool to parse JSON Schema files so we can create entity relations models from them."_
 
 _"the serialization lib of choice with its beautiful mappings and ease of use"_
 
