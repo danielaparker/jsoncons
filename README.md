@@ -49,7 +49,7 @@ old names but continues to support many of them. The deprecated names can be sup
 
 ## What users say
 
-_"I am so happy I have come across your json c++ library!"_
+_"Apache Kvrocks consistently utilizes jsoncons to offer support for JSON data structures to users. We find the development experience with jsoncons outstanding!"_
 
 _"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
 
