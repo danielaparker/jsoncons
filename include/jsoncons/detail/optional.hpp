@@ -250,16 +250,20 @@ namespace detail
 
         T& value() &
         {
-            return static_cast<bool>(*this)
-                       ? get()
-                       : JSONCONS_THROW(std::runtime_error("Bad optional access")), get();
+            if (has_value_)
+            {
+                return get();
+            }
+            JSONCONS_THROW(std::runtime_error("Bad optional access"));
         }
 
-        constexpr const T& value() const &
+        JSONCONS_CONSTEXPR const T& value() const &
         {
-            return static_cast<bool>(*this)
-                       ? get()
-                       : JSONCONS_THROW(std::runtime_error("Bad optional access")), get();
+            if (has_value_)
+            {
+                return get();
+            }
+            JSONCONS_THROW(std::runtime_error("Bad optional access"));
         }
 
         template <typename U>
