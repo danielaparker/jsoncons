@@ -302,7 +302,7 @@ namespace detail
             return std::addressof(this->value_);
         }
 
-        constexpr const T& operator*() const&
+        JSONCONS_CONSTEXPR const T& operator*() const&
         {
             return value();
         }
