@@ -60,6 +60,7 @@ namespace detail {
         pointer p_;
         std::size_t length_;
         uint8_t offset_;
+        uint8_t align_pad_;
 
         ~heap_string() noexcept = default; 
 
@@ -136,16 +137,29 @@ namespace detail {
             std::size_t len = aligned_size(length*sizeof(char_type));
 
             std::size_t align = alignof(storage_type);
-            std::size_t mem_len = (align-1)+len;
-
+            char* q = nullptr;
+            char* storage = nullptr;
             byte_allocator_type byte_alloc(alloc);
-            byte_pointer ptr = byte_alloc.allocate(mem_len);
+            uint8_t align_pad = 0;
 
-            char* q = extension_traits::to_plain_pointer(ptr);
+            if (align <= 8) {
+                byte_pointer ptr = byte_alloc.allocate(len);
+                if (reinterpret_cast<uintptr_t>(ptr) % align == 0) {
+                    storage = extension_traits::to_plain_pointer(ptr);
+                    q = storage;
+                    align_pad = 0;
+                } else {
+                    byte_alloc.deallocate(ptr, len);
+                }
+            }
 
-            char* storage = align_up(q, align);
-
-            JSONCONS_ASSERT(storage >= q);
+            if (storage == nullptr) {
+                align_pad = (align-1);
+                byte_pointer ptr = byte_alloc.allocate(align_pad+len);
+                q = extension_traits::to_plain_pointer(ptr);
+                storage = align_up(q, align);
+                JSONCONS_ASSERT(storage >= q);
+            }
 
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
@@ -157,6 +171,7 @@ namespace detail {
             ps->p_ = std::pointer_traits<typename heap_string_type::pointer>::pointer_to(*p);
             ps->length_ = length;
             ps->offset_ = (uint8_t)(storage - q);
+            ps->align_pad_ = align_pad;
             return std::pointer_traits<pointer>::pointer_to(*ps);
         }
 
@@ -170,7 +185,7 @@ namespace detail {
 
                 char* p = q - ptr->offset_;
 
-                std::size_t mem_size = (alignof(storage_type)-1)+ aligned_size(ptr->length_*sizeof(char_type));
+                std::size_t mem_size = ptr->align_pad_ + aligned_size(ptr->length_*sizeof(char_type));
                 byte_allocator_type byte_alloc(ptr->get_allocator());
                 byte_alloc.deallocate(p,mem_size + ptr->offset_);
             }
