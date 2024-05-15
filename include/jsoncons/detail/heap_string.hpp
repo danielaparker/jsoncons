@@ -15,7 +15,7 @@
 #include <memory> // std::allocator
 #include <jsoncons/config/compiler_support.hpp>
 
-namespace jsoncons { 
+namespace jsoncons {
 namespace detail {
 
     inline char*
@@ -30,8 +30,8 @@ namespace detail {
     {
         Extra extra_;
         Allocator alloc_;
-    
-        Allocator& get_allocator() 
+
+        Allocator& get_allocator()
         {
             return alloc_;
         }
@@ -53,7 +53,7 @@ namespace detail {
     struct heap_string : public heap_string_base<Extra,Allocator>
     {
         using char_type = CharT;
-        using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<CharT>;  
+        using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<CharT>;
         using allocator_traits_type = std::allocator_traits<allocator_type>;
         using pointer = typename allocator_traits_type::pointer;
 
@@ -62,7 +62,7 @@ namespace detail {
         uint8_t offset_;
         uint8_t align_pad_;
 
-        ~heap_string() noexcept = default; 
+        ~heap_string() noexcept = default;
 
         const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
         const char_type* data() const { return extension_traits::to_plain_pointer(p_); }
@@ -111,10 +111,10 @@ namespace detail {
         using heap_string_type = heap_string<CharT,Extra,Allocator>;
     private:
 
-        using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;  
+        using byte_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<char>;
         using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
-        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;  
+        using heap_string_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<heap_string_type>;
     public:
         using pointer = typename std::allocator_traits<heap_string_allocator_type>::pointer;
 
@@ -144,17 +144,17 @@ namespace detail {
 
             if (align <= 8) {
                 byte_pointer ptr = byte_alloc.allocate(len);
-                if (reinterpret_cast<uintptr_t>(ptr) % align == 0) {
-                    storage = extension_traits::to_plain_pointer(ptr);
-                    q = storage;
-                    align_pad = 0;
+                q = extension_traits::to_plain_pointer(ptr);
+
+                if (reinterpret_cast<uintptr_t>(q) % align == 0) {
+                    storage = q;
                 } else {
                     byte_alloc.deallocate(ptr, len);
                 }
             }
 
             if (storage == nullptr) {
-                align_pad = (align-1);
+                align_pad = uint8_t(align-1);
                 byte_pointer ptr = byte_alloc.allocate(align_pad+len);
                 q = extension_traits::to_plain_pointer(ptr);
                 storage = align_up(q, align);
@@ -163,7 +163,7 @@ namespace detail {
 
             heap_string_type* ps = new(storage)heap_string_type(extra, byte_alloc);
 
-            auto psa = launder_cast<storage_t*>(storage); 
+            auto psa = launder_cast<storage_t*>(storage);
 
             CharT* p = new(&psa->c)char_type[length + 1];
             std::memcpy(p, s, length*sizeof(char_type));
