@@ -236,7 +236,7 @@ int main()
     }
     
     std::cout << "\n(2) Validate using reporter callback\n";
-    auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+    auto reporter = [](const jsonschema::validation_message& message) -> jsonschema::walk_result
         {
             std::cout << message.instance_location().string() << ": " << message.message() << "\n";
             return jsonschema::walk_result::advance;
