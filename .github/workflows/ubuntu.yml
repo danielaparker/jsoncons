@@ -137,48 +137,20 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
-#  clang_build_cxx20:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: install_gcc
-#      run: |
-#           sudo apt update
-#           sudo apt install clang-14
-#      shell: bash
-#    - name: cmake
-#      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON 
-#      env:
-#        CC:   clang-14
-#        CXX:  clang++-14
-#
-#    - working-directory: build/
-#      run: cmake --build . --config ubuntu-latest
-#
-#    - working-directory: build/
-#      run: ctest -C ubuntu-latest --output-on-failure
-
-#  gcc_build_48:
-#    name: GCC 4.8
-#    runs-on: ubuntu-18.04
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#      with:
-#        fetch-depth: 0
-#    - name: Install
-#      run: |
-#           sudo apt-get update -y -qq && sudo apt-get install -y -qq g++-4.8 binutils
-#      shell: bash
-#    - name: cmake
-#      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
-#      env:
-#        CC:   gcc-4.8
-#        CXX:  g++-4.8
-#    - name: build
-#      run: cmake --build build --parallel 10
-#    - name: test
-#      run: cd build ; ctest -j 10 --output-on-failure
-
+  ci_test_compilers_gcc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: ['4', '5', '6', '7', '8', '9', '10', '11', '12', 'latest']
+    container: gcc:${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@v3.27.7
+      - name: cmake
+        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      - working-directory: build/
+        run: cmake --build . --config ubuntu-latest
+      - working-directory: build/
+        run: ctest -C ubuntu-latest --output-on-failure
 
