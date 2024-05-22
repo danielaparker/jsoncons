@@ -13,6 +13,22 @@
 #include <exception>
 #include <ostream>
 
+#ifdef __GNUC__
+#   define JSONCONS_GCC_VER __GNUC__
+#   if defined(__GNUC_PATCHLEVEL__)
+#       define JSONCONS_GCC_AVAILABLE(major, minor, patch) \
+            ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) \
+            >= (major * 10000 + minor * 100 + patch))
+#   else
+#       define JSONCONS_GCC_AVAILABLE(major, minor, patch) \
+            ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) \
+            >= (major * 10000 + minor * 100 + patch))
+#   endif
+#else
+#   define JSONCONS_GCC_VER 0
+#   define JSONCONS_GCC_AVAILABLE(major, minor, patch) 0
+#endif
+
 #if defined (__clang__)
 #define JSONCONS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
@@ -364,7 +380,7 @@ namespace jsoncons {
 #if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 #if defined(__clang__) 
 #define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
-#elif (defined(__GNUC__) && (__GNUC__ == 4)) && (defined(__GNUC__) && __GNUC_MINOR__ < 9)
+#elif JSONCONS_GCC_AVAILABLE(10,0,0)
 // gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
 // and gcc doesn't support allocators with no default constructor
 #else
