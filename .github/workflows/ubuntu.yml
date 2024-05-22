@@ -171,8 +171,8 @@ jobs:
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++11 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
         working-directory: build/
-        run: cmake --build . --parallel 10 
+        run: cmake --build . 
       - name: test
         working-directory: build/
-        run: ctest -j 10 --output-on-failure
+        run: ctest --output-on-failure
 
