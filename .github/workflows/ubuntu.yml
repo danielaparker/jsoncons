@@ -149,8 +149,8 @@ jobs:
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
         run: cmake -S . -B build -DJSONCONS_HAS_STATEFUL_ALLOCATOR=0 -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
-      - working-directory: build/
-        run: cmake --build . --config ubuntu-latest
-      - working-directory: build/
-        run: ctest -C ubuntu-latest --output-on-failure
+      - name: build
+        run: cmake --build build --parallel 10
+      - name: test
+        run: cd build ; ctest -j 10 --output-on-failure
 
