@@ -19,7 +19,7 @@ TEST_CASE("json(json_object_arg, first, last)")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
-        json j(json_object_arg, m.begin(),m.end());
+        json j{{json_object_arg, m.begin(), m.end()}};
 
         REQUIRE(j.size() == 3);
         auto it = j.object_range().begin();
