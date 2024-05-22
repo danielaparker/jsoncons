@@ -3,7 +3,6 @@
 
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
-#include <common/FreeListAllocator.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 

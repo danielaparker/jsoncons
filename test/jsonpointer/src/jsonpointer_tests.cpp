@@ -14,7 +14,6 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <scoped_allocator>
 
 using namespace jsoncons;
 using namespace jsoncons::literals;
@@ -505,6 +504,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
+#include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
 
 template<typename T>

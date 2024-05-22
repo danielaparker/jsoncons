@@ -3,16 +3,17 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <common/FreeListAllocator.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <cstddef>
 #include <catch/catch.hpp>
-#include <scoped_allocator>
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 
 using namespace jsoncons;
 

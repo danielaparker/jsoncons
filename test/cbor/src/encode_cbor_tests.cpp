@@ -6,8 +6,6 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
-#include <scoped_allocator>
-#include <common/FreeListAllocator.hpp>
 #include <vector>
 #include <catch/catch.hpp>
 
@@ -182,6 +180,9 @@ TEST_CASE("encode_cbor overloads")
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;

@@ -4,13 +4,11 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
-#include <common/FreeListAllocator.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
-#include <scoped_allocator>
 
 using namespace jsoncons;
 
@@ -260,6 +258,9 @@ TEST_CASE("json_reader json lines")
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 
 TEST_CASE("json_reader stateful allocator tests")
 {

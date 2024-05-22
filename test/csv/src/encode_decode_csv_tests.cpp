@@ -5,12 +5,10 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <catch/catch.hpp>
-#include <common/FreeListAllocator.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <map>
-#include <scoped_allocator>
 #include <vector>
 
 using namespace jsoncons;
@@ -246,6 +244,9 @@ namespace { namespace ns {
 JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
 
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;

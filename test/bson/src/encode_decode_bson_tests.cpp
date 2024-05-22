@@ -3,8 +3,6 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
-#include <common/FreeListAllocator.hpp>
-#include <scoped_allocator>
 #include <vector>
 #include <catch/catch.hpp>
 
@@ -181,6 +179,9 @@ TEST_CASE("bson encode array")
 }
 
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <common/FreeListAllocator.hpp>
+#include <scoped_allocator>
 
 template<typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
