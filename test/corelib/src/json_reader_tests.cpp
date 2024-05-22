@@ -12,9 +12,6 @@
 
 using namespace jsoncons;
 
-template<typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
-
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
 {
     REQUIRE_THROWS(json::parse(text));
@@ -261,6 +258,9 @@ TEST_CASE("json_reader json lines")
 
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
+
+template<typename T>
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("json_reader stateful allocator tests")
 {
