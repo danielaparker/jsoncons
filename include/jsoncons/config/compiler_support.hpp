@@ -363,9 +363,7 @@ namespace jsoncons {
     #define JSONCONS_COPY(first,last,d_first) std::copy(first, last, d_first)
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER <= 1900 
-#define JSONCONS_CONSTEXPR
-#elif defined(JSONCONS_HAS_CP14)
+#if defined(JSONCONS_HAS_CP14)
 #define JSONCONS_CONSTEXPR constexpr
 #else
 #define JSONCONS_CONSTEXPR
@@ -382,11 +380,8 @@ namespace jsoncons {
 #endif
 
 #if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
-#if defined(__clang__) 
-#define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
+#if defined(__clang__) && !JSONCONS_CLANG_AVAILABLE(11,0,0)
 #elif defined(__GNUC__) && !JSONCONS_GCC_AVAILABLE(10,0,0)
-// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
-// and gcc doesn't support allocators with no default constructor
 #else
 #define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
 #endif
