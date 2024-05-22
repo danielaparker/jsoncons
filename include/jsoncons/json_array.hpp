@@ -167,23 +167,12 @@ namespace jsoncons {
 
         iterator erase(const_iterator pos) 
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.erase(it);
-    #else
             return elements_.erase(pos);
-    #endif
         }
 
         iterator erase(const_iterator first, const_iterator last) 
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it1 = elements_.begin() + (first - elements_.begin());
-            iterator it2 = elements_.begin() + (last - elements_.begin());
-            return elements_.erase(it1,it2);
-    #else
             return elements_.erase(first,last);
-    #endif
         }
 
         Json& operator[](std::size_t i) {return elements_[i];}
@@ -210,47 +199,26 @@ namespace jsoncons {
         typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.emplace(it, std::forward<T>(value));
-    #else
             return elements_.emplace(pos, std::forward<T>(value));
-    #endif
         }
         template <class T, class A=allocator_type>
         typename std::enable_if<!extension_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.emplace(it, std::forward<T>(value));
-    #else
             return elements_.emplace(pos, std::forward<T>(value));
-    #endif
         }
 
         template <class InputIt>
         iterator insert(const_iterator pos, InputIt first, InputIt last)
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos - elements_.begin());
-            elements_.insert(it, first, last);
-            return first == last ? it : it + 1;
-    #else
             return elements_.insert(pos, first, last);
-    #endif
         }
 
         template <class A=allocator_type, class... Args>
         typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
         emplace(const_iterator pos, Args&&... args)
         {
-    #if defined(JSONCONS_NO_VECTOR_ERASE_TAKES_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos - elements_.begin());
-            return elements_.emplace(it, std::forward<Args>(args)...);
-    #else
             return elements_.emplace(pos, std::forward<Args>(args)...);
-    #endif
         }
 
         template <class... Args>
