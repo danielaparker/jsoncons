@@ -141,14 +141,31 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['8','9','10','11','12','latest']
+        compiler: ['6','7','8','9','10','11','12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
-        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        run: cmake --build build 
+      - name: test
+        run: cd build ; ctest --output-on-failure
+
+  ci_test_compilers_gcc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: ['12','latest']
+    container: gcc:${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@v3.27.7
+      - name: cmake
+        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
         run: cmake --build build 
       - name: test
@@ -159,7 +176,7 @@ jobs:
     strategy:
       matrix:
         # compiler: ['3.5', '3.6', '3.7', '3.8', '3.9', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '15-bullseye', 'latest']
-        compiler: ['3.9', '4', '5', '6', '7','8','9', '10', '11', '12', '13', '15-bullseye']
+        compiler: ['3.9', '4', '5', '6', '7','8','9', '10', '11', '12', '13', '14', '15-bullseye']
     container: silkeh/clang:${{ matrix.compiler }}
     steps:
       - name: Install unzip and git
@@ -168,7 +185,28 @@ jobs:
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
-        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++11 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
+      - name: build
+        working-directory: build/
+        run: cmake --build . 
+      - name: test
+        working-directory: build/
+        run: ctest --output-on-failure
+
+  ci_test_compilers_clang:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: ['13', '15-bullseye']
+    container: silkeh/clang:${{ matrix.compiler }}
+    steps:
+      - name: Install unzip and git
+        run: apt-get update ; apt-get install -y unzip git
+      - uses: actions/checkout@v3
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@v3.27.7
+      - name: cmake
+        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
         working-directory: build/
         run: cmake --build . 
