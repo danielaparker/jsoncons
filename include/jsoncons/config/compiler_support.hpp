@@ -380,7 +380,7 @@ namespace jsoncons {
 #if !defined(JSONCONS_HAS_STATEFUL_ALLOCATOR)
 #if defined(__clang__) 
 #define JSONCONS_HAS_STATEFUL_ALLOCATOR 1
-#elif JSONCONS_GCC_AVAILABLE(10,0,0)
+#elif !JSONCONS_GCC_AVAILABLE(10,0,0)
 // gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
 // and gcc doesn't support allocators with no default constructor
 #else
