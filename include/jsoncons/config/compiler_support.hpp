@@ -365,8 +365,10 @@ namespace jsoncons {
 
 #if defined(_MSC_VER) && _MSC_VER <= 1900 
 #define JSONCONS_CONSTEXPR
-#else
+#elif defined(JSONCONS_HAS_CP14)
 #define JSONCONS_CONSTEXPR constexpr
+#else
+#define JSONCONS_CONSTEXPR
 #endif
 
 #if !defined(JSONCONS_HAS_STD_REGEX)
