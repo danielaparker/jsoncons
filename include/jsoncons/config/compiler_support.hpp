@@ -23,12 +23,17 @@
             ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) \
             >= (major * 10000 + minor * 100 + patch))
 #   endif
+#   else
+#       define JSONCONS_GCC_AVAILABLE(major, minor, patch) 0
+#endif
 
 #if defined(__clang__)
-#       define JSONCONS_CLANG_AVAILABLE(major, minor, patch) \
+#   define JSONCONS_CLANG_AVAILABLE(major, minor, patch) \
             ((__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) \
             >= (major * 10000 + minor * 100 + patch))
-#   endif
+#   else
+#       define JSONCONS_CLANG_AVAILABLE(major, minor, patch) 0
+#endif
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
