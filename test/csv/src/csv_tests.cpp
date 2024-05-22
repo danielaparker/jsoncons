@@ -17,9 +17,6 @@
 
 using namespace jsoncons;
 
-template<typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
-
 TEST_CASE("csv subfield delimiter tests")
 {
     SECTION("n_objects tests")
@@ -1504,6 +1501,9 @@ TEST_CASE("csv detect bom")
 #include <common/FreeListAllocator.hpp>
 #include <scoped_allocator>
  
+template<typename T>
+using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+
 TEST_CASE("csv_reader constructors")
 {
     const std::string input = R"(Date,1Y,2Y,3Y,5Y

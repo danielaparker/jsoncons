@@ -8,11 +8,6 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include "FreeListAllocator.hpp"
-#include <scoped_allocator>
-
-template<typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 // for brevity
 using jsoncons::json; 
