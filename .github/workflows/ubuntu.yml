@@ -141,14 +141,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: ['9.5','10','11','12','latest']
+        compiler: ['9','10','11','12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
-        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+        run: cmake -S . -B build -DJSONCONS_HAS_STATEFUL_ALLOCATOR=0 -DJSONCONS_SANITIZE=ON -DLLVM_CXX_STD=c++17 -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - working-directory: build/
         run: cmake --build . --config ubuntu-latest
       - working-directory: build/
