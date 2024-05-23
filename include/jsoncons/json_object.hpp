@@ -214,6 +214,36 @@ namespace jsoncons {
         }
     };
 
+    // Structured Bindings Support
+    // See https://blog.tartanllama.xyz/structured-bindings/
+    template<std::size_t N, class Key, class Value, typename std::enable_if<N == 0, int>::type = 0>
+    auto get(const key_value<Key,Value>& i) -> decltype(i.key())
+    {
+        return i.key();
+    }
+    // Structured Bindings Support
+    // See https://blog.tartanllama.xyz/structured-bindings/
+    template<std::size_t N, class Key, class Value, typename std::enable_if<N == 1, int>::type = 0>
+    auto get(const key_value<Key,Value>& i) -> decltype(i.value())
+    {
+        return i.value();
+    }
+
+} // jsoncons
+
+namespace std
+{
+    template<class Key, class Value>
+    class tuple_size<jsoncons::key_value<Key,Value>>
+        : public std::integral_constant<std::size_t, 2> {};
+
+    template<class Key, class Value> struct tuple_element<0, jsoncons::key_value<Key,Value>> { using type = Key; };
+    template<class Key, class Value> struct tuple_element<1, jsoncons::key_value<Key,Value>> { using type = Value; };
+
+}  // namespace std
+
+namespace jsoncons {
+
     template <class KeyT, class ValueT>
     struct get_key_value
     {

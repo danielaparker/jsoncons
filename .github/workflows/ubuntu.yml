@@ -6,6 +6,38 @@ permissions:
   contents: read
 
 jobs:
+  github_default_compiler: 
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - g++-9
+          - g++-10
+          - g++-11
+          - g++-12
+          - clang++-13
+          - clang++-14
+        build_type: [Debug, Release]
+
+    runs-on: ubuntu-latest
+
+    env:
+      CXX: ${{ matrix.compiler }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: cmake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
+      env:
+        CC:   gcc-10
+        CXX:  g++-10
+
+    - working-directory: build/
+      run: cmake --build . --config ubuntu-latest
+
+    - working-directory: build/
+      run: ctest -C ubuntu-latest --output-on-failure
+
   gcc_build:
     runs-on: ubuntu-latest
 
@@ -150,9 +182,11 @@ jobs:
       - name: cmake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
-        run: cmake --build build 
+        working-directory: build/
+        run: cmake --build . 
       - name: test
-        run: cd build ; ctest --output-on-failure
+        working-directory: build/
+        run: ctest --output-on-failure
 
   ci_test_compilers_gcc2:
     runs-on: ubuntu-latest
@@ -167,9 +201,11 @@ jobs:
       - name: cmake
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
-        run: cmake --build build 
+        working-directory: build/
+        run: cmake --build . 
       - name: test
-        run: cd build ; ctest --output-on-failure
+        working-directory: build/
+        run: ctest --output-on-failure
 
   ci_test_compilers_clang:
     runs-on: ubuntu-latest
