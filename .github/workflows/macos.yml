@@ -8,11 +8,12 @@ permissions:
 jobs:
 
   xcode_1:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         xcode: ['11','12','13','14']
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v3
         with:
