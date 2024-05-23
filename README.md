@@ -726,9 +726,9 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 | Compiler                | Version                            | Architecture | Operating System | CI Service     |  
 |-------------------------|------------------------------------|--------------|------------------|----------------|
 | Visual Studio           | vs2019                             | x64          | Windows 10       | GitHub Actions |
-|                         | vs2022                             | x64          | Windows 10       |                |
+|                         | vs2022                             | x64          | Windows 10       | GitHub Actions |
 | Visual Studio - clang   | vs2019                             | x64          | Windows 10       | GitHub Actions |
-|                         | vs2022                             | x64          | Windows 10       |                |
+|                         | vs2022                             | x64          | Windows 10       | GitHub Actions |
 | g++                     | 10, 11                             | x64          | Ubuntu           | GitHub Actions |
 | g++                     | 6, 7, 8, 9, 10, 11, 12                             | x64          | Ubuntu           | circleci       |
 | clang                   | 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15                        | x64          | Ubuntu           | circleci       |
