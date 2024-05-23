@@ -39,7 +39,7 @@ TEST_CASE("jsoncons::detail::span constructor tests")
     }
     SECTION("jsoncons::detail::span(std::array)")
     {
-        std::array<double,4> c = {1,2,3,4};
+        std::array<double,4> c = {{1,2,3,4}};
 
         jsoncons::detail::span<double> s(c);
         CHECK(s.size() == 4);
