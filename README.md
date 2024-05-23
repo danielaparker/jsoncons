@@ -723,17 +723,16 @@ jsoncons requires a compiler with C++11 support. It is tested in continuous inte
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
-| Compiler                | Version                   |Architecture | Operating System  | Notes |
-|-------------------------|---------------------------|-------------|-------------------|-------|
-| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
-|                         | vs2017                    | x86,x64     | Windows 10        |       |
-|                         | vs2019                    | x86,x64     | Windows 10        |       |
-| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
-|                         | 4.9.2                     | i386        | Debian 8          |       |
-| clang                   | 4.0, 5.0, 6.0, 7, 8, 9, 10| x64         | Ubuntu            |       |
-| clang xcode             | 9.3, 9.4, 10, 10.1, 10.2, 11.2, 12 | x64         | OSX               |       |
+| Compiler                | Version                            | Architecture | Operating System | CI Service     |  
+|-------------------------|------------------------------------|--------------|------------------|----------------|
+| Visual Studio           | vs2019                             | x64          | Windows 10       | GitHub Actions |
+|                         | vs2022                             | x64          | Windows 10       |                |
+| Visual Studio - clang   | vs2019                             | x64          | Windows 10       | GitHub Actions |
+|                         | vs2022                             | x64          | Windows 10       |                |
+| g++                     | 10, 11                             | x64          | Ubuntu           | GitHub Actions |
+| g++                     | 6 - 12                             | x64          | Ubuntu           | circleci       |
+| clang                   | 3.9, 4 - 15                        | x64          | Ubuntu           | circleci       |
+| clang xcode             |                                    | x64          | OSX              | GitHub Actions |
 
 ## Building the test suite and examples with CMake
 
