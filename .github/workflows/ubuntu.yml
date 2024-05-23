@@ -6,16 +6,12 @@ permissions:
   contents: read
 
 jobs:
-  github_default_compiler: 
+  github_20: 
     strategy:
       fail-fast: false
       matrix:
         compiler:
-          - g++-9
-          - g++-10
-          - g++-11
           - g++-12
-          - clang++-13
           - clang++-14
         build_type: [Debug, Release]
 
@@ -27,10 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: cmake
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
-      env:
-        CC:   gcc-10
-        CXX:  g++-10
+      run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On
 
     - working-directory: build/
       run: cmake --build . --config ubuntu-latest
