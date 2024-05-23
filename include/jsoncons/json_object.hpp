@@ -234,7 +234,7 @@ namespace jsoncons {
 namespace std
 {
     template<class Key, class Value>
-    class tuple_size<jsoncons::key_value<Key,Value>>
+    struct tuple_size<jsoncons::key_value<Key,Value>>
         : public std::integral_constant<std::size_t, 2> {};
 
     template<class Key, class Value> struct tuple_element<0, jsoncons::key_value<Key,Value>> { using type = Key; };
