@@ -148,7 +148,7 @@ add_executable(unit_tests
                corelib/src/json_in_place_update_tests.cpp
                corelib/src/json_integer_tests.cpp
                corelib/src/json_less_tests.cpp
-               ccorelib/src/json_line_split_tests.cpp
+               corelib/src/json_line_split_tests.cpp
                corelib/src/json_literal_operator_tests.cpp
                corelib/src/json_object_tests.cpp
                corelib/src/ojson_object_tests.cpp
@@ -165,7 +165,7 @@ add_executable(unit_tests
                corelib/src/json_traits_macro_functional_tests.cpp
                corelib/src/json_traits_macro_tests.cpp
                corelib/src/json_traits_macro_limit_tests.cpp
-               ccorelib/src/json_traits_name_macro_tests.cpp
+               corelib/src/json_traits_name_macro_tests.cpp
                corelib/src/json_type_traits_chrono_tests.cpp
                corelib/src/json_type_traits_container_tests.cpp
                corelib/src/json_type_traits_tests.cpp
@@ -182,7 +182,7 @@ add_executable(unit_tests
                corelib/src/polymorphic_allocator_tests.cpp
                corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/string_to_double_tests.cpp
-               ccorelib/src/unicode_conv_tests.cpp
+               corelib/src/unicode_conv_tests.cpp
                corelib/src/wjson_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
