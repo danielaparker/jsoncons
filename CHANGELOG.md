@@ -1,3 +1,30 @@
+0.176.0 (pre-release, on master)
+-------
+
+Compiler support
+
+- Update to [Supported compilers](https://github.com/danielaparker/jsoncons?tab=readme-ov-file#supported-compilers)
+documentation to accurately reflect the compilers that currently in continuous integration testing. 
+
+- Support for some ancient compilers, in particular g++ 4.8 and 4.9, has been dropped. 
+
+- We (and users) have seen some compilation errors with tests of `std::scoped_allocator_adaptor` using our sample stateful allocator `FreeListAllocator`
+in versions of clang predating version 11, and versions of g++ predating version 10. We've therefore excluded these tests when testing with
+these older compilers.
+
+Enhancements
+
+- `basic_json` now supports using C++ 17 structured binding, so you can write
+
+```
+for (const auto& [key, value] : j.object_range())
+{
+    std::cout << key << " => " << value << std::endl;
+}
+```
+
+-  Addressed issue #509 of over allocating memory due to alignment constraints through pr #510
+
 0.175.0
 -------
 

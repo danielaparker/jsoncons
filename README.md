@@ -725,15 +725,16 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 
 | Compiler                | Version                            | Standard     | Architecture | Operating System | CI Service     |  
 |-------------------------|------------------------------------|--------------|--------------|------------------|----------------|
-| Visual Studio           | vs2019                             | default      | x86, x64     | Windows 10       | GitHub Actions |
-|                         | vs2022                             | default      | x86, x64     | Windows 10       | GitHub Actions |
-| Visual Studio - clang   | vs2019                             | default      | x86, x64     | Windows 10       | GitHub Actions |
-|                         | vs2022                             | default      | x86, x64     | Windows 10       | GitHub Actions |
+| Visual Studio           | vs2019                             | default      | x86, x64     | Windows 11       | GitHub Actions |
+|                         | vs2022                             | default      | x86, x64     | Windows 11       | GitHub Actions |
+| Visual Studio - clang   | vs2019                             | default      | x86, x64     | Windows 11       | GitHub Actions |
+|                         | vs2022                             | default      | x86, x64     | Windows 11       | GitHub Actions |
 | g++                     | 6, 7, 8, 9, 10, 11, 12             | default      | x64          | Ubuntu           | circleci       |
 | g++                     | 12                                 | c++20        | x64          | Ubuntu           | GitHub Actions |
 | clang                   | 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15     | default      | x64          | Ubuntu           | circleci       |
 | clang                   | 14                                 | c++20        | x64          | Ubuntu           | GitHub Actions |
-| clang xcode             |                                    | c++17        | x64          | OSX              | GitHub Actions |
+| clang xcode             | 11, 12, 13                         | default      | x64          | OSX 11           | GitHub Actions |
+| clang xcode             | 13, 14                             | default      | x64          | OSX 12           | GitHub Actions |
 
 ## Building the test suite and examples with CMake
 

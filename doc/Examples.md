@@ -3533,8 +3533,13 @@ json j(json_object_arg, {
 
 for (const auto& member : j.object_range())
 {
-    std::cout << member.key() << "=" 
-              << member.value() << std::endl;
+    std::cout << member.key() << " => " << member.value() << std::endl;
+}
+
+// or, since 0.176.0, using C++ 17 structured binding
+for (const auto& [key, value] : j.object_range())
+{
+    std::cout << key << " => " << value << std::endl;
 }
 ```
 

@@ -199,6 +199,14 @@ void object_range_based_for_loop()
     {
         std::cout << member.key() << " => " << member.value().as<std::string>() << std::endl;
     }
+
+#if defined(JSONCONS_HAS_2017)
+    // or, since 0.176.0, using C++ 17 structured binding
+    for (const auto& [key, value] : j.object_range())
+    {
+        std::cout << key << " => " << value << std::endl;
+    }
+#endif    
 }
 
 void validation_example()
