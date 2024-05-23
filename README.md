@@ -723,16 +723,17 @@ jsoncons requires a compiler with minimally C++11 support. It is tested in conti
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
-| Compiler                | Version                            | Architecture | Operating System | CI Service     |  
-|-------------------------|------------------------------------|--------------|------------------|----------------|
-| Visual Studio           | vs2019                             | x64          | Windows 10       | GitHub Actions |
-|                         | vs2022                             | x64          | Windows 10       | GitHub Actions |
-| Visual Studio - clang   | vs2019                             | x64          | Windows 10       | GitHub Actions |
-|                         | vs2022                             | x64          | Windows 10       | GitHub Actions |
-| g++                     | 10, 11                             | x64          | Ubuntu           | GitHub Actions |
-| g++                     | 6, 7, 8, 9, 10, 11, 12                             | x64          | Ubuntu           | circleci       |
-| clang                   | 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15                        | x64          | Ubuntu           | circleci       |
-| clang xcode             |                                    | x64          | OSX              | GitHub Actions |
+| Compiler                | Version                            | Standard     | Architecture | Operating System | CI Service     |  
+|-------------------------|------------------------------------|--------------|--------------|------------------|----------------|
+| Visual Studio           | vs2019                             | default      | x86, x64     | Windows 10       | GitHub Actions |
+|                         | vs2022                             | default      | x86, x64     | Windows 10       | GitHub Actions |
+| Visual Studio - clang   | vs2019                             | default      | x86, x64     | Windows 10       | GitHub Actions |
+|                         | vs2022                             | default      | x86, x64     | Windows 10       | GitHub Actions |
+| g++                     | 10, 11                             | c++17        | x64          | Ubuntu           | GitHub Actions |
+| clang                   | 13, 14                             | default      | x64          | Ubuntu           | GitHub Actions |
+| g++                     | 6, 7, 8, 9, 10, 11, 12             | default      | x64          | Ubuntu           | circleci       |
+| clang                   | 3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15     | default      | x64          | Ubuntu           | circleci       |
+| clang xcode             |                                    | c++17        | x64          | OSX              | GitHub Actions |
 
 ## Building the test suite and examples with CMake
 
