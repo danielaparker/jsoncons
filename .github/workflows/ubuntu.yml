@@ -154,7 +154,7 @@ jobs:
       - name: test
         run: cd build ; ctest --output-on-failure
 
-  ci_test_compilers_gcc:
+  ci_test_compilers_gcc2:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -193,7 +193,7 @@ jobs:
         working-directory: build/
         run: ctest --output-on-failure
 
-  ci_test_compilers_clang:
+  ci_test_compilers_clang2:
     runs-on: ubuntu-latest
     strategy:
       matrix:
