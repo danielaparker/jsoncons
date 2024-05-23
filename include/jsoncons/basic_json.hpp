@@ -897,7 +897,7 @@ namespace jsoncons {
         };
 #if defined(__GNUC__)
         #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+        #pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
 
         // array_storage
