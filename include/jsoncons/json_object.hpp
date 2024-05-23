@@ -233,12 +233,22 @@ namespace jsoncons {
 
 namespace std
 {
+#if defined(__clang__)
+    // Fix: https://github.com/nlohmann/json/issues/1401
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wmismatched-tags"
+#endif
+
     template<class Key, class Value>
     struct tuple_size<jsoncons::key_value<Key,Value>>
         : public std::integral_constant<std::size_t, 2> {};
 
     template<class Key, class Value> struct tuple_element<0, jsoncons::key_value<Key,Value>> { using type = Key; };
     template<class Key, class Value> struct tuple_element<1, jsoncons::key_value<Key,Value>> { using type = Value; };
+
+#if defined(__clang__)
+    #pragma clang diagnostic pop
+#endif
 
 }  // namespace std
 
