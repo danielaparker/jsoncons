@@ -895,6 +895,10 @@ namespace jsoncons {
                 return ptr_->get_allocator();
             }
         };
+#if defined(__GNUC__)
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 
         // array_storage
         class array_storage final
@@ -1209,6 +1213,10 @@ namespace jsoncons {
                 std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
             }
         };
+#if defined(__GNUC__)
+        #pragma GCC diagnostic pop
+#endif
+
     private:
         class json_const_pointer_storage final
         {

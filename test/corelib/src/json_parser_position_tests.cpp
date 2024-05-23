@@ -106,8 +106,10 @@ namespace {
 
         bool visit_key(const string_view_type& key, const ser_context&, std::error_code&) override
         {
-            JSONCONS_ASSERT(!current_.empty());
-            current_.back() = "'"+std::string(key)+"'";
+            if (!current_.empty())
+            {
+                current_.back() = std::string("'")  + std::string(key) + std::string("'");
+            }
             check = false;
             return true;
         }
