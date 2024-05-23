@@ -157,7 +157,7 @@ TEST_CASE("convert_map_test")
 
 TEST_CASE("convert_array_test")
 {
-    std::array<double,4> v{1,2,3,4};
+    std::array<double,4> v{{1,2,3,4}};
 
     std::string s;
     jsoncons::encode_json(v,s);
