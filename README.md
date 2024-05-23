@@ -719,7 +719,7 @@ string_value: 1.23456789012345678901234567890 (bigdec)
 
 ## Supported compilers
 
-jsoncons requires a compiler with C++11 support. It is tested in continuous integration on [Github Actions](https://github.com/danielaparker/jsoncons/actions), [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+jsoncons requires a compiler with minimally C++11 support. It is tested in continuous integration on [Github Actions](https://github.com/danielaparker/jsoncons/actions) and [circleci](https://app.circleci.com/pipelines/circleci/EFpnYcrBiZEvYvns3VF4vT).
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
