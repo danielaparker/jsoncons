@@ -63,7 +63,7 @@ class basic_cbor_parser : public ser_context
         byte_string_type bytes;
 
         mapped_string(const string_type& str, const allocator_type& alloc = allocator_type())
-            : type(jsoncons::cbor::detail::cbor_major_type::text_string), str(str.c_str(),str.size(),alloc), bytes(alloc)
+            : type(jsoncons::cbor::detail::cbor_major_type::text_string), str(str.c_str(), str.size(), alloc), bytes(alloc)
         {
         }
 

@@ -391,7 +391,7 @@ namespace jsoncons {
             members_.reserve(count);
             for (auto s = first; s != last; ++s)
             {
-                members_.emplace_back(key_type(s->first.c_str(),s->first.size(),get_allocator()), s->second);
+                members_.emplace_back(key_type(s->first.c_str(), s->first.size(), get_allocator()), s->second);
             }
             std::stable_sort(members_.begin(), members_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
@@ -534,13 +534,13 @@ namespace jsoncons {
                 auto last = first + count;
 
                 std::sort(first, last, compare);
-                members_.emplace_back(key_type(first->name.c_str(),first->name.size(),get_allocator()), std::move(first->value));
+                members_.emplace_back(key_type(first->name.c_str(), first->name.size(), get_allocator()), std::move(first->value));
                 auto prev_it = first;
                 for (auto it = first+1; it != last; ++it)
                 {
                     if (it->name != prev_it->name)
                     {
-                        members_.emplace_back(key_type(it->name.c_str(),it->name.size(),get_allocator()), std::move(it->value));
+                        members_.emplace_back(key_type(it->name.c_str(), it->name.size(), get_allocator()), std::move(it->value));
                     }
                     ++prev_it;
                 }
@@ -552,7 +552,7 @@ namespace jsoncons {
         {
             for (auto s = first; s != last; ++s)
             {
-                members_.emplace_back(key_type(s->first.c_str(),s->first.size(),get_allocator()), s->second);
+                members_.emplace_back(key_type(s->first.c_str(), s->first.size(), get_allocator()), s->second);
             }
             std::stable_sort(members_.begin(),members_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
