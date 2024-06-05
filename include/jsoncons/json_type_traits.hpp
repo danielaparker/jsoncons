@@ -127,7 +127,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
     template<class Json, class T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        extension_traits::is_list_like<T>::value && 
+        extension_traits::is_array_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
@@ -1642,7 +1642,7 @@ namespace variant_detail
                     {
                         auto sv = j.as_string_view();
                         Rep n{0};
-                        auto result = jsoncons::detail::to_integer_decimal(sv.data(), sv.size(), n);
+                        auto result = jsoncons::detail::decimal_to_integer(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();

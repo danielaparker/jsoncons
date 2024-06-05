@@ -775,7 +775,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{ 0 };
-            auto r = jsoncons::detail::base16_to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::detail::hex_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -787,7 +787,7 @@ private:
         if (!more) return more;
 
         int64_t val{ 0 };
-        auto r = jsoncons::detail::base16_to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::detail::hex_to_integer(s.data(),s.length(), val);
         if (r)
         {
             more = visit_int64(val, semantic_tag::none, context, ec);

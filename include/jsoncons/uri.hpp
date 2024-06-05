@@ -519,7 +519,7 @@ namespace jsoncons {
                     auto hex = encoded.substr(i + 1, 2);
 
                     uint8_t n;
-                    jsoncons::detail::to_integer_base16(hex.data(), hex.size(), n);
+                    jsoncons::detail::hex_to_integer(hex.data(), hex.size(), n);
                     decoded.push_back((char)n);
                     i += 3;
                 }

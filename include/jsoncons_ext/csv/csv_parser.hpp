@@ -2023,7 +2023,7 @@ private:
                 if (is_negative)
                 {
                     int64_t val{ 0 };
-                    auto result = jsoncons::detail::to_integer_decimal(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         more_ = visitor_->int64_value(val, semantic_tag::none, *this, ec);
@@ -2036,7 +2036,7 @@ private:
                 else
                 {
                     uint64_t val{ 0 };
-                    auto result = jsoncons::detail::to_integer_decimal(buffer_.data(), buffer_.length(), val);
+                    auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
                         more_ = visitor_->uint64_value(val, semantic_tag::none, *this, ec);

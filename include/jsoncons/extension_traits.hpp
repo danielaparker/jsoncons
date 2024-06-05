@@ -541,13 +541,13 @@ namespace extension_traits {
     template<class E, std::size_t N>
     struct is_std_array<std::array<E, N>> : std::true_type {};
 
-    // is_list_like
+    // is_array_like
 
     template <class T, class Enable=void>
-    struct is_list_like : std::false_type {};
+    struct is_array_like : std::false_type {};
 
     template <class T>
-    struct is_list_like<T, 
+    struct is_array_like<T, 
                           typename std::enable_if<is_detected<container_value_type_t,T>::value &&
                                                   is_detected<container_allocator_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
@@ -704,7 +704,7 @@ namespace impl {
     struct is_typed_array
     <
         T, 
-        typename std::enable_if<is_list_like<T>::value && 
+        typename std::enable_if<is_array_like<T>::value && 
                                 (std::is_same<typename std::decay<typename T::value_type>::type,uint8_t>::value ||  
                                  std::is_same<typename std::decay<typename T::value_type>::type,uint16_t>::value ||
                                  std::is_same<typename std::decay<typename T::value_type>::type,uint32_t>::value ||
