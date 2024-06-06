@@ -31,7 +31,8 @@ namespace {
         return json::parse(is);
     }
 
-    void jsonschema_tests(const std::string& fpath)
+    void jsonschema_tests(const std::string& fpath,
+        jsonschema::evaluation_options options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()))
     {
         std::fstream is(fpath);
         if (!is)
@@ -101,7 +102,9 @@ TEST_CASE("jsonschema draft7 tests")
 {
     SECTION("issues")
     {
-        //jsonschema_tests("./jsonschema/issues/draft7/issue-content.json");
+        jsonschema_tests("./jsonschema/issues/draft7/issue-520.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
     }
     SECTION("tests")
     {

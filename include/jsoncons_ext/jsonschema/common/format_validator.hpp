@@ -1046,7 +1046,7 @@ namespace jsonschema {
                 return result;
             }
         }
-        return walk_result::abort;
+        return walk_result::advance;
     }
 
     inline
@@ -1088,7 +1088,7 @@ namespace jsonschema {
                 return result;
             }
         }
-        return walk_result::abort;
+        return walk_result::advance;
     } 
 
     inline
@@ -1130,7 +1130,7 @@ namespace jsonschema {
                 return result;
             }
         }
-        return walk_result::abort;
+        return walk_result::advance;
     } 
 
     inline
@@ -1151,7 +1151,7 @@ namespace jsonschema {
                 return result;
             }
         }
-        return walk_result::abort;
+        return walk_result::advance;
     } 
 
     inline
@@ -1178,7 +1178,7 @@ namespace jsonschema {
             }
         }
 #endif
-        return walk_result::abort;
+        return walk_result::advance;
     } 
 
 } // namespace jsonschema

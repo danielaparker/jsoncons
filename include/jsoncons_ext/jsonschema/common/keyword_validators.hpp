@@ -415,7 +415,7 @@ namespace jsonschema {
                 walk_result result = format_check_(this_context.eval_path(), this->schema_location(), instance_location, s, reporter);
                 if (result == walk_result::abort)
                 {
-                    return walk_result::abort;
+                    return result;
                 }
             }
             return walk_result::advance;
@@ -2024,7 +2024,7 @@ namespace jsonschema {
                     "'" + instance.template as<std::string>() + "' is not a valid enum value."));
                 if (result == walk_result::abort)
                 {
-                    return walk_result::abort;
+                    return result;
                 }
             }
             return walk_result::advance;
