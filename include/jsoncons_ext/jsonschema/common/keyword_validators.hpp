@@ -2175,7 +2175,7 @@ namespace jsonschema {
                         }
                         break;
                     case json_schema_type::string:  // OK
-                        if (instance.is_string())
+                        if (instance.is_string() && instance.tag() != semantic_tag::bigint)
                         {
                             is_type_found = true;
                         }
@@ -2187,12 +2187,18 @@ namespace jsonschema {
                         }
                         break;
                     case json_schema_type::integer:
-                        if (instance.is_number())
+                        std::cout << instance << ", " << instance.tag() << "\n";
+                        if (instance.is_int64() || instance.is_uint64())
                         {
-                            if (instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>()))
-                            {
-                                is_type_found = true;
-                            }
+                            is_type_found = true;
+                        }
+                        else if (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())
+                        {
+                            is_type_found = true;
+                        }
+                        else if (instance.is_string() && instance.tag() == semantic_tag::bigint)
+                        {
+                            is_type_found = true;
                         }
                         break;
                     case json_schema_type::number:

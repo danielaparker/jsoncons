@@ -108,6 +108,7 @@ TEST_CASE("jsonschema draft2020-12 tests")
         //    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft202012()).
         //        require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/vocabulary.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft2020-12/optional/bignum.json");
     }
 //#if 0
     SECTION("more_tests")
