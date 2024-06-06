@@ -51,8 +51,7 @@ namespace {
             try
             {
                 jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(test_group.at("schema"), resolver, 
-                    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7())
-                    .require_format_validation(true));
+                    options);
 
                 int count_test = 0;
                 for (const auto& test_case : test_group["tests"].array_range()) 
@@ -160,21 +159,37 @@ TEST_CASE("jsonschema draft7 tests")
 
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/uniqueItems.json"); 
         // format tests
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json"); 
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/date-time.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true)); 
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/ecmascript-regex.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/email.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/hostname.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/email.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/hostname.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/idn-email.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/idn-hostname.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/ipv4.json"); 
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/ipv6.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/ipv4.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true)); 
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/ipv6.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/iri.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/iri-reference.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/json-pointer.json");
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/json-pointer.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/regex.json");
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/relative-json-pointer.json");
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json"); 
+        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/time.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true)); 
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri.json"); // REVISIT
  
         //jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/optional/format/uri.json");
