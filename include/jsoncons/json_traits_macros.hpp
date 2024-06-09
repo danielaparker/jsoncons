@@ -291,7 +291,6 @@ namespace jsoncons \
     struct json_type_traits<Json, ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         using class_type = ClassType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
-        static_assert(std::is_default_constructible<class_type>::value, #ClassType " is not default constructible"); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
