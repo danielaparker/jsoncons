@@ -225,65 +225,6 @@ public:
         return staj_filter_view(cursor, pred);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_cbor_cursor(Sourceable&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator& alloc = Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc), 
-         cursor_visitor_(filter), 
-         cursor_handler_adaptor_(cursor_visitor_, alloc),
-         eof_(false)
-    {
-        if (!done())
-        {
-            next();
-        }
-    }
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_cbor_cursor(Sourceable&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      std::error_code& ec)
-        : basic_cbor_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Sourceable>(source), filter, ec)
-    {
-    }
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_cbor_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Sourceable&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      std::error_code& ec)
-       : parser_(std::forward<Sourceable>(source), alloc), 
-         cursor_visitor_(filter),
-         cursor_handler_adaptor_(cursor_visitor_, alloc),
-         eof_(false)
-    {
-        if (!done())
-        {
-            next(ec);
-        }
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
-    void read(basic_json_visitor<char_type>& visitor)
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
-    void read(basic_json_visitor<char_type>& visitor,
-                 std::error_code& ec) 
-    {
-        read_to(visitor, ec);
-    }
-#endif
 private:
     static bool accept_all(const staj_event&, const ser_context&) 
     {

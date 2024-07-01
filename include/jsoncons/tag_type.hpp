@@ -24,16 +24,6 @@ struct temp_allocator_arg_t
 
 constexpr temp_allocator_arg_t temp_allocator_arg{};
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-struct result_allocator_arg_t
-{
-    explicit result_allocator_arg_t() = default; 
-};
-
-constexpr result_allocator_arg_t result_allocator_arg{};
-#endif
-
 struct half_arg_t
 {
     explicit half_arg_t() = default; 
@@ -92,13 +82,6 @@ enum class semantic_tag : uint8_t
     id = 0x12,
     regex = 0x13,
     code = 0x14
-#if !defined(JSONCONS_NO_DEPRECATED)
-    , big_integer = bigint
-    , big_decimal = bigdec
-    , big_float = bigfloat
-    , date_time = datetime
-    , timestamp = epoch_second
-#endif
 };
 
 template <class CharT>
@@ -236,12 +219,6 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     }
     return os;
 }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
-    JSONCONS_DEPRECATED_MSG("Instead, use byte_string_arg_t") typedef byte_string_arg_t bstr_arg_t;
-    constexpr byte_string_arg_t bstr_arg{};
-#endif
 
 }
 

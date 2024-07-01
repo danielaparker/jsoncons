@@ -338,11 +338,6 @@ namespace jsoncons { namespace csv {
     using csv_stream_reader = basic_csv_reader<char,stream_source<char>>;
     using wcsv_stream_reader = basic_csv_reader<wchar_t,stream_source<wchar_t>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use csv_string_reader or csv_stream_reader") typedef legacy_basic_csv_reader<char> csv_reader;
-    JSONCONS_DEPRECATED_MSG("Instead, use wcsv_string_reader or wcsv_stream_reader") typedef legacy_basic_csv_reader<wchar_t> wcsv_reader;
-#endif
-
 }}
 
 #endif

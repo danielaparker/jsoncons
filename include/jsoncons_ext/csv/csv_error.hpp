@@ -24,10 +24,6 @@ namespace jsoncons { namespace csv {
         unexpected_char_between_fields
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_errc") typedef csv_errc csv_parser_errc;
-#endif
-
 class csv_error_category_impl
    : public std::error_category
 {

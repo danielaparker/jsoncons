@@ -490,14 +490,5 @@ private:
 using ubjson_stream_encoder = basic_ubjson_encoder<jsoncons::binary_stream_sink>;
 using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class Sink=jsoncons::binary_stream_sink>
-using basic_ubjson_serializer = basic_ubjson_encoder<Sink>; 
-
-JSONCONS_DEPRECATED_MSG("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use ubjson_bytes_encoder") typedef ubjson_bytes_encoder ubjson_buffer_serializer;
-#endif
-
 }}
 #endif

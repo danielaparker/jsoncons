@@ -33,32 +33,6 @@ public:
         return *destination_;
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use destination()")
-    basic_json_visitor<char_type>& to_handler()
-    {
-        return destination_;
-    }
-    JSONCONS_DEPRECATED_MSG("Instead, use destination") 
-    basic_json_visitor<char_type>& input_handler()
-    {
-        return destination_;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use destination") 
-    basic_json_visitor<char_type>& downstream_handler()
-    {
-        return destination_;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use destination") 
-    basic_json_visitor<char_type>& destination_handler()
-    {
-        return destination_;
-    }
-#endif
-
 private:
     void visit_flush() override
     {
@@ -629,17 +603,6 @@ using json_filter = basic_json_filter<char>;
 using wjson_filter = basic_json_filter<wchar_t>;
 using rename_object_key_filter = basic_rename_object_key_filter<char>;
 using wrename_object_key_filter = basic_rename_object_key_filter<wchar_t>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-template <class CharT>
-using basic_json_content_filter = basic_json_filter<CharT>;
-JSONCONS_DEPRECATED_MSG("Instead, use json_filter") typedef basic_json_filter<char> json_content_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_filter") typedef basic_json_filter<wchar_t> wjson_content_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use rename_object_key_filter") typedef basic_rename_object_key_filter<char> rename_name_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_key_filter") typedef basic_rename_object_key_filter<wchar_t> wrename_name_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use rename_object_key_filter") typedef basic_rename_object_key_filter<char> rename_object_member_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_key_filter") typedef basic_rename_object_key_filter<wchar_t> wrename_object_member_filter;
-#endif
 
 }
 

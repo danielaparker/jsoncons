@@ -937,18 +937,6 @@ using csv_string_encoder = basic_csv_encoder<char,jsoncons::string_sink<std::str
 using csv_wstream_encoder = basic_csv_encoder<wchar_t>;
 using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT, class Sink = jsoncons::stream_sink<CharT>, class Allocator = std::allocator<CharT>>
-using basic_csv_serializer = basic_csv_encoder<CharT,Sink,Allocator>;
-
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_encoder") typedef csv_stream_encoder wcsv_encoder;
-#endif
-
 }}
 
 #endif

@@ -267,19 +267,6 @@ namespace jsoncons {
         {
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
-        int max_nesting_depth() const
-        {
-            return parser_.max_nesting_depth();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int) on options")
-        void max_nesting_depth(int depth)
-        {
-            parser_.max_nesting_depth(depth);
-        }
-#endif
         void read_next()
         {
             std::error_code ec;
@@ -563,19 +550,6 @@ namespace jsoncons {
             parser_.update(sv.data()+offset,sv.size()-offset);
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
-        int max_nesting_depth() const
-        {
-            return parser_.max_nesting_depth();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int) on options")
-        void max_nesting_depth(int depth)
-        {
-            parser_.max_nesting_depth(depth);
-        }
-#endif
         void read_next()
         {
             std::error_code ec;
@@ -722,10 +696,6 @@ namespace jsoncons {
     using json_stream_reader = basic_json_reader<char,stream_source<char>>;
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use json_stream_reader") typedef legacy_basic_json_reader<char> json_reader;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_reader") typedef legacy_basic_json_reader<wchar_t> wjson_reader;
-#endif
 }
 
 #endif

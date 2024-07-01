@@ -271,21 +271,6 @@ public:
         return basic_staj_filter_view<CharT>(cursor, pred);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
-    void read(basic_json_visitor<CharT>& visitor) 
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&, std::error_code&)")
-    void read(basic_json_visitor<CharT>& visitor,
-                 std::error_code& ec) 
-    {
-        read_to(visitor, ec);
-    }
-#endif
 private:
 
     void initialize_with_string_view(string_view_type sv)
@@ -348,11 +333,6 @@ using csv_stream_cursor = basic_csv_cursor<char,jsoncons::stream_source<char>>;
 using csv_string_cursor = basic_csv_cursor<char,jsoncons::string_source<char>>;
 using wcsv_stream_cursor = basic_csv_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
 using wcsv_string_cursor = basic_csv_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_cursor") typedef csv_stream_cursor csv_cursor;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_cursor") typedef wcsv_stream_cursor wcsv_cursor;
-#endif
 
 }}
 

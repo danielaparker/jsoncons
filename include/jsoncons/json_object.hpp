@@ -161,13 +161,6 @@ namespace jsoncons {
             key_.shrink_to_fit();
             value_.shrink_to_fit();
         }
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use key()")
-        const key_type& name() const
-        {
-            return key_;
-        }
-    #endif
 
         friend bool operator==(const key_value& lhs, const key_value& rhs) noexcept
         {

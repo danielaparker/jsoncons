@@ -736,17 +736,6 @@ namespace msgpack {
     using msgpack_stream_encoder = basic_msgpack_encoder<jsoncons::binary_stream_sink>;
     using msgpack_bytes_encoder = basic_msgpack_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_bytes_serializer;
-
-    template<class Sink=jsoncons::binary_stream_sink>
-    using basic_msgpack_serializer = basic_msgpack_encoder<Sink>; 
-
-    JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_encoder;
-    JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_serializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_buffer_serializer;
-    #endif
-
 } // namespace msgpack
 } // namespace jsoncons
 

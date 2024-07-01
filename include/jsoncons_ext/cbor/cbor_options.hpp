@@ -98,15 +98,6 @@ public:
         this->use_typed_arrays_ = value;
         return *this;
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use use_typed_arrays(bool)")
-    cbor_options& enable_typed_arrays(bool value)
-    {
-        this->use_typed_arrays_ = value;
-        return *this;
-    }
-#endif
 };
 
 }}

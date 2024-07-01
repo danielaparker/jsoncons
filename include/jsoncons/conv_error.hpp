@@ -117,10 +117,6 @@ namespace jsoncons {
         conv_errc ec;
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use conv_error") typedef conv_error convert_error;
-#endif
-
 } // namespace jsoncons
 
 namespace std {

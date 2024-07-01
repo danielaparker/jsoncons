@@ -571,15 +571,5 @@ private:
 using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
 using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class Sink=jsoncons::binary_stream_sink>
-using basic_bson_serializer = basic_bson_encoder<Sink>; 
-
-JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use bson_bytes_encoder")  typedef bson_bytes_encoder bson_buffer_serializer;
-
-#endif
-
 }}
 #endif

@@ -42,11 +42,6 @@ namespace jsoncons {
     struct is_json_type_traits_declared : public std::false_type
     {};
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    template <class T>
-    using is_json_type_traits_impl = is_json_type_traits_declared<T>;
-    #endif
-
     // json_type_traits
 
     template<typename T>

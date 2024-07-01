@@ -35,13 +35,6 @@ enum class csv_mapping_kind : uint8_t
     m_columns
 };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_kind") typedef csv_mapping_kind  mapping_kind;
-JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
-JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_kind") typedef csv_mapping_kind mapping_type;
-#endif
-
 enum class column_state {sequence,label};
 
 struct csv_type_info
@@ -598,14 +591,6 @@ public:
         return mapping_ != csv_mapping_kind() ? mapping_ : (assume_header() || this->column_names().size() > 0 ? csv_mapping_kind::n_objects : csv_mapping_kind::n_rows);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind")
-    csv_mapping_kind mapping() const 
-    {
-        return mapping_kind();
-    }
-#endif
-
     std::size_t max_lines() const 
     {
         return max_lines_;
@@ -716,7 +701,7 @@ public:
     using basic_csv_decode_options<CharT>::infer_types; 
     using basic_csv_decode_options<CharT>::lossless_number; 
     using basic_csv_decode_options<CharT>::comment_starter; 
-    using basic_csv_decode_options<CharT>::mapping; 
+    using basic_csv_decode_options<CharT>::mapping_kind; 
     using basic_csv_decode_options<CharT>::max_lines; 
     using basic_csv_decode_options<CharT>::column_types; 
     using basic_csv_decode_options<CharT>::column_defaults; 
@@ -887,15 +872,6 @@ public:
         return *this;
     }
 
-//#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind")
-    basic_csv_options& mapping(csv_mapping_kind value)
-    {
-        this->mapping_ = value;
-        return *this;
-    }
-//#endif
-
     basic_csv_options& mapping_kind(csv_mapping_kind value)
     {
         this->mapping_ = value;
@@ -959,28 +935,10 @@ public:
         return *this;
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use float_format(float_chars_format)")
-    basic_csv_options& floating_point_format(float_chars_format value)
-    {
-        this->float_format_ = value;
-        return *this;
-    }
-#endif
-
 };
 
 using csv_options = basic_csv_options<char>;
 using wcsv_options = basic_csv_options<wchar_t>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_parameters;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_options") typedef wcsv_options wcsv_parameters;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_serializing_options;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_options") typedef wcsv_options wcsv_serializing_options;
-#endif
-
 
 }}
 #endif

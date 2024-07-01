@@ -95,14 +95,6 @@ public:
         structure_stack_.emplace_back(structure_type::root_t, 0);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use json_decoder(allocator, temp_allocator)")
-    json_decoder(result_allocator_arg_t, const allocator_type& alloc, 
-        const temp_allocator_type& temp_alloc = temp_allocator_type())
-        : json_decoder(alloc, temp_alloc)
-    {
-    }
-#endif
     void reset()
     {
         is_valid_ = false;
@@ -123,14 +115,6 @@ public:
         is_valid_ = false;
         return std::move(result_);
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use get_result()")
-    Json& root()
-    {
-        return result_;
-    }
-#endif
 
 private:
 

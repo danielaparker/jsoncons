@@ -213,28 +213,7 @@ namespace jsoncons {
             return column_number_;
         }
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use line()")
-        std::size_t line_number() const noexcept
-        {
-            return line();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use column()")
-        std::size_t column_number() const noexcept
-        {
-            return column();
-        }
-    #endif
     };
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error serialization_error;
-JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error json_parse_exception;
-JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_exception;
-JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
-typedef ser_error codec_error;
-#endif
 
 } // namespace jsoncons
 

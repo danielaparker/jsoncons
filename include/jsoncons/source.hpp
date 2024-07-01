@@ -788,10 +788,6 @@ namespace jsoncons {
     constexpr std::size_t source_reader<Source>::max_buffer_length;
 #endif
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    using bin_stream_source = binary_stream_source;
-    #endif
-
 } // namespace jsoncons
 
 #endif

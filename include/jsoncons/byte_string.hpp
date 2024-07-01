@@ -392,13 +392,6 @@ namespace detail {
         {
             return data_;
         }
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use size()") 
-        std::size_t length() const
-        {
-            return size_;
-        }
-    #endif
         constexpr size_t size() const noexcept
         {
             return size_;
@@ -627,14 +620,6 @@ namespace detail {
         {
             return data_.size();
         }
-
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use size()") 
-        std::size_t length() const
-        {
-            return data_.size();
-        }
-    #endif
 
         int compare(const byte_string_view& s) const noexcept 
         {

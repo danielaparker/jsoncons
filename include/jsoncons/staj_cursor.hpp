@@ -740,30 +740,6 @@ using wstaj_cursor = basic_staj_cursor<wchar_t>;
 using staj_filter_view = basic_staj_filter_view<char>;
 using wstaj_filter_view = basic_staj_filter_view<wchar_t>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-JSONCONS_DEPRECATED_MSG("Instead, use staj_event_type") typedef staj_event_type stream_event_type;
-
-template<class CharT>
-using basic_stream_event = basic_staj_event<CharT>;
-
-template<class CharT>
-using basic_stream_reader = basic_staj_cursor<CharT>;
-
-template<class CharT>
-using basic_staj_reader = basic_staj_cursor<CharT>;
-
-JSONCONS_DEPRECATED_MSG("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
-
-JSONCONS_DEPRECATED_MSG("Instead, use staj_cursor") typedef basic_staj_cursor<char> stream_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_cursor") typedef basic_staj_cursor<wchar_t> wstream_reader;
-
-JSONCONS_DEPRECATED_MSG("Instead, use staj_cursor") typedef basic_staj_cursor<char> staj_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_cursor") typedef basic_staj_cursor<wchar_t> wstaj_reader;
-
-#endif
-
 }
 
 #endif
