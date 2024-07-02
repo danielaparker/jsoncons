@@ -8,64 +8,40 @@ static basic_json parse(const Source& source,
 static basic_json parse(const char_type* str, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (2) 
 
-static basic_json parse(std::basic_istream<char_type>& is, 
+static basic_json parse(const char_type* str, std::size_t length, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (3) 
+
+static basic_json parse(std::basic_istream<char_type>& is, 
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (4) 
 
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 
-    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (4) 
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (5) 
 
 template <class Source, class TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
     const Source& source, 
-    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (5) (since 0.171.0)
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (6) (since 0.171.0)
 
 template <class TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     const char_type* str, 
-    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (6) (since 0.171.0)
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (7) (since 0.171.0)
+
+template <class TempAllocator>
+static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
+    const char_type* str, std::size_t length, 
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (8) (since 0.177.0)
 
 template <class TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
     std::basic_istream<char_type>& is, 
-    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (7) (since 0.171.0)
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (9) (since 0.171.0)
 
 template <class InputIt,class TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     InputIt first, InputIt last, 
-    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (8) (since 0.171.0)
-
-template <class Source>
-static basic_json parse(const Source& source, 
-    const basic_json_decode_options<char_type>& options,                                         (9) (deprecated since 0.171.0)
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              
-
-template <class Source>
-static basic_json parse(const Source& source, 
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              (10) (deprecated since 0.171.0)
-
-static basic_json parse(const char_type* str, 
-    const basic_json_decode_options<char_type>& options,                                         (11) (deprecated since 0.171.0)
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              
-
-static basic_json parse(const char_type* str, 
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              (12) (deprecated since 0.171.0)
-
-static basic_json parse(std::basic_istream<char_type>& is, 
-    const basic_json_decode_options<char_type>& options,                                         (13) (deprecated since 0.171.0)
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              
-              
-static basic_json parse(std::istream& is, 
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              (14) (deprecated since 0.171.0)
-
-template <class InputIt>
-static basic_json parse(InputIt first, InputIt last, 
-    const basic_json_decode_options<char_type>& options,                                         (15) (deprecated since 0.171.0)
-    std::function<bool(json_errc,const ser_context&)> err_handler);           
-              
-template <class InputIt>
-static basic_json parse(InputIt first, InputIt last,                                             (16) (deprecated since 0.171.0)
-    std::function<bool(json_errc,const ser_context&)> err_handler);                              
+    const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (10) (since 0.171.0)
 ```
 (1) Parses JSON data from a contiguous character sequence provided by `source` and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
@@ -73,19 +49,24 @@ Throws a [ser_error](../ser_error.md) if parsing fails.
 (2) Parses JSON data from a null-terminated character string and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(3) Parses JSON data from an input stream and returns a `basic_json` value. 
+(3) Parses JSON data from a string and length and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(4) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
+(4) Parses JSON data from an input stream and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
-(5)-(8) Same as (1)-(4), except they accept an [allocator_set](allocator_set.md) argument.
+(5) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
+Throws a [ser_error](../ser_error.md) if parsing fails.
+
+(6)-(10) Same as (1)-(5), except they accept an [allocator_set](allocator_set.md) argument.
 
 #### Parameters
 
 `source` = a contigugous character source, such as a `std::string` or `std::string_view`
 
-`str` - a null terminated character string  
+`str` - a character string  
+
+`length` - the length of a character string
 
 `is` - an input stream  
 

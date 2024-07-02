@@ -2930,6 +2930,12 @@ namespace jsoncons {
             return decoder.get_result();
         }
 
+        static basic_json parse(const char_type* str, std::size_t length, 
+            const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
+        {
+            return parse(jsoncons::string_view(str,length), options);
+        }
+
         static basic_json parse(const char_type* source, 
             const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
@@ -2943,17 +2949,12 @@ namespace jsoncons {
             return parse(alloc_set, jsoncons::basic_string_view<char_type>(source), options);
         }
 
-        static basic_json parse(const char_type* s, 
-            const basic_json_decode_options<char_type>& options, 
-            std::function<bool(json_errc,const ser_context&)> err_handler)
+        template <class TempAllocator>
+        static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
+            const char_type* str, std::size_t length,
+            const basic_json_decode_options<char_type>& options = basic_json_options<char_type>())
         {
-            return parse(jsoncons::basic_string_view<char_type>(s), options, err_handler);
-        }
-
-        static basic_json parse(const char_type* s, 
-                                std::function<bool(json_errc,const ser_context&)> err_handler)
-        {
-            return parse(jsoncons::basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
+            return parse(alloc_set, jsoncons::basic_string_view<char_type>(str, length), options);
         }
 
         // from stream
@@ -3020,6 +3021,21 @@ namespace jsoncons {
                 JSONCONS_THROW(ser_error(json_errc::source_error, "Failed to parse json from iterator pair"));
             }
             return decoder.get_result();
+        }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+        static basic_json parse(const char_type* s, 
+            const basic_json_decode_options<char_type>& options, 
+            std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            return parse(jsoncons::basic_string_view<char_type>(s), options, err_handler);
+        }
+
+        static basic_json parse(const char_type* s, 
+                                std::function<bool(json_errc,const ser_context&)> err_handler)
+        {
+            return parse(jsoncons::basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
         }
 
         static basic_json parse(std::basic_istream<char_type>& is, 
@@ -3100,7 +3116,7 @@ namespace jsoncons {
         {
             return parse(first, last, basic_json_decode_options<CharT>(), err_handler);
         }
-
+#endif
         static basic_json make_array()
         {
             return basic_json(array());
