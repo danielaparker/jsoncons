@@ -21,7 +21,7 @@ jobs:
       CXX: ${{ matrix.compiler }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: cmake
       run: cmake -S . -B build -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DJSONCONS_BUILD_TESTS=On
 
@@ -169,7 +169,7 @@ jobs:
         compiler: ['6','7','8','9','10','11','12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
@@ -188,7 +188,7 @@ jobs:
         compiler: ['12','latest']
     container: gcc:${{ matrix.compiler }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
@@ -210,7 +210,7 @@ jobs:
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
@@ -231,7 +231,7 @@ jobs:
     steps:
       - name: Install unzip and git
         run: apt-get update ; apt-get install -y unzip git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@v3.27.7
       - name: cmake
