@@ -1,3 +1,8 @@
+master
+-------
+
+- Removed deprecated functions and type names identified in #487
+
 0.176.0 
 -------
 
