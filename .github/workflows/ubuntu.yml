@@ -171,7 +171,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@v3.27.7
+        uses: lukka/get-cmake@v3.30.0
       - name: cmake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
@@ -190,7 +190,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@v3.27.7
+        uses: lukka/get-cmake@v3.30.0
       - name: cmake
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
@@ -212,7 +212,7 @@ jobs:
         run: apt-get update ; apt-get install -y unzip git
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@v3.27.7
+        uses: lukka/get-cmake@v3.30.0
       - name: cmake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
       - name: build
@@ -233,7 +233,7 @@ jobs:
         run: apt-get update ; apt-get install -y unzip git
       - uses: actions/checkout@v3
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@v3.27.7
+        uses: lukka/get-cmake@v3.30.0
       - name: cmake
         run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
       - name: build
