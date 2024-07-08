@@ -15,17 +15,17 @@ namespace detail
 {
     constexpr std::size_t dynamic_extent = (std::numeric_limits<std::size_t>::max)();
 
-    template< class T, std::size_t Extent = dynamic_extent>
+    template< typename T, std::size_t Extent = dynamic_extent>
     class span;
 
-    template<class T>
+    template <typename T>
     struct is_span : std::false_type{};
 
-    template< class T>
+    template< typename T>
     struct is_span<span<T>> : std::true_type{};
 
     template<
-        class T,
+        typename T,
         std::size_t Extent
     > class span
     {
@@ -91,7 +91,7 @@ namespace detail
         {
         }
 
-        template <class U, std::size_t N>
+        template <typename U, std::size_t N>
         constexpr span(const span<U, N>& s,
                        typename std::enable_if<(N == dynamic_extent || N == extent) && std::is_convertible<U(*)[], element_type(*)[]>::value>::type* = 0) noexcept
             : data_(s.data()), size_(s.size())

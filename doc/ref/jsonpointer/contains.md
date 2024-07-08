@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
+template <typename Json>
 bool contains(const Json& root, const basic_json_pointer<Json::char_type>& location);
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 bool contains(const Json& root, const StringSource& location_str);
 ```
 #### Parameters

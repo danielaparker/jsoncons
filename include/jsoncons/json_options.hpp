@@ -56,10 +56,10 @@ struct allow_trailing_commas
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_json_options;
 
-template <class CharT>
+template <typename CharT>
 class basic_json_options_common
 {
     friend class basic_json_options<CharT>;
@@ -247,7 +247,7 @@ public:
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_json_decode_options : public virtual basic_json_options_common<CharT>
 {
     friend class basic_json_options<CharT>;
@@ -286,7 +286,7 @@ public:
 
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_json_encode_options : public virtual basic_json_options_common<CharT>
 {
     friend class basic_json_options<CharT>;
@@ -438,7 +438,7 @@ public:
 
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_json_options final: public basic_json_decode_options<CharT>, 
                                 public basic_json_encode_options<CharT>
 {

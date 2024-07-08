@@ -3,18 +3,18 @@
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
-template <class Json>
+template <typename Json>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema);  (1)
 
-template <class Json>
+template <typename Json>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
     const std::string& retrieval_uri);                               (2) (since 0.173.0)
 
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
     const std::string& retrieval_uri, const URIResolver& resolver);  (3) (since 0.173.0)
 
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, 
     const URIResolver& resolver);                                    (4)
 ```

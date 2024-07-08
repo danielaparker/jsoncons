@@ -21,7 +21,7 @@
 namespace jsoncons { 
 namespace bson {
 
-    template<class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_bson(const Source& v, 
@@ -38,7 +38,7 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_bson(const Source& v, 
@@ -56,7 +56,7 @@ namespace bson {
         return val;
     }
 
-    template<class T>
+    template <typename T>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
@@ -72,7 +72,7 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T>
+    template <typename T>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
@@ -89,7 +89,7 @@ namespace bson {
         return val;
     }
 
-    template<class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(InputIt first, InputIt last,
                 const bson_decode_options& options = bson_decode_options())
@@ -105,7 +105,7 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(InputIt first, InputIt last,
                 const bson_decode_options& options = bson_decode_options())
@@ -124,7 +124,7 @@ namespace bson {
 
     // With leading allocator_set parameter
 
-    template<class T,class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -142,7 +142,7 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T, class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -161,7 +161,7 @@ namespace bson {
         return val;
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 
@@ -178,7 +178,7 @@ namespace bson {
         return decoder.get_result();
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 

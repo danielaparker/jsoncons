@@ -57,7 +57,7 @@ struct csv_type_info
 
 namespace detail {
 
-template <class CharT,class Container>
+template <typename CharT,typename Container>
 void parse_column_names(const std::basic_string<CharT>& names, 
                         Container& cont)
 {
@@ -109,7 +109,7 @@ void parse_column_names(const std::basic_string<CharT>& names,
     }
 }
 
-template <class CharT,class Container>
+template <typename CharT,typename Container>
 void parse_column_types(const std::basic_string<CharT>& types, 
                         Container& column_types)
 {
@@ -257,10 +257,10 @@ void parse_column_types(const std::basic_string<CharT>& types,
 
 } // detail
 
-template <class CharT>
+template <typename CharT>
 class basic_csv_options;
 
-template <class CharT>
+template <typename CharT>
 class basic_csv_options_common 
 {
     friend class basic_csv_options<CharT>;
@@ -445,7 +445,7 @@ public:
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_csv_decode_options : public virtual basic_csv_options_common<CharT>
 {
     friend class basic_csv_options<CharT>;
@@ -607,7 +607,7 @@ public:
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_csv_encode_options : public virtual basic_csv_options_common<CharT>
 {
     friend class basic_csv_options<CharT>;
@@ -666,7 +666,7 @@ public:
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_csv_options final : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
 {
     using char_type = CharT;

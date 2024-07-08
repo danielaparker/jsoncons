@@ -344,7 +344,7 @@ TEST_CASE("test_from_stl_container")
 struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
 
 namespace jsoncons {
-template<class Json>
+template <typename Json>
 struct json_type_traits<Json, own_vector> {
     static bool is(const Json& j) noexcept
     { 
@@ -448,7 +448,7 @@ namespace ns {
     };
 
     struct EnumClassHash {
-        template<typename T>
+        template <typename T>
         std::size_t operator()(T t) const noexcept {
             return static_cast<std::size_t>(t);
         }
@@ -553,7 +553,7 @@ namespace ns {
       return l.name < r.name;
     }
 
-    template <class Container>
+    template <typename Container>
     struct Project {
         std::int32_t         version = 1;
         std::string          name;

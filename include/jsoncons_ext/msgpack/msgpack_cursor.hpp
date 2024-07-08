@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace msgpack {
 
-template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template <typename Source=jsoncons::binary_stream_source,typename Allocator=std::allocator<char>>
 class basic_msgpack_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
@@ -45,7 +45,7 @@ private:
 public:
     using string_view_type = string_view;
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator& alloc = Allocator())
@@ -62,7 +62,7 @@ public:
 
     // Constructors that set parse error codes
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
@@ -72,7 +72,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options,
                          std::error_code& ec)
@@ -83,7 +83,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
                          Sourceable&& source,
                          const msgpack_decode_options& options,
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source)
     {
         parser_.reset(std::forward<Sourceable>(source));
@@ -136,7 +136,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source, std::error_code& ec)
     {
         parser_.reset(std::forward<Sourceable>(source));

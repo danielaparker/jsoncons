@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-    template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+    template <typename Source=jsoncons::binary_stream_source,typename Allocator=std::allocator<char>>
     class cbor_event_reader : public basic_staj_event_reader<char>, private virtual ser_context
     {
     public:
@@ -44,7 +44,7 @@ namespace cbor {
     public:
         using string_view_type = string_view;
 
-        template <class Sourceable>
+        template <typename Sourceable>
         cbor_event_reader(Sourceable&& source,
                           const cbor_decode_options& options = cbor_decode_options(),
                           const Allocator& alloc = Allocator())
@@ -60,7 +60,7 @@ namespace cbor {
 
         // Constructors that set parse error codes
 
-        template <class Sourceable>
+        template <typename Sourceable>
         cbor_event_reader(Sourceable&& source, 
                           std::error_code& ec)
             : cbor_event_reader(std::allocator_arg, Allocator(),
@@ -70,7 +70,7 @@ namespace cbor {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         cbor_event_reader(Sourceable&& source, 
                           const cbor_decode_options& options,
                           std::error_code& ec)
@@ -81,7 +81,7 @@ namespace cbor {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         cbor_event_reader(std::allocator_arg_t, const Allocator& alloc, 
                           Sourceable&& source,
                           const cbor_decode_options& options,
@@ -107,7 +107,7 @@ namespace cbor {
             }
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         void reset(Sourceable&& source)
         {
             parser_.reset(std::forward<Sourceable>(source));
@@ -130,7 +130,7 @@ namespace cbor {
             }
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         void reset(Sourceable&& source, std::error_code& ec)
         {
             parser_.reset(std::forward<Sourceable>(source));

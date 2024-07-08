@@ -184,7 +184,7 @@ TEST_CASE("encode_cbor overloads")
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;

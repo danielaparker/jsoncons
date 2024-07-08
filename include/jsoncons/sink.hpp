@@ -22,7 +22,7 @@ namespace jsoncons {
 
     // stream_sink
 
-    template <class CharT>
+    template <typename CharT>
     class stream_sink
     {
     public:
@@ -198,7 +198,7 @@ namespace jsoncons {
 
     // string_sink
 
-    template <class StringT>
+    template <typename StringT>
     class string_sink 
     {
     public:
@@ -247,12 +247,12 @@ namespace jsoncons {
 
     // bytes_sink
 
-    template <class Container, class = void>
+    template <typename Container,typename = void>
     class bytes_sink
     {
     };
 
-    template <class Container>
+    template <typename Container>
     class bytes_sink<Container,typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value>::type> 
     {
     public:

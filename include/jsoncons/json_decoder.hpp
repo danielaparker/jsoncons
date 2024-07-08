@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-template <class Json,class TempAllocator=std::allocator<char>>
+template <typename Json,typename TempAllocator =std::allocator<char>>
 class json_decoder final : public basic_json_visitor<typename Json::char_type>
 {
 public:

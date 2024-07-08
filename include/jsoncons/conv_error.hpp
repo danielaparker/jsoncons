@@ -110,7 +110,7 @@ namespace jsoncons {
         not_base16
     };
 
-    template <class InputIt>
+    template <typename InputIt>
     struct decode_result 
     {
         InputIt it;

@@ -16,7 +16,7 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
+    template <typename Json>
     class schema_validator;
     
     enum class evaluation_flags : uint32_t {require_evaluated_properties=1, require_evaluated_items=2};
@@ -59,7 +59,7 @@ namespace jsonschema {
         return a;
     }
 
-    template<class Json>
+    template <typename Json>
     class evaluation_context
     {
     private:

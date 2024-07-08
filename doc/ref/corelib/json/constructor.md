@@ -11,16 +11,16 @@ basic_json(basic_json&& other) noexcept; (4)
 
 basic_json(basic_json&& other, const allocator_type& alloc) noexcept; (5)
 
-template <class T>
+template <typename T>
 basic_json(const T& val); 
                                                                   (6)
-template <class T>
+template <typename T>
 basic_json(const T& val, const Allocator& alloc = Allocator()); 
 
-template <class Unsigned>
+template <typename Unsigned>
 basic_json(Unsigned val, semantic_tag tag); (7)
 
-template <class Signed>
+template <typename Signed>
 basic_json(Signed val, semantic_tag tag); (8)
 
 basic_json(half_arg_t, uint16_t value, 
@@ -35,7 +35,7 @@ explicit basic_json(json_object_arg_t,
                     semantic_tag tag, 
                     const Allocator& alloc = Allocator()); (12) 
 
-template<class InputIt>
+template <typename InputIt>
 basic_json(json_object_arg_t, 
            InputIt first, InputIt last, 
            semantic_tag tag = semantic_tag::none,
@@ -53,7 +53,7 @@ explicit basic_json(json_array_arg_t,
                     semantic_tag tag, 
                     const Allocator& alloc = Allocator()); (16)
 
-template<class InputIt>
+template <typename InputIt>
 basic_json(json_array_arg_t, 
            InputIt first, InputIt last, 
            semantic_tag tag = semantic_tag::none, 
@@ -65,10 +65,10 @@ basic_json(json_array_arg_t,
            const Allocator& alloc = Allocator()); (18)
 
 
-template <class T>
+template <typename T>
 basic_json(const T& val); 
                                                        (19)
-template <class T>
+template <typename T>
 basic_json(const T& val, const allocator_type& alloc); 
 
 basic_json(const char_type* val); (20)
@@ -83,12 +83,12 @@ basic_json(byte_string_arg_t, const jsoncons::span<const uint8_t>& bytes,
            semantic_tag tag = semantic_tag::none,
            const Allocator& alloc = Allocator()); (23) (until 0.152)
 
-template <class Source>
+template <typename Source>
 basic_json(byte_string_arg_t, const Source& source, 
            semantic_tag tag = semantic_tag::none,
            const Allocator& alloc = Allocator()); (24) (since 0.152)
 
-template <class Source>
+template <typename Source>
 basic_json(byte_string_arg_t, const Source& source, 
            uint64_t ext_tag,
            const Allocator& alloc = Allocator()); (25) (since 0.152)

@@ -44,7 +44,7 @@ An empty list means a zero value.
 
 #### Accessors
 
-    template <typename Ch, typename Traits, typename Alloc>
+    template <typename Ch,typename Traits,typename Alloc>
     void dump(std::basic_string<Ch,Traits,Alloc>& data) const
 
     template <typename Alloc>
@@ -102,7 +102,7 @@ An empty list means a zero value.
 
     bool operator!=(const bigint& lhs, const bigint& rhs);
 
-    template <class CharT>
+    template <typename CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const bigint& o);
 
 #### Global arithmetic operators

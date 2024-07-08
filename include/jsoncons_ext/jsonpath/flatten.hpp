@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-    template<class Json>
+    template <typename Json>
     void flatten_(const typename Json::string_type& parent_key,
                   const Json& parent_value,
                   Json& result)
@@ -80,7 +80,7 @@ namespace jsoncons { namespace jsonpath {
         }
     }
 
-    template<class Json>
+    template <typename Json>
     Json flatten(const Json& value)
     {
         Json result;
@@ -102,7 +102,7 @@ namespace jsoncons { namespace jsonpath {
         single_quoted_string_escape_char
     };
 
-    template<class Json>
+    template <typename Json>
     Json unflatten(const Json& value)
     {
         using char_type = typename Json::char_type;

@@ -107,7 +107,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class json_array_receiver : public node_receiver<Json,JsonReference>
     {
     public:
@@ -129,7 +129,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_generator
     {
         using char_type = typename Json::char_type;
@@ -170,7 +170,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class base_selector : public jsonpath_selector<Json,JsonReference>
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
@@ -259,7 +259,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class identifier_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -419,7 +419,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class root_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -487,7 +487,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class current_node_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -543,7 +543,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class parent_node_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -639,7 +639,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class index_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -730,7 +730,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class wildcard_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -805,7 +805,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class recursive_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -880,7 +880,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class union_selector final : public jsonpath_selector<Json,JsonReference>
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
@@ -965,7 +965,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class filter_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -1053,7 +1053,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class index_expression_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -1154,7 +1154,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class slice_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -1242,7 +1242,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class function_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;

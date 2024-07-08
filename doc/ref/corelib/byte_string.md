@@ -65,7 +65,7 @@ Member type                         |Definition
 
     bool operator!=(const byte_string& lhs, const byte_string& rhs);
 
-    template <class CharT>
+    template <typename CharT>
     friend std::ostream& operator<<(std::ostream& os, const byte_string& o);
 
 ### Examples

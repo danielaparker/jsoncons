@@ -25,7 +25,7 @@
 
 namespace jsoncons {
 
-template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
 class basic_json_cursor : public basic_staj_cursor<CharT>, private virtual ser_context
 {
 public:
@@ -50,7 +50,7 @@ public:
 
     // Constructors that throw parse exceptions
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
@@ -67,7 +67,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
@@ -83,7 +83,7 @@ public:
 
 
     // Constructors that set parse error codes
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       std::error_code& ec)
         : basic_json_cursor(std::allocator_arg, Allocator(), 
@@ -94,7 +94,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec)
@@ -106,7 +106,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
@@ -119,7 +119,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
                       Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
@@ -137,7 +137,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
                       Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source)
     {
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source)
     {
@@ -199,7 +199,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source, std::error_code& ec)
     {
@@ -213,7 +213,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source, std::error_code& ec)
     {

@@ -915,7 +915,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     CHECK(expected == j);
 }
 
-template <class CursorType>
+template <typename CursorType>
 void check_csv_cursor_table(std::string info, CursorType& cursor,
                             std::string expected_key, unsigned expected_value)
 {

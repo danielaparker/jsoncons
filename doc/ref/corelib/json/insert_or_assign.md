@@ -1,10 +1,10 @@
 ### jsoncons::basic_json::insert_or_assign
 
 ```cpp
-template <class T>
+template <typename T>
 pair<object_iterator, bool> insert_or_assign(const string_view_type& key, T&& value); (1)
 
-template <class T>
+template <typename T>
 object_iterator insert_or_assign(const_object_iterator hint, const string_view_type& key, 
                                  T&& value); (2)
 ```

@@ -6,38 +6,38 @@ if a value does not already exist at that location.
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add_if_absent(Json& target, 
                     const basic_json_pointer<Json::char_type>& location, 
                     T&& value, 
                     bool create_if_missing = false);                     (1) 
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add_if_absent(Json& target, 
                    const basic_json_pointer<Json::char_type>& location, 
                    T&& value, 
                    std::error_code& ec);                                 (2) 
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add_if_absent(Json& target, 
                    const basic_json_pointer<Json::char_type>& location, 
                    T&& value, 
                    bool create_if_missing, 
                    std::error_code& ec);                                 (3) 
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add_if_absent(Json& target, 
                     const StringSource& location_str, 
                     T&& value, 
                     bool create_if_missing = false);                     (4) 
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add_if_absent(Json& target, 
                    const StringSource& location_str, 
                    T&& value, 
                    std::error_code& ec);                                 (5) 
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add_if_absent(Json& target, 
                    const StringSource& location_str, 
                    T&& value, 

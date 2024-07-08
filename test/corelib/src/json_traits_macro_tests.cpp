@@ -18,7 +18,7 @@ using namespace jsoncons;
 namespace {
 namespace ns {
 
-    template <typename T1, typename T2>
+    template <typename T1,typename T2>
     struct TemplatedStruct
     {
           T1 aT1;
@@ -497,7 +497,7 @@ void test_is_json_type_traits_declared(std::true_type)
 
 namespace 
 {
-    template <class T>
+    template <typename T>
     struct MyAlloc
     {
         using value_type = T;
@@ -509,7 +509,7 @@ namespace
         #endif
         MyAlloc(int) {}
 
-        template< class U >
+        template< typename U >
         MyAlloc(const MyAlloc<U>&) noexcept {}
 
         T* allocate(size_type n)
@@ -525,7 +525,7 @@ namespace
         bool operator==(const MyAlloc&) const { return true; }
         bool operator!=(const MyAlloc&) const { return false; }
 
-        template<typename U>
+        template <typename U>
         struct rebind
         {
             using other = MyAlloc<U>;

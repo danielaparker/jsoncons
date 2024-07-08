@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
-template <class Json>
+template <typename Json>
 class json_schema
 ```
 

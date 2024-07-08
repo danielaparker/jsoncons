@@ -14,7 +14,7 @@
 
 namespace jsoncons {
 
-    template <class Json>
+    template <typename Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
         static bool is(const Json& val) noexcept
@@ -46,7 +46,7 @@ namespace jsoncons {
         }
     };
 
-    template <class Json, class Backend>
+    template <typename Json,typename Backend>
     struct json_type_traits<Json,boost::multiprecision::number<Backend>>
     {
         using multiprecision_type = boost::multiprecision::number<Backend>;
@@ -74,7 +74,7 @@ namespace jsoncons {
         }
     };
 
-    template <class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
         using allocator_type = typename Json::allocator_type;

@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
 
-template <class Json>
+template <typename Json>
 void apply_merge_patch(Json& target, const Json& patch); 
 ```
 

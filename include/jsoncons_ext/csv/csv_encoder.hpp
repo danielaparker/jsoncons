@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
+template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
 class basic_csv_encoder final : public basic_json_visitor<CharT>
 {
 public:
@@ -152,7 +152,7 @@ public:
 
 private:
 
-    template<class AnyWriter>
+    template <typename AnyWriter>
     void escape_string(const CharT* s,
                        std::size_t length,
                        CharT quote_char, CharT quote_escape_char,
@@ -728,7 +728,7 @@ private:
         return true;
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     bool do_string_value(const CharT* s, std::size_t length, AnyWriter& sink)
     {
         bool quote = false;
@@ -748,7 +748,7 @@ private:
         return true;
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void write_string_value(const string_view_type& value, AnyWriter& sink)
     {
         begin_value(sink);
@@ -756,7 +756,7 @@ private:
         end_value();
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void write_double_value(double val, const ser_context& context, AnyWriter& sink, std::error_code& ec)
     {
         begin_value(sink);
@@ -818,7 +818,7 @@ private:
 
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void write_int64_value(int64_t val, AnyWriter& sink)
     {
         begin_value(sink);
@@ -828,7 +828,7 @@ private:
         end_value();
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void write_uint64_value(uint64_t val, AnyWriter& sink)
     {
         begin_value(sink);
@@ -838,7 +838,7 @@ private:
         end_value();
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void write_bool_value(bool val, AnyWriter& sink) 
     {
         begin_value(sink);
@@ -855,7 +855,7 @@ private:
         end_value();
     }
  
-    template <class AnyWriter>
+    template <typename AnyWriter>
     bool write_null_value(AnyWriter& sink) 
     {
         begin_value(sink);
@@ -864,7 +864,7 @@ private:
         return true;
     }
 
-    template <class AnyWriter>
+    template <typename AnyWriter>
     void begin_value(AnyWriter& sink)
     {
         JSONCONS_ASSERT(!stack_.empty());

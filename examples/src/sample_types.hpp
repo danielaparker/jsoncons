@@ -142,7 +142,7 @@ namespace ns {
         };
     };
 
-    template <typename T1, typename T2>
+    template <typename T1,typename T2>
     struct TemplatedStruct
     {
           T1 aT1;
@@ -163,7 +163,7 @@ namespace ns {
 
 namespace jsoncons {
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, ns::book>
     {
         using allocator_type = typename Json::allocator_type;

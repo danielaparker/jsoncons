@@ -1,7 +1,7 @@
 ### jsoncons::jsonpath::jsonpath_expression::update
 
 ```cpp
-template <class BinaryOp>
+template <typename BinaryOp>
 void update(reference root, BinaryOp op);                                   (1) (since 0.172.0)
 ```
 

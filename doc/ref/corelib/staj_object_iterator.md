@@ -62,10 +62,10 @@ Advances the iterator to the next object member.
 
 #### Non-member functions
 
-    template <class Key, class T, class Json>
+    template <typename Key,typename T,typename Json>
     bool operator==(const staj_object_iterator<Key, T, Json>& a, const staj_object_iterator<Key, T, Json>& b)
 
-    template <class Json, class T>
+    template <typename Json,typename T>
     bool operator!=(const staj_object_iterator<Key, T, Json>& a, const staj_object_iterator<Key, T, Json>& b)
 
 ### Examples

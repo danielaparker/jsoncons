@@ -85,7 +85,7 @@ enum class json_parse_state : uint8_t
     done
 };
 
-template <class CharT, class TempAllocator = std::allocator<char>>
+template <typename CharT,typename TempAllocator  = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
 public:

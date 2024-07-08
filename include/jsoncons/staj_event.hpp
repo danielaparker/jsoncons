@@ -46,7 +46,7 @@ enum class staj_event_type
     double_value
 };
 
-template <class CharT>
+template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
 {
     static constexpr const CharT* begin_array_name = JSONCONS_CSTRING_CONSTANT(CharT, "begin_array");
@@ -134,7 +134,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     return os;
 }
 
-template<class CharT>
+template <typename CharT>
 class basic_staj_event
 {
     staj_event_type event_type_;
@@ -228,7 +228,7 @@ public:
         return length_;
     }
 
-    template <class T>
+    template <typename T>
     T get() const
     {
         std::error_code ec;
@@ -240,13 +240,13 @@ public:
         return val;
     }
 
-    template <class T>
+    template <typename T>
     T get(std::error_code& ec) const
     {
         return get_<T>(std::allocator<char>{}, ec);
     }
 
-    template<class T, class Allocator, class CharT_ = CharT>
+    template <typename T,typename Allocator,typename CharT_ = CharT>
     typename std::enable_if<extension_traits::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get_(Allocator,std::error_code& ec) const
     {
@@ -301,7 +301,7 @@ public:
         }
     }
 
-    template<class T, class Allocator, class CharT_ = CharT>
+    template <typename T,typename Allocator,typename CharT_ = CharT>
     typename std::enable_if<extension_traits::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
@@ -319,7 +319,7 @@ public:
         return s;
     }
 
-    template<class T, class Allocator>
+    template <typename T,typename Allocator>
     typename std::enable_if<std::is_same<T, byte_string_view>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
@@ -336,7 +336,7 @@ public:
         return s;
     }
 
-    template<class T, class Allocator>
+    template <typename T,typename Allocator>
     typename std::enable_if<extension_traits::is_array_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get_(Allocator, std::error_code& ec) const
@@ -359,7 +359,7 @@ public:
         }
     }
 
-    template <class IntegerType, class Allocator>
+    template <typename IntegerType,typename Allocator>
     typename std::enable_if<extension_traits::is_integer<IntegerType>::value, IntegerType>::type
     get_(Allocator, std::error_code& ec) const
     {
@@ -392,14 +392,14 @@ public:
         }
     }
 
-    template<class T, class Allocator>
+    template <typename T,typename Allocator>
     typename std::enable_if<std::is_floating_point<T>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {
         return static_cast<T>(as_double(ec));
     }
 
-    template<class T, class Allocator>
+    template <typename T,typename Allocator>
     typename std::enable_if<extension_traits::is_bool<T>::value, T>::type
         get_(Allocator, std::error_code& ec) const
     {

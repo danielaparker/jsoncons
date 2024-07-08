@@ -1,10 +1,10 @@
 ### jsoncons::basic_json::emplace
 
 ```cpp
-template <class... Args>
+template <typename... Args>
 array_iterator emplace(Args&&... args);
 
-template <class... Args>
+template <typename... Args>
 array_iterator emplace(const_array_iterator pos, Args&&... args);
 ```
 

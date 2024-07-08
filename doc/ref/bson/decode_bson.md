@@ -5,28 +5,28 @@ Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ data
 ```cpp
 #include <jsoncons_ext/bson/bson.hpp>
 
-template<class T>
+template <typename T>
 T decode_bson(const std::vector<uint8_t>& source,
     const bson_decode_options& options = bson_decode_options());        (1) (until 0.152.0)
 
-template<class T, class Source>
+template <typename T,typename Source>
 T decode_bson(const Source& source, 
     const bson_decode_options& options = bson_decode_options());        (1) (since 0.152.0)
 
-template<class T>
+template <typename T>
 T decode_bson(std::istream& is,
     const bson_decode_options& options = bson_decode_options());        (2)
 
-template<class T, class InputIt>
+template <typename T,typename InputIt>
 T decode_bson(InputIt first, InputIt last,
     const bson_decode_options& options = bson_decode_options());        (3) (since 0.153.0)
 
-template<class T, class Source,class Allocator,class TempAllocator>
+template <typename T,typename Source,class Allocator,class TempAllocator>
 T decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& source,
     const bson_decode_options& options = bson_decode_options());        (4) (since 0.171.0)
 
-template<class T,class Allocator,class TempAllocator>
+template <typename T,class Allocator,class TempAllocator>
 T decode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
     const bson_decode_options& options = bson_decode_options());        (5) (since 0.171.0)

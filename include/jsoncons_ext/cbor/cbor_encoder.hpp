@@ -24,7 +24,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
+template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_cbor_encoder final : public basic_json_visitor<char>
 {
     using super_type = basic_json_visitor<char>;

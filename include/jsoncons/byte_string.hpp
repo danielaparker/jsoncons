@@ -29,7 +29,7 @@ namespace jsoncons {
 
 namespace detail {
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
     encode_base64_generic(InputIt first, InputIt last, const char alphabet[65], Container& result)
     {
@@ -89,7 +89,7 @@ namespace detail {
         return count;
     }
 
-    template <class InputIt, class F, class Container>
+    template <typename InputIt,typename F,typename Container>
     typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
@@ -147,7 +147,7 @@ namespace detail {
 
 } // namespace detail
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
     encode_base16(InputIt first, InputIt last, Container& result)
     {
@@ -162,7 +162,7 @@ namespace detail {
         return (last-first)*2;
     }
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
     encode_base64url(InputIt first, InputIt last, Container& result)
     {
@@ -173,7 +173,7 @@ namespace detail {
         return detail::encode_base64_generic(first, last, alphabet, result);
     }
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
     encode_base64(InputIt first, InputIt last, Container& result)
     {
@@ -184,13 +184,13 @@ namespace detail {
         return detail::encode_base64_generic(first, last, alphabet, result);
     }
 
-    template <class Char>
+    template <typename Char>
     bool is_base64(Char c) 
     {
         return (c >= 0 && c < 128) && (isalnum((int)c) || c == '+' || c == '/');
     }
 
-    template <class Char>
+    template <typename Char>
     bool is_base64url(Char c) 
     {
         return (c >= 0 && c < 128) && (isalnum((int)c) || c == '-' || c == '_');
@@ -204,7 +204,7 @@ namespace detail {
 
     // decode
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64url(InputIt first, InputIt last, Container& result)
     {
@@ -232,7 +232,7 @@ namespace detail {
         return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64url};
     }
 
-    template <class InputIt, class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64(InputIt first, InputIt last, Container& result)
     {
@@ -260,7 +260,7 @@ namespace detail {
         return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64};
     }
 
-    template <class InputIt,class Container>
+    template <typename InputIt,typename Container>
     typename std::enable_if<extension_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
     {
@@ -324,7 +324,7 @@ namespace detail {
 
     // basic_byte_string
 
-    template <class Allocator>
+    template <typename Allocator>
     class basic_byte_string;
 
     // byte_string_view
@@ -355,14 +355,14 @@ namespace detail {
         {
         }
     
-        template <class Container>
+        template <typename Container>
         constexpr explicit byte_string_view(const Container& cont,
                           typename std::enable_if<extension_traits::is_byte_sequence<Container>::value,int>::type = 0) 
             : data_(reinterpret_cast<const uint8_t*>(cont.data())), size_(cont.size())
         {
         }
     
-        template <class Allocator>
+        template <typename Allocator>
         constexpr byte_string_view(const basic_byte_string<Allocator>& bytes);
 
         constexpr byte_string_view(const byte_string_view&) noexcept = default;
@@ -449,14 +449,14 @@ namespace detail {
             return rc != 0 ? rc : (size_ == s.size() ? 0 : size_ < s.size() ? -1 : 1);
         }
 
-        template <class Allocator>
+        template <typename Allocator>
         int compare(const basic_byte_string<Allocator>& s) const noexcept 
         {
             const int rc = traits_type::compare(data_, s.data(), (std::min)(size_, s.size()));
             return rc != 0 ? rc : (size_ == s.size() ? 0 : size_ < s.size() ? -1 : 1);
         }
 
-        template <class CharT>
+        template <typename CharT>
         friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& bstr)
         {
             std::basic_ostringstream<CharT> ss;
@@ -482,7 +482,7 @@ namespace detail {
     };
 
     // basic_byte_string
-    template <class Allocator = std::allocator<uint8_t>>
+    template <typename Allocator = std::allocator<uint8_t>>
     class basic_byte_string
     {
         using byte_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t>;
@@ -633,7 +633,7 @@ namespace detail {
             return rc != 0 ? rc : (size() == s.size() ? 0 : size() < s.size() ? -1 : 1);
         }
 
-        template <class CharT>
+        template <typename CharT>
         friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_byte_string& o)
         {
             os << byte_string_view(o);
@@ -641,7 +641,7 @@ namespace detail {
         }
     };
 
-    template <class Allocator>
+    template <typename Allocator>
     constexpr byte_string_view::byte_string_view(const basic_byte_string<Allocator>& bytes) 
         : data_(bytes.data()), size_(bytes.size())
     {
@@ -653,17 +653,17 @@ namespace detail {
     {
         return lhs.compare(rhs) == 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator==(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator==(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) == 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator==(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) == 0;
@@ -676,17 +676,17 @@ namespace detail {
     {
         return lhs.compare(rhs) != 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator!=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator!=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) != 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator!=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) != 0;
@@ -699,17 +699,17 @@ namespace detail {
     {
         return lhs.compare(rhs) <= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) >= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) >= 0;
@@ -722,17 +722,17 @@ namespace detail {
     {
         return lhs.compare(rhs) < 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) > 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator<(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) > 0;
@@ -745,17 +745,17 @@ namespace detail {
     {
         return lhs.compare(rhs) >= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) <= 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) <= 0;
@@ -768,17 +768,17 @@ namespace detail {
     {
         return lhs.compare(rhs) > 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
     {
         return rhs.compare(lhs) < 0;
     }
-    template<class Allocator>
+    template <typename Allocator>
     bool operator>(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
         return rhs.compare(lhs) < 0;

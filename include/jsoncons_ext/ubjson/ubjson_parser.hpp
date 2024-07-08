@@ -38,7 +38,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Source,class Allocator=std::allocator<char>>
+template <typename Source,typename Allocator=std::allocator<char>>
 class basic_ubjson_parser : public ser_context
 {
     using char_type = char;
@@ -56,7 +56,7 @@ class basic_ubjson_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 public:
-    template <class Sourceable>
+    template <typename Sourceable>
         basic_ubjson_parser(Sourceable&& source,
                           const ubjson_decode_options& options = ubjson_decode_options(),
                           const Allocator& alloc = Allocator())
@@ -86,7 +86,7 @@ public:
         nesting_depth_ = 0;
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source)
     {
         source_ = std::forward<Sourceable>(source);

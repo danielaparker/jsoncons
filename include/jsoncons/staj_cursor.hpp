@@ -38,7 +38,7 @@ enum class staj_cursor_state
     shape
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_staj_visitor : public basic_json_visitor<CharT>
 {
     using super_type = basic_json_visitor<CharT>;
@@ -633,7 +633,7 @@ private:
 
 // basic_staj_cursor
 
-template<class CharT>
+template <typename CharT>
 class basic_staj_cursor
 {
 public:
@@ -663,7 +663,7 @@ public:
     virtual const ser_context& context() const = 0;
 };
 
-template<class CharT>
+template <typename CharT>
 class basic_staj_filter_view : basic_staj_cursor<CharT>
 {
     basic_staj_cursor<CharT>* cursor_;

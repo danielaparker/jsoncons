@@ -6,38 +6,38 @@ If a value already exists at the target location, that value is replaced.
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add(Json& target, 
          const basic_json_pointer<Json::char_type>& location, 
          T&& value, 
          bool create_if_missing = false);                      (1) (since 0.167.0)
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add(Json& target, 
          const basic_json_pointer<Json::char_type>& location, 
          T&& value, 
          std::error_code& ec);                                 (2) (since 0.167.0)
 
-template<class Json, class T>
+template <typename Json,typename T>
 void add(Json& target, 
          const basic_json_pointer<Json::char_type>& location, 
          T&& value, 
          bool create_if_missing, 
          std::error_code& ec);                                 (3) (since 0.167.0)
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add(Json& target, 
          const StringSource& location_str, 
          T&& value, 
          bool create_if_missing = false);                      (4)
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add(Json& target, 
          const StringSource& location_str, 
          T&& value, 
          std::error_code& ec);                                 (5)
 
-template<class Json, class StringSource, class T>
+template <typename Json,typename StringSource,typename T>
 void add(Json& target, 
          const StringSource& location_str, 
          T&& value, 

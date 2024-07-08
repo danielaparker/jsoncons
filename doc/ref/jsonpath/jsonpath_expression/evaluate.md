@@ -4,7 +4,7 @@
 Json evaluate(reference root, result_options options = result_options()); (1)
 ```
 ```cpp
-template <class BinaryOp>
+template <typename BinaryOp>
 void evaluate(reference root, BinaryOp op, 
               result_options options = result_options());  (2)
 ```

@@ -17,7 +17,7 @@
 namespace jsoncons { 
 namespace mergepatch {
 
-    template <class Json>
+    template <typename Json>
     Json from_diff(const Json& source, const Json& target)
     {
         if (!source.is_object() || !target.is_object())
@@ -55,7 +55,7 @@ namespace mergepatch {
     }
 
     namespace detail {
-        template <class Json>
+        template <typename Json>
         Json apply_merge_patch_(Json& target, const Json& patch)
         {
             if (patch.is_object())
@@ -91,7 +91,7 @@ namespace mergepatch {
         }
     } // namespace detail
 
-    template <class Json>
+    template <typename Json>
     void apply_merge_patch(Json& target, const Json& patch)
     {
         target = detail::apply_merge_patch_(target, patch);

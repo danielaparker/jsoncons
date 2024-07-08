@@ -12,13 +12,13 @@
 
 namespace jsoncons { 
 
-    template <class CharT, class Allocator = std::allocator<char>>
+    template <typename CharT,typename Allocator = std::allocator<char>>
     class basic_item_event_visitor_to_json_visitor;
 
-    template <class CharT>
+    template <typename CharT>
     class basic_item_event_visitor 
     {
-        template <class Ch, class Allocator>
+        template <typename Ch,typename Allocator>
         friend class basic_item_event_visitor_to_json_visitor;
     public:
         using char_type = CharT;
@@ -160,7 +160,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
                                const ser_context& context=ser_context(),
@@ -175,7 +175,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context=ser_context(),
@@ -305,7 +305,7 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
@@ -315,7 +315,7 @@ namespace jsoncons {
             return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context,
@@ -357,7 +357,7 @@ namespace jsoncons {
             return visit_double(value, tag, context, ec);
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag=semantic_tag::none,
                          const ser_context& context=ser_context())
@@ -371,7 +371,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag,
                          const ser_context& context,
@@ -742,7 +742,7 @@ namespace jsoncons {
         }
     };
 
- template <class CharT, class Allocator>
+ template <typename CharT,typename Allocator>
     class basic_item_event_visitor_to_json_visitor : public basic_item_event_visitor<CharT>
     {
     public:
@@ -1718,7 +1718,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_default_item_event_visitor : public basic_item_event_visitor<CharT>
     {
         bool parse_more_;
@@ -1865,7 +1865,7 @@ namespace jsoncons {
 
     // basic_json_visitor_to_item_event_visitor
 
-    template <class CharT>
+    template <typename CharT>
     class basic_json_visitor_to_item_event_visitor : public basic_json_visitor<CharT>
     {
     public:

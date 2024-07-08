@@ -172,10 +172,10 @@ namespace jsonpath {
         return a;
     }
 
-    template <class Json>
+    template <typename Json>
     class parameter;
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class value_or_pointer
     {
     public:
@@ -252,7 +252,7 @@ namespace jsonpath {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class parameter
     {
         using value_type = Json;
@@ -261,7 +261,7 @@ namespace jsonpath {
     private:
         value_or_pointer<Json,reference> data_;
     public:
-        template <class JsonReference>
+        template <typename JsonReference>
         parameter(value_or_pointer<Json,JsonReference>&& data) noexcept
             : data_(nullptr)
         {
@@ -286,7 +286,7 @@ namespace jsonpath {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class custom_function
     {
     public:
@@ -338,7 +338,7 @@ namespace jsonpath {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class custom_functions
     {
         using char_type = typename Json::char_type;
@@ -370,10 +370,10 @@ namespace jsonpath {
 
 namespace detail {
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class dynamic_resources;
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct unary_operator
     {
         std::size_t precedence_level_;
@@ -401,7 +401,7 @@ namespace detail {
                               std::error_code&) const = 0;
     };
 
-    template <class Json>
+    template <typename Json>
     bool is_false(const Json& val)
     {
         return ((val.is_array() && val.empty()) ||
@@ -411,13 +411,13 @@ namespace detail {
                  val.is_null());
     }
 
-    template <class Json>
+    template <typename Json>
     bool is_true(const Json& val)
     {
         return !is_false(val);
     }
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class unary_not_operator final : public unary_operator<Json,JsonReference>
     {
     public:
@@ -432,7 +432,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class unary_minus_operator final : public unary_operator<Json,JsonReference>
     {
     public:
@@ -458,7 +458,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class regex_operator final : public unary_operator<Json,JsonReference>
     {
         using char_type = typename Json::char_type;
@@ -485,7 +485,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct binary_operator
     {
         std::size_t precedence_level_;
@@ -523,7 +523,7 @@ namespace detail {
 
     // Implementations
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class or_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -560,7 +560,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class and_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -594,7 +594,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class eq_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -621,7 +621,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class ne_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -648,7 +648,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class lt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -683,7 +683,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class lte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -718,7 +718,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class gt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -755,7 +755,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class gte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -790,7 +790,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class plus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -832,7 +832,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class minus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -874,7 +874,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class mult_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -916,7 +916,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class div_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -960,7 +960,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class modulus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
@@ -1005,7 +1005,7 @@ namespace detail {
     };
 
     // function_base
-    template <class Json>
+    template <typename Json>
     class function_base
     {
         jsoncons::optional<std::size_t> arg_count_;
@@ -1041,7 +1041,7 @@ namespace detail {
         }
     };  
 
-    template <class Json>
+    template <typename Json>
     class decorator_function : public function_base<Json>
     {
     public:
@@ -1065,7 +1065,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class contains_function : public function_base<Json>
     {
     public:
@@ -1133,7 +1133,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class ends_with_function : public function_base<Json>
     {
     public:
@@ -1195,7 +1195,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class starts_with_function : public function_base<Json>
     {
     public:
@@ -1257,7 +1257,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class sum_function : public function_base<Json>
     {
     public:
@@ -1316,7 +1316,7 @@ namespace detail {
 
 #if defined(JSONCONS_HAS_STD_REGEX)
 
-    template <class Json>
+    template <typename Json>
     class tokenize_function : public function_base<Json>
     {
         using allocator_type = typename Json::allocator_type;
@@ -1387,7 +1387,7 @@ namespace detail {
 
 #endif // defined(JSONCONS_HAS_STD_REGEX)
 
-    template <class Json>
+    template <typename Json>
     class ceil_function : public function_base<Json>
     {
     public:
@@ -1439,7 +1439,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class floor_function : public function_base<Json>
     {
     public:
@@ -1491,7 +1491,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class to_number_function : public function_base<Json>
     {
     public:
@@ -1565,7 +1565,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class prod_function : public function_base<Json>
     {
     public:
@@ -1620,7 +1620,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class avg_function : public function_base<Json>
     {
     public:
@@ -1678,7 +1678,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class min_function : public function_base<Json>
     {
     public:
@@ -1748,7 +1748,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class max_function : public function_base<Json>
     {
     public:
@@ -1819,7 +1819,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class abs_function : public function_base<Json>
     {
     public:
@@ -1874,7 +1874,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class length_function : public function_base<Json>
     {
     public:
@@ -1931,7 +1931,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class keys_function : public function_base<Json>
     {
         using allocator_type = typename Json::allocator_type;
@@ -2059,7 +2059,7 @@ namespace detail {
         }
     }
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_value_pair
     {
         using char_type = typename Json::char_type;
@@ -2094,7 +2094,7 @@ namespace detail {
         }
     };
  
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_value_pair_less
     {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
@@ -2104,7 +2104,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_value_pair_greater
     {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
@@ -2114,7 +2114,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_value_pair_equal
     {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
@@ -2124,7 +2124,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct path_component_value_pair
     {
         using char_type = typename Json::char_type;
@@ -2154,7 +2154,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class node_receiver
     {
     public:
@@ -2168,7 +2168,7 @@ namespace detail {
         virtual void add(const path_node_type& base_path, reference value) = 0;
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class path_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
@@ -2193,7 +2193,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class path_component_value_receiver : public node_receiver<Json,JsonReference>
     {
     public:
@@ -2211,7 +2211,7 @@ namespace detail {
         }
     };
 
-    template <class Json, class JsonReference>
+    template <typename Json,typename JsonReference>
     class dynamic_resources
     {
         using allocator_type = typename Json::allocator_type;
@@ -2281,7 +2281,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     struct node_less
     {
         bool operator()(const path_value_pair<Json,JsonReference>& a, const path_value_pair<Json,JsonReference>& b) const
@@ -2290,7 +2290,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class jsonpath_selector
     {
         bool is_path_;
@@ -2356,7 +2356,7 @@ namespace detail {
         }
     };
 
-    template <class Json, class JsonReference>
+    template <typename Json,typename JsonReference>
     struct static_resources
     {
         using allocator_type = typename Json::allocator_type;
@@ -2596,7 +2596,7 @@ namespace detail {
         }
     };
 
-    template <class Json, class JsonReference>
+    template <typename Json,typename JsonReference>
     class expression_base
     {
     public:
@@ -2621,7 +2621,7 @@ namespace detail {
         virtual std::string to_string(int level = 0) const = 0;
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class token
     {
     public:
@@ -2980,7 +2980,7 @@ namespace detail {
         }
     };
 
-    template <class Callback, class Json,class JsonReference>
+    template <typename Callback,typename Json,typename JsonReference>
     class callback_receiver : public node_receiver<Json,JsonReference>
     {
     public:
@@ -3006,7 +3006,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class path_expression
     {
     public:
@@ -3078,7 +3078,7 @@ namespace detail {
             return result;
         }
 
-        template <class Callback>
+        template <typename Callback>
         typename std::enable_if<extension_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  reference root,
@@ -3188,7 +3188,7 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
+    template <typename Json,typename JsonReference>
     class expression : public expression_base<Json,JsonReference>
     {
     public:

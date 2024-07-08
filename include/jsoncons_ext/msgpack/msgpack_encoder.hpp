@@ -26,7 +26,7 @@ namespace msgpack {
 
     enum class msgpack_container_type {object, array};
 
-    template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
+    template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
     class basic_msgpack_encoder final : public basic_json_visitor<char>
     {
         enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };

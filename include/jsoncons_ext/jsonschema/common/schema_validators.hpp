@@ -18,7 +18,7 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
+    template <typename Json>
     class document_schema_validator : public schema_validator<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -108,7 +108,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class boolean_schema_validator : public schema_validator<Json>
     {
     public:
@@ -199,7 +199,7 @@ namespace jsonschema {
         }
     };
  
-    template <class Json>
+    template <typename Json>
     class object_schema_validator : public schema_validator<Json>
     {
     public:

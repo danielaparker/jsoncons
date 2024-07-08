@@ -23,7 +23,7 @@ namespace jsoncons {
 
     // text_source_adaptor
 
-    template<class Source>
+    template <typename Source>
     class text_source_adaptor 
     {
     public:
@@ -38,7 +38,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         text_source_adaptor(Sourceable&& source)
             : source_(std::forward<Sourceable>(source)), bof_(true)
         {
@@ -83,7 +83,7 @@ namespace jsoncons {
 
     // json_source_adaptor
 
-    template<class Source>
+    template <typename Source>
     class json_source_adaptor 
     {
     public:
@@ -98,7 +98,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         json_source_adaptor(Sourceable&& source)
             : source_(std::forward<Sourceable>(source)), bof_(true)
         {

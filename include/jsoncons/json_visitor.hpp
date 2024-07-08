@@ -20,7 +20,7 @@
 
 namespace jsoncons {
 
-    template <class CharT>
+    template <typename CharT>
     class basic_json_visitor
     {
     public:
@@ -159,7 +159,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
                                const ser_context& context=ser_context(),
@@ -174,7 +174,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context=ser_context(),
@@ -304,7 +304,7 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
@@ -314,7 +314,7 @@ namespace jsoncons {
             return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context,
@@ -356,7 +356,7 @@ namespace jsoncons {
             return visit_double(value, tag, context, ec);
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag=semantic_tag::none,
                          const ser_context& context=ser_context())
@@ -370,7 +370,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag,
                          const ser_context& context,
@@ -745,7 +745,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_default_json_visitor : public basic_json_visitor<CharT>
     {
         bool parse_more_;
@@ -881,7 +881,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_json_diagnostics_visitor : public basic_default_json_visitor<CharT>
     {
     public:
@@ -917,7 +917,7 @@ namespace jsoncons {
     public:
         // If CharT is char, then enable the default constructor which binds to
         // std::cout.
-        template <class U = enabler>
+        template <typename U = enabler>
         basic_json_diagnostics_visitor(
             typename std::enable_if<std::is_same<CharT, char>::value, U>::type = enabler{})
             : basic_json_diagnostics_visitor(std::cout)
@@ -926,7 +926,7 @@ namespace jsoncons {
 
         // If CharT is wchar_t, then enable the default constructor which binds
         // to std::wcout.
-        template <class U = enabler>
+        template <typename U = enabler>
         basic_json_diagnostics_visitor(
             typename std::enable_if<std::is_same<CharT, wchar_t>::value, U>::type = enabler{})
             : basic_json_diagnostics_visitor(std::wcout)
@@ -1038,19 +1038,19 @@ namespace jsoncons {
 #if __cplusplus >= 201703L
 // not needed for C++17
 #else
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_object_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_key_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_string_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_byte_string_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_null_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_bool_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_uint64_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_object_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_key_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_string_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_byte_string_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_null_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_bool_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_uint64_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
 #endif // C++17 check
 
     using json_visitor = basic_json_visitor<char>;

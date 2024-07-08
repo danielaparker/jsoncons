@@ -213,7 +213,7 @@ TEST_CASE("encode_ubjson overloads")
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("encode_ubjson allocator_set overloads")

@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template <class CharT, class Allocator>
+template <typename CharT,typename Allocator>
 class basic_path_element   (since 0.172.0)
 ```
 

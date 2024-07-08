@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template<class Json>
+template <typename Json>
 std::size_t remove(Json& root, const basic_json_location<Json::char_type>& location);            (1)
 
-template<class Json>
+template <typename Json>
 std::size_t remove(Json& root, const jsoncons::basic_string_view<Json::char_type>& path_string); (2)
 ```
 

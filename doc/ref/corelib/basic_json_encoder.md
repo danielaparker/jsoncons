@@ -102,12 +102,12 @@ Reset encoder to write a new value to a new sink
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); (12) (until 0.152.0)
 
-    template <class Source>
+    template <typename Source>
     bool byte_string_value(const Source& souce, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); (12) (since 0.152.0)
 
-    template <class Source>
+    template <typename Source>
     bool byte_string_value(const Source& souce, 
                            uint64_t ext_tag, 
                            const ser_context& context=ser_context()); (13) (since 0.152.0)
@@ -175,13 +175,13 @@ Reset encoder to write a new value to a new sink
                            const ser_context& context,
                            std::error_code& ec); (28) (until 0.152.0)
 
-    template <class Source>   
+    template <typename Source>   
     bool byte_string_value(const Source& source, 
                            semantic_tag tag, 
                            const ser_context& context,
                            std::error_code& ec); (28) (since 0.152.0)
 
-    template <class Source>   
+    template <typename Source>   
     bool byte_string_value(const Source& source, 
                            uint64_t ext_tag, 
                            const ser_context& context,
@@ -207,7 +207,7 @@ Reset encoder to write a new value to a new sink
                       const ser_context& context,
                       std::error_code& ec); (33)
 
-    template <class T>
+    template <typename T>
     bool typed_array(const span<T>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=ser_context()); (34)
@@ -222,7 +222,7 @@ Reset encoder to write a new value to a new sink
 
     bool end_multi_dim(const ser_context& context=ser_context()); (37) 
 
-    template <class T>
+    template <typename T>
     bool typed_array(const span<T>& data, 
                      semantic_tag tag,
                      const ser_context& context,

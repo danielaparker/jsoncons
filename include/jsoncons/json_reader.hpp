@@ -24,7 +24,7 @@ namespace jsoncons {
 
     // utf8_other_json_input_adapter
 
-    template <class CharT>
+    template <typename CharT>
     class json_utf8_to_other_visitor_adaptor : public json_visitor
     {
     public:
@@ -148,7 +148,7 @@ namespace jsoncons {
         }
     };
 
-    template<class CharT,class Source=jsoncons::stream_source<CharT>,class TempAllocator=std::allocator<char>>
+    template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
     class basic_json_reader 
     {
     public:
@@ -170,7 +170,7 @@ namespace jsoncons {
         basic_json_reader& operator=(const basic_json_reader&) = delete;
 
     public:
-        template <class Sourceable>
+        template <typename Sourceable>
         explicit basic_json_reader(Sourceable&& source, const TempAllocator& temp_alloc = TempAllocator())
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
@@ -180,7 +180,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options, 
                           const TempAllocator& temp_alloc = TempAllocator())
@@ -192,7 +192,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const TempAllocator& temp_alloc = TempAllocator())
@@ -204,7 +204,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -217,7 +217,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor, 
                           const TempAllocator& temp_alloc = TempAllocator())
@@ -229,7 +229,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor,
                           const basic_json_decode_options<CharT>& options, 
@@ -242,7 +242,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -255,7 +255,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,

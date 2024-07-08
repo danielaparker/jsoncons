@@ -13,7 +13,7 @@
 
 namespace jsoncons {
 
-template <class CharT>
+template <typename CharT>
 class basic_json_filter : public basic_json_visitor<CharT>
 {
 public:
@@ -234,7 +234,7 @@ private:
     }
 };
 
-template <class CharT>
+template <typename CharT>
 class basic_rename_object_key_filter : public basic_json_filter<CharT>
 {
 public:
@@ -268,7 +268,7 @@ private:
     }
 };
 
-template <class From,class To>
+template <typename From,typename To>
 class json_visitor_adaptor_base : public From
 {
 public:
@@ -491,12 +491,12 @@ private:
 
 };
 
-template <class From,class To,class Enable=void>
+template <typename From,typename To,typename Enable=void>
 class json_visitor_adaptor 
 {
 };
 
-template <class From,class To>
+template <typename From,typename To>
 class json_visitor_adaptor<From,To,typename std::enable_if<extension_traits::is_narrow_character<typename From::char_type>::value &&
                                                            extension_traits::is_narrow_character<typename To::char_type>::value>::type> : public json_visitor_adaptor_base<From,To>
 {
@@ -539,7 +539,7 @@ private:
     }
 };
 
-template <class From,class To>
+template <typename From,typename To>
 class json_visitor_adaptor<From,To,typename std::enable_if<!(extension_traits::is_narrow_character<typename From::char_type>::value &&
                                                              extension_traits::is_narrow_character<typename To::char_type>::value)>::type> : public json_visitor_adaptor_base<From,To>
 {
@@ -593,7 +593,7 @@ private:
     }
 };
 
-template <class From,class To>
+template <typename From,typename To>
 json_visitor_adaptor<From,To> make_json_visitor_adaptor(To& to)
 {
     return json_visitor_adaptor<From, To>(to);

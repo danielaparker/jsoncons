@@ -15,7 +15,7 @@ using namespace jsoncons;
 
 // https://tools.ietf.org/html/rfc4648#section-4 test vectors
 
-template <class CharT>
+template <typename CharT>
 void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;
@@ -35,7 +35,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::basic_str
     }
 }
 
-template <class CharT>
+template <typename CharT>
 void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;
@@ -55,7 +55,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::basic_
     }
 }
 
-template <class CharT>
+template <typename CharT>
 void check_encode_base16(const std::vector<uint8_t>& input, const std::basic_string<CharT>& expected)
 {
     std::basic_string<CharT> result;

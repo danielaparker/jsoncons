@@ -15,10 +15,10 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    template <class Json>
+    template <typename Json>
     using schema_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
-    template <class Json>
+    template <typename Json>
     class schema_builder
     {
     public:

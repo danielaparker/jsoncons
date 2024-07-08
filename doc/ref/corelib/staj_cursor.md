@@ -51,12 +51,12 @@ Returns the current [context](ser_context.md)
 
 #### Non-member functions
 
-    template <class T, class CharT, class Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    template <typename T,typename CharT,typename Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
     staj_array_view<Json,T> staj_array(basic_staj_cursor<CharT>& cursor);
 Create a view of the parse events as an array of items of type `T`. 
 The current event type must be `staj_event_type::begin_array`.
 
-    template <class Key, class T, class CharT, class Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    template <typename Key,typename T,typename CharT,typename Json=std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
     staj_object_view<Key, T, Json> staj_object(basic_staj_cursor<CharT>& cursor);
 Create a view of the parse events as an object of key-value pairs.
 The current event type must be `staj_event_type::begin_object`.

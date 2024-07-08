@@ -84,7 +84,7 @@ enum class semantic_tag : uint8_t
     code = 0x14
 };
 
-template <class CharT>
+template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_tag tag)
 {
     static constexpr const CharT* na_name = JSONCONS_CSTRING_CONSTANT(CharT, "n/a");

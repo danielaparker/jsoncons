@@ -6,26 +6,26 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 ```cpp
 #include <jsoncons/decode_json.hpp>
 
-template <class T, class Source>
+template <typename T,typename Source>
 T decode_json(const Source& s,
     const basic_json_decode_options<Source::value_type>& options 
         = basic_json_decode_options<Source::value_type>());                                     (1)
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 T decode_json(std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (2)
 
-template <class T, class Iterator>
+template <typename T,typename Iterator>
 T decode_json(Iterator first, Iterator last,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (3)
 
-template <class T, class Source, class Allocator, class TempAllocator>
+template <typename T,typename Source,typename Allocator,typename TempAllocator>
 T decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& s,
     const basic_json_decode_options<Source::value_type>& options 
         = basic_json_decode_options<Source::value_type>());                                     (4) (since 0.171.0)
 
-template <class T, class CharT, class Allocator, class TempAllocator>
+template <typename T,typename CharT,typename Allocator,typename TempAllocator>
 T decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::basic_istream<CharT>& is,
     const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>());      (5) (since 0.171.0)

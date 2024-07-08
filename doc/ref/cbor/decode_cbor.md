@@ -9,28 +9,28 @@
 Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
 ```cpp
-template<class T>
+template <typename T>
 T decode_cbor(const std::vector<uint8_t>& source,
     const cbor_decode_options& options = cbor_decode_options());        (1) (until 0.152.0)
 
-template<class T, class Source>
+template <typename T,typename Source>
 T decode_cbor(const Source& source,
     const cbor_decode_options& options = cbor_decode_options());        (1) (since 0.152.0)
 
-template<class T>
+template <typename T>
 T decode_cbor(std::istream& is,
     const cbor_decode_options& options = cbor_decode_options());        (2)
 
-template<class T, class InputIt>
+template <typename T,typename InputIt>
 T decode_cbor(InputIt first, InputIt last,
     const cbor_decode_options& options = cbor_decode_options());        (3) (since 0.153.0)
 
-template<class T, class Source,class Allocator,class TempAllocator>
+template <typename T,typename Source,class Allocator,class TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& source,
     const cbor_decode_options& options = cbor_decode_options());        (4) (since 0.171.0)
 
-template<class T,class Allocator,class TempAllocator>
+template <typename T,class Allocator,class TempAllocator>
 T decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
     const cbor_decode_options& options = cbor_decode_options());        (5) (since 0.171.0)

@@ -93,7 +93,7 @@ struct default_csv_parsing
 
 namespace detail {
 
-    template <class CharT,class TempAllocator>
+    template <typename CharT,typename TempAllocator >
     class parse_event
     {
         using temp_allocator_type = TempAllocator;
@@ -207,7 +207,7 @@ namespace detail {
         }
     };
 
-    template <class CharT, class TempAllocator>
+    template <typename CharT,typename TempAllocator >
     class m_columns_filter : public basic_json_visitor<CharT>
     {
     public:
@@ -492,7 +492,7 @@ namespace detail {
 
 } // namespace detail
 
-template<class CharT,class TempAllocator=std::allocator<char>>
+template <typename CharT,typename TempAllocator =std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:

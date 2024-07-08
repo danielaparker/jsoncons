@@ -1,7 +1,7 @@
 ### jsoncons::basic_json::parse
 
 ```cpp
-template <class Source>
+template <typename Source>
 static basic_json parse(const Source& source, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (1) 
 
@@ -14,31 +14,31 @@ static basic_json parse(const char_type* str, std::size_t length,
 static basic_json parse(std::basic_istream<char_type>& is, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (4) 
 
-template <class InputIt>
+template <typename InputIt>
 static basic_json parse(InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (5) 
 
-template <class Source, class TempAllocator>
+template <typename Source,typename TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
     const Source& source, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (6) (since 0.171.0)
 
-template <class TempAllocator>
+template <typename TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     const char_type* str, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (7) (since 0.171.0)
 
-template <class TempAllocator>
+template <typename TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     const char_type* str, std::size_t length, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (8) (since 0.177.0)
 
-template <class TempAllocator>
+template <typename TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set, 
     std::basic_istream<char_type>& is, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (9) (since 0.171.0)
 
-template <class InputIt,class TempAllocator>
+template <typename InputIt,class TempAllocator>
 static basic_json parse(const allocator_set<allocator_type,TempAllocator>& alloc_set,
     InputIt first, InputIt last, 
     const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>());   (10) (since 0.171.0)

@@ -277,7 +277,7 @@ TEST_CASE("encode/decode map with integer key")
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("decode_json with work allocator")

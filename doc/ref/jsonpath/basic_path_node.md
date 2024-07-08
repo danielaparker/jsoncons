@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template <class CharT>                           (since 0.172.0)
+template <typename CharT>                           (since 0.172.0)
 class basic_path_node
 ```
 
@@ -66,7 +66,7 @@ Returns the kind of the node
 
 #### Non-member functions
 
-    template <class CharT, class Allocator = std::allocator<CharT>>
+    template <typename CharT,typename Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_path_node<CharT>& location,
         const Allocator& alloc = Allocator())
 Returns a normalized path

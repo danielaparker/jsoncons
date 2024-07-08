@@ -33,20 +33,20 @@ msgpack_bytes_cursor   |basic_msgpack_cursor<jsoncons::bytes_source>
 
 #### Constructors
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator& alloc = Allocator()); (1)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          std::error_code& ec); (2)
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options,
                          std::error_code& ec); (3)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
                          Sourceable&& source,
                          const msgpack_decode_options& options,
@@ -96,13 +96,13 @@ Returns the current [context](ser_context.md)
     void reset();
 Reset cursor to read another value from the same source
 
-    template <class Sourceable>
+    template <typename Sourceable>
     reset(Sourceable&& source)
 Reset cursor to read new value from a new sources
 
 #### Non-member functions
 
-   template <class Source, class Allocator>
+   template <typename Source,typename Allocator>
    staj_filter_view operator|(basic_msgpack_cursor<Source,Allocator>& cursor, 
                               std::function<bool(const staj_event&, const ser_context&)> pred);
 

@@ -39,7 +39,7 @@ namespace detail {
         return cp >= 0x80;
     }
 
-    template <class CharT, class Sink>
+    template <typename CharT,typename Sink>
     std::size_t escape_string(const CharT* s, std::size_t length,
                          bool escape_all_non_ascii, bool escape_solidus,
                          Sink& sink)
@@ -188,7 +188,7 @@ namespace detail {
 
 } // namespace detail
 
-    template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
+    template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_json_encoder final : public basic_json_visitor<CharT>
     {
         static const jsoncons::basic_string_view<CharT> null_constant()
@@ -1060,7 +1060,7 @@ namespace detail {
         }
     };
 
-    template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
+    template <typename CharT,typename Sink=jsoncons::stream_sink<CharT>,typename Allocator=std::allocator<char>>
     class basic_compact_json_encoder final : public basic_json_visitor<CharT>
     {
         static const std::array<CharT, 4>& null_constant()

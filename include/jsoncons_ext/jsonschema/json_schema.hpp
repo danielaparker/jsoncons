@@ -98,10 +98,10 @@ namespace jsonschema {
         }
     };
        
-    template <class Json>
+    template <typename Json>
     class json_validator;
     
-    template <class Json>
+    template <typename Json>
     class json_schema
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -150,7 +150,7 @@ namespace jsonschema {
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class MsgReporter>
+        template <typename MsgReporter>
         typename std::enable_if<extension_traits::is_unary_function_object_exact<MsgReporter,walk_result,validation_message>::value,void>::type
         validate(const Json& instance, const MsgReporter& reporter) const
         {
@@ -164,7 +164,7 @@ namespace jsonschema {
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class MsgReporter>
+        template <typename MsgReporter>
         typename std::enable_if<extension_traits::is_unary_function_object_exact<MsgReporter,walk_result,validation_message>::value,void>::type
         validate(const Json& instance, MsgReporter&& reporter, Json& patch) const
         {
@@ -205,7 +205,7 @@ namespace jsonschema {
             visitor.flush();
         }
         
-        template <class WalkReporter>
+        template <typename WalkReporter>
         void walk(const Json& instance, const WalkReporter& reporter) const
         {
             jsonpointer::json_pointer instance_location{};

@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons/staj_cursor.hpp>
 
-template<class CharT>
+template <typename CharT>
 class basic_staj_event
 ```
 
@@ -55,11 +55,11 @@ If `event_type()` is a `staj_event_type::begin_object` or a `staj_event_type::be
 or array if known, otherwise 0.
 For all other event types, returns 0.
 
-    template <class T, class... Args>
+    template <typename T,typename... Args>
     T get() const;
 Attempts to convert the json value to the template value type.
 
-    template <class T, class... Args>
+    template <typename T,typename... Args>
     T get(std::error_code& ec) const;
 Attempts to convert the json value to the template value type.
 

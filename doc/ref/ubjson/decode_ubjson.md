@@ -5,28 +5,28 @@ Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data 
 ```cpp
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 
-template<class T>
+template <typename T>
 T decode_ubjson(const std::vector<uint8_t>& source,
     const bson_decode_options& options = bson_decode_options());    (1) (until 0.152.0)
 
-template<class T, class Source>
+template <typename T,typename Source>
 T decode_ubjson(const Source& source,
     const bson_decode_options& options = bson_decode_options());           (1) (since 0.152.0)
 
-template<class T>
+template <typename T>
 T decode_ubjson(std::istream>& is,
     const bson_decode_options& options = bson_decode_options());           (2)
 
-template<class T, class InputIt>
+template <typename T,typename InputIt>
 T decode_ubjson(InputIt first, InputIt last,
     const bson_decode_options& options = bson_decode_options());           (3)
 
-template<class T, class Source,class Allocator,class TempAllocator>
+template <typename T,typename Source,class Allocator,class TempAllocator>
 T decode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const Source& source,
     const ubjson_decode_options& options = ubjson_decode_options());       (4) (since 0.171.0)
 
-template<class T,class Allocator,class TempAllocator>
+template <typename T,class Allocator,class TempAllocator>
 T decode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     std::istream& is,
     const ubjson_decode_options& options = ubjson_decode_options());       (5) (since 0.171.0)

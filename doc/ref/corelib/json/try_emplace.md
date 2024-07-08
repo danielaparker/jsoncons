@@ -1,11 +1,11 @@
 ### jsoncons::basic_json::try_emplace
 
 ```cpp
-template <class T>
+template <typename T>
 pair<object_iterator, bool> try_emplace(const string_view_type& key, 
                                         Args&&... args); (1)
 
-template <class T>
+template <typename T>
 object_iterator try_emplace(const_object_iterator hint, 
                             const string_view_type& key, 
                             Args&&... args); (2)

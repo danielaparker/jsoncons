@@ -23,7 +23,7 @@
 namespace jsoncons { 
 namespace detail {
 
-    template <class CharT, class Traits = std::char_traits<CharT>>
+    template <typename CharT,typename Traits = std::char_traits<CharT>>
     class basic_string_view
     {
     private:
@@ -54,7 +54,7 @@ namespace detail {
         }
         constexpr basic_string_view(const basic_string_view& other) noexcept = default;
 
-        template <class Tr, class Allocator>
+        template <typename Tr,typename Allocator>
         JSONCONS_CPP14_CONSTEXPR  basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept
             : data_(s.data()), length_(s.length())
         {
@@ -68,7 +68,7 @@ namespace detail {
             return *this;
         }
 
-        template <class Allocator>
+        template <typename Allocator>
         explicit operator std::basic_string<CharT,Traits,Allocator>() const
         { 
             return std::basic_string<CharT,Traits,Allocator>(data_,length_); 
@@ -186,7 +186,7 @@ namespace detail {
             return rc != 0 ? rc : (length_ == length? 0 : length_ < length? -1 : 1);
         }
 
-        template <class Allocator>
+        template <typename Allocator>
         int compare(const std::basic_string<CharT,Traits,Allocator>& s) const noexcept 
         {
             const int rc = Traits::compare(data_, s.data(), (std::min)(length_, s.length()));
@@ -388,31 +388,31 @@ namespace detail {
     };
 
     // ==
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator==(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) == 0;
     }
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
                     const CharT* rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator==(const CharT* lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -420,31 +420,31 @@ namespace detail {
     }
 
     // !=
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator!=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) != 0;
     }
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
                     const CharT* rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator!=(const CharT* lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -452,19 +452,19 @@ namespace detail {
     }
 
     // <=
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator<=(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator<=(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator<=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -472,19 +472,19 @@ namespace detail {
     }
 
     // <
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator<(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator<(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator<(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -492,19 +492,19 @@ namespace detail {
     }
 
     // >=
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator>=(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator>=(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator>=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -512,19 +512,19 @@ namespace detail {
     }
 
     // >
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     bool operator>(const basic_string_view<CharT,Traits>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator>(const basic_string_view<CharT,Traits>& lhs, 
                     const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
-    template<class CharT,class Traits,class Allocator>
+    template <typename CharT,typename Traits,typename Allocator>
     bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs, 
                     const basic_string_view<CharT,Traits>& rhs) noexcept
     {
@@ -538,7 +538,7 @@ namespace detail {
 } // namespace jsoncons
 
 namespace std {
-    template<class CharT,class Traits>
+    template <typename CharT,typename Traits>
     struct hash<jsoncons::detail::basic_string_view<CharT, Traits>>
     {
         size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept

@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace bson {
 
-template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
+template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_bson_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };

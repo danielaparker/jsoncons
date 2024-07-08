@@ -5,7 +5,7 @@ Json select(const_reference root, result_options options = result_options()); (1
 ```
 
 ```cpp
-template <class BinaryOp>
+template <typename BinaryOp>
 void select(const_reference root, BinaryOp op, 
     result_options options = result_options());                                     (2) (since 0.172.0)
 ```

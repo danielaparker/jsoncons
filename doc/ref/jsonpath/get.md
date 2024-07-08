@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template<class Json>
+template <typename Json>
 Json* get(Json& root, const basic_json_location<Json::char_type>& location);                   (until 0.175.0)
 
-template<class Json>
+template <typename Json>
 std::pair<Json*,bool> get(Json& root, const basic_json_location<Json::char_type>& location);   (since 0.175.0)
 ```
 

@@ -13,7 +13,7 @@ namespace jsoncons {
 namespace jsonschema {
 namespace draft4 {
     
-    template <class Json>
+    template <typename Json>
     struct schema_draft4
     {
         static Json get_schema() 

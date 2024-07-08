@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
+template <typename Json>
 Json flatten(const Json& value); (1)
 
-template<class Json>
+template <typename Json>
 Json unflatten(const Json& value, unflatten_options options = unflatten_options::none); (2) (since 0.150.0)
 ```
 

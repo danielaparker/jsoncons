@@ -20,7 +20,7 @@ namespace jsoncons { namespace jsonpatch {
 
 namespace detail {
 
-    template <class CharT>
+    template <typename CharT>
     struct jsonpatch_names
     {
         static std::basic_string<CharT> test_name()
@@ -80,7 +80,7 @@ namespace detail {
         }
     };
 
-    template<class Json>
+    template <typename Json>
     jsonpointer::basic_json_pointer<typename Json::char_type> definite_path(const Json& root, jsonpointer::basic_json_pointer<typename Json::char_type>& location)
     {
         using char_type = typename Json::char_type;
@@ -121,7 +121,7 @@ namespace detail {
     enum class op_type {add,remove,replace};
     enum class state_type {begin,abort,commit};
 
-    template <class Json>
+    template <typename Json>
     struct operation_unwinder
     {
         using char_type = typename Json::char_type;
@@ -196,7 +196,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     Json from_diff(const Json& source, const Json& target, const typename Json::string_view_type& path)
     {
         using char_type = typename Json::char_type;
@@ -295,7 +295,7 @@ namespace detail {
     }
 }
 
-template <class Json>
+template <typename Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec)
 {
     if (!patch.is_array())
@@ -562,14 +562,14 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
     }
 }
 
-template <class Json>
+template <typename Json>
 Json from_diff(const Json& source, const Json& target)
 {
     std::basic_string<typename Json::char_type> path;
     return jsoncons::jsonpatch::detail::from_diff(source, target, path);
 }
 
-template <class Json>
+template <typename Json>
 void apply_patch(Json& target, const Json& patch)
 {
     std::error_code ec;

@@ -4,7 +4,7 @@
 basic_json& operator=(const basic_json& rhs);
 basic_json& operator=(basic_json&& rhs) noexcept; (1)
 
-template <class T>
+template <typename T>
 basic_json& operator=(const T& rhs); (2)
 
 basic_json& operator=(const char_type* rhs); (3)

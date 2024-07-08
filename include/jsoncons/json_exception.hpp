@@ -27,12 +27,12 @@ namespace jsoncons {
 
     // json_runtime_error
 
-    template <class Base, class Enable = void>
+    template <typename Base,typename Enable = void>
     class json_runtime_error
     {
     };
 
-    template <class Base>
+    template <typename Base>
     class json_runtime_error<Base,
                              typename std::enable_if<std::is_convertible<Base*,std::exception*>::value &&
                                                      extension_traits::is_constructible_from_string<Base>::value>::type> 
@@ -57,7 +57,7 @@ namespace jsoncons {
         std::string name_;
         mutable std::string what_;
     public:
-        template <class CharT>
+        template <typename CharT>
         explicit key_not_found(const CharT* key, std::size_t length) noexcept
             : std::out_of_range("Key not found")
         {
@@ -104,7 +104,7 @@ namespace jsoncons {
         std::string name_;
         mutable std::string what_;
     public:
-        template <class CharT>
+        template <typename CharT>
         explicit not_an_object(const CharT* key, std::size_t length) noexcept
             : std::runtime_error("Attempting to access a member of a value that is not an object")
         {

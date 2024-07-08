@@ -26,7 +26,7 @@
 
 namespace jsoncons { namespace csv {
 
-    template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+    template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
     class basic_csv_reader 
     {
         struct stack_item
@@ -58,7 +58,7 @@ namespace jsoncons { namespace csv {
           \param is The input stream to read from
         */
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor, 
                          const Allocator& alloc = Allocator())
@@ -71,7 +71,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          const basic_csv_decode_options<CharT>& options, 
@@ -85,7 +85,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
@@ -98,7 +98,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          const basic_csv_decode_options<CharT>& options,
@@ -169,7 +169,7 @@ namespace jsoncons { namespace csv {
         }
     };
 
-    template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+    template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
     class legacy_basic_csv_reader 
     {
         struct stack_item
@@ -201,7 +201,7 @@ namespace jsoncons { namespace csv {
           \param is The input stream to read from
         */
 
-        template <class Sourceable>
+        template <typename Sourceable>
         legacy_basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor, 
                          const Allocator& alloc = Allocator())
@@ -214,7 +214,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         legacy_basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          const basic_csv_decode_options<CharT>& options, 
@@ -228,7 +228,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         legacy_basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
@@ -241,7 +241,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         legacy_basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          const basic_csv_decode_options<CharT>& options,
@@ -254,7 +254,7 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         legacy_basic_csv_reader(Sourceable&& source,
                          basic_json_visitor<CharT>& visitor,
                          const basic_csv_decode_options<CharT>& options,

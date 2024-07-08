@@ -371,7 +371,7 @@ namespace jmespath {
 
     // dynamic_resources
 
-    template<class Json, class JsonReference>
+    template <typename Json,typename JsonReference>
     class dynamic_resources
     {
         typedef typename Json::char_type char_type;
@@ -459,7 +459,7 @@ namespace jmespath {
         }
     };
 
-    template<class Json, class JsonReference>
+    template <typename Json,typename JsonReference>
     class jmespath_evaluator 
     {
     public:
@@ -5155,10 +5155,10 @@ namespace jmespath {
 
     } // detail
 
-    template <class Json>
+    template <typename Json>
     using jmespath_expression = typename jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&>::jmespath_expression;
 
-    template<class Json>
+    template <typename Json>
     Json search(const Json& doc, const typename Json::string_view_type& path)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
@@ -5176,7 +5176,7 @@ namespace jmespath {
         return result;
     }
 
-    template<class Json>
+    template <typename Json>
     Json search(const Json& doc, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
@@ -5193,13 +5193,13 @@ namespace jmespath {
         return result;
     }
 
-    template <class Json>
+    template <typename Json>
     jmespath_expression<Json> make_expression(const typename json::string_view_type& expr)
     {
         return jmespath_expression<Json>::compile(expr);
     }
 
-    template <class Json>
+    template <typename Json>
     jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
                                               std::error_code& ec)
     {

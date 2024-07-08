@@ -337,7 +337,7 @@ TEST_CASE("test_ojson_merge_or_update_move")
 #include <common/FreeListAllocator.hpp>
 #include <scoped_allocator>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 using custom_json = jsoncons::basic_json<char, jsoncons::order_preserving_policy, MyScopedAllocator<char>>;

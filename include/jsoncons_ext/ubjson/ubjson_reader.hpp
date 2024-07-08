@@ -20,13 +20,13 @@
 
 namespace jsoncons { namespace ubjson {
 
-template <class Source,class Allocator=std::allocator<char>>
+template <typename Source,typename Allocator=std::allocator<char>>
 class basic_ubjson_reader
 {
     basic_ubjson_parser<Source,Allocator> parser_;
     json_visitor& visitor_;
 public:
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_ubjson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const Allocator& alloc)
@@ -37,7 +37,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_ubjson_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const ubjson_decode_options& options = ubjson_decode_options(),

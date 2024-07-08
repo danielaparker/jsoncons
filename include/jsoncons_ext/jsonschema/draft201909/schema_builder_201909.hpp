@@ -28,7 +28,7 @@ namespace jsoncons {
 namespace jsonschema {
 namespace draft201909 {
 
-    template <class Json>
+    template <typename Json>
     class schema_builder_201909 : public schema_builder<Json> 
     {
     public:

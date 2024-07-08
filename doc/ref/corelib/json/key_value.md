@@ -1,7 +1,7 @@
 ### jsoncons::key_value 
 
 ```cpp
-template <class KeyT, class ValueT>
+template <typename KeyT,typename ValueT>
 class key_value
 ```
 

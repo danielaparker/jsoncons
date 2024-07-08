@@ -31,7 +31,7 @@ TEST_CASE("extension_traits tests")
 
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("extension_traits tests is_propagating_allocator")

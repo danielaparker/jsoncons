@@ -25,7 +25,7 @@ namespace detail {
             (reinterpret_cast<uintptr_t>(ptr) + alignment - 1));
     }
 
-    template <class Extra,class Allocator>
+    template <typename Extra,typename Allocator>
     struct heap_string_base
     {
         Extra extra_;
@@ -49,7 +49,7 @@ namespace detail {
         ~heap_string_base() noexcept = default;
     };
 
-    template <class CharT, class Extra, class Allocator>
+    template <typename CharT,typename Extra,typename Allocator>
     struct heap_string : public heap_string_base<Extra,Allocator>
     {
         using char_type = CharT;
@@ -89,7 +89,7 @@ namespace detail {
     };
 
     // From boost 1_71
-    template <class T, class U>
+    template <typename T,typename U>
     T launder_cast(U* u)
     {
     #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
@@ -103,7 +103,7 @@ namespace detail {
 
     // heap_string_factory
 
-    template <class CharT,class Extra,class Allocator>
+    template <typename CharT,typename Extra,typename Allocator>
     class heap_string_factory
     {
     public:

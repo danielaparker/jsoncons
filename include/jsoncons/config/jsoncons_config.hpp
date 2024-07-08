@@ -79,31 +79,31 @@ namespace jsoncons
 
 namespace jsoncons {
 
-    template<class T> 
+    template <typename T> 
     struct unique_if 
     {
         using value_is_not_array = std::unique_ptr<T>;
     };
 
-    template<class T> 
+    template <typename T> 
     struct unique_if<T[]> 
     {
         typedef std::unique_ptr<T[]> value_is_array_of_unknown_bound;
     };
 
-    template<class T, std::size_t N> 
+    template <typename T, std::size_t N> 
     struct unique_if<T[N]> {
         using value_is_array_of_known_bound = void;
     };
 
-    template<class T, class... Args>
+    template <typename T,typename... Args>
     typename unique_if<T>::value_is_not_array
     make_unique(Args&&... args) 
     {
         return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
     }
 
-    template<class T>
+    template <typename T>
     typename unique_if<T>::value_is_array_of_unknown_bound
     make_unique(std::size_t n) 
     {
@@ -111,7 +111,7 @@ namespace jsoncons {
         return std::unique_ptr<T>(new U[n]());
     }
 
-    template<class T, class... Args>
+    template <typename T,typename... Args>
     typename unique_if<T>::value_is_array_of_known_bound
     make_unique(Args&&...) = delete;
 } // jsoncons
@@ -131,7 +131,7 @@ namespace binary {
 
     // native_to_big
 
-    template<typename T, class OutputIt, class Endian=endian>
+    template <typename T,typename OutputIt,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::big,void>::type
     native_to_big(T val, OutputIt d_first)
     {
@@ -143,7 +143,7 @@ namespace binary {
         }
     }
 
-    template<typename T, class OutputIt, class Endian=endian>
+    template <typename T,typename OutputIt,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::little,void>::type
     native_to_big(T val, OutputIt d_first)
     {
@@ -158,7 +158,7 @@ namespace binary {
 
     // native_to_little
 
-    template<typename T, class OutputIt, class Endian = endian>
+    template <typename T,typename OutputIt,typename Endian = endian>
     typename std::enable_if<Endian::native == Endian::little,void>::type
     native_to_little(T val, OutputIt d_first)
     {
@@ -170,7 +170,7 @@ namespace binary {
         }
     }
 
-    template<typename T, class OutputIt, class Endian=endian>
+    template <typename T,typename OutputIt,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::big, void>::type
     native_to_little(T val, OutputIt d_first)
     {
@@ -185,7 +185,7 @@ namespace binary {
 
     // big_to_native
 
-    template<class T,class Endian=endian>
+    template <typename T,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::big,T>::type
     big_to_native(const uint8_t* first, std::size_t count)
     {
@@ -198,7 +198,7 @@ namespace binary {
         return val;
     }
 
-    template<class T,class Endian=endian>
+    template <typename T,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::little,T>::type
     big_to_native(const uint8_t* first, std::size_t count)
     {
@@ -213,7 +213,7 @@ namespace binary {
 
     // little_to_native
 
-    template<class T,class Endian=endian>
+    template <typename T,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::little,T>::type
     little_to_native(const uint8_t* first, std::size_t count)
     {
@@ -226,7 +226,7 @@ namespace binary {
         return val;
     }
 
-    template<class T,class Endian=endian>
+    template <typename T,typename Endian=endian>
     typename std::enable_if<Endian::native == Endian::big,T>::type
     little_to_native(const uint8_t* first, std::size_t count)
     {
@@ -244,7 +244,7 @@ namespace binary {
 
 namespace jsoncons {
 
-    template<typename CharT>
+    template <typename CharT>
     constexpr const CharT* cstring_constant_of_type(const char* c, const wchar_t* w);
 
     template<> inline
@@ -258,7 +258,7 @@ namespace jsoncons {
         return w;
     }
 
-    template<typename CharT>
+    template <typename CharT>
     std::basic_string<CharT> string_constant_of_type(const char* c, const wchar_t* w);
 
     template<> inline
@@ -272,7 +272,7 @@ namespace jsoncons {
         return std::wstring(w);
     }
 
-    template<typename CharT>
+    template <typename CharT>
     jsoncons::basic_string_view<CharT> string_view_constant_of_type(const char* c, const wchar_t* w);
 
     template<> inline

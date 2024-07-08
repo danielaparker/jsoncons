@@ -115,7 +115,7 @@ class validation_output
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class json_validator
     {
         std::shared_ptr<json_schema<Json>> root_;
@@ -155,7 +155,7 @@ class validation_output
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
-        template <class MsgReporter>
+        template <typename MsgReporter>
         typename std::enable_if<extension_traits::is_unary_function_object<MsgReporter,validation_output>::value,Json>::type
         validate(const Json& instance, MsgReporter&& reporter) const
         {

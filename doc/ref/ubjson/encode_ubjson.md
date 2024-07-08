@@ -5,20 +5,20 @@ Encodes a C++ data structure to the [Universal Binary JSON Specification (UBJSON
 ```cpp
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 
-template<class T, class ByteContainer>
+template <typename T,typename ByteContainer>
 void encode_ubjson(const T& jval, ByteContainer& cont,
     const ubjson_decode_options& options = ubjson_decode_options());        (1) 
 
-template<class T>
+template <typename T>
 void encode_ubjson(const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (2)
 
-template<class T, class ByteContainer>
+template <typename T,typename ByteContainer>
 void encode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const T& jval, ByteContainer& cont,
     const ubjson_decode_options& options = ubjson_decode_options());        (3) (since 0.171.0)
 
-template<class T>
+template <typename T>
 void encode_ubjson(const allocator_set<Allocator,TempAllocator>& alloc_set,
     const T& jval, std::ostream& os,
     const bson_decode_options& options = bson_decode_options());            (4) (since 0.171.0)

@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 using custom_json = jsoncons::basic_json<char, jsoncons::sorted_policy, MyScopedAllocator<char>>;
