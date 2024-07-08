@@ -165,7 +165,7 @@ namespace extension_traits {
     template< 
         class Default, 
         class, // always void; supplied externally
-        template <typename...> typename Op, 
+        template <typename...> class Op, 
         typename... Args
     >
     struct detector
@@ -177,7 +177,7 @@ namespace extension_traits {
     // specialization recognizes and handles only types supporting Op
     template< 
         class Default, 
-        template <typename...> typename Op, 
+        template <typename...> class Op, 
         typename... Args
     >
     struct detector<Default, void_t<Op<Args...>>, Op, Args...>
@@ -188,33 +188,33 @@ namespace extension_traits {
 
     // is_detected, is_detected_t
 
-    template< template <typename...> typename Op,typename... Args >
+    template< template <typename...> class Op,typename... Args >
     using
     is_detected = detector<void, void, Op, Args...>;
 
-    template< template <typename...> typename Op,typename... Args >
+    template< template <typename...> class Op,typename... Args >
     using
     is_detected_t = typename is_detected<Op, Args...>::type;
 
     // detected_or, detected_or_t
 
-    template< class Default, template <typename...> typename Op,typename... Args >
+    template <typename Default, template <typename...> class Op,typename... Args >
     using
     detected_or = detector<Default, void, Op, Args...>;
 
-    template< class Default, template <typename...> typename Op,typename... Args >
+    template <typename Default, template <typename...> class Op,typename... Args >
     using
     detected_or_t = typename detected_or<Default, Op, Args...>::type;
 
     // is_detected_exact
 
-   template< class Expected, template <typename...> typename Op,typename... Args >
+   template< class Expected, template <typename...> class Op,typename... Args >
    using
    is_detected_exact = std::is_same< Expected, is_detected_t<Op, Args...> >;
 
     // is_detected_convertible
 
-    template< class To, template <typename...> typename Op,typename... Args >
+    template< class To, template <typename...> class Op,typename... Args >
     using
     is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
 
