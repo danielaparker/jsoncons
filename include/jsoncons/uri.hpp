@@ -680,7 +680,7 @@ namespace jsoncons {
                                 break;
                             case '#':
                                 path = std::make_pair(start,i);
-                                query = std::make_pair(start,start);
+                                query = std::make_pair(i,i);
                                 state = parse_state::expect_fragment;
                                 start = i+1;
                                 break;
