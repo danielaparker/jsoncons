@@ -20,7 +20,7 @@
 
 namespace jsoncons {
 
-    template <class CharT>
+    template <typename CharT>
     class basic_json_visitor
     {
     public:
@@ -159,7 +159,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
                                const ser_context& context=ser_context(),
@@ -174,7 +174,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context=ser_context(),
@@ -304,7 +304,7 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
@@ -314,7 +314,7 @@ namespace jsoncons {
             return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
-        template <class Source>
+        template <typename Source>
         bool byte_string_value(const Source& b, 
                                uint64_t ext_tag, 
                                const ser_context& context,
@@ -356,7 +356,7 @@ namespace jsoncons {
             return visit_double(value, tag, context, ec);
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag=semantic_tag::none,
                          const ser_context& context=ser_context())
@@ -370,7 +370,7 @@ namespace jsoncons {
             return more;
         }
 
-        template <class T>
+        template <typename T>
         bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag,
                          const ser_context& context,
@@ -438,174 +438,6 @@ namespace jsoncons {
             return visit_end_multi_dim(context, ec);
         }
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const Source&,semantic_tag=semantic_tag::none, const ser_context&=ser_context()") 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
-        {
-            return byte_string_value(byte_string(p, size), tag, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const Source&, semantic_tag, const ser_context&, std::error_code&") 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag, 
-                               const ser_context& context,
-                               std::error_code& ec)
-        {
-            return byte_string_value(byte_string(p, size), tag, context, ec);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&=ser_context())") 
-        bool name(const string_view_type& name, const ser_context& context=ser_context())
-        {
-            return key(name, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&, std::error_code&)") 
-        bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
-        {
-            return key(name, context, ec);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=ser_context()") 
-        bool byte_string_value(const byte_string_view& b, 
-                               byte_string_chars_format encoding_hint, 
-                               semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
-        {
-            switch (encoding_hint)
-            {
-                case byte_string_chars_format::base16:
-                    tag = semantic_tag::base16;
-                    break;
-                case byte_string_chars_format::base64:
-                    tag = semantic_tag::base64;
-                    break;
-                case byte_string_chars_format::base64url:
-                    tag = semantic_tag::base64url;
-                    break;
-                default:
-                    break;
-            }
-            return byte_string_value(b, tag, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=ser_context()") 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               byte_string_chars_format encoding_hint, 
-                               semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
-        {
-            switch (encoding_hint)
-            {
-                case byte_string_chars_format::base16:
-                    tag = semantic_tag::base16;
-                    break;
-                case byte_string_chars_format::base64:
-                    tag = semantic_tag::base64;
-                    break;
-                case byte_string_chars_format::base64url:
-                    tag = semantic_tag::base64url;
-                    break;
-                default:
-                    break;
-            }
-            return byte_string_value(byte_string(p, size), tag, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
-        bool big_integer_value(const string_view_type& value, const ser_context& context=ser_context()) 
-        {
-            return string_value(value, semantic_tag::bigint, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
-        bool big_decimal_value(const string_view_type& value, const ser_context& context=ser_context()) 
-        {
-            return string_value(value, semantic_tag::bigdec, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::datetime") 
-        bool date_time_value(const string_view_type& value, const ser_context& context=ser_context()) 
-        {
-            return string_value(value, semantic_tag::datetime, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::epoch_second") 
-        bool timestamp_value(int64_t val, const ser_context& context=ser_context()) 
-        {
-            return int64_value(val, semantic_tag::epoch_second, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
-        bool begin_document()
-        {
-            return true;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use flush() when serializing") 
-        bool end_document()
-        {
-            flush();
-            return true;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
-        void begin_json()
-        {
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use flush() when serializing") 
-        void end_json()
-        {
-            end_document();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&=ser_context())") 
-        void name(const char_type* p, std::size_t length, const ser_context& context) 
-        {
-            name(string_view_type(p, length), context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=ser_context())") 
-        void integer_value(int64_t value)
-        {
-            int64_value(value);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use int64_value(int64_t, semantic_tag = semantic_tag::none, const ser_context&=ser_context())") 
-        void integer_value(int64_t value, const ser_context& context)
-        {
-            int64_value(value,context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=ser_context())") 
-        void uinteger_value(uint64_t value)
-        {
-            uint64_value(value);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=ser_context())") 
-        void uinteger_value(uint64_t value, const ser_context& context)
-        {
-            uint64_value(value,context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
-        bool bignum_value(const string_view_type& value, const ser_context& context=ser_context()) 
-        {
-            return string_value(value, semantic_tag::bigint, context);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
-        bool decimal_value(const string_view_type& value, const ser_context& context=ser_context()) 
-        {
-            return string_value(value, semantic_tag::bigdec, context);
-        }
-
-    #endif
     private:
 
         virtual void visit_flush() = 0;
@@ -913,7 +745,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_default_json_visitor : public basic_json_visitor<CharT>
     {
         bool parse_more_;
@@ -1049,7 +881,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_json_diagnostics_visitor : public basic_default_json_visitor<CharT>
     {
     public:
@@ -1085,7 +917,7 @@ namespace jsoncons {
     public:
         // If CharT is char, then enable the default constructor which binds to
         // std::cout.
-        template <class U = enabler>
+        template <typename U = enabler>
         basic_json_diagnostics_visitor(
             typename std::enable_if<std::is_same<CharT, char>::value, U>::type = enabler{})
             : basic_json_diagnostics_visitor(std::cout)
@@ -1094,7 +926,7 @@ namespace jsoncons {
 
         // If CharT is wchar_t, then enable the default constructor which binds
         // to std::wcout.
-        template <class U = enabler>
+        template <typename U = enabler>
         basic_json_diagnostics_visitor(
             typename std::enable_if<std::is_same<CharT, wchar_t>::value, U>::type = enabler{})
             : basic_json_diagnostics_visitor(std::wcout)
@@ -1206,19 +1038,19 @@ namespace jsoncons {
 #if __cplusplus >= 201703L
 // not needed for C++17
 #else
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_object_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_key_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_string_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_byte_string_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_null_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_bool_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_uint64_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
-    template <class C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_array_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_array_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_begin_object_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_end_object_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_key_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_string_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_byte_string_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_null_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_bool_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_uint64_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_int64_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_half_name[];
+    template <typename C> constexpr C basic_json_diagnostics_visitor<C>::visit_double_name[];
 #endif // C++17 check
 
     using json_visitor = basic_json_visitor<char>;
@@ -1229,20 +1061,6 @@ namespace jsoncons {
 
     using json_diagnostics_visitor = basic_json_diagnostics_visitor<char>;
     using wjson_diagnostics_visitor = basic_json_diagnostics_visitor<wchar_t>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT>
-using basic_json_content_handler = basic_json_visitor<CharT>; 
-
-JSONCONS_DEPRECATED_MSG("Instead, use json_visitor") typedef json_visitor json_content_handler;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_visitor") typedef wjson_visitor wjson_content_handler;
-
-template<class CharT>
-using basic_default_json_content_handler = basic_default_json_visitor<CharT>; 
-
-JSONCONS_DEPRECATED_MSG("Instead, use default_json_visitor") typedef default_json_visitor default_json_content_handler;
-JSONCONS_DEPRECATED_MSG("Instead, use default_wjson_visitor") typedef wdefault_json_visitor default_wjson_content_handler;
-#endif
 
 } // namespace jsoncons
 

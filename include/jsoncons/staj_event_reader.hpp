@@ -38,7 +38,7 @@ namespace jsoncons {
         shape
     };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_item_event_receiver : public basic_item_event_visitor<CharT>
     {
         using super_type = basic_item_event_visitor<CharT>;
@@ -626,7 +626,7 @@ namespace jsoncons {
 
     // basic_staj_event_reader
 
-    template<class CharT>
+    template <typename CharT>
     class basic_staj_event_reader
     {
     public:
@@ -656,7 +656,7 @@ namespace jsoncons {
         virtual const ser_context& context() const = 0;
     };
 
-    template<class CharT>
+    template <typename CharT>
     class basic_staj2_filter_view : basic_staj_event_reader<CharT>
     {
         basic_staj_event_reader<CharT>* cursor_;

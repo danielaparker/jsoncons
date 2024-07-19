@@ -377,7 +377,7 @@ namespace ns {
         }
     };
 
-    template <class Employee>
+    template <typename Employee>
     std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
     {
         static std::map<Employee, uint64_t> employee_id_map = {{Employee("John", "Smith"), 1},{Employee("Jane", "Doe"), 2}};
@@ -390,7 +390,7 @@ namespace ns {
         return ids;
     }
 
-    template <class Employee>
+    template <typename Employee>
     std::vector<Employee> toEmployeesFromIds(const std::vector<uint64_t>& ids)
     {
         static std::map<uint64_t, Employee> id_employee_map = {{1, Employee("John", "Smith")},{2, Employee("Jane", "Doe")}};

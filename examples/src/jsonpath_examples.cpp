@@ -11,7 +11,7 @@
 #include "FreeListAllocator.hpp"
 #include <scoped_allocator>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 // for brevity
@@ -757,7 +757,7 @@ void parent_operator_example()
     std::cout << pretty_print(result) << "\n\n";
 }
 
-template <class Json>
+template <typename Json>
 class my_custom_functions : public jsonpath::custom_functions<Json>
 {
 public:

@@ -300,6 +300,7 @@
 // Follows boost
 
 // gcc and clang
+#if !defined(__CUDA_ARCH__)
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cplusplus)
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
 #  define JSONCONS_HAS_INT128
@@ -329,6 +330,7 @@
 #endif
 #endif
 #endif
+#endif // __CUDA_ARCH__
 
 // Follows boost config/detail/suffix.hpp
 #if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)

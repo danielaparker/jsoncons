@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-template <class Allocator,class TempAllocator>
+template <typename Allocator,typename TempAllocator >
 class allocator_set
 {
     Allocator result_alloc_;
@@ -43,19 +43,19 @@ allocator_set<std::allocator<char>,std::allocator<char>> combine_allocators()
     return allocator_set<std::allocator<char>,std::allocator<char>>(std::allocator<char>(), std::allocator<char>());
 }
 
-template <class Allocator>
+template <typename Allocator>
 allocator_set<Allocator,std::allocator<char>> combine_allocators(const Allocator& alloc)
 {
     return allocator_set<Allocator,std::allocator<char>>(alloc, std::allocator<char>());
 }
 
-template <class Allocator,class TempAllocator>
+template <typename Allocator,typename TempAllocator >
 allocator_set<Allocator,TempAllocator> combine_allocators(const Allocator& alloc, const TempAllocator& temp_alloc)
 {
     return allocator_set<Allocator,TempAllocator>(alloc, temp_alloc);
 }
 
-template <class TempAllocator>
+template <typename TempAllocator >
 allocator_set<std::allocator<char>,TempAllocator> temp_allocator_only(const TempAllocator& temp_alloc)
 {
     return allocator_set<std::allocator<char>,TempAllocator>(std::allocator<char>(), temp_alloc);

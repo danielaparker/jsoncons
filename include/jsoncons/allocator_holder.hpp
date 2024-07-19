@@ -9,7 +9,7 @@
 
 namespace jsoncons {
 
-template <class Allocator>
+template <typename Allocator>
 class allocator_holder
 {
 public:

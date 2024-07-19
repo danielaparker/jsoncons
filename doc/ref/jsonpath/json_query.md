@@ -5,25 +5,25 @@
 ```
 
 ```cpp
-template<class Json>
+template <typename Json>
 Json json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (until 0.164.0)
     result_options options = result_options());                             
                                                                        (1)
-template<class Json>                                              
+template <typename Json>                                              
 Json json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (since 0.164.0)
     result_options options = result_options(),
     const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
 ```cpp
-template<class Json, class BinaryCallback>
+template <typename Json,typename BinaryCallback>
 void json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (until 0.164.0)
     BinaryCallback callback
     result_options options = result_options());       
                                                                        (2)
-template<class Json, class BinaryCallback>                        
+template <typename Json,typename BinaryCallback>                        
 void json_query(const Json& root value, 
     const Json::string_view_type& expr,                                     (since 0.164.0)
     BinaryCallback callback,
@@ -32,14 +32,14 @@ void json_query(const Json& root value,
 ```
 
 ```cpp
-template<class Json, class TempAllocator>                                              
+template <typename Json,typename TempAllocator>                                              
 Json json_query(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     const Json& root value, const Json::string_view_type& expr,        (3) (since 0.170.0)
     result_options options = result_options(),
     const custom_functions<Json>& funcs = custom_functions<Json>());                    
 ```
 ```cpp
-template<class Json, class BinaryCallback, class TempAllocator>                        
+template <typename Json,typename BinaryCallback,typename TempAllocator>                        
 void json_query(const allocator_set<Json::allocator_type,TempAllocator>& alloc_set, 
     const Json& root value, const Json::string_view_type& expr,        (4) (since 0.170.0)
     BinaryCallback callback,
@@ -427,7 +427,7 @@ $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,
 using json = jsoncons::json;
 namespace jsonpath = jsoncons::jsonpath;
 
-template <class Json>
+template <typename Json>
 class my_custom_functions : public jsonpath::custom_functions<Json>
 {
 public:

@@ -1615,7 +1615,7 @@ namespace ns {
 
 namespace jsoncons {
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, ns::book>
     {
         using allocator_type = Json::allocator_type;
@@ -1900,7 +1900,7 @@ Output:
 #include <jsoncons/json.hpp>
 
 namespace ns {
-    template <typename T1, typename T2>
+    template <typename T1,typename T2>
     struct TemplatedStruct
     {
           T1 aT1;
@@ -2996,7 +2996,7 @@ for full details.
 
 namespace jsoncons 
 {
-    template <class Json, class Backend>
+    template <typename Json,typename Backend>
     struct json_type_traits<Json,boost::multiprecision::number<Backend>>
     {
         using multiprecision_type = boost::multiprecision::number<Backend>;

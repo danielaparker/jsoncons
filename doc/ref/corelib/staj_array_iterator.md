@@ -61,10 +61,10 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-    template <class class T, class Json>
+    template <typename class T,typename Json>
     bool operator==(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
-    template <class Json, class T>
+    template <typename Json,typename T>
     bool operator!=(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
 ### Examples

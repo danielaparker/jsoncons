@@ -1,7 +1,7 @@
 ### jsoncons::basic_json::push_back
 
 ```cpp
-template <class T>
+template <typename T>
 void push_back(T&& val)
 ```
 Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.

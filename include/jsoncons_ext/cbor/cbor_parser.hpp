@@ -41,7 +41,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Source,class Allocator=std::allocator<char>>
+template <typename Source,typename Allocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     using char_type = char;
@@ -63,7 +63,7 @@ class basic_cbor_parser : public ser_context
         byte_string_type bytes;
 
         mapped_string(const string_type& str, const allocator_type& alloc = allocator_type())
-            : type(jsoncons::cbor::detail::cbor_major_type::text_string), str(str,alloc), bytes(alloc)
+            : type(jsoncons::cbor::detail::cbor_major_type::text_string), str(str.c_str(), str.size(), alloc), bytes(alloc)
         {
         }
 
@@ -138,7 +138,7 @@ class basic_cbor_parser : public ser_context
             : bytes(b)
         {
         }
-        template <class Container>
+        template <typename Container>
         void operator()(Container& c, std::error_code&)
         {
             c.clear();
@@ -158,7 +158,7 @@ class basic_cbor_parser : public ser_context
             : source(source)
         {
         }
-        template <class Container>
+        template <typename Container>
         void operator()(Container& cont, std::error_code& ec)
         {
             source->read_byte_string(cont,ec);
@@ -166,7 +166,7 @@ class basic_cbor_parser : public ser_context
     };
 
 public:
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_cbor_parser(Sourceable&& source,
                       const cbor_decode_options& options = cbor_decode_options(),
                       const Allocator& alloc = Allocator())
@@ -206,7 +206,7 @@ public:
         nesting_depth_ = 0;
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source)
     {
         source_ = std::forward<Sourceable>(source);
@@ -812,7 +812,7 @@ private:
         return more;
     }
 
-    template <class Function>
+    template <typename Function>
     void iterate_string_chunks(Function& func, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
     {
         int nesting_level = 0;

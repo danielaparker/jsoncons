@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
-template <class Json>
+template <typename Json>
 class json_validator
 ```
 
@@ -17,7 +17,7 @@ class json_validator
 
     Json validate(const Json& instance) const;  (2)
 
-    template <class MsgReporter>
+    template <typename MsgReporter>
     Json validate(const Json& instance, const MsgReporter& reporter) const;  (3)
 
 (1) Validates input JSON against a JSON Schema and returns false upon the 

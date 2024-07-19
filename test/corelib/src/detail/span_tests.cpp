@@ -23,7 +23,7 @@ TEST_CASE("jsoncons::detail::span constructor tests")
     SECTION("jsoncons::detail::span(C& c)")
     {
         using C = std::vector<uint8_t>;
-        C c = {1,2,3,4};
+        C c = {{1,2,3,4}};
 
         jsoncons::detail::span<const uint8_t> s(c);
         CHECK(s.size() == c.size());

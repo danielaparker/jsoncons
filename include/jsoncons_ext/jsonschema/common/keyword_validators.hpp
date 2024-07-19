@@ -28,7 +28,7 @@
 namespace jsoncons {
 namespace jsonschema {
     
-    template<class Json>
+    template <typename Json>
     class recursive_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -77,8 +77,6 @@ namespace jsonschema {
                 }
             }
 
-            //std::cout << "recursive_ref_validator.do_validate " << "keywordLocation: << " << this->schema_location().string() << ", instanceLocation:" << instance_location.string() << "\n";
-
             evaluation_context<Json> this_context(context, this->keyword_name());
             if (schema_ptr == nullptr)
             {
@@ -126,7 +124,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class dynamic_ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -232,7 +230,7 @@ namespace jsonschema {
 
     // contentEncoding
 
-    template <class Json>
+    template <typename Json>
     class content_encoding_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -304,7 +302,7 @@ namespace jsonschema {
 
     // contentMediaType
 
-    template <class Json>
+    template <typename Json>
     class content_media_type_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -379,7 +377,7 @@ namespace jsonschema {
 
     // format 
 
-    template <class Json>
+    template <typename Json>
     class format_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -415,7 +413,7 @@ namespace jsonschema {
                 walk_result result = format_check_(this_context.eval_path(), this->schema_location(), instance_location, s, reporter);
                 if (result == walk_result::abort)
                 {
-                    return walk_result::abort;
+                    return result;
                 }
             }
             return walk_result::advance;
@@ -431,7 +429,7 @@ namespace jsonschema {
     // pattern 
 
 #if defined(JSONCONS_HAS_STD_REGEX)
-    template <class Json>
+    template <typename Json>
     class pattern_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -491,7 +489,7 @@ namespace jsonschema {
         }
     };
 #else
-    template <class Json>
+    template <typename Json>
     class pattern_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -524,7 +522,7 @@ namespace jsonschema {
 
     // maxLength
 
-    template <class Json>
+    template <typename Json>
     class max_length_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -578,7 +576,7 @@ namespace jsonschema {
 
     // maxItems
 
-    template <class Json>
+    template <typename Json>
     class max_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -632,7 +630,7 @@ namespace jsonschema {
 
     // minItems
 
-    template <class Json>
+    template <typename Json>
     class min_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -686,7 +684,7 @@ namespace jsonschema {
 
     // items
 
-    template <class Json>
+    template <typename Json>
     class items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -817,7 +815,7 @@ namespace jsonschema {
 
     // uniqueItems
 
-    template <class Json>
+    template <typename Json>
     class unique_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -884,7 +882,7 @@ namespace jsonschema {
 
     // minLength
 
-    template <class Json>
+    template <typename Json>
     class min_length_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -939,7 +937,7 @@ namespace jsonschema {
 
     // not
 
-    template <class Json>
+    template <typename Json>
     class not_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1010,7 +1008,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class any_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1107,7 +1105,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class one_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1223,7 +1221,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class all_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1331,7 +1329,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1357,43 +1355,69 @@ namespace jsonschema {
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            switch (instance.type())
+            if (instance.is_int64() && value_.is_int64())
             {
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                if (instance.template as<int64_t>() > value_.template as<int64_t>())
                 {
-                    if (instance.template as<int64_t>() > value_.template as<int64_t>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                case json_type::double_value:
+            }
+            else if (instance.is_uint64() && value_.is_uint64())
+            {
+                if (instance.template as<uint64_t>() > value_.template as<uint64_t>())
                 {
-                    if (instance.template as<double>() > value_.template as<double>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                default:
-                    break;
+            }
+            else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
+            {
+                auto sv1 = instance.as_string_view();
+                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                auto s2 = value_.as_string();
+                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                if (n1 > n2)
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
+            }
+            else if (instance.is_number())
+            {
+                if (instance.template as<double>() > value_.template as<double>())
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
             }
             return walk_result::advance;
         }
@@ -1405,7 +1429,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class exclusive_maximum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1431,43 +1455,69 @@ namespace jsonschema {
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            switch (instance.type())
+            if (instance.is_int64() && value_.is_int64())
             {
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                if (instance.template as<int64_t>() >= value_.template as<int64_t>())
                 {
-                    if (instance.template as<int64_t>() >= value_.template as<int64_t>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                case json_type::double_value:
+            }
+            else if (instance.is_uint64() && value_.is_uint64())
+            {
+                if (instance.template as<uint64_t>() >= value_.template as<uint64_t>())
                 {
-                    if (instance.template as<double>() >= value_.template as<double>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                default:
-                    break;
+            }
+            else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
+            {
+                auto sv1 = instance.as_string_view();
+                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                auto s2 = value_.as_string();
+                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                if (n1 >= n2)
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
+            }
+            else if (instance.is_number())
+            {
+                if (instance.template as<double>() >= value_.template as<double>())
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
             }
             return walk_result::advance;
         }
@@ -1479,7 +1529,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1505,43 +1555,69 @@ namespace jsonschema {
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            switch (instance.type())
+            if (instance.is_int64() && value_.is_int64())
             {
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                if (instance.template as<int64_t>() < value_.template as<int64_t>())
                 {
-                    if (instance.template as<int64_t>() < value_.template as<int64_t>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                case json_type::double_value:
+            }
+            else if (instance.is_uint64() && value_.is_uint64())
+            {
+                if (instance.template as<uint64_t>() < value_.template as<uint64_t>())
                 {
-                    if (instance.template as<double>() < value_.template as<double>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                default:
-                    break;
+            }
+            else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
+            {
+                auto sv1 = instance.as_string_view();
+                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                auto s2 = value_.as_string();
+                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                if (n1 < n2)
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
+            }
+            else if (instance.is_number())
+            {
+                if (instance.template as<double>() < value_.template as<double>())
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
             }
             return walk_result::advance;
         }
@@ -1553,7 +1629,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class exclusive_minimum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1579,43 +1655,69 @@ namespace jsonschema {
         {
             evaluation_context<Json> this_context(context, this->keyword_name());
 
-            switch (instance.type())
+            if (instance.is_int64() && value_.is_int64())
             {
-                case json_type::int64_value:
-                case json_type::uint64_value:
+                if (instance.template as<int64_t>() <= value_.template as<int64_t>())
                 {
-                    if (instance.template as<int64_t>() <= value_.template as<int64_t>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                case json_type::double_value:
+            }
+            else if (instance.is_uint64() && value_.is_uint64())
+            {
+                if (instance.template as<uint64_t>() <= value_.template as<uint64_t>())
                 {
-                    if (instance.template as<double>() <= value_.template as<double>())
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
                     {
-                        walk_result result = reporter.error(validation_message(this->keyword_name(),
-                            this_context.eval_path(), 
-                            this->schema_location(), 
-                            instance_location, 
-                            message_ + instance.template as<std::string>()));
-                        if (result == walk_result::abort)
-                        {
-                            return result;
-                        }
+                        return result;
                     }
-                    break;
                 }
-                default:
-                    break;
+            }
+            else if (instance.is_string_view() && instance.tag() == semantic_tag::bigint)
+            {
+                auto sv1 = instance.as_string_view();
+                bigint n1 = bigint::from_string(sv1.data(), sv1.length());
+                auto s2 = value_.as_string();
+                bigint n2 = bigint::from_string(s2.data(), s2.length());
+                if (n1 <= n2)
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
+            }
+            else if (instance.is_number())
+            {
+                if (instance.template as<double>() <= value_.template as<double>())
+                {
+                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                        this_context.eval_path(), 
+                        this->schema_location(), 
+                        instance_location, 
+                        message_ + instance.template as<std::string>()));
+                    if (result == walk_result::abort)
+                    {
+                        return result;
+                    }
+                }
             }
             return walk_result::advance;
         }
@@ -1627,7 +1729,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class multiple_of_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1688,7 +1790,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class required_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1751,7 +1853,7 @@ namespace jsonschema {
 
     // maxProperties
 
-    template <class Json>
+    template <typename Json>
     class max_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1805,7 +1907,7 @@ namespace jsonschema {
 
     // minProperties
 
-    template <class Json>
+    template <typename Json>
     class min_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -1857,7 +1959,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class conditional_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -1981,7 +2083,7 @@ namespace jsonschema {
 
     // enum_validator
 
-    template <class Json>
+    template <typename Json>
     class enum_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -2024,7 +2126,7 @@ namespace jsonschema {
                     "'" + instance.template as<std::string>() + "' is not a valid enum value."));
                 if (result == walk_result::abort)
                 {
-                    return walk_result::abort;
+                    return result;
                 }
             }
             return walk_result::advance;
@@ -2039,7 +2141,7 @@ namespace jsonschema {
 
     // const_validator
 
-    template <class Json>
+    template <typename Json>
     class const_validator : public keyword_validator_base<Json>
     {        
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -2112,7 +2214,7 @@ namespace jsonschema {
 
     }
 
-    template <class Json>
+    template <typename Json>
     class type_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2175,7 +2277,7 @@ namespace jsonschema {
                         }
                         break;
                     case json_schema_type::string:  // OK
-                        if (instance.is_string())
+                        if (instance.is_string() && instance.tag() != semantic_tag::bigint)
                         {
                             is_type_found = true;
                         }
@@ -2187,12 +2289,17 @@ namespace jsonschema {
                         }
                         break;
                     case json_schema_type::integer:
-                        if (instance.is_number())
+                        if (instance.is_int64() || instance.is_uint64())
                         {
-                            if (instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>()))
-                            {
-                                is_type_found = true;
-                            }
+                            is_type_found = true;
+                        }
+                        else if (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())
+                        {
+                            is_type_found = true;
+                        }
+                        else if (instance.is_string() && instance.tag() == semantic_tag::bigint)
+                        {
+                            is_type_found = true;
                         }
                         break;
                     case json_schema_type::number:
@@ -2281,7 +2388,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2443,7 +2550,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class pattern_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2571,7 +2678,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class additional_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2767,7 +2874,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class dependent_required_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2850,7 +2957,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class dependent_schemas_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -2932,7 +3039,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class property_names_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -3027,7 +3134,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class dependencies_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -3102,7 +3209,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class max_contains_keyword : public keyword_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -3148,7 +3255,7 @@ namespace jsonschema {
 
     // minItems
 
-    template <class Json>
+    template <typename Json>
     class min_contains_keyword : public keyword_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -3192,7 +3299,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class contains_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -3369,7 +3476,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class items_keyword : public keyword_base<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -3488,7 +3595,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class prefix_items_validator : public keyword_validator_base<Json>
     {
         using schema_validator_type = typename schema_validator<Json>::schema_validator_type;
@@ -3616,7 +3723,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class unevaluated_properties_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;
@@ -3726,7 +3833,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class unevaluated_items_validator : public keyword_validator_base<Json>
     {
         using keyword_validator_type = typename keyword_validator<Json>::keyword_validator_type;

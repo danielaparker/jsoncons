@@ -5,24 +5,24 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 ```cpp
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <class T,class Source>
+template <typename T,class Source>
 T decode_csv(const Source& s, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (1)
 
-template <class T,class CharT>
+template <typename T,class CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (2)
 
-template <class T,class InputIt>
+template <typename T,class InputIt>
 T decode_csv(InputIt first, InputIt last,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>()));                          (3) (since 0.153.0)
 
-template <class T, class Source, class Allocator, class TempAllocator>
+template <typename T,typename Source,typename Allocator,typename TempAllocator>
 T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
     const Source& s,
     const basic_csv_decode_options<Source::value_type>& options = basic_csv_decode_options<Source::value_type>()); (4)
 
-template <class T, class CharT, class Allocator, class TempAllocator>
+template <typename T,typename CharT,typename Allocator,typename TempAllocator>
 T decode_csv(allocator_set<Allocator,TempAllocator> alloc_set,
     std::basic_istream<CharT>& is,
     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>());                           (5)

@@ -26,7 +26,7 @@ namespace jsoncons {
 
     // json_array
 
-    template <class Json,template<typename,typename> class SequenceContainer = std::vector>
+    template <typename Json,template <typename,typename> class SequenceContainer = std::vector>
     class json_array : public allocator_holder<typename Json::allocator_type>
     {
     public:
@@ -69,7 +69,7 @@ namespace jsoncons {
         {
         }
 
-        template <class InputIterator>
+        template <typename InputIterator>
         json_array(InputIterator begin, InputIterator end, const allocator_type& alloc = allocator_type())
             : allocator_holder<allocator_type>(alloc), 
               elements_(begin,end,value_allocator_type(alloc))
@@ -155,16 +155,6 @@ namespace jsoncons {
 
         void resize(std::size_t n, const Json& val) {elements_.resize(n,val);}
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("Instead, use erase(const_iterator, const_iterator)")
-        void remove_range(std::size_t from_index, std::size_t to_index) 
-        {
-            JSONCONS_ASSERT(from_index <= to_index);
-            JSONCONS_ASSERT(to_index <= elements_.size());
-            elements_.erase(elements_.cbegin()+from_index,elements_.cbegin()+to_index);
-        }
-    #endif
-
         iterator erase(const_iterator pos) 
         {
             return elements_.erase(pos);
@@ -181,47 +171,47 @@ namespace jsoncons {
 
         // push_back
 
-        template <class T, class A=allocator_type>
+        template <typename T,typename A=allocator_type>
         typename std::enable_if<extension_traits::is_stateless<A>::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value));
         }
 
-        template <class T, class A=allocator_type>
+        template <typename T,typename A=allocator_type>
         typename std::enable_if<!extension_traits::is_stateless<A>::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value));
         }
 
-        template <class T, class A=allocator_type>
+        template <typename T,typename A=allocator_type>
         typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
             return elements_.emplace(pos, std::forward<T>(value));
         }
-        template <class T, class A=allocator_type>
+        template <typename T,typename A=allocator_type>
         typename std::enable_if<!extension_traits::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
             return elements_.emplace(pos, std::forward<T>(value));
         }
 
-        template <class InputIt>
+        template <typename InputIt>
         iterator insert(const_iterator pos, InputIt first, InputIt last)
         {
             return elements_.insert(pos, first, last);
         }
 
-        template <class A=allocator_type, class... Args>
+        template <typename A=allocator_type,typename... Args>
         typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
         emplace(const_iterator pos, Args&&... args)
         {
             return elements_.emplace(pos, std::forward<Args>(args)...);
         }
 
-        template <class... Args>
+        template <typename... Args>
         Json& emplace_back(Args&&... args)
         {
             elements_.emplace_back(std::forward<Args>(args)...);

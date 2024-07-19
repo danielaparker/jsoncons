@@ -1,16 +1,23 @@
-0.176.0 (pre-release, on master)
+master
+-------
+
+- Removed deprecated functions and type names identified in #487
+
+0.176.0 
 -------
 
 Compiler support
 
 - Update to [Supported compilers](https://github.com/danielaparker/jsoncons?tab=readme-ov-file#supported-compilers)
-documentation to accurately reflect the compilers that currently in continuous integration testing. 
+documentation to reflect the compilers that are currently in continuous integration testing. 
 
 - Support for some ancient compilers, in particular g++ 4.8 and 4.9, has been dropped. 
 
+- Accepted pr #519 to support build with with llvm-toolset-7 on CentOS 7. 
+
 - We (and users) have seen some compilation errors with tests of `std::scoped_allocator_adaptor` using our sample stateful allocator `FreeListAllocator`
 in versions of clang predating version 11, and versions of g++ predating version 10. We've therefore excluded these tests when testing with
-these older compilers.
+the older compilers.
 
 Enhancements
 
@@ -24,6 +31,16 @@ for (const auto& [key, value] : j.object_range())
 ```
 
 -  Addressed issue #509 of over allocating memory due to alignment constraints through pr #510
+
+jsonschema library defect fixes:
+
+- Fixed issue #520 where enabling format validation resulted in a premature abort to validation
+
+- Addressed issue #521 so that jsonschema now supports big integers
+
+Other defect fixes:
+
+- Resolved #518 about CUDA and int128 and float 128
 
 0.175.0
 -------

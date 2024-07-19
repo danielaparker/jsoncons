@@ -22,7 +22,7 @@ namespace jsonpath {
 
     enum class path_node_kind { root, name, index };
 
-    template <class CharT>
+    template <typename CharT>
     class basic_path_node 
     {
     public:
@@ -233,7 +233,7 @@ namespace jsonpath {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     Json* select(Json& root, const basic_path_node<typename Json::char_type>& path)
     {
         using path_node_type = basic_path_node<typename Json::char_type>;
@@ -276,7 +276,7 @@ namespace jsonpath {
         return current;
     }
 
-    template <class CharT, class Allocator=std::allocator<CharT>>
+    template <typename CharT,typename Allocator=std::allocator<CharT>>
     std::basic_string<CharT,std::char_traits<CharT>,Allocator> to_basic_string(const basic_path_node<CharT>& path, const Allocator& alloc=Allocator())
     {
         std::basic_string<CharT,std::char_traits<CharT>,Allocator> buffer(alloc);

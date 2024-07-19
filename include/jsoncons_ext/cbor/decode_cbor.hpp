@@ -23,7 +23,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-    template<class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const Source& v, 
@@ -40,7 +40,7 @@ namespace cbor {
         return decoder.get_result();
     }
 
-    template<class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const Source& v, 
@@ -58,7 +58,7 @@ namespace cbor {
         return val;
     }
 
-    template<class T>
+    template <typename T>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -74,7 +74,7 @@ namespace cbor {
         return decoder.get_result();
     }
      
-    template<class T>
+    template <typename T>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -91,7 +91,7 @@ namespace cbor {
         return val;
     }
 
-    template<class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(InputIt first, InputIt last,
                 const cbor_decode_options& options = cbor_decode_options())
@@ -107,7 +107,7 @@ namespace cbor {
         return decoder.get_result();
     }
 
-    template<class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(InputIt first, InputIt last,
                 const cbor_decode_options& options = cbor_decode_options())
@@ -126,7 +126,7 @@ namespace cbor {
 
     // With leading allocator_set parameter
 
-    template <class T,class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -144,7 +144,7 @@ namespace cbor {
         return decoder.get_result();
     }
 
-    template <class T,class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -163,7 +163,7 @@ namespace cbor {
         return val;
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 
@@ -180,7 +180,7 @@ namespace cbor {
         return decoder.get_result();
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type 
     decode_cbor(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::istream& is, 

@@ -24,7 +24,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
+template <typename Sink=jsoncons::binary_stream_sink,typename Allocator=std::allocator<char>>
 class basic_cbor_encoder final : public basic_json_visitor<char>
 {
     using super_type = basic_json_visitor<char>;
@@ -775,7 +775,7 @@ private:
         if (exponent.length() > 0)
         {
             int64_t val{ 0 };
-            auto r = jsoncons::detail::base16_to_integer(exponent.data(), exponent.length(), val);
+            auto r = jsoncons::detail::hex_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
@@ -787,7 +787,7 @@ private:
         if (!more) return more;
 
         int64_t val{ 0 };
-        auto r = jsoncons::detail::base16_to_integer(s.data(),s.length(), val);
+        auto r = jsoncons::detail::hex_to_integer(s.data(),s.length(), val);
         if (r)
         {
             more = visit_int64(val, semantic_tag::none, context, ec);
@@ -1739,17 +1739,6 @@ private:
 
 using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
 using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;
-
-template<class Sink=jsoncons::binary_stream_sink>
-using basic_cbor_serializer = basic_cbor_encoder<Sink>; 
-
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_encoder") typedef cbor_stream_encoder cbor_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_encoder") typedef cbor_stream_encoder cbor_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_buffer_serializer;
-#endif
 
 }}
 #endif

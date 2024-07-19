@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace msgpack {
 
-template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template <typename Source=jsoncons::binary_stream_source,typename Allocator=std::allocator<char>>
 class basic_msgpack_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
@@ -45,7 +45,7 @@ private:
 public:
     using string_view_type = string_view;
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator& alloc = Allocator())
@@ -62,7 +62,7 @@ public:
 
     // Constructors that set parse error codes
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
@@ -72,7 +72,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options,
                          std::error_code& ec)
@@ -83,7 +83,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
                          Sourceable&& source,
                          const msgpack_decode_options& options,
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source)
     {
         parser_.reset(std::forward<Sourceable>(source));
@@ -136,7 +136,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     void reset(Sourceable&& source, std::error_code& ec)
     {
         parser_.reset(std::forward<Sourceable>(source));
@@ -219,66 +219,6 @@ public:
     {
         return staj_filter_view(cursor, pred);
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_msgpack_cursor(Sourceable&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const msgpack_decode_options& options = msgpack_decode_options(),
-                      const Allocator& alloc = Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc), 
-         cursor_visitor_(filter), 
-         cursor_handler_adaptor_(cursor_visitor_, alloc),
-         eof_(false)
-    {
-        if (!done())
-        {
-            next();
-        }
-    }
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_msgpack_cursor(Sourceable&& source,
-                         std::function<bool(const staj_event&, const ser_context&)> filter,
-                         std::error_code& ec)
-       : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Sourceable>(source), filter, ec)
-    {
-    }
-
-    template <class Sourceable>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                         Sourceable&& source,
-                         std::function<bool(const staj_event&, const ser_context&)> filter,
-                         std::error_code& ec)
-       : parser_(std::forward<Sourceable>(source), alloc), 
-         cursor_visitor_(filter),
-         cursor_handler_adaptor_(cursor_visitor_, alloc),
-         eof_(false)
-    {
-        if (!done())
-        {
-            next(ec);
-        }
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
-    void read(basic_json_visitor<char_type>& visitor)
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
-    void read(basic_json_visitor<char_type>& visitor,
-                 std::error_code& ec) 
-    {
-        read_to(visitor, ec);
-    }
-#endif
 private:
     static bool accept_all(const staj_event&, const ser_context&) 
     {

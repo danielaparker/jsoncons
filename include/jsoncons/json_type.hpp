@@ -26,7 +26,7 @@ namespace jsoncons {
         object_value
     };
 
-    template <class CharT>
+    template <typename CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, json_type type)
     {
         static constexpr const CharT* null_value = JSONCONS_CSTRING_CONSTANT(CharT, "null");
@@ -113,7 +113,7 @@ namespace jsoncons {
         json_const_pointer = 0x0c
     };
 
-    template <class CharT>
+    template <typename CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, json_storage_kind storage)
     {
         static constexpr const CharT* null_value = JSONCONS_CSTRING_CONSTANT(CharT, "null");

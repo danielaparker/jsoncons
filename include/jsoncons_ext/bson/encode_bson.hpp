@@ -20,7 +20,7 @@
 namespace jsoncons { 
 namespace bson {
 
-    template<class T, class ByteContainer>
+    template <typename T,typename ByteContainer>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_bson(const T& j, 
@@ -33,7 +33,7 @@ namespace bson {
         j.dump(adaptor);
     }
 
-    template<class T, class ByteContainer>
+    template <typename T,typename ByteContainer>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_bson(const T& val, 
@@ -49,7 +49,7 @@ namespace bson {
         }
     }
 
-    template<class T>
+    template <typename T>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_bson(const T& j, 
                 std::ostream& os, 
@@ -61,7 +61,7 @@ namespace bson {
         j.dump(adaptor);
     }
 
-    template<class T>
+    template <typename T>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_bson(const T& val, 
                 std::ostream& os, 
@@ -78,7 +78,7 @@ namespace bson {
   
     // with temp_allocator_rag
 
-    template<class T, class ByteContainer, class Allocator, class TempAllocator>
+    template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -92,7 +92,7 @@ namespace bson {
         j.dump(adaptor);
     }
 
-    template<class T, class ByteContainer, class Allocator, class TempAllocator>
+    template <typename T,typename ByteContainer,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_back_insertable_byte_container<ByteContainer>::value,void>::type 
     encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -109,7 +109,7 @@ namespace bson {
         }
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value,void>::type 
     encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& j, 
@@ -122,7 +122,7 @@ namespace bson {
         j.dump(adaptor);
     }
 
-    template<class T,class Allocator,class TempAllocator>
+    template <typename T,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,void>::type 
     encode_bson(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 const T& val, 

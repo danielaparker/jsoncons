@@ -22,7 +22,7 @@
 
 namespace jsoncons { 
 
-    template <class CharT>
+    template <typename CharT>
     class basic_null_istream : public std::basic_istream<CharT>
     {
         class null_buffer : public std::basic_streambuf<CharT>
@@ -60,7 +60,7 @@ namespace jsoncons {
         }
     };
 
-    template <class CharT>
+    template <typename CharT>
     struct char_result
     {
         CharT value;
@@ -69,7 +69,7 @@ namespace jsoncons {
 
     // text sources
 
-    template <class CharT>
+    template <typename CharT>
     class stream_source 
     {
         static constexpr std::size_t default_max_buffer_size = 16384;
@@ -301,7 +301,7 @@ namespace jsoncons {
 
     // string_source
 
-    template <class CharT>
+    template <typename CharT>
     class string_source 
     {
     public:
@@ -321,7 +321,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         string_source(const Sourceable& s,
                       typename std::enable_if<extension_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
             : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
@@ -399,7 +399,7 @@ namespace jsoncons {
 
     // iterator source
 
-    template <class IteratorT>
+    template <typename IteratorT>
     class iterator_source
     {
     public:
@@ -471,7 +471,7 @@ namespace jsoncons {
             return span<const value_type>(buffer_.data(), length);
         }
 
-        template <class Category = iterator_category>
+        template <typename Category = iterator_category>
         typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
@@ -492,7 +492,7 @@ namespace jsoncons {
             return count;
         }
 
-        template <class Category = iterator_category>
+        template <typename Category = iterator_category>
         typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
@@ -534,7 +534,7 @@ namespace jsoncons {
         {
         }
 
-        template <class Sourceable>
+        template <typename Sourceable>
         bytes_source(const Sourceable& source,
                      typename std::enable_if<extension_traits::is_byte_sequence<Sourceable>::value,int>::type = 0)
             : data_(reinterpret_cast<const value_type*>(source.data())), 
@@ -609,7 +609,7 @@ namespace jsoncons {
 
     // binary_iterator source
 
-    template <class IteratorT>
+    template <typename IteratorT>
     class binary_iterator_source
     {
     public:
@@ -680,7 +680,7 @@ namespace jsoncons {
             return span<const value_type>(buffer_.data(), length);
         }
 
-        template <class Category = iterator_category>
+        template <typename Category = iterator_category>
         typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
@@ -700,7 +700,7 @@ namespace jsoncons {
             return count;
         }
 
-        template <class Category = iterator_category>
+        template <typename Category = iterator_category>
         typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
@@ -720,13 +720,13 @@ namespace jsoncons {
         }
     };
 
-    template <class Source>
+    template <typename Source>
     struct source_reader
     {
         using value_type = typename Source::value_type;
         static constexpr std::size_t max_buffer_length = 16384;
 
-        template <class Container>
+        template <typename Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
                                 extension_traits::has_reserve<Container>::value &&
@@ -749,7 +749,7 @@ namespace jsoncons {
             return length - unread;
         }
 
-        template <class Container>
+        template <typename Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
                                 extension_traits::has_reserve<Container>::value &&
@@ -784,13 +784,9 @@ namespace jsoncons {
 #if __cplusplus >= 201703L
 // not needed for C++17
 #else
-    template <class Source>
+    template <typename Source>
     constexpr std::size_t source_reader<Source>::max_buffer_length;
 #endif
-
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    using bin_stream_source = binary_stream_source;
-    #endif
 
 } // namespace jsoncons
 

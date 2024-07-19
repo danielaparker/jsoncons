@@ -18,7 +18,7 @@ using namespace jsoncons;
 struct own_vector : std::vector<std::int64_t> { using  std::vector<int64_t>::vector; };
 
 namespace jsoncons {
-template<class Json>
+template <typename Json>
 struct json_type_traits<Json, own_vector> {
     static bool is(const Json&) noexcept { return true; }
     static own_vector as(const Json&) { return own_vector(); }

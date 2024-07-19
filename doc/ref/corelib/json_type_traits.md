@@ -10,7 +10,7 @@
 and a value of some other type. `json_type_traits` implementations must specialize this traits class:
 
 ```cpp
-template <class Json, class T, class Enable=void>
+template <typename Json,typename T,typename Enable=void>
 struct json_type_traits
 {
     using allocator_type = Json::allocator_type;

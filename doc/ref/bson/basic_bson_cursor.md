@@ -33,21 +33,21 @@ bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
 
 #### Constructors
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
                       const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator()); (1)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source, 
                       std::error_code& ec); (2)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
                       const bson_decode_options& options,
                       std::error_code& ec); (3)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Sourceable&& source,
                       const bson_decode_options& options,
@@ -97,13 +97,13 @@ Returns the current [context](ser_context.md)
     void reset();
 Reset cursor to read another value from the same source
 
-    template <class Sourceable>
+    template <typename Sourceable>
     reset(Sourceable&& source)
 Reset cursor to read new value from a new source
 
 #### Non-member functions
 
-   template <class Source, class Allocator>
+   template <typename Source,typename Allocator>
    staj_filter_view operator|(basic_bson_cursor<Source,Allocator>& cursor, 
                               std::function<bool(const staj_event&, const ser_context&)> pred);
 

@@ -22,7 +22,7 @@
 
 namespace jsoncons {
 
-template<class Json>
+template <typename Json>
 class json_printable
 {
 public:
@@ -58,26 +58,26 @@ private:
     json_printable();
 };
 
-template<class Json>
+template <typename Json>
 json_printable<Json> print(const Json& j)
 {
     return json_printable<Json>(j, indenting::no_indent);
 }
 
-template<class Json>
+template <typename Json>
 json_printable<Json> print(const Json& j,
                            const basic_json_encode_options<typename Json::char_type>& options)
 {
     return json_printable<Json>(j, options, indenting::no_indent);
 }
 
-template<class Json>
+template <typename Json>
 json_printable<Json> pretty_print(const Json& j)
 {
     return json_printable<Json>(j, indenting::indent);
 }
 
-template<class Json>
+template <typename Json>
 json_printable<Json> pretty_print(const Json& j,
                                   const basic_json_encode_options<typename Json::char_type>& options)
 {

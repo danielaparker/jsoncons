@@ -1,7 +1,7 @@
 ### jsoncons::jsonschema::json_schema<Json>::walk
 
 ```cpp
-template <class WalkReporter>
+template <typename WalkReporter>
 void walk(const Json& instance, const WalkReporter& reporter) const; (since 0.175.0)
 ```
 

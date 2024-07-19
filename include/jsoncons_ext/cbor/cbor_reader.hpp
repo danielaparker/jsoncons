@@ -21,7 +21,7 @@
 
 namespace jsoncons { namespace cbor {
 
-template <class Source,class Allocator=std::allocator<char>>
+template <typename Source,typename Allocator=std::allocator<char>>
 class basic_cbor_reader 
 {
     using char_type = char;
@@ -30,7 +30,7 @@ class basic_cbor_reader
     basic_item_event_visitor_to_json_visitor<char_type,Allocator> adaptor_;
     item_event_visitor& visitor_;
 public:
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_cbor_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const Allocator& alloc)
@@ -41,7 +41,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_cbor_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const cbor_decode_options& options = cbor_decode_options(),
@@ -50,7 +50,7 @@ public:
          adaptor_(visitor, alloc), visitor_(adaptor_)
     {
     }
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_cbor_reader(Sourceable&& source, 
                       item_event_visitor& visitor, 
                       const Allocator& alloc)
@@ -61,7 +61,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_cbor_reader(Sourceable&& source, 
                       item_event_visitor& visitor, 
                       const cbor_decode_options& options = cbor_decode_options(),
@@ -105,11 +105,6 @@ public:
 using cbor_stream_reader = basic_cbor_reader<jsoncons::binary_stream_source>;
 
 using cbor_bytes_reader = basic_cbor_reader<jsoncons::bytes_source>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_reader") typedef cbor_stream_reader cbor_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_reader") typedef cbor_bytes_reader cbor_buffer_reader;
-#endif
 
 }}
 

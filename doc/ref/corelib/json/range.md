@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons/basic_json.hpp>
 
-template <class IteratorT, class ConstIteratorT>
+template <typename IteratorT,typename ConstIteratorT>
 class range; 
 ```
 

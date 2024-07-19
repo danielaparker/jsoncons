@@ -137,7 +137,7 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
 #include <common/FreeListAllocator.hpp>
 #include <scoped_allocator>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 TEST_CASE("encode_msgpack allocator_set overloads")

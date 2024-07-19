@@ -20,7 +20,7 @@ namespace jsoncons {
 
     // decode_json
 
-    template <class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(const Source& s,
@@ -38,7 +38,7 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T, class Source>
+    template <typename T,typename Source>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_char_sequence<Source>::value,T>::type
     decode_json(const Source& s,
@@ -57,7 +57,7 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -72,7 +72,7 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -89,7 +89,7 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
     decode_json(InputIt first, InputIt last,
                 const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
@@ -107,7 +107,7 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T, class InputIt>
+    template <typename T,typename InputIt>
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
     decode_json(InputIt first, InputIt last,
                 const basic_json_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
@@ -128,7 +128,7 @@ namespace jsoncons {
 
     // With leading allocator_set parameter
 
-    template <class T,class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -148,7 +148,7 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T,class Source,class Allocator,class TempAllocator>
+    template <typename T,typename Source,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value &&
                             extension_traits::is_char_sequence<Source>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
@@ -169,7 +169,7 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T,class CharT,class Allocator,class TempAllocator>
+    template <typename T,typename CharT,typename Allocator,typename TempAllocator >
     typename std::enable_if<extension_traits::is_basic_json<T>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::basic_istream<CharT>& is,
@@ -186,7 +186,7 @@ namespace jsoncons {
         return decoder.get_result();
     }
 
-    template <class T,class CharT,class Allocator,class TempAllocator>
+    template <typename T,typename CharT,typename Allocator,typename TempAllocator >
     typename std::enable_if<!extension_traits::is_basic_json<T>::value,T>::type
     decode_json(const allocator_set<Allocator,TempAllocator>& alloc_set,
                 std::basic_istream<CharT>& is,

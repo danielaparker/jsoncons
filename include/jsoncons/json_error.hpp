@@ -138,12 +138,6 @@ namespace jsoncons {
         return std::error_code(static_cast<int>(result),json_error_category());
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use json_errc") typedef json_errc json_parser_errc;
-
-JSONCONS_DEPRECATED_MSG("Instead, use json_errc") typedef json_errc json_parse_errc;
-#endif
-
 } // jsoncons
 
 namespace std {

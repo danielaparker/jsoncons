@@ -73,7 +73,7 @@ namespace std {
 
 namespace jsoncons { namespace detail {
 
-template <class T,class CharT>
+template <typename T,typename CharT>
 struct to_integer_result
 {
     const CharT* ptr;
@@ -104,7 +104,7 @@ struct to_integer_result
 enum class integer_chars_format : uint8_t {decimal=1,hex};
 enum class integer_chars_state {initial,minus,integer,binary,octal,decimal,base16};
 
-template <class CharT>
+template <typename CharT>
 bool is_base10(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -159,7 +159,7 @@ bool is_base10(const CharT* s, std::size_t length)
     return state == integer_chars_state::decimal ? true : false;
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 bool is_base16(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -204,9 +204,9 @@ bool is_base16(const CharT* s, std::size_t length)
     return state == integer_chars_state::base16 ? true : false;
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-to_integer_decimal(const CharT* s, std::size_t length, T& n)
+decimal_to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
 
@@ -274,9 +274,9 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
     return (state == integer_chars_state::initial) ? to_integer_result<T,CharT>(s, to_integer_errc::invalid_number) : to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-to_integer_decimal(const CharT* s, std::size_t length, T& n)
+decimal_to_integer(const CharT* s, std::size_t length, T& n)
 {
     n = 0;
 
@@ -295,7 +295,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
     using U = typename extension_traits::make_unsigned<T>::type;
 
     U u;
-    auto ru = to_integer_decimal(s, length, u);
+    auto ru = decimal_to_integer(s, length, u);
     if (ru.ec != to_integer_errc())
     {
         return to_integer_result<T,CharT>(ru.ptr, ru.ec);
@@ -326,138 +326,7 @@ to_integer_decimal(const CharT* s, std::size_t length, T& n)
     }
 }
 
-template <class T, class CharT>
-typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-to_integer_base16(const CharT* s, std::size_t length, T& n)
-{
-    n = 0;
-
-    integer_chars_state state = integer_chars_state::initial;
-
-    const CharT* end = s + length; 
-    while (s < end)
-    {
-        switch(state)
-        {
-            case integer_chars_state::initial:
-            {
-                switch(*s)
-                {
-                    case '0':
-                        if (++s == end)
-                        {
-                            return (++s == end) ? to_integer_result<T,CharT>(s) : to_integer_result<T, CharT>(s, to_integer_errc());
-                        }
-                        else
-                        {
-                            return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
-                        }
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be base16
-                    case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                    case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                        state = integer_chars_state::base16;
-                        break;
-                    default:
-                        return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
-                }
-                break;
-            }
-            case integer_chars_state::base16:
-            {
-                static constexpr T max_value = (extension_traits::integer_limits<T>::max)();
-                static constexpr T max_value_div_16 = max_value / 16;
-                for (; s < end; ++s)
-                {
-                    CharT c = *s;
-                    T x = 0;
-                    switch(*s)
-                    {
-                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            x = static_cast<T>(c - '0');
-                            break;
-                        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                            x = static_cast<T>(c - ('a' - 10));
-                            break;
-                        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                            x = static_cast<T>(c - ('A' - 10));
-                            break;
-                        default:
-                            return to_integer_result<T,CharT>(s, to_integer_errc::invalid_digit);
-                    }
-                    if (n > max_value_div_16)
-                    {
-                        return to_integer_result<T,CharT>(s, to_integer_errc::overflow);
-                    }
-                    n = n * 16;
-                    if (n > max_value - x)
-                    {
-                        return to_integer_result<T,CharT>(s, to_integer_errc::overflow);
-                    }
-                    n += x;
-                }
-                break;
-            }
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
-        }
-    }
-    return (state == integer_chars_state::initial) ? to_integer_result<T,CharT>(s, to_integer_errc::invalid_number) : to_integer_result<T,CharT>(s, to_integer_errc());
-}
-
-template <class T, class CharT>
-typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-to_integer_base16(const CharT* s, std::size_t length, T& n)
-{
-    n = 0;
-
-    if (length == 0)
-    {
-        return to_integer_result<T,CharT>(s, to_integer_errc::invalid_number);
-    }
-
-    bool is_negative = *s == '-' ? true : false;
-    if (is_negative)
-    {
-        ++s;
-        --length;
-    }
-
-    using U = typename extension_traits::make_unsigned<T>::type;
-
-    U u;
-    auto ru = to_integer_base16(s, length, u);
-    if (ru.ec != to_integer_errc())
-    {
-        return to_integer_result<T,CharT>(ru.ptr, ru.ec);
-    }
-    if (is_negative)
-    {
-        if (u > static_cast<U>(-((extension_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
-        {
-            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
-        }
-        else
-        {
-            n = static_cast<T>(U(0) - u);
-            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc());
-        }
-    }
-    else
-    {
-        if (u > static_cast<U>((extension_traits::integer_limits<T>::max)()))
-        {
-            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc::overflow);
-        }
-        else
-        {
-            n = static_cast<T>(u);
-            return to_integer_result<T,CharT>(ru.ptr, to_integer_errc());
-        }
-    }
-}
-
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, std::size_t length, T& n)
 {
@@ -640,7 +509,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
     return (state == integer_chars_state::initial) ? to_integer_result<T,CharT>(s, to_integer_errc::invalid_number) : to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, std::size_t length, T& n)
 {
@@ -692,7 +561,7 @@ to_integer(const CharT* s, std::size_t length, T& n)
     }
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized,to_integer_result<T,CharT>>::type
 to_integer(const CharT* s, T& n)
 {
@@ -706,7 +575,7 @@ to_integer(const CharT* s, T& n)
 // - digit
 // - digit1-digits
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 {
@@ -767,7 +636,7 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 // - digit
 // - digit1-digits
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
 to_integer_unchecked(const CharT* s, std::size_t length, T& n)
 {
@@ -822,11 +691,11 @@ to_integer_unchecked(const CharT* s, std::size_t length, T& n)
     return to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-// base16_to_integer
+// hex_to_integer
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-base16_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -908,9 +777,9 @@ base16_to_integer(const CharT* s, std::size_t length, T& n)
     return to_integer_result<T,CharT>(s, to_integer_errc());
 }
 
-template <class T, class CharT>
+template <typename T,typename CharT>
 typename std::enable_if<extension_traits::integer_limits<T>::is_specialized && !extension_traits::integer_limits<T>::is_signed,to_integer_result<T,CharT>>::type
-base16_to_integer(const CharT* s, std::size_t length, T& n)
+hex_to_integer(const CharT* s, std::size_t length, T& n)
 {
     static_assert(extension_traits::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -966,7 +835,7 @@ public:
         return '.';
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
     operator()(const CharT* s, std::size_t len) const
     {
@@ -979,7 +848,7 @@ public:
         return val;
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
     operator()(const CharT* s, std::size_t len) const
     {
@@ -1030,7 +899,7 @@ public:
         return '.';
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
     operator()(const CharT* s, std::size_t) const
     {
@@ -1043,7 +912,7 @@ public:
         return val;
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
     operator()(const CharT* s, std::size_t) const
     {
@@ -1088,7 +957,7 @@ public:
         return '.';
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
     operator()(const CharT* s, std::size_t) const
     {
@@ -1101,7 +970,7 @@ public:
         return val;
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
     operator()(const CharT* s, std::size_t) const
     {
@@ -1145,7 +1014,7 @@ public:
         return decimal_point_;
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
     operator()(const CharT* s, std::size_t /*length*/) const
     {
@@ -1158,7 +1027,7 @@ public:
         return val;
     }
 
-    template <class CharT>
+    template <typename CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
     operator()(const CharT* s, std::size_t /*length*/) const
     {

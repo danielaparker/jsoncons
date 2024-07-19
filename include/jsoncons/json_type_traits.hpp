@@ -38,22 +38,17 @@
 
 namespace jsoncons {
 
-    template <class T>
+    template <typename T>
     struct is_json_type_traits_declared : public std::false_type
     {};
 
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    template <class T>
-    using is_json_type_traits_impl = is_json_type_traits_declared<T>;
-    #endif
-
     // json_type_traits
 
-    template<typename T>
+    template <typename T>
     struct unimplemented : std::false_type
     {};
 
-    template <class Json, class T, class Enable=void>
+    template <typename Json,typename T,typename Enable=void>
     struct json_type_traits
     {
         using allocator_type = typename Json::allocator_type;
@@ -83,25 +78,25 @@ namespace jsoncons {
 
 namespace detail {
 
-template<class Json, class T>
+template <typename Json,typename T>
 using
 traits_can_convert_t = decltype(json_type_traits<Json,T>::can_convert(Json()));
 
-template<class Json, class T>
+template <typename Json,typename T>
 using
 has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
-    template <class T>
+    template <typename T>
     struct invoke_can_convert
     {
-        template <class Json>
+        template <typename Json>
         static 
         typename std::enable_if<has_can_convert<Json,T>::value,bool>::type
         can_convert(const Json& j) noexcept
         {
             return json_type_traits<Json,T>::can_convert(j);
         }
-        template <class Json>
+        template <typename Json>
         static 
         typename std::enable_if<!has_can_convert<Json,T>::value,bool>::type
         can_convert(const Json& j) noexcept
@@ -111,38 +106,38 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
     };
 
     // is_json_type_traits_unspecialized
-    template<class Json, class T, class Enable = void>
+    template <typename Json,typename T,typename Enable = void>
     struct is_json_type_traits_unspecialized : std::false_type {};
 
     // is_json_type_traits_unspecialized
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct is_json_type_traits_unspecialized<Json,T,
         typename std::enable_if<!std::integral_constant<bool, json_type_traits<Json, T>::is_compatible>::value>::type
     > : std::true_type {};
 
     // is_compatible_array_type
-    template<class Json, class T, class Enable=void>
+    template <typename Json,typename T,typename Enable=void>
     struct is_compatible_array_type : std::false_type {};
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        extension_traits::is_list_like<T>::value && 
+        extension_traits::is_array_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
 } // namespace detail
 
     // is_json_type_traits_specialized
-    template<class Json, class T, class Enable=void>
+    template <typename Json,typename T,typename Enable=void>
     struct is_json_type_traits_specialized : std::false_type {};
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct is_json_type_traits_specialized<Json,T, 
         typename std::enable_if<!jsoncons::detail::is_json_type_traits_unspecialized<Json,T>::value
     >::type> : std::true_type {};
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
     {
         using char_type = typename Json::char_type;
@@ -156,15 +151,15 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return j.as_cstring();
         }
-        template <class ... Args>
+        template <typename ... Args>
         static Json to_json(const char_type* s, Args&&... args)
         {
             return Json(s, semantic_tag::none, std::forward<Args>(args)...);
         }
     };
 
-    template<class Json>
-    struct json_type_traits<Json, typename std::decay<typename Json::char_type>::type*>
+    template <typename Json>
+    struct json_type_traits<Json,typename std::decay<typename Json::char_type>::type*>
     {
         using char_type = typename Json::char_type;
         using allocator_type = typename Json::allocator_type;
@@ -173,7 +168,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         {
             return j.is_string();
         }
-        template <class ... Args>
+        template <typename ... Args>
         static Json to_json(const char_type* s, Args&&... args)
         {
             return Json(s, semantic_tag::none, std::forward<Args>(args)...);
@@ -182,7 +177,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // integer
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T,
         typename std::enable_if<(extension_traits::is_signed_integer<T>::value && sizeof(T) <= sizeof(int64_t)) || (extension_traits::is_unsigned_integer<T>::value && sizeof(T) <= sizeof(uint64_t)) 
     >::type>
@@ -209,7 +204,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T,
         typename std::enable_if<(extension_traits::is_signed_integer<T>::value && sizeof(T) > sizeof(int64_t)) || (extension_traits::is_unsigned_integer<T>::value && sizeof(T) > sizeof(uint64_t)) 
     >::type>
@@ -231,7 +226,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T,
                             typename std::enable_if<std::is_floating_point<T>::value
     >::type>
@@ -256,8 +251,8 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
-    struct json_type_traits<Json, typename Json::object>
+    template <typename Json>
+    struct json_type_traits<Json,typename Json::object>
     {
         using json_object = typename Json::object;
         using allocator_type = typename Json::allocator_type;
@@ -276,8 +271,8 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
-    struct json_type_traits<Json, typename Json::array>
+    template <typename Json>
+    struct json_type_traits<Json,typename Json::array>
     {
         using json_array = typename Json::array;
         using allocator_type = typename Json::allocator_type;
@@ -296,7 +291,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, Json>
     {
         using allocator_type = typename Json::allocator_type;
@@ -319,7 +314,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, jsoncons::null_type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -346,7 +341,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, bool>
     {
         using allocator_type = typename Json::allocator_type;
@@ -369,8 +364,8 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T>
-    struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T, 
+    template <typename Json,typename T>
+    struct json_type_traits<Json, T,typename std::enable_if<std::is_same<T, 
         std::conditional<!std::is_same<bool,std::vector<bool>::const_reference>::value,
                          std::vector<bool>::const_reference,
                          void>::type>::value>::type>
@@ -395,7 +390,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, std::vector<bool>::reference>
     {
         using allocator_type = typename Json::allocator_type;
@@ -418,7 +413,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     extension_traits::is_string<T>::value &&
@@ -447,7 +442,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     extension_traits::is_string<T>::value &&
@@ -485,7 +480,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     extension_traits::is_string_view<T>::value &&
@@ -516,7 +511,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // array back insertable
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value &&
@@ -545,7 +540,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
         // array back insertable non-byte container
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<!extension_traits::is_byte<typename Container::value_type>::value,Container>::type
         as(const Json& j)
         {
@@ -568,7 +563,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
         // array back insertable byte container
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<extension_traits::is_byte<typename Container::value_type>::value,Container>::type
         as(const Json& j)
         {
@@ -610,7 +605,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         }
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<!extension_traits::is_std_byte<typename Container::value_type>::value,Json>::type
         to_json(const T& val)
         {
@@ -626,7 +621,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j;
         }
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<!extension_traits::is_std_byte<typename Container::value_type>::value,Json>::type
         to_json(const T& val, const allocator_type& alloc)
         {
@@ -642,7 +637,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j;
         }
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<extension_traits::is_std_byte<typename Container::value_type>::value,Json>::type
         to_json(const T& val)
         {
@@ -650,7 +645,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j;
         }
 
-        template <class Container = T>
+        template <typename Container = T>
         static typename std::enable_if<extension_traits::is_std_byte<typename Container::value_type>::value,Json>::type
         to_json(const T& val, const allocator_type& alloc)
         {
@@ -670,7 +665,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // array, not back insertable but insertable
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value &&
@@ -746,7 +741,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // array not back insertable or insertable, but front insertable
 
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value &&
@@ -826,7 +821,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // std::array
 
-    template<class Json, class E, std::size_t N>
+    template <typename Json,typename E, std::size_t N>
     struct json_type_traits<Json, std::array<E, N>>
     {
         using allocator_type = typename Json::allocator_type;
@@ -889,7 +884,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
     };
 
     // map like
-    template<class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     extension_traits::is_map_like<T>::value &&
@@ -943,7 +938,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template <class Json, typename T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     extension_traits::is_map_like<T>::value &&
@@ -1034,7 +1029,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     namespace tuple_detail
     {
-        template<size_t Pos, std::size_t Size, class Json, class Tuple>
+        template<size_t Pos, std::size_t Size,typename Json,typename Tuple>
         struct json_tuple_helper
         {
             using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
@@ -1065,7 +1060,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             }
         };
 
-        template<size_t Size, class Json, class Tuple>
+        template<size_t Size,typename Json,typename Tuple>
         struct json_tuple_helper<0, Size, Json, Tuple>
         {
             static bool is(const Json&) noexcept
@@ -1083,7 +1078,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         };
     } // namespace detail
 
-    template<class Json, typename... E>
+    template <typename Json,typename... E>
     struct json_type_traits<Json, std::tuple<E...>>
     {
     private:
@@ -1122,7 +1117,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T1, class T2>
+    template <typename Json,typename T1,typename T2>
     struct json_type_traits<Json, std::pair<T1,T2>>
     {
     public:
@@ -1157,7 +1152,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, T,
                             typename std::enable_if<extension_traits::is_basic_byte_string<T>::value>::type>
     {
@@ -1181,7 +1176,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class ValueType>
+    template <typename Json,typename ValueType>
     struct json_type_traits<Json, std::shared_ptr<ValueType>,
                             typename std::enable_if<!is_json_type_traits_declared<std::shared_ptr<ValueType>>::value &&
                                                     !std::is_polymorphic<ValueType>::value
@@ -1211,7 +1206,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class ValueType>
+    template <typename Json,typename ValueType>
     struct json_type_traits<Json, std::unique_ptr<ValueType>,
                             typename std::enable_if<!is_json_type_traits_declared<std::unique_ptr<ValueType>>::value &&
                                                     !std::is_polymorphic<ValueType>::value
@@ -1241,7 +1236,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, jsoncons::optional<T>,
                             typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<T>>::value>::type>
     {
@@ -1262,7 +1257,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
     };
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, byte_string_view>
     {
         using allocator_type = typename Json::allocator_type;
@@ -1286,7 +1281,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // basic_bigint
 
-    template<class Json, class Allocator>
+    template <typename Json,typename Allocator>
     struct json_type_traits<Json, basic_bigint<Allocator>>
     {
     public:
@@ -1338,7 +1333,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
     // std::valarray
 
-    template<class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json, std::valarray<T>>
     {
         using allocator_type = typename Json::allocator_type;
@@ -1410,14 +1405,14 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
 
 namespace variant_detail
 {
-    template<int N, class Json, class Variant, class ... Args>
+    template<int N,typename Json,typename Variant,typename ... Args>
     typename std::enable_if<N == std::variant_size_v<Variant>, bool>::type
     is_variant(const Json& /*j*/)
     {
         return false;
     }
 
-    template<std::size_t N, class Json, class Variant, class T, class ... U>
+    template<std::size_t N,typename Json,typename Variant,typename T,typename ... U>
     typename std::enable_if<N < std::variant_size_v<Variant>, bool>::type
     is_variant(const Json& j)
     {
@@ -1431,14 +1426,14 @@ namespace variant_detail
       }
     }
 
-    template<int N, class Json, class Variant, class ... Args>
+    template<int N,typename Json,typename Variant,typename ... Args>
     typename std::enable_if<N == std::variant_size_v<Variant>, Variant>::type
     as_variant(const Json& /*j*/)
     {
         JSONCONS_THROW(conv_error(conv_errc::not_variant));
     }
 
-    template<std::size_t N, class Json, class Variant, class T, class ... U>
+    template<std::size_t N,typename Json,typename Variant,typename T,typename ... U>
     typename std::enable_if<N < std::variant_size_v<Variant>, Variant>::type
     as_variant(const Json& j)
     {
@@ -1453,14 +1448,14 @@ namespace variant_detail
       }
     }
 
-    template <class Json>
+    template <typename Json>
     struct variant_to_json_visitor
     {
         Json& j_;
 
         variant_to_json_visitor(Json& j) : j_(j) {}
 
-        template<class T>
+        template <typename T>
         void operator()(const T& value) const
         {
             j_ = value;
@@ -1469,7 +1464,7 @@ namespace variant_detail
 
 } // namespace variant_detail
 
-    template<class Json, typename... VariantTypes>
+    template <typename Json,typename... VariantTypes>
     struct json_type_traits<Json, std::variant<VariantTypes...>>
     {
     public:
@@ -1506,7 +1501,7 @@ namespace variant_detail
 #endif
 
     // std::chrono::duration
-    template<class Json,class Rep,class Period>
+    template <typename Json,typename Rep,typename Period>
     struct json_type_traits<Json,std::chrono::duration<Rep,Period>>
     {
         using duration_type = std::chrono::duration<Rep,Period>;
@@ -1532,7 +1527,7 @@ namespace variant_detail
             return to_json_(val);
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, duration_type>::type
         from_json_(const Json& j)
@@ -1594,7 +1589,7 @@ namespace variant_detail
             }
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value, duration_type>::type
         from_json_(const Json& j)
@@ -1642,7 +1637,7 @@ namespace variant_detail
                     {
                         auto sv = j.as_string_view();
                         Rep n{0};
-                        auto result = jsoncons::detail::to_integer_decimal(sv.data(), sv.size(), n);
+                        auto result = jsoncons::detail::decimal_to_integer(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();
@@ -1672,7 +1667,7 @@ namespace variant_detail
             }
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value, duration_type>::type
         from_json_(const Json& j)
@@ -1728,7 +1723,7 @@ namespace variant_detail
             }
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
         to_json_(const duration_type& val)
@@ -1736,7 +1731,7 @@ namespace variant_detail
             return Json(val.count(), semantic_tag::epoch_second);
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value,Json>::type
         to_json_(const duration_type& val)
@@ -1744,7 +1739,7 @@ namespace variant_detail
             return Json(val.count(), semantic_tag::epoch_milli);
         }
 
-        template <class PeriodT=Period>
+        template <typename PeriodT=Period>
         static 
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value,Json>::type
         to_json_(const duration_type& val)
@@ -1754,7 +1749,7 @@ namespace variant_detail
     };
 
     // std::nullptr_t
-    template <class Json>
+    template <typename Json>
     struct json_type_traits<Json,std::nullptr_t>
     {
         using allocator_type = typename Json::allocator_type;
@@ -1790,7 +1785,7 @@ namespace variant_detail
         }
     };
 
-    template<class Json, std::size_t N>
+    template <typename Json, std::size_t N>
     struct json_type_traits<Json, std::bitset<N>>
     {
         using allocator_type = typename Json::allocator_type;

@@ -20,7 +20,7 @@ namespace jsonschema {
     
     enum class walk_result {advance, abort};
 
-    template <class Json>
+    template <typename Json>
     struct json_schema_traits    
     {
         using walk_reporter_type = std::function<walk_result(const std::string& keyword,
@@ -186,10 +186,10 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class schema_validator;
 
-    template <class Json>
+    template <typename Json>
     class ref
     {
     public:
@@ -197,7 +197,7 @@ namespace jsonschema {
         virtual void set_referred_schema(const schema_validator<Json>* target) = 0;
     };
 
-    template <class Json>
+    template <typename Json>
     class validator_base 
     {
     public:
@@ -234,7 +234,7 @@ namespace jsonschema {
             const jsonpointer::json_pointer& /*instance_location*/, const walk_reporter_type& /*reporter*/) const = 0;
    };
 
-    template <class Json>
+    template <typename Json>
     class keyword_validator : public validator_base<Json> 
     {
     public:
@@ -253,7 +253,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class keyword_validator_base : public keyword_validator<Json>
     {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
@@ -291,7 +291,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
@@ -362,7 +362,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class keyword_base 
     {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
@@ -406,7 +406,7 @@ namespace jsonschema {
         }
     };
 
-    template <class Json>
+    template <typename Json>
     class schema_validator : public validator_base<Json>
     {
     public:

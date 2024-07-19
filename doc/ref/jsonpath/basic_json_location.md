@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template <class CharT, class Allocator = std::allocator<CharT>>     (since 0.172.0)
+template <typename CharT,typename Allocator = std::allocator<CharT>>     (since 0.172.0)
 class basic_json_location
 ```
 
@@ -73,7 +73,7 @@ Checks if the location is empty
     basic_json_location& append(const string_view_type& name)
 Appends `name` to the location.
 
-    template <class IntegerType>
+    template <typename IntegerType>
     basic_json_location& append(IntegerType index) 
 Appends `index` to the location.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
@@ -105,7 +105,7 @@ using the dot notation.
   </tr>
 </table>
 
-    template <class CharT, class Allocator = std::allocator<CharT>>
+    template <typename CharT,typename Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 
         const Allocator& alloc = Allocator())
 Returns a normalized path

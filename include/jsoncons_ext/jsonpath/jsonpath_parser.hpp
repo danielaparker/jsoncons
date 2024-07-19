@@ -95,7 +95,7 @@ namespace detail {
         expect_and
     };
 
-    template<class Json,
+    template <typename Json,
              class JsonReference>
     class jsonpath_evaluator : public ser_context
     {

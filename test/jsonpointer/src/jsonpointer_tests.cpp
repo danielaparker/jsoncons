@@ -18,7 +18,7 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-template <class CharT, class Policy, class Allocator>
+template <typename CharT,typename Policy,typename Allocator>
 void check_contains(const basic_json<CharT,Policy,Allocator>& example, const std::string& pointer, bool expected)
 {
     bool result = jsonpointer::contains(example,pointer);
@@ -31,7 +31,7 @@ void check_contains(const basic_json<CharT,Policy,Allocator>& example, const std
     CHECK(result == expected);
 }
 
-template <class CharT, class Policy, class Allocator>
+template <typename CharT,typename Policy,typename Allocator>
 void check_get(const basic_json<CharT,Policy,Allocator>& example, const std::string& pointer, const basic_json<CharT,Policy,Allocator>& expected)
 {
     std::error_code ec;
@@ -507,7 +507,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 #include <scoped_allocator>
 #include <common/FreeListAllocator.hpp>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;

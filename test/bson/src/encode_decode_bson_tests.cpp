@@ -183,7 +183,7 @@ TEST_CASE("bson encode array")
 #include <common/FreeListAllocator.hpp>
 #include <scoped_allocator>
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 

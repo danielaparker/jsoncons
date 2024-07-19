@@ -34,25 +34,25 @@ source_type                |Source
 
 #### Constructors
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor, 
                      const TempAllocator& alloc = TempAllocator()); (1)
 
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options, 
                      const TempAllocator& alloc = TempAllocator()); (2)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const TempAllocator& alloc = TempAllocator()); (3)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_reader(Sourceable&& source,
                      basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options,

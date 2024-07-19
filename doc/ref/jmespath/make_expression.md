@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
-template <class Json>
+template <typename Json>
 jmespath_expression<Json> make_expression(const json::string_view_type& expr); (1)
 
-template <class Json>
+template <typename Json>
 jmespath_expression<Json> make_expression(const json::string_view_type& expr,
                                           std::error_code& ec); (2)
 ```

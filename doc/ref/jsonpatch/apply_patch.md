@@ -3,10 +3,10 @@
 ```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-template <class Json>
+template <typename Json>
 void apply_patch(Json& target, const Json& patch); (1)
 
-template <class Json>
+template <typename Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec); (2)
 ```
 

@@ -3,41 +3,41 @@
 ```cpp
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
-template <class Json>
+template <typename Json>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     evaluation_options options = evaluation_options{});        
                                                                (1)
-template <class Json>
+template <typename Json>
 json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
     evaluation_options options = evaluation_options{});        
 
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const URIResolver& resolver,                               
     evaluation_options options = evaluation_options{});        (2)
 
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
     const URIResolver& resolver,                               
     evaluation_options options = evaluation_options{});        
 
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const std::string& retrieval_uri,                          
     evaluation_options options = evaluation_options{});         
                                                                (3)
-template <class Json,class URIResolver>
+template <typename Json,class URIResolver>
 json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
     const std::string& retrieval_uri,                          
     evaluation_options options = evaluation_options{});         
 
-    template <class Json>
+    template <typename Json>
 json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175.0)
     const std::string& retrieval_uri,                          
     const URIResolver& resolver, 
     evaluation_options options = evaluation_options{});         
                                                                (4)
-    template <class Json>
+    template <typename Json>
 json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0)
     const std::string& retrieval_uri,                          
     const URIResolver& resolver, 

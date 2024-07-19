@@ -1,6 +1,6 @@
 ### jsoncons::basic_json::emplace_back
 ```cpp
-template<class... Args>
+template <typename... Args>
 json& emplace_back(Args&&... args);
 ```
 

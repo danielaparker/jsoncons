@@ -1,10 +1,10 @@
 ### jsoncons::basic_json::make_array
 
 ```cpp
-template <class T>
+template <typename T>
 static basic_json make_array(size_ n, const T& val)
 
-template <class T>
+template <typename T>
 static basic_json make_array(size_ n, const T& val, 
                              const allocator_type& alloc = allocator_type())
 

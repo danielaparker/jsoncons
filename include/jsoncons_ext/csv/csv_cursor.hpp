@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
 class basic_csv_cursor : public basic_staj_cursor<CharT>, private virtual ser_context
 {
 public:
@@ -50,7 +50,7 @@ public:
 
     // Constructors that throw parse exceptions
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
@@ -66,7 +66,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
@@ -82,7 +82,7 @@ public:
 
 
     // Constructors that set parse error codes
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
                      std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
@@ -93,7 +93,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::error_code& ec)
@@ -105,7 +105,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
@@ -118,7 +118,7 @@ public:
     {
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
                      Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
@@ -135,7 +135,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
                      Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
@@ -150,7 +150,7 @@ public:
         initialize_with_string_view(sv, ec);
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source)
     {
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source)
     {
@@ -173,7 +173,7 @@ public:
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source, std::error_code& ec)
     {
@@ -186,7 +186,7 @@ public:
         }
     }
 
-    template <class Sourceable>
+    template <typename Sourceable>
     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type
     reset(Sourceable&& source, std::error_code& ec)
     {
@@ -271,21 +271,6 @@ public:
         return basic_staj_filter_view<CharT>(cursor, pred);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
-    void read(basic_json_visitor<CharT>& visitor) 
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&, std::error_code&)")
-    void read(basic_json_visitor<CharT>& visitor,
-                 std::error_code& ec) 
-    {
-        read_to(visitor, ec);
-    }
-#endif
 private:
 
     void initialize_with_string_view(string_view_type sv)
@@ -348,11 +333,6 @@ using csv_stream_cursor = basic_csv_cursor<char,jsoncons::stream_source<char>>;
 using csv_string_cursor = basic_csv_cursor<char,jsoncons::string_source<char>>;
 using wcsv_stream_cursor = basic_csv_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
 using wcsv_string_cursor = basic_csv_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_stream_cursor") typedef csv_stream_cursor csv_cursor;
-JSONCONS_DEPRECATED_MSG("Instead, use wcsv_stream_cursor") typedef wcsv_stream_cursor wcsv_cursor;
-#endif
 
 }}
 

@@ -5,51 +5,51 @@ Selects a value.
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
+template <typename Json>
 Json& get(Json& root, 
           const basic_json_pointer<Json::char_type>& location,
           bool create_if_missing = false);                               (1)
 
-template<class Json>
+template <typename Json>
 const Json& get(const Json& root, 
                 const basic_json_pointer<Json::char_type>& location);    (2)
 
-template<class Json>
+template <typename Json>
 Json& get(Json& root, 
           const basic_json_pointer<Json::char_type>& location, 
           std::error_code& ec);                                          (3)
 
-template<class Json>
+template <typename Json>
 const Json& get(const Json& root, 
                 const basic_json_pointer<Json::char_type>& location, 
                 std::error_code& ec);                                    (4)
 
-template<class Json>
+template <typename Json>
 Json& get(Json& root, 
           const basic_json_pointer<Json::char_type>& location, 
           bool create_if_missing, 
           std::error_code& ec);                                          (5)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 Json& get(Json& root, 
           const StringSource& location_str,
           bool create_if_missing = false);                               (6)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 const Json& get(const Json& root, 
                 const StringSource& location_str);                       (7)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 Json& get(Json& root, 
           const StringSource& location_str, 
           std::error_code& ec);                                          (8)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 const Json& get(const Json& root, 
                 const StringSource& location_str, 
                 std::error_code& ec);                                    (9)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 Json& get(Json& root, 
           const StringSource& location_str, 
           bool create_if_missing, 

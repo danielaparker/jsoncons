@@ -18,7 +18,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-    template <class CharT, class Sink>
+    template <typename CharT,typename Sink>
     std::size_t escape_string(const CharT* s, std::size_t length, Sink& sink)
     {
         std::size_t count = 0;

@@ -300,7 +300,7 @@ Output:
 using json = jsoncons::json;
 namespace jsonpath = jsoncons::jsonpath;
 
-template <class Json>
+template <typename Json>
 class my_custom_functions : public jsonpath::custom_functions<Json>
 {
 public:

@@ -281,7 +281,7 @@ namespace ns {
           std::string someString;
     };
 
-    template <typename T1, typename T2>
+    template <typename T1,typename T2>
     struct TemplatedStruct2
     {
           T1 aT1;

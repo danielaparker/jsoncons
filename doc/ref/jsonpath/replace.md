@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template<class Json>
+template <typename Json>
 std::pair<Json*,bool> replace(Json& root, 
     const basic_json_location<Json::char_type>& location, 
     const Json& new_value,

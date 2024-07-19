@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-template <class Json>
+template <typename Json>
 Json from_diff(const Json& source, const Json& target)
 ```
 

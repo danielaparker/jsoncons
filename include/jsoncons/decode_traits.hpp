@@ -23,10 +23,10 @@ namespace jsoncons {
 
     // decode_traits
 
-    template <class T, class CharT, class Enable = void>
+    template <typename T,typename CharT,typename Enable = void>
     struct decode_traits
     {
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>& decoder, 
                         std::error_code& ec)
@@ -49,12 +49,12 @@ namespace jsoncons {
 
     // primitive
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<extension_traits::is_primitive<T>::value
     >::type>
     {
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>&, 
                         std::error_code& ec)
@@ -66,13 +66,13 @@ namespace jsoncons {
 
     // string
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<extension_traits::is_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>&, 
                         std::error_code& ec)
@@ -82,13 +82,13 @@ namespace jsoncons {
         }
     };
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<extension_traits::is_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>&, 
                         std::error_code& ec)
@@ -105,10 +105,10 @@ namespace jsoncons {
 
     // std::pair
 
-    template <class T1, class T2, class CharT>
+    template <typename T1,typename T2,typename CharT>
     struct decode_traits<std::pair<T1, T2>, CharT>
     {
-        template <class Json, class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static std::pair<T1, T2> decode(basic_staj_cursor<CharT>& cursor,
                                         json_decoder<Json, TempAllocator>& decoder,
                                         std::error_code& ec)
@@ -148,17 +148,17 @@ namespace jsoncons {
     };
 
     // vector like
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 extension_traits::is_list_like<T>::value &&
+                 extension_traits::is_array_like<T>::value &&
                  extension_traits::is_back_insertable<T>::value &&
                  !extension_traits::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>& decoder, 
                         std::error_code& ec)
@@ -186,7 +186,7 @@ namespace jsoncons {
         }
     };
 
-    template <class T>
+    template <typename T>
     struct typed_array_visitor : public default_json_visitor
     {
         T& v_;
@@ -307,17 +307,17 @@ namespace jsoncons {
         }
     };
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 extension_traits::is_list_like<T>::value &&
+                 extension_traits::is_array_like<T>::value &&
                  extension_traits::is_back_insertable_byte_container<T>::value &&
                  extension_traits::is_typed_array<T>::value
     >::type>
     {
         using value_type = typename T::value_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>&, 
                         std::error_code& ec)
@@ -380,10 +380,10 @@ namespace jsoncons {
         }
     };
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 extension_traits::is_list_like<T>::value &&
+                 extension_traits::is_array_like<T>::value &&
                  extension_traits::is_back_insertable<T>::value &&
                  !extension_traits::is_back_insertable_byte_container<T>::value &&
                  extension_traits::is_typed_array<T>::value
@@ -391,7 +391,7 @@ namespace jsoncons {
     {
         using value_type = typename T::value_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>&, 
                         std::error_code& ec)
@@ -433,17 +433,17 @@ namespace jsoncons {
     };
 
     // set like
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 extension_traits::is_list_like<T>::value &&
+                 extension_traits::is_array_like<T>::value &&
                  !extension_traits::is_back_insertable<T>::value &&
                  extension_traits::is_insertable<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>& decoder, 
                         std::error_code& ec)
@@ -487,12 +487,12 @@ namespace jsoncons {
 
     // std::array
 
-    template <class T, class CharT, std::size_t N>
+    template <typename T,typename CharT, std::size_t N>
     struct decode_traits<std::array<T,N>,CharT>
     {
         using value_type = typename std::array<T,N>::value_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static std::array<T, N> decode(basic_staj_cursor<CharT>& cursor, 
                                        json_decoder<Json,TempAllocator>& decoder, 
                                        std::error_code& ec)
@@ -524,7 +524,7 @@ namespace jsoncons {
 
     // map like
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 extension_traits::is_map_like<T>::value &&
@@ -535,7 +535,7 @@ namespace jsoncons {
         using value_type = typename T::value_type;
         using key_type = typename T::key_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>& decoder, 
                         std::error_code& ec)
@@ -581,7 +581,7 @@ namespace jsoncons {
         }
     };
 
-    template <class T, class CharT>
+    template <typename T,typename CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 extension_traits::is_map_like<T>::value &&
@@ -592,7 +592,7 @@ namespace jsoncons {
         using value_type = typename T::value_type;
         using key_type = typename T::key_type;
 
-        template <class Json,class TempAllocator>
+        template <typename Json,typename TempAllocator >
         static T decode(basic_staj_cursor<CharT>& cursor, 
                         json_decoder<Json,TempAllocator>& decoder, 
                         std::error_code& ec)

@@ -5,10 +5,10 @@ void validate(const Json& instance) const;  (1)
 
 void validate(const Json& instance, Json& patch) const;  (2)
 
-template <class MsgReporter>
+template <typename MsgReporter>
 void validate(const Json& instance, const MsgReporter& reporter) const;  (3)
 
-template <class MsgReporter>
+template <typename MsgReporter>
 void validate(const Json& instance, const MsgReporter& reporter, Json& patch) const;  (4)
 
 void validate(const Json& instance, json_visitor<Json>& visitor) const;  (5)

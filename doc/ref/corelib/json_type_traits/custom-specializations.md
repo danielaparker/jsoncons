@@ -6,7 +6,7 @@ type that satisfies the conditions for a sequence container, you
 may see a compile error "more than one partial specialization matches the template argument list".
 For these situations `jsoncons` provides the traits class
 ```cpp
-template <class T>
+template <typename T>
 struct is_json_type_traits_declared : public std::false_type {};
 ```
 which inherits from [std::false_type](http://www.cplusplus.com/reference/type_traits/false_type/).
@@ -30,7 +30,7 @@ to inform the `jsoncons` library that the type is already specialized.
 
 namespace jsoncons 
 {
-    template <class Json>
+    template <typename Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
         static bool is(const Json& val) noexcept
@@ -123,7 +123,7 @@ namespace ns {
 
 namespace jsoncons {
 
-    template<class Json>
+    template <typename Json>
     struct json_type_traits<Json, ns::book>
     {
         using allocator_type = Json::allocator_type;
@@ -234,7 +234,7 @@ struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; 
 
 namespace jsoncons {
 
-template<class Json>
+template <typename Json>
 struct json_type_traits<Json, own_vector> 
 {
     static bool is(const Json& j) noexcept
@@ -293,7 +293,7 @@ Output:
 
 namespace jsoncons {
 
-    template <class Json, class T>
+    template <typename Json,typename T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
         static bool is(const Json& val) noexcept

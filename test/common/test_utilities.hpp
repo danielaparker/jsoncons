@@ -5,7 +5,7 @@
 #include <string>
 #include <cstddef>
 
-template <class Generator>
+template <typename Generator>
 std::string random_binary_string(Generator& gen, std::size_t n)
 {
   std::string s;

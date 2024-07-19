@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template <class CharT>
+template <typename CharT>
 class basic_json_pointer
 ```
 
@@ -56,7 +56,7 @@ URI fragment identifier (starts with `#`).
     basic_json_pointer& append(const string_type& s);     (since 0.172.0)
 Appends the token s.
 
-    template <class IntegerType>
+    template <typename IntegerType>
     basic_json_pointer& append(IntegerType index)         (since 0.172.0)
 Appends the token `index`.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
@@ -64,7 +64,7 @@ This overload only participates in overload resolution if `IntegerType` is an in
     basic_json_pointer& operator/=(const string_type& s)
 Appends the token s.
 
-    template <class IntegerType>
+    template <typename IntegerType>
     basic_json_pointer& operator/=(IntegerType index) 
 Appends the token `index`.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
@@ -98,26 +98,26 @@ URI fragment identifier (starts with `#`).
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);
 Concatenates a JSON Pointer pointer and a string. Effectively returns basic_json_pointer<CharT>(lhs) /= s.
 
-    template <class CharT,class IntegerType>
+    template <typename CharT,class IntegerType>
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, IntegerType index);
 Concatenates a JSON Pointer pointer and an index. Effectively returns basic_json_pointer<CharT>(lhs) /= index.
 This overload only participates in overload resolution if `IntegerType` is an integer type.
 
-    template <class CharT,class IntegerType>
+    template <typename CharT,class IntegerType>
     basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs );
 Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lhs) += rhs.
 
-    template <class CharT,class IntegerType>
+    template <typename CharT,class IntegerType>
     bool operator==(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
-    template <class CharT,class IntegerType>
+    template <typename CharT,class IntegerType>
     bool operator!=(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
     std::string to_string(const json_pointer& ptr);      (since 0.172.0)
 
     std::wstring to_wstring(const wjson_pointer& ptr);   (since 0.172.0)
 
-    template <class CharT>
+    template <typename CharT>
     std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& ptr);
 Performs stream output
 

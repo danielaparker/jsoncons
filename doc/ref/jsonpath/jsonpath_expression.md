@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
-template <class Json>
+template <typename Json>
 class jsonpath_expression
 ```
 
@@ -29,7 +29,7 @@ class jsonpath_expression
 </table>
 
 ```cpp
-template <class BinaryOp>
+template <typename BinaryOp>
 void update(const_reference root, BinaryOp op);                                   (1) (since 0.172.0)
 ```
 

@@ -28,7 +28,7 @@ Member type                         |Definition
 
     constexpr byte_string_view(const uint8_t* data, std::size_t length) noexcept;
 
-    template <class Container>
+    template <typename Container>
     constexpr explicit byte_string_view(const Container& cont); 
 
     constexpr byte_string_view(const byte_string_view&) noexcept = default;
@@ -71,7 +71,7 @@ Member type                         |Definition
 
     bool operator!=(const byte_string_view& lhs, const byte_string_view& rhs);
 
-    template <class CharT>
+    template <typename CharT>
     friend std::ostream& operator<<(std::ostream& os, const byte_string_view& o);
 
 ### Examples

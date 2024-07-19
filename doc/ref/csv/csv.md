@@ -124,7 +124,7 @@ namespace ns {
 
 } // namespace ns
 
-template <class Json>
+template <typename Json>
 struct json_type_traits<Json,boost::gregorian::date>
 {
     static bool is(const Json& val) noexcept

@@ -91,7 +91,7 @@ public:
         }
     }
 
-    template<typename U>
+    template <typename U>
     struct rebind
     {
         using other = FreeListAllocator<U>;
@@ -103,12 +103,12 @@ public:
     using difference_type = std::ptrdiff_t;
 };
 
-template <typename T, typename U>
+template <typename T,typename U>
 inline bool operator == (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
     return true;
 }
 
-template <typename T, typename U>
+template <typename T,typename U>
 inline bool operator != (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
     return false;
 }

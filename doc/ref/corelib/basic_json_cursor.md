@@ -37,28 +37,28 @@ Type                |Definition
 
 #### Constructors
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator()); (1)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       std::error_code& ec); (2)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec); (3)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec); (4)
 
-    template <class Sourceable>
+    template <typename Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
@@ -111,13 +111,13 @@ Returns the current [context](ser_context.md)
     void reset();
 Reset cursor to read another value from the same source
 
-    template <class Sourceable>
+    template <typename Sourceable>
     reset(Sourceable&& source)
 Reset cursor to read new value from a new source
 
 #### Non-member functions
 
-   template <class CharT, class Source, class Allocator>
+   template <typename CharT,typename Source,typename Allocator>
    basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Source,Allocator>& cursor, 
                                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 

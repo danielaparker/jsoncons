@@ -23,7 +23,7 @@
 namespace jsoncons { 
 namespace jsonpath { 
 
-    template <class CharT,class Allocator>
+    template <typename CharT,typename Allocator>
     class basic_path_element 
     {
     public:
@@ -123,7 +123,7 @@ namespace jsonpath {
 
         enum class selector_separator_kind{bracket,dot};
 
-        template<class CharT, class Allocator>
+        template <typename CharT,typename Allocator>
         class json_location_parser
         {
         public:
@@ -540,7 +540,7 @@ namespace jsonpath {
 
     } // namespace detail
 
-    template <class CharT, class Allocator = std::allocator<CharT>>
+    template <typename CharT,typename Allocator = std::allocator<CharT>>
     class basic_json_location
     {
     public:
@@ -659,7 +659,7 @@ namespace jsonpath {
             return *this;
         }
 
-        template <class IntegerType>
+        template <typename IntegerType>
         typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             append(IntegerType val)
         {
@@ -674,7 +674,7 @@ namespace jsonpath {
             return *this;
         }
 
-        template <class IntegerType>
+        template <typename IntegerType>
         typename std::enable_if<extension_traits::is_integer<IntegerType>::value, basic_json_location&>::type
             operator/=(IntegerType val)
         {
@@ -720,7 +720,7 @@ namespace jsonpath {
         }
     };
 
-    template<class Json>
+    template <typename Json>
     std::size_t remove(Json& root, const basic_json_location<typename Json::char_type>& location)
     {
         std::size_t count = 0;
@@ -781,7 +781,7 @@ namespace jsonpath {
         return count;
     }
 
-    template<class Json>
+    template <typename Json>
     std::pair<Json*,bool> get(Json& root, const basic_json_location<typename Json::char_type>& location)
     {
         Json* p_current = std::addressof(root);
@@ -833,7 +833,7 @@ namespace jsonpath {
         return std::make_pair(p_current,found);
     }
 
-    template <class CharT, class Allocator = std::allocator<CharT>>
+    template <typename CharT,typename Allocator = std::allocator<CharT>>
     std::basic_string<CharT, std::char_traits<CharT>, Allocator> to_basic_string(const basic_json_location<CharT,Allocator>& location, 
         const Allocator& alloc = Allocator())
     {
@@ -861,7 +861,7 @@ namespace jsonpath {
         return buffer;
     }
 
-    template<class Json>
+    template <typename Json>
     std::pair<Json*,bool> replace(Json& root, const basic_json_location<typename Json::char_type>& location, const Json& value,
         bool create_if_missing=false)
     {

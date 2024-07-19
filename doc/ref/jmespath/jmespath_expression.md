@@ -3,7 +3,7 @@
 ```cpp
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
-template <class Json>
+template <typename Json>
 class jmespath_expression
 ```
 

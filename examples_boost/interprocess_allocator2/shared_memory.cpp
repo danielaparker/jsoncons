@@ -15,13 +15,13 @@ using MyScopedAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
 
 struct boost_sorted_policy 
 {
-    template <class KeyT,class Json>
+    template <typename KeyT,typename Json>
     using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
 
-    template <class Json>
+    template <typename Json>
     using array = json_array<Json,boost::interprocess::vector>;
 
-    template <class CharT, class CharTraits, class Allocator>
+    template <typename CharT,typename CharTraits,typename Allocator>
     using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 

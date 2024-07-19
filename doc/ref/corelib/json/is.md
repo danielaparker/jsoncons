@@ -1,7 +1,7 @@
 ### jsoncons::basic_json::is
 
 ```cpp
-template <class T, class... Args>
+template <typename T,typename... Args>
 bool is(Args&&... args) const noexcept; (1)
 
 bool is_null() const noexcept; (2)

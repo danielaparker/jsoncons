@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-template<typename T>
+template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
 
 class MyIterator

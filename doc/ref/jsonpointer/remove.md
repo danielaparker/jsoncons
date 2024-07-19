@@ -5,20 +5,20 @@ Removes a `json` element.
 ```cpp
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
+template <typename Json>
 void remove(Json& target, 
             const basic_json_pointer<Json::char_type>& location); (1)
 
-template<class Json>
+template <typename Json>
 void remove(Json& target, 
             const basic_json_pointer<Json::char_type>& location, 
             std::error_code& ec);                                 (2)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 void remove(Json& target, 
             const StringSource& location_str);                    (3)
 
-template<class Json, class StringSource>
+template <typename Json,typename StringSource>
 void remove(Json& target, 
             const StringSource& location_str, 
             std::error_code& ec);                                 (4)

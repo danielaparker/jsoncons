@@ -110,16 +110,12 @@ namespace jsoncons {
         not_base16
     };
 
-    template <class InputIt>
+    template <typename InputIt>
     struct decode_result 
     {
         InputIt it;
         conv_errc ec;
     };
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use conv_error") typedef conv_error convert_error;
-#endif
 
 } // namespace jsoncons
 
