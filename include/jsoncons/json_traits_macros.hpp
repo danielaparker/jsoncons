@@ -97,8 +97,8 @@ namespace jsoncons
 #pragma warning( disable : 4127)
 #endif
 
-#define JSONCONS_CONCAT_RAW(a, b) a ## b
-#define JSONCONS_CONCAT(a, b) JSONCONS_CONCAT_RAW(a, b)
+#define JSONCONS_CONCAT_IMPL(a, b) a ## b
+#define JSONCONS_CONCAT(a, b) JSONCONS_CONCAT_IMPL(a, b)
 
 // Inspired by https://github.com/Loki-Astari/ThorsSerializer/blob/master/src/Serialize/Traits.h
 

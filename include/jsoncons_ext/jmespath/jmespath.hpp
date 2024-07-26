@@ -3355,7 +3355,7 @@ namespace jmespath {
             {
             }
 
-            Json evaluate(reference doc)
+            Json evaluate(reference doc) const
             {
                 if (output_stack_.empty())
                 {
@@ -3370,7 +3370,7 @@ namespace jmespath {
                 return result;
             }
 
-            Json evaluate(reference doc, std::error_code& ec)
+            Json evaluate(reference doc, std::error_code& ec) const
             {
                 if (output_stack_.empty())
                 {

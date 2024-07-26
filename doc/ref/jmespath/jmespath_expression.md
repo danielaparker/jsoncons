@@ -9,9 +9,13 @@ class jmespath_expression
 
 #### Member functions
 
-    Json evaluate(reference doc); (1)
+    Json evaluate(reference doc);                               (until 0.177.0)
+                                                            (1)
+    Json evaluate(reference doc) const;                         (since 0.177.0)
 
-    Json evaluate(reference doc, std::error_code& ec); (2)
+    Json evaluate(reference doc, std::error_code& ec);          (until 0.177.0)
+                                                            (2)
+    Json evaluate(reference doc, std::error_code& ec) const;    (since 0.177.0)
 
 #### Parameters
 
