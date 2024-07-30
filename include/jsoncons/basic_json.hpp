@@ -703,7 +703,7 @@ namespace jsoncons {
                 assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
             }
 
-            void assign(std::true_type, const  long_string_storage& other)
+            void assign(std::true_type, const long_string_storage& other)
             {
                 tag_ = other.tag_;
                 heap_string_factory_type::destroy(ptr_);
