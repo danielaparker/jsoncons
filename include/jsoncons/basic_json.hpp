@@ -4369,6 +4369,10 @@ namespace jsoncons {
                     return static_cast<double>(cast<uint64_storage>().value());
                 case json_storage_kind::json_const_pointer:
                     return cast<json_const_pointer_storage>().value()->as_double();
+                case json_storage_kind::null_value:
+					return 0;
+                case json_storage_kind::bool_value:
+					return cast<bool_storage>().value();
                 default:
                     JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
             }
