@@ -977,8 +977,8 @@ namespace jsoncons {
                 {
                     switch (kv.value().storage_kind())
                     {
-                        case json_storage_kind::array_value:
-                        case json_storage_kind::object_value:
+                        case json_storage_kind::array:
+                        case json_storage_kind::object:
                             if (!kv.value().empty())
                             {
                                 temp.emplace_back(std::move(kv.value()));
@@ -1700,8 +1700,8 @@ namespace jsoncons {
                 {
                     switch (kv.value().storage_kind())
                     {
-                        case json_storage_kind::array_value:
-                        case json_storage_kind::object_value:
+                        case json_storage_kind::array:
+                        case json_storage_kind::object:
                             if (!kv.value().empty())
                             {
                                 temp.emplace_back(std::move(kv.value()));

@@ -247,7 +247,7 @@ namespace jsoncons {
                 elements_.pop_back();
                 switch (current.storage_kind())
                 {
-                    case json_storage_kind::array_value:
+                    case json_storage_kind::array:
                     {
                         for (auto&& item : current.array_range())
                         {
@@ -259,7 +259,7 @@ namespace jsoncons {
                         current.clear();                           
                         break;
                     }
-                    case json_storage_kind::object_value:
+                    case json_storage_kind::object:
                     {
                         for (auto&& kv : current.object_range())
                         {

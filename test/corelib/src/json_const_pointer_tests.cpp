@@ -287,10 +287,10 @@ TEST_CASE("json_const_pointer identifier tests")
             target = deep_copy(j3);
         }
         CHECK(target == expected);
-        CHECK(target.storage_kind() == json_storage_kind::array_value);
+        CHECK(target.storage_kind() == json_storage_kind::array);
         for (const auto& item : target.array_range())
         {
-            CHECK(item.storage_kind() == json_storage_kind::uint64_value);
+            CHECK(item.storage_kind() == json_storage_kind::uint64);
         }
     }
 }
