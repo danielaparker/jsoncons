@@ -20,7 +20,7 @@ TEST_CASE("test json_storage_kind")
         CHECK(is_scalar(json_storage_kind::half_float));
         CHECK(is_scalar(json_storage_kind::short_str));
         CHECK(is_scalar(json_storage_kind::empty_object));
-        CHECK(is_scalar(json_storage_kind::json_const_pointer));
+        CHECK(is_scalar(json_storage_kind::const_json_pointer));
         CHECK_FALSE(is_scalar(json_storage_kind::long_str));
         CHECK_FALSE(is_scalar(json_storage_kind::byte_str));
         CHECK_FALSE(is_scalar(json_storage_kind::array));
