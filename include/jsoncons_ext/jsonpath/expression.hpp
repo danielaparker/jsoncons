@@ -2632,6 +2632,7 @@ namespace detail {
 
         union
         {
+            char dummy_;
             selector_type* selector_;
             std::unique_ptr<expression_base_type> expression_;
             const unary_operator<Json,JsonReference>* unary_operator_;
@@ -2654,67 +2655,67 @@ namespace detail {
         }
 
         token(current_node_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::current_node)
+            : token_kind_(jsonpath_token_kind::current_node), dummy_{}
         {
         }
 
         token(root_node_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::root_node)
+            : token_kind_(jsonpath_token_kind::root_node), dummy_{}
         {
         }
 
         token(end_function_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_function)
+            : token_kind_(jsonpath_token_kind::end_function), dummy_{}
         {
         }
 
         token(separator_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::separator)
+            : token_kind_(jsonpath_token_kind::separator), dummy_{}
         {
         }
 
         token(lparen_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::lparen)
+            : token_kind_(jsonpath_token_kind::lparen), dummy_{}
         {
         }
 
         token(rparen_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::rparen)
+            : token_kind_(jsonpath_token_kind::rparen), dummy_{}
         {
         }
 
         token(begin_union_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::begin_union)
+            : token_kind_(jsonpath_token_kind::begin_union), dummy_{}
         {
         }
 
         token(end_union_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_union)
+            : token_kind_(jsonpath_token_kind::end_union), dummy_{}
         {
         }
 
         token(begin_filter_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::begin_filter)
+            : token_kind_(jsonpath_token_kind::begin_filter), dummy_{}
         {
         }
 
         token(end_filter_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_filter)
+            : token_kind_(jsonpath_token_kind::end_filter), dummy_{}
         {
         }
 
         token(begin_expression_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::begin_expression)
+            : token_kind_(jsonpath_token_kind::begin_expression), dummy_{}
         {
         }
 
         token(end_index_expression_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_index_expression)
+            : token_kind_(jsonpath_token_kind::end_index_expression), dummy_{}
         {
         }
 
         token(end_argument_expression_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_argument_expression)
+            : token_kind_(jsonpath_token_kind::end_argument_expression), dummy_{}
         {
         }
 
@@ -2736,7 +2737,7 @@ namespace detail {
         }
 
         token(argument_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::argument)
+            : token_kind_(jsonpath_token_kind::argument), dummy_{}
         {
         }
 
