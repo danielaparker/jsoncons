@@ -2761,13 +2761,13 @@ namespace detail {
             return *resources.create_json(value_);
         }
 
-        token& operator=(token&& other)
-        {
-
 #if defined(__GNUC__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
+        token& operator=(token&& other)
+        {
+
             if (&other != this)
             {
                 if (token_kind_ == other.token_kind_)
@@ -2803,10 +2803,10 @@ namespace detail {
                 }
             }
             return *this;
+        }
 #if defined(__GNUC__)
 # pragma GCC diagnostic pop
 #endif
-        }
 
         ~token() noexcept
         {
@@ -2879,12 +2879,12 @@ namespace detail {
             }
         }
 
-        void construct(token&& other)
-        {
 #if defined(__GNUC__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
+        void construct(token&& other)
+        {
             token_kind_ = other.token_kind_;
             switch (token_kind_)
             {
@@ -2909,10 +2909,10 @@ namespace detail {
                 default:
                     break;
             }
+        }
 #if defined(__GNUC__)
 # pragma GCC diagnostic pop
 #endif
-        }
 
         void destroy() noexcept 
         {

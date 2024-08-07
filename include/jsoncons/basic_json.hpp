@@ -654,13 +654,13 @@ namespace jsoncons {
             {
                 ptr_ = heap_string_factory_type::create(data, length, null_type(), alloc);
             }
-
+/*
             long_string_storage(semantic_tag tag, pointer ptr)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), small_string_length_(0), 
                   tag_(tag), ptr_(ptr)
             {
             }
-
+*/
             long_string_storage(const long_string_storage& other)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), small_string_length_(0), tag_(other.tag_)
             {
