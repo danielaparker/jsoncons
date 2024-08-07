@@ -2763,6 +2763,11 @@ namespace detail {
 
         token& operator=(token&& other)
         {
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
             if (&other != this)
             {
                 if (token_kind_ == other.token_kind_)
@@ -2798,6 +2803,9 @@ namespace detail {
                 }
             }
             return *this;
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
         }
 
         ~token() noexcept
