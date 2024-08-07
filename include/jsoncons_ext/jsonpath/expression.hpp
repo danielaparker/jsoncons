@@ -2761,9 +2761,9 @@ namespace detail {
             return *resources.create_json(value_);
         }
 
-#if defined(__GNUC__) 
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
 # pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wuninitialized"
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
         token& operator=(token&& other)
         {
@@ -2804,7 +2804,7 @@ namespace detail {
             }
             return *this;
         }
-#if defined(__GNUC__)
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
 # pragma GCC diagnostic pop
 #endif
 
@@ -2879,9 +2879,9 @@ namespace detail {
             }
         }
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
 # pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wuninitialized"
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
         void construct(token&& other)
         {
@@ -2910,7 +2910,7 @@ namespace detail {
                     break;
             }
         }
-#if defined(__GNUC__)
+#if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
 # pragma GCC diagnostic pop
 #endif
 
