@@ -112,7 +112,6 @@ private:
     basic_json_decode_options<char_type> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
-    int initial_stack_capacity_;
     int nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -160,7 +159,6 @@ public:
                       const TempAllocator& temp_alloc = TempAllocator())
        : options_(options),
          err_handler_(err_handler),
-         initial_stack_capacity_(default_initial_stack_capacity_),
          nesting_depth_(0), 
          cp_(0),
          cp2_(0),
@@ -179,7 +177,8 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
 
-        state_stack_.reserve(initial_stack_capacity_);
+        std::size_t initial_stack_capacity = (options.max_nesting_depth()+2) <= default_initial_stack_capacity_ ? (options.max_nesting_depth()+2) : default_initial_stack_capacity_;
+        state_stack_.reserve(initial_stack_capacity );
         push_state(json_parse_state::root);
 
         if (options_.enable_str_to_nan())
@@ -456,7 +455,6 @@ public:
     void reset()
     {
         state_stack_.clear();
-        state_stack_.reserve(initial_stack_capacity_);
         push_state(json_parse_state::root);
         state_ = json_parse_state::start;
         more_ = true;
@@ -2781,6 +2779,7 @@ private:
     void push_state(json_parse_state state)
     {
         state_stack_.push_back(state);
+        //std::cout << "max_nesting_depth: " << options_.max_nesting_depth() << ", capacity: " << state_stack_.capacity() << ", nesting_depth: " << nesting_depth_ << ", stack size: " << state_stack_.size() << "\n";
     }
 
     json_parse_state pop_state()

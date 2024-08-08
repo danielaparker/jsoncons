@@ -12,6 +12,28 @@
 
 using namespace jsoncons;
 
+TEST_CASE("test json_options max_nesting_depth")
+{
+    std::string str = R"(
+{
+    "foo" : [1,2,3],
+    "bar" : [4,5,{"f":6}]
+}
+    )";
+
+    SECTION("success")
+    {
+        json_options options = json_options{}.max_nesting_depth(3);
+        REQUIRE_NOTHROW(json::parse(str, options));
+    }
+
+    SECTION("fail")
+    {
+        json_options options = json_options{}.max_nesting_depth(2);
+        REQUIRE_THROWS(json::parse(str, options));
+    }
+}
+
 TEST_CASE("test_default_nan_replacement")
 {
     json obj;
