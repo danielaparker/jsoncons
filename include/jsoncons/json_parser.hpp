@@ -107,7 +107,7 @@ private:
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state>;
 
     static constexpr std::size_t initial_string_buffer_capacity_ = 1024;
-    static constexpr std::size_t default_initial_stack_capacity_ = 100;
+    static constexpr int default_initial_stack_capacity_ = 100;
 
     basic_json_decode_options<char_type> options_;
 
