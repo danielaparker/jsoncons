@@ -2104,7 +2104,7 @@ namespace jsoncons {
 
         void uninitialized_copy(const basic_json& other)
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2133,7 +2133,7 @@ namespace jsoncons {
 
         void uninitialized_copy_a(const basic_json& other, const Allocator& alloc)
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2162,7 +2162,7 @@ namespace jsoncons {
 
         void uninitialized_move(basic_json&& other) noexcept
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2198,7 +2198,7 @@ namespace jsoncons {
         void uninitialized_move_a(std::false_type /* stateful allocator */, 
             basic_json&& other, const Allocator& alloc) noexcept
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2227,7 +2227,7 @@ namespace jsoncons {
 
         void copy_assignment(const basic_json& other)
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
@@ -2289,7 +2289,7 @@ namespace jsoncons {
 
         void move_assignment(basic_json&& other)
         {
-            if (is_scalar(other.storage_kind()))
+            if (is_scalar_storage(other.storage_kind()))
             {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
@@ -2642,11 +2642,59 @@ namespace jsoncons {
                         case json_storage_kind::const_json_pointer:
                             return compare(*(rhs.cast<json_const_pointer_storage>().value()));
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            if (is_string_storage(rhs.storage_kind()))
+                            {
+                                double val1 = as<double>();
+                                double val2 = rhs.as<double>();
+                                auto r = val1 - val2;
+                                return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                            }
+                            else
+                            {
+                                return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            }
                     }
                     break;
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
+                    if (is_number_tag(tag()))
+                    {
+                        double val1 = as<double>(); 
+                        switch (rhs.storage_kind())
+                        {
+                            case json_storage_kind::int64:
+                            {
+                                auto r = val1 - static_cast<double>(rhs.cast<int64_storage>().value());
+                                return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                            }
+                            case json_storage_kind::uint64:
+                            {
+                                auto r = val1 - static_cast<double>(rhs.cast<uint64_storage>().value());
+                                return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                            }
+                            case json_storage_kind::float64:
+                            {
+                                auto r = val1 - rhs.cast<double_storage>().value();
+                                return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                            }
+                            case json_storage_kind::const_json_pointer:
+                                return compare(*(rhs.cast<json_const_pointer_storage>().value()));
+                            default:
+                                if (is_string_storage(rhs.storage_kind()))
+                                {
+                                    double val2 = rhs.as<double>();
+                                    auto r = val1 - val2; 
+                                    return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
+                                }
+                                else
+                                {
+                                    return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                                }
+                        }
+                    }
+                    else
+                    {
+                    }
                     switch (tag())
                     {
                         case semantic_tag::bigint:

@@ -11,20 +11,62 @@ using namespace jsoncons;
 
 TEST_CASE("test json_storage_kind")
 {
-    SECTION("is_scalar")
+    SECTION("is_scalar_storage")
     {
-        CHECK(is_scalar(json_storage_kind::null));
-        CHECK(is_scalar(json_storage_kind::boolean));
-        CHECK(is_scalar(json_storage_kind::uint64));
-        CHECK(is_scalar(json_storage_kind::int64));
-        CHECK(is_scalar(json_storage_kind::half_float));
-        CHECK(is_scalar(json_storage_kind::short_str));
-        CHECK(is_scalar(json_storage_kind::empty_object));
-        CHECK(is_scalar(json_storage_kind::const_json_pointer));
-        CHECK_FALSE(is_scalar(json_storage_kind::long_str));
-        CHECK_FALSE(is_scalar(json_storage_kind::byte_str));
-        CHECK_FALSE(is_scalar(json_storage_kind::array));
-        CHECK_FALSE(is_scalar(json_storage_kind::object));
+        CHECK(is_scalar_storage(json_storage_kind::null));
+        CHECK(is_scalar_storage(json_storage_kind::boolean));
+        CHECK(is_scalar_storage(json_storage_kind::uint64));
+        CHECK(is_scalar_storage(json_storage_kind::int64));
+        CHECK(is_scalar_storage(json_storage_kind::half_float));
+        CHECK(is_scalar_storage(json_storage_kind::short_str));
+        CHECK(is_scalar_storage(json_storage_kind::empty_object));
+        CHECK(is_scalar_storage(json_storage_kind::const_json_pointer));
+        CHECK_FALSE(is_scalar_storage(json_storage_kind::long_str));
+        CHECK_FALSE(is_scalar_storage(json_storage_kind::byte_str));
+        CHECK_FALSE(is_scalar_storage(json_storage_kind::array));
+        CHECK_FALSE(is_scalar_storage(json_storage_kind::object));
+    }
+    SECTION("is_string_storage")
+    {
+        CHECK_FALSE(is_string_storage(json_storage_kind::null));
+        CHECK_FALSE(is_string_storage(json_storage_kind::boolean));
+        CHECK_FALSE(is_string_storage(json_storage_kind::uint64));
+        CHECK_FALSE(is_string_storage(json_storage_kind::int64));
+        CHECK_FALSE(is_string_storage(json_storage_kind::half_float));
+        CHECK(is_string_storage(json_storage_kind::short_str));
+        CHECK_FALSE(is_string_storage(json_storage_kind::empty_object));
+        CHECK_FALSE(is_string_storage(json_storage_kind::const_json_pointer));
+        CHECK(is_string_storage(json_storage_kind::long_str));
+        CHECK_FALSE(is_string_storage(json_storage_kind::byte_str));
+        CHECK_FALSE(is_string_storage(json_storage_kind::array));
+        CHECK_FALSE(is_string_storage(json_storage_kind::object));
+    }
+}
+
+TEST_CASE("test semantic_tag")
+{
+    SECTION("is_number")
+    {
+        CHECK_FALSE(is_number_tag(semantic_tag::none));
+        CHECK_FALSE(is_number_tag(semantic_tag::undefined));
+        CHECK_FALSE(is_number_tag(semantic_tag::datetime));
+        CHECK_FALSE(is_number_tag(semantic_tag::epoch_second));
+        CHECK_FALSE(is_number_tag(semantic_tag::epoch_milli));
+        CHECK_FALSE(is_number_tag(semantic_tag::epoch_nano));
+        CHECK_FALSE(is_number_tag(semantic_tag::base64));
+        CHECK_FALSE(is_number_tag(semantic_tag::base64url));
+        CHECK_FALSE(is_number_tag(semantic_tag::uri));
+        CHECK_FALSE(is_number_tag(semantic_tag::clamped));
+        CHECK_FALSE(is_number_tag(semantic_tag::multi_dim_row_major));
+        CHECK_FALSE(is_number_tag(semantic_tag::multi_dim_column_major));
+        CHECK(is_number_tag(semantic_tag::bigint));
+        CHECK(is_number_tag(semantic_tag::bigdec));
+        CHECK(is_number_tag(semantic_tag::bigfloat));
+        CHECK(is_number_tag(semantic_tag::float128));
+        CHECK_FALSE(is_number_tag(semantic_tag::ext));
+        CHECK_FALSE(is_number_tag(semantic_tag::id));
+        CHECK_FALSE(is_number_tag(semantic_tag::regex));
+        CHECK_FALSE(is_number_tag(semantic_tag::code));
     }
 }
 
