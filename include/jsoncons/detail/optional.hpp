@@ -226,7 +226,7 @@ namespace detail
         typename std::enable_if<!std::is_same<optional<T>,typename std::decay<T2>::type>::value &&
                                 std::is_constructible<T, T2>::value &&
                                 std::is_assignable<T&, T2>::value &&
-                                !(std::is_scalar_storage<T>::value && std::is_same<T,typename std::decay<T2>::type>::value),
+                                !(std::is_scalar<T>::value && std::is_same<T,typename std::decay<T2>::type>::value),
             optional&>::type
         operator=(T2&& v)
         {
