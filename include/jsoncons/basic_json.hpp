@@ -2694,41 +2694,17 @@ namespace jsoncons {
                     }
                     else
                     {
-                    }
-                    switch (tag())
-                    {
-                        case semantic_tag::bigint:
-                        case semantic_tag::bigdec:
-                        case semantic_tag::bigfloat:
+                        // compare regular text
+                        switch (rhs.storage_kind())
                         {
-                            // same text -> equal
-                            if (rhs.storage_kind() == json_storage_kind::short_str || rhs.storage_kind() == json_storage_kind::long_str)
-                            {
-                                int compareString = as_string_view().compare(rhs.as_string_view());
-                                if (compareString == 0)
-                                {
-                                    return 0;
-                                }
-                            }
-                            
-                            // compare big numbers as double
-                            auto r = as_double() - rhs.as_double();
-                            return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
-                        }
-                        default:
-                        {
-                            // compare regular text
-                            switch (rhs.storage_kind())
-                            {
-                                case json_storage_kind::short_str:
-                                    return as_string_view().compare(rhs.as_string_view());
-                                case json_storage_kind::long_str:
-                                    return as_string_view().compare(rhs.as_string_view());
-                                case json_storage_kind::const_json_pointer:
-                                    return compare(*(rhs.cast<json_const_pointer_storage>().value()));
-                                default:
-                                    return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
-                            }
+                            case json_storage_kind::short_str:
+                                return as_string_view().compare(rhs.as_string_view());
+                            case json_storage_kind::long_str:
+                                return as_string_view().compare(rhs.as_string_view());
+                            case json_storage_kind::const_json_pointer:
+                                return compare(*(rhs.cast<json_const_pointer_storage>().value()));
+                            default:
+                                return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
                         }
                     }
                     break;
