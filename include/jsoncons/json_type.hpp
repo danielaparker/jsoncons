@@ -102,18 +102,24 @@ namespace jsoncons {
         boolean = 1,             // 0001
         int64 = 2,               // 0010
         uint64 = 3,              // 0011
-        half_float = 4,          // 0100
+        empty_object = 4,        // 0100
         float64 = 5,             // 0101
-        short_str = 6,           // 0110
-        empty_object = 7,        // 0111
+        half_float = 6,          // 0110
+        short_str = 7,           // 0111
         const_json_pointer = 8,  // 1000    
-        long_str = 12,           // 1100  
-        byte_str = 13,           // 1101
+        byte_str = 12,           // 1100  
+        object = 13,             // 1101
         array = 14,              // 1110
-        object = 15              // 1111
+        long_str = 15            // 1111
     };
 
-    inline bool is_scalar(json_storage_kind storage_kind) noexcept
+    inline bool is_string_storage(json_storage_kind storage_kind) noexcept
+    {
+        static const uint8_t mask{ uint8_t(json_storage_kind::short_str) & uint8_t(json_storage_kind::long_str) };
+        return (uint8_t(storage_kind) & mask) == mask;
+    }
+
+    inline bool is_scalar_storage(json_storage_kind storage_kind) noexcept
     {
         static const uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
             & uint8_t(json_storage_kind::array) & uint8_t(json_storage_kind::object) };

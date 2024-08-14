@@ -61,28 +61,35 @@ constexpr json_const_pointer_arg_t json_const_pointer_arg{};
  
 enum class semantic_tag : uint8_t 
 {
-    none = 0,
-    undefined = 0x01,
-    datetime = 0x02,
-    epoch_second = 0x03,
-    epoch_milli = 0x04,
-    epoch_nano = 0x05,
-    bigint = 0x06,
-    bigdec = 0x07,
-    bigfloat = 0x08,
-    float128 = 0x09,
-    base16 = 0x1a,
-    base64 = 0x1b,
-    base64url = 0x1c,
-    uri = 0x0d,
-    clamped = 0x0e,
-    multi_dim_row_major = 0x0f,
-    multi_dim_column_major = 0x10,
-    ext = 0x11,
-    id = 0x12,
-    regex = 0x13,
-    code = 0x14
+    none = 0,                  // 00000000     
+    undefined = 1,             // 00000001
+    datetime = 2,              // 00000010
+    epoch_second = 3,          // 00000011
+    epoch_milli = 4,           // 00000100
+    epoch_nano = 5,            // 00000101
+    base16 = 6,                // 00000110
+    base64 = 7,                // 00000111
+    base64url = 8,             // 00001000
+    uri = 9,
+    multi_dim_row_major = 10,
+    multi_dim_column_major = 11,
+    bigint = 12,                // 00001100
+    bigdec = 13,                // 00001101
+    bigfloat = 14,              // 00001110
+    float128 = 15,              // 00001111
+    clamped = 16,
+    ext = 17,
+    id = 18,
+    regex = 19,
+    code = 20
 };
+
+inline bool is_number_tag(semantic_tag tag) noexcept
+{
+    static const uint8_t mask{ uint8_t(semantic_tag::bigint) & uint8_t(semantic_tag::bigdec) 
+        & uint8_t(semantic_tag::bigfloat) & uint8_t(semantic_tag::float128) };
+    return (uint8_t(tag) & mask) == mask;
+}
 
 template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_tag tag)

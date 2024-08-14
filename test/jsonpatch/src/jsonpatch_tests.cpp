@@ -6,20 +6,16 @@
 #endif
 #include <catch/catch.hpp>
 #include <iostream>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <utility>
-#include <ctime>
-#include <new>
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 using jsoncons::json;
+using jsoncons::json_options;
+using jsoncons::ojson;
 namespace jsonpatch = jsoncons::jsonpatch;
 using namespace jsoncons::literals;
 
-void check_patch(json& target, const json& patch, const std::error_code& expected_ec, const json& expected)
+template <typename Json>
+void check_patch(Json& target, const Json& patch, const std::error_code& expected_ec, const Json& expected)
 {
     std::error_code ec;
     jsonpatch::apply_patch(target, patch, ec);
@@ -192,5 +188,27 @@ TEST_CASE("jsonpatch - remove two items from array")
     check_patch(source,patch,std::error_code(),target);
 }
 
+TEST_CASE("from diff with null and lossless number")
+{
+    ojson expected_patch = ojson::parse(
+        R"([{"op":"replace","path":"/hello","value":null},{"op":"replace","path":"/hello2","value":"123.4"}])"
+    );
+    
+    json_options options = json_options{}
+           .lossless_number(true)
+           .bigint_format(jsoncons::bigint_chars_format::number)
+           .byte_string_format(jsoncons::byte_string_chars_format::base64);
+
+    const char* json1 = "{\"hello\":123.4, \"hello2\":null}";
+    const char* json2 = "{\"hello\":null,  \"hello2\":123.4 }";
+
+    ojson j1 = ojson::parse(json1, options);
+    ojson j2 = ojson::parse(json2, options);
+
+    ojson patch = jsonpatch::from_diff(j1, j2);
+    
+    CHECK(expected_patch == patch);
+    check_patch(j1,patch,std::error_code(),j2);
+}
 
 
