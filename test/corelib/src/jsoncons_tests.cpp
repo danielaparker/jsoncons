@@ -192,8 +192,8 @@ TEST_CASE("test_uHHHH")
     CHECK(static_cast<uint8_t>(s[5]) == 0x80);
 
     std::ostringstream os;
-    json_options options;
-    options.escape_all_non_ascii(true);
+    auto options = json_options{}
+        .escape_all_non_ascii(true);
     arr.dump(os, options);
     std::string outputStr = os.str();
 

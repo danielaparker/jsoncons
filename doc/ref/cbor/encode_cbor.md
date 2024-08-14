@@ -207,8 +207,8 @@ int main()
   ]
 )");
 
-    cbor::cbor_encode_options options;
-    options.pack_strings(true);
+    auto options = cbor::cbor_encode_options{}
+        .pack_strings(true);
     std::vector<uint8_t> buf;
 
     cbor::encode_cbor(j, buf, options);

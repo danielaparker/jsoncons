@@ -194,10 +194,10 @@ TEST_CASE("from diff with null and lossless number")
         R"([{"op":"replace","path":"/hello","value":null},{"op":"replace","path":"/hello2","value":"123.4"}])"
     );
     
-    json_options options = json_options{}
-           .lossless_number(true)
-           .bigint_format(jsoncons::bigint_chars_format::number)
-           .byte_string_format(jsoncons::byte_string_chars_format::base64);
+    auto options = json_options{}
+        .lossless_number(true)
+        .bigint_format(jsoncons::bigint_chars_format::number)
+        .byte_string_format(jsoncons::byte_string_chars_format::base64);
 
     const char* json1 = "{\"hello\":123.4, \"hello2\":null}";
     const char* json2 = "{\"hello\":null,  \"hello2\":123.4 }";

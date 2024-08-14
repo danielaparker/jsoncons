@@ -323,8 +323,8 @@ int main()
     std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
 
     // Using lossless_number option
-    json_options options;
-    options.lossless_number(true);
+    auto options = json_options{}
+        .lossless_number(true);
 
     json j2 = json::parse(s, options);
     // Access as string
@@ -404,8 +404,8 @@ try
     auto j = jsoncons::json::parse(s, jsoncons::strict_json_parsing());
 
     // since 0.171.0
-    jsoncons::json_options options;
-    options.err_handler(jsoncons::strict_json_parsing());
+    auto options = json_options{}
+        .err_handler(jsoncons::strict_json_parsing());
     auto j = jsoncons::json::parse(s, options);
 }
 catch (const ser_error& e)
@@ -428,8 +428,8 @@ Like this,
 std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
 try
 {
-    json_options options;
-    options.max_nesting_depth(20);
+    auto options = json_options{}
+        .max_nesting_depth(20);
     json j = json::parse(s, options);
 }
 catch (const ser_error& e)
@@ -609,8 +609,8 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 #### Escape all non-ascii characters
 
 ```
-json_options options;
-options.escape_all_non_ascii(true);
+auto options = json_options{}
+    .escape_all_non_ascii(true);
 
 j.dump(std::cout, options); // compact
 
@@ -635,9 +635,9 @@ j["field1"] = std::sqrt(-1.0);
 j["field2"] = 1.79e308 * 1000;
 j["field3"] = -1.79e308 * 1000;
 
-json_options options;
-options.nan_to_str("NaN")
-       .inf_to_str("Inf"); 
+auto options = json_options{}
+    .nan_to_str("NaN")
+    .inf_to_str("Inf"); 
 
 std::ostringstream os;
 os << pretty_print(j, options);
@@ -3030,8 +3030,8 @@ int main()
     typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_50> multiprecision_type;
 
     std::string s = "[100000000000000000000000000000000.1234]";
-    json_options options;
-    options.lossless_number(true);
+    auto options = json_options{}
+        .lossless_number(true);
     json j = json::parse(s, options);
 
     multiprecision_type x = j[0].as<multiprecision_type>();

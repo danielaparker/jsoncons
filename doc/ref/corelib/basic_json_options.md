@@ -192,9 +192,9 @@ obj["field1"] = std::sqrt(-1.0);
 obj["field2"] = 1.79e308*1000;
 obj["field3"] = -1.79e308*1000;
 
-json_options options;
-format.nan_to_num("null");        // default is "null"
-format.inf_to_num("1e9999");  // default is "null"
+auto options = json_options{}
+    .nan_to_num("null");        // default is "null"
+    .inf_to_num("1e9999");      // default is "null"
 
 std::cout << pretty_print(obj,options) << std::endl;
 ```
@@ -237,8 +237,8 @@ int main()
     std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
 
     // Using lossless_number option
-    json_options options;
-    options.lossless_number(true);
+    auto options = json_options{}
+        .lossless_number(true);
 
     json j2 = json::parse(s, options);
     // Access as string
@@ -269,13 +269,13 @@ std::cout << "Default (same line)" << std::endl;
 std::cout << pretty_print(j) << std::endl;
 
 std::cout << "New line" << std::endl;
-json_options options1;
-format1.object_array_line_splits(line_split_kind::new_line);
+auto options1 = json_options{}
+    .object_array_line_splits(line_split_kind::new_line);
 std::cout << pretty_print(j,options1) << std::endl;
 
 std::cout << "Multi line" << std::endl;
-json_options options2;
-format2.object_array_line_splits(line_split_kind::multi_line);
+auto options2 = json_options{}
+    .object_array_line_splits(line_split_kind::multi_line);
 std::cout << pretty_print(j,options2) << std::endl;
 ```
 
@@ -346,13 +346,13 @@ Multi line
     std::cout << pretty_print(j) << std::endl;
 
     std::cout << "Same line" << std::endl;
-    json_options options1;
-    format1.array_array_line_splits(line_split_kind::same_line);
+    auto options1 = json_options{}
+        .array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(j, options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    json_options options2;
-    format2.array_array_line_splits(line_split_kind::multi_line);
+    auto options2 = json_options{}
+        .array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(j, options2) << std::endl;
 ```
 
@@ -463,8 +463,8 @@ int main()
     // auto j = json::parse(s, allow_trailing_commas());
 
     // since 0.171.0
-    json_options options;
-    options.err_handler(allow_trailing_commas());
+    auto options = json_options{}
+        .err_handler(allow_trailing_commas());
     auto j = json::parse(s, options);
     std::cout << "(2) " << j << "\n\n";
 }

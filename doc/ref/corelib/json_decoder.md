@@ -141,8 +141,8 @@ int main()
 
     using my_json = basic_json<char,sorted_policy,my_alloc>;
 
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
 
     std::ifstream is("bond_yields.csv");
     json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));

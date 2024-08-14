@@ -258,22 +258,22 @@ TEST_CASE("dump cbor to string test")
     //std::cout << s0 << std::endl;
 
     std::string s1;
-    json_options options1;
-    options1.bigint_format(bigint_chars_format::number);
+    auto options1 = json_options{}
+        .bigint_format(bigint_chars_format::number);
     j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
     //std::cout << s1 << std::endl;
 
     std::string s2;
-    json_options options2;
-    options2.bigint_format(bigint_chars_format::base10);
+    auto options2 = json_options{}
+        .bigint_format(bigint_chars_format::base10);
     j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
     //std::cout << s2 << std::endl;
 
     std::string s3;
-    json_options options3;
-    options3.bigint_format(bigint_chars_format::base64url);
+    auto options3 = json_options{}
+        .bigint_format(bigint_chars_format::base64url);
     j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
     //std::cout << s3 << std::endl;
@@ -300,22 +300,22 @@ TEST_CASE("test_dump_to_stream")
     //std::cout << os0.str() << std::endl;
 
     std::ostringstream os1;
-    json_options options1;
-    options1.bigint_format(bigint_chars_format::number);
+    auto options1 = json_options{}
+        .bigint_format(bigint_chars_format::number);
     j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
     //std::cout << os1.str() << std::endl;
 
     std::ostringstream os2;
-    json_options options2;
-    options2.bigint_format(bigint_chars_format::base10);
+    auto options2 = json_options{}
+        .bigint_format(bigint_chars_format::base10);
     j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
     //std::cout << os2.str() << std::endl;
 
     std::ostringstream os3;
-    json_options options3;
-    options3.bigint_format(bigint_chars_format::base64url);
+    auto options3 = json_options{}
+        .bigint_format(bigint_chars_format::base64url);
     j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
     //std::cout << os3.str() << std::endl;

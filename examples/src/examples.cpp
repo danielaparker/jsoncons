@@ -87,7 +87,7 @@ void first_example_c()
     ]
     )");
 
-    json_options options;
+    auto options = json_options{};
 
     for (const auto& book : books.array_range())
     {
@@ -117,9 +117,8 @@ void first_example_d()
     }
     json books = json::parse(is);
 
-    json_options options;
-    //options.floatfield(std::ios::fixed);
-    options.precision(2);
+    auto options = json_options{}
+        .precision(2);
 
     for (const auto& book : books.at("books").array_range())
     {

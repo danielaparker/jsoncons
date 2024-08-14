@@ -155,7 +155,7 @@ namespace
 
         std::string output;
 
-        jsoncons::encode_json(shapes, output, indenting::indent);
+        jsoncons::encode_json(shapes, output, jsoncons::indenting::indent);
         std::cout << "\n(2)\n" << output << "\n";
     }
 }

@@ -332,7 +332,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    json_options options;
+    auto options = json_options{};
     json_stream_encoder os(std::cout, options); 
     os.begin_array();
     for (std::size_t i = 0; i < A.size1(); ++i)

@@ -309,8 +309,8 @@ int main()
     std::vector<double> v{10.0,20.0,30.0,40.0};
 
     std::vector<uint8_t> buffer;
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
     cbor::encode_cbor(v, buffer, options);
 
     std::cout << "(1)\n";

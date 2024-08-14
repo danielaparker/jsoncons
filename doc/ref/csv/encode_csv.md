@@ -92,13 +92,13 @@ int main()
     ojson j = ojson::parse(input);
 
     std::string output;
-    csv::csv_options ioptions;
-    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    auto ioptions = csv::csv_options{}
+        .quote_style(csv::quote_style_kind::nonnumeric);
     csv::encode_csv(j, output, ioptions);
     std::cout << output << "\n\n";
 
-    csv::csv_options ooptions;
-    ooptions.assume_header(true);
+    auto ooptions = csv::csv_options{}
+        .assume_header(true);
     ojson other = csv::decode_csv<ojson>(output, ooptions);
     assert(other == j);
 }
@@ -138,14 +138,14 @@ int main()
     json j = json::parse(input);
 
     std::string output;
-    csv::csv_options ioptions;
-    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    auto ioptions = csv::csv_options{}
+        .quote_style(csv::quote_style_kind::nonnumeric);
     csv::encode_csv(j, output, ioptions);
     std::cout << output << "\n\n";
 
-    csv::csv_options ooptions;
-    ooptions.assume_header(true)
-            .mapping_kind(csv::csv_mapping_kind::n_rows);
+    auto ooptions = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::n_rows);
     json other = csv::decode_csv<json>(output, ooptions);
     assert(other == j);
 }
@@ -185,14 +185,14 @@ int main()
     ojson j = ojson::parse(input);
 
     std::string output;
-    csv::csv_options ioptions;
-    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    auto ioptions = csv::csv_options{}
+        .quote_style(csv::quote_style_kind::nonnumeric);
     csv::encode_csv(j, output, ioptions);
     std::cout << output << "\n\n";
 
-    csv::csv_options ooptions;
-    ooptions.assume_header(true)
-            .mapping_kind(csv::csv_mapping_kind::m_columns);
+    auto ooptions = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::m_columns);
     ojson other = csv::decode_csv<ojson>(output, ooptions);
     assert(other == j);
 }

@@ -154,9 +154,9 @@ std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-csv_options options;
-options.field_delimiter = '\t'
-       .assume_header = true;
+auto options = csv_options{}          
+    .field_delimiter = '\t'
+    .assume_header = true;
 
 csv_stream_reader reader(is,decoder,options);
 reader.read();
@@ -213,9 +213,9 @@ std::ifstream is(in_file);
 
 json_decoder<json> decoder;
 
-csv_options options;
-options.column_names("Country Code,Name")
-      .header_lines(1);
+auto options = csv_options{}          
+    .column_names("Country Code,Name")
+    .header_lines(1);
 
 csv_stream_reader reader(is,decoder,options);
 reader.read();
@@ -262,11 +262,11 @@ Date,1Y,2Y,3Y,5Y
 
 ```cpp
 json_decoder<ojson> decoder;
-csv_options options;
-options.assume_header(true)
-       .column_types("string,float,float,float,float");
+auto options = csv_options{}          
+    .assume_header(true)
+    .column_types("string,float,float,float,float")
+    .mapping_kind(csv_mapping_kind::n_rows);
 
-options.mapping_kind(csv_mapping_kind::n_rows);
 std::istringstream is1("bond_yields.csv");
 csv_stream_reader reader1(is1,decoder,options);
 reader1.read();
@@ -347,10 +347,10 @@ int main()
 
     // array of arrays
     json_decoder<ojson> decoder1;
-    csv_options options1;
-    options1.header_lines(1);
-    options1.assume_header(false);
-    options1.column_types("string,float*");
+    auto options1 = csv_options{}
+        .header_lines(1)
+        .assume_header(false)
+        .column_types("string,float*");
     std::istringstream is1(bond_yields);
     csv_stream_reader reader1(is1, decoder1, options1);
     reader1.read();
@@ -359,9 +359,9 @@ int main()
 
     // array of objects
     json_decoder<ojson> decoder2;
-    csv_options options2;
-    options2.assume_header(true);
-    options2.column_types("string,[float*]");
+    auto options2 = csv_options{}
+        .assume_header(true)
+        .column_types("string,[float*]");
     std::istringstream is2(bond_yields);
     csv_stream_reader reader2(is2, decoder2, options2);
     reader2.read();
@@ -405,8 +405,8 @@ const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
 )";
 
     json_decoder<ojson> decoder;
-    csv_options options;
-    options.column_types("[integer,string]*");
+    auto options = csv_options{}          
+        .column_types("[integer,string]*");
 
     // Default
     std::istringstream is1(holidays);

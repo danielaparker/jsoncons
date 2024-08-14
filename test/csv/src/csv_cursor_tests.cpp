@@ -22,8 +22,8 @@ TEST_CASE("csv_cursor eof test")
 
     SECTION("csv::csv_mapping_kind::n_rows eof test")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_rows);
         std::error_code ec;
         csv::csv_string_cursor cursor(data, options, ec);
@@ -41,8 +41,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     SECTION("n_rows test")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
@@ -106,8 +106,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     }
     SECTION("m_columns test")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::m_columns);
         csv::csv_string_cursor cursor(data, options);
 
@@ -171,8 +171,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     SECTION("test 1")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
         /* for (; !cursor.done(); cursor.next())
@@ -287,8 +287,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     SECTION("test 2")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_objects);
         csv::csv_string_cursor cursor(data, options);
 /*
@@ -418,8 +418,8 @@ NY,LON,TOR;LON
 
     SECTION("test 1")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .subfield_delimiter(';');
 
         csv::csv_string_cursor cursor(data, options);
@@ -608,9 +608,9 @@ TEST_CASE("csv_cursor n_rows, no header test")
 
     SECTION("test 1")
     {
-        csv::csv_options options;
-        options.mapping_kind(csv::csv_mapping_kind::n_rows)
-               .assume_header(false);
+        auto options = csv::csv_options{}
+            .mapping_kind(csv::csv_mapping_kind::n_rows)
+            .assume_header(false);
 
         csv::csv_string_cursor cursor(data, options);
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -636,8 +636,8 @@ TEST_CASE("csv_cursor n_objects, header test")
 
     SECTION("test 2")
     {
-        csv::csv_options options;
-        options.assume_header(true);
+        auto options = csv::csv_options{}
+            .assume_header(true);
 
         csv::csv_string_cursor cursor(data, options);
 
@@ -668,8 +668,8 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
 
     SECTION("test 1")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .subfield_delimiter(';')
                .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
@@ -704,8 +704,8 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
 
     SECTION("test 2")
     {
-        csv::csv_options options;
-        options.assume_header(true)
+        auto options = csv::csv_options{}
+            .assume_header(true)
                .subfield_delimiter(';');
         csv::csv_string_cursor cursor(data, options);
 
@@ -787,8 +787,8 @@ TEST_CASE("csv_cursor with filter tests")
     std::string data;
     csv::encode_csv(j, data);
 
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
     auto filtered_c = cursor | remove_mark_csv_filter();
 

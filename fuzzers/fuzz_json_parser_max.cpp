@@ -9,8 +9,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     std::istringstream is(s);
 
     default_json_visitor visitor;
-    json_options options;
-    options.max_nesting_depth(std::numeric_limits<int>::max());
+    auto options = json_options{}
+        .max_nesting_depth(std::numeric_limits<int>::max());
 
     json_stream_reader reader(is, visitor, options);
     std::error_code ec;

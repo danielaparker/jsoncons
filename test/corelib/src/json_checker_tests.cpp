@@ -344,8 +344,8 @@ TEST_CASE("test_fail18")
     REQUIRE(is);
     JSONCONS_TRY
     {
-        json_options options;
-        options.max_nesting_depth(19);
+        auto options = json_options{}
+            .max_nesting_depth(19);
         json::parse(is, options);
     }
     JSONCONS_CATCH (const ser_error& e)

@@ -104,9 +104,9 @@ void parse_nan_replacement_example()
         }
     )";
 
-    json_options options;
-    options.nan_to_str("NaN")
-           .inf_to_str("Infinity");
+    auto options = json_options{}
+        .nan_to_str("NaN")
+        .inf_to_str("Infinity");
 
     jsoncons::json_decoder<json> decoder;
     json_parser parser(options);

@@ -72,8 +72,8 @@ int main()
     ]
     )");
 
-    csv_options options;
-    options.column_names("author,title,price");
+    auto options = csv_options{}          
+        .column_names("author,title,price");
 
     csv_stream_encoder encoder(std::cout, options);
 

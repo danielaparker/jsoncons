@@ -29,8 +29,8 @@ void parse_with_comment()
         auto j1 = json::parse(s, strict_json_parsing());
 
         // since 0.171.0
-        json_options options;
-        options.err_handler(strict_json_parsing());
+        auto options = json_options{}
+            .err_handler(strict_json_parsing());
         auto j2 = json::parse(s, options);
     }
     catch (const ser_error& e)
@@ -64,8 +64,8 @@ void parse_with_trailing_commas()
     // auto j = json::parse(s, allow_trailing_commas());
 
     // since 0.171.0
-    json_options options;
-    options.err_handler(allow_trailing_commas());
+    auto options = json_options{}
+        .err_handler(allow_trailing_commas());
     auto j = json::parse(s, options);
     std::cout << "(2) " << j << "\n\n";
 }
@@ -90,8 +90,8 @@ void max_nesting_path_example()
     std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
     try
     {
-        json_options options;
-        options.max_nesting_depth(20);
+        auto options = json_options{}
+            .max_nesting_depth(20);
         json::parse(s, options);
     }
     catch (const ser_error& e)

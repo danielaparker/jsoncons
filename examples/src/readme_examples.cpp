@@ -232,7 +232,7 @@ void playing_around()
 
     // Print bytes
     std::cout << "(1)\n" << byte_string_view(bytes_in) << "\n\n";
-
+/*
     9f -- Start indefinte length array
       83 -- Array of length 3
         63 -- String value of length 3
@@ -243,7 +243,7 @@ void playing_around()
           49 -- Byte string value of length 9
             010000000000000000 -- Bytes content
       ff -- "break" 
-
+*/
     // Unpack bytes into a json variant value, and add some more elements
     json j = cbor::decode_cbor<json>(bytes_in);
 
@@ -264,9 +264,9 @@ void playing_around()
     std::cout << pretty_print(j) << "\n\n";
 
     // Print JSON representation with different options
-    json_options options;
-    options.byte_string_format(byte_string_chars_format::base64)
-           .bigint_format(bigint_chars_format::base64url);
+    auto options = json_options{}
+        .byte_string_format(byte_string_chars_format::base64)
+        .bigint_format(bigint_chars_format::base64url);
     std::cout << "(5)\n";
     std::cout << pretty_print(j, options) << "\n\n";
 
@@ -323,8 +323,8 @@ void playing_around()
               19 6ab3 -- 27315
 */
     // Encode to CSV
-    csv::csv_options csv_options;
-    csv_options.column_names("Column 1,Column 2,Column 3");
+    auto csv_options = csv::csv_options{}          
+        .column_names("Column 1,Column 2,Column 3");
 
     std::cout << "(10)\n";
     csv::encode_csv(j, std::cout, csv_options);

@@ -100,10 +100,10 @@ Extra comma at line 1 and column 10
 ```cpp
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
 
-json_options options;
-options.nan_to_str("NaN")
-       .inf_to_str("PositiveInfinity")
-       .neginf_to_str("NegativeInfinity");
+auto options = json_options{}
+    .nan_to_str("NaN")
+    .inf_to_str("PositiveInfinity")
+    .neginf_to_str("NegativeInfinity");
 
 json j = json::parse(s,options);
 

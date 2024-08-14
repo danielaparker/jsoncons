@@ -304,8 +304,8 @@ int main()
     std::cout << "(3)\n" << byte_string_view(output1) << "\n\n";
 
     std::vector<uint8_t> output2;
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 

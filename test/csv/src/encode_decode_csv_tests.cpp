@@ -65,9 +65,9 @@ TEST_CASE("encode decode csv source")
 {
     using cpp_type = std::vector<std::tuple<std::string,int>>;
     std::string input = "\"a\",1\n\"b\",2";
-    csv::csv_options options;
-    options.mapping_kind(csv::csv_mapping_kind::n_rows)
-           .assume_header(false);
+    auto options = csv::csv_options{}
+        .mapping_kind(csv::csv_mapping_kind::n_rows)
+        .assume_header(false);
 
     SECTION("from string")
     {
@@ -269,8 +269,8 @@ TEST_CASE("encode_csv allocator_set overloads")
         std::string s;
         std::stringstream ss(s);
 
-        jsoncons::csv::csv_options options;
-        options.assume_header(true);
+        auto options = jsoncons::csv::csv_options{}
+            .assume_header(true);
         options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
         csv::encode_csv(/*alloc_set,*/ persons, ss, options);
         json other = csv::decode_csv<json>(/*alloc_set,*/ ss, options);
@@ -280,8 +280,8 @@ TEST_CASE("encode_csv allocator_set overloads")
     {
         std::string s;
         std::stringstream ss(s);
-        jsoncons::csv::csv_options options;
-        options.assume_header(true);
+        auto options = jsoncons::csv::csv_options{}
+            .assume_header(true);
         options.mapping_kind(jsoncons::csv::csv_mapping_kind::n_objects);
         csv::encode_csv(/*alloc_set,*/ persons, ss, options);
         auto other = csv::decode_csv<std::vector<ns::Person>>(/*alloc_set,*/ ss, options);

@@ -39,8 +39,8 @@ void decode_float64_big_endian_array()
     std::cout << "(3)\n" << byte_string_view(output1) << "\n\n";
 
     std::vector<uint8_t> output2;
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 
@@ -80,8 +80,8 @@ void encode_decode_large_typed_array()
     {
         x[i] = static_cast<float>(i);
     }
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(x, buf, options);
@@ -133,8 +133,8 @@ void encode_half_array()
 
     std::vector<uint8_t> buffer;
 
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
     cbor::cbor_bytes_encoder encoder(buffer, options);
 
     std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};
@@ -265,8 +265,8 @@ void read_to_cbor_visitor()
     std::vector<double> v{10.0,20.0,30.0,40.0};
 
     std::vector<uint8_t> buffer;
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
     cbor::encode_cbor(v, buffer, options);
 
     std::cout << "(1)\n";

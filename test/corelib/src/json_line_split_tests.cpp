@@ -67,10 +67,10 @@ std::string expected = R"({
         "properties": {}
     }
 })";
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces);
-        options.object_array_line_splits(line_split_kind::same_line)
-               .array_array_line_splits(line_split_kind::new_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .object_array_line_splits(line_split_kind::same_line)
+            .array_array_line_splits(line_split_kind::new_line);
         std::ostringstream os;
         os << pretty_print(val, options);
         CHECK(os.str() == expected);
@@ -78,10 +78,10 @@ std::string expected = R"({
 
     SECTION("array_array same_line")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::same_line)
-               .array_array_line_splits(line_split_kind::same_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .object_array_line_splits(line_split_kind::same_line)
+            .array_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
@@ -101,10 +101,10 @@ std::string expected = R"({
 
     SECTION("array_array new_line")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .array_array_line_splits(line_split_kind::new_line)
-               .object_array_line_splits(line_split_kind::same_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .array_array_line_splits(line_split_kind::new_line)
+            .object_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
@@ -126,10 +126,10 @@ std::string expected = R"({
 
     SECTION("array_array multi_line")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .array_array_line_splits(line_split_kind::multi_line)
-               .object_array_line_splits(line_split_kind::same_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .array_array_line_splits(line_split_kind::multi_line)
+            .object_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
@@ -154,10 +154,10 @@ std::string expected = R"({
 
     SECTION("object_array same_line")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::same_line)
-               .array_array_line_splits(line_split_kind::new_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .object_array_line_splits(line_split_kind::same_line)
+            .array_array_line_splits(line_split_kind::new_line);
     std::string expected = R"({
     "data": {
         "id": [1,2,3],
@@ -178,10 +178,10 @@ std::string expected = R"({
 
     SECTION("object_array new_line")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::new_line)
-               .array_array_line_splits(line_split_kind::new_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .object_array_line_splits(line_split_kind::new_line)
+            .array_array_line_splits(line_split_kind::new_line);
     std::string expected = R"({
     "data": {
         "id": [
@@ -204,10 +204,10 @@ std::string expected = R"({
 
     SECTION("")
     {
-        json_options options;
-        options.spaces_around_comma(spaces_option::no_spaces)
-               .object_array_line_splits(line_split_kind::multi_line)
-               .array_array_line_splits(line_split_kind::same_line);
+        auto options = json_options{}
+            .spaces_around_comma(spaces_option::no_spaces)
+            .object_array_line_splits(line_split_kind::multi_line)
+            .array_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
     "data": {
         "id": [

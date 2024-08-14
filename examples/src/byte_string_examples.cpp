@@ -63,18 +63,18 @@ void serialize_json_byte_string()
     std::cout << "(1) "<< j << "\n\n";
 
     // base16
-    json_options options2;
-    options2.byte_string_format(byte_string_chars_format::base16);
+    auto options2 = json_options{}
+        .byte_string_format(byte_string_chars_format::base16);
     std::cout << "(2) "<< print(j, options2) << "\n\n";
 
     // base64
-    json_options options3;
-    options3.byte_string_format(byte_string_chars_format::base64);
+    auto options3 = json_options{}
+        .byte_string_format(byte_string_chars_format::base64);
     std::cout << "(3) "<< print(j, options3) << "\n\n";
 
     // base64url
-    json_options options4;
-    options4.byte_string_format(byte_string_chars_format::base64url);
+    auto options4 = json_options{}
+        .byte_string_format(byte_string_chars_format::base64url);
     std::cout << "(4) "<< print(j, options4) << "\n\n";
 }
 

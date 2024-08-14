@@ -19,8 +19,8 @@ TEST_CASE("test_array_extra_comma")
 
     json expected = json::parse("[1,2,3]");
 
-    json_options options;
-    options.err_handler(err_handler);
+    auto options = json_options{}
+        .err_handler(err_handler);
     json val = json::parse("[1,2,3,]", options);
 
     CHECK(val == expected);

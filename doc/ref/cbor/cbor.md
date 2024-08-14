@@ -373,8 +373,8 @@ int main()
     {
         x[i] = static_cast<float>(i);
     }
-    cbor::cbor_options options;
-    options.use_typed_arrays(true);
+    auto options = cbor::cbor_options{}
+        .use_typed_arrays(true);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(x, buf, options);

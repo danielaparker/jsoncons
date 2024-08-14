@@ -139,8 +139,8 @@ TEST_CASE("serialize big array to ubjson")
     std::vector<uint8_t> data;
     jsoncons::ubjson::encode_ubjson(val, data);
 
-    jsoncons::ubjson::ubjson_options options;
-    options.max_items((std::numeric_limits<int32_t>::max)());
+    auto options = jsoncons::ubjson::ubjson_options{}
+        .max_items((std::numeric_limits<int32_t>::max)());
     ns::hiking_reputon val2 = jsoncons::ubjson::decode_ubjson<ns::hiking_reputon>(data, options);
 
     CHECK(val2 == val);

@@ -194,8 +194,8 @@ TEST_CASE("test_serialize_negative_bignum2")
     JSONCONS_TRY
     {
         json result = cbor::decode_cbor<json>(v);
-        json_options options;
-        options.bigint_format(bigint_chars_format::number);
+        auto options = json_options{}
+            .bigint_format(bigint_chars_format::number);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[-18446744073709551617]"));
@@ -224,8 +224,8 @@ TEST_CASE("test_serialize_negative_bignum3")
     JSONCONS_TRY
     {
         json result = cbor::decode_cbor<json>(v);
-        json_options options;
-        options.bigint_format(bigint_chars_format::base64url);
+        auto options = json_options{}
+            .bigint_format(bigint_chars_format::base64url);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[\"~AQAAAAAAAAAA\"]"));
@@ -405,8 +405,8 @@ TEST_CASE("encode stringref")
   ]
 )");
 
-    cbor::cbor_options options;
-    options.pack_strings(true);
+    auto options = cbor::cbor_options{}
+        .pack_strings(true);
     std::vector<uint8_t> buf;
 
     cbor::encode_cbor(j, buf, options);

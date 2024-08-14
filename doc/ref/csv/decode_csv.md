@@ -73,9 +73,9 @@ using namespace jsoncons;
 
 int main()
 {
-    csv::csv_options options;
-    options.assume_header(true)
-           .mapping_kind(csv::csv_mapping_kind::n_objects);
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::n_objects);
 
     std::ifstream is1("input/sales.csv");
     ojson j1 = csv::decode_csv<ojson>(is1,options);
@@ -165,9 +165,9 @@ int main()
 00000002,"Brown,Sarah",sales,89000.00
 )";
 
-    csv::csv_options options;
-    options.assume_header(true)
-           .infer_types(false);
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .infer_types(false);
     ojson j = csv::decode_csv<ojson>(s,options);
 
     std::cout << pretty_print(j) << std::endl;
@@ -207,9 +207,9 @@ int main()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv::csv_options options;
-    options.assume_header(true)
-           .column_types("string,float,float,float,float");
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .column_types("string,float,float,float,float");
 
     // csv_mapping_kind::n_objects
     options.mapping_kind(csv::csv_mapping_kind::n_objects);
@@ -287,27 +287,27 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    json_options print_options;
-    print_options.array_array_line_splits(line_split_kind::same_line);
+    auto print_options = json_options{}
+        .array_array_line_splits(line_split_kind::same_line);
 
-    csv::csv_options options1;
-    options1.assume_header(true)
-           .subfield_delimiter(';');
+    auto options1 = csv::csv_options{}
+        .assume_header(true)
+        .subfield_delimiter(';');
 
     json j1 = csv::decode_csv<json>(s,options1);
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
-    csv::csv_options options2;
-    options2.mapping_kind(csv::csv_mapping_kind::n_rows)
-           .subfield_delimiter(';');
+    auto options2 = csv::csv_options{}       
+        .mapping_kind(csv::csv_mapping_kind::n_rows)
+        .subfield_delimiter(';');
 
     json j2 = csv::decode_csv<json>(s,options2);
     std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
-    csv::csv_options options3;
-    options3.assume_header(true)
-           .mapping_kind(csv::csv_mapping_kind::m_columns)
-           .subfield_delimiter(';');
+    auto options3 = csv::csv_options{}
+        assume_header(true)
+        .mapping_kind(csv::csv_mapping_kind::m_columns)
+        .subfield_delimiter(';');
 
     json j3 = csv::decode_csv<json>(s,options3);
     std::cout << "(3)\n" << pretty_print(j3,print_options) << "\n\n";
@@ -375,9 +375,9 @@ int main()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv::csv_options ioptions;
-    ioptions.header_lines(1)
-            .mapping_kind(csv::csv_mapping_kind::n_rows);
+    auto ioptions = csv::csv_options{}
+        .header_lines(1)
+        .mapping_kind(csv::csv_mapping_kind::n_rows);
 
     using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
@@ -396,8 +396,8 @@ int main()
 
     std::string output;
 
-    csv::csv_options ooptions;
-    ooptions.column_names("Date,1Y,2Y,3Y,5Y");
+    auto ooptions = csv::csv_options{}
+        .column_names("Date,1Y,2Y,3Y,5Y");
     csv::encode_csv<table_type>(table, output, ooptions);
 
     std::cout << "(2)\n";

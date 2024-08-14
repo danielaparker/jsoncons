@@ -31,11 +31,11 @@ void tuple_example()
     auto results1 = decode_json<std::vector<qualifying_results_type>>(json_data);
     assert(results1 == results);
 
-    csv::csv_options csv_options;
-    csv_options.column_names("Pos,Driver,Entrant,Time,Gap");
-    csv_options.mapping_kind(csv::csv_mapping_kind::n_rows);
+    auto csv_options = csv::csv_options{}          
+        .column_names("Pos,Driver,Entrant,Time,Gap")
+        .mapping_kind(csv::csv_mapping_kind::n_rows)
+        .header_lines(1);
     std::string csv_data;
-    csv_options.header_lines(1);
     csv::encode_csv(results, csv_data, csv_options);
     std::cout << csv_data << "\n\n";
     auto results2 = csv::decode_csv<std::vector<qualifying_results_type>>(csv_data, csv_options);

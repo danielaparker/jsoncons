@@ -44,15 +44,15 @@ jsoncons allows you to work with the CSV data similarly to JSON data:
 ```cpp
 int main()
 {
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
 
     // Parse the CSV data into an ojson value
     ojson j = csv::decode_csv<ojson>(data, options);
 
     // Pretty print
-    json_options print_options;
-    print_options.float_format(float_chars_format::fixed);
+    auto print_options = json_options{}
+        .float_format(float_chars_format::fixed);
     std::cout << "(1)\n" << pretty_print(j, print_options) << "\n\n";
 
     // Iterate over the rows
@@ -158,9 +158,9 @@ JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::fixing, index_id, observation_date, rate)
 
 int main()
 {
-    csv::csv_options options;
-    options.assume_header(true)
-           .float_format(float_chars_format::fixed);
+    auto options = csv::csv_options{}
+        .assume_header(true)
+        .float_format(float_chars_format::fixed);
 
     // Decode the CSV data into a c++ structure
     std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
@@ -198,8 +198,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 ```cpp
 int main()
 {
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
 
     for (; !cursor.done(); cursor.next())
@@ -283,15 +283,15 @@ You can use a [staj_array_iterator](../staj_array_iterator.md) to group the CSV 
 ```cpp
 int main()
 {
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
 
     csv::csv_string_cursor cursor(data, options);
 
     auto view = staj_array<ojson>(cursor);
 
-    json_options print_options;
-    print_options.float_format(float_chars_format::fixed);
+    auto print_options = json_options{}
+        .float_format(float_chars_format::fixed);
     for (const auto& item : view)
     {
         std::cout << pretty_print(item, print_options) << "\n";
@@ -324,8 +324,8 @@ int main()
 {
     using record_type = std::tuple<std::string,std::string,double>;
 
-    csv::csv_options options;
-    options.assume_header(true);
+    auto options = csv::csv_options{}
+        .assume_header(true);
     csv::csv_string_cursor cursor(data, options);
 
     auto view = staj_array<record_type>(cursor);

@@ -390,8 +390,8 @@ std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-csv_options options;
-options.field_delimiter = '\t';
+auto options = csv_options{}          
+    .field_delimiter = '\t';
 
 json_stream_reader reader(is,decoder);
 reader.read();
@@ -440,8 +440,8 @@ int main()
     ]
     )");
 
-    csv_options options;
-    options.column_names("author,title,price");
+    auto options = csv_options{}          
+        .column_names("author,title,price");
 
     csv_stream_encoder encoder(std::cout, options);
 

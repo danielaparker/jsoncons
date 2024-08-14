@@ -210,14 +210,14 @@ int main()
     std::cout << "\n\n";
 
     std::cout << "(4) ";
-    json_options options1;
-    options1.bigint_format(bigint_chars_format::number);
+    auto options1 = json_options{}
+        .bigint_format(bigint_chars_format::number);
     j.dump(std::cout, options1);
     std::cout << "\n\n";
 
     std::cout << "(5) ";
-    json_options options2;
-    options2.bigint_format(bigint_chars_format::base64url);
+    auto options2 = json_options{}
+        .bigint_format(bigint_chars_format::base64url);
     j.dump(std::cout, options2);
     std::cout << "\n\n";
 }
@@ -253,14 +253,14 @@ int main()
     std::cout << "\n\n";
 
     std::cout << "(2) ";
-    json_options options1;
-    options1.bigint_format(bigint_chars_format::number);
+    auto options1 = json_options{}
+        .bigint_format(bigint_chars_format::number);
     j.dump(std::cout, options1);
     std::cout << "\n\n";
 
     std::cout << "(3) ";
-    json_options options2;
-    options2.bigint_format(bigint_chars_format::base64url);
+    auto options2 = json_options{}
+        .bigint_format(bigint_chars_format::base64url);
     j.dump(std::cout, options2);
     std::cout << "\n\n";
 }

@@ -28,8 +28,8 @@ TEST_CASE("oss-fuzz issues")
     SECTION("issue 21589")
     {
         std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
-        json_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = json_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         REQUIRE_THROWS_WITH(json::parse(is, options), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_rbracket).c_str()));
@@ -46,8 +46,8 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         default_json_visitor visitor;
 
@@ -70,8 +70,8 @@ TEST_CASE("oss-fuzz issues")
 
         default_json_visitor visitor;
 
-        cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         cbor::cbor_stream_reader reader(is,visitor,options);
 
@@ -92,9 +92,9 @@ TEST_CASE("oss-fuzz issues")
 
         json_decoder<json> visitor;
 
-        csv::csv_options options;
-        options.assume_header(true);
-        options.mapping_kind(csv::csv_mapping_kind::n_rows);
+        auto options = csv::csv_options{}
+            .assume_header(true)
+            .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_stream_reader reader(is,visitor,options);
 
         std::error_code ec;
@@ -157,8 +157,8 @@ TEST_CASE("oss-fuzz issues")
         std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        cbor::cbor_options options;
-        options.max_nesting_depth(10000);
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(10000);
         REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
 
@@ -171,8 +171,8 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        cbor::cbor_options options;
-        options.max_nesting_depth(10000);
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(10000);
 
         REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
@@ -184,8 +184,8 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
-        cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = cbor::cbor_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         default_json_visitor visitor;
         cbor::cbor_stream_reader reader(is,visitor,options);
@@ -206,7 +206,7 @@ TEST_CASE("oss-fuzz issues")
 
         json_decoder<json> visitor;
 
-        msgpack::msgpack_options options;
+        auto options = msgpack::msgpack_options{};
 
         msgpack::msgpack_stream_reader reader(is,visitor);
         std::error_code ec;
@@ -225,7 +225,7 @@ TEST_CASE("oss-fuzz issues")
 
         default_json_visitor visitor;
 
-        cbor::cbor_options options;
+        auto options = cbor::cbor_options{}
 
         cbor::cbor_stream_reader reader(is,visitor,options);
 
@@ -247,8 +247,8 @@ TEST_CASE("oss-fuzz issues")
 
         default_json_visitor visitor;
 
-        msgpack::msgpack_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = msgpack::msgpack_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         msgpack::msgpack_stream_reader reader(is,visitor,options);
         std::error_code ec;
@@ -267,8 +267,8 @@ TEST_CASE("oss-fuzz issues")
 
         default_json_visitor visitor;
 
-        bson::bson_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = bson::bson_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         bson::bson_stream_reader reader(is,visitor,options);
         std::error_code ec;
@@ -334,7 +334,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(is); //-V521
 
         json_decoder<json> visitor;
-        cbor::cbor_options options;
+        auto options = cbor::cbor_options{};
 
         cbor::cbor_stream_reader reader(is,visitor,options);
 
@@ -499,8 +499,8 @@ TEST_CASE("oss-fuzz issues")
         CHECK(is); //-V521
 
         default_json_visitor visitor;
-        msgpack::msgpack_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        auto options = msgpack::msgpack_options{}
+            .max_nesting_depth(std::numeric_limits<int>::max());
 
         msgpack::msgpack_stream_reader reader(is, visitor, options);
         std::error_code ec;

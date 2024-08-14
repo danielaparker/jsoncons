@@ -71,7 +71,6 @@ void constructor_examples()
     arr.push_back(j3);
     arr.push_back(j4);
 
-    json_options options;
     std::cout << pretty_print(arr) << "\n\n";
 }
 
