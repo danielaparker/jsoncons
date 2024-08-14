@@ -2644,8 +2644,8 @@ namespace jsoncons {
                         default:
                             if (is_string_storage(rhs.storage_kind()))
                             {
-                                double val1 = as<double>();
-                                double val2 = rhs.as<double>();
+                                double val1 = as_double();
+                                double val2 = rhs.as_double();
                                 auto r = val1 - val2;
                                 return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                             }
@@ -2659,7 +2659,7 @@ namespace jsoncons {
                 case json_storage_kind::long_str:
                     if (is_number_tag(tag()))
                     {
-                        double val1 = as<double>(); 
+                        double val1 = as_double(); 
                         switch (rhs.storage_kind())
                         {
                             case json_storage_kind::int64:
@@ -2682,7 +2682,7 @@ namespace jsoncons {
                             default:
                                 if (is_string_storage(rhs.storage_kind()))
                                 {
-                                    double val2 = rhs.as<double>();
+                                    double val2 = rhs.as_double();
                                     auto r = val1 - val2; 
                                     return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                                 }
@@ -2712,7 +2712,7 @@ namespace jsoncons {
                             }
                             
                             // compare big numbers as double
-                            auto r = as<double>() - rhs.as<double>();
+                            auto r = as_double() - rhs.as_double();
                             return r == 0 ? 0 : (r < 0.0 ? -1 : 1);
                         }
                         default:
