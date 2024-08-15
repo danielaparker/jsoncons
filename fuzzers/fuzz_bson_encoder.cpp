@@ -1,7 +1,6 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 
 using namespace jsoncons;
