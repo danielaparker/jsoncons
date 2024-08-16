@@ -1,7 +1,19 @@
-master
+0.177.0
 -------
 
+Changes
+
 - Removed deprecated functions and type names identified in #487
+
+- Reduced the size of some initial `json_parser` allocations to help with #531
+
+Defect fixes
+
+- Fixed #530 by making `jmespath_expression::evaluate` const
+
+- Fixed #488 related to some standard libraries that don't support strings with stateful allocators.
+
+- Fixed issue identified in PR #532 with `basic_json::compare` function
 
 0.176.0 
 -------
