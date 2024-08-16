@@ -106,8 +106,8 @@ private:
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state>;
 
-    static constexpr std::size_t initial_string_buffer_capacity_ = 1024;
-    static constexpr int default_initial_stack_capacity_ = 100;
+    static constexpr std::size_t initial_string_buffer_capacity = 256;
+    static constexpr int default_initial_stack_capacity = 66;
 
     basic_json_decode_options<char_type> options_;
 
@@ -175,9 +175,9 @@ public:
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc)
     {
-        string_buffer_.reserve(initial_string_buffer_capacity_);
+        string_buffer_.reserve(initial_string_buffer_capacity);
 
-        std::size_t initial_stack_capacity = (options.max_nesting_depth()+2) <= default_initial_stack_capacity_ ? (options.max_nesting_depth()+2) : default_initial_stack_capacity_;
+        std::size_t initial_stack_capacity = (options.max_nesting_depth()+2) <= default_initial_stack_capacity ? (options.max_nesting_depth()+2) : default_initial_stack_capacity;
         state_stack_.reserve(initial_stack_capacity );
         push_state(json_parse_state::root);
 
