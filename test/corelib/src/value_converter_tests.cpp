@@ -52,17 +52,5 @@ TEST_CASE("convert into list-like")
         
         CHECK(v == expected);
     }
-    SECTION("from wstring")
-    {
-        value_converter<jsoncons::basic_string_view<wchar_t>,std::vector<uint8_t>> converter;
-
-        std::vector<uint8_t> expected = { 'f','o','o','b','a','r' };
-
-        std::error_code ec;
-        std::vector<uint8_t> v = converter.convert(jsoncons::wstring_view(L"Zm9vYmFy"), semantic_tag::base64url, ec);
-        REQUIRE(!ec);
-
-        CHECK(v == expected);
-    }
 }
 

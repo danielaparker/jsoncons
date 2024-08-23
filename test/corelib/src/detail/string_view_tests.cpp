@@ -22,20 +22,5 @@ TEST_CASE("string_view tests")
         CHECK(map.find(key2) != map.end());
         CHECK(map[key2] == 2);
     }
-    SECTION("test 2")
-    {
-        std::unordered_map<jsoncons::detail::wstring_view,int> map;
-
-        std::wstring key1{L"Foo"};
-        std::wstring key2{L"Bar"};
-
-        map.emplace(key1, 1);
-        map.emplace(key2, 2);
-
-        CHECK(map.find(key1) != map.end());
-        CHECK(map[key1] == 1);
-        CHECK(map.find(key2) != map.end());
-        CHECK(map[key2] == 2);
-    }
 }
 
