@@ -47,13 +47,17 @@ old names but continues to support many of them. The deprecated names can be sup
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 - [ubjson](doc/ref/ubjson/ubjson.md) implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 
+## Contemplated Changes
+
+We're thinking about dropping support for `wjson` and `wojson`, and more generally for the `wchar_t` specialization of `basic_json`. For the rationale, and an opportunity to comment, see [Issue #536](https://github.com/danielaparker/jsoncons/issues/536).
+
 ## What users say
 
 _"Apache Kvrocks consistently utilizes jsoncons to offer support for JSON data structures to users. We find the development experience with jsoncons outstanding!"_
 
-_"I have been using your library in my native language – R – and have created an R package making it easy for (a) JMESpath and JSONpath queries on JSON strings or R objects and (b) for other R developers to link to your library."_
+_"I have been using your library in my native language â€“ R â€“ and have created an R package making it easy for (a) JMESpath and JSONpath queries on JSON strings or R objects and (b) for other R developers to link to your library."_
 
-_"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript"_
+_"Iâ€™m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript"_
 
 _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 
