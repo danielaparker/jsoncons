@@ -47,10 +47,6 @@ old names but continues to support many of them. The deprecated names can be sup
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 - [ubjson](doc/ref/ubjson/ubjson.md) implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 
-## Contemplated Changes
-
-We're thinking about dropping support for `wjson` and `wojson`, and more generally for the `wchar_t` specialization of `basic_json`. For the rationale, and an opportunity to comment, see [Issue #536](https://github.com/danielaparker/jsoncons/issues/536).
-
 ## What users say
 
 _"Apache Kvrocks consistently utilizes jsoncons to offer support for JSON data structures to users. We find the development experience with jsoncons outstanding!"_
@@ -70,6 +66,16 @@ _"We love your JSON Schema validator. We are using it in ER/Studio our data mode
 _"the serialization lib of choice with its beautiful mappings and ease of use"_
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team loves it"_ _"Your repo rocks!!!!!"_
+
+## Mentions on the web
+
+[Get started with HealthImaging image sets and image frames using an AWS SDK](https://docs.aws.amazon.com/healthimaging/latest/devguide/example_medical-imaging_Scenario_ImageSetsAndFrames_section.html)
+
+[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)
+
+[rjsoncons](https://cran.rstudio.com/web/packages/rjsoncons/index.html)
+
+[coppeliarobotics](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
 
 ## Get jsoncons
 
