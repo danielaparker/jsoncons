@@ -177,7 +177,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 
-        std::size_t initial_stack_capacity = (options.max_nesting_depth()+2) <= default_initial_stack_capacity ? (options.max_nesting_depth()+2) : default_initial_stack_capacity;
+        std::size_t initial_stack_capacity = options.max_nesting_depth() <= (default_initial_stack_capacity-2) ? (options.max_nesting_depth()+2) : default_initial_stack_capacity;
         state_stack_.reserve(initial_stack_capacity );
         push_state(json_parse_state::root);
 
