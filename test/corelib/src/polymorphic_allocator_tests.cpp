@@ -14,13 +14,13 @@ using pmr_ojson = jsoncons::pmr::ojson;
 TEST_CASE("string polymorhic allocator tests")
 {
     char buffer1[1024] = {}; // a small buffer on the stack
+    memset(buffer1, 0, sizeof(buffer1));
     std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
     std::pmr::polymorphic_allocator<char> alloc1(&pool1);
 
     char buffer2[1024] = {}; // a small buffer on the stack
     std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
     std::pmr::polymorphic_allocator<char> alloc2(&pool2);
-
 
     const char* long_string1 = "String too long for short string";
 

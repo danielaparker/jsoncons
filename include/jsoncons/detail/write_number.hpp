@@ -76,11 +76,11 @@ namespace detail {
         return count;
     }
 
-    // integer_to_string_hex
+    // integer_to_hex
 
     template <typename Integer,typename Result>
     typename std::enable_if<extension_traits::is_integer<Integer>::value,std::size_t>::type
-    integer_to_string_hex(Integer value, Result& result)
+    integer_to_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
 

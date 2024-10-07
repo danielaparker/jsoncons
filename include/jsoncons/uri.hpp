@@ -981,7 +981,7 @@ namespace jsoncons {
                             {
                                 encoded.push_back('0');
                             }
-                            jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                            jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                         }
                         else if (escaped)
                         {
@@ -1014,7 +1014,7 @@ namespace jsoncons {
                         if (!is_unreserved(ch) && !is_punct(ch))
                         {
                             encoded.push_back('%');
-                            jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                            jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                         }
                         else
                         {
@@ -1046,7 +1046,7 @@ namespace jsoncons {
                     {
                         encoded.push_back('0');
                     }
-                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                    jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else if (escaped)
                 {
@@ -1068,7 +1068,7 @@ namespace jsoncons {
                 if (!is_unreserved(ch) && !is_punct(ch))
                 {
                     encoded.push_back('%');
-                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                    jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else
                 {
@@ -1096,7 +1096,7 @@ namespace jsoncons {
                     {
                         encoded.push_back('0');
                     }
-                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                    jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else if (escaped)
                 {
@@ -1118,7 +1118,7 @@ namespace jsoncons {
                 if (!is_unreserved(ch) && !is_reserved(ch))
                 {
                     encoded.push_back('%');
-                    jsoncons::detail::integer_to_string_hex((uint8_t)ch, encoded);
+                    jsoncons::detail::integer_to_hex((uint8_t)ch, encoded);
                 }
                 else
                 {
