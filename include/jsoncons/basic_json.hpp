@@ -3711,6 +3711,17 @@ namespace jsoncons {
             }
         }
 
+        allocator_type get_default_allocator(std::false_type) const
+        {
+            JSONCONS_THROW(json_runtime_error<std::domain_error>("No default allocator if allocator is not default constructible."));
+        }
+
+        allocator_type get_default_allocator(std::true_type) const
+        {
+            return allocator_type{};
+        }
+
+        template <typename U=Allocator>
         allocator_type get_allocator() const
         {
             switch (storage_kind())
@@ -3732,7 +3743,7 @@ namespace jsoncons {
                     return cast<object_storage>().get_allocator();
                 }
                 default:
-                    return allocator_type();
+                    return get_default_allocator(std::is_default_constructible<U>());
             }
         }
 
