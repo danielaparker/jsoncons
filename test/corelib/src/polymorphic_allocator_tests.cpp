@@ -10,7 +10,7 @@ using namespace jsoncons;
 
 using pmr_json = jsoncons::pmr::json;
 using pmr_ojson = jsoncons::pmr::ojson;
-
+    
 TEST_CASE("string polymorhic allocator tests")
 {
     char buffer1[1024] = {}; // a small buffer on the stack

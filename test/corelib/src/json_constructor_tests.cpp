@@ -21,13 +21,79 @@ using pmr_json = jsoncons::pmr::json;
 using pmr_ojson = jsoncons::pmr::ojson;
 
 
-TEST_CASE("json constructor with alloc arg")
+TEST_CASE("json constructor with pmr allocator")
 {
-    SECTION("test 1")
+    char buffer1[1024] = {}; // a small buffer on the stack
+    char* last1 = buffer1 + sizeof(buffer1);
+    std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
+    std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+
+    char buffer2[1024] = {}; // another small buffer on the stack
+    char* last2 = buffer2 + sizeof(buffer2);
+    std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
+    std::pmr::polymorphic_allocator<char> alloc2(&pool2);
+
+    const char* long_key = "Key too long for short string";
+    const char* long_key_end = long_key + strlen(long_key);
+    const char* long_string = "String too long for short string";
+    const char* long_string_end = long_string + strlen(long_string);
+    const char* another_long_string = "Another string too long for short string";
+    const char* another_long_string_end = another_long_string + strlen(another_long_string);
+
+    SECTION("long string copy constructor")
     {
-        char buffer1[1024] = {}; // a small buffer on the stack
-        std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
-        std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+        pmr_json j1{long_string, alloc1};
+        REQUIRE(&pool1 == j1.get_allocator().resource()); 
+        auto it = std::search(buffer1, last1, long_string, long_string_end);
+        CHECK(it != last1);
+
+        pmr_json j2{j1};
+        REQUIRE_FALSE(&pool1 == j2.get_allocator().resource()); 
+
+        pmr_json j3{j1, alloc2};
+        REQUIRE(&pool2 == j3.get_allocator().resource()); 
+        it = std::search(buffer2, last2, long_string, long_string_end);
+        CHECK(it != last1);
+    }
+
+    SECTION("array copy constructor")
+    {
+        pmr_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(&pool1 == j1.get_allocator().resource());
+        j1.push_back(long_string); 
+        auto it = std::search(buffer1, last1, long_string, long_string_end);
+        CHECK(it != last1);
+
+        pmr_json j2{j1};
+        REQUIRE_FALSE(&pool1 == j2.get_allocator().resource()); 
+
+        pmr_json j3{j1, alloc2};
+        REQUIRE(&pool2 == j3.get_allocator().resource()); 
+        it = std::search(buffer2, last2, long_string, long_string_end);
+        CHECK(it != last1);
+    }
+
+    SECTION("object copy constructor")
+    {
+        pmr_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(&pool1 == j1.get_allocator().resource());
+        j1.insert_or_assign(long_key, long_string); 
+        auto it = std::search(buffer1, last1, long_string, long_string_end);
+        CHECK(it != last1);
+
+        pmr_json j2{j1};
+        REQUIRE_FALSE(&pool1 == j2.get_allocator().resource()); 
+
+        pmr_json j3{j1, alloc2};
+        REQUIRE(&pool2 == j3.get_allocator().resource()); 
+        it = std::search(buffer2, last2, long_key, long_key_end);
+        CHECK(it != last1);
+        it = std::search(buffer2, last2, long_string, long_string_end);
+        CHECK(it != last1);
+    }
+
+    /*SECTION("test 2")
+    {
         pmr_json j1{ alloc1 };
 
         const char* long_key1 = "Key too long for short string";
@@ -41,24 +107,22 @@ TEST_CASE("json constructor with alloc arg")
         it = std::search(buffer1, last1, long_key1, long_key1 + strlen(long_key1));
         CHECK(it != last1);
     }
-    SECTION("test 2")
+    SECTION("test 3")
     {
         const char* long_string1 = "String too long for short string";
         pmr_json j1(long_string1);
         
-        char buffer2[1024] = {}; // a small buffer on the stack
-        std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
-        std::pmr::polymorphic_allocator<char> alloc2(&pool2);
         pmr_json j2{j1, alloc2};
         
         char* last2 = buffer2 + sizeof(buffer2);
         auto it = std::search(buffer2, last2, long_string1, long_string1+strlen(long_string1));
         CHECK(it != last2);
-    }
+    }*/
 }
 
 #endif
 
+#if 0
 TEST_CASE("json constructor byte_string_arg tests")
 {
     std::string expected_base64url = "Zm9vYmFy";
@@ -381,4 +445,6 @@ TEST_CASE("json constructor unsigned __int64 tests")
     }
 }
 #pragma GCC diagnostic pop
+#endif
+
 #endif

@@ -657,7 +657,8 @@ namespace jsoncons {
             long_string_storage(const long_string_storage& other)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
             {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), 
+                    std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()));
             }
 
             long_string_storage(const long_string_storage& other, const Allocator& alloc)
@@ -777,7 +778,8 @@ namespace jsoncons {
             byte_string_storage(const byte_string_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
             {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), other.get_allocator());
+                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), 
+                    std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()));
             }
 
             byte_string_storage(const byte_string_storage& other, const Allocator& alloc)
@@ -929,7 +931,7 @@ namespace jsoncons {
             array_storage(const array_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(other.ptr_->get_allocator(), *(other.ptr_));
+                create(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
             }
 
             array_storage(array_storage&& other) noexcept
@@ -1072,7 +1074,7 @@ namespace jsoncons {
             explicit object_storage(const object_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(other.ptr_->get_allocator(), *(other.ptr_));
+                create(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
             }
 
             object_storage(const object_storage& other, const Allocator& alloc)
