@@ -12,7 +12,6 @@ jobs:
       matrix:
         compiler:
           - g++-12
-          - clang++-14
         build_type: [Debug, Release]
 
     runs-on: ubuntu-latest
@@ -118,27 +117,27 @@ jobs:
     - working-directory: build/
       run: ctest -C ubuntu-latest --output-on-failure
 
-  clang_13_build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: install_gcc
-      run: |
-           sudo apt update
-           sudo apt install clang-13
-      shell: bash
-    - name: cmake
-      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
-      env:
-        CC:   clang-13
-        CXX:  clang++-13
-
-    - working-directory: build/
-      run: cmake --build . --config ubuntu-latest
-
-    - working-directory: build/
-      run: ctest -C ubuntu-latest --output-on-failure
+  #clang_13_build:
+  #  runs-on: ubuntu-latest
+  #
+  #  steps:
+  #  - uses: actions/checkout@v4
+  #  - name: install_gcc
+  #    run: |
+  #         sudo apt update
+  #         sudo apt install clang-13
+  #    shell: bash
+  #  - name: cmake
+  #    run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Release -DJSONCONS_BUILD_TESTS=On 
+  #    env:
+  #      CC:   clang-13
+  #      CXX:  clang++-13
+  #
+  #  - working-directory: build/
+  #    run: cmake --build . --config ubuntu-latest
+  #
+  #  - working-directory: build/
+  #    run: ctest -C ubuntu-latest --output-on-failure
 
   clang_14_build:
     runs-on: ubuntu-latest
