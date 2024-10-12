@@ -694,18 +694,6 @@ namespace jsoncons {
 
             void assign(const long_string_storage& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
-            }
-
-            void assign(std::true_type, const long_string_storage& other)
-            {
-                tag_ = other.tag_;
-                heap_string_factory_type::destroy(ptr_);
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
-            }
-
-            void assign(std::false_type, const long_string_storage& other)
-            {
                 auto alloc = get_allocator();
                 tag_ = other.tag_;
                 heap_string_factory_type::destroy(ptr_);
@@ -814,18 +802,6 @@ namespace jsoncons {
             }
 
             void assign(const byte_string_storage& other)
-            {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
-            }
-
-            void assign(std::true_type, const byte_string_storage& other)
-            {
-                tag_ = other.tag_;
-                heap_string_factory_type::destroy(ptr_);
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), other.get_allocator());
-            }
-
-            void assign(std::false_type, const byte_string_storage& other)
             {
                 auto alloc = get_allocator();
                 tag_ = other.tag_;
@@ -986,8 +962,9 @@ namespace jsoncons {
             void assign(std::true_type, const array_storage& other)
             {
                 tag_ = other.tag_;
-                destroy();
-                create(array_allocator(other.get_allocator()), *(other.ptr_));
+                *ptr_ = *(other.ptr_);
+                //destroy();
+                //create(array_allocator(other.get_allocator()), *(other.ptr_));
             }
 
             void assign(std::false_type, const array_storage& other)
@@ -1127,9 +1104,11 @@ namespace jsoncons {
             void assign(std::true_type, const object_storage& other)
             {
                 tag_ = other.tag_;
-                destroy();
-                ptr_ = nullptr;
-                create(object_allocator(other.get_allocator()), *(other.ptr_));
+                *ptr_ = *(other.ptr_);
+                //tag_ = other.tag_;
+                //destroy();
+                //ptr_ = nullptr;
+                //create(object_allocator(other.get_allocator()), *(other.ptr_));
             }
 
             void assign(std::false_type, const object_storage& other)
