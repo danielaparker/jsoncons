@@ -956,23 +956,8 @@ namespace jsoncons {
 
             void assign(const array_storage& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
-            }
-
-            void assign(std::true_type, const array_storage& other)
-            {
                 tag_ = other.tag_;
                 *ptr_ = *(other.ptr_);
-                //destroy();
-                //create(array_allocator(other.get_allocator()), *(other.ptr_));
-            }
-
-            void assign(std::false_type, const array_storage& other)
-            {
-                auto alloc = get_allocator();
-                tag_ = other.tag_;
-                destroy();
-                create(array_allocator(alloc), *(other.ptr_));
             }
 
             void assign(array_storage&& other)
@@ -1098,26 +1083,8 @@ namespace jsoncons {
 
             void assign(const object_storage& other)
             {
-                assign(std::integral_constant<bool,std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value>(), other);
-            }
-
-            void assign(std::true_type, const object_storage& other)
-            {
                 tag_ = other.tag_;
                 *ptr_ = *(other.ptr_);
-                //tag_ = other.tag_;
-                //destroy();
-                //ptr_ = nullptr;
-                //create(object_allocator(other.get_allocator()), *(other.ptr_));
-            }
-
-            void assign(std::false_type, const object_storage& other)
-            {
-                auto alloc = get_allocator();
-                tag_ = other.tag_;
-                destroy();
-                ptr_ = nullptr;
-                create(object_allocator(alloc), *(other.ptr_));
             }
 
             void assign(object_storage&& other)
