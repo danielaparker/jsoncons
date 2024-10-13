@@ -2180,58 +2180,37 @@ namespace jsoncons {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
-            else
+            else if (storage_kind() == other.storage_kind())
             {
                 switch (other.storage_kind())
                 {
                     case json_storage_kind::long_str:
-                        if (storage_kind() == json_storage_kind::long_str)
-                        {
-                            cast<long_string_storage>().assign(other.cast<long_string_storage>());
-                        }
-                        else
-                        {
-                            destroy();
-                            uninitialized_copy(other);
-                        }
+                        cast<long_string_storage>().assign(other.cast<long_string_storage>());
                         break;
                     case json_storage_kind::byte_str:
-                        if (storage_kind() == json_storage_kind::byte_str)
-                        {
-                            cast<byte_string_storage>().assign(other.cast<byte_string_storage>());
-                        }
-                        else
-                        {
-                            destroy();
-                            uninitialized_copy(other);
-                        }
+                        cast<byte_string_storage>().assign(other.cast<byte_string_storage>());
                         break;
                     case json_storage_kind::array:
-                        if (storage_kind() == json_storage_kind::array)
-                        {
-                            cast<array_storage>().assign(other.cast<array_storage>());
-                        }
-                        else
-                        {
-                            destroy();
-                            uninitialized_copy(other);
-                        }
+                        cast<array_storage>().assign(other.cast<array_storage>());
                         break;
                     case json_storage_kind::object:
-                        if (storage_kind() == json_storage_kind::object)
-                        {
-                            cast<object_storage>().assign(other.cast<object_storage>());
-                        }
-                        else
-                        {
-                            destroy();
-                            uninitialized_copy(other);
-                        }
+                        cast<object_storage>().assign(other.cast<object_storage>());
                         break;
                     default:
                         JSONCONS_UNREACHABLE();
                         break;
                 }
+            }
+            else if (is_scalar_storage(storage_kind())) // rhs is not scalar storage
+            {
+                destroy();
+                uninitialized_copy(other);
+            }
+            else // lhs and rhs are not scalar storage
+            {
+                auto alloc = get_allocator();
+                destroy();
+                uninitialized_copy_a(other, alloc);
             }
         }
 

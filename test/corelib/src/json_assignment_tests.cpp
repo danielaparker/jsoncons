@@ -215,6 +215,57 @@ TEST_CASE("json assignment with pmr allocator")
         REQUIRE(&pool2 == j1.get_allocator().resource());
         REQUIRE(&pool1 == j2.get_allocator().resource());
     }
+
+    SECTION("long string to number assignment")
+    {
+        pmr_json j1{10};
+
+        pmr_json j2{long_string2, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource()); 
+        auto it = std::search(buffer2, last2, long_string2, long_string2_end);
+        CHECK(it != last2);
+
+        j1 = j2;
+        REQUIRE(j1.get_allocator() == std::pmr::polymorphic_allocator<char>{});
+        CHECK(j1 == j2);
+    }
+
+    SECTION("number to long string assignment")
+    {
+        pmr_json j1{10};
+
+        pmr_json j2{long_string2, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource()); 
+        auto it = std::search(buffer2, last2, long_string2, long_string2_end);
+        CHECK(it != last2);
+
+        j2 = j1;
+        CHECK(j2.is_number());
+    }
+
+    SECTION("object to array assignment")
+    {
+        pmr_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(&pool1 == j1.get_allocator().resource());
+        j1.push_back(long_string1); 
+        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
+        CHECK(it != last1);
+
+        pmr_json j2{jsoncons::json_object_arg, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource());
+        j2.try_emplace(long_key2, long_string2);
+        it = std::search(buffer2, last2, long_key2, long_key2_end);
+        it = std::search(buffer2, last2, long_string2, long_string2_end);
+        CHECK(it != last2);
+
+        j1 = j2;
+        REQUIRE(&pool1 == j1.get_allocator().resource());
+        CHECK(j1 == j2);
+
+        j2 = j1;
+        REQUIRE(&pool2 == j2.get_allocator().resource());
+        CHECK(j1 == j2);
+    }
 }
 
 #endif
