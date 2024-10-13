@@ -109,14 +109,14 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("byte string to byte string move assignment")
     {
-        pmr_json j1{long_string1, alloc1};
+        pmr_json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
-        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
+        auto it = std::search(buffer1, last1, byte_string.data(), byte_string.data()+byte_string.size());
         CHECK(it != last1);
 
-        pmr_json j2{long_string2, alloc2};
+        pmr_json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
-        it = std::search(buffer2, last2, long_string2, long_string2_end);
+        it = std::search(buffer2, last2, byte_string2.data(), byte_string2.data()+byte_string2.size());
         CHECK(it != last2);
 
         j1 = std::move(j2);
