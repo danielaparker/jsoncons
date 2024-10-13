@@ -184,37 +184,31 @@ TEST_CASE("json constructor with pmr allocator")
         CHECK(it != last1);
     }
 
-    /*SECTION("test 2")
+    SECTION("test 2")
     {
         pmr_json j1{ alloc1 };
 
-        const char* long_key1 = "Key too long for short string";
-        const char* long_string1 = "String too long for short string";
-        j1[long_key1] = long_string1;
+        j1[long_key] = long_string;
 
-        char* last1 = buffer1 + sizeof(buffer1);
-        auto it = std::search(buffer1, last1, long_string1, long_string1 + strlen(long_string1));
+        auto it = std::search(buffer1, last1, long_string, long_string_end);
         CHECK(it != last1);
 
-        it = std::search(buffer1, last1, long_key1, long_key1 + strlen(long_key1));
+        it = std::search(buffer1, last1, long_key, long_key_end);
         CHECK(it != last1);
     }
     SECTION("test 3")
     {
-        const char* long_string1 = "String too long for short string";
-        pmr_json j1(long_string1);
+        pmr_json j1(long_string);
         
         pmr_json j2{j1, alloc2};
         
-        char* last2 = buffer2 + sizeof(buffer2);
-        auto it = std::search(buffer2, last2, long_string1, long_string1+strlen(long_string1));
+        auto it = std::search(buffer2, last2, long_string, long_string_end);
         CHECK(it != last2);
-    }*/
+    }
 }
 
 #endif
 
-#if 0
 TEST_CASE("json constructor byte_string_arg tests")
 {
     std::string expected_base64url = "Zm9vYmFy";
@@ -539,4 +533,3 @@ TEST_CASE("json constructor unsigned __int64 tests")
 #pragma GCC diagnostic pop
 #endif
 
-#endif
