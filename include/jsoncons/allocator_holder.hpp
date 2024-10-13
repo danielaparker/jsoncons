@@ -20,8 +20,8 @@ public:
     allocator_holder() = default;
     allocator_holder(const allocator_holder&)  = default;
     allocator_holder(allocator_holder&&)  = default;
-    allocator_holder& operator=(const allocator_holder&)  = default;
-    allocator_holder& operator=(allocator_holder&&)  = default;
+    allocator_holder& operator=(const allocator_holder&) = default;
+    allocator_holder& operator=(allocator_holder&&) = default;
     allocator_holder(const allocator_type& alloc)
         : alloc_(alloc)
         {}

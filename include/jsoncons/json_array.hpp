@@ -238,7 +238,6 @@ namespace jsoncons {
 
         json_array& operator=(const json_array& other)
         {
-            allocator_holder<allocator_type>::operator=(other.get_allocator());
             elements_ = other.elements_;
             return *this;
         }
