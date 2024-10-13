@@ -63,6 +63,23 @@ TEST_CASE("json assignment with pmr allocator")
         it = std::search(buffer2, last2, another_long_string, another_long_string_end);
         CHECK(j1 == j2);
     }
+
+    SECTION("long string to long string move assignment")
+    {
+        pmr_json j1{long_string, alloc1};
+        REQUIRE(&pool1 == j1.get_allocator().resource()); 
+        auto it = std::search(buffer1, last1, long_string, long_string_end);
+        CHECK(it != last1);
+
+        pmr_json j2{another_long_string, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource()); 
+        it = std::search(buffer2, last2, another_long_string, another_long_string_end);
+        CHECK(it != last2);
+
+        j1 = std::move(j2);
+        REQUIRE(&pool2 == j1.get_allocator().resource());
+        REQUIRE(&pool1 == j2.get_allocator().resource());
+    }
 }
 
 #endif
