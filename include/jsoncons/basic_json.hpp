@@ -3670,7 +3670,7 @@ namespace jsoncons {
                     return cast<object_storage>().get_allocator();
                 }
                 default:
-                    return get_default_allocator(std::is_default_constructible<U>());
+                    return get_default_allocator(jsoncons::extension_traits::is_stateless<U>());
             }
         }
 

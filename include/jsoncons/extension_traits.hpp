@@ -922,6 +922,7 @@ namespace impl {
             (is_detected<allocator_outer_allocator_type_t,T>::value && is_detected<allocator_inner_allocator_type_t,T>::value)>::type
     > : std::true_type{};
 
+    
 } // extension_traits
 } // jsoncons
 

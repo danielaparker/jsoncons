@@ -36,7 +36,7 @@ public:
     using value_type = T;
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
-
+    
     FreeListAllocator(int) noexcept 
     {}
     FreeListAllocator(const FreeListAllocator&) noexcept {}
