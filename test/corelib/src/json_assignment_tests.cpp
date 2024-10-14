@@ -12,13 +12,8 @@
 
 using namespace jsoncons;
 
-
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
-using namespace jsoncons;
-
-using pmr_json = jsoncons::pmr::json;
-using pmr_ojson = jsoncons::pmr::ojson;
 
 TEST_CASE("json assignment with pmr allocator")
 {
@@ -46,12 +41,12 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("long string to long string assignment")
     {
-        pmr_json j1{long_string1, alloc1};
+        jsoncons::pmr::json j1{long_string1, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
         auto it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{long_string2, alloc2};
+        jsoncons::pmr::json j2{long_string2, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         it = std::search(buffer2, last2, long_string2, long_string2_end);
         CHECK(it != last2);
@@ -69,12 +64,12 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("long string to long string move assignment")
     {
-        pmr_json j1{long_string1, alloc1};
+        jsoncons::pmr::json j1{long_string1, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
         auto it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{long_string2, alloc2};
+        jsoncons::pmr::json j2{long_string2, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         it = std::search(buffer2, last2, long_string2, long_string2_end);
         CHECK(it != last2);
@@ -86,12 +81,12 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("byte string to byte string assignment")
     {
-        pmr_json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
         auto it = std::search(buffer1, last1, byte_string.data(), byte_string.data()+byte_string.size());
         CHECK(it != last1);
 
-        pmr_json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
+        jsoncons::pmr::json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         it = std::search(buffer2, last2, byte_string2.data(), byte_string2.data()+byte_string2.size());
         CHECK(it != last2);
@@ -109,12 +104,12 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("byte string to byte string move assignment")
     {
-        pmr_json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
+        jsoncons::pmr::json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource()); 
         auto it = std::search(buffer1, last1, byte_string.data(), byte_string.data()+byte_string.size());
         CHECK(it != last1);
 
-        pmr_json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
+        jsoncons::pmr::json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         it = std::search(buffer2, last2, byte_string2.data(), byte_string2.data()+byte_string2.size());
         CHECK(it != last2);
@@ -126,13 +121,13 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("array to array assignment")
     {
-        pmr_json j1{jsoncons::json_array_arg, alloc1};
+        jsoncons::pmr::json j1{jsoncons::json_array_arg, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.push_back(long_string1); 
         auto it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{jsoncons::json_array_arg, alloc2};
+        jsoncons::pmr::json j2{jsoncons::json_array_arg, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource());
         j2.push_back(long_string2);
         it = std::search(buffer2, last2, long_string2, long_string2_end);
@@ -151,13 +146,13 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("array to array move assignment")
     {
-        pmr_json j1{jsoncons::json_array_arg, alloc1};
+        jsoncons::pmr::json j1{jsoncons::json_array_arg, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.push_back(long_string1); 
         auto it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{jsoncons::json_array_arg, alloc2};
+        jsoncons::pmr::json j2{jsoncons::json_array_arg, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource());
         j2.push_back(long_string2);
         it = std::search(buffer2, last2, long_string2, long_string2_end);
@@ -170,14 +165,14 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("object to object assignment")
     {
-        pmr_json j1{jsoncons::json_object_arg, alloc1};
+        jsoncons::pmr::json j1{jsoncons::json_object_arg, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.insert_or_assign(long_key1, long_string1); 
         auto it = std::search(buffer1, last1, long_key1, long_key1_end);
         it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{jsoncons::json_object_arg, alloc2};
+        jsoncons::pmr::json j2{jsoncons::json_object_arg, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource());
         j2.try_emplace(long_key2, long_string2);
         it = std::search(buffer2, last2, long_key2, long_key2_end);
@@ -197,14 +192,14 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("object to object move assignment")
     {
-        pmr_json j1{jsoncons::json_object_arg, alloc1};
+        jsoncons::pmr::json j1{jsoncons::json_object_arg, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.insert_or_assign(long_key1, long_string1); 
         auto it = std::search(buffer1, last1, long_key1, long_key1_end);
         it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{jsoncons::json_object_arg, alloc2};
+        jsoncons::pmr::json j2{jsoncons::json_object_arg, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource());
         j2.try_emplace(long_key2, long_string2);
         it = std::search(buffer2, last2, long_key2, long_key2_end);
@@ -218,9 +213,9 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("long string to number assignment")
     {
-        pmr_json j1{10};
+        jsoncons::pmr::json j1{10};
 
-        pmr_json j2{long_string2, alloc2};
+        jsoncons::pmr::json j2{long_string2, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         auto it = std::search(buffer2, last2, long_string2, long_string2_end);
         CHECK(it != last2);
@@ -232,9 +227,9 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("number to long string assignment")
     {
-        pmr_json j1{10};
+        jsoncons::pmr::json j1{10};
 
-        pmr_json j2{long_string2, alloc2};
+        jsoncons::pmr::json j2{long_string2, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource()); 
         auto it = std::search(buffer2, last2, long_string2, long_string2_end);
         CHECK(it != last2);
@@ -245,13 +240,13 @@ TEST_CASE("json assignment with pmr allocator")
 
     SECTION("object to array assignment")
     {
-        pmr_json j1{jsoncons::json_array_arg, alloc1};
+        jsoncons::pmr::json j1{jsoncons::json_array_arg, alloc1};
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.push_back(long_string1); 
         auto it = std::search(buffer1, last1, long_string1, long_string1_end);
         CHECK(it != last1);
 
-        pmr_json j2{jsoncons::json_object_arg, alloc2};
+        jsoncons::pmr::json j2{jsoncons::json_object_arg, alloc2};
         REQUIRE(&pool2 == j2.get_allocator().resource());
         j2.try_emplace(long_key2, long_string2);
         it = std::search(buffer2, last2, long_key2, long_key2_end);
