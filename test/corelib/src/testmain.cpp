@@ -17,4 +17,5 @@ TEST_CASE("configuration")
     #endif
     
     char* p = new char[100];     
+    (void)p;
 }
