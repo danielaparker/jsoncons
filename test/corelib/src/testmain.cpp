@@ -15,4 +15,6 @@ TEST_CASE("configuration")
     #if defined(JSONCONS_HAS_STD_REGEX)
         std::cout << "JSONCONS_HAS_STD_REGEX\n";
     #endif
+    
+    char* p = new char[100];     
 }
