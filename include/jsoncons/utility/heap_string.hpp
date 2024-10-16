@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_HEAP_STRING_BOX_HPP
-#define JSONCONS_DETAIL_HEAP_STRING_BOX_HPP
+#ifndef JSONCONS_UTILITY_HEAP_STRING_HPP
+#define JSONCONS_UTILITY_HEAP_STRING_HPP
 
 #include <stdexcept>
 #include <string>
@@ -16,7 +16,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
-namespace detail {
+namespace utility {
 
     inline char*
     align_up(char* ptr, std::size_t alignment) noexcept
@@ -192,7 +192,7 @@ namespace detail {
         }
     };
 
-} // namespace detail
+} // namespace utility
 } // namespace jsoncons
 
 #endif

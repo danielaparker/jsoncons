@@ -5,7 +5,6 @@
 // See https://github.com/danielaparker/jsoncons for latest version
 
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <jsoncons/byte_string.hpp>
 
 #include <catch/catch.hpp>
 #include <fstream>
