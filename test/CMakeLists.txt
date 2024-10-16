@@ -126,7 +126,7 @@ add_executable(unit_tests
                corelib/src/detail/optional_tests.cpp
                corelib/src/detail/span_tests.cpp
                corelib/src/detail/string_view_tests.cpp
-               corelib/src/detail/heap_string_tests.cpp
+               corelib/src/utility/heap_string_tests.cpp
                corelib/src/detail/to_integer_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
