@@ -179,13 +179,6 @@ TEST_CASE("json constructor with pmr allocator")
         CHECK(it != last1);
     }
 
-    SECTION("empty object with given allocator")
-    {
-        jsoncons::pmr::json j1{alloc1};
-        REQUIRE(j1.is_object());
-        REQUIRE(&pool1 == j1.get_allocator().resource());
-    }
-
     SECTION("object move constructor")
     {
         jsoncons::pmr::json j1{jsoncons::json_object_arg, alloc1};
@@ -205,18 +198,6 @@ TEST_CASE("json constructor with pmr allocator")
         CHECK(it != last1);
     }
 
-    SECTION("test 2")
-    {
-        jsoncons::pmr::json j1{ alloc1 };
-
-        j1[long_key1] = long_string1;
-
-        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
-        CHECK(it != last1);
-
-        it = std::search(buffer1, last1, long_key1, long_key1_end);
-        CHECK(it != last1);
-    }
     SECTION("test 3")
     {
         jsoncons::pmr::json j1(long_string1);
