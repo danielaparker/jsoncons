@@ -1497,11 +1497,11 @@ TEST_CASE("csv detect bom")
 /*
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1 
  
-#include <common/FreeListAllocator.hpp>
+#include <common/free_list_allocator.hpp>
 #include <scoped_allocator>
  
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 TEST_CASE("csv_reader constructors")
 {

@@ -7,13 +7,13 @@
 #include <map>
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include "FreeListAllocator.hpp"
+#include "free_list_allocator.hpp"
 #include <scoped_allocator>
 
 using namespace jsoncons;
 
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 class MyIterator
 {

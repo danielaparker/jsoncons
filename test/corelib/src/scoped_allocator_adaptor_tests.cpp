@@ -13,12 +13,12 @@
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
-#include <common/FreeListAllocator.hpp>
+#include <common/free_list_allocator.hpp>
 
 using namespace jsoncons;
 
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 using custom_json = jsoncons::basic_json<char, jsoncons::sorted_policy, MyScopedAllocator<char>>;
 using custom_string = std::basic_string<char, std::char_traits<char>, MyScopedAllocator<char>>;

@@ -208,13 +208,12 @@ TEST_CASE("json constructor with pmr allocator")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
-#include <common/FreeListAllocator.hpp>
+#include <common/free_list_allocator.hpp>
 
 TEST_CASE("json constructor with scoped_allocator")
 {
-    using cust_allocator = std::scoped_allocator_adaptor<FreeListAllocator<char>>;
+    using cust_allocator = std::scoped_allocator_adaptor<free_list_allocator<char>>;
     using cust_json = basic_json<char,sorted_policy,cust_allocator>;
-    using cust_string = std::basic_string<char,std::char_traits<char>,cust_allocator>;
 
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);

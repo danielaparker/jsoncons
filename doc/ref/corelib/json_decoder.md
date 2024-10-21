@@ -146,7 +146,7 @@ int main()
 
     std::ifstream is("bond_yields.csv");
     json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
-    csv::basic_csv_reader<char,stream_source<char>,FreeListAllocator<char>> reader(is, decoder, options, my_alloc(3));
+    csv::basic_csv_reader<char,stream_source<char>,free_list_allocator<char>> reader(is, decoder, options, my_alloc(3));
     reader.read();
 
     my_json j = decoder.get_result();

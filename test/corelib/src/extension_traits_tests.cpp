@@ -30,15 +30,15 @@ TEST_CASE("extension_traits tests")
 #if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
 
 #include <scoped_allocator>
-#include <common/FreeListAllocator.hpp>
+#include <common/free_list_allocator.hpp>
 template <typename T>
-using MyScopedAllocator = std::scoped_allocator_adaptor<FreeListAllocator<T>>;
+using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 TEST_CASE("extension_traits tests is_propagating_allocator")
 {
     SECTION("is_propagating_allocator")
     {
-        CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<FreeListAllocator<char>>::value);
+        CHECK_FALSE(jsoncons::extension_traits::is_propagating_allocator<free_list_allocator<char>>::value);
         CHECK(jsoncons::extension_traits::is_propagating_allocator<MyScopedAllocator<char>>::value);
     }
 }

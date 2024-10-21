@@ -263,5 +263,191 @@ TEST_CASE("json assignment with pmr allocator")
     }
 }
 
-#endif
+#endif // polymorphic_allocator
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/free_list_allocator.hpp>
+
+TEST_CASE("json assignment with scoped allocator")
+{
+    using cust_allocator = std::scoped_allocator_adaptor<free_list_allocator<char>>;
+    using cust_json = basic_json<char,sorted_policy,cust_allocator>;
+
+    cust_allocator alloc1(1);
+    cust_allocator alloc2(2);
+
+    const char* long_key1 = "Key too long for short string";
+    const char* long_key2 = "Another key too long for short string";
+    const char* long_string1 = "String too long for short string";
+    const char* long_string2 = "Another string too long for short string";
+
+    std::vector<uint8_t> byte_string = { 'H','e','l','l','o' };
+    std::vector<uint8_t> byte_string2 = { 'W','o','r','l','d' };
+
+    SECTION("long string to long string assignment")
+    {
+        cust_json j1{long_string1, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{long_string2, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+        
+        j1 = j2;
+        REQUIRE(alloc1 == j1.get_allocator());
+
+        j2 = j1;
+        REQUIRE(alloc2 == j2.get_allocator());
+    }
+
+    SECTION("long string to long string move assignment")
+    {
+        cust_json j1{long_string1, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{long_string2, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+
+        j1 = std::move(j2);
+        REQUIRE(alloc2 == j1.get_allocator());
+        REQUIRE(alloc1 == j2.get_allocator());
+    }
+
+    SECTION("byte string to byte string assignment")
+    {
+        cust_json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+
+        j1 = j2;
+        REQUIRE(alloc1 == j1.get_allocator());
+
+        j2 = j1;
+        REQUIRE(alloc2 == j2.get_allocator());
+    }
+
+    SECTION("byte string to byte string move assignment")
+    {
+        cust_json j1{byte_string_arg, byte_string, semantic_tag::none, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{byte_string_arg, byte_string2, semantic_tag::none, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+
+        j1 = std::move(j2);
+        REQUIRE(alloc2 == j1.get_allocator());
+        REQUIRE(alloc1 == j2.get_allocator());
+    }
+
+    SECTION("array to array assignment")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.push_back(long_string1); 
+
+        cust_json j2{jsoncons::json_array_arg, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator());
+        j2.push_back(long_string2);
+
+        j1 = j2;
+        REQUIRE(alloc1 == j1.get_allocator());
+
+        j2 = j1;
+        REQUIRE(alloc2 == j2.get_allocator());
+    }
+
+    SECTION("array to array move assignment")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.push_back(long_string1); 
+
+        cust_json j2{jsoncons::json_array_arg, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator());
+        j2.push_back(long_string2);
+
+        j1 = std::move(j2);
+        REQUIRE(alloc2 == j1.get_allocator());
+        REQUIRE(alloc1 == j2.get_allocator());
+    }
+
+    SECTION("object to object assignment")
+    {
+        cust_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.insert_or_assign(long_key1, long_string1); 
+
+        cust_json j2{jsoncons::json_object_arg, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator());
+        j2.try_emplace(long_key2, long_string2);
+
+        j1 = j2;
+        REQUIRE(alloc1 == j1.get_allocator());
+
+        j2 = j1;
+        REQUIRE(alloc2 == j2.get_allocator());
+    }
+
+    SECTION("object to object move assignment")
+    {
+        cust_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.insert_or_assign(long_key1, long_string1); 
+
+        cust_json j2{jsoncons::json_object_arg, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator());
+        j2.try_emplace(long_key2, long_string2);
+
+        j1 = std::move(j2);
+        REQUIRE(alloc2 == j1.get_allocator());
+        REQUIRE(alloc1 == j2.get_allocator());
+    }
+
+    SECTION("long string to number assignment")
+    {
+        cust_json j1{10};
+
+        cust_json j2{long_string2, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+
+        j1 = j2;
+        REQUIRE(alloc2 == j1.get_allocator());
+        CHECK(j1 == j2);
+    }
+
+    SECTION("number to long string assignment")
+    {
+        cust_json j1{10};
+
+        cust_json j2{long_string2, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator()); 
+
+        j2 = j1;
+        CHECK(j2.is_number());
+    }
+
+    SECTION("object to array assignment")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.push_back(long_string1); 
+
+        cust_json j2{jsoncons::json_object_arg, alloc2};
+        REQUIRE(alloc2 == j2.get_allocator());
+        j2.try_emplace(long_key2, long_string2);
+
+        j1 = j2;
+        REQUIRE(alloc1 == j1.get_allocator());
+        CHECK(j1 == j2);
+
+        j2 = j1;
+        REQUIRE(alloc2 == j2.get_allocator());
+        CHECK(j1 == j2);
+    }
+}
+
+#endif // scoped_allocator
 

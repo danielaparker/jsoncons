@@ -1,8 +1,8 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#ifndef SAMPLE_ALLOCATORS_HPP
-#define SAMPLE_ALLOCATORS_HPP
+#ifndef FREE_LIST_ALLOCATOR_HPP
+#define FREE_LIST_ALLOCATOR_HPP
 
 #include <algorithm>
 #include <iostream>
@@ -14,8 +14,7 @@
 // From http://coliru.stacked-crooked.com/a/cfd0c5c5021596ad
 
 template <typename T>
-class FreeListAllocator {
-
+class free_list_allocator {
     union node {
         node* next;
         alignas(alignof(T)) unsigned char storage[sizeof(T)];
@@ -32,34 +31,41 @@ class FreeListAllocator {
         }
         list = nullptr;
     }
+    int id_;
 
 public:
     using value_type = T;
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
-
-    FreeListAllocator(int) noexcept 
-    {}
-    FreeListAllocator(const FreeListAllocator&) noexcept {}
+    
+    free_list_allocator(int id) noexcept 
+        : id_(id) {}
+    free_list_allocator(const free_list_allocator& other) noexcept : id_(other.id_) {}
     template <typename U>
-    FreeListAllocator(const FreeListAllocator<U>&) noexcept {}
-    FreeListAllocator(FreeListAllocator&& other) noexcept :  list(other.list) {
+    free_list_allocator(const free_list_allocator<U>& other) noexcept : id_(other.id()) {}
+    free_list_allocator(free_list_allocator&& other) noexcept : id_(other.id_), list(other.list) {
+        other.id_ = -1;                                                       
         other.list = nullptr;
     }
 
-    FreeListAllocator& operator = (const FreeListAllocator&) noexcept {
-        // noop
-        return *this;
+    free_list_allocator& operator = (const free_list_allocator& other) = delete;
+
+    ~free_list_allocator() noexcept { clear(); }
+    
+    int id() const noexcept
+    {
+        return id_;
     }
 
-    FreeListAllocator& operator = (FreeListAllocator&& other) noexcept {
-        clear();
-        list = other.list;
-        other.list = nullptr;
-        return *this;
+    friend bool operator==(const free_list_allocator& lhs, const free_list_allocator& rhs) noexcept
+    {
+        return lhs.id_ == rhs.id_;
     }
 
-    ~FreeListAllocator() noexcept { clear(); }
+    friend bool operator!=(const free_list_allocator& lhs, const free_list_allocator& rhs) noexcept
+    {
+        return !(lhs == rhs);
+    }
 
     T* allocate(size_type n) {
         //std::cout << "Allocate(" << n << ") from ";
@@ -95,7 +101,7 @@ public:
     template <typename U>
     struct rebind
     {
-        using other = FreeListAllocator<U>;
+        using other = free_list_allocator<U>;
     };
     using pointer = T*;
     using const_pointer = const T*;
@@ -103,15 +109,5 @@ public:
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
 };
-
-template <typename T,typename U>
-inline bool operator == (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
-    return true;
-}
-
-template <typename T,typename U>
-inline bool operator != (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
-    return false;
-}
 
 #endif
