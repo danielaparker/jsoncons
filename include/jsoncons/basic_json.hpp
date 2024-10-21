@@ -3258,7 +3258,7 @@ namespace jsoncons {
         }
 
         template <typename IntegerType>
-        basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
+        basic_json(IntegerType val, semantic_tag, const Allocator& alloc = Allocator(),
                    typename std::enable_if<extension_traits::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
         {
             std::basic_string<CharT> s;
@@ -3288,7 +3288,7 @@ namespace jsoncons {
         }
 
         template <typename IntegerType>
-        basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
+        basic_json(IntegerType val, semantic_tag, const Allocator& alloc = Allocator(),
                    typename std::enable_if<extension_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
         {
             std::basic_string<CharT> s;
