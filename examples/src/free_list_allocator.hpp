@@ -50,6 +50,15 @@ public:
 
     free_list_allocator& operator = (const free_list_allocator& other) = delete;
 
+    free_list_allocator& operator = (free_list_allocator&& other) noexcept {
+        clear();
+        id_ = other.id_;
+        list = other.list;
+        other.id_ = -1;
+        other.list = nullptr;
+        return *this;
+    }
+    
     ~free_list_allocator() noexcept { clear(); }
     
     int id() const noexcept
