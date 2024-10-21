@@ -92,6 +92,8 @@ TEST_CASE("ojson object erase with iterator")
 
         CHECK(doc.size() == 1);
         CHECK(doc.at("b") == 2);
+        CHECK(doc.at("b") == 2.0);
+        CHECK(doc.at("b") == 2.0f);
         CHECK(doc["b"] == 2);
     }
 
