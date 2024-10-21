@@ -31,34 +31,53 @@ class FreeListAllocator {
         }
         list = nullptr;
     }
+    int id_;
 
 public:
     using value_type = T;
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
     
-    FreeListAllocator(int) noexcept 
-    {}
-    FreeListAllocator(const FreeListAllocator&) noexcept {}
+    FreeListAllocator(int id) noexcept 
+        : id_(id) {}
+    FreeListAllocator(const FreeListAllocator& other) noexcept : id_(other.id_) {}
     template <typename U>
-    FreeListAllocator(const FreeListAllocator<U>&) noexcept {}
-    FreeListAllocator(FreeListAllocator&& other) noexcept :  list(other.list) {
+    FreeListAllocator(const FreeListAllocator<U>& other) noexcept : id_(other.id()) {}
+    FreeListAllocator(FreeListAllocator&& other) noexcept : id_(other.id_), list(other.list) {
+        other.id_ = -1;                                                       
         other.list = nullptr;
     }
 
-    FreeListAllocator& operator = (const FreeListAllocator&) noexcept {
-        // noop
+    FreeListAllocator& operator = (const FreeListAllocator& other) noexcept {
+        id_ = other.id_;
         return *this;
     }
 
     FreeListAllocator& operator = (FreeListAllocator&& other) noexcept {
         clear();
+        id_ = other.id_;
         list = other.list;
+        other.id_ = -1;
         other.list = nullptr;
         return *this;
     }
 
     ~FreeListAllocator() noexcept { clear(); }
+    
+    int id() const noexcept
+    {
+        return id_;
+    }
+
+    friend bool operator==(const FreeListAllocator& lhs, const FreeListAllocator& rhs) noexcept
+    {
+        return lhs.id_ == rhs.id_;
+    }
+
+    friend bool operator!=(const FreeListAllocator& lhs, const FreeListAllocator& rhs) noexcept
+    {
+        return !(lhs == rhs);
+    }
 
     T* allocate(size_type n) {
         //std::cout << "Allocate(" << n << ") from ";
@@ -102,15 +121,5 @@ public:
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
 };
-
-template <typename T,typename U>
-inline bool operator == (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
-    return true;
-}
-
-template <typename T,typename U>
-inline bool operator != (const FreeListAllocator<T>&, const FreeListAllocator<U>&) {
-    return false;
-}
 
 #endif

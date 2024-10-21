@@ -700,9 +700,21 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
-            void assign(long_string_storage&& other)
+            void assign(long_string_storage&& other) noexcept
             {
                 swap(other);
+            }
+            
+            long_string_storage& operator=(const long_string_storage& other)
+            {
+                assign(other);
+                return *this;
+            }
+
+            long_string_storage& operator=(long_string_storage&& other)
+            {
+                swap(other);
+                return *this;
             }
 
             ~long_string_storage() noexcept
@@ -809,9 +821,21 @@ namespace jsoncons {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
-            void assign(byte_string_storage&& other)
+            void assign(byte_string_storage&& other) noexcept
             {
                 swap(other);
+            }
+
+            byte_string_storage& operator=(const byte_string_storage& other)
+            {
+                assign(other);
+                return *this;
+            }
+
+            byte_string_storage& operator=(byte_string_storage&& other) noexcept
+            {
+                swap(other);
+                return *this;
             }
 
             ~byte_string_storage() noexcept
@@ -960,9 +984,21 @@ namespace jsoncons {
                 *ptr_ = *(other.ptr_);
             }
 
-            void assign(array_storage&& other)
+            void assign(array_storage&& other) noexcept
             {
                 swap(other);
+            }
+
+            array_storage& operator=(const array_storage& other)
+            {
+                assign(other);
+                return *this;
+            }
+
+            array_storage& operator=(array_storage&& other) noexcept
+            {
+                swap(other);
+                return *this;
             }
 
             void swap(array_storage& other)
@@ -1087,9 +1123,21 @@ namespace jsoncons {
                 *ptr_ = *(other.ptr_);
             }
 
-            void assign(object_storage&& other)
+            void assign(object_storage&& other) noexcept
             {
                 swap(other);
+            }
+
+            object_storage& operator=(const object_storage& other)
+            {
+                assign(other);
+                return *this;
+            }
+
+            object_storage& operator=(object_storage&& other) noexcept
+            {
+                swap(other);
+                return *this;
             }
 
             void swap(object_storage& other)

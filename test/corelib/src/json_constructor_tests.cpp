@@ -12,7 +12,6 @@
 
 using namespace jsoncons;
 
-
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR) && JSONCONS_HAS_POLYMORPHIC_ALLOCATOR == 1
 #include <memory_resource> 
 
@@ -109,8 +108,7 @@ TEST_CASE("json constructor with pmr allocator")
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.push_back(long_string1); 
         j1.push_back(long_string2);
-        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
-        it = std::search(buffer1, last1, long_string2, long_string2_end);
+        auto it = std::search(buffer1, last1, long_string2, long_string2_end);
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{j1};
@@ -128,8 +126,7 @@ TEST_CASE("json constructor with pmr allocator")
         REQUIRE(&pool1 == j1.get_allocator().resource());
         j1.push_back(long_string1); 
         j1.push_back(long_string2);
-        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
-        it = std::search(buffer1, last1, long_string2, long_string2_end);
+        auto it = std::search(buffer1, last1, long_string2, long_string2_end);
         CHECK(it != last1);
 
         jsoncons::pmr::json j2{std::move(j1)};
@@ -204,31 +201,157 @@ TEST_CASE("json constructor with pmr allocator")
         it = std::search(buffer2, last2, long_string1, long_string1_end);
         CHECK(it != last1);
     }
-
-    SECTION("test 2")
-    {
-        jsoncons::pmr::json j1{ alloc1 };
-
-        j1[long_key1] = long_string1;
-
-        auto it = std::search(buffer1, last1, long_string1, long_string1_end);
-        CHECK(it != last1);
-
-        it = std::search(buffer1, last1, long_key1, long_key1_end);
-        CHECK(it != last1);
-    }
-    SECTION("test 3")
-    {
-        jsoncons::pmr::json j1(long_string1);
-        
-        jsoncons::pmr::json j2{j1, alloc2};
-        
-        auto it = std::search(buffer2, last2, long_string1, long_string1_end);
-        CHECK(it != last2);
-    }
 }
 
-#endif
+#endif // polymorphic_allocator
+
+#if defined(JSONCONS_HAS_STATEFUL_ALLOCATOR) && JSONCONS_HAS_STATEFUL_ALLOCATOR == 1
+
+#include <scoped_allocator>
+#include <common/FreeListAllocator.hpp>
+
+TEST_CASE("json constructor with scoped_allocator")
+{
+    using cust_allocator = std::scoped_allocator_adaptor<FreeListAllocator<char>>;
+    using cust_json = basic_json<char,sorted_policy,cust_allocator>;
+    using cust_string = std::basic_string<char,std::char_traits<char>,cust_allocator>;
+
+    cust_allocator alloc1(1);
+    cust_allocator alloc2(2);
+
+    const char* long_key1 = "Key too long for short string";
+    const char* long_string1 = "String too long for short string";
+    const char* long_string2 = "Another string too long for short string";
+
+    std::vector<uint8_t> byte_string1 = { 'H','e','l','l','o' };
+    
+    SECTION("long string copy constructor")
+    {
+        cust_json j1{long_string1, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{j1};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{j1, alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+        REQUIRE_FALSE(alloc1 == j3.get_allocator()); 
+    }
+
+    SECTION("long string move constructor")
+    {
+        cust_json j1{long_string1, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+        REQUIRE_FALSE(alloc1 == j3.get_allocator()); 
+    }
+
+    SECTION("byte string copy constructor")
+    {
+        cust_json j1{byte_string_arg, byte_string1, semantic_tag::none, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{j1};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{j1, alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+        REQUIRE_FALSE(alloc1 == j3.get_allocator()); 
+    }
+
+    SECTION("byte string move constructor")
+    {
+        cust_json j1{byte_string_arg, byte_string1, semantic_tag::none, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator()); 
+
+        cust_json j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }
+
+    SECTION("array copy constructor")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.push_back(long_string1); 
+        j1.push_back(long_string2);
+
+        cust_json j2{j1};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{j1, alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }
+
+    SECTION("array move constructor")
+    {
+        cust_json j1{jsoncons::json_array_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.push_back(long_string1); 
+        j1.push_back(long_string2);
+
+        cust_json j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }
+
+    SECTION("object copy constructor")
+    {
+        cust_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.insert_or_assign(long_key1, long_string1); 
+
+        cust_json j2{j1};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{j1, alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }
+
+    SECTION("object move constructor")
+    {
+        cust_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.insert_or_assign(long_key1, long_string1); 
+
+        cust_json j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }
+
+    SECTION("empty object with given allocator")
+    {
+        cust_json j1{alloc1};
+        REQUIRE(j1.is_object());
+        REQUIRE(alloc1 == j1.get_allocator());
+    }
+
+    SECTION("object move constructor")
+    {
+        cust_json j1{jsoncons::json_object_arg, alloc1};
+        REQUIRE(alloc1 == j1.get_allocator());
+        j1.insert_or_assign(long_key1, long_string1); 
+
+        cust_json j2{std::move(j1)};
+        REQUIRE(alloc1 == j2.get_allocator()); 
+
+        cust_json j3{std::move(j2), alloc2};
+        REQUIRE(alloc2 == j3.get_allocator()); 
+    }        
+}
+
+#endif // scoped_allocator
 
 TEST_CASE("json constructor byte_string_arg tests")
 {
