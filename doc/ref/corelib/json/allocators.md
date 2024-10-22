@@ -1,15 +1,16 @@
 ### Allocators
 
 
-A `basic_json` is a union type that can hold one of a number of possible data members, 
-some of which require an allocator (a long string, byte string, array, or object), 
-and others that do not (a scalar, i.e., an empty object, short string, number, boolean, or null). 
-It has an `Allocator` template parameter and an `allocator_type` member that indicates
-that it is allocator aware. 
+A `basic_json` has an `Allocator` template parameter and an `allocator_type` member that indicates
+that it is allocator aware. `Allocator` must be a Scoped Allocator, that is, an allocator 
+that applies not only to a `basic_json`'s data member, but also to its data member's elements.
+In particular, `Allocator` must be either a stateless allocator, 
+a <a href=https://en.cppreference.com/w/cpp/memory/polymorphic_allocator>std::pmr::polymorphic_allocator</a>, 
+or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>std::scoped_allocator_adaptor</a>, see <a href=json/allocators.md>allocators</a>. 
 
 Every constructor has a version that can be invoked with an allocator argument. 
 This argument is used to allocate memory for a long string, byte string, array, or object. 
-In the case of scalars, it is ignored.
+In the case of scalars, it is ignored. 
 
 Scoped Allocators are allocators that apply not only to the top-level container, but also to its elements 
 
