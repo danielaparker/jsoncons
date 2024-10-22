@@ -23,7 +23,8 @@ A `basic_json` is a union type that can hold one of a number of possible data me
 (a long string, byte string, array, or object), and others which do not (an empty object, short string, number, boolean, or null). 
 The data member may be tagged with a [semantic_tag](semantic_tag.md) that provides additional information about its value.
 
-When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
+When assigned a new `basic_json` value, the old value is overwritten. The member data type of the new value may be different 
+from the old value. 
 
 A `basic_json` can support multiple readers concurrently, as long as it is not being modified.
 If it is being modified, it must be by one writer with no concurrent readers.
