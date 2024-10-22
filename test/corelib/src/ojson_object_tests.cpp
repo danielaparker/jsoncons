@@ -342,20 +342,20 @@ TEST_CASE("test_ojson_merge_or_update_move")
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
-using custom_json = jsoncons::basic_json<char, jsoncons::order_preserving_policy, MyScopedAllocator<char>>;
+using cust_json = jsoncons::basic_json<char, jsoncons::order_preserving_policy, MyScopedAllocator<char>>;
 
-TEST_CASE("custom_json.merge test with order_preserving_policy and statefule allocator")
+TEST_CASE("cust_json.merge test with order_preserving_policy and statefule allocator")
 {
     MyScopedAllocator<char> alloc(1);
 
-    custom_json doc = custom_json::parse(combine_allocators(alloc), R"(
+    cust_json doc = cust_json::parse(combine_allocators(alloc), R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const custom_json source = custom_json::parse(combine_allocators(alloc), R"(
+    const cust_json source = cust_json::parse(combine_allocators(alloc), R"(
     {
         "a" : 2,
         "c" : 3,
@@ -367,7 +367,7 @@ TEST_CASE("custom_json.merge test with order_preserving_policy and statefule all
 
     SECTION("merge doc with source")
     {
-        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
         {
             "a" : 1,
             "b" : 2,
@@ -382,7 +382,7 @@ TEST_CASE("custom_json.merge test with order_preserving_policy and statefule all
 
     SECTION("merge doc")
     {
-        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
 {"a":1,"b":2,"c":3,"d":4,"e":6}
         )");
         doc.merge(doc.object_range().begin()+1,source);
@@ -391,13 +391,13 @@ TEST_CASE("custom_json.merge test with order_preserving_policy and statefule all
 
 }
 
-TEST_CASE("custom_json object erase with iterator")
+TEST_CASE("cust_json object erase with iterator")
 {
     MyScopedAllocator<char> alloc(1);
 
-    SECTION("custom_json erase with iterator")
+    SECTION("cust_json erase with iterator")
     {
-        custom_json doc(jsoncons::json_object_arg, alloc);
+        cust_json doc(jsoncons::json_object_arg, alloc);
 
         doc.try_emplace("a", 1);
         doc.try_emplace("b", 2);
@@ -421,9 +421,9 @@ TEST_CASE("custom_json object erase with iterator")
         CHECK(doc["b"] == 2);
     }
 
-    SECTION("custom_json erase with iterator 2")
+    SECTION("cust_json erase with iterator 2")
     {
-        custom_json doc(jsoncons::json_object_arg, alloc);
+        cust_json doc(jsoncons::json_object_arg, alloc);
 
         doc.try_emplace("a", 1);
         doc.try_emplace("b", 2);
@@ -447,9 +447,9 @@ TEST_CASE("custom_json object erase with iterator")
         CHECK(doc["c"] == 3);
     }
 
-    SECTION("custom_json erase with iterator 3")
+    SECTION("cust_json erase with iterator 3")
     {
-        custom_json doc(jsoncons::json_object_arg, alloc);
+        cust_json doc(jsoncons::json_object_arg, alloc);
 
         doc.try_emplace("c", 1);
         doc.try_emplace("b", 2);
@@ -474,18 +474,18 @@ TEST_CASE("custom_json object erase with iterator")
     }
 }
 
-TEST_CASE("custom_json merge_or_update test")
+TEST_CASE("cust_json merge_or_update test")
 {
     MyScopedAllocator<char> alloc(1);
 
-    custom_json doc = custom_json::parse(combine_allocators(alloc), R"(
+    cust_json doc = cust_json::parse(combine_allocators(alloc), R"(
     {
         "a" : 1,
         "b" : 2
     }
     )");
 
-    const custom_json source = custom_json::parse(combine_allocators(alloc), R"(
+    const cust_json source = cust_json::parse(combine_allocators(alloc), R"(
     {
         "a" : 2,
         "c" : 3
@@ -494,7 +494,7 @@ TEST_CASE("custom_json merge_or_update test")
 
     SECTION("merge_or_update source into doc")
     {
-        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
         {
             "a" : 2,
             "b" : 2,
@@ -507,7 +507,7 @@ TEST_CASE("custom_json merge_or_update test")
 
     SECTION("merge_or_update source into doc at pos 1")
     {
-        const custom_json expected = custom_json::parse(combine_allocators(alloc), R"(
+        const cust_json expected = cust_json::parse(combine_allocators(alloc), R"(
         {
             "a" : 2,
             "b" : 2,

@@ -1513,7 +1513,7 @@ TEST_CASE("csv_reader constructors")
 
     SECTION("stateful allocator")
     {
-        using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+        using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
         MyScopedAllocator<char> my_allocator{1}; 
 
@@ -1521,12 +1521,12 @@ TEST_CASE("csv_reader constructors")
             .assume_header(true)
                .mapping_kind(csv::csv_mapping_kind::n_objects);
 
-        json_decoder<custom_json,MyScopedAllocator<char>> decoder(my_allocator,
+        json_decoder<cust_json,MyScopedAllocator<char>> decoder(my_allocator,
                                                               my_allocator);
         csv::basic_csv_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
         CHECK(j.size() == 3); //-V521
         //std::cout << pretty_print(j) << "\n";
     }

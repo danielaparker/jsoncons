@@ -510,14 +510,14 @@ TEST_CASE("[jsonpointer] create_if_missing")
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
-using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpointer get with stateful allocator")
 {
     MyScopedAllocator<char> alloc(1);
 
     // Example from RFC 6901
-    const custom_json example = custom_json::parse(combine_allocators(alloc), R"(
+    const cust_json example = cust_json::parse(combine_allocators(alloc), R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -546,18 +546,18 @@ TEST_CASE("jsonpointer get with stateful allocator")
     check_contains(example,"/m~0n",true);
 
     check_get(example,"",example);
-    check_get(example,"/foo", custom_json::parse(combine_allocators(alloc),
+    check_get(example,"/foo", cust_json::parse(combine_allocators(alloc),
         jsoncons::string_view("[\"bar\", \"baz\"]"), json_options()));
-    check_get(example,"/foo/0", custom_json("bar", semantic_tag::none, alloc));
-    check_get(example,"/", custom_json(0));
-    check_get(example,"/a~1b", custom_json(1));
-    check_get(example,"/c%d", custom_json(2));
-    check_get(example,"/e^f", custom_json(3));
-    check_get(example,"/g|h", custom_json(4));
-    check_get(example,"/i\\j", custom_json(5));
-    check_get(example,"/k\"l", custom_json(6));
-    check_get(example,"/ ", custom_json(7));
-    check_get(example,"/m~0n", custom_json(8));
+    check_get(example,"/foo/0", cust_json("bar", semantic_tag::none, alloc));
+    check_get(example,"/", cust_json(0));
+    check_get(example,"/a~1b", cust_json(1));
+    check_get(example,"/c%d", cust_json(2));
+    check_get(example,"/e^f", cust_json(3));
+    check_get(example,"/g|h", cust_json(4));
+    check_get(example,"/i\\j", cust_json(5));
+    check_get(example,"/k\"l", cust_json(6));
+    check_get(example,"/ ", cust_json(7));
+    check_get(example,"/m~0n", cust_json(8));
 }
 #endif
 

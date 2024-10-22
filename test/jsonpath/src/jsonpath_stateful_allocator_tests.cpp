@@ -19,7 +19,7 @@ using namespace jsoncons;
 template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
-using custom_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
+using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
 
 TEST_CASE("jsonpath stateful allocator test")
 {
@@ -49,17 +49,17 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("make_expression")
     {
-        json_decoder<custom_json> decoder(MyScopedAllocator<char>(1));
+        json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
 
         basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
 
         jsoncons::string_view p{"$..book[?(@.category == 'fiction')].title"};
-        auto expr = jsoncons::jsonpath::make_expression<custom_json>(combine_allocators(myAlloc), p);  
+        auto expr = jsoncons::jsonpath::make_expression<cust_json>(combine_allocators(myAlloc), p);  
         auto result = expr.evaluate(j);
 
         CHECK(result.size() == 2);
@@ -68,7 +68,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 1")
     {
-        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
@@ -76,7 +76,7 @@ TEST_CASE("jsonpath stateful allocator test")
         basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
 
         auto result = jsoncons::jsonpath::json_query(combine_allocators(myAlloc), 
             j,"$..book[?(@.category == 'fiction')].title");
@@ -87,7 +87,7 @@ TEST_CASE("jsonpath stateful allocator test")
     }
     SECTION("json_query 2")
     {
-        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
@@ -95,11 +95,11 @@ TEST_CASE("jsonpath stateful allocator test")
         basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
 
         jsonpath::json_query(combine_allocators(myAlloc), 
             j, "$..book[?(@.title == 'Sword of Honour')].title", 
-            [](const jsoncons::string_view&, const custom_json& title) 
+            [](const jsoncons::string_view&, const cust_json& title) 
             {
                 CHECK((title.as<jsoncons::string_view>() == "Sword of Honour")); 
             }
@@ -108,14 +108,14 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 1")
     {
-        json_decoder<custom_json> decoder(MyScopedAllocator<char>(1));
+        json_decoder<cust_json> decoder(MyScopedAllocator<char>(1));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
 
         basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
 
         auto res = jsonpath::json_query(combine_allocators(myAlloc), j, "$..book[?(@.price==12.99)].price");
 
@@ -131,7 +131,7 @@ TEST_CASE("jsonpath stateful allocator test")
 
     SECTION("json_replace 2")
     {
-        json_decoder<custom_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
+        json_decoder<cust_json,MyScopedAllocator<char>> decoder(MyScopedAllocator<char>(1),
                                                               MyScopedAllocator<char>(2));
 
         auto myAlloc = MyScopedAllocator<char>(3);        
@@ -139,12 +139,12 @@ TEST_CASE("jsonpath stateful allocator test")
         basic_json_reader<char,string_source<char>,MyScopedAllocator<char>> reader(input, decoder, myAlloc);
         reader.read();
 
-        custom_json j = decoder.get_result();
+        cust_json j = decoder.get_result();
 
         // make a discount on all books
         jsonpath::json_replace(combine_allocators(myAlloc),
             j, "$.store.book[*].price",
-            [](const jsoncons::string_view&, custom_json& price) 
+            [](const jsoncons::string_view&, cust_json& price) 
             {
                 price = std::round(price.as<double>() - 1.0); 
             }

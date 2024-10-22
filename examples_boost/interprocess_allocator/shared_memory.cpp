@@ -25,7 +25,7 @@ struct boost_sorted_policy
     using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using custom_json = basic_json<char,boost_sorted_policy,MyScopedAllocator>;
+using cust_json = basic_json<char,boost_sorted_policy,MyScopedAllocator>;
 
 int f1(int argc, char *argv[])
 {
@@ -46,10 +46,10 @@ int f1(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      custom_json* j = segment.construct<custom_json>("MyJson1")(json_array_arg, alloc);
+      cust_json* j = segment.construct<cust_json>("MyJson1")(json_array_arg, alloc);
       j->push_back(10);
 
-      custom_json o(json_object_arg, alloc);
+      cust_json o(json_object_arg, alloc);
       o.insert_or_assign("category", "reference");
       o.insert_or_assign("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
@@ -57,15 +57,15 @@ int f1(int argc, char *argv[])
 
       j->push_back(o);
 
-      //custom_json a = custom_json::array(2,custom_json(json_object_arg, semantic_tag::none, alloc),alloc);
+      //cust_json a = cust_json::array(2,cust_json(json_object_arg, semantic_tag::none, alloc),alloc);
       //a[0]["first"] = 1;
 
-      //custom_json a(json_array_arg, semantic_tag::none, alloc);
+      //cust_json a(json_array_arg, semantic_tag::none, alloc);
 
       //j->push_back(a);
 
-      std::pair<custom_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<custom_json>("MyJson1");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson1");
 
       std::cout << "Parent:" << std::endl;
       std::cout << pretty_print(*(res.first)) << std::endl;
@@ -76,7 +76,7 @@ int f1(int argc, char *argv[])
          return 1;
 
       //Check child has destroyed all objects
-      if (segment.find<custom_json>("MyJson1").first)
+      if (segment.find<cust_json>("MyJson1").first)
          return 1;
    }
    else{
@@ -84,8 +84,8 @@ int f1(int argc, char *argv[])
       boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
                                                          "MySharedMemory");
 
-      std::pair<custom_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<custom_json>("MyJson1");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson1");
 
       if (res.first != nullptr)
       {
@@ -98,7 +98,7 @@ int f1(int argc, char *argv[])
       }
 
       //We're done, delete all the objects
-      segment.destroy<custom_json>("MyJson1");
+      segment.destroy<cust_json>("MyJson1");
    }
    return 0;
 } 
@@ -124,16 +124,16 @@ int f2(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      custom_json* j = segment.construct<custom_json>("MyJson2")(custom_json(json_array_arg, semantic_tag::none, alloc));
+      cust_json* j = segment.construct<cust_json>("MyJson2")(cust_json(json_array_arg, semantic_tag::none, alloc));
       j->push_back(10);
       j->push_back(20);
       j->push_back(30);
-      j->push_back(custom_json(json_object_arg, semantic_tag::none, alloc));
-      j->push_back(custom_json(json_array_arg, semantic_tag::none, alloc));
+      j->push_back(cust_json(json_object_arg, semantic_tag::none, alloc));
+      j->push_back(cust_json(json_array_arg, semantic_tag::none, alloc));
       j->at(4).push_back(40);
 
-      std::pair<custom_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<custom_json>("MyJson2");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson2");
 
       std::cout << "Parent:" << std::endl;
       std::cout << pretty_print(*(res.first)) << std::endl;
@@ -144,7 +144,7 @@ int f2(int argc, char *argv[])
          return 1;
 
       //Check child has destroyed all objects
-      if (segment.find<custom_json>("MyJson2").first)
+      if (segment.find<cust_json>("MyJson2").first)
          return 1;
    }
    else{
@@ -152,8 +152,8 @@ int f2(int argc, char *argv[])
       boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
                                                          "MySharedMemory");
 
-      std::pair<custom_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<custom_json>("MyJson2");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson2");
 
       if (res.first != nullptr)
       {
@@ -166,7 +166,7 @@ int f2(int argc, char *argv[])
       }
 
       //We're done, delete all the objects
-      segment.destroy<custom_json>("MyJson2");
+      segment.destroy<cust_json>("MyJson2");
    }
    return 0;
 } 

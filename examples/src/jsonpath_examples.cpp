@@ -810,7 +810,7 @@ void custom_functions2()
 void make_expression_with_stateful_allocator()
 {
     using my_alloc = MyScopedAllocator<char>; // an allocator with a single-argument constructor
-    using custom_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
+    using cust_json = jsoncons::basic_json<char,jsoncons::sorted_policy,my_alloc>;
 
     std::string json_text = R"(
 {
@@ -846,19 +846,19 @@ void make_expression_with_stateful_allocator()
     auto alloc = my_alloc(1);        
 
     // until 0.171.0
-    // jsoncons::json_decoder<custom_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
+    // jsoncons::json_decoder<cust_json,my_alloc> decoder(jsoncons::result_allocator_arg, alloc, alloc);
 
     // since 0.171.0
-    jsoncons::json_decoder<custom_json,my_alloc> decoder(alloc, alloc);
+    jsoncons::json_decoder<cust_json,my_alloc> decoder(alloc, alloc);
 
     jsoncons::basic_json_reader<char,jsoncons::string_source<char>,my_alloc> reader(json_text, decoder, alloc);
     reader.read();
 
-    custom_json doc = decoder.get_result();
+    cust_json doc = decoder.get_result();
     std::cout << pretty_print(doc) << "\n\n";
 
     std::string_view p{"$.books[?(@.category == 'fiction')].title"};
-    auto expr = jsoncons::jsonpath::make_expression<custom_json>(jsoncons::combine_allocators(alloc), p);  
+    auto expr = jsoncons::jsonpath::make_expression<cust_json>(jsoncons::combine_allocators(alloc), p);  
     auto result = expr.evaluate(doc);
 
     std::cout << pretty_print(result) << "\n\n";

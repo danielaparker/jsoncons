@@ -19,8 +19,9 @@ namespace pmr {
 }
 ```
 
-A `basic_json` is a union type that can hold one of a number of possible data members, some of which require an allocator 
-(a long string, byte string, array, or object), and others which do not (an empty object, short string, number, boolean, or null). 
+A `basic_json` is a union type that can hold one of a number of possible data members, 
+some of which require an allocator (a long string, byte string, array, or object), 
+and others that do not (a scalar, i.e., an empty object, short string, number, boolean, or null). 
 The data member may be tagged with a [semantic_tag](semantic_tag.md) that provides additional information about its value.
 
 When assigned a new `basic_json` value, the old value is overwritten. The member data type of the new value may be different 

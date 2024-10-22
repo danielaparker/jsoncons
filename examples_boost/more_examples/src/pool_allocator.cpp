@@ -12,13 +12,13 @@
 
 using namespace jsoncons;
 
-using custom_json = basic_json<char,sorted_policy,boost::pool_allocator<char>>;
+using cust_json = basic_json<char,sorted_policy,boost::pool_allocator<char>>;
 
 void pool_allocator_examples()
 {
     std::cout << "pool_allocator examples\n\n";
 
-    jsoncons::json_decoder<custom_json,boost::pool_allocator<char>> decoder;
+    jsoncons::json_decoder<cust_json,boost::pool_allocator<char>> decoder;
 
     static std::string s("[1,2,3,4,5,6]");
     std::istringstream is(s);
@@ -26,7 +26,7 @@ void pool_allocator_examples()
     basic_json_reader<char,stream_source<char>,boost::pool_allocator<char>> reader(is,decoder); 
     reader.read();
 
-    custom_json j = decoder.get_result();
+    cust_json j = decoder.get_result();
 
     std::cout << j << std::endl;
 }
