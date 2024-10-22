@@ -58,7 +58,7 @@ Type                |Definition
     The allocator type may be a stateless allocator, a <a href=https://en.cppreference.com/w/cpp/memory/polymorphic_allocator>std::pmr::polymorphic_allocator</a>, 
 or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>std::scoped_allocator_adaptor</a>, see <a href=json/allocators.md>allocators</a>.
 Non-propagating stateful allocators, such as the <a href=https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction>Boost.Interprocess allocators</a>,
-must be wrapped by a `std::scoped_allocator_adaptor`.</td>
+must be wrapped by a <code>std::scoped_allocator_adaptor</code>.</td>
   </tr>
 </table>
 
