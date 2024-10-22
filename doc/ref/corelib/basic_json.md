@@ -54,10 +54,10 @@ Type                |Definition
   </tr>
   <tr>
     <td>Allocator</td>
-    <td>[Allocator](json/allocators.md) type for allocating internal storage for long strings, byte strings, arrays and objects.
-    The allocator type may be a stateless allocator, a [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator), 
-or a [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor), see [allocators](json/allocators.md).
-Non-propagating stateful allocators, such as the [Boost.Interprocess allocators](https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction),
+    <td>Allocator type for allocating internal storage for long strings, byte strings, arrays and objects.
+    The allocator type may be a stateless allocator, a <a href=https://en.cppreference.com/w/cpp/memory/polymorphic_allocator>std::pmr::polymorphic_allocator</a>, 
+or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>std::scoped_allocator_adaptor</a>, see <a href=json/allocators.md>allocators</a>.
+Non-propagating stateful allocators, such as the <a href=https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction>Boost.Interprocess allocators</a>,
 must be wrapped by a `std::scoped_allocator_adaptor`.</td>
   </tr>
 </table>
