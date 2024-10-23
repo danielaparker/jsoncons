@@ -20,9 +20,17 @@ namespace pmr {
 ```
 
 A `basic_json` is a union type that can hold one of a number of possible data members, 
-some of which require an allocator (a long string, byte string, array, or object), 
-and others that do not (a scalar, i.e., an empty object, short string, number, boolean, or null). 
-The data member may be tagged with a [semantic_tag](semantic_tag.md) that provides additional information about its value.
+some that require an allocator (a pointer to a long string, byte string, array, or object), 
+and others that do not (an empty object, short string, number, boolean, or null). 
+The data member may be tagged with a [semantic_tag](semantic_tag.md) that provides additional 
+information about its value. The sizeof a `basic_json` regardless of its template parameters 
+is 16 bytes.
+
+A `basic_json` is allocator-aware, and supports allocator propagation to allocator-aware arrays
+or objects. Every constructor has a version that accepts an allocator argument. 
+The allocator is used to allocate memory for a long string, byte string, array, or object,
+and it is retained in the long string, byte string, array, or object itself.   
+For other data members the allocator argument is ignored. 
 
 When assigned a new `basic_json` value, the old value is overwritten. The member data type of the new value may be different 
 from the old value. 
@@ -125,7 +133,8 @@ Member type                         |Definition
 </table>
 
     allocator_type get_allocator() const
-Returns the allocator associated with the basic_json value.
+For a long string, byte string, array, or object, returns the retained allocator used to allocate memory
+for that instance, otherwise attempts to return a default constructed allocator. 
 
 #### Ranges and Iterators
 
