@@ -29,7 +29,7 @@ is 16 bytes.
 A `basic_json` is allocator-aware, and supports allocator propagation to allocator-aware arrays
 or objects. Every constructor has a version that accepts an allocator argument. 
 The allocator is used to allocate memory for a long string, byte string, array, or object,
-and it is retained in the long string, byte string, array, or object itself.   
+and it is retained in the long string, byte string, array, or object itself.
 For other data members the allocator argument is ignored. 
 
 When assigned a new `basic_json` value, the old value is overwritten. The member data type of the new value may be different 
