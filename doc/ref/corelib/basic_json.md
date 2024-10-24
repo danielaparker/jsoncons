@@ -134,7 +134,7 @@ Member type                         |Definition
 
     allocator_type get_allocator() const
 For a long string, byte string, array, or object, returns the retained allocator used to allocate memory
-for that instance, otherwise attempts to return a default constructed allocator. 
+for their storage, otherwise attempts to return a default constructed allocator. 
 
 #### Ranges and Iterators
 
