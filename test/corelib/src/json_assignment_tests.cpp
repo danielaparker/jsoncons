@@ -264,7 +264,6 @@ TEST_CASE("json assignment with pmr allocator")
 
         j2 = std::move(j1);
         CHECK(j2.is_number());
-        std::cout << j1 << "\n";
         CHECK(j1.is_string());
         REQUIRE(&pool2 == j1.get_allocator().resource()); 
     }

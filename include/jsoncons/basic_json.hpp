@@ -711,7 +711,7 @@ namespace jsoncons {
                 return *this;
             }
 
-            long_string_storage& operator=(long_string_storage&& other)
+            long_string_storage& operator=(long_string_storage&& other) noexcept
             {
                 swap(other);
                 return *this;
@@ -722,7 +722,7 @@ namespace jsoncons {
                 heap_string_factory_type::destroy(ptr_);
             }
 
-            void swap(long_string_storage& other)
+            void swap(long_string_storage& other) noexcept
             {
                 using std::swap;
                 swap(ptr_, other.ptr_);
@@ -843,7 +843,7 @@ namespace jsoncons {
                 heap_string_factory_type::destroy(ptr_);
             }
 
-            void swap(byte_string_storage& other)
+            void swap(byte_string_storage& other) noexcept
             {
                 using std::swap;
                 swap(ptr_, other.ptr_);
@@ -1001,7 +1001,7 @@ namespace jsoncons {
                 return *this;
             }
 
-            void swap(array_storage& other)
+            void swap(array_storage& other) noexcept
             {
                 using std::swap;
                 swap(ptr_, other.ptr_);
@@ -1140,7 +1140,7 @@ namespace jsoncons {
                 return *this;
             }
 
-            void swap(object_storage& other)
+            void swap(object_storage& other) noexcept
             {
                 using std::swap;
                 swap(ptr_, other.ptr_);
@@ -1810,7 +1810,7 @@ namespace jsoncons {
                 evaluate().dump_pretty(std::forward<Args>(args)...);
             }
 
-            void swap(basic_json& other) 
+            void swap(basic_json& other) noexcept
             {
                 evaluate_with_default().swap(other);
             }
@@ -2054,22 +2054,22 @@ namespace jsoncons {
             construct<TypeR>(std::move(tmpR));
         }
 
-        void swap_l_r(identity<long_string_storage>,identity<long_string_storage>,basic_json& other)
+        void swap_l_r(identity<long_string_storage>,identity<long_string_storage>,basic_json& other) noexcept
         {
             cast<long_string_storage>().swap(other.cast<long_string_storage>());
         }
 
-        void swap_l_r(identity<byte_string_storage>,identity<byte_string_storage>,basic_json& other)
+        void swap_l_r(identity<byte_string_storage>,identity<byte_string_storage>,basic_json& other) noexcept
         {
             cast<byte_string_storage>().swap(other.cast<byte_string_storage>());
         }
 
-        void swap_l_r(identity<array_storage>,identity<array_storage>,basic_json& other)
+        void swap_l_r(identity<array_storage>,identity<array_storage>,basic_json& other) noexcept
         {
             cast<array_storage>().swap(other.cast<array_storage>());
         }
 
-        void swap_l_r(identity<object_storage>,identity<object_storage>,basic_json& other)
+        void swap_l_r(identity<object_storage>,identity<object_storage>,basic_json& other) noexcept
         {
             cast<object_storage>().swap(other.cast<object_storage>());
         }
@@ -2262,7 +2262,7 @@ namespace jsoncons {
             }
         }
 
-        void move_assignment(basic_json&& other)
+        void move_assignment(basic_json&& other) noexcept
         {
             if (is_scalar_storage(storage_kind()) && is_scalar_storage(other.storage_kind()))
             {
