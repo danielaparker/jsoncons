@@ -11,20 +11,20 @@ using namespace jsoncons;
 
 TEST_CASE("test json_storage_kind")
 {
-    SECTION("is_scalar_storage")
+    SECTION("is_trivial_storage")
     {
-        CHECK(is_scalar_storage(json_storage_kind::null));
-        CHECK(is_scalar_storage(json_storage_kind::boolean));
-        CHECK(is_scalar_storage(json_storage_kind::uint64));
-        CHECK(is_scalar_storage(json_storage_kind::int64));
-        CHECK(is_scalar_storage(json_storage_kind::half_float));
-        CHECK(is_scalar_storage(json_storage_kind::short_str));
-        CHECK(is_scalar_storage(json_storage_kind::empty_object));
-        CHECK(is_scalar_storage(json_storage_kind::const_json_pointer));
-        CHECK_FALSE(is_scalar_storage(json_storage_kind::long_str));
-        CHECK_FALSE(is_scalar_storage(json_storage_kind::byte_str));
-        CHECK_FALSE(is_scalar_storage(json_storage_kind::array));
-        CHECK_FALSE(is_scalar_storage(json_storage_kind::object));
+        CHECK(is_trivial_storage(json_storage_kind::null));
+        CHECK(is_trivial_storage(json_storage_kind::boolean));
+        CHECK(is_trivial_storage(json_storage_kind::uint64));
+        CHECK(is_trivial_storage(json_storage_kind::int64));
+        CHECK(is_trivial_storage(json_storage_kind::half_float));
+        CHECK(is_trivial_storage(json_storage_kind::short_str));
+        CHECK(is_trivial_storage(json_storage_kind::empty_object));
+        CHECK(is_trivial_storage(json_storage_kind::const_json_pointer));
+        CHECK_FALSE(is_trivial_storage(json_storage_kind::long_str));
+        CHECK_FALSE(is_trivial_storage(json_storage_kind::byte_str));
+        CHECK_FALSE(is_trivial_storage(json_storage_kind::array));
+        CHECK_FALSE(is_trivial_storage(json_storage_kind::object));
     }
     SECTION("is_string_storage")
     {

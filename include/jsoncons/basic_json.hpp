@@ -2100,7 +2100,7 @@ namespace jsoncons {
 
         void uninitialized_copy(const basic_json& other)
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2129,7 +2129,7 @@ namespace jsoncons {
 
         void uninitialized_copy_a(const basic_json& other, const Allocator& alloc)
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2158,7 +2158,7 @@ namespace jsoncons {
 
         void uninitialized_move(basic_json&& other) noexcept
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2194,7 +2194,7 @@ namespace jsoncons {
         void uninitialized_move_a(std::false_type /* stateful allocator */, 
             basic_json&& other, const Allocator& alloc) noexcept
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
@@ -2223,7 +2223,7 @@ namespace jsoncons {
 
         void copy_assignment(const basic_json& other)
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(other.storage_kind()))
             {
                 destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
@@ -2249,7 +2249,7 @@ namespace jsoncons {
                         break;
                 }
             }
-            else if (is_scalar_storage(storage_kind())) // rhs is not scalar storage
+            else if (is_trivial_storage(storage_kind())) // rhs is not scalar storage
             {
                 destroy();
                 uninitialized_copy(other);
@@ -2264,7 +2264,7 @@ namespace jsoncons {
 
         void move_assignment(basic_json&& other) noexcept
         {
-            if (is_scalar_storage(storage_kind()) && is_scalar_storage(other.storage_kind()))
+            if (is_trivial_storage(storage_kind()) && is_trivial_storage(other.storage_kind()))
             {
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }

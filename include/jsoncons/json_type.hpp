@@ -119,7 +119,7 @@ namespace jsoncons {
         return (uint8_t(storage_kind) & mask) == mask;
     }
 
-    inline bool is_scalar_storage(json_storage_kind storage_kind) noexcept
+    inline bool is_trivial_storage(json_storage_kind storage_kind) noexcept
     {
         static const uint8_t mask{ uint8_t(json_storage_kind::long_str) & uint8_t(json_storage_kind::byte_str) 
             & uint8_t(json_storage_kind::array) & uint8_t(json_storage_kind::object) };
