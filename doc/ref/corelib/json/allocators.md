@@ -23,7 +23,7 @@ For other data members the allocator argument is ignored.
 Json j1(std::move(j));
 ```
 
-copies the pointer or scalar value in `j` to `j1`, and changes the data member in `j` to `null`. For example: 
+initializes `j1` with the pointer or non-pointer value in `j`, and changes the value in `j` to `null`. For example: 
 
 ```
 char buffer[1024] = {};
@@ -49,9 +49,9 @@ j1 = std::move(j);
 ```
 
 swaps the two pointers. If `j` holds a pointer and `j1` holds a non-pointer value,
-move assignment copies `j`'s pointer to `j1` and changes `j`'s value to null.  
-If `j` holds a non-pointer and `j1` holds a pointer value,
-move assignment copies `j`'s value to `j1` and leaves `j` alone. For example:
+move assignment copies `j`'s pointer to `j1` and changes `j`'s value to null.
+If `j` holds a non-pointer and `j1` holds a pointer value, move assignment copies `j`'s 
+value to `j1` and leaves `j` alone. For example:
 
 ```cpp
 char buffer[1024];
