@@ -23,8 +23,8 @@ Json j1(j);
 ```
 
 constructs `j1` from `j`. If `j` is a long string, bytes string, array or object,
-copy construction uses allocator traits `select_on_container_copy_construction` to obtain
-an allocator (since 0.178.0) For example: 
+copy construction applies allocator traits `select_on_container_copy_construction` to
+the allocator from `j` (since 0.178.0) For example: 
 
 ```cpp
 char buffer[1024];
@@ -32,9 +32,11 @@ std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) }
 std::pmr::polymorphic_allocator<char> alloc(&pool);
 
 jsoncons::pmr::json j{ "String too long for short string", alloc };
+assert(j.is_string());
+assert(j.get_allocator() == alloc);
 
 jsoncons::pmr::json j1(j);
-assert(j1.is_string());
+assert(j1 == j);
 assert(j1.get_allocator() == std::allocator_traits<std::pmr::polymorphic_allocator<char>>::
     select_on_container_copy_construction(j.get_allocator()));
 assert(j1.get_allocator() == std::pmr::polymorphic_allocator<char>{}); // expected result for pmr allocators
