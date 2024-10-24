@@ -30,7 +30,8 @@ A `basic_json` is allocator-aware, and supports allocator propagation to allocat
 or objects. Every constructor has a version that accepts an allocator argument. 
 A long string, byte string, array or object contains a pointer to underlying storage,
 the allocator is used to allocate that storage, and it is retained in that storage.
-For other data members the allocator argument is ignored. 
+For other data members the allocator argument is ignored. For more about allocators,
+see <a href=json/allocators.md>Allocators</a>.
 
 When assigned a new `basic_json` value, the old value is overwritten. The member data type of the new value may be different 
 from the old value. 
@@ -66,7 +67,7 @@ Type                |Definition
     <td>Allocator</td>
     <td>Allocator type for allocating internal storage for long strings, byte strings, arrays and objects.
     The allocator type may be a stateless allocator, a <a href=https://en.cppreference.com/w/cpp/memory/polymorphic_allocator>std::pmr::polymorphic_allocator</a>, 
-or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>std::scoped_allocator_adaptor</a>, see <a href=json/allocators.md>allocators</a>.
+or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>std::scoped_allocator_adaptor</a>.
 Non-propagating stateful allocators, such as the <a href=https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction>Boost.Interprocess allocators</a>,
 must be wrapped by a <code>std::scoped_allocator_adaptor</code>.</td>
   </tr>
