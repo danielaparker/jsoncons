@@ -21,7 +21,7 @@ namespace pmr {
 
 A `basic_json` is a union type that can hold one of a number of possible data members, 
 some that require an allocator (a long string, byte string, array, or object), 
-and others that are trivially copyable that do not (an empty object, short string, number, boolean, or null). 
+and other trivially copyable ones that do not (an empty object, short string, number, boolean, or null). 
 The data member may be tagged with a [semantic_tag](semantic_tag.md) that provides additional 
 information about its value. The sizeof a `basic_json` regardless of its template parameters 
 is normally 16 bytes.
