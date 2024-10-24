@@ -42,16 +42,14 @@ assert(j.is_null());
 
 #### Move assignment
 
-If `j` and `j1` both hold pointers, `basic_json` move assignment 
+If either `j` or `j1` hold pointer values, `basic_json` move assignment 
 
 ```
 j1 = std::move(j);
 ```
 
-swaps the two pointers. If `j` holds a pointer and `j1` a non-pointer value,
-move assignment copies `j`'s pointer to `j1` and changes `j`'s value to null.
-If `j` holds a non-pointer and `j1` a pointer value, move assignment copies `j`'s 
-value to `j1` and leaves `j` alone. For example:
+swaps the two data member values. If both `j` and `j1` hold non-pointer values,
+move assignment copies `j`'s value to `j1` and leaves `j` unchanged. For example:
 
 ```cpp
 char buffer[1024];
@@ -68,5 +66,5 @@ assert(j1.is_number());
 j1 = std::move(j);
 assert(j1.is_string());
 assert(alloc == j1.get_allocator());
-assert(j.is_null());
+assert(j.is_number());
 ```

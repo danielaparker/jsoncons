@@ -2264,9 +2264,8 @@ namespace jsoncons {
 
         void move_assignment(basic_json&& other)
         {
-            if (is_scalar_storage(other.storage_kind()))
+            if (is_scalar_storage(storage_kind()) && is_scalar_storage(other.storage_kind()))
             {
-                destroy();
                 std::memcpy(static_cast<void*>(this), &other, sizeof(basic_json));
             }
             else
@@ -2280,8 +2279,7 @@ namespace jsoncons {
                         }
                         else
                         {
-                            destroy();
-                            uninitialized_move(std::move(other));
+                            swap(other);
                         }
                         break;
                     case json_storage_kind::byte_str:
@@ -2291,8 +2289,7 @@ namespace jsoncons {
                         }
                         else
                         {
-                            destroy();
-                            uninitialized_move(std::move(other));
+                            swap(other);
                         }
                         break;
                     case json_storage_kind::array:
@@ -2302,8 +2299,7 @@ namespace jsoncons {
                         }
                         else
                         {
-                            destroy();
-                            uninitialized_move(std::move(other));
+                            swap(other);
                         }
                         break;
                     case json_storage_kind::object:
@@ -2313,12 +2309,11 @@ namespace jsoncons {
                         }
                         else
                         {
-                            destroy();
-                            uninitialized_move(std::move(other));
+                            swap(other);
                         }
                         break;
                     default:
-                        JSONCONS_UNREACHABLE();
+                        swap(other);
                         break;
                 }
             }

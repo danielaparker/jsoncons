@@ -238,6 +238,37 @@ TEST_CASE("json assignment with pmr allocator")
         CHECK(j2.is_number());
     }
 
+    SECTION("long string to number move assignment")
+    {
+        jsoncons::pmr::json j1{10};
+
+        jsoncons::pmr::json j2{long_string2, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource()); 
+        auto it = std::search(buffer2, last2, long_string2, long_string2_end);
+        CHECK(it != last2);
+
+        j1 = std::move(j2);
+        REQUIRE(&pool2 == j1.get_allocator().resource()); 
+        CHECK(j1.as<std::string>() == long_string2);
+        CHECK(j2.is_number());
+    }
+
+    SECTION("number to long string move assignment")
+    {
+        jsoncons::pmr::json j1{10};
+
+        jsoncons::pmr::json j2{long_string2, alloc2};
+        REQUIRE(&pool2 == j2.get_allocator().resource()); 
+        auto it = std::search(buffer2, last2, long_string2, long_string2_end);
+        CHECK(it != last2);
+
+        j2 = std::move(j1);
+        CHECK(j2.is_number());
+        std::cout << j1 << "\n";
+        CHECK(j1.is_string());
+        REQUIRE(&pool2 == j1.get_allocator().resource()); 
+    }
+
     SECTION("object to array assignment")
     {
         jsoncons::pmr::json j1{jsoncons::json_array_arg, alloc1};
