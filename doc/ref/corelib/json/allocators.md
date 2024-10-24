@@ -48,9 +48,9 @@ If `j` and `j1` both hold pointers, `basic_json` move assignment
 j1 = std::move(j);
 ```
 
-swaps the two pointers. If `j` holds a pointer and `j1` holds a non-pointer value,
+swaps the two pointers. If `j` holds a pointer and `j1` a non-pointer value,
 move assignment copies `j`'s pointer to `j1` and changes `j`'s value to null.
-If `j` holds a non-pointer and `j1` holds a pointer value, move assignment copies `j`'s 
+If `j` holds a non-pointer and `j1` a pointer value, move assignment copies `j`'s 
 value to `j1` and leaves `j` alone. For example:
 
 ```cpp
