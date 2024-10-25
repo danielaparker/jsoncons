@@ -1001,17 +1001,24 @@ namespace jmespath {
 
                 string_type sep = arg0.template as<string_type>();
                 string_type buf;
-                for (auto& j : arg1.array_range())
+                bool is_first = true;
+                for (auto &j : arg1.array_range())
                 {
                     if (!j.is_string())
                     {
                         ec = jmespath_errc::invalid_type;
                         return resources.null_value();
                     }
-                    if (!buf.empty())
+
+                    if (is_first)
+                    {
+                        is_first = false;
+                    }
+                    else
                     {
                         buf.append(sep);
                     }
+                    
                     auto sv = j.template as<string_view_type>();
                     buf.append(sv.begin(), sv.end());
                 }
