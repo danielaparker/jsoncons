@@ -714,11 +714,6 @@ namespace jsoncons {
                 return *this;
             }
 
-            ~long_string_storage() noexcept
-            {
-                heap_string_factory_type::destroy(ptr_);
-            }
-
             void swap(long_string_storage& other) noexcept
             {
                 using std::swap;
@@ -832,11 +827,6 @@ namespace jsoncons {
                 return *this;
             }
 
-            ~byte_string_storage() noexcept
-            {
-                heap_string_factory_type::destroy(ptr_);
-            }
-
             void swap(byte_string_storage& other) noexcept
             {
                 using std::swap;
@@ -882,7 +872,6 @@ namespace jsoncons {
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-
             pointer ptr_;
 
             template <typename... Args>
@@ -959,14 +948,6 @@ namespace jsoncons {
                 else
                 {
                     create(array_allocator(alloc), *(other.ptr_));
-                }
-            }
-
-            ~array_storage() noexcept
-            {
-                if (ptr_ != nullptr)
-                {
-                    destroy();
                 }
             }
 
@@ -1096,14 +1077,6 @@ namespace jsoncons {
                 else
                 {
                     create(object_allocator(alloc), *(other.ptr_));
-                }
-            }
-
-            ~object_storage() noexcept
-            {
-                if (ptr_ != nullptr)
-                {
-                    destroy();
                 }
             }
 
@@ -1852,17 +1825,29 @@ namespace jsoncons {
             switch (storage_kind())
             {
                 case json_storage_kind::long_str:
-                    destroy_var<long_string_storage>();
+                {
+                    long_string_storage::heap_string_factory_type::destroy(cast<long_string_storage>().ptr_);
                     break;
+                }
                 case json_storage_kind::byte_str:
-                    destroy_var<byte_string_storage>();
+                    byte_string_storage::heap_string_factory_type::destroy(cast<byte_string_storage>().ptr_);
                     break;
                 case json_storage_kind::array:
-                    destroy_var<array_storage>();
+                {
+                    auto& storage = cast<array_storage>();
+                    typename array_storage::array_allocator alloc{storage.ptr_->get_allocator()};
+                    std::allocator_traits<array_storage::array_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                    std::allocator_traits<array_storage::array_allocator>::deallocate(alloc, storage.ptr_,1);
                     break;
+                }
                 case json_storage_kind::object:
-                    destroy_var<object_storage>();
+                {
+                    auto& storage = cast<object_storage>();
+                    typename object_storage::object_allocator alloc{storage.ptr_->get_allocator()};
+                    std::allocator_traits<object_storage::object_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                    std::allocator_traits<object_storage::object_allocator>::deallocate(alloc, storage.ptr_,1);
                     break;
+                }
                 default:
                     break;
             }
@@ -1872,12 +1857,6 @@ namespace jsoncons {
         void construct(Args&&... args)
         {
             ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
-        }
-
-        template <typename T>
-        void destroy_var()
-        {
-            cast<T>().~T();
         }
 
         template <typename T>
