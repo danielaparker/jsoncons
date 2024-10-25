@@ -636,18 +636,15 @@ namespace jsoncons {
         };
 
         // long_string_storage
-        class long_string_storage final
+        struct long_string_storage
         {
-        public:
-            uint8_t storage_kind_:4;
-            uint8_t short_str_length_:4;
-            semantic_tag tag_;
-        private:
             using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,allocator_type>;
             using pointer = typename heap_string_factory_type::pointer;
 
+            uint8_t storage_kind_:4;
+            uint8_t short_str_length_:4;
+            semantic_tag tag_;
             pointer ptr_;
-        public:
 
             long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const allocator_type& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag)
@@ -756,18 +753,15 @@ namespace jsoncons {
         };
 
         // byte_string_storage
-        class byte_string_storage final
+        struct byte_string_storage 
         {
-        public:
-            uint8_t storage_kind_:4;
-            uint8_t short_str_length_:4;
-            semantic_tag tag_;
-        private:
             using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,allocator_type>;
             using pointer = typename heap_string_factory_type::pointer;
 
+            uint8_t storage_kind_:4;
+            uint8_t short_str_length_:4;
+            semantic_tag tag_;
             pointer ptr_;
-        public:
 
             byte_string_storage(const uint8_t* data, std::size_t length, semantic_tag tag, uint64_t ext_tag, const allocator_type& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag)
@@ -880,16 +874,14 @@ namespace jsoncons {
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-        // array_storage
-        class array_storage final
+        struct array_storage
         {
-        public:
+            using array_allocator = typename std::allocator_traits<allocator_type>:: template rebind_alloc<array>;
+            using pointer = typename std::allocator_traits<array_allocator>::pointer;
+
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
-            using array_allocator = typename std::allocator_traits<allocator_type>:: template rebind_alloc<array>;
-            using pointer = typename std::allocator_traits<array_allocator>::pointer;
 
             pointer ptr_;
 
@@ -1030,16 +1022,14 @@ namespace jsoncons {
         };
 
         // object_storage
-        class object_storage final
+        struct object_storage
         {
-        public:
-            uint8_t storage_kind_:4;
-            uint8_t short_str_length_:4;
-            semantic_tag tag_;
-        private:
             using object_allocator = typename std::allocator_traits<allocator_type>:: template rebind_alloc<object>;
             using pointer = typename std::allocator_traits<object_allocator>::pointer;
 
+            uint8_t storage_kind_:4;
+            uint8_t short_str_length_:4;
+            semantic_tag tag_;
             pointer ptr_;
 
             template <typename... Args>
@@ -1169,7 +1159,6 @@ namespace jsoncons {
                 JSONCONS_ASSERT(ptr_ != nullptr);
                 return ptr_->get_allocator();
             }
-        private:
 
             void destroy() noexcept
             {
