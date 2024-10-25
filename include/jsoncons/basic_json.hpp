@@ -2737,25 +2737,34 @@ namespace jsoncons {
             {
                 return;
             }
-
-            switch (storage_kind())
+            if (is_trivial_storage(storage_kind()) && is_trivial_storage(other.storage_kind()))
             {
-                case json_storage_kind::null: swap_l<null_storage>(other); break;
-                case json_storage_kind::empty_object : swap_l<empty_object_storage>(other); break;
-                case json_storage_kind::boolean: swap_l<bool_storage>(other); break;
-                case json_storage_kind::int64: swap_l<int64_storage>(other); break;
-                case json_storage_kind::uint64: swap_l<uint64_storage>(other); break;
-                case json_storage_kind::half_float: swap_l<half_storage>(other); break;
-                case json_storage_kind::float64: swap_l<double_storage>(other); break;
-                case json_storage_kind::short_str: swap_l<short_string_storage>(other); break;
-                case json_storage_kind::long_str: swap_l<long_string_storage>(other); break;
-                case json_storage_kind::byte_str: swap_l<byte_string_storage>(other); break;
-                case json_storage_kind::array: swap_l<array_storage>(other); break;
-                case json_storage_kind::object: swap_l<object_storage>(other); break;
-                case json_storage_kind::const_json_pointer: swap_l<json_const_pointer_storage>(other); break;
-                default:
-                    JSONCONS_UNREACHABLE();
-                    break;
+                basic_json temp;               
+                std::memcpy(static_cast<void*>(&temp), static_cast<void*>(&other), sizeof(basic_json));
+                std::memcpy(static_cast<void*>(&other), static_cast<void*>(this), sizeof(basic_json));
+                std::memcpy(static_cast<void*>(this), static_cast<void*>(&temp), sizeof(basic_json));
+            }
+            else
+            {
+                switch (storage_kind())
+                {
+                    case json_storage_kind::null: swap_l<null_storage>(other); break;
+                    case json_storage_kind::empty_object : swap_l<empty_object_storage>(other); break;
+                    case json_storage_kind::boolean: swap_l<bool_storage>(other); break;
+                    case json_storage_kind::int64: swap_l<int64_storage>(other); break;
+                    case json_storage_kind::uint64: swap_l<uint64_storage>(other); break;
+                    case json_storage_kind::half_float: swap_l<half_storage>(other); break;
+                    case json_storage_kind::float64: swap_l<double_storage>(other); break;
+                    case json_storage_kind::short_str: swap_l<short_string_storage>(other); break;
+                    case json_storage_kind::long_str: swap_l<long_string_storage>(other); break;
+                    case json_storage_kind::byte_str: swap_l<byte_string_storage>(other); break;
+                    case json_storage_kind::array: swap_l<array_storage>(other); break;
+                    case json_storage_kind::object: swap_l<object_storage>(other); break;
+                    case json_storage_kind::const_json_pointer: swap_l<json_const_pointer_storage>(other); break;
+                    default:
+                        JSONCONS_UNREACHABLE();
+                        break;
+                }
             }
         }
         // from string
