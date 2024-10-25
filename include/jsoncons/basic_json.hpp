@@ -638,7 +638,7 @@ namespace jsoncons {
         // long_string_storage
         struct long_string_storage
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,allocator_type>;
+            using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -646,7 +646,7 @@ namespace jsoncons {
             semantic_tag tag_;
             pointer ptr_;
 
-            long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const allocator_type& alloc)
+            long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag)
             {
                 ptr_ = heap_string_factory_type::create(data, length, null_type(), alloc);
@@ -655,10 +655,10 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
             {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), 
-                    std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()));
+                    std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()));
             }
 
-            long_string_storage(const long_string_storage& other, const allocator_type& alloc)
+            long_string_storage(const long_string_storage& other, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
             {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
@@ -673,7 +673,7 @@ namespace jsoncons {
                 other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
             }
 
-            long_string_storage(long_string_storage&& other, const allocator_type& alloc)
+            long_string_storage(long_string_storage&& other, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
             {
                 if (other.get_allocator() == alloc)
@@ -741,7 +741,7 @@ namespace jsoncons {
                 return ptr_->length();
             }
         
-            allocator_type get_allocator() const
+            Allocator get_allocator() const
             {
                 return ptr_->get_allocator();
             }
@@ -750,7 +750,7 @@ namespace jsoncons {
         // byte_string_storage
         struct byte_string_storage 
         {
-            using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,allocator_type>;
+            using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,Allocator>;
             using pointer = typename heap_string_factory_type::pointer;
 
             uint8_t storage_kind_:4;
@@ -758,7 +758,7 @@ namespace jsoncons {
             semantic_tag tag_;
             pointer ptr_;
 
-            byte_string_storage(const uint8_t* data, std::size_t length, semantic_tag tag, uint64_t ext_tag, const allocator_type& alloc)
+            byte_string_storage(const uint8_t* data, std::size_t length, semantic_tag tag, uint64_t ext_tag, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag)
             {
                 ptr_ = heap_string_factory_type::create(data, length, ext_tag, alloc);
@@ -768,10 +768,10 @@ namespace jsoncons {
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
             {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), 
-                    std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()));
+                    std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()));
             }
 
-            byte_string_storage(const byte_string_storage& other, const allocator_type& alloc)
+            byte_string_storage(const byte_string_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
             {
                 ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
@@ -786,7 +786,7 @@ namespace jsoncons {
                 other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
             }
 
-            byte_string_storage(byte_string_storage&& other, const allocator_type& alloc)
+            byte_string_storage(byte_string_storage&& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
             {
                 if (other.get_allocator() == alloc)
@@ -854,7 +854,7 @@ namespace jsoncons {
                 return ptr_->extra();
             }
 
-            allocator_type get_allocator() const
+            Allocator get_allocator() const
             {
                 return ptr_->get_allocator();
             }
@@ -866,8 +866,8 @@ namespace jsoncons {
 
         struct array_storage
         {
-            using array_allocator = typename std::allocator_traits<allocator_type>:: template rebind_alloc<array>;
-            using pointer = typename std::allocator_traits<array_allocator>::pointer;
+            using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<array>;
+            using pointer = typename std::allocator_traits<allocator_type>::pointer;
 
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
@@ -875,26 +875,19 @@ namespace jsoncons {
             pointer ptr_;
 
             template <typename... Args>
-            void create(array_allocator alloc, Args&& ... args)
+            void create(allocator_type alloc, Args&& ... args)
             {
-                ptr_ = std::allocator_traits<array_allocator>::allocate(alloc, 1);
+                ptr_ = std::allocator_traits<allocator_type>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
-                    std::allocator_traits<array_allocator>::construct(alloc, extension_traits::to_plain_pointer(ptr_), 
+                    std::allocator_traits<allocator_type>::construct(alloc, extension_traits::to_plain_pointer(ptr_), 
                         std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
-                    std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
+                    std::allocator_traits<allocator_type>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
-            }
-
-            void destroy() noexcept
-            {
-                array_allocator alloc(ptr_->get_allocator());
-                std::allocator_traits<array_allocator>::destroy(alloc, extension_traits::to_plain_pointer(ptr_));
-                std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
             }
         public:
             array_storage(const array& val, semantic_tag tag)
@@ -912,7 +905,7 @@ namespace jsoncons {
             array_storage(const array_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
+                create(std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
             }
 
             array_storage(array_storage&& other) noexcept
@@ -927,13 +920,13 @@ namespace jsoncons {
                 other.tag_ = semantic_tag::none;
             }
 
-            array_storage(const array_storage& other, const allocator_type& alloc)
+            array_storage(const array_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(array_allocator(alloc), *(other.ptr_));
+                create(allocator_type(alloc), *(other.ptr_));
             }
 
-            array_storage(array_storage&& other, const allocator_type& alloc)
+            array_storage(array_storage&& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 if (other.get_allocator() == alloc)
@@ -947,7 +940,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(array_allocator(alloc), *(other.ptr_));
+                    create(allocator_type(alloc), *(other.ptr_));
                 }
             }
 
@@ -986,7 +979,7 @@ namespace jsoncons {
                 return tag_;
             }
 
-            allocator_type get_allocator() const
+            Allocator get_allocator() const
             {
                 return ptr_->get_allocator();
             }
@@ -1005,8 +998,8 @@ namespace jsoncons {
         // object_storage
         struct object_storage
         {
-            using object_allocator = typename std::allocator_traits<allocator_type>:: template rebind_alloc<object>;
-            using pointer = typename std::allocator_traits<object_allocator>::pointer;
+            using allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<object>;
+            using pointer = typename std::allocator_traits<allocator_type>::pointer;
 
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
@@ -1014,16 +1007,16 @@ namespace jsoncons {
             pointer ptr_;
 
             template <typename... Args>
-            void create(object_allocator alloc, Args&& ... args)
+            void create(allocator_type alloc, Args&& ... args)
             {
-                ptr_ = std::allocator_traits<object_allocator>::allocate(alloc, 1);
+                ptr_ = std::allocator_traits<allocator_type>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
-                    std::allocator_traits<object_allocator>::construct(alloc, extension_traits::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<allocator_type>::construct(alloc, extension_traits::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
-                    std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
+                    std::allocator_traits<allocator_type>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -1043,13 +1036,13 @@ namespace jsoncons {
             explicit object_storage(const object_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
+                create(std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
             }
 
-            object_storage(const object_storage& other, const allocator_type& alloc)
+            object_storage(const object_storage& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
-                create(object_allocator(alloc), *(other.ptr_));
+                create(allocator_type(alloc), *(other.ptr_));
             }
 
             explicit object_storage(object_storage&& other) noexcept
@@ -1063,7 +1056,7 @@ namespace jsoncons {
                 other.tag_ = semantic_tag::none;
             }
 
-            object_storage(object_storage&& other, const allocator_type& alloc)
+            object_storage(object_storage&& other, const Allocator& alloc)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
             {
                 if (other.get_allocator() == alloc)
@@ -1076,7 +1069,7 @@ namespace jsoncons {
                 }
                 else
                 {
-                    create(object_allocator(alloc), *(other.ptr_));
+                    create(allocator_type(alloc), *(other.ptr_));
                 }
             }
 
@@ -1127,17 +1120,10 @@ namespace jsoncons {
                 return *ptr_;
             }
 
-            allocator_type get_allocator() const
+            Allocator get_allocator() const
             {
                 JSONCONS_ASSERT(ptr_ != nullptr);
                 return ptr_->get_allocator();
-            }
-
-            void destroy() noexcept
-            {
-                object_allocator alloc(ptr_->get_allocator());
-                std::allocator_traits<object_allocator>::destroy(alloc, extension_traits::to_plain_pointer(ptr_));
-                std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
             }
         };
 #if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
@@ -1826,26 +1812,38 @@ namespace jsoncons {
             {
                 case json_storage_kind::long_str:
                 {
-                    long_string_storage::heap_string_factory_type::destroy(cast<long_string_storage>().ptr_);
+                    if (cast<long_string_storage>().ptr_ != nullptr)
+                    {
+                        long_string_storage::heap_string_factory_type::destroy(cast<long_string_storage>().ptr_);
+                    }
                     break;
                 }
                 case json_storage_kind::byte_str:
-                    byte_string_storage::heap_string_factory_type::destroy(cast<byte_string_storage>().ptr_);
+                    if (cast<byte_string_storage>().ptr_ != nullptr)
+                    {
+                        byte_string_storage::heap_string_factory_type::destroy(cast<byte_string_storage>().ptr_);
+                    }
                     break;
                 case json_storage_kind::array:
                 {
-                    auto& storage = cast<array_storage>();
-                    typename array_storage::array_allocator alloc{storage.ptr_->get_allocator()};
-                    std::allocator_traits<typename array_storage::array_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
-                    std::allocator_traits<typename array_storage::array_allocator>::deallocate(alloc, storage.ptr_,1);
+                    if (cast<array_storage>().ptr_ != nullptr)
+                    {
+                        auto& storage = cast<array_storage>();
+                        typename array_storage::allocator_type alloc{storage.ptr_->get_allocator()};
+                        std::allocator_traits<typename array_storage::allocator_type>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                        std::allocator_traits<typename array_storage::allocator_type>::deallocate(alloc, storage.ptr_,1);
+                    }
                     break;
                 }
                 case json_storage_kind::object:
                 {
-                    auto& storage = cast<object_storage>();
-                    typename object_storage::object_allocator alloc{storage.ptr_->get_allocator()};
-                    std::allocator_traits<typename object_storage::object_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
-                    std::allocator_traits<typename object_storage::object_allocator>::deallocate(alloc, storage.ptr_,1);
+                    if (cast<object_storage>().ptr_ != nullptr)
+                    {
+                        auto& storage = cast<object_storage>();
+                        typename object_storage::allocator_type alloc{storage.ptr_->get_allocator()};
+                        std::allocator_traits<typename object_storage::allocator_type>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                        std::allocator_traits<typename object_storage::allocator_type>::deallocate(alloc, storage.ptr_,1);
+                    }
                     break;
                 }
                 default:
