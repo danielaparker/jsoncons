@@ -1836,16 +1836,16 @@ namespace jsoncons {
                 {
                     auto& storage = cast<array_storage>();
                     typename array_storage::array_allocator alloc{storage.ptr_->get_allocator()};
-                    std::allocator_traits<array_storage::array_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
-                    std::allocator_traits<array_storage::array_allocator>::deallocate(alloc, storage.ptr_,1);
+                    std::allocator_traits<typename array_storage::array_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                    std::allocator_traits<typename array_storage::array_allocator>::deallocate(alloc, storage.ptr_,1);
                     break;
                 }
                 case json_storage_kind::object:
                 {
                     auto& storage = cast<object_storage>();
                     typename object_storage::object_allocator alloc{storage.ptr_->get_allocator()};
-                    std::allocator_traits<object_storage::object_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
-                    std::allocator_traits<object_storage::object_allocator>::deallocate(alloc, storage.ptr_,1);
+                    std::allocator_traits<typename object_storage::object_allocator>::destroy(alloc, extension_traits::to_plain_pointer(storage.ptr_));
+                    std::allocator_traits<typename object_storage::object_allocator>::deallocate(alloc, storage.ptr_,1);
                     break;
                 }
                 default:
