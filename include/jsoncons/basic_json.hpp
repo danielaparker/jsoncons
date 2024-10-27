@@ -447,17 +447,15 @@ namespace jsoncons {
         static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
     public:
-        class common_storage final
+        struct common_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
         };
 
-        class null_storage final
+        struct null_storage 
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
@@ -468,9 +466,8 @@ namespace jsoncons {
             }
         };
 
-        class empty_object_storage final
+        struct empty_object_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
@@ -481,15 +478,13 @@ namespace jsoncons {
             }
         };  
 
-        class bool_storage final
+        struct bool_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             bool val_;
-        public:
+
             bool_storage(bool val, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::boolean)), short_str_length_(0), tag_(tag),
                   val_(val)
@@ -503,15 +498,13 @@ namespace jsoncons {
 
         };
 
-        class int64_storage final
+        struct int64_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             int64_t val_;
-        public:
+
             int64_storage(int64_t val, 
                        semantic_tag tag = semantic_tag::none)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::int64)), short_str_length_(0), tag_(tag),
@@ -525,15 +518,13 @@ namespace jsoncons {
             }
         };
 
-        class uint64_storage final
+        struct uint64_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             uint64_t val_;
-        public:
+
             uint64_storage(uint64_t val, 
                         semantic_tag tag = semantic_tag::none)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::uint64)), short_str_length_(0), tag_(tag),
@@ -547,15 +538,13 @@ namespace jsoncons {
             }
         };
 
-        class half_storage final
+        struct half_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             uint16_t val_;
-        public:
+
             half_storage(uint16_t val, semantic_tag tag = semantic_tag::none)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::half_float)), short_str_length_(0), tag_(tag),
                   val_(val)
@@ -568,15 +557,13 @@ namespace jsoncons {
             }
         };
 
-        class double_storage final
+        struct double_storage
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             double val_;
-        public:
+
             double_storage(double val, 
                            semantic_tag tag = semantic_tag::none)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::float64)), short_str_length_(0), tag_(tag),
@@ -590,17 +577,15 @@ namespace jsoncons {
             }
         };
 
-        class short_string_storage final
+        struct short_string_storage
         {
-        public:
+            static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
+            static constexpr size_t max_length = capacity - 1;
+
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
-            static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
             char_type data_[capacity];
-        public:
-            static constexpr size_t max_length = capacity - 1;
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::short_str)), short_str_length_(length), tag_(tag)
@@ -889,7 +874,12 @@ namespace jsoncons {
                     JSONCONS_RETHROW;
                 }
             }
-        public:
+
+            array_storage(pointer ptr, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::array)), short_str_length_(0), tag_(tag), ptr_(ptr)
+            {
+            }
+
             array_storage(const array& val, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::array)), short_str_length_(0), tag_(tag), ptr_(nullptr)
             {
@@ -1020,7 +1010,7 @@ namespace jsoncons {
                     JSONCONS_RETHROW;
                 }
             }
-        public:
+
             object_storage(const object& val, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::object)), short_str_length_(0), tag_(tag), ptr_(nullptr)
             {
@@ -1131,15 +1121,13 @@ namespace jsoncons {
 #endif
 
     private:
-        class json_const_pointer_storage final
+        struct json_const_pointer_storage 
         {
-        public:
             uint8_t storage_kind_:4;
             uint8_t short_str_length_:4;
             semantic_tag tag_;
-        private:
             const basic_json* p_;
-        public:
+
             json_const_pointer_storage(const basic_json* p)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::const_json_pointer)), short_str_length_(0), tag_(p->tag()),
                   p_(p)
