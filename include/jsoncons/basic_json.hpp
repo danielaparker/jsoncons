@@ -860,6 +860,23 @@ namespace jsoncons {
             pointer ptr_;
 
             template <typename... Args>
+            static pointer create_ptr(allocator_type alloc, Args&& ... args)
+            {
+                auto ptr = std::allocator_traits<allocator_type>::allocate(alloc, 1);
+                JSONCONS_TRY
+                {
+                    std::allocator_traits<allocator_type>::construct(alloc, extension_traits::to_plain_pointer(ptr), 
+                        std::forward<Args>(args)...);
+                }
+                JSONCONS_CATCH(...)
+                {
+                    std::allocator_traits<allocator_type>::deallocate(alloc, ptr,1);
+                    JSONCONS_RETHROW;
+                }
+                return ptr;
+            }
+
+            template <typename... Args>
             void create(allocator_type alloc, Args&& ... args)
             {
                 ptr_ = std::allocator_traits<allocator_type>::allocate(alloc, 1);
@@ -2068,11 +2085,16 @@ namespace jsoncons {
                     case json_storage_kind::byte_str:
                         construct<byte_string_storage>(other.cast<byte_string_storage>());
                         break;
+                    case json_storage_kind::array:
+                    {
+                        auto ptr = array_storage::create_ptr(
+                            std::allocator_traits<Allocator>::select_on_container_copy_construction(other.cast<array_storage>().get_allocator()), 
+                            *(other.cast<array_storage>().ptr_));
+                        construct<array_storage>(ptr, other.tag());
+                        break;
+                    }
                     case json_storage_kind::object:
                         construct<object_storage>(other.cast<object_storage>());
-                        break;
-                    case json_storage_kind::array:
-                        construct<array_storage>(other.cast<array_storage>());
                         break;
                     default:
                         JSONCONS_UNREACHABLE();
@@ -2098,8 +2120,11 @@ namespace jsoncons {
                         construct<byte_string_storage>(other.cast<byte_string_storage>(),alloc);
                         break;
                     case json_storage_kind::array:
-                        construct<array_storage>(other.cast<array_storage>(),alloc);
-                        break;
+                        {
+                            auto ptr = array_storage::create_ptr(alloc, *(other.cast<array_storage>().ptr_));
+                            construct<array_storage>(ptr, other.tag());
+                            break;
+                        }
                     case json_storage_kind::object:
                         construct<object_storage>(other.cast<object_storage>(),alloc);
                         break;
