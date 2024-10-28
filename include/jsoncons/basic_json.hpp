@@ -631,6 +631,11 @@ namespace jsoncons {
             semantic_tag tag_;
             pointer ptr_;
 
+            long_string_storage(pointer ptr, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag), ptr_(ptr)
+            {
+            }
+
             long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag)
             {
@@ -742,6 +747,11 @@ namespace jsoncons {
             uint8_t short_str_length_:4;
             semantic_tag tag_;
             pointer ptr_;
+
+            byte_string_storage(pointer ptr, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag), ptr_(ptr)
+            {
+            }
 
             byte_string_storage(const uint8_t* data, std::size_t length, semantic_tag tag, uint64_t ext_tag, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag)
@@ -1009,6 +1019,11 @@ namespace jsoncons {
                     std::allocator_traits<allocator_type>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
+            }
+
+            object_storage(pointer ptr, semantic_tag tag)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::object)), short_str_length_(0), tag_(tag), ptr_(ptr)
+            {
             }
 
             object_storage(const object& val, semantic_tag tag)
@@ -2096,8 +2111,13 @@ namespace jsoncons {
                         break;
                     }
                     case json_storage_kind::object:
-                        construct<object_storage>(other.cast<object_storage>());
+                    {
+                        auto ptr = create_ptr<object_storage>(
+                            std::allocator_traits<Allocator>::select_on_container_copy_construction(other.cast<object_storage>().get_allocator()), 
+                            other.cast<object_storage>().value());
+                        construct<object_storage>(ptr, other.tag());
                         break;
+                    }
                     default:
                         JSONCONS_UNREACHABLE();
                         break;
@@ -2122,14 +2142,17 @@ namespace jsoncons {
                         construct<byte_string_storage>(other.cast<byte_string_storage>(),alloc);
                         break;
                     case json_storage_kind::array:
-                        {
-                            auto ptr = create_ptr<array_storage>(alloc, other.cast<array_storage>().value());
-                            construct<array_storage>(ptr, other.tag());
-                            break;
-                        }
-                    case json_storage_kind::object:
-                        construct<object_storage>(other.cast<object_storage>(),alloc);
+                    {
+                        auto ptr = create_ptr<array_storage>(alloc, other.cast<array_storage>().value());
+                        construct<array_storage>(ptr, other.tag());
                         break;
+                    }
+                    case json_storage_kind::object:
+                    {
+                        auto ptr = create_ptr<object_storage>(alloc, other.cast<object_storage>().value());
+                        construct<object_storage>(ptr, other.tag());
+                        break;
+                    }
                     default:
                         JSONCONS_UNREACHABLE();
                         break;
