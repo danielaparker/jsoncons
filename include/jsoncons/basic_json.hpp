@@ -646,31 +646,10 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
             }
-
-            void assign(const long_string_storage& other)
-            {
-                auto alloc = get_allocator();
-                tag_ = other.tag_;
-                heap_string_factory_type::destroy(ptr_);
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
-            }
-
-            void assign(long_string_storage&& other) noexcept
-            {
-                swap(other);
-            }
             
-            long_string_storage& operator=(const long_string_storage& other)
-            {
-                assign(other);
-                return *this;
-            }
+            long_string_storage& operator=(const long_string_storage& other) = delete;
 
-            long_string_storage& operator=(long_string_storage&& other) noexcept
-            {
-                swap(other);
-                return *this;
-            }
+            long_string_storage& operator=(long_string_storage&& other) noexcept = delete;
 
             void swap(long_string_storage& other) noexcept
             {
@@ -732,30 +711,9 @@ namespace jsoncons {
             {
             }
 
-            void assign(const byte_string_storage& other)
-            {
-                auto alloc = get_allocator();
-                tag_ = other.tag_;
-                heap_string_factory_type::destroy(ptr_);
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
-            }
+            byte_string_storage& operator=(const byte_string_storage& other) = delete;
 
-            void assign(byte_string_storage&& other) noexcept
-            {
-                swap(other);
-            }
-
-            byte_string_storage& operator=(const byte_string_storage& other)
-            {
-                assign(other);
-                return *this;
-            }
-
-            byte_string_storage& operator=(byte_string_storage&& other) noexcept
-            {
-                swap(other);
-                return *this;
-            }
+            byte_string_storage& operator=(byte_string_storage&& other) noexcept = delete;
 
             void swap(byte_string_storage& other) noexcept
             {
@@ -2113,11 +2071,19 @@ namespace jsoncons {
                 switch (other.storage_kind())
                 {
                     case json_storage_kind::long_str:
-                        cast<long_string_storage>().assign(other.cast<long_string_storage>());
+                    {
+                        auto alloc = cast<long_string_storage>().get_allocator();
+                        destroy();
+                        uninitialized_copy_a(other, alloc);
                         break;
+                    }
                     case json_storage_kind::byte_str:
-                        cast<byte_string_storage>().assign(other.cast<byte_string_storage>());
+                    {
+                        auto alloc = cast<byte_string_storage>().get_allocator();
+                        destroy();
+                        uninitialized_copy_a(other, alloc);
                         break;
+                    }
                     case json_storage_kind::array:
                         cast<array_storage>().assign(other.cast<array_storage>());
                         break;
@@ -2153,24 +2119,10 @@ namespace jsoncons {
                 switch (other.storage_kind())
                 {
                     case json_storage_kind::long_str:
-                        if (storage_kind() == json_storage_kind::long_str)
-                        {
-                            cast<long_string_storage>().assign(std::move(other.cast<long_string_storage>()));
-                        }
-                        else
-                        {
-                            swap(other);
-                        }
+                        swap(other);
                         break;
                     case json_storage_kind::byte_str:
-                        if (storage_kind() == json_storage_kind::byte_str)
-                        {
-                            cast<byte_string_storage>().assign(std::move(other.cast<byte_string_storage>()));
-                        }
-                        else
-                        {
-                            swap(other);
-                        }
+                        swap(other);
                         break;
                     case json_storage_kind::array:
                         if (storage_kind() == json_storage_kind::array)
