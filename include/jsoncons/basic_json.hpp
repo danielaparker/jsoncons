@@ -647,31 +647,6 @@ namespace jsoncons {
             {
             }
 
-            long_string_storage(long_string_storage&& other) noexcept
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
-            {
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-                other.tag_ = semantic_tag::none;
-                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-            }
-
-            long_string_storage(long_string_storage&& other, const Allocator& alloc)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-                    other.tag_ = semantic_tag::none;
-                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                }
-                else
-                {
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
-                }
-            }
-
             void assign(const long_string_storage& other)
             {
                 auto alloc = get_allocator();
@@ -755,31 +730,6 @@ namespace jsoncons {
             byte_string_storage(const byte_string_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-            }
-
-            byte_string_storage(byte_string_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
-            {
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-                other.tag_ = semantic_tag::none;
-                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-            }
-
-            byte_string_storage(byte_string_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-                    other.tag_ = semantic_tag::none;
-                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                }
-                else
-                {
-                    ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
-                }
             }
 
             void assign(const byte_string_storage& other)
@@ -891,36 +841,6 @@ namespace jsoncons {
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
             }
-             
-            array_storage(array_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_),
-                  ptr_(nullptr)
-            {
-                using std::swap;
-                swap(other.ptr_, ptr_);
-
-                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                other.short_str_length_ = 0;
-                other.tag_ = semantic_tag::none;
-            }
-
-            array_storage(array_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    // Transfer resources 
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-
-                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                    other.tag_ = semantic_tag::none;
-                }
-                else
-                {
-                    create(allocator_type(alloc), *(other.ptr_));
-                }
-            }
 
             void assign(const array_storage& other)
             {
@@ -1019,34 +939,6 @@ namespace jsoncons {
             explicit object_storage(const object_storage& other)
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-            }
-
-            explicit object_storage(object_storage&& other) noexcept
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_),
-                  ptr_(nullptr)
-            {
-                ptr_ = other.ptr_;
-                other.ptr_ = nullptr;
-                other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                other.short_str_length_ = 0;
-                other.tag_ = semantic_tag::none;
-            }
-
-            object_storage(object_storage&& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
-            {
-                if (other.get_allocator() == alloc)
-                {
-                    ptr_ = other.ptr_;
-                    other.ptr_ = nullptr;
-                    other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
-                    other.short_str_length_ = 0;
-                    other.tag_ = semantic_tag::none;
-                }
-                else
-                {
-                    create(allocator_type(alloc), *(other.ptr_));
-                }
             }
 
             void assign(const object_storage& other)
