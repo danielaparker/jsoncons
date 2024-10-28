@@ -860,23 +860,6 @@ namespace jsoncons {
             pointer ptr_;
 
             template <typename... Args>
-            static pointer create_ptr(allocator_type alloc, Args&& ... args)
-            {
-                auto ptr = std::allocator_traits<allocator_type>::allocate(alloc, 1);
-                JSONCONS_TRY
-                {
-                    std::allocator_traits<allocator_type>::construct(alloc, extension_traits::to_plain_pointer(ptr), 
-                        std::forward<Args>(args)...);
-                }
-                JSONCONS_CATCH(...)
-                {
-                    std::allocator_traits<allocator_type>::deallocate(alloc, ptr,1);
-                    JSONCONS_RETHROW;
-                }
-                return ptr;
-            }
-
-            template <typename... Args>
             void create(allocator_type alloc, Args&& ... args)
             {
                 ptr_ = std::allocator_traits<allocator_type>::allocate(alloc, 1);
@@ -1856,6 +1839,25 @@ namespace jsoncons {
             }
         }
 
+        template <typename StorageType, typename... Args>
+        typename StorageType::pointer create_ptr(const allocator_type& alloc, Args&& ... args)
+        {
+            using stor_allocator_type = typename StorageType::allocator_type;
+            stor_allocator_type stor_alloc(alloc);
+            auto ptr = std::allocator_traits<stor_allocator_type>::allocate(stor_alloc, 1);
+            JSONCONS_TRY
+            {
+                std::allocator_traits<stor_allocator_type>::construct(stor_alloc, extension_traits::to_plain_pointer(ptr), 
+                    std::forward<Args>(args)...);
+            }
+            JSONCONS_CATCH(...)
+            {
+                std::allocator_traits<stor_allocator_type>::deallocate(stor_alloc, ptr,1);
+                JSONCONS_RETHROW;
+            }
+            return ptr;
+        }
+
         template <typename VariantType,typename... Args>
         void construct(Args&&... args)
         {
@@ -2087,9 +2089,9 @@ namespace jsoncons {
                         break;
                     case json_storage_kind::array:
                     {
-                        auto ptr = array_storage::create_ptr(
+                        auto ptr = create_ptr<array_storage>(
                             std::allocator_traits<Allocator>::select_on_container_copy_construction(other.cast<array_storage>().get_allocator()), 
-                            *(other.cast<array_storage>().ptr_));
+                            other.cast<array_storage>().value());
                         construct<array_storage>(ptr, other.tag());
                         break;
                     }
@@ -2121,7 +2123,7 @@ namespace jsoncons {
                         break;
                     case json_storage_kind::array:
                         {
-                            auto ptr = array_storage::create_ptr(alloc, *(other.cast<array_storage>().ptr_));
+                            auto ptr = create_ptr<array_storage>(alloc, other.cast<array_storage>().value());
                             construct<array_storage>(ptr, other.tag());
                             break;
                         }
@@ -3123,7 +3125,7 @@ namespace jsoncons {
         explicit basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
         {
             //construct<array_storage>(array(alloc), semantic_tag::none);
-            auto ptr = array_storage::create_ptr(alloc);
+            auto ptr = create_ptr<array_storage>(alloc);
             construct<array_storage>(ptr, semantic_tag::none);
         }
 
@@ -3131,8 +3133,7 @@ namespace jsoncons {
                             semantic_tag tag, 
                             const Allocator& alloc = Allocator()) 
         {
-            //construct<array_storage>(array(alloc), tag);
-            auto ptr = array_storage::create_ptr(alloc);
+            auto ptr = create_ptr<array_storage>(alloc);
             construct<array_storage>(ptr, tag);
         }
 
