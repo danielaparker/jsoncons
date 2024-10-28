@@ -13,6 +13,7 @@ run_examples_vc140x64.cmd
 UNIX
 
 From the examples/build/cmake directory
+include Config.cmake and Linux.cmake as CMakeLists.txt expects it.
 
 mkdir -p debug
 cd debug
