@@ -6,13 +6,13 @@
 cmake_minimum_required (VERSION 2.8)
 
 # load global config
-include (../../../build/cmake/config.cmake)
+include (../../build/cmake/Config.cmake)
 
 
 project (Examples CXX)
 
 # load per-platform configuration
-include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
+include (../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 include_directories (../../include
                      ../../../include)
