@@ -641,17 +641,10 @@ namespace jsoncons {
             {
                 ptr_ = heap_string_factory_type::create(data, length, null_type(), alloc);
             }
-            long_string_storage(const long_string_storage& other)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
-            {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), 
-                    std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()));
-            }
 
-            long_string_storage(const long_string_storage& other, const Allocator& alloc)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_)
+            long_string_storage(const long_string_storage& other)
+                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), null_type(), alloc);
             }
 
             long_string_storage(long_string_storage&& other) noexcept
@@ -760,16 +753,8 @@ namespace jsoncons {
             }
 
             byte_string_storage(const byte_string_storage& other)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
+                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), 
-                    std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()));
-            }
-
-            byte_string_storage(const byte_string_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_)
-            {
-                ptr_ = heap_string_factory_type::create(other.data(), other.length(), other.ext_tag(), alloc);
             }
 
             byte_string_storage(byte_string_storage&& other) noexcept
@@ -903,11 +888,10 @@ namespace jsoncons {
             }
 
             array_storage(const array_storage& other)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
+                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-                create(std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
             }
-
+             
             array_storage(array_storage&& other) noexcept
                 : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_),
                   ptr_(nullptr)
@@ -918,12 +902,6 @@ namespace jsoncons {
                 other.storage_kind_ = static_cast<uint8_t>(json_storage_kind::null);
                 other.short_str_length_ = 0;
                 other.tag_ = semantic_tag::none;
-            }
-
-            array_storage(const array_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
-            {
-                create(allocator_type(alloc), *(other.ptr_));
             }
 
             array_storage(array_storage&& other, const Allocator& alloc)
@@ -1039,15 +1017,8 @@ namespace jsoncons {
             }
 
             explicit object_storage(const object_storage& other)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
+                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
-                create(std::allocator_traits<Allocator>::select_on_container_copy_construction(other.get_allocator()), *(other.ptr_));
-            }
-
-            object_storage(const object_storage& other, const Allocator& alloc)
-                : storage_kind_(other.storage_kind_), short_str_length_(0), tag_(other.tag_), ptr_(nullptr)
-            {
-                create(allocator_type(alloc), *(other.ptr_));
             }
 
             explicit object_storage(object_storage&& other) noexcept
@@ -2065,33 +2036,9 @@ namespace jsoncons {
         template <typename TypeL,typename TypeR>
         void swap_l_r(identity<TypeL>,identity<TypeR>,basic_json& other)
         {
-            TypeR tmpR(std::move(other.cast<TypeR>())); 
-
-            other.destroy();
-            other.construct<TypeL>(std::move(cast<TypeL>()));
-
-            destroy();
-            construct<TypeR>(std::move(tmpR));
-        }
-
-        void swap_l_r(identity<long_string_storage>,identity<long_string_storage>,basic_json& other) noexcept
-        {
-            cast<long_string_storage>().swap(other.cast<long_string_storage>());
-        }
-
-        void swap_l_r(identity<byte_string_storage>,identity<byte_string_storage>,basic_json& other) noexcept
-        {
-            cast<byte_string_storage>().swap(other.cast<byte_string_storage>());
-        }
-
-        void swap_l_r(identity<array_storage>,identity<array_storage>,basic_json& other) noexcept
-        {
-            cast<array_storage>().swap(other.cast<array_storage>());
-        }
-
-        void swap_l_r(identity<object_storage>,identity<object_storage>,basic_json& other) noexcept
-        {
-            cast<object_storage>().swap(other.cast<object_storage>());
+            TypeR temp{other.cast<TypeR>()};
+            other.construct<TypeL>(cast<TypeL>());
+            construct<TypeR>(temp);
         }
 
         template <typename TypeL>
@@ -2178,11 +2125,19 @@ namespace jsoncons {
                 switch (other.storage_kind())
                 {
                     case json_storage_kind::long_str:
-                        construct<long_string_storage>(other.cast<long_string_storage>(),alloc);
+                    {
+                        const auto& storage = other.cast<long_string_storage>();
+                        auto ptr = make_long_string(alloc, storage.data(), storage.length());
+                        construct<long_string_storage>(ptr, other.tag());
                         break;
+                    }
                     case json_storage_kind::byte_str:
-                        construct<byte_string_storage>(other.cast<byte_string_storage>(),alloc);
+                    {
+                        const auto& storage = other.cast<byte_string_storage>();
+                        auto ptr = make_byte_string(alloc, storage.data(), storage.length(), storage.ext_tag());
+                        construct<byte_string_storage>(ptr, other.tag());
                         break;
+                    }
                     case json_storage_kind::array:
                     {
                         auto ptr = create_array(alloc, other.cast<array_storage>().value());
