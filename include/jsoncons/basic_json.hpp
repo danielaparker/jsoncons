@@ -3122,14 +3122,18 @@ namespace jsoncons {
 
         explicit basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
         {
-            construct<array_storage>(array(alloc), semantic_tag::none);
+            //construct<array_storage>(array(alloc), semantic_tag::none);
+            auto ptr = array_storage::create_ptr(alloc);
+            construct<array_storage>(ptr, semantic_tag::none);
         }
 
         explicit basic_json(json_array_arg_t, 
                             semantic_tag tag, 
                             const Allocator& alloc = Allocator()) 
         {
-            construct<array_storage>(array(alloc), tag);
+            //construct<array_storage>(array(alloc), tag);
+            auto ptr = array_storage::create_ptr(alloc);
+            construct<array_storage>(ptr, tag);
         }
 
         template <typename InputIt>
