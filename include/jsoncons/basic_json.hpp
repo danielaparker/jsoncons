@@ -3125,7 +3125,9 @@ namespace jsoncons {
 
         explicit basic_json(json_object_arg_t, const Allocator& alloc = Allocator()) 
         {
-            construct<object_storage>(object(alloc), semantic_tag::none);
+            //construct<object_storage>(object(alloc), semantic_tag::none);
+            auto ptr = create_ptr<object_storage>(alloc);
+            construct<object_storage>(ptr, semantic_tag::none);
         }
 
         template <typename InputIt>
@@ -3134,7 +3136,9 @@ namespace jsoncons {
                    semantic_tag tag = semantic_tag::none,
                    const Allocator& alloc = Allocator()) 
         {
-            construct<object_storage>(object(first,last,alloc), tag);
+            //construct<object_storage>(object(first,last,alloc), tag);
+            auto ptr = create_ptr<object_storage>(alloc, first, last);
+            construct<object_storage>(ptr, tag);
         }
 
         basic_json(json_object_arg_t, 
@@ -3142,12 +3146,13 @@ namespace jsoncons {
                    semantic_tag tag = semantic_tag::none, 
                    const Allocator& alloc = Allocator()) 
         {
-            construct<object_storage>(object(init,alloc), tag);
+            //construct<object_storage>(object(init,alloc), tag);
+            auto ptr = create_ptr<object_storage>(alloc, init);
+            construct<object_storage>(ptr, tag);
         }
 
         explicit basic_json(json_array_arg_t, const Allocator& alloc = Allocator()) 
         {
-            //construct<array_storage>(array(alloc), semantic_tag::none);
             auto ptr = create_ptr<array_storage>(alloc);
             construct<array_storage>(ptr, semantic_tag::none);
         }
