@@ -649,15 +649,6 @@ namespace jsoncons {
             
             long_string_storage& operator=(const long_string_storage& other) = delete;
 
-            long_string_storage& operator=(long_string_storage&& other) noexcept = delete;
-
-            void swap(long_string_storage& other) noexcept
-            {
-                using std::swap;
-                swap(ptr_, other.ptr_);
-                swap(tag_, other.tag_);
-            }
-
             semantic_tag tag() const
             {
                 return tag_;
@@ -712,15 +703,6 @@ namespace jsoncons {
             }
 
             byte_string_storage& operator=(const byte_string_storage& other) = delete;
-
-            byte_string_storage& operator=(byte_string_storage&& other) noexcept = delete;
-
-            void swap(byte_string_storage& other) noexcept
-            {
-                using std::swap;
-                swap(ptr_, other.ptr_);
-                swap(tag_, other.tag_);
-            }
 
             semantic_tag tag() const
             {
@@ -806,29 +788,7 @@ namespace jsoncons {
                 *ptr_ = *(other.ptr_);
             }
 
-            void assign(array_storage&& other) noexcept
-            {
-                swap(other);
-            }
-
-            array_storage& operator=(const array_storage& other)
-            {
-                assign(other);
-                return *this;
-            }
-
-            array_storage& operator=(array_storage&& other) noexcept
-            {
-                swap(other);
-                return *this;
-            }
-
-            void swap(array_storage& other) noexcept
-            {
-                using std::swap;
-                swap(ptr_, other.ptr_);
-                swap(tag_, other.tag_);
-            }
+            array_storage& operator=(const array_storage& other) = delete;
 
             semantic_tag tag() const
             {
@@ -905,29 +865,7 @@ namespace jsoncons {
                 *ptr_ = *(other.ptr_);
             }
 
-            void assign(object_storage&& other) noexcept
-            {
-                swap(other);
-            }
-
-            object_storage& operator=(const object_storage& other)
-            {
-                assign(other);
-                return *this;
-            }
-
-            object_storage& operator=(object_storage&& other) noexcept
-            {
-                swap(other);
-                return *this;
-            }
-
-            void swap(object_storage& other) noexcept
-            {
-                using std::swap;
-                swap(ptr_, other.ptr_);
-                swap(tag_, other.tag_);
-            }
+            object_storage& operator=(const object_storage& other) = delete;
 
             semantic_tag tag() const
             {
@@ -2095,12 +2033,12 @@ namespace jsoncons {
                         break;
                 }
             }
-            else if (is_trivial_storage(storage_kind())) // rhs is not scalar storage
+            else if (is_trivial_storage(storage_kind())) // rhs is not trivial storage
             {
                 destroy();
                 uninitialized_copy(other);
             }
-            else // lhs and rhs are not scalar storage
+            else // lhs and rhs are not trivial storage
             {
                 auto alloc = get_allocator();
                 destroy();
@@ -2116,38 +2054,7 @@ namespace jsoncons {
             }
             else
             {
-                switch (other.storage_kind())
-                {
-                    case json_storage_kind::long_str:
-                        swap(other);
-                        break;
-                    case json_storage_kind::byte_str:
-                        swap(other);
-                        break;
-                    case json_storage_kind::array:
-                        if (storage_kind() == json_storage_kind::array)
-                        {
-                            cast<array_storage>().assign(std::move(other.cast<array_storage>()));
-                        }
-                        else
-                        {
-                            swap(other);
-                        }
-                        break;
-                    case json_storage_kind::object:
-                        if (storage_kind() == json_storage_kind::object)
-                        {
-                            cast<object_storage>().assign(std::move(other.cast<object_storage>()));
-                        }
-                        else
-                        {
-                            swap(other);
-                        }
-                        break;
-                    default:
-                        swap(other);
-                        break;
-                }
+                swap(other);
             }
         }
 
