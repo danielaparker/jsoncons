@@ -2168,16 +2168,20 @@ namespace jsoncons {
                 switch (other.storage_kind())
                 {
                     case json_storage_kind::long_str:
-                        construct<long_string_storage>(std::move(other.cast<long_string_storage>()));
+                        construct<long_string_storage>(other.cast<long_string_storage>());
+                        other.construct<null_storage>();
                         break;
                     case json_storage_kind::byte_str:
-                        construct<byte_string_storage>(std::move(other.cast<byte_string_storage>()));
+                        construct<byte_string_storage>(other.cast<byte_string_storage>());
+                        other.construct<null_storage>();
                         break;
                     case json_storage_kind::array:
-                        construct<array_storage>(std::move(other.cast<array_storage>()));
+                        construct<array_storage>(other.cast<array_storage>());
+                        other.construct<null_storage>();
                         break;
                     case json_storage_kind::object:
-                        construct<object_storage>(std::move(other.cast<object_storage>()));
+                        construct<object_storage>(other.cast<object_storage>());
+                        other.construct<null_storage>();
                         break;
                     default:
                         JSONCONS_UNREACHABLE();
@@ -2201,24 +2205,7 @@ namespace jsoncons {
             }
             else
             {
-                switch (other.storage_kind())
-                {
-                    case json_storage_kind::long_str:
-                        construct<long_string_storage>(std::move(other.cast<long_string_storage>()), alloc);
-                        break;
-                    case json_storage_kind::byte_str:
-                        construct<byte_string_storage>(std::move(other.cast<byte_string_storage>()), alloc);
-                        break;
-                    case json_storage_kind::array:
-                        construct<array_storage>(std::move(other.cast<array_storage>()), alloc);
-                        break;
-                    case json_storage_kind::object:
-                        construct<object_storage>(std::move(other.cast<object_storage>()), alloc);
-                        break;
-                    default:
-                        JSONCONS_UNREACHABLE();
-                        break;
-                }
+                uninitialized_copy_a(other, alloc);
             }
         }
 
