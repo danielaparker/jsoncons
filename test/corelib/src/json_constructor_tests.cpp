@@ -218,6 +218,10 @@ TEST_CASE("json constructor with scoped_allocator")
     cust_allocator alloc1(1);
     cust_allocator alloc2(2);
 
+    REQUIRE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_swap::value);
+    REQUIRE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_move_assignment::value);
+    REQUIRE_FALSE(std::allocator_traits<free_list_allocator<char>>::propagate_on_container_copy_assignment::value);
+
     const char* long_key1 = "Key too long for short string";
     const char* long_string1 = "String too long for short string";
     const char* long_string2 = "Another string too long for short string";
@@ -348,12 +352,12 @@ TEST_CASE("json constructor with scoped_allocator")
         cust_json j3{std::move(j2), alloc2};
         REQUIRE(alloc2 == j3.get_allocator()); 
     }        
-/*
+
     SECTION("iterator constructor")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
-        cust_json j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
+        /*cust_json j1{jsoncons::json_object_arg, m.begin(), m.end(), semantic_tag::none, alloc1};
         REQUIRE(alloc1 == j1.get_allocator());
         REQUIRE(j1.size() == 3);
         CHECK(j1.at("a") == 3);
@@ -364,9 +368,8 @@ TEST_CASE("json constructor with scoped_allocator")
         REQUIRE(alloc1 == j2.get_allocator()); 
 
         cust_json j3{std::move(j2), alloc2};
-        REQUIRE(alloc2 == j3.get_allocator()); 
+        REQUIRE(alloc2 == j3.get_allocator());*/ 
     }
-*/
 }
 
 #endif // scoped_allocator

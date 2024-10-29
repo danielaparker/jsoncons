@@ -2812,7 +2812,6 @@ namespace jsoncons {
                    semantic_tag tag = semantic_tag::none,
                    const Allocator& alloc = Allocator()) 
         {
-            //construct<object_storage>(object(first,last,alloc), tag);
             auto ptr = create_object(alloc, first, last);
             construct<object_storage>(ptr, tag);
         }

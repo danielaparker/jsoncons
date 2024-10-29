@@ -37,6 +37,7 @@ public:
     using value_type = T;
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
+    using propagate_on_container_swap = std::true_type;
     
     free_list_allocator(int id) noexcept 
         : id_(id) {}
