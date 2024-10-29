@@ -71,7 +71,7 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team
 
 [Get started with HealthImaging image sets and image frames using an AWS SDK](https://docs.aws.amazon.com/healthimaging/latest/devguide/example_medical-imaging_Scenario_ImageSetsAndFrames_section.html)
 
-[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;[rjsoncons](https://cran.rstudio.com/web/packages/rjsoncons/index.html)&nbsp;&nbsp;[coppeliarobotics](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
+[RubyGems.org](https://rubygems.org/gems/jsoncons/versions/0.1.3?locale=en)&nbsp;&nbsp;&nbsp;[rjsoncons](https://cran.rstudio.com/web/packages/rjsoncons/index.html)&nbsp;&nbsp;&nbsp;[coppeliarobotics](https://manual.coppeliarobotics.com/en/zmqRemoteApiOverview.htm)
 
 ## Get jsoncons
 
