@@ -587,7 +587,7 @@ namespace jsoncons {
             semantic_tag tag_;
             char_type data_[capacity];
 
-            short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
+            short_string_storage(const char_type* p, uint8_t length, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::short_str)), short_str_length_(length), tag_(tag)
             {
                 JSONCONS_ASSERT(length <= max_length);
@@ -635,13 +635,13 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag), ptr_(ptr)
             {
             }
-
+/*
             long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const Allocator& alloc)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag)
             {
                 ptr_ = heap_string_factory_type::create(data, length, null_type(), alloc);
             }
-
+*/
             long_string_storage(const long_string_storage& other)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {
@@ -689,12 +689,6 @@ namespace jsoncons {
             byte_string_storage(pointer ptr, semantic_tag tag)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag), ptr_(ptr)
             {
-            }
-
-            byte_string_storage(const uint8_t* data, std::size_t length, semantic_tag tag, uint64_t ext_tag, const Allocator& alloc)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::byte_str)), short_str_length_(0), tag_(tag)
-            {
-                ptr_ = heap_string_factory_type::create(data, length, ext_tag, alloc);
             }
 
             byte_string_storage(const byte_string_storage& other)
@@ -1664,10 +1658,10 @@ namespace jsoncons {
             return ptr;
         }
 
-        template <typename VariantType,typename... Args>
+        template <typename StorageType,typename... Args>
         void construct(Args&&... args)
         {
-            ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
+            ::new (&cast<StorageType>()) StorageType(std::forward<Args>(args)...);
         }
 
         template <typename T>
@@ -3002,11 +2996,12 @@ namespace jsoncons {
         {
             if (length <= short_string_storage::max_length)
             {
-                construct<short_string_storage>(tag, s, static_cast<uint8_t>(length));
+                construct<short_string_storage>(s, static_cast<uint8_t>(length), tag);
             }
             else
             {
-                construct<long_string_storage>(s, length, tag, char_allocator_type());
+                auto ptr = make_long_string(allocator_type{}, s, length);
+                construct<long_string_storage>(ptr, tag);
             }
         }
 
@@ -3014,11 +3009,12 @@ namespace jsoncons {
         {
             if (length <= short_string_storage::max_length)
             {
-                construct<short_string_storage>(tag, s, static_cast<uint8_t>(length));
+                construct<short_string_storage>(s, static_cast<uint8_t>(length), tag);
             }
             else
             {
-                construct<long_string_storage>(s, length, tag, alloc);
+                auto ptr = make_long_string(alloc, s, length);
+                construct<long_string_storage>(ptr, tag);
             }
         }
 
@@ -3064,11 +3060,12 @@ namespace jsoncons {
             jsoncons::detail::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
-                construct<short_string_storage>(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
             }
             else
             {
-                construct<long_string_storage>(s.data(), s.length(), semantic_tag::bigint, alloc);
+                auto ptr = make_long_string(alloc, s.data(), s.length());
+                construct<long_string_storage>(ptr, semantic_tag::bigint);
             }
         }
 
@@ -3094,11 +3091,12 @@ namespace jsoncons {
             jsoncons::detail::from_integer(val, s);
             if (s.length() <= short_string_storage::max_length)
             {
-                construct<short_string_storage>(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                construct<short_string_storage>(s.data(), static_cast<uint8_t>(s.length()), semantic_tag::bigint);
             }
             else
             {
-                construct<long_string_storage>(s.data(), s.length(), semantic_tag::bigint, alloc);
+                auto ptr = make_long_string(alloc, s.data(), s.length());
+                construct<long_string_storage>(ptr, semantic_tag::bigint);
             }
         }
 
@@ -3134,7 +3132,9 @@ namespace jsoncons {
                    typename std::enable_if<extension_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
-            construct<byte_string_storage>(bytes.data(), bytes.size(), tag, 0, alloc);
+            
+            auto ptr = make_byte_string(alloc, bytes.data(), bytes.size(), 0);
+            construct<byte_string_storage>(ptr, tag);
         }
 
         template <typename Source>
@@ -3144,7 +3144,9 @@ namespace jsoncons {
                    typename std::enable_if<extension_traits::is_byte_sequence<Source>::value,int>::type = 0)
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
-            construct<byte_string_storage>(bytes.data(), bytes.size(), semantic_tag::ext, ext_tag, alloc);
+
+            auto ptr = make_byte_string(alloc, bytes.data(), bytes.size(), ext_tag);
+            construct<byte_string_storage>(ptr, semantic_tag::ext);
         }
 
         ~basic_json() noexcept
