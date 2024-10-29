@@ -94,8 +94,6 @@ assert(j1 == j);
 assert(j1.get_allocator().resource() == &pool2);
 ```
 
-#### Copy construction
-
 #### Move construction
 
 `basic_json` move construction 
@@ -121,6 +119,46 @@ assert(j1.is_string());
 assert(j1.get_allocator().resource() == &pool);
 assert(j.is_null());
 ```
+
+#### Copy assignment
+
+If the left side is a long string, byte string, array or object, uses its allocator,
+otherwise, if the right side is a long string, byte string, array or object,
+constructs a copy of the right side as if using copy construction, i.e.
+applies allocator traits `select_on_container_copy_construction` to the
+right side allocator. For example:
+
+```cpp
+char buffer1[1024];
+std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
+std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+
+char buffer2[1024];
+std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
+std::pmr::polymorphic_allocator<char> alloc2(&pool2);
+
+jsoncons::pmr::json j{ "String too long for short string", alloc1 };
+assert(j.is_string());
+assert(j.get_allocator().resource() == &pool1);
+
+// copy long string to number
+jsoncons::pmr::json j1{10};
+j1 = j;
+assert(j1.is_string());
+assert(j1.get_allocator() == std::allocator_traits<std::pmr::polymorphic_allocator<char>>::
+    select_on_container_copy_construction(j.get_allocator()));
+
+// copy long string to array
+jsoncons::pmr::json j2{ jsoncons::json_array_arg, {1,2,3,4}, 
+    jsoncons::semantic_tag::none, alloc2};
+j2 = j;
+assert(j2.is_string());
+assert(j2.get_allocator().resource() == &pool2); // uses array's allocator
+```
+
+`basic_json` does not check allocator traits `propagate_on_container_copy_assignment`.
+In the case of arrays and objects, `basic_json` leaves it to the implementing types (by
+default `std::vector`) to conform to the traits.
 
 #### Move assignment
 
@@ -151,6 +189,9 @@ assert(j1.is_string());
 assert(j1.get_allocator().resource() == &pool);
 assert(j.is_number());
 ```
+
+`basic_json` does not check allocator traits `propagate_on_container_move_assignment`.
+It simply swaps pointers, or a pointer and a trivial value, or copies a trivial value.
 
 #### References
 

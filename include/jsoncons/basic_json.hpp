@@ -2873,7 +2873,9 @@ namespace jsoncons {
 
         basic_json(const array& val, semantic_tag tag = semantic_tag::none)
         {
-            auto ptr = create_array(val.get_allocator(), val);
+            auto ptr = create_array(
+                std::allocator_traits<Allocator>::select_on_container_copy_construction(val.get_allocator()), 
+                val);
             construct<array_storage>(ptr, tag);
         }
 
@@ -2886,7 +2888,9 @@ namespace jsoncons {
 
         basic_json(const object& val, semantic_tag tag = semantic_tag::none)
         {
-            auto ptr = create_object(val.get_allocator(), val);
+            auto ptr = create_object(
+                std::allocator_traits<Allocator>::select_on_container_copy_construction(val.get_allocator()), 
+                val);
             construct<object_storage>(ptr, tag);
         }
 
