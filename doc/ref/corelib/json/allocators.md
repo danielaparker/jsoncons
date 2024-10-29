@@ -23,26 +23,21 @@ char buffer[1024];
 std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
 std::pmr::polymorphic_allocator<char> alloc(&pool);
 
-std::string key1 = "KeyToLongForShortString";
-std::string value1 = "string too long for short string";
-std::string key2 = "AnotherKeyToLongForShortString";
-std::string value2 = "another string too long for short string";
+std::string key = "key too long for short string";
+std::string value = "string too long for short string";
 
 jsoncons::pmr::json j{ jsoncons::json_object_arg, alloc };
 assert(j.get_allocator().resource() == &pool);
-j[key1] = value1;
-j.try_emplace(key2, value2);
-auto it = std::search(std::begin(buffer), std::end(buffer), key1.begin(), key1.end());
+
+j.try_emplace(key, value);
+
+auto it = std::search(std::begin(buffer), std::end(buffer), key.begin(), key.end());
 assert(it != std::end(buffer));
-it = std::search(std::begin(buffer), std::end(buffer), value1.begin(), value1.end());
-assert(it != std::end(buffer));
-it = std::search(std::begin(buffer), std::end(buffer), key2.begin(), key2.end());
-assert(it != std::end(buffer));
-it = std::search(std::begin(buffer), std::end(buffer), value2.begin(), value2.end());
+it = std::search(std::begin(buffer), std::end(buffer), value.begin(), value.end());
 assert(it != std::end(buffer));
 ```
 
-#### Copy constructor
+#### Copy construction
 
 `basic_json` copy constructor 
 
@@ -70,7 +65,7 @@ assert(j1.get_allocator() == std::allocator_traits<std::pmr::polymorphic_allocat
 assert(j1.get_allocator() == std::pmr::polymorphic_allocator<char>{}); // expected result for pmr allocators
 ```
 
-#### Allocator-extended copy constructor
+#### Allocator-extended copy construction
 
 `basic_json` copy constructor 
 
@@ -99,7 +94,9 @@ assert(j1 == j);
 assert(j1.get_allocator().resource() == &pool2);
 ```
 
-#### Move constructor
+#### Copy construction
+
+#### Move construction
 
 `basic_json` move construction 
 
@@ -155,7 +152,7 @@ assert(j1.get_allocator().resource() == &pool);
 assert(j.is_number());
 ```
 
-#### Resources
+#### References
 
 [An allocator-aware variant type](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/p3153r0.html)
 
@@ -166,5 +163,7 @@ assert(j.is_number());
 [std::pmr::polymorphic_allocator](https://en.cppreference.com/w/cpp/memory/polymorphic_allocator)
 
 [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor)
+
+[Towards meaningful fancy pointers](https://quuxplusone.github.io/draft/fancy-pointers.html)
 
 
