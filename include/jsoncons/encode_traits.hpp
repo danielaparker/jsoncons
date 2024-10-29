@@ -32,7 +32,7 @@ namespace jsoncons {
                            const Json& proto, 
                            std::error_code& ec)
         {
-            encode(std::integral_constant<bool, extension_traits::is_stateless<typename Json::allocator_type>::value>(),
+            encode(std::integral_constant<bool, std::allocator_traits<typename Json::allocator_type>::is_always_equal::value>(),
                       val, encoder, proto, ec);
         }
     private:

@@ -24,7 +24,7 @@ TEST_CASE("string polymorhic allocator tests")
 
     const char* long_string1 = "String too long for short string";
 
-    CHECK_FALSE(extension_traits::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+    CHECK_FALSE(std::allocator_traits<std::pmr::polymorphic_allocator<char>>::is_always_equal::value);
     CHECK_FALSE(alloc1 == alloc2);
     CHECK(alloc1 == alloc1);
 
@@ -61,7 +61,7 @@ TEST_CASE("Test polymorhic allocator")
 
     const char* a_long_string = "String too long for short string";
 
-    CHECK_FALSE(extension_traits::is_stateless<std::pmr::polymorphic_allocator<char>>::value);
+    CHECK_FALSE(std::allocator_traits<std::pmr::polymorphic_allocator<char>>::is_always_equal::value);
 
     pmr_json an_object1(json_object_arg, alloc1);
     an_object1.try_emplace("true", true);

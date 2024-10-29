@@ -400,7 +400,7 @@ namespace jsoncons {
     class basic_json
     {
     public:
-        static_assert(extension_traits::is_stateless<Allocator>::value || extension_traits::is_propagating_allocator<Allocator>::value,
+        static_assert(std::allocator_traits<Allocator>::is_always_equal::value || extension_traits::is_propagating_allocator<Allocator>::value,
                       "Regular stateful allocators must be wrapped with std::scoped_allocator_adaptor");
 
         using allocator_type = Allocator; 
@@ -2789,7 +2789,7 @@ namespace jsoncons {
         template <typename U = Allocator>
         basic_json(basic_json&& other, const Allocator& alloc) noexcept
         {
-            uninitialized_move_a(extension_traits::is_stateless<U>{}, std::move(other), alloc);
+            uninitialized_move_a(std::allocator_traits<U>::is_always_equal(), std::move(other), alloc);
         }
 
         explicit basic_json(json_object_arg_t, 
@@ -3426,7 +3426,7 @@ namespace jsoncons {
                     return cast<object_storage>().get_allocator();
                 }
                 default:
-                    return get_default_allocator(jsoncons::extension_traits::is_stateless<U>());
+                    return get_default_allocator(std::allocator_traits<U>::is_always_equal());
             }
         }
 
@@ -3706,7 +3706,7 @@ namespace jsoncons {
         template <typename U=Allocator>
         void create_object_implicitly()
         {
-            create_object_implicitly(extension_traits::is_stateless<U>());
+            create_object_implicitly(std::allocator_traits<U>::is_always_equal());
         }
 
         void create_object_implicitly(std::false_type)

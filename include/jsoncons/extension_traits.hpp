@@ -218,13 +218,6 @@ namespace extension_traits {
     using
     is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
 
-    template <typename T>
-    struct is_stateless
-     : public std::integral_constant<bool,  
-          (std::is_default_constructible<T>::value &&
-          std::is_empty<T>::value)>
-    {};
-
     // to_plain_pointer
 
     template <typename Pointer> inline

@@ -172,27 +172,27 @@ namespace jsoncons {
         // push_back
 
         template <typename T,typename A=allocator_type>
-        typename std::enable_if<extension_traits::is_stateless<A>::value,void>::type 
+        typename std::enable_if<std::allocator_traits<A>::is_always_equal::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value));
         }
 
         template <typename T,typename A=allocator_type>
-        typename std::enable_if<!extension_traits::is_stateless<A>::value,void>::type 
+        typename std::enable_if<!std::allocator_traits<A>::is_always_equal::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value));
         }
 
         template <typename T,typename A=allocator_type>
-        typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<std::allocator_traits<A>::is_always_equal::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
             return elements_.emplace(pos, std::forward<T>(value));
         }
         template <typename T,typename A=allocator_type>
-        typename std::enable_if<!extension_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!std::allocator_traits<A>::is_always_equal::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
             return elements_.emplace(pos, std::forward<T>(value));
@@ -205,7 +205,7 @@ namespace jsoncons {
         }
 
         template <typename A=allocator_type,typename... Args>
-        typename std::enable_if<extension_traits::is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<std::allocator_traits<A>::is_always_equal::value,iterator>::type 
         emplace(const_iterator pos, Args&&... args)
         {
             return elements_.emplace(pos, std::forward<Args>(args)...);

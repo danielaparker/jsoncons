@@ -32,7 +32,7 @@ TEST_CASE("scoped allocator adaptor basic_json tests")
 
     const char* long_string = "String too long for short string";
 
-    CHECK_FALSE(extension_traits::is_stateless<MyScopedAllocator<char>>::value);
+    CHECK_FALSE(std::allocator_traits<MyScopedAllocator<char>>::is_always_equal::value);
 
     SECTION("construct from string")
     {
@@ -107,7 +107,7 @@ TEST_CASE("scoped allocator adaptor parse tests")
     using cust_json = basic_json<char,sorted_policy,MyScopedAllocator<char>>;
     using cust_string = std::basic_string<char,std::char_traits<char>,MyScopedAllocator<char>>;
 
-    CHECK_FALSE(extension_traits::is_stateless<MyScopedAllocator<char>>::value);
+    CHECK_FALSE(std::allocator_traits<MyScopedAllocator<char>>::is_always_equal::value);
 
     MyScopedAllocator<char> alloc1(1); 
     MyScopedAllocator<char> alloc2(2); 
