@@ -1552,13 +1552,13 @@ namespace jsoncons {
             }
         }
 
-        typename long_string_storage::pointer make_long_string(const allocator_type& alloc, const char_type* data, std::size_t length)
+        typename long_string_storage::pointer create_long_string(const allocator_type& alloc, const char_type* data, std::size_t length)
         {
             using heap_string_factory_type = jsoncons::utility::heap_string_factory<char_type,null_type,Allocator>;
             return heap_string_factory_type::create(data, length, null_type(), alloc); 
         }
 
-        typename byte_string_storage::pointer make_byte_string(const allocator_type& alloc, const uint8_t* data, std::size_t length,
+        typename byte_string_storage::pointer create_byte_string(const allocator_type& alloc, const uint8_t* data, std::size_t length,
             uint64_t ext_tag)
         {
             using heap_string_factory_type = jsoncons::utility::heap_string_factory<uint8_t,uint64_t,Allocator>;
@@ -1805,7 +1805,7 @@ namespace jsoncons {
                     case json_storage_kind::long_str:
                     {
                         const auto& storage = other.cast<long_string_storage>();
-                        auto ptr = make_long_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
+                        auto ptr = create_long_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
                             storage.data(), storage.length());
                         construct<long_string_storage>(ptr, other.tag());
                         break;
@@ -1813,7 +1813,7 @@ namespace jsoncons {
                     case json_storage_kind::byte_str:
                     {
                         const auto& storage = other.cast<byte_string_storage>();
-                        auto ptr = make_byte_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
+                        auto ptr = create_byte_string(std::allocator_traits<Allocator>::select_on_container_copy_construction(storage.get_allocator()),
                             storage.data(), storage.length(), storage.ext_tag());
                         construct<byte_string_storage>(ptr, other.tag());
                         break;
@@ -1854,14 +1854,14 @@ namespace jsoncons {
                     case json_storage_kind::long_str:
                     {
                         const auto& storage = other.cast<long_string_storage>();
-                        auto ptr = make_long_string(alloc, storage.data(), storage.length());
+                        auto ptr = create_long_string(alloc, storage.data(), storage.length());
                         construct<long_string_storage>(ptr, other.tag());
                         break;
                     }
                     case json_storage_kind::byte_str:
                     {
                         const auto& storage = other.cast<byte_string_storage>();
-                        auto ptr = make_byte_string(alloc, storage.data(), storage.length(), storage.ext_tag());
+                        auto ptr = create_byte_string(alloc, storage.data(), storage.length(), storage.ext_tag());
                         construct<byte_string_storage>(ptr, other.tag());
                         break;
                     }
@@ -2894,7 +2894,7 @@ namespace jsoncons {
         basic_json(object&& val, semantic_tag tag = semantic_tag::none)
         {
             auto alloc = val.get_allocator();
-            auto ptr = create_object(alloc);
+            auto ptr = create_object(alloc, std::move(val));
             construct<object_storage>(ptr, tag);
         }
 
@@ -2955,7 +2955,7 @@ namespace jsoncons {
             }
             else
             {
-                auto ptr = make_long_string(allocator_type{}, s, length);
+                auto ptr = create_long_string(allocator_type{}, s, length);
                 construct<long_string_storage>(ptr, tag);
             }
         }
@@ -2968,7 +2968,7 @@ namespace jsoncons {
             }
             else
             {
-                auto ptr = make_long_string(alloc, s, length);
+                auto ptr = create_long_string(alloc, s, length);
                 construct<long_string_storage>(ptr, tag);
             }
         }
@@ -3019,7 +3019,7 @@ namespace jsoncons {
             }
             else
             {
-                auto ptr = make_long_string(alloc, s.data(), s.length());
+                auto ptr = create_long_string(alloc, s.data(), s.length());
                 construct<long_string_storage>(ptr, semantic_tag::bigint);
             }
         }
@@ -3050,7 +3050,7 @@ namespace jsoncons {
             }
             else
             {
-                auto ptr = make_long_string(alloc, s.data(), s.length());
+                auto ptr = create_long_string(alloc, s.data(), s.length());
                 construct<long_string_storage>(ptr, semantic_tag::bigint);
             }
         }
@@ -3088,7 +3088,7 @@ namespace jsoncons {
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
             
-            auto ptr = make_byte_string(alloc, bytes.data(), bytes.size(), 0);
+            auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), 0);
             construct<byte_string_storage>(ptr, tag);
         }
 
@@ -3100,7 +3100,7 @@ namespace jsoncons {
         {
             auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
 
-            auto ptr = make_byte_string(alloc, bytes.data(), bytes.size(), ext_tag);
+            auto ptr = create_byte_string(alloc, bytes.data(), bytes.size(), ext_tag);
             construct<byte_string_storage>(ptr, semantic_tag::ext);
         }
 
