@@ -6,32 +6,31 @@
 #include <jsoncons/json.hpp>
 #include <scoped_allocator>
 
-using namespace jsoncons;
-
 using shmem_allocator = boost::interprocess::allocator<int,
     boost::interprocess::managed_shared_memory::segment_manager>;
 
-using MyScopedAllocator = std::scoped_allocator_adaptor<shmem_allocator>;
+using cust_allocator = std::scoped_allocator_adaptor<shmem_allocator>;
 
 struct boost_sorted_policy 
 {
     template <typename KeyT,typename Json>
-    using object = sorted_json_object<KeyT,Json,boost::interprocess::vector>;
+    using object = jsoncons::sorted_json_object<KeyT,Json,boost::interprocess::vector>;
 
     template <typename Json>
-    using array = json_array<Json,boost::interprocess::vector>;
+    using array = jsoncons::json_array<Json,boost::interprocess::vector>;
 
     template <typename CharT,typename CharTraits,typename Allocator>
     using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-using shm_json = basic_json<char,boost_sorted_policy, MyScopedAllocator>;
+using cust_json = jsoncons::basic_json<char,boost_sorted_policy, cust_allocator>;
 
 int main(int argc, char *argv[])
 {
    typedef std::pair<double, int> MyType;
 
-   if (argc == 1){  //Parent process
+   if (argc == 1) // Parent process
+   {  
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
@@ -48,10 +47,10 @@ int main(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      shm_json* j = segment.construct<shm_json>("my json")(json_array_arg, alloc);
+      cust_json* j = segment.construct<cust_json>("MyJson")(jsoncons::json_array_arg, alloc);
       j->push_back(10);
 
-      shm_json o(json_object_arg, alloc);
+      cust_json o(jsoncons::json_object_arg, alloc);
       o.try_emplace("category", "reference");
       o.try_emplace("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
@@ -59,47 +58,48 @@ int main(int argc, char *argv[])
 
       j->push_back(o);
 
-      shm_json a = shm_json::array(2,shm_json::object(alloc),alloc);
+      cust_json a(jsoncons::json_array_arg, 2,  cust_json(jsoncons::json_object_arg, alloc), 
+          jsoncons::semantic_tag::none, alloc);
       a[0]["first"] = 1;
 
       j->push_back(a);
 
-      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<shm_json>("my json");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson");
 
-      std::cout << "Parent:" << std::endl;
-      std::cout << pretty_print(*(res.first)) << std::endl;
+      std::cout << "Parent process:\n";
+      std::cout << pretty_print(*(res.first)) << "\n\n";
 
       //Launch child process
       std::string s(argv[0]); s += " child ";
       if (0 != std::system(s.c_str()))
          return 1;
 
-
       //Check child has destroyed all objects
-      if (segment.find<MyType>("my json").first)
+      if (segment.find<MyType>("MyJson").first)
          return 1;
    }
-   else{
+   else // Child process
+   {
       //Open managed shared memory
       boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
           "MySharedMemory");
 
-      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<shm_json>("my json");
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson");
 
       if (res.first != nullptr)
       {
-          std::cout << "Child:" << std::endl;
-          std::cout << pretty_print(*(res.first)) << std::endl;
+          std::cout << "Child process:\n";
+          std::cout << pretty_print(*(res.first)) << "\n";
       }
       else
       {
-          std::cout << "Result is null" << std::endl;
+          std::cout << "Result is null\n";
       }
 
       //We're done, delete all the objects
-      segment.destroy<shm_json>("my json");
+      segment.destroy<cust_json>("MyJson");
    }
    return 0;
 }

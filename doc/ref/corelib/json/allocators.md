@@ -9,10 +9,19 @@ or a <a href=https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor>s
 Non-propagating stateful allocators, such as the [Boost.Interprocess allocators](https://www.boost.org/doc/libs/1_82_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.allocator_introduction),
 must be wrapped by a [std::scoped_allocator_adaptor](https://en.cppreference.com/w/cpp/memory/scoped_allocator_adaptor).
 
-Every constructor has a version that accepts an allocator argument. 
-A long string, byte string, array or object contains a pointer to underlying storage,
+Every constructor has a version that accepts an allocator argument, this is required for
+allocator propogation. A long string, byte string, array or object makes use of the
+allocator argument to allocate storage. For other data members the allocator argument is ignored.
+
+A long string, byte string, array and object data member all contain a pointer `ptr` obtained
+from an earlier call to `allocate`. `ptr` points to storage that contains both 
+the data representing the long string, byte string, array or object, and the 
+allocator used to allocate that storage. To later deallocate that storage, the allocator is
+retrieved with `ptr->get_allocator()`.  
+
+contains a pointer to underlying storage,
 the allocator is used to allocate that storage, and it is retained in that storage.
-For other data members the allocator argument is ignored.
+
 
 #### Propagation
 
@@ -221,6 +230,157 @@ assert(j.is_number());
 
 `basic_json` does not check allocator traits `propagate_on_container_move_assignment`.
 It simply swaps pointers, or a pointer and a trivial value, or copies a trivial value.
+
+#### Fancy pointers
+
+`basic_json` is compatible with boost [boost::interprocess::offset_ptr](https://www.boost.org/doc/libs/1_86_0/doc/html/interprocess/offset_ptr.html),
+provided that the implementing containers for arrays and objects, are. In the example below, boost containers are used. 
+ 
+```cpp
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/containers/vector.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/string.hpp>
+#include <cstdlib> //std::system
+#include <jsoncons/json.hpp>
+#include <scoped_allocator>
+
+using shmem_allocator = boost::interprocess::allocator<int,
+    boost::interprocess::managed_shared_memory::segment_manager>;
+
+using cust_allocator = std::scoped_allocator_adaptor<shmem_allocator>;
+
+struct boost_sorted_policy 
+{
+    template <typename KeyT,typename Json>
+    using object = jsoncons::sorted_json_object<KeyT,Json,boost::interprocess::vector>;
+
+    template <typename Json>
+    using array = jsoncons::json_array<Json,boost::interprocess::vector>;
+
+    template <typename CharT,typename CharTraits,typename Allocator>
+    using member_key = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
+};
+
+using cust_json = jsoncons::basic_json<char,boost_sorted_policy, cust_allocator>;
+
+int main(int argc, char *argv[])
+{
+   typedef std::pair<double, int> MyType;
+
+   if (argc == 1) // Parent process
+   {  
+      //Remove shared memory on construction and destruction
+      struct shm_remove
+      {
+         shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove() noexcept { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+      } remover;
+
+      //Construct managed shared memory
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only, 
+                                                         "MySharedMemory", 65536);
+
+      //Initialize shared memory STL-compatible allocator
+      const shmem_allocator alloc(segment.get_segment_manager());
+
+      // Create json value with all dynamic allocations in shared memory
+
+      cust_json* j = segment.construct<cust_json>("MyJson")(jsoncons::json_array_arg, alloc);
+      j->push_back(10);
+
+      cust_json o(jsoncons::json_object_arg, alloc);
+      o.try_emplace("category", "reference");
+      o.try_emplace("author", "Nigel Rees");
+      o.insert_or_assign("title", "Sayings of the Century");
+      o.insert_or_assign("price", 8.95);
+
+      j->push_back(o);
+
+      cust_json a(jsoncons::json_array_arg, 2,  cust_json(jsoncons::json_object_arg, alloc), 
+          jsoncons::semantic_tag::none, alloc);
+      a[0]["first"] = 1;
+
+      j->push_back(a);
+
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson");
+
+      std::cout << "Parent process:\n";
+      std::cout << pretty_print(*(res.first)) << "\n\n";
+
+      //Launch child process
+      std::string s(argv[0]); s += " child ";
+      if (0 != std::system(s.c_str()))
+         return 1;
+
+      //Check child has destroyed all objects
+      if (segment.find<MyType>("MyJson").first)
+         return 1;
+   }
+   else // Child process
+   {
+      //Open managed shared memory
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
+          "MySharedMemory");
+
+      std::pair<cust_json*, boost::interprocess::managed_shared_memory::size_type> res;
+      res = segment.find<cust_json>("MyJson");
+
+      if (res.first != nullptr)
+      {
+          std::cout << "Child process:\n";
+          std::cout << pretty_print(*(res.first)) << "\n";
+      }
+      else
+      {
+          std::cout << "Result is null\n";
+      }
+
+      //We're done, delete all the objects
+      segment.destroy<cust_json>("MyJson");
+   }
+   return 0;
+}
+```
+
+Output:
+
+```
+Parent process:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
+]
+
+Child process:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
+]
+```
 
 #### References
 

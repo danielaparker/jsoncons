@@ -2832,9 +2832,16 @@ namespace jsoncons {
             construct<array_storage>(ptr, semantic_tag::none);
         }
 
-        explicit basic_json(json_array_arg_t, 
-                            semantic_tag tag, 
-                            const Allocator& alloc = Allocator()) 
+        basic_json(json_array_arg_t, std::size_t count, const basic_json& value,
+            semantic_tag tag = semantic_tag::none, const Allocator& alloc = Allocator()) 
+        {
+            auto ptr = create_array(alloc, count, value);
+            construct<array_storage>(ptr, tag);
+        }
+
+        basic_json(json_array_arg_t, 
+            semantic_tag tag, 
+            const Allocator& alloc = Allocator()) 
         {
             auto ptr = create_array(alloc);
             construct<array_storage>(ptr, tag);
