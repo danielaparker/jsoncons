@@ -1,6 +1,6 @@
 ### Allocators
 
-A `basic_json` has an `Allocator` template parameter and an `allocator_type` member that indicates
+The class `basic_json` has an `Allocator` template parameter and an `allocator_type` member that indicates
 that it is allocator aware. `Allocator` must be a Scoped Allocator, that is, an allocator 
 that applies not only to a `basic_json`'s data member, but also to its data member's elements.
 In particular, `Allocator` must be either a stateless allocator, 
