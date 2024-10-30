@@ -19,10 +19,6 @@ the data representing the long string, byte string, array or object, and the
 allocator used to allocate that storage. To later deallocate that storage, the allocator is
 retrieved with `ptr->get_allocator()`.  
 
-contains a pointer to underlying storage,
-the allocator is used to allocate that storage, and it is retained in that storage.
-
-
 #### Propagation
 
 The allocator applies not only to a `basic_json`'s data member, but also to its data member's elements. For example:
