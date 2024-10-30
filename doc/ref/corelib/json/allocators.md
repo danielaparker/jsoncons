@@ -11,7 +11,7 @@ must be wrapped by a [std::scoped_allocator_adaptor](https://en.cppreference.com
 
 Every constructor has a version that accepts an allocator argument, this is required for
 allocator propogation. A long string, byte string, array or object makes use of the
-allocator argument to allocate storage. For the other data members (an empty object, short string, 
+allocator argument to allocate storage. For the other data members (short string, 
 number, boolean, or null) the allocator argument is ignored.
 
 A long string, byte string, array and object data member all contain a pointer `ptr` obtained
