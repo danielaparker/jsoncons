@@ -77,21 +77,21 @@ constructs `j1` from `j`. If `j` holds a long string, bytes string, array or obj
 copy construction uses allocator `alloc` for allocating storage, otherwise `alloc` is ignored. For example: 
 
 ```cpp
+char buffer[1024];
+std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
+std::pmr::polymorphic_allocator<char> alloc(&pool);
+
 char buffer1[1024];
 std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
 std::pmr::polymorphic_allocator<char> alloc1(&pool1);
 
-char buffer2[1024];
-std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
-std::pmr::polymorphic_allocator<char> alloc2(&pool2);
-
-jsoncons::pmr::json j{ "String too long for short string", alloc1 };
+jsoncons::pmr::json j{ "String too long for short string", alloc };
 assert(j.is_string());
-assert(j.get_allocator().resource() == &pool1);
+assert(j.get_allocator().resource() == &pool);
 
-jsoncons::pmr::json j1(j, alloc2);
+jsoncons::pmr::json j1(j, alloc1);
 assert(j1 == j);
-assert(j1.get_allocator().resource() == &pool2);
+assert(j1.get_allocator().resource() == &pool1);
 ```
 
 #### Move construction
@@ -120,6 +120,28 @@ assert(j1.get_allocator().resource() == &pool);
 assert(j.is_null());
 ```
 
+#### Allocator-extended move construction
+
+For example:
+
+```cpp
+char buffer[1024];
+std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
+std::pmr::polymorphic_allocator<char> alloc(&pool);
+
+char buffer1[1024];
+std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
+std::pmr::polymorphic_allocator<char> alloc1(&pool1);
+
+jsoncons::pmr::json j{ "String too long for short string", alloc };
+assert(j.is_string());
+assert(j.get_allocator().resource() == &pool);
+
+jsoncons::pmr::json j1(std::move(j), alloc1);
+assert(j1.is_string());
+assert(j1.get_allocator().resource() == &pool1);
+```
+
 #### Copy assignment
 
 If the left side is a long string, byte string, array or object, uses its allocator,
@@ -129,17 +151,17 @@ applies allocator traits `select_on_container_copy_construction` to the
 right side allocator. For example:
 
 ```cpp
+char buffer[1024];
+std::pmr::monotonic_buffer_resource pool{ std::data(buffer), std::size(buffer) };
+std::pmr::polymorphic_allocator<char> alloc(&pool);
+
 char buffer1[1024];
 std::pmr::monotonic_buffer_resource pool1{ std::data(buffer1), std::size(buffer1) };
 std::pmr::polymorphic_allocator<char> alloc1(&pool1);
 
-char buffer2[1024];
-std::pmr::monotonic_buffer_resource pool2{ std::data(buffer2), std::size(buffer2) };
-std::pmr::polymorphic_allocator<char> alloc2(&pool2);
-
-jsoncons::pmr::json j{ "String too long for short string", alloc1 };
+jsoncons::pmr::json j{ "String too long for short string", alloc };
 assert(j.is_string());
-assert(j.get_allocator().resource() == &pool1);
+assert(j.get_allocator().resource() == &pool);
 
 // copy long string to number
 jsoncons::pmr::json j1{10};
@@ -147,13 +169,14 @@ j1 = j;
 assert(j1.is_string());
 assert(j1.get_allocator() == std::allocator_traits<std::pmr::polymorphic_allocator<char>>::
     select_on_container_copy_construction(j.get_allocator()));
+assert(j1.get_allocator() == std::pmr::polymorphic_allocator<char>{});
 
 // copy long string to array
 jsoncons::pmr::json j2{ jsoncons::json_array_arg, {1,2,3,4}, 
-    jsoncons::semantic_tag::none, alloc2};
+    jsoncons::semantic_tag::none, alloc1};
 j2 = j;
 assert(j2.is_string());
-assert(j2.get_allocator().resource() == &pool2); // uses array's allocator
+assert(j2.get_allocator().resource() == &pool1);
 ```
 
 `basic_json` does not check allocator traits `propagate_on_container_copy_assignment`.
