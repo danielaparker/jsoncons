@@ -230,7 +230,7 @@ It simply swaps pointers, or a pointer and a trivial value, or copies a trivial 
 #### Fancy pointers
 
 `basic_json` is compatible with boost [boost::interprocess::offset_ptr](https://www.boost.org/doc/libs/1_86_0/doc/html/interprocess/offset_ptr.html),
-provided that the implementing containers for arrays and objects, are also compatible. In the example below, boost containers are used. 
+provided that the implementing containers for arrays and objects are also compatible. In the example below, boost containers are used. 
  
 ```cpp
 #include <boost/interprocess/managed_shared_memory.hpp>
