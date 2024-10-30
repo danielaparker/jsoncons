@@ -39,13 +39,13 @@ assert(it != std::end(buffer));
 
 #### Copy construction
 
-`basic_json` copy constructor 
+The copy constructor 
 
 ```
 Json j1(j);
 ```
 
-constructs `j1` from `j`. If `j` holds a long string, bytes string, array or object,
+constructs `j1` from the contents of `j`. If `j` holds a long string, bytes string, array or object,
 copy construction applies allocator traits `select_on_container_copy_construction` to
 the allocator from `j` (since 0.178.0) For example: 
 
@@ -67,13 +67,13 @@ assert(j1.get_allocator() == std::pmr::polymorphic_allocator<char>{}); // expect
 
 #### Allocator-extended copy construction
 
-`basic_json` copy constructor 
+The allocator-extended copy constructor 
 
 ```
 Json j1(j, alloc);
 ```
 
-constructs `j1` from `j`. If `j` holds a long string, bytes string, array or object,
+constructs `j1` from the contents of `j` using `alloc` as the allocator. If `j` holds a long string, bytes string, array or object,
 copy construction uses allocator `alloc` for allocating storage, otherwise `alloc` is ignored. For example: 
 
 ```cpp
@@ -96,14 +96,14 @@ assert(j1.get_allocator().resource() == &pool1);
 
 #### Move construction
 
-`basic_json` move construction 
+The move constructor 
 
 ```
 Json j1(std::move(j));
 ```
 
-initializes `j1` with the contents of `j`, which is either a pointer or a trivially copyable value,
-and changes the value in `j` to `null`. For example: 
+constructs `j1` by taking the contents of `j`, which has either a pointer or a trivially copyable value,
+and replaces it with `null`. For example: 
 
 ```
 char buffer[1024];
@@ -122,7 +122,13 @@ assert(j.is_null());
 
 #### Allocator-extended move construction
 
-For example:
+The allocator-extended move constructor 
+
+```
+Json j1(std::move(j), alloc);
+```
+
+constructs `j1` with a copy of the data member `j`, using `alloc` as the allocator. For example:
 
 ```cpp
 char buffer[1024];
