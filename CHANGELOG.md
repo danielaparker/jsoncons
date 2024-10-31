@@ -27,6 +27,14 @@ object.
 [here](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json/allocators.md),
 and added numerous tests for conformance to the rules.  
 
+- Added `basic_json` constructor
+
+```
+basic_json(json_array_arg_t, 
+    std::size_t count, const basic_json& value, semantic_tag tag = semantic_tag::none, 
+    const Allocator& alloc = Allocator());   
+```
+
 0.177.0
 -------
 
