@@ -635,13 +635,7 @@ namespace jsoncons {
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag), ptr_(ptr)
             {
             }
-/*
-            long_string_storage(const char_type* data, std::size_t length, semantic_tag tag, const Allocator& alloc)
-                : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(tag)
-            {
-                ptr_ = heap_string_factory_type::create(data, length, null_type(), alloc);
-            }
-*/
+
             long_string_storage(const long_string_storage& other)
                 : storage_kind_(static_cast<uint8_t>(json_storage_kind::long_str)), short_str_length_(0), tag_(other.tag_), ptr_(other.ptr_)
             {

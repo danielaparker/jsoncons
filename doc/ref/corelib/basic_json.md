@@ -187,7 +187,7 @@ for their storage, otherwise attempts to return a default constructed allocator.
 
 <table border="0">
   <tr>
-    <td><code>bool contains(const string_view_type& key) const noexcept</code></td>
+    <td>bool contains(const string_view_type& key) const noexcept</td>
     <td>Returns <code>true</code> if an object has a member with the given <code>key</code> , otherwise <code>false</code></td> 
   </tr>
   <tr>

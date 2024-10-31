@@ -270,7 +270,7 @@ using jsoncons::json;
 
 int main()
 {
-    json j(json::object_arg, {{"1",2},{"3",4}});
+    json j(json_object_arg, {{"1",2},{"3",4}});
     assert(j.is<own_vector>());
     auto v = j.as<own_vector>();
     json j2 = v;

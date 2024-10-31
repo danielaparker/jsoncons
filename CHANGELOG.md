@@ -1,6 +1,32 @@
 0.178.0 (on master)
 -------
 
+Defect fixes:
+
+- Fixed issue with `jmespath::join function` through PR #546
+ 
+- Fixed issue with the path for cmake config files through PR #547
+
+- Made the basic_json constructor `basic_json(const Allocator&)`  
+consistent with `basic_json(json_object_arg_t, const Allocator& alloc = Allocator())`.
+
+- `basic_json` copy construction now applies allocator traits `select_on_container_copy_construction`
+to the allocator obtained from `other`. For pmr allocators, this gives a default constructed pmr allocator rather
+than a copy of the allocator in `other`.
+ 
+Enhancements:
+ 
+- Improved the implementation of `basic_json` swap. Previously in
+some cases it would allocate. 
+ 
+- Improved the implementation of `basic_json` copy assignment. 
+Reduced allocations when assigning from array to array and object to
+object.
+
+- Documented the rules for `basic_json` allocators
+[here](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json/allocators.md),
+and added numerous tests for conformance to the rules.  
+
 0.177.0
 -------
 
