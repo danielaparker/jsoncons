@@ -1749,13 +1749,13 @@ namespace jsoncons {
         }
 
         template <typename TypeL,typename TypeR>
-        void swap_l_r(basic_json& other)
+        void swap_l_r(basic_json& other) noexcept
         {
             swap_l_r(identity<TypeL>(), identity<TypeR>(), other);
         }
 
         template <typename TypeL,typename TypeR>
-        void swap_l_r(identity<TypeL>,identity<TypeR>,basic_json& other)
+        void swap_l_r(identity<TypeL>,identity<TypeR>,basic_json& other) noexcept
         {
             TypeR temp{other.cast<TypeR>()};
             other.construct<TypeL>(cast<TypeL>());
@@ -1763,7 +1763,7 @@ namespace jsoncons {
         }
 
         template <typename TypeL>
-        void swap_l(basic_json& other)
+        void swap_l(basic_json& other) noexcept
         {
             switch (other.storage_kind())
             {
