@@ -7,10 +7,10 @@ Defect fixes:
  
 - Fixed issue with the path for cmake config files through PR #547
 
-- Made the basic_json constructor `basic_json(const Allocator&)`  
+- Related to #539, made the basic_json constructor `basic_json(const Allocator&)`  
 consistent with `basic_json(json_object_arg_t, const Allocator& alloc = Allocator())`.
 
-- `basic_json` copy construction now applies allocator traits `select_on_container_copy_construction`
+- Related to #539, `basic_json` copy construction now applies allocator traits `select_on_container_copy_construction`
 to the allocator obtained from `other`. For pmr allocators, this gives a default constructed pmr allocator rather
 than a copy of the allocator in `other`.
  
@@ -27,7 +27,7 @@ object.
 [here](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/json/allocators.md),
 and added numerous tests for conformance to the rules.  
 
-- Added `basic_json` constructor
+- Added missing `basic_json` constructor
 
 ```
 basic_json(json_array_arg_t, 
