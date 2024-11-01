@@ -56,19 +56,17 @@ TEST_CASE("test_object_set")
     REQUIRE_THROWS_AS(b.insert_or_assign("key1","value1"), std::runtime_error);
 }
 
-TEST_CASE("test_array_add")
+TEST_CASE("test json object missing key")
 {
     json b;
     b["key1"] = "value1";
     REQUIRE_THROWS_AS(b.push_back(0), std::domain_error);
 }
 
-TEST_CASE("test_object_index")
+TEST_CASE("test const json object missing key")
 {
-    json b;
-    REQUIRE_THROWS_AS(b["key1"].as<std::string>(), std::out_of_range);
-
-    b["key1"] = "value1";
-    REQUIRE_THROWS_AS(b["key2"].as<std::string>(), std::out_of_range);
+    const json b{};
+    REQUIRE_NOTHROW(b["key1"].as<std::string>());
+    REQUIRE_THROWS_AS(b.at("key1").as<std::string>(), std::out_of_range);
 }
 

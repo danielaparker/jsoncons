@@ -376,26 +376,6 @@ namespace jsoncons {
         }
     };
 
-    // is_proxy_of
-
-    template <typename T,typename Json,typename Enable = void>
-    struct is_proxy_of : std::false_type {};
-
-    template <typename Proxy,typename Json>
-    struct is_proxy_of<Proxy,Json,
-        typename std::enable_if<std::is_same<typename Proxy::proxied_type,Json>::value>::type
-    > : std::true_type {};
-
-
-    // is_proxy
-
-    template <typename T,typename Enable = void>
-    struct is_proxy : std::false_type {};
-
-    template <typename T>
-    struct is_proxy<T,typename std::enable_if<is_proxy_of<T,typename T::proxied_type>::value>::type
-    > : std::true_type {};
-
     template <typename CharT,typename Policy,typename Allocator>
     class basic_json
     {
@@ -846,642 +826,6 @@ namespace jsoncons {
                 return p_;
             }
         };
-
-        template <typename ParentType>
-        class proxy 
-        {
-            friend class basic_json<char_type,policy_type,allocator_type>;
-
-            ParentType& parent_;
-            string_view_type key_;
-
-            proxy() = delete;
-
-            proxy(const proxy& other) = default;
-            proxy(proxy&& other) = default;
-            proxy& operator = (const proxy& other) = delete; 
-            proxy& operator = (proxy&& other) = delete; 
-
-            proxy(ParentType& parent, const string_view_type& key)
-                : parent_(parent), key_(key)
-            {
-            }
-
-            basic_json& evaluate_with_default()
-            {
-                basic_json& val = parent_.evaluate_with_default();
-                auto it = val.find(key_);
-                if (it == val.object_range().end())
-                {
-                    auto r = val.try_emplace(key_, json_object_arg, semantic_tag::none);
-                    return r.first->value();
-                }
-                else
-                {
-                    return it->value();
-                }
-            }
-
-            basic_json& evaluate(std::size_t index)
-            {
-                return evaluate().at(index);
-            }
-
-            const basic_json& evaluate(std::size_t index) const
-            {
-                return evaluate().at(index);
-            }
-
-            basic_json& evaluate(const string_view_type& index)
-            {
-                return evaluate().at(index);
-            }
-
-            const basic_json& evaluate(const string_view_type& index) const
-            {
-                return evaluate().at(index);
-            }
-        public:
-            using proxied_type = basic_json;
-            using proxy_type = proxy<typename ParentType::proxy_type>;
-
-            basic_json& evaluate() 
-            {
-                return parent_.evaluate(key_);
-            }
-
-            const basic_json& evaluate() const
-            {
-                return parent_.evaluate(key_);
-            }
-
-            operator basic_json&()
-            {
-                return evaluate();
-            }
-
-            operator const basic_json&() const
-            {
-                return evaluate();
-            }
-
-            object_range_type object_range()
-            {
-                return evaluate().object_range();
-            }
-
-            const_object_range_type object_range() const
-            {
-                return evaluate().object_range();
-            }
-
-            array_range_type array_range()
-            {
-                return evaluate().array_range();
-            }
-
-            const_array_range_type array_range() const
-            {
-                return evaluate().array_range();
-            }
-
-            std::size_t size() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return 0;
-                }
-                return evaluate().size();
-            }
-
-            json_storage_kind storage_kind() const
-            {
-                return evaluate().storage_kind();
-            }
-
-            semantic_tag tag() const
-            {
-                return evaluate().tag();
-            }
-
-            json_type type() const
-            {
-                return evaluate().type();
-            }
-
-            std::size_t count(const string_view_type& name) const
-            {
-                return evaluate().count(name);
-            }
-
-            allocator_type get_allocator() const
-            {
-                return evaluate().get_allocator();
-            }
-
-            uint64_t ext_tag() const
-            {
-                return evaluate().ext_tag();
-            }
-
-            bool contains(const string_view_type& key) const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-
-                return evaluate().contains(key);
-            }
-
-            bool is_null() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_null();
-            }
-
-            bool empty() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return true;
-                }
-                return evaluate().empty();
-            }
-
-            std::size_t capacity() const
-            {
-                return evaluate().capacity();
-            }
-
-            void reserve(std::size_t n)
-            {
-                evaluate().reserve(n);
-            }
-
-            void resize(std::size_t n)
-            {
-                evaluate().resize(n);
-            }
-
-            template <typename T>
-            void resize(std::size_t n, T val)
-            {
-                evaluate().resize(n,val);
-            }
-
-            template <typename T,typename... Args>
-            bool is(Args&&... args) const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().template is<T>(std::forward<Args>(args)...);
-            }
-
-            bool is_string() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_string();
-            }
-
-            bool is_string_view() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_string_view();
-            }
-
-            bool is_byte_string() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_byte_string();
-            }
-
-            bool is_byte_string_view() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_byte_string_view();
-            }
-
-            bool is_bignum() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_bignum();
-            }
-
-            bool is_number() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_number();
-            }
-            bool is_bool() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_bool();
-            }
-
-            bool is_object() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_object();
-            }
-
-            bool is_array() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_array();
-            }
-
-            bool is_int64() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_int64();
-            }
-
-            bool is_uint64() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_uint64();
-            }
-
-            bool is_half() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_half();
-            }
-
-            bool is_double() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().is_double();
-            }
-
-            string_view_type as_string_view() const 
-            {
-                return evaluate().as_string_view();
-            }
-
-            byte_string_view as_byte_string_view() const 
-            {
-                return evaluate().as_byte_string_view();
-            }
-
-            template <typename SAllocator=std::allocator<char_type>>
-            std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
-            {
-                return evaluate().as_string();
-            }
-
-            template <typename SAllocator=std::allocator<char_type>>
-            std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
-            {
-                return evaluate().as_string(alloc);
-            }
-
-            template <typename BAllocator=std::allocator<uint8_t>>
-            basic_byte_string<BAllocator> as_byte_string() const
-            {
-                return evaluate().template as_byte_string<BAllocator>();
-            }
-
-            template <typename T>
-            typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
-            as() const
-            {
-                return evaluate().template as<T>();
-            }
-
-            template <typename T>
-            typename std::enable_if<std::is_convertible<uint8_t,typename T::value_type>::value,T>::type
-            as(byte_string_arg_t, semantic_tag hint) const
-            {
-                return evaluate().template as<T>(byte_string_arg, hint);
-            }
-
-            bool as_bool() const
-            {
-                return evaluate().as_bool();
-            }
-
-            double as_double() const
-            {
-                return evaluate().as_double();
-            }
-
-            template <typename T>
-            T as_integer() const
-            {
-                return evaluate().template as_integer<T>();
-            }
-
-            template <typename T>
-            proxy& operator=(T&& val) 
-            {
-                parent_.evaluate_with_default().insert_or_assign(key_, std::forward<T>(val));
-                return *this;
-            }
-
-            basic_json& operator[](std::size_t i)
-            {
-                return evaluate_with_default().at(i);
-            }
-
-            const basic_json& operator[](std::size_t i) const
-            {
-                return evaluate().at(i);
-            }
-
-            proxy_type operator[](const string_view_type& key)
-            {
-                return proxy_type(*this,key);
-            }
-
-            const basic_json& operator[](const string_view_type& name) const
-            {
-                return at(name);
-            }
-
-            basic_json& at(const string_view_type& name)
-            {
-                return evaluate().at(name);
-            }
-
-            const basic_json& at(const string_view_type& name) const
-            {
-                return evaluate().at(name);
-            }
-
-            const basic_json& at_or_null(const string_view_type& name) const
-            {
-                return evaluate().at_or_null(name);
-            }
-
-            const basic_json& at(std::size_t index)
-            {
-                return evaluate().at(index);
-            }
-
-            const basic_json& at(std::size_t index) const
-            {
-                return evaluate().at(index);
-            }
-
-            object_iterator find(const string_view_type& name)
-            {
-                return evaluate().find(name);
-            }
-
-            const_object_iterator find(const string_view_type& name) const
-            {
-                return evaluate().find(name);
-            }
-
-            template <typename T,typename U>
-            T get_value_or(const string_view_type& name, U&& default_value) const
-            {
-                static_assert(std::is_copy_constructible<T>::value,
-                              "get_value_or: T must be copy constructible");
-                static_assert(std::is_convertible<U&&, T>::value,
-                              "get_value_or: U must be convertible to T");
-                return evaluate().template get_value_or<T,U>(name,std::forward<U>(default_value));
-            }
-
-            void shrink_to_fit()
-            {
-                evaluate_with_default().shrink_to_fit();
-            }
-
-            void clear()
-            {
-                evaluate().clear();
-            }
-            // Remove all elements from an array or object
-
-            object_iterator erase(const_object_iterator pos)
-            {
-                return evaluate().erase(pos);
-            }
-            // Remove a range of elements from an object 
-
-            object_iterator erase(const_object_iterator first, const_object_iterator last)
-            {
-                return evaluate().erase(first, last);
-            }
-            // Remove a range of elements from an object 
-
-            void erase(const string_view_type& name)
-            {
-                evaluate().erase(name);
-            }
-
-            array_iterator erase(const_array_iterator pos)
-            {
-                return evaluate().erase(pos);
-            }
-            // Removes the element at pos 
-
-            array_iterator erase(const_array_iterator first, const_array_iterator last)
-            {
-                return evaluate().erase(first, last);
-            }
-            // Remove a range of elements from an array 
-
-            // merge
-
-            void merge(const basic_json& source)
-            {
-                return evaluate().merge(source);
-            }
-
-            void merge(basic_json&& source)
-            {
-                return evaluate().merge(std::move(source));
-            }
-
-            void merge(object_iterator hint, const basic_json& source)
-            {
-                return evaluate().merge(hint, source);
-            }
-
-            void merge(object_iterator hint, basic_json&& source)
-            {
-                return evaluate().merge(hint, std::move(source));
-            }
-
-            // merge_or_update
-
-            void merge_or_update(const basic_json& source)
-            {
-                return evaluate().merge_or_update(source);
-            }
-
-            void merge_or_update(basic_json&& source)
-            {
-                return evaluate().merge_or_update(std::move(source));
-            }
-
-            void merge_or_update(object_iterator hint, const basic_json& source)
-            {
-                return evaluate().merge_or_update(hint, source);
-            }
-
-            void merge_or_update(object_iterator hint, basic_json&& source)
-            {
-                return evaluate().merge_or_update(hint, std::move(source));
-            }
-
-            template <typename T>
-            std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
-            {
-                return evaluate().insert_or_assign(name,std::forward<T>(val));
-            }
-
-           // emplace
-
-            template <typename ... Args>
-            std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
-            {
-                return evaluate().try_emplace(name,std::forward<Args>(args)...);
-            }
-
-            template <typename T>
-            object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
-            {
-                return evaluate().insert_or_assign(hint, name, std::forward<T>(val));
-            }
-
-            template <typename ... Args>
-            object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
-            {
-                return evaluate().try_emplace(hint, name, std::forward<Args>(args)...);
-            }
-
-            template <typename... Args> 
-            array_iterator emplace(const_array_iterator pos, Args&&... args)
-            {
-                return evaluate_with_default().emplace(pos, std::forward<Args>(args)...);
-            }
-
-            template <typename... Args> 
-            basic_json& emplace_back(Args&&... args)
-            {
-                return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
-            }
-
-            template <typename T>
-            void push_back(T&& val)
-            {
-                evaluate_with_default().push_back(std::forward<T>(val));
-            }
-
-            template <typename T>
-            array_iterator insert(const_array_iterator pos, T&& val)
-            {
-                return evaluate_with_default().insert(pos, std::forward<T>(val));
-            }
-
-            template <typename InputIt>
-            array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
-            {
-                return evaluate_with_default().insert(pos, first, last);
-            }
-
-            template <typename InputIt>
-            void insert(InputIt first, InputIt last)
-            {
-                evaluate_with_default().insert(first, last);
-            }
-
-            template <typename InputIt>
-            void insert(sorted_unique_range_tag tag, InputIt first, InputIt last)
-            {
-                evaluate_with_default().insert(tag, first, last);
-            }
-
-            template <typename... Args>
-            void dump(Args&& ... args) const
-            {
-                evaluate().dump(std::forward<Args>(args)...);
-            }
-
-            template <typename... Args>
-            void dump_pretty(Args&& ... args) const
-            {
-                evaluate().dump_pretty(std::forward<Args>(args)...);
-            }
-
-            void swap(basic_json& other) noexcept
-            {
-                evaluate_with_default().swap(other);
-            }
-
-            friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const proxy& o)
-            {
-                o.dump(os);
-                return os;
-            }
-
-            std::basic_string<char_type> to_string() const 
-            {
-                return evaluate().to_string();
-            }
-
-            template <typename IntegerType>
-            bool is_integer() const noexcept
-            {
-                if (!parent_.contains(key_))
-                {
-                    return false;
-                }
-                return evaluate().template is_integer<IntegerType>();
-            }
-
-        };
-
-        using proxy_type = proxy<basic_json>;
 
         union 
         {
@@ -2903,14 +2247,14 @@ namespace jsoncons {
         }
 
         template <typename T,
-                  class = typename std::enable_if<!is_proxy_of<T,basic_json>::value && !extension_traits::is_basic_json<T>::value>::type>
+                  class = typename std::enable_if<!extension_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val)
             : basic_json(json_type_traits<basic_json,T>::to_json(val))
         {
         }
 
         template <typename T,
-                  class = typename std::enable_if<!is_proxy_of<T,basic_json>::value && !extension_traits::is_basic_json<T>::value>::type>
+                  class = typename std::enable_if<!extension_traits::is_basic_json<T>::value>::type>
         basic_json(const T& val, const Allocator& alloc)
             : basic_json(json_type_traits<basic_json,T>::to_json(val,alloc))
         {
@@ -3136,25 +2480,56 @@ namespace jsoncons {
             return at(i);
         }
 
-        proxy_type operator[](const string_view_type& name)
+        basic_json& operator[](const string_view_type& name)
         {
             switch (storage_kind())
             {
-            case json_storage_kind::empty_object: 
-                create_object_implicitly();
-                JSONCONS_FALLTHROUGH;
-            case json_storage_kind::object:
-                return proxy_type(*this, name);
-                break;
-            default:
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-                break;
-            }
+                case json_storage_kind::empty_object: 
+                    return try_emplace(name, basic_json{}).first->value();
+                case json_storage_kind::object:
+                {           
+                    auto it = cast<object_storage>().value().find(name);
+                    if (it == cast<object_storage>().value().end())
+                    {
+                        return try_emplace(name, basic_json{}).first->value();
+                    }
+                    else
+                    {
+                        return it->value();
+                    }
+                    break;
+                }
+                default:
+                    JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                    break;
+            }               
         }
 
         const basic_json& operator[](const string_view_type& name) const
         {
-            return at(name);
+            static const basic_json an_empty_object = basic_json();
+
+            switch (storage_kind())
+            {
+                case json_storage_kind::empty_object: 
+                    return an_empty_object;
+                case json_storage_kind::object:
+                {           
+                    auto it = cast<object_storage>().value().find(name);
+                    if (it == cast<object_storage>().value().end())
+                    {
+                        return an_empty_object;
+                    }
+                    else
+                    {
+                        return it->value();
+                    }
+                    break;
+                }
+                default:
+                    JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                    break;
+            }
         }
 
 
@@ -4944,24 +4319,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator==(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) == 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator==(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) == 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator==(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) == 0;
     }
 
     // operator!=
@@ -4981,24 +4342,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator!=(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) != 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator!=(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) != 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator!=(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) != 0;
     }
 
     // operator<
@@ -5018,24 +4365,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator<(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) < 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator<(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) > 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator<(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) > 0;
     }
 
     // operator<=
@@ -5055,24 +4388,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator<=(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) <= 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator<=(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) >= 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator<=(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) >= 0;
     }
 
     // operator>
@@ -5092,24 +4411,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator>(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) > 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator>(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) < 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator>(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) < 0;
     }
 
     // operator>=
@@ -5129,24 +4434,10 @@ namespace jsoncons {
     }
 
     template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator>=(const Json& lhs, const T& rhs) 
-    {
-        return lhs.evaluate().compare(rhs) >= 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<extension_traits::is_basic_json<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,Json>::value,bool>::type
+    typename std::enable_if<extension_traits::is_basic_json<Json>::value && std::is_convertible<T,Json>::value,bool>::type
     operator>=(const T& lhs, const Json& rhs) 
     {
         return rhs.compare(lhs) <= 0;
-    }
-
-    template <typename Json,typename T>
-    typename std::enable_if<is_proxy<Json>::value && !is_proxy<T>::value && !extension_traits::is_basic_json<T>::value && std::is_convertible<T,typename Json::proxied_type>::value,bool>::type
-    operator>=(const T& lhs, const Json& rhs) 
-    {
-        return rhs.evaluate().compare(lhs) <= 0;
     }
 
     // swap

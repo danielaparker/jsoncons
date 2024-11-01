@@ -91,7 +91,7 @@ TEST_CASE("json as<T>")
         {
             json j;
             std::string s = j["empty"].as<std::string>();
-            CHECK(false);
+            CHECK(s == "{}");
         }
         JSONCONS_CATCH (const std::out_of_range& e)
         {
@@ -448,7 +448,7 @@ TEST_CASE("test_const_member_read")
 
     int val1 = b["field1"].as<int>();
     CHECK(val1 == 10);
-    REQUIRE_THROWS_AS(b["field2"], std::out_of_range);
+    REQUIRE_NOTHROW(b["field2"]);
 }
 
 TEST_CASE("test_proxy_const_member_read")
@@ -457,12 +457,12 @@ TEST_CASE("test_proxy_const_member_read")
 
     a["object1"] = json();
     a["object1"]["field1"] = "value1";
-    a["object1"]["field2"]; // No throw yet
+    a["object1"]["field2"]; // Inserts empty object for "field2"
 
     const json b(a);
 
     std::string s1 = b["object1"]["field1"].as<std::string>();
-    REQUIRE_THROWS_AS(b["object1"]["field2"], std::out_of_range);
+    REQUIRE_NOTHROW(b["object1"]["field2"]);
 
     CHECK(s1 == std::string("value1"));
 }
@@ -609,18 +609,6 @@ TEST_CASE("json_object_iterator test 1")
         CHECK(member.key() == "name1");
         CHECK(member.value() == json("value1"));
     }
-}
-
-TEST_CASE("test_object_key_proxy")
-{
-    json a;
-    a["key1"] = "value1";
-
-    json b;
-    b["key2"] = json();
-    b["key2"]["key3"] = std::move(a);
-
-    CHECK_FALSE((a.is_object() || a.is_array() || a.is_string()));
 }
 
 // accessor tests
@@ -905,29 +893,11 @@ TEST_CASE("test_value_not_found_and_defaults")
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
-    JSONCONS_TRY
-    {
-        auto val = obj["outdoor_experience"].as<std::string>();
-        CHECK(false);
-    }
-    JSONCONS_CATCH (const std::out_of_range& e)
-    {
-        CHECK(e.what() == std::string("Key not found: 'outdoor_experience'"));
-    }
+    CHECK_NOTHROW(obj["outdoor_experience"].as<std::string>());
 
     std::string experience = obj.contains("outdoor_experience") ? obj["outdoor_experience"].as<std::string>() : "";
 
-    CHECK(experience == "");
-
-    JSONCONS_TRY
-    {
-        auto val = obj["first_aid_certification"].as<std::string>();
-        CHECK(false);
-    }
-    JSONCONS_CATCH (const std::out_of_range& e)
-    {
-        CHECK(e.what() == std::string("Key not found: 'first_aid_certification'"));
-    }
+    CHECK(experience == "{}");
 }
 
 TEST_CASE("test_set_override")

@@ -98,7 +98,6 @@ Member type                         |Definition
 `const_object_range_type`|range<const_object_iterator,const_array_iterator>     (since 0.173.3)
 `array_range_type`|range<array_iterator,const_array_iterator>                   (since 0.173.3)
 `const_array_range_type`|range<const_array_iterator,const_array_iterator>       (since 0.173.3)
-`proxy_type`|proxy<basic_json>. The `proxy_type` class supports conversion to `basic_json&`.
 
 ### Static member functions
 

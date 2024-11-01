@@ -121,7 +121,7 @@ TEST_CASE("basic_json object == basic_json object")
     }
 }
 
-TEST_CASE("basic_json proxy == basic_json")
+TEST_CASE("basic_json == basic_json")
 {
     SECTION("test 1")
     {
@@ -130,10 +130,6 @@ TEST_CASE("basic_json proxy == basic_json")
         o1["b"] = 2;
 
         json o2(2);
-
-        CHECK(is_proxy<typename std::decay<decltype(o1["a"])>::type>::value);
-        CHECK(is_proxy_of<decltype(o1["a"]),json>::value);
-        CHECK(extension_traits::is_basic_json<typename decltype(o1["a"])::proxied_type>::value);
 
         CHECK_FALSE((o1["a"] == o2));
         CHECK_FALSE((o2 == o1["a"]));
