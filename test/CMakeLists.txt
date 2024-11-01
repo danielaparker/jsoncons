@@ -157,7 +157,6 @@ add_executable(unit_tests
                corelib/src/json_parse_error_tests.cpp
                corelib/src/json_parser_position_tests.cpp
                corelib/src/json_parser_tests.cpp
-               corelib/src/json_proxy_tests.cpp
                corelib/src/json_push_back_tests.cpp
                corelib/src/json_reader_exception_tests.cpp
                corelib/src/json_reader_tests.cpp

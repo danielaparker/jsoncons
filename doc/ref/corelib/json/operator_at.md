@@ -1,26 +1,21 @@
 ### jsoncons::basic_json::operator[]
 
 ```cpp
-proxy_type operator[](const string_view_type& key); (1)
+proxy_type operator[](const string_view_type& key);             (1)  (until 0.179.0)
+basic_json& operator[](const string_view_type& key);                 (since 0.179.0)
 
-const_reference operator[](const string_view_type& key) const; (2)
+const_reference operator[](const string_view_type& key) const;  (2)
 
-reference operator[](std::size_t i); (3)
+reference operator[](std::size_t i);                            (3)
 
-const_reference operator[](std::size_t i) const; (4)
+const_reference operator[](std::size_t i) const;                (4)
 ```
 
-(1) Returns a "reference-like" proxy object that can be used to access 
-or assign to the underlying keyed value. Type `proxy_type` supports 
-the `basic_json` interface and conversion to `basic_json&`. If accessing 
-and the key exists, evaluates to a reference to the keyed value.If 
-accessing and the key does not exist, `noexcept` accessors return a 
-default value, e.g. the `is_xxx` functions return `false`, other 
-accessors throw.
-If assigning, inserts or updates with the new value. 
-Throws `std::domain_error` if not an object. 
-If read, throws `std::out_of_range` if the object does not have a 
-member with the specified key.  
+(1) Unitl 0.179.0, returns a "reference-like" proxy object that can be used to access 
+or assign to the underlying keyed value. 
+  
+Since 0.179, returns a reference to the value that is associated with `key`, 
+performing an insertion if no such `key` exists.  
 
 (2) If `key` matches the key of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
 Throws `std::domain_error` if not an object.
