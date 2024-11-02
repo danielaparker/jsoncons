@@ -34,7 +34,7 @@ when this operator is used for reading but the key does not exist.
 
 ### Examples
 
-#### Assigning to a proxy when the key does not exist
+#### Assigning to and` object when the key does not exist
 
 ```cpp
 int main()

@@ -1,4 +1,19 @@
-0.178.0 (on master)
+0.179.0 (on master)
+-------
+
+Changes:
+
+- Removed `basic_json` proxy type. The rationale for this change is given in #315.
+
+- The new behavior for the non-const overload of operator[](const string_view_type&) will follow the standard library 
+`std::map` behavior, that is, return a reference to the value that is associated with the key, inserting a default 
+constructed value with the key if no such key already exists.
+
+- The new behavior for the const overload of operator[](const string_view_type&) will be to return 
+a const reference to the value that is associated with key, returning a const reference to a default 
+constructed value with static storage duration if no such key already exists.
+
+0.178.0
 -------
 
 Defect fixes:
