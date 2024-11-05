@@ -108,7 +108,7 @@ void validate_three_ways()
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
 json resolver(const jsoncons::uri& uri)
 {
-    std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
+    std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
     std::string pathname = "./input/jsonschema/";
     pathname += std::string(uri.path());
