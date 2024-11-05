@@ -388,7 +388,7 @@ namespace jsonschema = jsoncons::jsonschema;
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
 json resolver(const jsoncons::uri& uri)
 {
-    std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
+    std::cout << "base: " << uri.base() << ", path: " << uri.path() << "\n\n";
 
     std::string pathname = "./input/jsonschema/";
     pathname += std::string(uri.path());
@@ -431,8 +431,8 @@ int main()
 
         auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
-            std::cout << message.instance_location().string() << ": " << message.message() << "\n";
-            for (const auto& detail : message.details())
+            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
+            for (const auto& detail : msg.details())
             {
                 std::cout << "    "  << detail.message() << "\n";
             }
@@ -450,7 +450,7 @@ int main()
 ```
 Output:
 ```
-uri: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name-defs.json
+base: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name-defs.json
 
 /name: Must be valid against at least one schema, but found no matching schemas
     Expected null, found object
