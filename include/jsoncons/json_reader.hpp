@@ -149,7 +149,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader 
+    class basic_json_reader : public read_more_command 
     {
     public:
         using char_type = CharT;
@@ -263,8 +263,40 @@ namespace jsoncons {
                           const TempAllocator& temp_alloc = TempAllocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
-             parser_(options,err_handler,temp_alloc)
+             parser_(options, err_handler, this, temp_alloc)
         {
+        }
+        
+        virtual void read_more(std::error_code& ec)
+        {
+            std::cout << "UPDATE BUFFER\n";
+            if (!parser_.stopped())
+            {
+                if (parser_.source_exhausted())
+                {
+                    auto s = source_.read_buffer(ec);
+                    if (ec) return;
+                    if (s.size() > 0)
+                    {
+                        parser_.update(s.data(),s.size());
+                    }
+                }
+                /*bool eof = parser_.source_exhausted();
+                parser_.parse_some(visitor_, ec);
+                if (ec) return;
+                if (eof)
+                {
+                    if (parser_.enter())
+                    {
+                        break;
+                    }
+                    else if (!parser_.accept())
+                    {
+                        ec = json_errc::unexpected_eof;
+                        return;
+                    }
+                }*/
+            }
         }
 
         void read_next()

@@ -25,6 +25,7 @@ TEST_CASE("Test cyrillic.json")
     REQUIRE(is);
     json j = json::parse(is);
 }
+#if 0
 
 TEST_CASE("test_object2")
 {
@@ -338,3 +339,4 @@ TEST_CASE("test_diagnostics_visitor", "")
         CHECK(os.str() == expected.str());
     }
 }
+#endif

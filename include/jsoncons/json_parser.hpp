@@ -29,9 +29,14 @@
 
 namespace jsoncons {
 
-namespace detail {
-
-}
+class read_more_command
+{
+public:
+    virtual ~read_more_command() = default;
+    virtual void read_more(std::error_code& ec)
+    {
+    }
+};
 
 enum class json_parse_state : uint8_t 
 {
@@ -132,6 +137,9 @@ private:
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
+    read_more_command default_more_command;
+    read_more_command* more_command_ = &default_more_command;
+    
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
     basic_json_parser& operator=(const basic_json_parser&) = delete;
@@ -174,6 +182,49 @@ public:
          done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc)
+    {
+        string_buffer_.reserve(initial_string_buffer_capacity);
+
+        std::size_t initial_stack_capacity = options.max_nesting_depth() <= (default_initial_stack_capacity-2) ? (options.max_nesting_depth()+2) : default_initial_stack_capacity;
+        state_stack_.reserve(initial_stack_capacity );
+        push_state(json_parse_state::root);
+
+        if (options_.enable_str_to_nan())
+        {
+            string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
+        }
+        if (options_.enable_str_to_inf())
+        {
+            string_double_map_.emplace_back(options_.inf_to_str(),std::numeric_limits<double>::infinity());
+        }
+        if (options_.enable_str_to_neginf())
+        {
+            string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
+        }
+    }
+
+    basic_json_parser(const basic_json_decode_options<char_type>& options,
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      read_more_command* observer,
+                      const TempAllocator& temp_alloc = TempAllocator())
+       : options_(options),
+         err_handler_(err_handler),
+         nesting_depth_(0), 
+         cp_(0),
+         cp2_(0),
+         line_(1),
+         position_(0),
+         mark_position_(0),
+         saved_position_(0),
+         begin_input_(nullptr),
+         end_input_(nullptr),
+         input_ptr_(nullptr),
+         state_(json_parse_state::start),
+         more_(true),
+         done_(false),
+         string_buffer_(temp_alloc),
+         state_stack_(temp_alloc),
+         more_command_(observer)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 
@@ -2255,12 +2306,21 @@ string_u1:
             ++input_ptr_;
         }
 
-        // Buffer exhausted               
+        // Buffer exhausted
+        
         {
             string_buffer_.append(sb,input_ptr_-sb);
             position_ += (input_ptr_ - sb);
-            state_ = json_parse_state::string;
-            return;
+            //state_ = json_parse_state::string;
+            more_command_->read_more(ec);
+            if (ec)
+            {
+                return;
+            }
+            local_input_end = end_input_;
+            sb = input_ptr_;
+            goto string_u1;
+            //return;
         }
 
 escape:
