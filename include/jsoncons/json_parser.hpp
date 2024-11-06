@@ -29,11 +29,11 @@
 
 namespace jsoncons {
 
-class read_more_command
+class chunk_reader
 {
 public:
-    virtual ~read_more_command() = default;
-    virtual bool read_more(std::error_code&)
+    virtual ~chunk_reader() = default;
+    virtual bool read_chunk(std::error_code&)
     {
         return false;
     }
@@ -138,8 +138,8 @@ private:
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
-    read_more_command default_more_command;
-    read_more_command* more_command_ = &default_more_command;
+    chunk_reader default_chunk_reader;
+    chunk_reader* chunk_rdr_ = &default_chunk_reader;
     
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -206,7 +206,7 @@ public:
 
     basic_json_parser(const basic_json_decode_options<char_type>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      read_more_command* observer,
+                      chunk_reader* observer,
                       const TempAllocator& temp_alloc = TempAllocator())
        : options_(options),
          err_handler_(err_handler),
@@ -225,7 +225,7 @@ public:
          done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc),
-         more_command_(observer)
+         chunk_rdr_(observer)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 
@@ -307,11 +307,19 @@ public:
         return input_end_;
     }
 
-    void skip_space()
+    void skip_space(std::error_code& ec)
     {
         const char_type* local_input_end = input_end_;
-        while (input_ptr_ != local_input_end) 
+        while (true) 
         {
+            if (input_ptr_ == local_input_end)
+            {
+                if (!chunk_rdr_->read_chunk(ec))
+                {
+                    break;
+                }
+                local_input_end = input_end_;
+            }
             switch (*input_ptr_)
             {
                 case ' ':
@@ -337,12 +345,20 @@ public:
         }
     }
 
-    void skip_whitespace()
+    void skip_whitespace(std::error_code& ec)
     {
         const char_type* local_input_end = input_end_;
 
-        while (input_ptr_ != local_input_end) 
+        while (true) 
         {
+            if (input_ptr_ == local_input_end)
+            {
+                if (!chunk_rdr_->read_chunk(ec))
+                {
+                    break;
+                }
+                local_input_end = input_end_;
+            }
             switch (state_)
             {
                 case json_parse_state::cr:
@@ -369,7 +385,7 @@ public:
                         case '\t':
                         case '\n':
                         case '\r':
-                            skip_space();
+                            skip_space(ec);
                             break;
                         default:
                             return;
@@ -688,7 +704,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -807,7 +823,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/':
                                 ++input_ptr_;
@@ -887,7 +903,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/':
                                 ++input_ptr_;
@@ -962,7 +978,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -1043,7 +1059,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/': 
                                 push_state(state_);
@@ -1097,7 +1113,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/': 
                                 push_state(state_);
@@ -1245,7 +1261,7 @@ public:
                                 mark_position_ = position_;
                                 break;   
                             case ' ':case '\t':
-                                skip_space();
+                                skip_space(ec);
                                 break;
                             case '/': 
                                 ++input_ptr_;
@@ -1780,7 +1796,7 @@ public:
 minus_sign:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -1807,7 +1823,7 @@ minus_sign:
 zero:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1839,7 +1855,7 @@ zero:
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
-                skip_space();
+                skip_space(ec);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
@@ -1889,7 +1905,7 @@ zero:
 integer:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1921,7 +1937,7 @@ integer:
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
-                skip_space();
+                skip_space(ec);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
@@ -1970,7 +1986,7 @@ integer:
 fraction1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -1993,7 +2009,7 @@ fraction1:
 fraction2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -2025,7 +2041,7 @@ fraction2:
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
-                skip_space();
+                skip_space(ec);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
@@ -2073,7 +2089,7 @@ fraction2:
 exp1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2105,7 +2121,7 @@ exp1:
 exp2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2129,7 +2145,7 @@ exp2:
 exp3:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -2161,7 +2177,7 @@ exp3:
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
-                skip_space();
+                skip_space(ec);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
@@ -2346,7 +2362,7 @@ string_u1:
         {
             string_buffer_.append(sb,input_ptr_-sb);
             position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2360,7 +2376,7 @@ escape:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2427,7 +2443,7 @@ escape_u1:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2451,7 +2467,7 @@ escape_u2:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2475,7 +2491,7 @@ escape_u3:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2499,7 +2515,7 @@ escape_u4:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2534,7 +2550,7 @@ escape_expect_surrogate_pair1:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2563,7 +2579,7 @@ escape_expect_surrogate_pair2:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2591,7 +2607,7 @@ escape_u5:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2615,7 +2631,7 @@ escape_u6:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2639,7 +2655,7 @@ escape_u7:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }
@@ -2663,7 +2679,7 @@ escape_u8:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!more_command_->read_more(ec))
+            if (!chunk_rdr_->read_chunk(ec))
             {
                 return;
             }

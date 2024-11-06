@@ -149,7 +149,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader final : public read_more_command 
+    class basic_json_reader final : public chunk_reader 
     {
     public:
         using char_type = CharT;
@@ -269,7 +269,7 @@ namespace jsoncons {
         {
         }
         
-        virtual bool read_more(std::error_code& ec)
+        virtual bool read_chunk(std::error_code& ec)
         {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
@@ -341,7 +341,7 @@ namespace jsoncons {
             
             while (!source_.eof())
             {
-                parser_.skip_whitespace();
+                parser_.skip_whitespace(ec);
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
