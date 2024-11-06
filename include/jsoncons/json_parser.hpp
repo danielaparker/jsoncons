@@ -33,8 +33,9 @@ class read_more_command
 {
 public:
     virtual ~read_more_command() = default;
-    virtual void read_more(std::error_code& ec)
+    virtual bool read_more(std::error_code&)
     {
+        return false;
     }
 };
 
@@ -2311,8 +2312,10 @@ string_u1:
         {
             string_buffer_.append(sb,input_ptr_-sb);
             position_ += (input_ptr_ - sb);
-            //state_ = json_parse_state::string;
-            more_command_->read_more(ec);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
             if (ec)
             {
                 return;
@@ -2320,7 +2323,6 @@ string_u1:
             local_input_end = end_input_;
             sb = input_ptr_;
             goto string_u1;
-            //return;
         }
 
 escape:

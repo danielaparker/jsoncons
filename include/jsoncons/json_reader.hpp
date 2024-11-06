@@ -267,18 +267,20 @@ namespace jsoncons {
         {
         }
         
-        virtual void read_more(std::error_code& ec)
+        virtual bool read_more(std::error_code& ec)
         {
-            std::cout << "UPDATE BUFFER\n";
+            //std::cout << "UPDATE BUFFER\n";
+            bool success = false;
             if (!parser_.stopped())
             {
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) return;
+                    if (ec) return false;
                     if (s.size() > 0)
                     {
                         parser_.update(s.data(),s.size());
+                        success = true;
                     }
                 }
                 /*bool eof = parser_.source_exhausted();
@@ -297,6 +299,7 @@ namespace jsoncons {
                     }
                 }*/
             }
+            return success;
         }
 
         void read_next()
