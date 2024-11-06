@@ -61,8 +61,7 @@ TEST_CASE("test_exception_rbrace")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -82,8 +81,7 @@ TEST_CASE("test_exception_array_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -102,8 +100,7 @@ TEST_CASE("test_exception_unicode_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -123,8 +120,7 @@ TEST_CASE("test_exception_tru_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -144,8 +140,7 @@ TEST_CASE("test_exception_fals_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -165,8 +160,7 @@ TEST_CASE("test_exception_nul_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -186,8 +180,7 @@ TEST_CASE("test_exception_true_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -206,8 +199,7 @@ TEST_CASE("test_exception_false_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -226,8 +218,7 @@ TEST_CASE("test_exception_null_eof")
     JSONCONS_TRY
     {
         json_stream_reader reader(is,decoder);
-        reader.read_next();  // must throw
-        CHECK(0 != 0);
+        CHECK_THROWS(reader.read_next()); 
     }
     JSONCONS_CATCH (const ser_error& e)
     {
@@ -251,4 +242,3 @@ TEST_CASE("test_exception")
         CHECK((e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column() == 8));
     }
 }
-
