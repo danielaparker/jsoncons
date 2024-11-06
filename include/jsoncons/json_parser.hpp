@@ -61,11 +61,6 @@ enum class json_parse_state : uint8_t
     minus, 
     zero,  
     integer,
-    fraction1,
-    fraction2,
-    exp1,
-    exp2,
-    exp3,
     cr,
     done
 };
@@ -1355,17 +1350,6 @@ public:
                     parse_string(visitor, ec);
                     if (ec) return;
                     break;
-                case json_parse_state::minus:
-                case json_parse_state::zero:  
-                case json_parse_state::integer: 
-                case json_parse_state::fraction1: 
-                case json_parse_state::fraction2: 
-                case json_parse_state::exp1: 
-                case json_parse_state::exp2:  
-                case json_parse_state::exp3: 
-                    parse_number(visitor, ec);  
-                    if (ec) return;
-                    break;
                 case json_parse_state::slash: 
                 {
                     switch (*input_ptr_)
@@ -1592,16 +1576,6 @@ public:
                 goto zero;
             case json_parse_state::integer:
                 goto integer;
-            case json_parse_state::fraction1:
-                goto fraction1;
-            case json_parse_state::fraction2:
-                goto fraction2;
-            case json_parse_state::exp1:
-                goto exp1;
-            case json_parse_state::exp2:
-                goto exp2;
-            case json_parse_state::exp3:
-                goto exp3;
             default:
                 JSONCONS_UNREACHABLE();               
         }
@@ -1815,7 +1789,6 @@ fraction1:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = json_parse_state::fraction1;
                 return;
         }
 fraction2:
@@ -1895,7 +1868,6 @@ fraction2:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = json_parse_state::fraction2;
                 return;
         }
 exp1:
@@ -1927,7 +1899,6 @@ exp1:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
-                state_ = json_parse_state::exp1;
                 return;
         }
 exp2:
@@ -1950,7 +1921,6 @@ exp2:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
-                state_ = json_parse_state::exp2;
                 return;
         }
         
@@ -2026,7 +1996,6 @@ exp3:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = json_parse_state::exp3;
                 return;
         }
 
@@ -2039,8 +2008,19 @@ exp3:
         const char_type* sb = input_ptr_;
 
 string_u1:
-        while (input_ptr_ < local_input_end)
+        while (true)
         {
+            if (input_ptr_ == local_input_end)
+            {
+                string_buffer_.append(sb,input_ptr_-sb);
+                position_ += (input_ptr_ - sb);
+                if (!chunk_rdr_->read_chunk(ec))
+                {
+                    return;
+                }
+                local_input_end = input_end_;
+                sb = input_ptr_;
+            }
             switch (*input_ptr_)
             {
                 JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -2137,20 +2117,6 @@ string_u1:
                 break;
             }
             ++input_ptr_;
-        }
-
-        // Buffer exhausted
-        
-        {
-            string_buffer_.append(sb,input_ptr_-sb);
-            position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
-            {
-                return;
-            }
-            local_input_end = input_end_;
-            sb = input_ptr_;
-            goto string_u1;
         }
 
 escape:
