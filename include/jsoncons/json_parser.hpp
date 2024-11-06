@@ -126,7 +126,7 @@ private:
     std::size_t mark_position_;
     std::size_t saved_position_;
     const char_type* begin_input_;
-    const char_type* end_input_;
+    const char_type* input_end_;
     const char_type* input_ptr_;
     json_parse_state state_;
     bool more_;
@@ -176,7 +176,7 @@ public:
          mark_position_(0),
          saved_position_(0),
          begin_input_(nullptr),
-         end_input_(nullptr),
+         input_end_(nullptr),
          input_ptr_(nullptr),
          state_(json_parse_state::start),
          more_(true),
@@ -218,7 +218,7 @@ public:
          mark_position_(0),
          saved_position_(0),
          begin_input_(nullptr),
-         end_input_(nullptr),
+         input_end_(nullptr),
          input_ptr_(nullptr),
          state_(json_parse_state::start),
          more_(true),
@@ -249,7 +249,7 @@ public:
 
     bool source_exhausted() const
     {
-        return input_ptr_ == end_input_;
+        return input_ptr_ == input_end_;
     }
 
     ~basic_json_parser() noexcept
@@ -304,12 +304,12 @@ public:
 
     const char_type* last() const
     {
-        return end_input_;
+        return input_end_;
     }
 
     void skip_space()
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
         while (input_ptr_ != local_input_end) 
         {
             switch (*input_ptr_)
@@ -339,7 +339,7 @@ public:
 
     void skip_whitespace()
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         while (input_ptr_ != local_input_end) 
         {
@@ -499,7 +499,7 @@ public:
         cp2_ = 0;
         saved_position_ = 0;
         begin_input_ = nullptr;
-        end_input_ = nullptr;
+        input_end_ = nullptr;
         input_ptr_ = nullptr;
         string_buffer_.clear();
     }
@@ -534,7 +534,7 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        for (; input_ptr_ != end_input_; ++input_ptr_)
+        for (; input_ptr_ != input_end_; ++input_ptr_)
         {
             char_type curr_char_ = *input_ptr_;
             switch (curr_char_)
@@ -564,7 +564,7 @@ public:
     void update(const char_type* data, std::size_t length)
     {
         begin_input_ = data;
-        end_input_ = data + length;
+        input_end_ = data + length;
         input_ptr_ = begin_input_;
     }
 
@@ -611,7 +611,7 @@ public:
             more_ = false;
             return;
         }
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && more_)
         {
@@ -1650,7 +1650,7 @@ public:
     void parse_true(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         saved_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 4))
+        if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
@@ -1685,7 +1685,7 @@ public:
     void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         saved_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 4))
+        if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
@@ -1720,7 +1720,7 @@ public:
     void parse_false(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         saved_position_ = position_;
-        if (JSONCONS_LIKELY(end_input_ - input_ptr_ >= 5))
+        if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 5))
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
@@ -1754,7 +1754,7 @@ public:
 
     void parse_number(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
 
         switch (state_)
         {
@@ -1784,7 +1784,7 @@ minus_sign:
             {
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -1816,7 +1816,7 @@ zero:
                 end_integer_value(visitor, ec);
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -1898,7 +1898,7 @@ integer:
                 end_integer_value(visitor, ec);
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -1974,7 +1974,7 @@ fraction1:
             {
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -2002,7 +2002,7 @@ fraction2:
                 end_fraction_value(visitor, ec);
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -2077,7 +2077,7 @@ exp1:
             {
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -2109,7 +2109,7 @@ exp2:
             {
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -2138,7 +2138,7 @@ exp3:
                 end_fraction_value(visitor, ec);
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
         }
         switch (*input_ptr_)
         {
@@ -2207,7 +2207,7 @@ exp3:
 
     void parse_string(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        const char_type* local_input_end = end_input_;
+        const char_type* local_input_end = input_end_;
         const char_type* sb = input_ptr_;
 
         switch (state_)
@@ -2350,7 +2350,7 @@ string_u1:
             {
                 return;
             }
-            local_input_end = end_input_;
+            local_input_end = input_end_;
             sb = input_ptr_;
             goto string_u1;
         }
@@ -2358,8 +2358,14 @@ string_u1:
 escape:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         switch (*input_ptr_)
         {
@@ -2419,8 +2425,14 @@ escape:
 escape_u1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u1;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp_ = append_to_codepoint(0, *input_ptr_, ec);
@@ -2437,8 +2449,14 @@ escape_u1:
 escape_u2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u2;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
@@ -2455,8 +2473,14 @@ escape_u2:
 escape_u3:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u3;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
@@ -2473,8 +2497,14 @@ escape_u3:
 escape_u4:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u4;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
@@ -2502,8 +2532,14 @@ escape_u4:
 escape_expect_surrogate_pair1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_expect_surrogate_pair1;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             switch (*input_ptr_)
@@ -2525,8 +2561,14 @@ escape_expect_surrogate_pair1:
 escape_expect_surrogate_pair2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_expect_surrogate_pair2;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             switch (*input_ptr_)
@@ -2547,8 +2589,14 @@ escape_expect_surrogate_pair2:
 escape_u5:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u5;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp2_ = append_to_codepoint(0, *input_ptr_, ec);
@@ -2565,8 +2613,14 @@ escape_u5:
 escape_u6:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u6;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
@@ -2583,8 +2637,14 @@ escape_u6:
 escape_u7:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u7;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
@@ -2601,8 +2661,14 @@ escape_u7:
 escape_u8:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::escape_u8;
-            return;
+            //string_buffer_.append(sb,input_ptr_-sb);
+            //position_ += (input_ptr_ - sb);
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = input_end_;
+            sb = input_ptr_;
         }
         {
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);

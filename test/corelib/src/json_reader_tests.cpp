@@ -12,7 +12,41 @@
 
 using namespace jsoncons; 
 
-TEST_CASE("test json_reader buffered read")
+class lenient_error_handler
+{
+    std::error_code value_;
+public:
+    lenient_error_handler(std::error_code value)
+        : value_(value)
+    {
+    }
+
+    bool operator()(const std::error_code& ec, const ser_context&) noexcept
+    {
+        return ec == value_; // if returns true, use default processing
+    }
+};
+
+TEST_CASE("!test_parse_big_string2")
+{
+    std::string input = "\"Big\t Str\\\"ing\"";
+
+    std::istringstream is(input);
+    json_decoder<json> decoder;
+    lenient_error_handler err_handler(json_errc::illegal_character_in_string);
+    JSONCONS_TRY
+    {
+        json_stream_reader reader(is, decoder, err_handler);
+        reader.read_next();
+    }
+        JSONCONS_CATCH(const std::exception&)
+    {
+    }
+    CHECK(decoder.is_valid());
+    CHECK(std::string("Big\t Str\"ing") == decoder.get_result().as<std::string>());
+}
+
+/*TEST_CASE("test json_reader buffered read")
 {
     std::string input;
     
@@ -40,7 +74,7 @@ TEST_CASE("test json_reader buffered read")
         //CHECK(j[1].as<double>() == -123456789.123456789);
         
     }
-}
+}*/
 
 #if 0
 

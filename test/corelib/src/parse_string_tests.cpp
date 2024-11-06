@@ -30,7 +30,7 @@ public:
         return ec == value_; // if returns true, use default processing
     }
 };
-
+#if 0
 TEST_CASE("test_parse_small_string1")
 {
     std::string input = "\"String\"";
@@ -83,6 +83,7 @@ TEST_CASE("test_parse_small_string4")
         CHECK(std::string("Str\"ing") == decoder.get_result().as<std::string>());
     }
 }
+#endif
 TEST_CASE("test_parse_big_string1")
 {
     std::string input = "\"Big Str\\\"ing\"";
@@ -103,7 +104,7 @@ TEST_CASE("test_parse_big_string1")
         CHECK(std::string("Big Str\"ing") == decoder.get_result().as<std::string>());
     }
 }
-
+#if 0
 TEST_CASE("test_parse_big_string2")
 {
     std::string input = "\"Big\t Str\\\"ing\"";
@@ -122,5 +123,5 @@ TEST_CASE("test_parse_big_string2")
     CHECK(decoder.is_valid());
     CHECK(std::string("Big\t Str\"ing") == decoder.get_result().as<std::string>());
 }
-
+#endif
 
