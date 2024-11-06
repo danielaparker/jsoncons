@@ -58,17 +58,6 @@ enum class json_parse_state : uint8_t
     array, 
     string,
     member_name,
-    escape, 
-    escape_u1, 
-    escape_u2, 
-    escape_u3, 
-    escape_u4, 
-    escape_expect_surrogate_pair1, 
-    escape_expect_surrogate_pair2, 
-    escape_u5, 
-    escape_u6, 
-    escape_u7, 
-    escape_u8, 
     minus, 
     zero,  
     integer,
@@ -2049,36 +2038,6 @@ exp3:
         const char_type* local_input_end = input_end_;
         const char_type* sb = input_ptr_;
 
-        switch (state_)
-        {
-            case json_parse_state::string:
-                goto string_u1;
-            case json_parse_state::escape:
-                goto escape;
-            case json_parse_state::escape_u1:
-                goto escape_u1;
-            case json_parse_state::escape_u2:
-                goto escape_u2;
-            case json_parse_state::escape_u3:
-                goto escape_u3;
-            case json_parse_state::escape_u4:
-                goto escape_u4;
-            case json_parse_state::escape_expect_surrogate_pair1:
-                goto escape_expect_surrogate_pair1;
-            case json_parse_state::escape_expect_surrogate_pair2:
-                goto escape_expect_surrogate_pair2;
-            case json_parse_state::escape_u5:
-                goto escape_u5;
-            case json_parse_state::escape_u6:
-                goto escape_u6;
-            case json_parse_state::escape_u7:
-                goto escape_u7;
-            case json_parse_state::escape_u8:
-                goto escape_u8;
-            default:
-                JSONCONS_UNREACHABLE();               
-        }
-
 string_u1:
         while (input_ptr_ < local_input_end)
         {
@@ -2257,7 +2216,6 @@ escape:
             err_handler_(json_errc::illegal_escaped_character, *this);
             ec = json_errc::illegal_escaped_character;
             more_ = false;
-            state_ = json_parse_state::escape;
             return;
         }
 
@@ -2277,7 +2235,6 @@ escape_u1:
             cp_ = append_to_codepoint(0, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u1;
                 return;
             }
             ++input_ptr_;
@@ -2301,7 +2258,6 @@ escape_u2:
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u2;
                 return;
             }
             ++input_ptr_;
@@ -2325,7 +2281,6 @@ escape_u3:
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u3;
                 return;
             }
             ++input_ptr_;
@@ -2349,7 +2304,6 @@ escape_u4:
             cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u4;
                 return;
             }
             if (unicode_traits::is_high_surrogate(cp_))
@@ -2392,7 +2346,6 @@ escape_expect_surrogate_pair1:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
                 ec = json_errc::expected_codepoint_surrogate_pair;
                 more_ = false;
-                state_ = json_parse_state::escape_expect_surrogate_pair1;
                 return;
             }
         }
@@ -2420,7 +2373,6 @@ escape_expect_surrogate_pair2:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
                 ec = json_errc::expected_codepoint_surrogate_pair;
                 more_ = false;
-                state_ = json_parse_state::escape_expect_surrogate_pair2;
                 return;
             }
         }
@@ -2441,7 +2393,6 @@ escape_u5:
             cp2_ = append_to_codepoint(0, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u5;
                 return;
             }
         }
@@ -2465,7 +2416,6 @@ escape_u6:
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u6;
                 return;
             }
             ++input_ptr_;
@@ -2489,7 +2439,6 @@ escape_u7:
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u7;
                 return;
             }
             ++input_ptr_;
@@ -2513,7 +2462,6 @@ escape_u8:
             cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
-                state_ = json_parse_state::escape_u8;
                 return;
             }
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
