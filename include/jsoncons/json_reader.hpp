@@ -149,7 +149,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader : public read_more_command 
+    class basic_json_reader final : public read_more_command 
     {
     public:
         using char_type = CharT;
@@ -164,6 +164,7 @@ namespace jsoncons {
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,TempAllocator> parser_;
+        bool eof_;
 
         // Noncopyable and nonmoveable
         basic_json_reader(const basic_json_reader&) = delete;
@@ -255,7 +256,7 @@ namespace jsoncons {
         {
         }
 
-        template <typename Sourceable>
+        template <typename Sourceable> 
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
@@ -263,7 +264,8 @@ namespace jsoncons {
                           const TempAllocator& temp_alloc = TempAllocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
-             parser_(options, err_handler, this, temp_alloc)
+             parser_(options, err_handler, this, temp_alloc),
+             eof_(false)
         {
         }
         
@@ -282,22 +284,11 @@ namespace jsoncons {
                         parser_.update(s.data(),s.size());
                         success = true;
                     }
+                    else
+                    {
+                        eof_ = true;
+                    }
                 }
-                /*bool eof = parser_.source_exhausted();
-                parser_.parse_some(visitor_, ec);
-                if (ec) return;
-                if (eof)
-                {
-                    if (parser_.enter())
-                    {
-                        break;
-                    }
-                    else if (!parser_.accept())
-                    {
-                        ec = json_errc::unexpected_eof;
-                        return;
-                    }
-                }*/
             }
             return success;
         }

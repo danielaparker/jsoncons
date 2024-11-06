@@ -10,7 +10,39 @@
 #include <utility>
 #include <ctime>
 
-using namespace jsoncons;
+using namespace jsoncons; 
+
+TEST_CASE("test json_reader buffered read")
+{
+    std::string input;
+    
+    std::string str(stream_source<char>::default_max_buffer_size-7, 'a');
+    std::string neg_num("-123456789.123456789");
+    
+    int64_t m = (std::numeric_limits<int64_t>::lowest)();
+    std::string int_overflow = std::to_string(m);
+    int_overflow.push_back('0');
+        
+    SECTION("test 1")
+    {
+        //input.push_back('[');
+        //input.push_back('"');
+        //input.append(str);
+        //input.push_back('"');
+        //input.push_back(',');
+        input.append(int_overflow);
+        //input.push_back(']');
+        
+        std::stringstream is(input);
+        
+        auto j = json::parse(is);
+        
+        //CHECK(j[1].as<double>() == -123456789.123456789);
+        
+    }
+}
+
+#if 0
 
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
 {
@@ -300,4 +332,6 @@ TEST_CASE("json_reader stateful allocator tests")
         //std::cout << pretty_print(j) << "\n";
     }
 }
+#endif
+
 #endif

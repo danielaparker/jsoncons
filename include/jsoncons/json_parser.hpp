@@ -571,7 +571,7 @@ public:
     void parse_some(basic_json_visitor<char_type>& visitor)
     {
         std::error_code ec;
-        parse_some(visitor, ec);
+        parse_some(visitor, ec); 
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,line_,column()));
@@ -617,16 +617,6 @@ public:
         {
             switch (state_)
             {
-                case json_parse_state::zero:  
-                case json_parse_state::integer:
-                    end_integer_value(visitor, ec);
-                    if (ec) return;
-                    break;
-                case json_parse_state::fraction2:
-                case json_parse_state::exp3:
-                    end_fraction_value(visitor, ec);
-                    if (ec) return;
-                    break;
                 case json_parse_state::accept:
                     visitor.flush();
                     done_ = true;
@@ -1790,8 +1780,11 @@ public:
 minus_sign:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::minus;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -1814,8 +1807,16 @@ minus_sign:
 zero:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::zero;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                end_integer_value(visitor, ec);
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -1888,8 +1889,16 @@ zero:
 integer:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::integer;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                end_integer_value(visitor, ec);
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -1961,8 +1970,11 @@ integer:
 fraction1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::fraction1;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -1981,8 +1993,16 @@ fraction1:
 fraction2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::fraction2;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                end_fraction_value(visitor, ec);
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -2053,8 +2073,11 @@ fraction2:
 exp1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::exp1;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -2082,8 +2105,11 @@ exp1:
 exp2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::exp2;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -2103,8 +2129,16 @@ exp2:
 exp3:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = json_parse_state::exp3;
-            return;
+            if (!more_command_->read_more(ec))
+            {
+                if (JSONCONS_UNLIKELY(ec))
+                {
+                    return;
+                }
+                end_fraction_value(visitor, ec);
+                return;
+            }
+            local_input_end = end_input_;
         }
         switch (*input_ptr_)
         {
@@ -2313,10 +2347,6 @@ string_u1:
             string_buffer_.append(sb,input_ptr_-sb);
             position_ += (input_ptr_ - sb);
             if (!more_command_->read_more(ec))
-            {
-                return;
-            }
-            if (ec)
             {
                 return;
             }
