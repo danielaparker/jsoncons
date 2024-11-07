@@ -58,9 +58,6 @@ enum class json_parse_state : uint8_t
     array, 
     string,
     member_name,
-    minus, 
-    zero,  
-    integer,
     cr,
     done
 };
@@ -721,19 +718,13 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
                             case '0': 
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                state_ = json_parse_state::zero;
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -741,9 +732,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1130,9 +1118,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1140,9 +1125,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1150,9 +1132,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1285,9 +1264,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1295,9 +1271,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1305,9 +1278,6 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1665,17 +1635,24 @@ public:
     void parse_number(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         const char_type* local_input_end = input_end_;
-
-        switch (state_)
+        
+        if (*input_ptr_ == '-')
         {
-            case json_parse_state::minus:
-                goto minus_sign;
-            case json_parse_state::zero:
-                goto zero;
-            case json_parse_state::integer:
-                goto integer;
-            default:
-                JSONCONS_UNREACHABLE();               
+            ++input_ptr_;
+            ++position_;
+            goto minus_sign;
+        }
+        else if (*input_ptr_ == '0')
+        {
+            ++input_ptr_;
+            ++position_;
+            goto zero;
+        }
+        else
+        {
+            ++input_ptr_;
+            ++position_;
+            goto integer;
         }
 minus_sign:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
@@ -1777,13 +1754,11 @@ zero:
                 err_handler_(json_errc::leading_zero, *this);
                 ec = json_errc::leading_zero;
                 more_ = false;
-                state_ = json_parse_state::zero;
                 return;
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = json_parse_state::zero;
                 return;
         }
 integer:
@@ -1864,7 +1839,6 @@ integer:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = json_parse_state::integer;
                 return;
         }
 fraction1:
