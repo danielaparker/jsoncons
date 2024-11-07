@@ -1451,25 +1451,18 @@ public:
 
     void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        static const char_type value[] = {'n','u','l','l'};
+        static const char_type pat[] = {'n','u','l','l'};
 
         saved_position_ = position_;
 
         std::ptrdiff_t n = input_end_ - input_ptr_;
-        std::ptrdiff_t m = 4 - n;
         if (JSONCONS_UNLIKELY(n < 4))
         {
-            bool matches = true;
-            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
-            {
-                if (*(input_ptr_+(i)) != value[i])
-                {
-                    matches = false;
-                }
-            }
+            std::ptrdiff_t m = 4 - n;
+            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
-            if (!matches)
+            if (matches != 0)
             {
                 ec = json_errc::invalid_value;
                 more_ = false;
@@ -1483,17 +1476,10 @@ public:
                 }
                 else
                 {
-                    matches = true;
-                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
-                    {
-                        if (*(input_ptr_+(i)) != value[n+i])
-                        {
-                            matches = false;
-                        }
-                    }
+                    matches = std::memcmp(input_ptr_, pat+n, m*sizeof(char_type));
                     input_ptr_ += m;
                     position_ += m;
-                    if (!matches)
+                    if (matches != 0)
                     {
                         ec = json_errc::invalid_value;
                         more_ = false;
@@ -1536,25 +1522,18 @@ public:
 
     void parse_true(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        static const char_type value[] = {'t','r','u','e'};
+        static const char_type pat[] = {'t','r','u','e'};
 
         saved_position_ = position_;
 
         std::ptrdiff_t n = input_end_ - input_ptr_;
-        std::ptrdiff_t m = 4 - n;
         if (JSONCONS_UNLIKELY(n < 4))
         {
-            bool matches = true;
-            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
-            {
-                if (*(input_ptr_+(i)) != value[i])
-                {
-                    matches = false;
-                }
-            }
+            std::ptrdiff_t m = 4 - n;
+            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
-            if (!matches)
+            if (matches != 0)
             {
                 ec = json_errc::invalid_value;
                 more_ = false;
@@ -1568,17 +1547,10 @@ public:
                 }
                 else
                 {
-                    matches = true;
-                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
-                    {
-                        if (*(input_ptr_+(i)) != value[n+i])
-                        {
-                            matches = false;
-                        }
-                    }
+                    matches = std::memcmp(input_ptr_, pat+n, m*sizeof(char_type));
                     input_ptr_ += m;
                     position_ += m;
-                    if (!matches)
+                    if (matches != 0)
                     {
                         ec = json_errc::invalid_value;
                         more_ = false;
@@ -1621,25 +1593,18 @@ public:
 
     void parse_false(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        static const char_type value[] = {'f','a','l','s','e'};
+        static const char_type pat[] = {'f','a','l','s','e'};
             
         saved_position_ = position_;
         
         std::ptrdiff_t n = input_end_ - input_ptr_;
-        std::ptrdiff_t m = 5 - n;
         if (JSONCONS_UNLIKELY(n < 5))
         {
-            bool matches = true;
-            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
-            {
-                if (*(input_ptr_+(i)) != value[i])
-                {
-                    matches = false;
-                }
-            }
+            std::ptrdiff_t m = 5 - n;
+            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
-            if (!matches)
+            if (matches != 0)
             {
                 ec = json_errc::invalid_value;
                 more_ = false;
@@ -1653,17 +1618,10 @@ public:
                 }
                 else
                 {
-                    matches = true;
-                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
-                    {
-                        if (*(input_ptr_+(i)) != value[n+i])
-                        {
-                            matches = false;
-                        }
-                    }
+                    matches = std::memcmp(input_ptr_, pat+n, m*sizeof(char_type));
                     input_ptr_ += m;
                     position_ += m;
-                    if (!matches)
+                    if (matches != 0)
                     {
                         ec = json_errc::invalid_value;
                         more_ = false;
