@@ -1459,7 +1459,7 @@ public:
         if (JSONCONS_UNLIKELY(n < 4))
         {
             std::ptrdiff_t m = 4 - n;
-            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
+            int matches = std::memcmp(input_ptr_+1, pat+1, (n-1)*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
             if (matches != 0)
@@ -1530,7 +1530,7 @@ public:
         if (JSONCONS_UNLIKELY(n < 4))
         {
             std::ptrdiff_t m = 4 - n;
-            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
+            int matches = std::memcmp(input_ptr_+1, pat+1, (n-1)*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
             if (matches != 0)
@@ -1601,7 +1601,7 @@ public:
         if (JSONCONS_UNLIKELY(n < 5))
         {
             std::ptrdiff_t m = 5 - n;
-            int matches = std::memcmp(input_ptr_, pat, n*sizeof(char_type));
+            int matches = std::memcmp(input_ptr_+1, pat+1, (n-1)*sizeof(char_type));
             input_ptr_ += n;
             position_ += n;
             if (matches != 0)
