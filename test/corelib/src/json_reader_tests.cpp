@@ -55,8 +55,9 @@ TEST_CASE("test json_reader buffered read")
         std::stringstream is(str2);
 
         auto j = json::parse(is);
-
-        //CHECK(j[1].as<double>() == -123456789.123456789);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK_FALSE(j[1].as<bool>());
 
     }
 
@@ -74,6 +75,9 @@ TEST_CASE("test json_reader buffered read")
         std::stringstream is(str2);
 
         auto j = json::parse(is);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[1].as<bool>());
     }
 
     SECTION("null with split buffer")
@@ -84,12 +88,15 @@ TEST_CASE("test json_reader buffered read")
         str2.append(stream_source<char>::default_max_buffer_size - 5, 'a');
         str2.push_back('"');
         str2.push_back(',');
-        str2.append("true");
+        str2.append("null");
         str2.push_back(']');
 
         std::stringstream is(str2);
 
         auto j = json::parse(is);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[1].is_null());
     }
 }
 

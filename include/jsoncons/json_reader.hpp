@@ -273,23 +273,18 @@ namespace jsoncons {
         {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
-            if (!parser_.stopped())
+            auto s = source_.read_buffer(ec);
+            if (ec) return false;
+            if (s.size() > 0)
             {
-                //if (parser_.source_exhausted())
-                {
-                    auto s = source_.read_buffer(ec);
-                    if (ec) return false;
-                    if (s.size() > 0)
-                    {
-                        parser_.update(s.data(),s.size());
-                        success = true;
-                    }
-                    else
-                    {
-                        eof_ = true;
-                    }
-                }
+                parser_.update(s.data(),s.size());
+                success = true;
             }
+            else
+            {
+                eof_ = true;
+            }
+            
             return success;
         }
 
