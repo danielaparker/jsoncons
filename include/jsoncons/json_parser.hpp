@@ -1451,116 +1451,256 @@ public:
 
     void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        static const char_type value[] = {'n','u','l','l'};
+
         saved_position_ = position_;
 
-        if (JSONCONS_LIKELY(input_end_ - input_ptr_ < 4))
+        std::ptrdiff_t n = input_end_ - input_ptr_;
+        std::ptrdiff_t m = 4 - n;
+        if (JSONCONS_UNLIKELY(n < 4))
         {
-            if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < 4)
+            bool matches = true;
+            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
             {
-                std::ptrdiff_t diff = input_end_ - input_ptr_;
-                input_ptr_ += diff;
-                position_ += diff;
+                if (*(input_ptr_+(i)) != value[i])
+                {
+                    matches = false;
+                }
+            }
+            input_ptr_ += n;
+            position_ += n;
+            if (!matches)
+            {
                 ec = json_errc::invalid_value;
                 more_ = false;
-                return;
-            }
-        }           
-
-        if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
-        {
-            input_ptr_ += 4;
-            position_ += 4;
-            more_ = visitor.null_value(semantic_tag::none, *this, ec);
-            if (parent() == json_parse_state::root)
-            {
-                state_ = json_parse_state::accept;
             }
             else
             {
-                state_ = json_parse_state::expect_comma_or_end;
+                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                {
+                    ec = json_errc::invalid_value;
+                    more_ = false;
+                }
+                else
+                {
+                    matches = true;
+                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
+                    {
+                        if (*(input_ptr_+(i)) != value[n+i])
+                        {
+                            matches = false;
+                        }
+                    }
+                    input_ptr_ += m;
+                    position_ += m;
+                    if (!matches)
+                    {
+                        ec = json_errc::invalid_value;
+                        more_ = false;
+                    }
+                    more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                    if (parent() == json_parse_state::root)
+                    {
+                        state_ = json_parse_state::accept;
+                    }
+                    else
+                    {
+                        state_ = json_parse_state::expect_comma_or_end;
+                    }
+                }
             }
         }
         else
         {
-            err_handler_(json_errc::invalid_value, *this);
-            ec = json_errc::invalid_value;
-            more_ = false;
+            if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
+            {
+                input_ptr_ += 4;
+                position_ += 4;
+                more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                if (parent() == json_parse_state::root)
+                {
+                    state_ = json_parse_state::accept;
+                }
+                else
+                {
+                    state_ = json_parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                ec = json_errc::invalid_value;
+                more_ = false;
+            }
         }
     }
 
     void parse_true(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        static const char_type value[] = {'t','r','u','e'};
+
         saved_position_ = position_;
-        if (JSONCONS_LIKELY(input_end_ - input_ptr_ < 4))
+
+        std::ptrdiff_t n = input_end_ - input_ptr_;
+        std::ptrdiff_t m = 4 - n;
+        if (JSONCONS_UNLIKELY(n < 4))
         {
-            if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < 4)
+            bool matches = true;
+            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
             {
-                std::ptrdiff_t diff = input_end_ - input_ptr_;
-                input_ptr_ += diff;
-                position_ += diff;
+                if (*(input_ptr_+(i)) != value[i])
+                {
+                    matches = false;
+                }
+            }
+            input_ptr_ += n;
+            position_ += n;
+            if (!matches)
+            {
                 ec = json_errc::invalid_value;
                 more_ = false;
-                return;
-            }
-        }           
-            
-        if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
-        {
-            input_ptr_ += 4;
-            position_ += 4;
-            more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
-            if (parent() == json_parse_state::root)
-            {
-                state_ = json_parse_state::accept;
             }
             else
             {
-                state_ = json_parse_state::expect_comma_or_end;
+                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                {
+                    ec = json_errc::invalid_value;
+                    more_ = false;
+                }
+                else
+                {
+                    matches = true;
+                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
+                    {
+                        if (*(input_ptr_+(i)) != value[n+i])
+                        {
+                            matches = false;
+                        }
+                    }
+                    input_ptr_ += m;
+                    position_ += m;
+                    if (!matches)
+                    {
+                        ec = json_errc::invalid_value;
+                        more_ = false;
+                    }
+                    more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
+                    if (parent() == json_parse_state::root)
+                    {
+                        state_ = json_parse_state::accept;
+                    }
+                    else
+                    {
+                        state_ = json_parse_state::expect_comma_or_end;
+                    }
+                }
             }
         }
         else
         {
-            err_handler_(json_errc::invalid_value, *this);
-            ec = json_errc::invalid_value;
-            more_ = false;
+            if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
+            {
+                input_ptr_ += 4;
+                position_ += 4;
+                more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
+                if (parent() == json_parse_state::root)
+                {
+                    state_ = json_parse_state::accept;
+                }
+                else
+                {
+                    state_ = json_parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                ec = json_errc::invalid_value;
+                more_ = false;
+            }
         }
     }
 
     void parse_false(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        static const char_type value[] = {'f','a','l','s','e'};
+            
         saved_position_ = position_;
-        if (JSONCONS_LIKELY(input_end_ - input_ptr_ < 5))
+        
+        std::ptrdiff_t n = input_end_ - input_ptr_;
+        std::ptrdiff_t m = 5 - n;
+        if (JSONCONS_UNLIKELY(n < 5))
         {
-            if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < 5)
+            bool matches = true;
+            for (std::ptrdiff_t i = 1; i < n && matches; ++i)
             {
-                std::ptrdiff_t diff = input_end_ - input_ptr_;
-                input_ptr_ += diff;
-                position_ += diff;
+                if (*(input_ptr_+(i)) != value[i])
+                {
+                    matches = false;
+                }
+            }
+            input_ptr_ += n;
+            position_ += n;
+            if (!matches)
+            {
                 ec = json_errc::invalid_value;
                 more_ = false;
-                return;
-            }
-        }
-
-        if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
-        {
-            input_ptr_ += 5;
-            position_ += 5;
-            more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
-            if (parent() == json_parse_state::root)
-            {
-                state_ = json_parse_state::accept;
             }
             else
             {
-                state_ = json_parse_state::expect_comma_or_end;
+                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                {
+                    ec = json_errc::invalid_value;
+                    more_ = false;
+                }
+                else
+                {
+                    matches = true;
+                    for (std::ptrdiff_t i = 0; i < m && matches; ++i)
+                    {
+                        if (*(input_ptr_+(i)) != value[n+i])
+                        {
+                            matches = false;
+                        }
+                    }
+                    input_ptr_ += m;
+                    position_ += m;
+                    if (!matches)
+                    {
+                        ec = json_errc::invalid_value;
+                        more_ = false;
+                    }
+                    more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                    if (parent() == json_parse_state::root)
+                    {
+                        state_ = json_parse_state::accept;
+                    }
+                    else
+                    {
+                        state_ = json_parse_state::expect_comma_or_end;
+                    }
+                }
             }
         }
         else
         {
-            err_handler_(json_errc::invalid_value, *this);
-            ec = json_errc::invalid_value;
-            more_ = false;
+            if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
+            {
+                input_ptr_ += 5;
+                position_ += 5;
+                more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                if (parent() == json_parse_state::root)
+                {
+                    state_ = json_parse_state::accept;
+                }
+                else
+                {
+                    state_ = json_parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                ec = json_errc::invalid_value;
+                more_ = false;
+            }
         }
     }
 

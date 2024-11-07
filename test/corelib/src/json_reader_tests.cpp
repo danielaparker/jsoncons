@@ -23,7 +23,7 @@ TEST_CASE("test json_reader buffered read")
     std::string int_overflow = std::to_string(m);
     int_overflow.push_back('0');
         
-    SECTION("test 1")
+    /*SECTION("test 1")
     {
         //input.push_back('[');
         //input.push_back('"');
@@ -39,10 +39,59 @@ TEST_CASE("test json_reader buffered read")
         
         //CHECK(j[1].as<double>() == -123456789.123456789);
         
+    }*/
+
+    SECTION("false with split buffer")
+    {
+        std::string str2;
+        str2.push_back('[');
+        str2.push_back('"');
+        str2.append(stream_source<char>::default_max_buffer_size-8, 'a');
+        str2.push_back('"');
+        str2.push_back(',');
+        str2.append("false");
+        str2.push_back(']');
+
+        std::stringstream is(str2);
+
+        auto j = json::parse(is);
+
+        //CHECK(j[1].as<double>() == -123456789.123456789);
+
+    }
+
+    SECTION("true with split buffer")
+    {
+        std::string str2;
+        str2.push_back('[');
+        str2.push_back('"');
+        str2.append(stream_source<char>::default_max_buffer_size - 6, 'a');
+        str2.push_back('"');
+        str2.push_back(',');
+        str2.append("true");
+        str2.push_back(']');
+
+        std::stringstream is(str2);
+
+        auto j = json::parse(is);
+    }
+
+    SECTION("null with split buffer")
+    {
+        std::string str2;
+        str2.push_back('[');
+        str2.push_back('"');
+        str2.append(stream_source<char>::default_max_buffer_size - 5, 'a');
+        str2.push_back('"');
+        str2.push_back(',');
+        str2.append("true");
+        str2.push_back(']');
+
+        std::stringstream is(str2);
+
+        auto j = json::parse(is);
     }
 }
-
-#if 0
 
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
 {
@@ -332,6 +381,4 @@ TEST_CASE("json_reader stateful allocator tests")
         //std::cout << pretty_print(j) << "\n";
     }
 }
-#endif
-
 #endif

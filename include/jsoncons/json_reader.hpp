@@ -275,7 +275,7 @@ namespace jsoncons {
             bool success = false;
             if (!parser_.stopped())
             {
-                if (parser_.source_exhausted())
+                //if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
                     if (ec) return false;
