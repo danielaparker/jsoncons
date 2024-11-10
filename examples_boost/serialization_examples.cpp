@@ -5,8 +5,10 @@
 #include <jsoncons/json.hpp>
 #include <iomanip>
 #include <assert.h>
+#include <boost/multiprecision/cpp_int.hpp>
 
 using namespace jsoncons;
+namespace boost_mp = boost::multiprecision;
 
 void serialization_example1()
 {
@@ -409,7 +411,8 @@ void bignum_access_examples()
     // If your compiler supports extended integral types
 #if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128)
     __int128 i = j.as<__int128>();
-    std::cout << "(4) " << i << "\n\n";
+    boost_mp::int128_t boost_i = static_cast<boost_mp::int128_t>(i);
+    std::cout << "(4) " << boost_i << "\n\n";
 #endif
 }
 
@@ -485,7 +488,9 @@ int main()
     decimal_precision_examples();
     bignum_access_examples(); 
     chinese_char();
-    chinese_uchar8_t();
+    #ifdef __cpp_char8_t
+        chinese_uchar8_t();
+    #endif
     std::cout << std::endl;
 }
 
