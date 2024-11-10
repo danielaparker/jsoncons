@@ -19,9 +19,16 @@ include_directories (../../include
 
 file(GLOB_RECURSE Example_sources ../../src/*.cpp)
 
-add_executable (jsoncons_examples ${Example_sources})
+# Loop through each example file and create an executable for each
+foreach(example_file ${Example_sources})
+    # Extract the filename without path and extension
+    get_filename_component(example_name ${example_file} NAME_WE)
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  # special link option on Linux because llvm stl rely on GNU stl
-  target_link_libraries (jsoncons_examples -Wl,-lstdc++)
-endif()
+    # Create an executable with the example name and file
+    add_executable(${example_name} ${example_file})
+
+    if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+      # special link option on Linux because llvm stl rely on GNU stl
+      target_link_libraries(${example_name} -Wl,-lstdc++)
+    endif()
+endforeach()
