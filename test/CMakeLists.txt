@@ -133,7 +133,7 @@ add_executable(unit_tests
                corelib/src/dtoa_tests.cpp
                corelib/src/encode_decode_json_tests.cpp
                corelib/src/encode_traits_tests.cpp
-               corelib/src/error_recovery_tests.cpp
+               corelib/src/json_parser_recovery_tests.cpp
                corelib/src/json_array_tests.cpp
                corelib/src/json_as_tests.cpp
                corelib/src/json_bitset_traits_tests.cpp

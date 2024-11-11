@@ -46,7 +46,6 @@ enum class json_parse_state : uint8_t
     expect_value_or_end,
     expect_value,
     array, 
-    string,
     member_name,
     cr,
     done
@@ -728,7 +727,6 @@ public:
                             if (ec) return;
                             break;
                         case '\"':
-                            state_ = json_parse_state::string;
                             saved_position_ = position_;
                             ++input_ptr_;
                             ++position_;
@@ -915,7 +913,6 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 push_state(json_parse_state::member_name);
-                                state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
                                 if (ec) return;
@@ -983,7 +980,6 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 push_state(json_parse_state::member_name);
-                                state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
                                 if (ec) return;
@@ -1131,7 +1127,6 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
                                 if (ec) return;
@@ -1277,7 +1272,6 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
                                 if (ec) return;
@@ -1337,10 +1331,6 @@ public:
                                 break;
                             }
                         }
-                    break;
-                case json_parse_state::string: 
-                    parse_string(visitor, ec);
-                    if (ec) return;
                     break;
                 case json_parse_state::slash: 
                 {
@@ -2341,8 +2331,7 @@ escape_u4:
                 unicode_traits::convert(&cp_, 1, string_buffer_);
                 sb = ++input_ptr_;
                 ++position_;
-                state_ = json_parse_state::string;
-                return;
+                goto string_u1;
             }
         }
 

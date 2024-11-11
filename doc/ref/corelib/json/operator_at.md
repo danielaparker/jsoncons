@@ -2,7 +2,7 @@
 
 ```cpp
 proxy_type operator[](const string_view_type& key);             (1)  (until 0.179.0)
-reference operator[](const string_view_type& key);                 (since 0.179.0)
+reference operator[](const string_view_type& key);                   (since 0.179.0)
 
 const_reference operator[](const string_view_type& key) const;  (2)
 
@@ -14,18 +14,33 @@ const_reference operator[](std::size_t i) const;                (4)
 (1) Unitl 0.179.0, returns a "reference-like" proxy object that can be used to access 
 or assign to the underlying keyed value. 
   
-Since 0.179, returns a reference to the value that is associated with `key`, 
-performing an insertion if no such `key` exists.  
+Since 0.179, returns a reference to the value mapped to `key`, 
+inserting a default constructed value mapped to `key` if no such key already exists 
+(a default constructed value is an empty object.)
 
-(2) If `key` matches the key of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
-Throws `std::domain_error` if not an object.
-Throws `std::out_of_range` if the object does not have a member with the specified key.  
+(2) Until 0.179.0, if `key` exists, returns a const reference to the `basic_json` value mapped to `key`, otherwise throws.
+
+Since 0.179.0, returns a const reference to the `basic_json` value mapped to `key`, returning a const reference to a default 
+constructed `basic_json` value with static storage duration if no such key already exists.
 
 (3) Returns a reference to the value at index i in a `basic_json` object or array.
 Throws `std::domain_error` if not an object or array.
 
 (4) Returns a `const_reference` to the value at index i in a `basic_json` object or array.
 Throws `std::domain_error` if not an object or array.
+
+Exceptions
+
+(1) Throws `std::domain_error` if not an object. Until 0.179.0, throws a `std::out_of_range` if 
+assigning to a `basic_json` and the key does not exist. Since 0.179.0, inserts a default constructed
+key-value pair if the key does not exist. 
+
+(2) Throws `std::domain_error` if not an object. Until 0.179.0, throws a `std::out_of_range` if 
+the key does not exist. Since 0.179.0, does 
+
+(3) Throws `std::domain_error` if not an array.
+
+(4) Throws `std::domain_error` if not an array.
 
 #### Notes
 
