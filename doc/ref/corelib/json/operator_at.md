@@ -2,7 +2,7 @@
 
 ```cpp
 proxy_type operator[](const string_view_type& key);             (1)  (until 0.179.0)
-basic_json& operator[](const string_view_type& key);                 (since 0.179.0)
+reference operator[](const string_view_type& key);                 (since 0.179.0)
 
 const_reference operator[](const string_view_type& key) const;  (2)
 
@@ -34,7 +34,7 @@ when this operator is used for reading but the key does not exist.
 
 ### Examples
 
-#### Assigning to and` object when the key does not exist
+#### Assigning to an object when the key does not exist
 
 ```cpp
 int main()

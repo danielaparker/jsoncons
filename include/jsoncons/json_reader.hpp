@@ -149,7 +149,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader final : public chunk_reader 
+    class basic_json_reader final : public chunk_reader<CharT> 
     {
     public:
         using char_type = CharT;
@@ -264,12 +264,12 @@ namespace jsoncons {
                           const TempAllocator& temp_alloc = TempAllocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
-             parser_(options, err_handler, this, temp_alloc),
+             parser_(this, options, err_handler, temp_alloc),
              eof_(false)
         {
         }
         
-        virtual bool read_chunk(std::error_code& ec)
+        bool read_chunk(basic_json_parser_input<char_type>&, std::error_code& ec) final
         {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
@@ -306,32 +306,18 @@ namespace jsoncons {
                 return;
             }        
             parser_.reset();
-            while (!parser_.stopped())
+            auto s = source_.read_buffer(ec);
+            if (ec) return;
+            if (s.size() > 0)
             {
-                if (parser_.source_exhausted())
-                {
-                    auto s = source_.read_buffer(ec);
-                    if (ec) return;
-                    if (s.size() > 0)
-                    {
-                        parser_.update(s.data(),s.size());
-                    }
-                }
-                bool eof = parser_.source_exhausted();
-                parser_.parse_some(visitor_, ec);
-                if (ec) return;
-                if (eof)
-                {
-                    if (parser_.enter())
-                    {
-                        break;
-                    }
-                    else if (!parser_.accept())
-                    {
-                        ec = json_errc::unexpected_eof;
-                        return;
-                    }
-                }
+                parser_.update(s.data(),s.size());
+            }
+            parser_.parse_some(visitor_, ec);
+            if (ec) return;
+            if (!parser_.enter() && !parser_.accept())
+            {
+                ec = json_errc::unexpected_eof;
+                return;
             }
             
             while (!source_.eof())
@@ -339,11 +325,11 @@ namespace jsoncons {
                 parser_.skip_whitespace(ec);
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_.read_buffer(ec);
+                    auto s1 = source_.read_buffer(ec);
                     if (ec) return;
-                    if (s.size() > 0)
+                    if (s1.size() > 0)
                     {
-                        parser_.update(s.data(),s.size());
+                        parser_.update(s1.data(),s1.size());
                     }
                 }
                 else

@@ -25,7 +25,6 @@ TEST_CASE("Test cyrillic.json")
     REQUIRE(is);
     json j = json::parse(is);
 }
-#if 0
 
 TEST_CASE("test_object2")
 {
@@ -232,47 +231,43 @@ TEST_CASE("test_parse_null")
     json j = decoder.get_result();
 }
 
-TEST_CASE("test_parse_array_string")
-{
-    jsoncons::json_decoder<json> decoder;
-    json_parser parser;
-
-    parser.reset();
-
-    static std::string s1("[\"\"");
-
-    parser.update(s1.data(),s1.length());
-    parser.parse_some(decoder);
-    CHECK_FALSE(parser.done());
-    static std::string s2("]");
-    parser.update(s2.data(), s2.length());
-    parser.parse_some(decoder);
-    parser.finish_parse(decoder);
-    CHECK(parser.done());
-
-    json j = decoder.get_result();
-}
-
 TEST_CASE("test_incremental_parsing")
 {
-    jsoncons::json_decoder<json> decoder;
-    json_parser parser;
+    SECTION("Array of strings")
+    {
+        std::vector<std::string> chunks = {"[fal", "se]"};
+        std::size_t index = 0;
 
-    parser.reset();
+        auto read_chunk = [&](jsoncons::json_parser_input& input, std::error_code& /*ec*/) -> bool
+        {
+            if (index < chunks.size())
+            {
+                input.update(chunks[index].data(), chunks[index].size());
+                ++index;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        };
 
-    parser.update("[fal",4);
-    parser.parse_some(decoder);
-    CHECK_FALSE(parser.done());
-    CHECK(parser.source_exhausted());
-    parser.update("se]",3);
-    parser.parse_some(decoder);
+        jsoncons::json_decoder<json> decoder;
+        json_parser parser{read_chunk};
 
-    parser.finish_parse(decoder);
-    CHECK(parser.done());
+        parser.reset();
 
-    json j = decoder.get_result();
-    REQUIRE(j.is_array());
-    CHECK_FALSE(j[0].as<bool>());
+        parser.parse_some(decoder);
+        CHECK_FALSE(parser.done());
+        CHECK(parser.source_exhausted());
+        parser.parse_some(decoder);
+        parser.finish_parse(decoder);
+        CHECK(parser.done());
+
+        json j = decoder.get_result();
+        REQUIRE(j.is_array());
+        CHECK_FALSE(j[0].as<bool>());
+    }
 }
 
 TEST_CASE("test_parser_reinitialization")
@@ -339,4 +334,4 @@ TEST_CASE("test_diagnostics_visitor", "")
         CHECK(os.str() == expected.str());
     }
 }
-#endif
+

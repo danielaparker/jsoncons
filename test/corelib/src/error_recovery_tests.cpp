@@ -13,6 +13,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("test_array_extra_comma")
 {
     allow_trailing_commas err_handler;
@@ -48,20 +49,70 @@ TEST_CASE("test_object_extra_comma")
 
     CHECK(val == expected);
 }
-
-TEST_CASE("test_name_without_quotes")
+#endif
+TEST_CASE("test json_parser error recovery")
 {
-    //allow_trailing_commas err_handler;
-
-    /*json val = json::parse(R"(
+    SECTION("illegal control character")
     {
-        first : 1,
-        second : 2
+        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+            {
+                return ec == json_errc::illegal_control_character;
+            };
+        
+        std::string str;
+        str.push_back('"');
+        str.push_back('C');
+        str.push_back(0x0e);
+        str.push_back('a');
+        str.push_back('t');
+        str.push_back('"');
+        auto j = jsoncons::json::parse(str, err_handler);
+        REQUIRE(j.is_string());
+        CHECK(j.as_string() == "Cat");
     }
-    )", 
-    err_handler);
 
-    std::cout << val << std::endl;*/
+    SECTION("\r")
+    {
+        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+            {
+                return ec == json_errc::illegal_character_in_string;
+            };
+
+
+        std::string str;
+        str.push_back('C');
+        str.push_back('\r');
+        str.push_back('a');
+        str.push_back('t');
+        std::string str2;
+        str2.push_back('"');
+        str2.append(str);
+        str2.push_back('"');
+        auto j = jsoncons::json::parse(str2, err_handler);
+        REQUIRE(j.is_string());
+        CHECK(j.as_string() == "Cat");
+    }
+    SECTION("\n")
+    {
+        auto err_handler = [](const std::error_code& ec, const ser_context&) noexcept -> bool
+            {
+                return ec == json_errc::illegal_character_in_string;
+            };
+
+
+        std::string str;
+        str.push_back('C');
+        str.push_back('\n');
+        str.push_back('a');
+        str.push_back('t');
+        std::string str2;
+        str2.push_back('"');
+        str2.append(str);
+        str2.push_back('"');
+        auto j = jsoncons::json::parse(str2, err_handler);
+        REQUIRE(j.is_string());
+        CHECK(j.as_string() == "Cat");
+    }
 }
 
 

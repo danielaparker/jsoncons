@@ -29,11 +29,23 @@
 
 namespace jsoncons {
 
+template <typename CharT>
+class basic_json_parser_input
+{
+public:
+    using char_type = CharT;
+    
+    virtual void update(const char_type* data, std::size_t length) = 0;
+};
+
+template <typename CharT>
 class chunk_reader
 {
 public:
+    using char_type = CharT;
+
     virtual ~chunk_reader() = default;
-    virtual bool read_chunk(std::error_code&)
+    virtual bool read_chunk(basic_json_parser_input<char_type>&, std::error_code&)
     {
         return false;
     }
@@ -63,12 +75,33 @@ enum class json_parse_state : uint8_t
 };
 
 template <typename CharT,typename TempAllocator  = std::allocator<char>>
-class basic_json_parser : public ser_context
+class basic_json_parser : public ser_context, public virtual basic_json_parser_input<CharT> 
 {
 public:
     using char_type = CharT;
     using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
+    using chunk_reader_type = std::function<bool(basic_json_parser_input<char_type>& input, std::error_code& ec)>;
 private:
+    class chunk_reader_adaptor : public chunk_reader<char_type>
+    {
+        chunk_reader_type read_chunk_;
+
+    public:
+        chunk_reader_adaptor()
+            : read_chunk_([](basic_json_parser_input<char_type>&, std::error_code&){return false;})
+        {
+        }
+        chunk_reader_adaptor(chunk_reader_type read_chunk)
+            : read_chunk_(read_chunk)
+        {
+        }
+
+        bool read_chunk(basic_json_parser_input<char_type>& input, std::error_code& ec)
+        {
+            return read_chunk_(input, ec);
+        }
+    };
+
     struct string_maps_to_double
     {
         string_view_type s;
@@ -109,8 +142,8 @@ private:
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
-    chunk_reader default_chunk_reader;
-    chunk_reader* chunk_rdr_ = &default_chunk_reader;
+    chunk_reader_adaptor chk_rdr_;
+    chunk_reader<char_type>* chunk_rdr_;
     
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -122,21 +155,35 @@ public:
     {
     }
 
+    basic_json_parser(chunk_reader_type chunk_rdr, const TempAllocator& temp_alloc = TempAllocator())
+        : basic_json_parser(chunk_rdr, basic_json_decode_options<char_type>(), default_json_parsing(), 
+            temp_alloc)
+    {
+    }
+
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+        const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(basic_json_decode_options<char_type>(), err_handler, temp_alloc)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<char_type>& options, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+        const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(options, options.err_handler(), temp_alloc)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<char_type>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& temp_alloc = TempAllocator())
+        std::function<bool(json_errc,const ser_context&)> err_handler, 
+        const TempAllocator& temp_alloc = TempAllocator())
+       : basic_json_parser(&chk_rdr_, options, err_handler, temp_alloc)
+    {
+    }
+
+    basic_json_parser(chunk_reader<char_type>* chunk_rdr,
+        const basic_json_decode_options<char_type>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler, 
+        const TempAllocator& temp_alloc = TempAllocator())
        : options_(options),
          err_handler_(err_handler),
          nesting_depth_(0), 
@@ -153,7 +200,9 @@ public:
          more_(true),
          done_(false),
          string_buffer_(temp_alloc),
-         state_stack_(temp_alloc)
+         state_stack_(temp_alloc),
+         chk_rdr_{},
+         chunk_rdr_(chunk_rdr)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 
@@ -175,10 +224,10 @@ public:
         }
     }
 
-    basic_json_parser(const basic_json_decode_options<char_type>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      chunk_reader* observer,
-                      const TempAllocator& temp_alloc = TempAllocator())
+    basic_json_parser(chunk_reader_type chunk_rdr,
+        const basic_json_decode_options<char_type>& options,
+        std::function<bool(json_errc,const ser_context&)> err_handler, 
+        const TempAllocator& temp_alloc = TempAllocator())
        : options_(options),
          err_handler_(err_handler),
          nesting_depth_(0), 
@@ -196,7 +245,8 @@ public:
          done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc),
-         chunk_rdr_(observer)
+         chk_rdr_(chunk_rdr),
+         chunk_rdr_(&chk_rdr_)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 
@@ -285,7 +335,7 @@ public:
         {
             if (input_ptr_ == local_input_end)
             {
-                if (!chunk_rdr_->read_chunk(ec))
+                if (!chunk_rdr_->read_chunk(*this, ec))
                 {
                     break;
                 }
@@ -324,7 +374,7 @@ public:
         {
             if (input_ptr_ == local_input_end)
             {
-                if (!chunk_rdr_->read_chunk(ec))
+                if (!chunk_rdr_->read_chunk(*this, ec))
                 {
                     break;
                 }
@@ -548,7 +598,7 @@ public:
         update(sv.data(),sv.length());
     }
 
-    void update(const char_type* data, std::size_t length)
+    void update(const char_type* data, std::size_t length) final
     {
         begin_input_ = data;
         input_end_ = data + length;
@@ -602,26 +652,38 @@ public:
 
         if (input_ptr_ == local_input_end && more_)
         {
-            switch (state_)
+            if (input_ptr_ == local_input_end)
             {
-                case json_parse_state::accept:
-                    visitor.flush();
-                    done_ = true;
-                    state_ = json_parse_state::done;
-                    more_ = false;
-                    break;
-                case json_parse_state::start:
-                case json_parse_state::done:
-                    more_ = false;
-                    break;
-                case json_parse_state::cr:
-                    state_ = pop_state();
-                    break;
-                default:
-                    err_handler_(json_errc::unexpected_eof, *this);
-                    ec = json_errc::unexpected_eof;
-                    more_ = false;
+                chunk_rdr_->read_chunk(*this, ec);
+                if (ec)
+                {
                     return;
+                }
+                local_input_end = input_end_;
+            }
+            if (input_ptr_ == local_input_end)
+            {
+                switch (state_)
+                {
+                    case json_parse_state::accept:
+                        visitor.flush();
+                        done_ = true;
+                        state_ = json_parse_state::done;
+                        more_ = false;
+                        break;
+                    case json_parse_state::start:
+                    case json_parse_state::done:
+                        more_ = false;
+                        break;
+                    case json_parse_state::cr:
+                        state_ = pop_state();
+                        break;
+                    default:
+                        err_handler_(json_errc::unexpected_eof, *this);
+                        ec = json_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                }
             }
         }
 
@@ -629,12 +691,13 @@ public:
         {
             if (input_ptr_ == local_input_end)
             {
-                if (!chunk_rdr_->read_chunk(ec))
+                if (!chunk_rdr_->read_chunk(*this, ec))
                 {
                     break;
                 }
                 local_input_end = input_end_;
             }
+            
             switch (state_)
             {
                 case json_parse_state::accept:
@@ -659,112 +722,112 @@ public:
                     }
                     break;
                 case json_parse_state::start: 
+                {
+                    switch (*input_ptr_)
                     {
-                        switch (*input_ptr_)
-                        {
-                            JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                more_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!more_)
-                                {
-                                    ec = json_errc::illegal_control_character;
-                                    return;
-                                }
-                                break;
-                            case '\r': 
-                                push_state(state_);
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
-                            case ' ':case '\t':
-                                skip_space(ec);
-                                break;
-                            case '/': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::slash;
-                                break;
-                            case '{':
-                                saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                begin_object(visitor, ec);
-                                if (ec) return;
-                                break;
-                            case '[':
-                                saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                begin_array(visitor, ec);
-                                if (ec) return;
-                                break;
-                            case '\"':
-                                state_ = json_parse_state::string;
-                                saved_position_ = position_;
-                                ++input_ptr_;
-                                ++position_;
-                                string_buffer_.clear();
-                                parse_string(visitor, ec);
-                                if (ec) return;
-                                break;
-                            case '-':
-                                string_buffer_.clear();
-                                string_buffer_.push_back('-');
-                                saved_position_ = position_;
-                                parse_number(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case '0': 
-                                string_buffer_.clear();
-                                string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                saved_position_ = position_;
-                                parse_number(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                string_buffer_.clear();
-                                string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                saved_position_ = position_;
-                                parse_number(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case 'n':
-                                parse_null(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case 't':
-                                parse_true(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case 'f':
-                                parse_false(visitor, ec);
-                                if (ec) {return;}
-                                break;
-                            case '}':
-                                err_handler_(json_errc::unexpected_rbrace, *this);
-                                ec = json_errc::unexpected_rbrace;
-                                more_ = false;
+                        JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                            more_ = err_handler_(json_errc::illegal_control_character, *this);
+                            if (!more_)
+                            {
+                                ec = json_errc::illegal_control_character;
                                 return;
-                            case ']':
-                                err_handler_(json_errc::unexpected_rbracket, *this);
-                                ec = json_errc::unexpected_rbracket;
-                                more_ = false;
-                                return;
-                            default:
-                                err_handler_(json_errc::syntax_error, *this);
-                                ec = json_errc::syntax_error;
-                                more_ = false;
-                                return;
-                        }
+                            }
+                            break;
+                        case '\r': 
+                            push_state(state_);
+                            ++input_ptr_;
+                            ++position_;
+                            state_ = json_parse_state::cr;
+                            break; 
+                        case '\n': 
+                            ++input_ptr_;
+                            ++line_;
+                            ++position_;
+                            mark_position_ = position_;
+                            break;   
+                        case ' ':case '\t':
+                            skip_space(ec);
+                            break;
+                        case '/': 
+                            ++input_ptr_;
+                            ++position_;
+                            push_state(state_);
+                            state_ = json_parse_state::slash;
+                            break;
+                        case '{':
+                            saved_position_ = position_;
+                            ++input_ptr_;
+                            ++position_;
+                            begin_object(visitor, ec);
+                            if (ec) return;
+                            break;
+                        case '[':
+                            saved_position_ = position_;
+                            ++input_ptr_;
+                            ++position_;
+                            begin_array(visitor, ec);
+                            if (ec) return;
+                            break;
+                        case '\"':
+                            state_ = json_parse_state::string;
+                            saved_position_ = position_;
+                            ++input_ptr_;
+                            ++position_;
+                            string_buffer_.clear();
+                            parse_string(visitor, ec);
+                            if (ec) return;
+                            break;
+                        case '-':
+                            string_buffer_.clear();
+                            string_buffer_.push_back('-');
+                            saved_position_ = position_;
+                            parse_number(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case '0': 
+                            string_buffer_.clear();
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            saved_position_ = position_;
+                            parse_number(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            string_buffer_.clear();
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            saved_position_ = position_;
+                            parse_number(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case 'n':
+                            parse_null(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case 't':
+                            parse_true(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case 'f':
+                            parse_false(visitor, ec);
+                            if (ec) {return;}
+                            break;
+                        case '}':
+                            err_handler_(json_errc::unexpected_rbrace, *this);
+                            ec = json_errc::unexpected_rbrace;
+                            more_ = false;
+                            return;
+                        case ']':
+                            err_handler_(json_errc::unexpected_rbracket, *this);
+                            ec = json_errc::unexpected_rbracket;
+                            more_ = false;
+                            return;
+                        default:
+                            err_handler_(json_errc::syntax_error, *this);
+                            ec = json_errc::syntax_error;
+                            more_ = false;
+                            return;
                     }
                     break;
+                }
 
                 case json_parse_state::expect_comma_or_end: 
                     {
@@ -1439,7 +1502,7 @@ public:
             }
             else
             {
-                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                if (!chunk_rdr_->read_chunk(*this, ec) || (input_end_ - input_ptr_) < m)
                 {
                     ec = json_errc::invalid_value;
                     more_ = false;
@@ -1510,7 +1573,7 @@ public:
             }
             else
             {
-                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                if (!chunk_rdr_->read_chunk(*this, ec) || (input_end_ - input_ptr_) < m)
                 {
                     ec = json_errc::invalid_value;
                     more_ = false;
@@ -1581,7 +1644,7 @@ public:
             }
             else
             {
-                if (!chunk_rdr_->read_chunk(ec) || (input_end_ - input_ptr_) < m)
+                if (!chunk_rdr_->read_chunk(*this, ec) || (input_end_ - input_ptr_) < m)
                 {
                     ec = json_errc::invalid_value;
                     more_ = false;
@@ -1657,7 +1720,7 @@ public:
 minus_sign:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -1684,7 +1747,7 @@ minus_sign:
 zero:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1764,7 +1827,7 @@ zero:
 integer:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1844,7 +1907,7 @@ integer:
 fraction1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -1866,7 +1929,7 @@ fraction1:
 fraction2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -1945,7 +2008,7 @@ fraction2:
 exp1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -1976,7 +2039,7 @@ exp1:
 exp2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -1999,7 +2062,7 @@ exp2:
 exp3:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 if (JSONCONS_UNLIKELY(ec))
                 {
@@ -2086,7 +2149,7 @@ string_u1:
             {
                 string_buffer_.append(sb,input_ptr_-sb);
                 position_ += (input_ptr_ - sb);
-                if (!chunk_rdr_->read_chunk(ec))
+                if (!chunk_rdr_->read_chunk(*this, ec))
                 {
                     return;
                 }
@@ -2098,68 +2161,32 @@ string_u1:
                 JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 {
                     position_ += (input_ptr_ - sb + 1);
-                    more_ = err_handler_(json_errc::illegal_control_character, *this);
-                    if (!more_)
+                    if (!err_handler_(json_errc::illegal_control_character, *this))
                     {
+                        more_ = false;
                         ec = json_errc::illegal_control_character;
-                        state_ = json_parse_state::string;
                         return;
                     }
                     // recovery - skip
                     string_buffer_.append(sb,input_ptr_-sb);
-                    ++input_ptr_;
-                    state_ = json_parse_state::string;
-                    return;
-                }
-                case '\r':
-                {
-                    position_ += (input_ptr_ - sb + 1);
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
-                    {
-                        ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    push_state(state_);
-                    state_ = json_parse_state::cr;
-                    return;
+                    sb = input_ptr_ + 1;
+                    break;
                 }
                 case '\n':
-                {
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
-                    {
-                        ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    return;
-                }
+                case '\r':
                 case '\t':
                 {
                     position_ += (input_ptr_ - sb + 1);
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
+                    if (!err_handler_(json_errc::illegal_character_in_string, *this))
                     {
+                        more_ = false;
                         ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
                         return;
                     }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    state_ = json_parse_state::string;
-                    return;
+                    // recovery - skip
+                    string_buffer_.append(sb,input_ptr_-sb);
+                    sb = input_ptr_ + 1;
+                    break;
                 }
                 case '\\': 
                 {
@@ -2196,7 +2223,7 @@ escape:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2262,7 +2289,7 @@ escape_u1:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2285,7 +2312,7 @@ escape_u2:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2308,7 +2335,7 @@ escape_u3:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2331,7 +2358,7 @@ escape_u4:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2365,7 +2392,7 @@ escape_expect_surrogate_pair1:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2393,7 +2420,7 @@ escape_expect_surrogate_pair2:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2420,7 +2447,7 @@ escape_u5:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2443,7 +2470,7 @@ escape_u6:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2466,7 +2493,7 @@ escape_u7:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2489,7 +2516,7 @@ escape_u8:
         {
             //string_buffer_.append(sb,input_ptr_-sb);
             //position_ += (input_ptr_ - sb);
-            if (!chunk_rdr_->read_chunk(ec))
+            if (!chunk_rdr_->read_chunk(*this, ec))
             {
                 return;
             }
@@ -2804,6 +2831,8 @@ private:
 using json_parser = basic_json_parser<char>;
 using wjson_parser = basic_json_parser<wchar_t>;
 
+using json_parser_input = basic_json_parser_input<char>;
+using wjson_parser_input = basic_json_parser_input<wchar_t>;
 }
 
 #endif

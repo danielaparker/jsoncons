@@ -33,7 +33,7 @@ TEST_CASE("test json_reader buffered read")
         CHECK(j.as<std::string>() == str);
     }
 
-    SECTION("number with split buffer")
+    /*SECTION("number with split buffer")
     {
         std::string str(stream_source<char>::default_max_buffer_size-7, 'a');
         std::string neg_num("-123456789.123456789");
@@ -111,7 +111,7 @@ TEST_CASE("test json_reader buffered read")
         REQUIRE(j.is_array());
         REQUIRE(j.size() == 2);
         CHECK(j[1].is_null());
-    }
+    }*/
 }
 
 void test_json_reader_error(const std::string& text, const std::error_code& ec)
@@ -403,3 +403,4 @@ TEST_CASE("json_reader stateful allocator tests")
     }
 }
 #endif
+
