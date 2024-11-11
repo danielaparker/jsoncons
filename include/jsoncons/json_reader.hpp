@@ -269,7 +269,7 @@ namespace jsoncons {
         {
         }
         
-        bool read_chunk(basic_json_parser_input<char_type>&, std::error_code& ec) final
+        bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
         {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;

@@ -238,7 +238,7 @@ TEST_CASE("test_incremental_parsing")
         std::vector<std::string> chunks = {"[fal", "se]"};
         std::size_t index = 0;
 
-        auto read_chunk = [&](jsoncons::json_parser_input& input, std::error_code& /*ec*/) -> bool
+        auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
         {
             if (index < chunks.size())
             {
@@ -260,7 +260,6 @@ TEST_CASE("test_incremental_parsing")
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
-        parser.parse_some(decoder);
         parser.finish_parse(decoder);
         CHECK(parser.done());
 

@@ -29,28 +29,6 @@
 
 namespace jsoncons {
 
-template <typename CharT>
-class basic_json_parser_input
-{
-public:
-    using char_type = CharT;
-    
-    virtual void update(const char_type* data, std::size_t length) = 0;
-};
-
-template <typename CharT>
-class chunk_reader
-{
-public:
-    using char_type = CharT;
-
-    virtual ~chunk_reader() = default;
-    virtual bool read_chunk(basic_json_parser_input<char_type>&, std::error_code&)
-    {
-        return false;
-    }
-};
-
 enum class json_parse_state : uint8_t 
 {
     root,
@@ -75,32 +53,13 @@ enum class json_parse_state : uint8_t
 };
 
 template <typename CharT,typename TempAllocator  = std::allocator<char>>
-class basic_json_parser : public ser_context, public virtual basic_json_parser_input<CharT> 
+class basic_json_parser : public ser_context, public virtual basic_parser_input<CharT> 
 {
 public:
     using char_type = CharT;
     using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
-    using chunk_reader_type = std::function<bool(basic_json_parser_input<char_type>& input, std::error_code& ec)>;
+    using chunk_reader_type = std::function<bool(basic_parser_input<char_type>& input, std::error_code& ec)>;
 private:
-    class chunk_reader_adaptor : public chunk_reader<char_type>
-    {
-        chunk_reader_type read_chunk_;
-
-    public:
-        chunk_reader_adaptor()
-            : read_chunk_([](basic_json_parser_input<char_type>&, std::error_code&){return false;})
-        {
-        }
-        chunk_reader_adaptor(chunk_reader_type read_chunk)
-            : read_chunk_(read_chunk)
-        {
-        }
-
-        bool read_chunk(basic_json_parser_input<char_type>& input, std::error_code& ec)
-        {
-            return read_chunk_(input, ec);
-        }
-    };
 
     struct string_maps_to_double
     {
@@ -142,7 +101,7 @@ private:
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
-    chunk_reader_adaptor chk_rdr_;
+    chunk_reader_adaptor<char_type> chk_rdr_;
     chunk_reader<char_type>* chunk_rdr_;
     
     // Noncopyable and nonmoveable
@@ -2830,9 +2789,6 @@ private:
 
 using json_parser = basic_json_parser<char>;
 using wjson_parser = basic_json_parser<wchar_t>;
-
-using json_parser_input = basic_json_parser_input<char>;
-using wjson_parser_input = basic_json_parser_input<wchar_t>;
 }
 
 #endif
