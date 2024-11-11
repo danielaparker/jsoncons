@@ -235,7 +235,8 @@ TEST_CASE("test_incremental_parsing")
 {
     SECTION("Array of strings")
     {
-        std::vector<std::string> chunks = {"[fal", "se, ", "t", "rue", ", null", ",", "1", "234", ",\"Hello ", "World\"", "]"};
+        std::vector<std::string> chunks = {"[fal", "se, ", "t", "rue", ", null", ",", "1", "234", ",\"Hello ", "World\",", 
+            "0.", "1234", "]"};
         std::size_t index = 0;
 
         auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
@@ -265,12 +266,13 @@ TEST_CASE("test_incremental_parsing")
 
         json j = decoder.get_result();
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 5);
+        REQUIRE(j.size() == 6);
         CHECK_FALSE(j[0].as<bool>());
         CHECK(j[1].as<bool>());
         CHECK(j[2].is_null());
         CHECK(j[3].as<int>() == 1234);
         CHECK(j[4].as<std::string>() == "Hello World");
+        CHECK(j[5].as<double>() == 0.1234);
     }
 }
 
