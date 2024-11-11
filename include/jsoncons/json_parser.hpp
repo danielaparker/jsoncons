@@ -606,20 +606,18 @@ public:
             more_ = false;
             return;
         }
-        const char_type* local_input_end = input_end_;
 
-        if (input_ptr_ == local_input_end && more_)
+        if (input_ptr_ == input_end_ && more_)
         {
-            if (input_ptr_ == local_input_end)
+            if (input_ptr_ == input_end_)
             {
                 chunk_rdr_->read_chunk(*this, ec);
                 if (ec)
                 {
                     return;
                 }
-                local_input_end = input_end_;
             }
-            if (input_ptr_ == local_input_end)
+            if (input_ptr_ == input_end_)
             {
                 switch (state_)
                 {
@@ -647,13 +645,12 @@ public:
 
         while (more_)
         {
-            if (input_ptr_ == local_input_end)
+            if (input_ptr_ == input_end_)
             {
                 if (!chunk_rdr_->read_chunk(*this, ec))
                 {
                     break;
                 }
-                local_input_end = input_end_;
             }
             
             switch (state_)

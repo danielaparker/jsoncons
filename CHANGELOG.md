@@ -1,7 +1,7 @@
 0.179.0 (on master)
 -------
 
-Changes:
+Changes to basic_json::operator[]:
 
 - Removed `basic_json` proxy type. The rationale for this change is given in #315.
 
