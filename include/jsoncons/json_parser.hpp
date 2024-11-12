@@ -57,7 +57,7 @@ class basic_json_parser : public ser_context, public virtual basic_parser_input<
 public:
     using char_type = CharT;
     using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
-    using chunk_reader_type = std::function<bool(basic_parser_input<char_type>& input, std::error_code& ec)>;
+    using chunk_reader_type = std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)>;
 private:
 
     struct string_maps_to_double
@@ -126,9 +126,15 @@ public:
     {
     }
 #endif
-    basic_json_parser(const basic_json_decode_options<char_type>& options, 
+    basic_json_parser(const basic_json_decode_options<CharT>& options, 
         const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(options, options.err_handler(), temp_alloc)
+    {
+    }
+
+    basic_json_parser(chunk_reader_type chunk_rdr, const basic_json_decode_options<CharT>& options, 
+        const TempAllocator& temp_alloc = TempAllocator())
+        : basic_json_parser(chunk_rdr, options, options.err_handler(), temp_alloc)
     {
     }
 

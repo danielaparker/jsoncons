@@ -45,14 +45,27 @@ wjson_parser    |`jsoncons::basic_json_parser<wchar_t,std::allocator<char>>`
 
 #### Constructors
 
-    basic_json_parser();                                                              (1)
+    basic_json_parser(const TempAllocator& temp_alloc = TempAllocator());                     (1)
 
-    basic_json_parser(const json_decode_options& options);                            (2)
+    basic_json_parser(const basic_json_decode_options<CharT>& options, 
+        const TempAllocator& temp_alloc = TempAllocator());                                   (2)
 
-    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); (3)   (deprecated since 0.171.0)
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
+        const TempAllocator& temp_alloc = TempAllocator());                                   (3)   (deprecated since 0.171.0)
 
-    basic_json_parser(const json_decode_options& options, 
-        std::function<bool(json_errc,const ser_context&)> err_handler);               (4)   (deprecated since 0.171.0)
+    basic_json_parser(const basic_json_decode_options<CharT>& options, 
+        std::function<bool(json_errc,const ser_context&)> err_handler,                        (4)   (deprecated since 0.171.0) 
+        const TempAllocator& temp_alloc = TempAllocator());                       
+
+    basic_json_parser(
+        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> chunk_rdr, 
+        const TempAllocator& temp_alloc = TempAllocator());                                   (5)   (since 0.179.0)
+
+    basic_json_parser(
+        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> chunk_rdr, 
+        const basic_json_decode_options<CharT>& options,
+        const TempAllocator& temp_alloc = TempAllocator());                                   (6)   (since 0.179.0)
+
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
 and a default [err_handler](err_handler.md).
@@ -132,97 +145,6 @@ to continue.
 
 ### Examples
 
-#### Incremental parsing
-
-```cpp
-int main()
-{
-    json_parser parser;
-    jsoncons::json_decoder<json> decoder;
-    try
-    {
-        parser.update("10");
-        parser.parse_some(decoder);
-        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.update(".5");
-        parser.parse_some(decoder); // This is the end, but the parser can't tell
-        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.finish_parse(decoder); // Indicates that this is the end
-        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.check_done(); // Checks if there are any unconsumed 
-                             // non-whitespace characters in the input
-        std::cout << "(4) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        json j = decoder.get_result();
-        std::cout << "(5) " << j << "\n";
-    }
-    catch (const ser_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-```
-
-Output:
-
-```
-(1) done: false, source_exhausted: true
-
-(2) done: false, source_exhausted: true
-
-(3) done: true, source_exhausted: true
-
-(4) done: true, source_exhausted: true
-
-(5) 10.5
-```
-
-#### Incremental parsing with unconsumed non-whitespace characters
-
-```cpp
-int main()
-{
-    json_parser parser;
-    jsoncons::json_decoder<json> decoder;
-    try
-    {
-        parser.update("[10");
-        parser.parse_some(decoder);
-        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.update(".5]{}");
-        parser.parse_some(decoder); // The parser reaches the end at ']'
-        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.finish_parse(decoder); // Indicates that this is the end
-        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        parser.check_done(); // Checks if there are any unconsumed 
-                             // non-whitespace characters in the input
-                             (there are)
-    }
-    catch (const ser_error& e)
-    {
-        std::cout << "(4) " << e.what() << std::endl;
-    }
-}
-```
-
-Output:
-
-```
-(1) done: false, source_exhausted: true
-
-(2) done: true, source_exhausted: false
-
-(3) done: true, source_exhausted: false
-
-(4) Unexpected non-whitespace character after JSON text at line 1 and column 7
-```
-
 #### nan, inf, and -inf substitition
 
 ```cpp
@@ -278,4 +200,111 @@ B: inf
 C: -inf
 ```
 
+#### Incremental parsing (until 0.179.0)
 
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    jsoncons::json_parser parser;
+    try
+    {
+        parser.update("[fal");
+        parser.parse_some(decoder);
+        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.update("se,");
+        parser.parse_some(decoder);
+        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.update("9");
+        parser.parse_some(decoder);
+        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.update("0]");
+        parser.parse_some(decoder);
+        std::cout << "(4) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.finish_parse(decoder);
+        std::cout << "(5) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.check_done();
+        std::cout << "(6) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        jsoncons::json j = decoder.get_result();
+        std::cout << "(7) " << j << "\n\n";
+    }
+    catch (const jsoncons::ser_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+```
+
+Output:
+
+```
+```
+
+#### Incremental parsing (since 0.179.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    std::vector<std::string> chunks = {"[fal", "se,", "9", "0]"};
+    std::size_t index = 0;
+
+    auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
+    {
+        if (index < chunks.size())
+        {
+            input.update(chunks[index].data(), chunks[index].size());
+            ++index;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
+
+    jsoncons::json_decoder<jsoncons::json> decoder;
+    jsoncons::json_parser parser{read_chunk};
+
+    parser.reset();
+    try
+    {
+        parser.parse_some(decoder);
+        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+        parser.finish_parse(decoder);
+        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+        parser.check_done();
+        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        jsoncons::json j = decoder.get_result();
+        std::cout << "(4) " << j << "\n\n";
+    }
+    catch (const jsoncons::ser_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+```
+
+Output:
+
+```
+(1) done: false, source_exhausted: true
+
+(2) done: true, source_exhausted: true
+
+(3) done: true, source_exhausted: true
+
+(4) [false,90]
+```
