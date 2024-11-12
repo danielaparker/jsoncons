@@ -119,25 +119,27 @@ public:
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(basic_json_decode_options<char_type>(), err_handler, temp_alloc)
     {
     }
-
+#endif
     basic_json_parser(const basic_json_decode_options<char_type>& options, 
         const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(options, options.err_handler(), temp_alloc)
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_parser(const basic_json_decode_options<char_type>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAllocator& temp_alloc = TempAllocator())
        : basic_json_parser(&chk_rdr_, options, err_handler, temp_alloc)
     {
     }
-
+#endif
     basic_json_parser(chunk_reader<char_type>* chunk_rdr,
         const basic_json_decode_options<char_type>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 

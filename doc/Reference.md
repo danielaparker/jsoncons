@@ -25,7 +25,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [basic_json_visitor](ref/corelib/basic_json_visitor.md)  
 
-[json_parser](ref/corelib/json_parser.md)  
+[basic_json_parser](ref/corelib/basic_json_parser.md)  
 [basic_json_reader](ref/corelib/basic_json_reader.md)  
 
 [json_decoder](ref/corelib/json_decoder.md)  

@@ -1,12 +1,15 @@
-### jsoncons::json_parser
+### jsoncons::basic_json_parser
 
 ```cpp
 #include <jsoncons/json_parser.hpp>
 
-typedef basic_json_parser<char> json_parser
+template< 
+    typename CharT,
+    typename TempAllocator = std::allocator<char>
+> class basic_json_parser;
 ```
 
-`json_parser` is an incremental json parser. It can be fed its input
+A `basic_json_parser` is an incremental json parser. It can be fed its input
 in chunks, and does not require an entire file to be loaded in memory
 at one time.
 
@@ -28,21 +31,28 @@ no more input, `finish_parse` may be called.
 `check_done` can be called to check if the input has any unconsumed 
 non-whitespace characters, which would normally be considered an error.  
 
-`json_parser` is used by the push parser [basic_json_reader](basic_json_reader.md),
+`basic_json_parser` is used by the push parser [basic_json_reader](basic_json_reader.md),
 and by the pull parser [basic_json_cursor](basic_json_cursor.md).
 
-`json_parser` is noncopyable and nonmoveable.
+`basic_json_parser` is noncopyable and nonmoveable.
+
+Aliases for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+json_parser     |`jsoncons::basic_json_parser<char,std::allocator<char>>`
+wjson_parser    |`jsoncons::basic_json_parser<wchar_t,std::allocator<char>>`
 
 #### Constructors
 
-    json_parser(); (1)
+    basic_json_parser();                                                              (1)
 
-    json_parser(const json_decode_options& options); (2)
+    basic_json_parser(const json_decode_options& options);                            (2)
 
-    json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); (3)
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); (3)   (deprecated since 0.171.0)
 
-    json_parser(const json_decode_options& options, 
-                std::function<bool(json_errc,const ser_context&)> err_handler); (4)
+    basic_json_parser(const json_decode_options& options, 
+        std::function<bool(json_errc,const ser_context&)> err_handler);               (4)   (deprecated since 0.171.0)
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
 and a default [err_handler](err_handler.md).

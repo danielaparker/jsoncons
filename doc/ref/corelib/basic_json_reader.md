@@ -10,7 +10,7 @@ template<
 >
 class basic_json_reader 
 ```
-`basic_json_reader` uses the incremental parser [basic_json_parser](json_parser.md) 
+`basic_json_reader` uses the incremental parser [basic_json_parser](basic_json_parser.md) 
 to read arbitrarily large files in chunks.
 A `basic_json_reader` can read a sequence of JSON texts from a stream, using `read_next()`,
 which omits the check for unconsumed non-whitespace characters. 
