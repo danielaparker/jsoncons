@@ -559,12 +559,23 @@ public:
         }
     }
 
-    void update(const string_view_type sv)
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use set_buffer once or provide a chunk reader")
+    void update(string_view_type sv)
     {
         update(sv.data(),sv.length());
     }
 
-    void update(const char_type* data, std::size_t length) final
+    JSONCONS_DEPRECATED_MSG("Instead, use set_buffer once or provide a chunk reader")
+    void update(const char_type* data, std::size_t length)
+    {
+        begin_input_ = data;
+        input_end_ = data + length;
+        input_ptr_ = begin_input_;
+    }
+#endif
+
+    void set_buffer(const char_type* data, std::size_t length) final
     {
         begin_input_ = data;
         input_end_ = data + length;

@@ -796,7 +796,7 @@ public:
     using char_type = CharT;
     
     virtual ~basic_parser_input() = default;
-    virtual void update(const char_type* data, std::size_t length) = 0;
+    virtual void set_buffer(const CharT* data, std::size_t length) = 0;
 };
 
 template <typename CharT>

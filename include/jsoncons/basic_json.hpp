@@ -1800,7 +1800,7 @@ namespace jsoncons {
                 JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
             }
             std::size_t offset = (r.ptr - source.data());
-            parser.update(source.data()+offset,source.size()-offset);
+            parser.set_buffer(source.data()+offset,source.size()-offset);
             parser.parse_some(decoder);
             parser.finish_parse(decoder);
             parser.check_done();
@@ -1826,7 +1826,7 @@ namespace jsoncons {
                 JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
             }
             std::size_t offset = (r.ptr - source.data());
-            parser.update(source.data()+offset,source.size()-offset);
+            parser.set_buffer(source.data()+offset,source.size()-offset);
             parser.parse_some(decoder);
             parser.finish_parse(decoder);
             parser.check_done();
@@ -1997,7 +1997,7 @@ namespace jsoncons {
                 JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
             }
             std::size_t offset = (r.ptr - source.data());
-            parser.update(source.data()+offset,source.size()-offset);
+            parser.set_buffer(source.data()+offset,source.size()-offset);
             parser.parse_some(decoder);
             parser.finish_parse(decoder);
             parser.check_done();

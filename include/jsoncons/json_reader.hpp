@@ -32,7 +32,6 @@ namespace jsoncons {
     private:
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& other_visitor_;
-        //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
         // noncopyable and nonmoveable
         json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
@@ -44,10 +43,8 @@ namespace jsoncons {
         {
         }
 
-        json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor/*,
-                                              std::function<bool(json_errc,const ser_context&)> err_handler*/)
-            : other_visitor_(other_visitor)/*,
-              err_handler_(err_handler)*/
+        json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor)
+            : other_visitor_(other_visitor)
         {
         }
 
@@ -194,6 +191,31 @@ namespace jsoncons {
         }
 
         template <typename Sourceable>
+        basic_json_reader(Sourceable&& source, 
+                          basic_json_visitor<CharT>& visitor, 
+                          const TempAllocator& temp_alloc = TempAllocator())
+            : basic_json_reader(std::forward<Sourceable>(source),
+                                visitor,
+                                basic_json_decode_options<CharT>(),
+                                temp_alloc)
+        {
+        }
+
+        template <typename Sourceable>
+        basic_json_reader(Sourceable&& source, 
+                          basic_json_visitor<CharT>& visitor,
+                          const basic_json_decode_options<CharT>& options, 
+                          const TempAllocator& temp_alloc = TempAllocator())
+            : source_(std::forward<Sourceable>(source)),
+              visitor_(visitor),
+              parser_(this, options, options.err_handler(), temp_alloc),
+              eof_(false)
+        {
+        }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+        template <typename Sourceable>
+        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const TempAllocator& temp_alloc = TempAllocator())
@@ -206,6 +228,7 @@ namespace jsoncons {
         }
 
         template <typename Sourceable>
+        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -219,31 +242,7 @@ namespace jsoncons {
         }
 
         template <typename Sourceable>
-        basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor, 
-                          const TempAllocator& temp_alloc = TempAllocator())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                visitor,
-                                basic_json_decode_options<CharT>(),
-                                default_json_parsing(),
-                                temp_alloc)
-        {
-        }
-
-        template <typename Sourceable>
-        basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor,
-                          const basic_json_decode_options<CharT>& options, 
-                          const TempAllocator& temp_alloc = TempAllocator())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                visitor,
-                                options,
-                                options.err_handler(),
-                                temp_alloc)
-        {
-        }
-
-        template <typename Sourceable>
+        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -257,6 +256,7 @@ namespace jsoncons {
         }
 
         template <typename Sourceable> 
+        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
@@ -268,6 +268,7 @@ namespace jsoncons {
              eof_(false)
         {
         }
+#endif
         
         bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
         {
@@ -277,7 +278,7 @@ namespace jsoncons {
             if (ec) return false;
             if (s.size() > 0)
             {
-                parser_.update(s.data(),s.size());
+                parser_.set_buffer(s.data(),s.size());
                 success = true;
             }
             else
@@ -310,7 +311,7 @@ namespace jsoncons {
             if (ec) return;
             if (s.size() > 0)
             {
-                parser_.update(s.data(),s.size());
+                parser_.set_buffer(s.data(),s.size());
             }
             parser_.parse_some(visitor_, ec);
             if (ec) return;
@@ -329,7 +330,7 @@ namespace jsoncons {
                     if (ec) return;
                     if (s1.size() > 0)
                     {
-                        parser_.update(s1.data(),s1.size());
+                        parser_.set_buffer(s1.data(),s1.size());
                     }
                 }
                 else
@@ -381,7 +382,7 @@ namespace jsoncons {
                         if (ec) return;
                         if (s.size() > 0)
                         {
-                            parser_.update(s.data(),s.size());
+                            parser_.set_buffer(s.data(),s.size());
                         }
                     }
                     if (!parser_.source_exhausted())

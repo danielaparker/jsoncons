@@ -13,24 +13,6 @@ A `basic_json_parser` is an incremental json parser. It can be fed its input
 in chunks, and does not require an entire file to be loaded in memory
 at one time.
 
-A buffer of text is supplied to the parser with a call to `update(buffer)`. 
-If a subsequent call to `parse_some` reaches the end of the buffer in the middle of parsing, 
-say after digesting the sequence 'f', 'a', 'l', member function `stopped()` will return `false` 
-and `source_exhausted()` will return `true`. Additional JSON text can be supplied to the parser, 
-`parse_some` called again, and parsing will resume from where it left off. 
-
-A typical application will repeatedly call the `parse_some` function 
-until `stopped()` returns true. A stopped state indicates that a content
-visitor function returned `false`, an error occured, or a complete JSON 
-text has been consumed. If the latter, `done() `will return `true`.
-  
-As an alternative to repeatedly calling `parse_some()` until `stopped()`
-returns `true`, when `source_exhausted()` is `true` and there is
-no more input, `finish_parse` may be called.  
- 
-`check_done` can be called to check if the input has any unconsumed 
-non-whitespace characters, which would normally be considered an error.  
-
 `basic_json_parser` is used by the push parser [basic_json_reader](basic_json_reader.md),
 and by the pull parser [basic_json_cursor](basic_json_cursor.md).
 
@@ -79,13 +61,14 @@ and a specified [err_handler](err_handler.md).
 (4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
 and a specified [err_handler](err_handler.md).
 
-Note: It is the programmer's responsibility to ensure that a `basic_json_parser` does not outlive any string passed in the constuctor.
-
 #### Member functions
 
-    void update(const string_view_type& sv)
-    void update(const char* data, std::size_t length)
+    void update(const string_view_type& sv)              
+    void update(const CharT* data, std::size_t length)             (deprecated in 0.179.0)
 Update the parser with a chunk of JSON
+
+    void set_buffer(const CharT* data, std::size_t length) final   (since 0.179.0)
+Initializes the buffer to parse from with a chunk of JSON text
 
     bool done() const
 Returns `true` when the parser has consumed a complete JSON text, `false` otherwise
@@ -247,6 +230,19 @@ int main()
 Output:
 
 ```
+(1) done: false, source_exhausted: true
+
+(2) done: false, source_exhausted: true
+
+(3) done: false, source_exhausted: true
+
+(4) done: false, source_exhausted: true
+
+(5) done: true, source_exhausted: true
+
+(6) done: true, source_exhausted: true
+
+(7) [false,90]
 ```
 
 #### Incremental parsing (since 0.179.0)
@@ -264,7 +260,7 @@ int main()
     {
         if (index < chunks.size())
         {
-            input.update(chunks[index].data(), chunks[index].size());
+            input.set_buffer(chunks[index].data(), chunks[index].size());
             ++index;
             return true;
         }

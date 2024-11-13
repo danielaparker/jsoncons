@@ -54,7 +54,7 @@ void incremental_parsing_example()
     {
         if (index < chunks.size())
         {
-            input.update(chunks[index].data(), chunks[index].size());
+            input.set_buffer(chunks[index].data(), chunks[index].size());
             ++index;
             return true;
         }
@@ -106,7 +106,11 @@ void parse_nan_replacement_example()
     jsoncons::json_parser parser(options);
     try
     {
-        parser.update(s);
+#if JSONCONS_VERSION_MAJOR == 0 && JSONCONS_VERSION_MINOR < 179
+        parser.update(s);     // until 0.179.0
+#else        
+        parser.set_buffer(s.data(), s.size());   // since 0.179.0
+#endif        
         parser.parse_some(decoder);
         parser.finish_parse(decoder);
         parser.check_done();

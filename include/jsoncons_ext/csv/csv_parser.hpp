@@ -1310,6 +1310,13 @@ public:
         input_ptr_ = begin_input_;
     }
 
+    void set_buffer(const CharT* data, std::size_t length)
+    {
+        begin_input_ = data;
+        input_end_ = data + length;
+        input_ptr_ = begin_input_;
+    }
+
     std::size_t line() const override
     {
         return line_;
@@ -1674,7 +1681,7 @@ private:
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
                                 basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
-                                parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
+                                parser.set_buffer(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*visitor_);
                                 parser.finish_parse(*visitor_);
                             }
@@ -1705,7 +1712,7 @@ private:
                                 if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                                 {
                                     basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
-                                    parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
+                                    parser.set_buffer(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                     parser.parse_some(*visitor_);
                                     parser.finish_parse(*visitor_);
                                 }
@@ -1740,7 +1747,7 @@ private:
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
                                 basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
-                                parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
+                                parser.set_buffer(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*visitor_);
                                 parser.finish_parse(*visitor_);
                             }
@@ -1761,7 +1768,7 @@ private:
                         if (column_index_ < column_defaults_.size() + offset_ && column_defaults_[column_index_ - offset_].length() > 0)
                         {
                             basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
-                            parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
+                            parser.set_buffer(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                             parser.parse_some(*visitor_);
                             parser.finish_parse(*visitor_);
                         }
