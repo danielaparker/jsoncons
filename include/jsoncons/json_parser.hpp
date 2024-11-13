@@ -20,6 +20,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_error.hpp>
+#include <jsoncons/chunk_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \

@@ -140,7 +140,7 @@ int main()
     std::cout << "\njson_parser examples\n\n";
     
     incremental_parsing_example();
-    //parse_nan_replacement_example();
+    parse_nan_replacement_example();
 
     std::cout << std::endl;
 }

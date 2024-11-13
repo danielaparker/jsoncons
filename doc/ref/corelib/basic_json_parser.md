@@ -25,6 +25,13 @@ Type                |Definition
 json_parser     |`jsoncons::basic_json_parser<char,std::allocator<char>>`
 wjson_parser    |`jsoncons::basic_json_parser<wchar_t,std::allocator<char>>`
 
+#### Member types
+
+Type                       |Definition
+---------------------------|------------------------------
+char_type                  |CharT
+temp_allocator_type        |TempAllocator
+
 #### Constructors
 
     basic_json_parser(const TempAllocator& temp_alloc = TempAllocator());                     (1)
