@@ -173,7 +173,6 @@ namespace jsoncons {
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
-                                default_json_parsing(),
                                 temp_alloc)
         {
         }
