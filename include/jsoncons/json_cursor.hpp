@@ -304,7 +304,7 @@ public:
                     if (ec) return;
                     if (s.size() > 0)
                     {
-                        parser_.update(s.data(),s.size());
+                        parser_.set_buffer(s.data(),s.size());
                     }
                 }
                 if (!parser_.source_exhausted())
@@ -354,7 +354,7 @@ private:
             JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser_.line(),parser_.column()));
         }
         std::size_t offset = (r.ptr - sv.data());
-        parser_.update(sv.data()+offset,sv.size()-offset);
+        parser_.set_buffer(sv.data()+offset,sv.size()-offset);
 
         bool is_done = parser_.done() || done_;
         if (!is_done)
@@ -372,7 +372,7 @@ private:
             return;
         }
         std::size_t offset = (r.ptr - sv.data());
-        parser_.update(sv.data()+offset,sv.size()-offset);
+        parser_.set_buffer(sv.data()+offset,sv.size()-offset);
         bool is_done = parser_.done() || done_;
         if (!is_done)
         {
@@ -406,7 +406,7 @@ private:
                 if (ec) return;
                 if (s.size() > 0)
                 {
-                    parser_.update(s.data(),s.size());
+                    parser_.set_buffer(s.data(),s.size());
                     if (ec) return;
                 }
             }
