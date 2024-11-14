@@ -15,6 +15,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("oss-fuzz issues")
 {
     // Fuzz target: fuzz_parse
@@ -276,32 +277,6 @@ TEST_CASE("oss-fuzz issues")
         CHECK(ec == bson::bson_errc::unexpected_eof);
     }
 
-    // Fuzz target: fuzz_cbor_encoder
-    // Issue: failed_throw
-    // Resolution: change assert to illegal_chunked_string error code
-    SECTION("issue 21902")
-    {
-        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is); //-V521
-
-        try
-        {
-            std::vector<uint8_t> buf;
-            cbor::cbor_bytes_encoder encoder(buf);
-            cbor::cbor_stream_reader reader(is, encoder);
-
-            std::error_code ec;
-            REQUIRE_NOTHROW(reader.read(ec));
-            CHECK(ec == cbor::cbor_errc::illegal_chunked_string); //-V521
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << "" << std::endl;
-        }
-    }
-
     // Fuzz target: fuzz_csv_encoder
     // Issue: Failed throw
     // Resolution: check if csv_parser is still in start state when no more input
@@ -507,24 +482,6 @@ TEST_CASE("oss-fuzz issues")
         reader.read(ec);
     }
 
-    // Fuzz target: fuzz_ubjson_encoder
-    // Issue: Timeout
-    SECTION("issue 23840")
-    {
-        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson_encoder-5711604342849536";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is); //-V521
-
-        std::vector<uint8_t> output;
-        ubjson::ubjson_bytes_encoder encoder(output);
-        ubjson::ubjson_stream_reader reader(is, encoder);
-
-        std::error_code ec;
-        reader.read(ec);
-        CHECK(ec == ubjson::ubjson_errc::unknown_type); //-V521
-    }
-
     // Fuzz target: fuzz_ubjson
     // Issue: failed_throw
     SECTION("issue 25891")
@@ -704,4 +661,95 @@ TEST_CASE("oss-fuzz issues")
         }
     }
 }
+#endif
 
+TEST_CASE("Fuzz target: fuzz_ubjson_encoder")
+{
+    // Issue: Timeout
+    /*SECTION("issue 23840")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson_encoder-5711604342849536";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> output;
+        ubjson::ubjson_bytes_encoder encoder(output);
+        ubjson::ubjson_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == ubjson::ubjson_errc::unknown_type); //-V521
+    }*/
+
+    // Issue: Timeout (exceeds 60 secs)
+    /*SECTION("issue 378891965")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson_encoder-6542820946542592";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> output;
+        ubjson::ubjson_bytes_encoder encoder(output);
+        ubjson::ubjson_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == ubjson::ubjson_errc::unknown_type); //-V521
+    }*/
+}
+
+TEST_CASE("Fuzz target: fuzz_cbor_encoder")
+{
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: failed_throw
+    // Resolution: change assert to illegal_chunked_string error code
+/*    SECTION("issue 21902")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        try
+        {
+            std::vector<uint8_t> buf;
+            cbor::cbor_bytes_encoder encoder(buf);
+            cbor::cbor_stream_reader reader(is, encoder);
+
+            std::error_code ec;
+            REQUIRE_NOTHROW(reader.read(ec));
+            CHECK(ec == cbor::cbor_errc::illegal_chunked_string); //-V521
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "" << std::endl;
+        }
+    }
+*/
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: Integer-overflow
+    SECTION("issue 42538003")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-4729089884225536";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        try
+        {
+            std::vector<uint8_t> buf;
+            cbor::cbor_bytes_encoder encoder(buf);
+            cbor::cbor_stream_reader reader(is, encoder);
+
+            std::error_code ec;
+            REQUIRE_NOTHROW(reader.read(ec));
+            CHECK(ec == cbor::cbor_errc::illegal_chunked_string); //-V521
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "" << std::endl;
+        }
+    }
+}

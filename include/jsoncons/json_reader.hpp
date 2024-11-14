@@ -184,7 +184,6 @@ namespace jsoncons {
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
-                                options.err_handler(),
                                 temp_alloc)
         {
         }

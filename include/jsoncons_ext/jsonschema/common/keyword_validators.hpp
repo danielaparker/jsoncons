@@ -39,7 +39,8 @@ namespace jsonschema {
 
     public:
         recursive_ref_validator(const Json& schema, const uri& schema_location) 
-            : keyword_validator_base<Json>("$recursiveRef", schema, schema_location)
+            : keyword_validator_base<Json>("$recursiveRef", schema, schema_location),
+              tentative_target_(nullptr)
         {}
 
         uri get_base_uri() const
@@ -136,7 +137,8 @@ namespace jsonschema {
 
     public:
         dynamic_ref_validator(const Json& schema, const uri& schema_location, const uri_wrapper& value) 
-            : keyword_validator_base<Json>("$dynamicRef", schema, schema_location), value_(value)
+            : keyword_validator_base<Json>("$dynamicRef", schema, schema_location), value_(value),
+            tentative_target_(nullptr)
         {
             //std::cout << "dynamic_ref_validator path: " << schema_location.string() << ", value: " << value.string() << "\n";
         }
