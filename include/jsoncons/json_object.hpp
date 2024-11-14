@@ -1303,7 +1303,10 @@ namespace jsoncons {
                     }
                     if (i < length)
                     {
-                        items[count] = items[i];
+                        if (i != count)
+                        {
+                            items[count] = std::move(items[i]);
+                        }
                         ++count;
                     }
                 }
