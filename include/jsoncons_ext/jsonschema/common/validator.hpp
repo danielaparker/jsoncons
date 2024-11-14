@@ -172,9 +172,10 @@ namespace jsonschema {
         }
         void merge(std::unordered_set<std::string>&& properties)
         {
-            for (auto&& name : properties)
+            auto end = std::make_move_iterator(properties.end());
+            for (auto it = std::make_move_iterator(properties.begin()); it != end; ++it)
             {
-                evaluated_properties.insert(std::move(name));
+                evaluated_properties.insert(*it);
             }
         }
         void merge(const range_collection& ranges)

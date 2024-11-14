@@ -70,7 +70,7 @@ namespace utility {
         Extra extra() const { return this->extra_; }
 
         heap_string(Extra extra, const Allocator& alloc)
-            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0), offset_(0)
+            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0), offset_(0), align_pad_(0)
         {
         }
 

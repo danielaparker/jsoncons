@@ -43,16 +43,6 @@
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
 
-#if defined(__clang__)
-#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
-#elif defined(__GNUC__) && ((__GNUC__ >= 7))
-#  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
-#elif defined (__GNUC__)
-#  define JSONCONS_FALLTHROUGH // FALLTHRU
-#else
-#  define JSONCONS_FALLTHROUGH
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
 #define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -414,4 +404,17 @@ namespace jsoncons {
             JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
 
+#if defined(JSONCONS_HAS_2017)
+#  define JSONCONS_FALLTHROUGH [[fallthrough]]
+#elif defined(__clang__)
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__) && ((__GNUC__ >= 7))
+#  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
+#elif defined (__GNUC__)
+#  define JSONCONS_FALLTHROUGH // FALLTHRU
+#else
+#  define JSONCONS_FALLTHROUGH
+#endif
+        
+        
 #endif // JSONCONS_COMPILER_SUPPORT_HPP
