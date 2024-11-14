@@ -1292,10 +1292,7 @@ namespace jsoncons {
         {
             if (length > 0)
             {
-                auto first = items;
-                auto last = first + length;
-
-                std::sort(first, last, compare1);
+                std::sort(items, items+length, compare1);
 
                 std::size_t count = 1;
                 for (std::size_t i = 1; i < length; ++i)
@@ -1311,15 +1308,13 @@ namespace jsoncons {
                     }
                 }
 
-                last = first+count;
-                std::sort(first, last, compare2);
+                std::sort(items, items+count, compare2);
 
                 members_.reserve(count);
 
-                //for (auto it = first; it != last; ++it)
                 for (std::size_t i = 0; i < count; ++i)
                 {
-                    members_.emplace_back(std::move(first[i].name), std::move(first[i].value));
+                    members_.emplace_back(std::move(items[i].name), std::move(items[i].value));
                 }
             }
         }
