@@ -297,7 +297,7 @@ public:
 
     void skip_space(std::error_code& ec)
     {
-        bool got_cr = false;
+        bool prev_char_is_cr = false;
         const char_type* local_input_end = input_end_;
         while (true) 
         {
@@ -313,24 +313,25 @@ public:
             {
                 case ' ':
                 case '\t':
+                    prev_char_is_cr = false;
                     ++input_ptr_;
                     ++position_;
                     break;
                 case '\r': 
+                    prev_char_is_cr = true;
                     ++input_ptr_;
                     ++line_;
                     ++position_;
                     mark_position_ = position_;
-                    got_cr = true;
                     break; 
                 case '\n': 
                     ++input_ptr_;
-                    if (got_cr)
+                    if (prev_char_is_cr)
                     {
-                        got_cr = false;
+                        prev_char_is_cr = false;
                     }
                     else
-                    {
+                    {                        
                         ++line_;
                     }
                     ++position_;
@@ -338,57 +339,6 @@ public:
                     break;   
                 default:
                     return;
-            }
-        }
-    }
-
-    void skip_whitespace(std::error_code& ec)
-    {
-        bool got_cr = false;
-        const char_type* local_input_end = input_end_;
-
-        while (true) 
-        {
-            if (input_ptr_ == local_input_end)
-            {
-                if (!chunk_rdr_->read_chunk(*this, ec))
-                {
-                    break;
-                }
-                local_input_end = input_end_;
-            }
-            switch (state_)
-            {
-                case json_parse_state::cr:
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    switch (*input_ptr_)
-                    {
-                        case '\n':
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = pop_state();
-                            break;
-                        default:
-                            state_ = pop_state();
-                            break;
-                    }
-                    break;
-
-                default:
-                    switch (*input_ptr_)
-                    {
-                        case ' ':
-                        case '\t':
-                        case '\n':
-                        case '\r':
-                            skip_space(ec);
-                            break;
-                        default:
-                            return;
-                    }
-                    break;
             }
         }
     }
