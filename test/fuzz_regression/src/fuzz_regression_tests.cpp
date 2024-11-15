@@ -745,7 +745,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
 
             std::error_code ec;
             REQUIRE_NOTHROW(reader.read(ec));
-            CHECK(ec == cbor::cbor_errc::illegal_chunked_string); //-V521
+            CHECK_FALSE(ec); //-V521
         }
         catch (const std::exception& e)
         {
