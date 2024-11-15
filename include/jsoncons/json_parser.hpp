@@ -677,18 +677,7 @@ public:
                                 return;
                             }
                             break;
-                        case '\r': 
-                            push_state(state_);
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = json_parse_state::cr;
-                            break; 
-                        case '\n': 
-                            ++input_ptr_;
-                            ++line_;
-                            ++position_;
-                            mark_position_ = position_;
-                            break;   
+                        case '\r': case '\n': 
                         case ' ':case '\t':
                             skip_space(ec);
                             break;
@@ -786,18 +775,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -866,18 +844,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -940,18 +907,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1020,18 +976,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                ++input_ptr_;
-                                ++position_;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1074,18 +1019,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                push_state(state_);
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1212,18 +1146,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1695,22 +1618,7 @@ zero:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
@@ -1775,22 +1683,7 @@ integer:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                push_state(state_);
-                ++input_ptr_;
-                ++position_;
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
@@ -1877,22 +1770,7 @@ fraction2:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                push_state(state_);
-                ++input_ptr_;
-                ++position_;
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
@@ -2010,22 +1888,7 @@ exp3:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
