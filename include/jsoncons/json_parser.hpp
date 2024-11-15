@@ -500,8 +500,7 @@ public:
     {
         for (; input_ptr_ != input_end_; ++input_ptr_)
         {
-            char_type curr_char_ = *input_ptr_;
-            switch (curr_char_)
+            switch (*input_ptr_)
             {
                 case '\n':
                 case '\r':

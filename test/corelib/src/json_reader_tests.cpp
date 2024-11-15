@@ -340,16 +340,18 @@ TEST_CASE("json_reader json lines")
         json_decoder<json> decoder;
         json_stream_reader reader(is, decoder);
 
-        CHECK(!reader.eof());
+        REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(!reader.eof());
+        CHECK(decoder.get_result() == json::parse(R"(["Name", "Session", "Score", "Completed"])"));
+        REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(!reader.eof());
+        REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(!reader.eof());
+        REQUIRE(!reader.eof());
         reader.read_next();
-        CHECK(!reader.eof());
+        REQUIRE(!reader.eof());
         reader.read_next();
+        CHECK(decoder.get_result() == json::parse(R"(["Deloise", "2012A", 19, true])"));
         CHECK(!reader.eof());
         reader.read_next();
         CHECK(reader.eof());
