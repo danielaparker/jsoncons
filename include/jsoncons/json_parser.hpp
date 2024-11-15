@@ -297,6 +297,7 @@ public:
 
     void skip_space(std::error_code& ec)
     {
+        bool got_cr = false;
         const char_type* local_input_end = input_end_;
         while (true) 
         {
@@ -316,17 +317,25 @@ public:
                     ++position_;
                     break;
                 case '\r': 
-                    push_state(state_);
-                    ++input_ptr_;
-                    ++position_;
-                    state_ = json_parse_state::cr;
-                    return; 
-                case '\n': 
                     ++input_ptr_;
                     ++line_;
                     ++position_;
                     mark_position_ = position_;
-                    return;   
+                    got_cr = true;
+                    break; 
+                case '\n': 
+                    ++input_ptr_;
+                    if (got_cr)
+                    {
+                        got_cr = false;
+                    }
+                    else
+                    {
+                        ++line_;
+                    }
+                    ++position_;
+                    mark_position_ = position_;
+                    break;   
                 default:
                     return;
             }
@@ -335,6 +344,7 @@ public:
 
     void skip_whitespace(std::error_code& ec)
     {
+        bool got_cr = false;
         const char_type* local_input_end = input_end_;
 
         while (true) 

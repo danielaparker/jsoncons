@@ -321,7 +321,7 @@ namespace jsoncons {
             
             while (!source_.eof())
             {
-                parser_.skip_whitespace(ec);
+                parser_.skip_space(ec);
                 if (parser_.source_exhausted())
                 {
                     auto s1 = source_.read_buffer(ec);
