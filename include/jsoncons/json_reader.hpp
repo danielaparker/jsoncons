@@ -20,7 +20,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/source_adaptor.hpp>
 
-namespace jsoncons {
+namespace jsoncons { 
 
     // utf8_other_json_input_adapter
 
@@ -319,9 +319,22 @@ namespace jsoncons {
                 return;
             }
             
-            if (!source_.eof())
+            while (!source_.eof())
             {
-                parser_.skip_whitespace(ec);
+                parser_.skip_space(ec);
+                if (parser_.source_exhausted())
+                {
+                    auto s1 = source_.read_buffer(ec);
+                    if (ec) return;
+                    if (s1.size() > 0)
+                    {
+                        parser_.set_buffer(s1.data(),s1.size());
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
