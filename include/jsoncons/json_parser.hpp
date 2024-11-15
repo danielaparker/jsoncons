@@ -48,7 +48,6 @@ enum class json_parse_state : uint8_t
     expect_value,
     array, 
     member_name,
-    cr,
     done
 };
 
@@ -620,9 +619,6 @@ public:
                     case json_parse_state::done:
                         more_ = false;
                         break;
-                    case json_parse_state::cr:
-                        state_ = pop_state();
-                        break;
                     default:
                         err_handler_(json_errc::unexpected_eof, *this);
                         ec = json_errc::unexpected_eof;
@@ -649,21 +645,6 @@ public:
                     done_ = true;
                     state_ = json_parse_state::done;
                     more_ = false;
-                    break;
-                case json_parse_state::cr:
-                    ++line_;
-                    mark_position_ = position_;
-                    switch (*input_ptr_)
-                    {
-                        case '\n':
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = pop_state();
-                            break;
-                        default:
-                            state_ = pop_state();
-                            break;
-                    }
                     break;
                 case json_parse_state::start: 
                 {
@@ -1280,17 +1261,8 @@ public:
                 {
                     switch (*input_ptr_)
                     {
-                        case '\r':
-                            push_state(state_);
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = json_parse_state::cr;
-                            break;
-                        case '\n':
-                            ++input_ptr_;
-                            ++line_;
-                            ++position_;
-                            mark_position_ = position_;
+                        case '\r': case '\n': 
+                            skip_space(ec);
                             break;
                         case '*':
                             ++input_ptr_;
