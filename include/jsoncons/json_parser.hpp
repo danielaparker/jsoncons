@@ -298,6 +298,7 @@ public:
     void skip_space(std::error_code& ec)
     {
         const char_type* local_input_end = input_end_;
+
         while (true) 
         {
             if (input_ptr_ == local_input_end)

@@ -203,14 +203,23 @@ private:
         {
         }
 
-        dynamic_storage(const dynamic_storage& stor, const real_allocator_type& alloc)
+        dynamic_storage(const dynamic_storage& stor, real_allocator_type alloc)
             : is_dynamic_(true), 
               is_negative_(stor.is_negative_),
               length_(stor.length_),
-              capacity_(0),
+              capacity_(round_up(stor.length_)),
               data_(nullptr)
         {
-            create(stor.length_, alloc);
+            data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
+            JSONCONS_TRY
+            {
+                std::allocator_traits<real_allocator_type>::construct(alloc, extension_traits::to_plain_pointer(data_));
+            }
+            JSONCONS_CATCH(...)
+            {
+                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
+                JSONCONS_RETHROW;
+            }
             std::memcpy(data_, stor.data_, size_type(stor.length_*sizeof(uint64_t)));
         }
 
@@ -224,21 +233,6 @@ private:
             stor.length_ = 0;
             stor.capacity_ = 0;
             stor.data_ = nullptr;
-        }
-
-        void create(size_type length, real_allocator_type alloc)
-        {
-            capacity_ = round_up(length);
-            data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
-            JSONCONS_TRY
-            {
-                std::allocator_traits<real_allocator_type>::construct(alloc, extension_traits::to_plain_pointer(data_));
-            }
-            JSONCONS_CATCH(...)
-            {
-                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
-                JSONCONS_RETHROW;
-            }
         }
 
         void destroy(const real_allocator_type& a) noexcept
@@ -271,7 +265,7 @@ private:
         }
 
         // Find suitable new block size
-        constexpr size_type round_up(size_type i) const 
+        constexpr size_type round_up(size_type i) const noexcept 
         {
             return (i/word_length + 1) * word_length;
         }

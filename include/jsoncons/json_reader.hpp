@@ -319,22 +319,9 @@ namespace jsoncons {
                 return;
             }
             
-            while (!source_.eof())
+            if (!source_.eof())
             {
                 parser_.skip_whitespace(ec);
-                if (parser_.source_exhausted())
-                {
-                    auto s1 = source_.read_buffer(ec);
-                    if (ec) return;
-                    if (s1.size() > 0)
-                    {
-                        parser_.set_buffer(s1.data(),s1.size());
-                    }
-                }
-                else
-                {
-                    break;
-                }
             }
         }
 
