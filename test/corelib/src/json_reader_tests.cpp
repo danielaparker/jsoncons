@@ -352,8 +352,6 @@ TEST_CASE("json_reader json lines")
         REQUIRE(!reader.eof());
         reader.read_next();
         CHECK(decoder.get_result() == json::parse(R"(["Deloise", "2012A", 19, true])"));
-        CHECK(!reader.eof());
-        reader.read_next();
         CHECK(reader.eof());
     }
 }

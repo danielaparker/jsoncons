@@ -498,8 +498,17 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        for (; input_ptr_ != input_end_; ++input_ptr_)
+        const char_type* local_input_end = input_end_;
+        while (true) 
         {
+            if (input_ptr_ == local_input_end)
+            {
+                if (!chunk_rdr_->read_chunk(*this, ec))
+                {
+                    break;
+                }
+                local_input_end = input_end_;
+            }
             switch (*input_ptr_)
             {
                 case '\n':
@@ -516,6 +525,7 @@ public:
                     }
                     break;
             }
+            ++input_ptr_;
         }
     }
 
