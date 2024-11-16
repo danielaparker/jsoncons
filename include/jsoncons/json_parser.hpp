@@ -48,7 +48,6 @@ enum class json_parse_state : uint8_t
     expect_value,
     array, 
     member_name,
-    cr,
     done
 };
 
@@ -297,8 +296,8 @@ public:
 
     void skip_space(std::error_code& ec)
     {
+        bool prev_char_is_cr = false;
         const char_type* local_input_end = input_end_;
-
         while (true) 
         {
             if (input_ptr_ == local_input_end)
@@ -313,73 +312,32 @@ public:
             {
                 case ' ':
                 case '\t':
+                    prev_char_is_cr = false;
                     ++input_ptr_;
                     ++position_;
                     break;
                 case '\r': 
-                    push_state(state_);
+                    prev_char_is_cr = true;
                     ++input_ptr_;
+                    ++line_;
                     ++position_;
-                    state_ = json_parse_state::cr;
-                    return; 
+                    mark_position_ = position_;
+                    break; 
                 case '\n': 
                     ++input_ptr_;
-                    ++line_;
+                    if (prev_char_is_cr)
+                    {
+                        prev_char_is_cr = false;
+                    }
+                    else
+                    {                        
+                        ++line_;
+                    }
                     ++position_;
                     mark_position_ = position_;
-                    return;   
+                    break;   
                 default:
                     return;
-            }
-        }
-    }
-
-    void skip_whitespace(std::error_code& ec)
-    {
-        const char_type* local_input_end = input_end_;
-
-        while (true) 
-        {
-            if (input_ptr_ == local_input_end)
-            {
-                if (!chunk_rdr_->read_chunk(*this, ec))
-                {
-                    break;
-                }
-                local_input_end = input_end_;
-            }
-            switch (state_)
-            {
-                case json_parse_state::cr:
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    switch (*input_ptr_)
-                    {
-                        case '\n':
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = pop_state();
-                            break;
-                        default:
-                            state_ = pop_state();
-                            break;
-                    }
-                    break;
-
-                default:
-                    switch (*input_ptr_)
-                    {
-                        case ' ':
-                        case '\t':
-                        case '\n':
-                        case '\r':
-                            skip_space(ec);
-                            break;
-                        default:
-                            return;
-                    }
-                    break;
             }
         }
     }
@@ -539,10 +497,18 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        for (; input_ptr_ != input_end_; ++input_ptr_)
+        const char_type* local_input_end = input_end_;
+        while (true) 
         {
-            char_type curr_char_ = *input_ptr_;
-            switch (curr_char_)
+            if (input_ptr_ == local_input_end)
+            {
+                if (!chunk_rdr_->read_chunk(*this, ec))
+                {
+                    break;
+                }
+                local_input_end = input_end_;
+            }
+            switch (*input_ptr_)
             {
                 case '\n':
                 case '\r':
@@ -558,6 +524,7 @@ public:
                     }
                     break;
             }
+            ++input_ptr_;
         }
     }
 
@@ -652,9 +619,6 @@ public:
                     case json_parse_state::done:
                         more_ = false;
                         break;
-                    case json_parse_state::cr:
-                        state_ = pop_state();
-                        break;
                     default:
                         err_handler_(json_errc::unexpected_eof, *this);
                         ec = json_errc::unexpected_eof;
@@ -682,21 +646,6 @@ public:
                     state_ = json_parse_state::done;
                     more_ = false;
                     break;
-                case json_parse_state::cr:
-                    ++line_;
-                    mark_position_ = position_;
-                    switch (*input_ptr_)
-                    {
-                        case '\n':
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = pop_state();
-                            break;
-                        default:
-                            state_ = pop_state();
-                            break;
-                    }
-                    break;
                 case json_parse_state::start: 
                 {
                     switch (*input_ptr_)
@@ -709,18 +658,7 @@ public:
                                 return;
                             }
                             break;
-                        case '\r': 
-                            push_state(state_);
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = json_parse_state::cr;
-                            break; 
-                        case '\n': 
-                            ++input_ptr_;
-                            ++line_;
-                            ++position_;
-                            mark_position_ = position_;
-                            break;   
+                        case '\r': case '\n': 
                         case ' ':case '\t':
                             skip_space(ec);
                             break;
@@ -818,18 +756,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -898,18 +825,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -972,18 +888,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1052,18 +957,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                ++input_ptr_;
-                                ++position_;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1106,18 +1000,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                push_state(state_);
-                                ++input_ptr_;
-                                ++position_;
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1244,18 +1127,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 break;
-                            case '\r': 
-                                ++input_ptr_;
-                                ++position_;
-                                push_state(state_);
-                                state_ = json_parse_state::cr;
-                                break; 
-                            case '\n': 
-                                ++input_ptr_;
-                                ++line_;
-                                ++position_;
-                                mark_position_ = position_;
-                                break;   
+                            case '\r': case '\n': 
                             case ' ':case '\t':
                                 skip_space(ec);
                                 break;
@@ -1389,17 +1261,8 @@ public:
                 {
                     switch (*input_ptr_)
                     {
-                        case '\r':
-                            push_state(state_);
-                            ++input_ptr_;
-                            ++position_;
-                            state_ = json_parse_state::cr;
-                            break;
-                        case '\n':
-                            ++input_ptr_;
-                            ++line_;
-                            ++position_;
-                            mark_position_ = position_;
+                        case '\r': case '\n': 
+                            skip_space(ec);
                             break;
                         case '*':
                             ++input_ptr_;
@@ -1727,22 +1590,7 @@ zero:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
@@ -1807,22 +1655,7 @@ integer:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                push_state(state_);
-                ++input_ptr_;
-                ++position_;
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_integer_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
                 if (ec) return;
@@ -1909,22 +1742,7 @@ fraction2:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                push_state(state_);
-                ++input_ptr_;
-                ++position_;
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
@@ -2042,22 +1860,7 @@ exp3:
         }
         switch (*input_ptr_)
         {
-            case '\r': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++position_;
-                push_state(state_);
-                state_ = json_parse_state::cr;
-                return; 
-            case '\n': 
-                end_fraction_value(visitor, ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++line_;
-                ++position_;
-                mark_position_ = position_;
-                return;   
+            case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
                 if (ec) return;
