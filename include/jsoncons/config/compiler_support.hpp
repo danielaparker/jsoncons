@@ -17,11 +17,11 @@
 #   if defined(__GNUC_PATCHLEVEL__)
 #       define JSONCONS_GCC_AVAILABLE(major, minor, patch) \
             ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) \
-            >= (major * 10000 + minor * 100 + patch))
+            >= ((major) * 10000 + (minor) * 100 + (patch)))
 #   else
 #       define JSONCONS_GCC_AVAILABLE(major, minor, patch) \
             ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) \
-            >= (major * 10000 + minor * 100 + patch))
+            >= ((major) * 10000 + (minor) * 100 + (patch)))
 #   endif
 #   else
 #       define JSONCONS_GCC_AVAILABLE(major, minor, patch) 0
@@ -30,7 +30,7 @@
 #if defined(__clang__)
 #   define JSONCONS_CLANG_AVAILABLE(major, minor, patch) \
             ((__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) \
-            >= (major * 10000 + minor * 100 + patch))
+            >= ((major) * 10000 + (minor) * 100 + (patch)))
 #   else
 #       define JSONCONS_CLANG_AVAILABLE(major, minor, patch) 0
 #endif

@@ -597,13 +597,10 @@ public:
 
         if (input_ptr_ == input_end_ && more_)
         {
-            if (input_ptr_ == input_end_)
+            chunk_rdr_->read_chunk(*this, ec);
+            if (ec)
             {
-                chunk_rdr_->read_chunk(*this, ec);
-                if (ec)
-                {
-                    return;
-                }
+                return;
             }
             if (input_ptr_ == input_end_)
             {
@@ -2397,7 +2394,7 @@ private:
 
     void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        int64_t val;
+        int64_t val{};
         auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
