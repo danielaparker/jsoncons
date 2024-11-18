@@ -107,7 +107,7 @@ namespace jsoncons {
         half_float = 6,          // 0110
         short_str = 7,           // 0111
         json_const_pointer = 8,  // 1000    
-        json_pointer = 9,        // 1001    
+        json_reference = 9,        // 1001    
         byte_str = 12,           // 1100  
         object = 13,             // 1101
         array = 14,              // 1110
@@ -143,6 +143,7 @@ namespace jsoncons {
         static constexpr const CharT* empty_object_value = JSONCONS_CSTRING_CONSTANT(CharT, "empty_object");
         static constexpr const CharT* object_value = JSONCONS_CSTRING_CONSTANT(CharT, "object");
         static constexpr const CharT* json_const_pointer = JSONCONS_CSTRING_CONSTANT(CharT, "json_const_pointer");
+        static constexpr const CharT* json_reference = JSONCONS_CSTRING_CONSTANT(CharT, "json_reference");
 
         switch (storage)
         {
@@ -209,6 +210,11 @@ namespace jsoncons {
             case json_storage_kind::json_const_pointer:
             {
                 os << json_const_pointer;
+                break;
+            }
+            case json_storage_kind::json_reference:
+            {
+                os << json_reference;
                 break;
             }
         }

@@ -140,7 +140,7 @@ add_executable(unit_tests
                corelib/src/json_checker_tests.cpp
                corelib/src/json_comparator_tests.cpp
                corelib/src/json_const_pointer_arg_tests.cpp
-               corelib/src/json_pointer_arg_tests.cpp
+               corelib/src/json_reference_arg_tests.cpp
                corelib/src/json_assignment_tests.cpp
                corelib/src/json_constructor_tests.cpp
                corelib/src/json_cursor_tests.cpp

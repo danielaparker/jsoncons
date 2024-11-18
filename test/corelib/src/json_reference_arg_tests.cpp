@@ -19,40 +19,40 @@ TEST_CASE("json_pointer array tests")
 
     SECTION("size()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_array());
         CHECK(v.size() == 3);
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_array());
         REQUIRE_NOTHROW(v.at(1));
     }
     SECTION("copy")
     {
-        json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_pointer);
+        json v(json_reference_arg, j);
+        CHECK(v.storage_kind() == json_storage_kind::json_reference);
 
         json j2(v);
-        CHECK(j2.storage_kind() == json_storage_kind::json_pointer);
+        CHECK(j2.storage_kind() == json_storage_kind::json_reference);
     }
     SECTION("assignment")
     {
-        json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_pointer);
+        json v(json_reference_arg, j);
+        CHECK(v.storage_kind() == json_storage_kind::json_reference);
 
         json j2;
         j2 = v;
-        CHECK(j2.storage_kind() == json_storage_kind::json_pointer);
+        CHECK(j2.storage_kind() == json_storage_kind::json_reference);
     }
     SECTION("push_back")
     {
         json expected = json::parse(R"( ["one", "two", "three", "four"] )");
 
-        json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_pointer);
+        json v(json_reference_arg, j);
+        CHECK(v.storage_kind() == json_storage_kind::json_reference);
         j.push_back("four");
         
         CHECK(expected == v);
@@ -61,8 +61,8 @@ TEST_CASE("json_pointer array tests")
     {
         json expected = json::parse(R"( ["one", "two", "three", "four"] )");
 
-        json v(json_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_pointer);
+        json v(json_reference_arg, j);
+        CHECK(v.storage_kind() == json_storage_kind::json_reference);
         j.emplace_back("four");
 
         CHECK(expected == v);
@@ -75,14 +75,14 @@ TEST_CASE("json_pointer object tests")
 
     SECTION("size()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_object());
         CHECK(v.size() == 3);
         CHECK_FALSE(v.empty());
     }
     SECTION("at()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_object());
         REQUIRE_NOTHROW(v.at("two"));
         CHECK(v.contains("two"));
@@ -99,7 +99,7 @@ TEST_CASE("json_pointer string tests")
 
     SECTION("is_string()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_string());
         REQUIRE(v.is_string_view());
 
@@ -114,7 +114,7 @@ TEST_CASE("json_pointer byte_string tests")
 
     SECTION("is_byte_string()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_byte_string());
         REQUIRE(v.is_byte_string_view());
     }
@@ -127,13 +127,13 @@ TEST_CASE("json_pointer bool tests")
 
     SECTION("true")
     {
-        json v(json_pointer_arg, &tru);
+        json v(json_reference_arg, tru);
         REQUIRE(v.is_bool());
         CHECK(v.as_bool());
     }
     SECTION("false")
     {
-        json v(json_pointer_arg, &fal);
+        json v(json_reference_arg, fal);
         REQUIRE(v.is_bool());
         CHECK_FALSE(v.as_bool());
     }
@@ -145,7 +145,7 @@ TEST_CASE("json_pointer int64 tests")
 
     SECTION("is_int64()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_int64());
         CHECK(v.as<int64_t>() == -100);
     }
@@ -157,7 +157,7 @@ TEST_CASE("json_pointer uint64 tests")
 
     SECTION("is_uint64()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_uint64());
         CHECK(v.as<uint64_t>() == 100);
     }
@@ -169,7 +169,7 @@ TEST_CASE("json_pointer half tests")
 
     SECTION("is_half()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_half());
         CHECK(v.as<uint16_t>() == 100);
     }
@@ -181,7 +181,7 @@ TEST_CASE("json_pointer double tests")
 
     SECTION("is_double()")
     {
-        json v(json_pointer_arg, &j);
+        json v(json_reference_arg, j);
         REQUIRE(v.is_double());
 
         CHECK(v.as_double() == 123.456);

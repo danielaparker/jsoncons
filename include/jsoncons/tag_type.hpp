@@ -59,12 +59,12 @@ struct json_const_pointer_arg_t
 
 constexpr json_const_pointer_arg_t json_const_pointer_arg{};
 
-struct json_pointer_arg_t
+struct json_reference_arg_t
 {
-    explicit json_pointer_arg_t() = default; 
+    explicit json_reference_arg_t() = default; 
 };
 
-constexpr json_pointer_arg_t json_pointer_arg{};
+constexpr json_reference_arg_t json_reference_arg{};
  
 enum class semantic_tag : uint8_t 
 {
