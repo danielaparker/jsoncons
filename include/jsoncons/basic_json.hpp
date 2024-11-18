@@ -2612,7 +2612,7 @@ namespace jsoncons {
                     break;
                 }
                 case json_storage_kind::json_const_pointer: 
-                    return *(cast<json_const_pointer_storage>().value())[key];
+                    return cast<json_const_pointer_storage>().value()->at(key);
                 case json_storage_kind::json_reference: 
                     return cast<json_reference_storage>().value()[key];
                 default:

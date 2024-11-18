@@ -36,6 +36,18 @@ TEST_CASE("json_const_pointer array tests")
         REQUIRE(v.is_array());
         CHECK(v.at(1) == std::string("two"));
     }
+    SECTION("operator[]()")
+    {
+        json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_array());
+        REQUIRE_THROWS(v[1]);
+    }
+    SECTION("operator[]() const")
+    {
+        const json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_array());
+        CHECK(v[1] == std::string("two"));
+    }
     SECTION("copy")
     {
         json v(json_const_pointer_arg, &j);
