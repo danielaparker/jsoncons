@@ -158,6 +158,74 @@ TEST_CASE("json_reference object tests")
         v.at("one") = "first";
         CHECK("first" == v.at("one"));
     }
+    SECTION("insert_or_assign()")
+    {
+        json expected = json::parse(R"( {"one" : 1, "two" : 2, "three" : "third", "four" : 4} )");
+
+        json v(json_reference_arg, j);
+        REQUIRE(v.is_object());
+        REQUIRE_NOTHROW(v.at("two"));
+        CHECK(v.contains("two"));
+        CHECK(v.count("two") == 1);
+
+        CHECK(v.get_value_or<int>("three", 0) == 3);
+        CHECK(v.get_value_or<int>("four", 4) == 4);
+
+        v.insert_or_assign("four", 4);
+        v.insert_or_assign("three", "third");
+        CHECK(expected == v);
+    }
+    SECTION("try_emplace()")
+    {
+        json expected = json::parse(R"( {"one" : 1, "two" : 2, "three" : 3, "four" : 4} )");
+
+        json v(json_reference_arg, j);
+        REQUIRE(v.is_object());
+        REQUIRE_NOTHROW(v.at("two"));
+        CHECK(v.contains("two"));
+        CHECK(v.count("two") == 1);
+
+        CHECK(v.get_value_or<int>("three", 0) == 3);
+        CHECK(v.get_value_or<int>("four", 4) == 4);
+
+        v.try_emplace("four", 4);
+        v.try_emplace("three", "third"); // does nothing
+        CHECK(expected == v);
+    }
+    SECTION("merge()")
+    {
+        json expected1 = json::parse(R"( {"one" : 1, "two" : 2, "three" : 3, "four" : 4} )");
+        json expected2 = json::parse(R"( {"one" : 1, "two" : 2, "three" : 3, "four" : 4, "five" : 5} )");
+        
+        json j1 = json::parse(R"( {"three" : "third", "four" : 4} )");
+
+        json v(json_reference_arg, j);
+        REQUIRE(v.is_object());
+
+        v.merge(j1);
+        CHECK(expected1 == v);
+
+        json j2 = json::parse(R"( {"five" : 5} )");
+        j2.merge(v);
+        CHECK(expected2 == j2);
+    }
+    SECTION("merge_or_update()")
+    {
+        json expected1 = json::parse(R"( {"one" : 1, "two" : 2, "three" : "third", "four" : 4} )");
+        json expected2 = json::parse(R"( {"one" : 1, "two" : 2, "three" : "third", "four" : 4, "five" : 5} )");
+
+        json j1 = json::parse(R"( {"three" : "third", "four" : 4} )");
+
+        json v(json_reference_arg, j);
+        REQUIRE(v.is_object());
+
+        v.merge_or_update(j1);
+        CHECK(expected1 == v);
+
+        json j2 = json::parse(R"( {"five" : 5} )");
+        j2.merge_or_update(v);
+        CHECK(expected2 == j2);
+    }
 }
 
 TEST_CASE("json_reference string tests")

@@ -86,6 +86,8 @@ basic_json(byte_string_arg_t,
     const Allocator& alloc = Allocator());       (24) 
 
 basic_json(json_const_pointer_arg, const basic_json* j_ptr); (25) (since 0.156.0)
+
+basic_json(json_reference_arg, basic_json& j);               (26) (since 0.179.0)
 ```
 
 (1) Constructs an empty json object. 
@@ -157,6 +159,9 @@ Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambigu
 (25) Constructs a `basic_json` value that provides a non-owning view of
 another `basic_json` value. If second argument `j_ptr` is null,
 constructs a `null` value.
+
+(26) Constructs a `basic_json` value that provides a non-owning view of
+another `basic_json` value. 
 
 ### Helpers
 

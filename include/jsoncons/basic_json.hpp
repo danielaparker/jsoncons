@@ -2586,7 +2586,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value()[key];
                 default:
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                    break;
             }               
         }
 
@@ -2617,7 +2616,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value()[key];
                 default:
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                    break;
             }
         }
 
@@ -3586,9 +3584,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().at(key);
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3612,9 +3608,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().at(key);
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3669,9 +3663,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().find(key);
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3688,9 +3680,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().find(key);
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3720,9 +3710,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().at_or_null(key);
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3755,9 +3743,7 @@ namespace jsoncons {
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().template get_value_or<T,U>(key,std::forward<U>(default_value));
                 default:
-                {
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                }
             }
         }
 
@@ -3811,7 +3797,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().erase(pos);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
-                break;
             }
         }
 
@@ -3827,7 +3812,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().erase(first, last);
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
-                    break;
             }
         }
 
@@ -3854,7 +3838,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().erase(first, last);
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
-                    break;
             }
         }
 
@@ -3873,7 +3856,6 @@ namespace jsoncons {
                     return cast<json_reference_storage>().value().erase(key);
                 default:
                     JSONCONS_THROW(not_an_object(key.data(),key.length()));
-                    break;
             }
         }
 
@@ -3942,11 +3924,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge(source.cast<object_storage>().value());
                             break;
                         case json_storage_kind::json_reference:
-                            merge(source.cast<json_reference_storage>().value());
+                            cast<json_reference_storage>().value().merge(source);
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge(source.cast<json_reference_storage>().value());
                     break;
                default:
                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -3970,11 +3955,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge(std::move(source.cast<object_storage>().value()));
                             break;
                         case json_storage_kind::json_reference:
-                            merge(std::move(source.cast<json_reference_storage>().value()));
+                            cast<json_reference_storage>().value().merge(std::move(source));
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge(std::move(source.cast<json_reference_storage>().value()));
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -3998,12 +3986,15 @@ namespace jsoncons {
                             cast<object_storage>().value().merge(hint, source.cast<object_storage>().value());
                             break;
                         case json_storage_kind::json_reference:
-                            merge(hint, source.cast<json_reference_storage>().value());
+                            cast<json_reference_storage>().value().merge(hint, source);
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
                     }
                      break;
+                case json_storage_kind::json_reference:
+                    merge(hint, source.cast<json_reference_storage>().value());
+                    break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
             }
@@ -4026,11 +4017,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge(hint, std::move(source.cast<object_storage>().value()));
                             break;
                         case json_storage_kind::json_reference:
-                            merge(hint, std::move(source.cast<json_reference_storage>().value()));
+                            cast<json_reference_storage>().value().merge(hint, std::move(source));
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge(hint, std::move(source.cast<json_reference_storage>().value()));
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4056,11 +4050,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge_or_update(source.cast<object_storage>().value());
                             break;
                         case json_storage_kind::json_reference:
-                            merge_or_update(source.cast<json_reference_storage>().value());
+                            cast<json_reference_storage>().value().merge_or_update(source);
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge_or_update(source.cast<json_reference_storage>().value());
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4084,11 +4081,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge_or_update(std::move(source.cast<object_storage>().value()));
                             break;
                         case json_storage_kind::json_reference:
-                            merge_or_update(std::move(source.cast<json_reference_storage>().value()));
+                            cast<json_reference_storage>().value().merge_or_update(std::move(source));
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge_or_update(std::move(source.cast<json_reference_storage>().value()));
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4112,11 +4112,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge_or_update(hint, source.cast<object_storage>().value());
                             break;
                         case json_storage_kind::json_reference:
-                            merge_or_update(hint, source.cast<json_reference_storage>().value());
+                            cast<json_reference_storage>().value().merge_or_update(hint, source);
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge_or_update(hint, source.cast<json_reference_storage>().value());
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4140,11 +4143,14 @@ namespace jsoncons {
                             cast<object_storage>().value().merge_or_update(hint, std::move(source.cast<object_storage>().value()));
                             break;
                         case json_storage_kind::json_reference:
-                            merge_or_update(hint, std::move(source.cast<json_reference_storage>().value()));
+                            cast<json_reference_storage>().value().merge_or_update(hint, std::move(source));
                             break;
                         default:
                             JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
                     }
+                    break;
+                case json_storage_kind::json_reference:
+                    merge_or_update(hint, std::move(source.cast<json_reference_storage>().value()));
                     break;
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
