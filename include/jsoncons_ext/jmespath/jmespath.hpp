@@ -3212,6 +3212,17 @@ namespace jmespath {
             static_resources(static_resources&& expr) = default;
             static_resources& operator=(static_resources&& expr) = default;
 
+            typedef std::function<const function_base *(const string_type &)> customer_get_function;
+            static const customer_get_function get_or_set_customer_get_function(customer_get_function cgf = nullptr, bool set = false)
+            {
+                static customer_get_function customer = nullptr;
+                if(set){
+                    customer = cgf;
+                }
+
+                return customer;
+            }
+
             const function_base* get_function(const string_type& name, std::error_code& ec) const
             {
                 static abs_function abs_func;
@@ -3271,6 +3282,15 @@ namespace jmespath {
                     {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func},
                     {string_type{'n','o','t', '_', 'n', 'u','l','l'}, &not_null_func}
                 };
+
+                const customer_get_function cgf = get_or_set_customer_get_function();
+                if(cgf){
+                    const function_base *func = cgf(name);
+                    if(func){
+                        return func;
+                    }
+                }
+
                 auto it = functions_.find(name);
                 if (it == functions_.end())
                 {
@@ -3749,7 +3769,29 @@ namespace jmespath {
                                 push_token(token(f), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::function_expression;
-                                state_stack_.emplace_back(path_state::expression_or_expression_type);
+                                // check no-args function
+                                bool is_no_args_func = true;
+                                bool isEnd = false;
+                                for (const char_type *p2_ = p_ + 1; p2_ < end_input_ && !isEnd; ++p2_)
+                                {
+                                    
+                                    switch (*p2_)
+                                    {
+                                        case ' ':case '\t':case '\r':case '\n':
+                                            break;
+                                        case ')':
+                                            isEnd = true;
+                                            break;
+                                        default:
+                                            is_no_args_func = false;
+                                            isEnd = true;
+                                            break;
+                                        }
+                                }
+                                if (!is_no_args_func)
+                                {
+                                    state_stack_.emplace_back(path_state::expression_or_expression_type);
+                                }
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5036,6 +5078,14 @@ namespace jmespath {
                         {
                             ec = jmespath_errc::invalid_arity;
                             return;
+                        }
+                        if (arg_count == 0)
+                        {
+                            toks.emplace_back(std::move(*it));
+                            ++it;
+                            output_stack_.erase(it.base(), output_stack_.end());
+                            output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            break;
                         }
                         if (toks.back().type() != token_kind::literal)
                         {
