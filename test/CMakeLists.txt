@@ -76,6 +76,7 @@ add_executable(unit_tests
                cbor/src/cbor_typed_array_tests.cpp
                cbor/src/decode_cbor_tests.cpp
                cbor/src/encode_cbor_tests.cpp
+               csv/src/csv_reader_tests.cpp
                csv/src/csv_cursor_tests.cpp
                csv/src/csv_subfield_tests.cpp
                csv/src/csv_tests.cpp
