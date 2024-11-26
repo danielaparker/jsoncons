@@ -790,7 +790,7 @@ namespace jmespath {
                     sum += j.template as<double>();
                 }
 
-                return sum == 0 ? resources.null_value() : *resources.create_json(sum/arg0.size());
+                return arg0.size() == 0 ? resources.null_value() : *resources.create_json(sum / arg0.size());
             }
         };
 
