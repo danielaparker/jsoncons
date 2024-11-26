@@ -573,7 +573,7 @@
     },
     {
       "expression": "not_null()",
-      "error": "invalid-arity"
+      "result": null
     },
     {
       "comment": "function projection on single arg function",
