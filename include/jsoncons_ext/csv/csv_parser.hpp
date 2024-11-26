@@ -831,8 +831,17 @@ public:
             }
         }
 
-        for (; (input_ptr_ < local_input_end) && more_;)
+        while (more_)
         {
+            if (input_ptr_ == local_input_end)
+            {
+                if (!chunk_rdr_->read_chunk(*this, ec))
+                {
+                    break;
+                }
+                local_input_end = input_end_;
+            }
+
             CharT curr_char = *input_ptr_;
 
             switch (state_) 
