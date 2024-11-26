@@ -562,7 +562,7 @@ public:
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      const TempAllocator& alloc = TempAllocator())
-        : basic_csv_parser(&chk_rdr_,options, options, alloc)
+        : basic_csv_parser(&chk_rdr_, options, default_csv_parsing(), alloc)
     {
     }
 
