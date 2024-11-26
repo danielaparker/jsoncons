@@ -22,6 +22,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
+#include <jsoncons/chunk_reader.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -493,11 +494,12 @@ namespace detail {
 } // namespace detail
 
 template <typename CharT,typename TempAllocator =std::allocator<char>>
-class basic_csv_parser : public ser_context
+class basic_csv_parser : public ser_context, public virtual basic_parser_input<CharT>
 {
 public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
     using char_type = CharT;
+    using chunk_reader_type = std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)>;
 private:
     struct string_maps_to_double
     {
@@ -547,9 +549,12 @@ private:
     string_type buffer_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
+    chunk_reader_adaptor<char_type> chk_rdr_;
+    chunk_reader<char_type>* chunk_rdr_;
+
 public:
     basic_csv_parser(const TempAllocator& alloc = TempAllocator())
-       : basic_csv_parser(basic_csv_decode_options<CharT>(), 
+       : basic_csv_parser(&chk_rdr_,basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(),
                           alloc)
     {
@@ -557,23 +562,29 @@ public:
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      const TempAllocator& alloc = TempAllocator())
-        : basic_csv_parser(options, 
-                           default_csv_parsing(),
-                           alloc)
+        : basic_csv_parser(&chk_rdr_,options, options, alloc)
+    {
+    }
+
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        const TempAllocator& alloc = TempAllocator())
+        : basic_csv_parser(&chk_rdr_, options, err_handler, alloc)
     {
     }
 
     basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler,
                      const TempAllocator& alloc = TempAllocator())
-        : basic_csv_parser(basic_csv_decode_options<CharT>(), 
+        : basic_csv_parser(&chk_rdr_, basic_csv_decode_options<CharT>(), 
                            err_handler,
                            alloc)
     {
     }
 
-    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const TempAllocator& alloc = TempAllocator())
+    basic_csv_parser(chunk_reader<CharT>* chunk_rdr,
+        const basic_csv_decode_options<CharT>& options,
+        std::function<bool(csv_errc,const ser_context&)> err_handler,
+        const TempAllocator& alloc = TempAllocator())
        : alloc_(alloc),
          state_(csv_parse_state::start),
          visitor_(nullptr),
@@ -596,7 +607,8 @@ public:
          column_types_(alloc),
          column_defaults_(alloc),
          state_stack_(alloc),
-         buffer_(alloc)
+         buffer_(alloc),
+         chunk_rdr_(chunk_rdr)
     {
         if (options_.enable_str_to_nan())
         {
@@ -1298,19 +1310,23 @@ public:
         return state_;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use set_buffer once or provide a chunk reader")
     void update(const string_view_type sv)
     {
         update(sv.data(),sv.length());
     }
 
+    JSONCONS_DEPRECATED_MSG("Instead, use set_buffer once or provide a chunk reader")
     void update(const CharT* data, std::size_t length)
     {
         begin_input_ = data;
         input_end_ = data + length;
         input_ptr_ = begin_input_;
     }
+#endif
 
-    void set_buffer(const CharT* data, std::size_t length)
+    void set_buffer(const CharT* data, std::size_t length) final
     {
         begin_input_ = data;
         input_end_ = data + length;

@@ -146,7 +146,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader final : public chunk_reader<CharT> 
+    class basic_json_reader final : private chunk_reader<CharT> 
     {
     public:
         using char_type = CharT;
@@ -267,25 +267,6 @@ namespace jsoncons {
         {
         }
 #endif
-        
-        bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
-        {
-            //std::cout << "UPDATE BUFFER\n";
-            bool success = false;
-            auto s = source_.read_buffer(ec);
-            if (ec) return false;
-            if (s.size() > 0)
-            {
-                parser_.set_buffer(s.data(),s.size());
-                success = true;
-            }
-            else
-            {
-                eof_ = true;
-            }
-            
-            return success;
-        }
 
         void read_next()
         {
@@ -370,6 +351,26 @@ namespace jsoncons {
             {
                 check_done(ec);
             }
+        }
+    private:
+        
+        bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
+        {
+            //std::cout << "UPDATE BUFFER\n";
+            bool success = false;
+            auto s = source_.read_buffer(ec);
+            if (ec) return false;
+            if (s.size() > 0)
+            {
+                parser_.set_buffer(s.data(),s.size());
+                success = true;
+            }
+            else
+            {
+                eof_ = true;
+            }
+
+            return success;
         }
     };
 
