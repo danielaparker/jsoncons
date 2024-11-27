@@ -34,7 +34,7 @@ enum class json_parse_state : uint8_t
 {
     root,
     start, 
-    accept, 
+    accept,
     slash,  
     slash_slash, 
     slash_star, 
@@ -595,10 +595,15 @@ public:
             return;
         }
 
+        skip_space(ec);
+        if (JSONCONS_UNLIKELY(ec))
+        {
+            return;
+        }
         if (input_ptr_ == input_end_ && more_)
         {
             chunk_rdr_->read_chunk(*this, ec);
-            if (ec)
+            if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
@@ -613,6 +618,9 @@ public:
                         more_ = false;
                         break;
                     case json_parse_state::start:
+                        more_ = false;
+                        ec = json_errc::unexpected_eof;
+                        break;
                     case json_parse_state::done:
                         more_ = false;
                         break;
