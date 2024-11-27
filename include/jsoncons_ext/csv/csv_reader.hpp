@@ -130,20 +130,16 @@ namespace jsoncons { namespace csv {
                 ec = csv_errc::source_error;
                 return;
             }   
-            while (!parser_.stopped())
+            if (parser_.source_exhausted())
             {
-                if (parser_.source_exhausted())
-                {
-                    auto s = source_.read_buffer(ec);
-                    if (ec) return;
-                    if (s.size() > 0)
-                    {
-                        parser_.set_buffer(s.data(),s.size());
-                    }
-                }
-                parser_.parse_some(visitor_, ec);
+                auto s = source_.read_buffer(ec);
                 if (ec) return;
+                if (s.size() > 0)
+                {
+                    parser_.set_buffer(s.data(),s.size());
+                }
             }
+            parser_.parse_some(visitor_, ec);
         }
 
         std::size_t line() const
