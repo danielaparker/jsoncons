@@ -15,7 +15,7 @@ TEST_CASE("test csv_reader buffered read")
     2017-01-09,0.0062,0.0075,0.0083,0.011
     2017-01-08,0.0063,0.0076,0.0084,0.0112
     2017-01-08,0.0063,0.0076,0.0084,0.0112
-    )";
+)";
 
         jsoncons::json_decoder<jsoncons::ojson> decoder;
         auto options = csv::csv_options{}
