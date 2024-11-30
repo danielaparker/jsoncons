@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_7_HPP
 #define JSONCONS_JSONSCHEMA_DRAFT7_SCHEMA_BUILDER_7_HPP
 
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>

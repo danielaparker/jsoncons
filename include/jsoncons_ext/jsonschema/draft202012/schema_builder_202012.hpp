@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_DRAFT202012_SCHEMA_BUILDER_202012_HPP
 #define JSONCONS_JSONSCHEMA_DRAFT202012_SCHEMA_BUILDER_202012_HPP
 
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -252,7 +252,7 @@ namespace draft202012 {
             if (it != sch.object_range().end()) 
             {
                 std::string value = it->value().template as<std::string>();
-                jsoncons::uri new_uri(context.get_base_uri(), uri_fragment_part, value);
+                jsoncons::uri new_uri(context.get_base_uri(), utility::uri_fragment_part, value);
                 dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
                 local_anchor_dict.emplace(value, context.get_base_uri());
             }
@@ -579,7 +579,7 @@ namespace draft202012 {
                         JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
                     }
                     auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    jsoncons::uri new_uri(uri, utility::uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {
@@ -595,7 +595,7 @@ namespace draft202012 {
                         JSONCONS_THROW(schema_error("Invalid $dynamicAnchor " + anchor));
                     }
                     auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    jsoncons::uri new_uri(uri, utility::uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {

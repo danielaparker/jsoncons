@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
@@ -118,7 +118,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= field;
 
-            jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
+            jsoncons::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
 
             return uri_wrapper(std::move(new_uri));
         }
@@ -131,7 +131,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= index;
 
-            jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
+            jsoncons::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
 
             return uri_wrapper(std::move(new_uri));
         }

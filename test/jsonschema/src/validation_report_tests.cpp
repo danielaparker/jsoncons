@@ -628,14 +628,14 @@ TEST_CASE("jsonschema more output tests 3")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/baz",
-        "schemaLocation": "/example-schema#/additionalProperties",
+        "schemaLocation": "example-schema#/additionalProperties",
         "instanceLocation": "/baz",
         "error": "Additional property 'baz' not allowed by schema."
     },
     {
         "valid": false,
         "evaluationPath": "/required",
-        "schemaLocation": "/example-schema#/required",
+        "schemaLocation": "example-schema#/required",
         "instanceLocation": "",
         "error": "Required property 'foo' not found."
     }

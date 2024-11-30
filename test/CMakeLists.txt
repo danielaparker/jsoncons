@@ -128,6 +128,7 @@ add_executable(unit_tests
                corelib/src/detail/span_tests.cpp
                corelib/src/detail/string_view_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
+               corelib/src/utility/uri_tests.cpp
                corelib/src/detail/to_integer_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
@@ -171,7 +172,6 @@ add_executable(unit_tests
                corelib/src/json_type_traits_chrono_tests.cpp
                corelib/src/json_type_traits_container_tests.cpp
                corelib/src/json_type_traits_tests.cpp
-               corelib/src/uri_tests.cpp
                corelib/src/json_validation_tests.cpp 
                corelib/src/jsoncons_tests.cpp
                corelib/src/JSONTestSuite_tests.cpp

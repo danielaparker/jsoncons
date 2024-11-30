@@ -1,11 +1,10 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 
-//#if 0
 TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)")
 {
     SECTION("https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top")
@@ -323,14 +322,14 @@ TEST_CASE("uri constructors")
     {
         jsoncons::uri x{"http://localhost:4242/draft2019-09/recursiveRef6/base.json"};
 
-        jsoncons::uri y{ x, jsoncons::uri_fragment_part, "/anyOf" };
+        jsoncons::uri y{ x, jsoncons::utility::uri_fragment_part, "/anyOf" };
 
         jsoncons::uri expected{"http://localhost:4242/draft2019-09/recursiveRef6/base.json#/anyOf"};
 
         CHECK(expected == y);       
     }
 }
-//#endif
+
 
 TEST_CASE("uri parsing tests")
 {
@@ -348,6 +347,122 @@ TEST_CASE("uri parsing tests")
         */
 
         //CHECK(ec);       
+    }
+}
+
+TEST_CASE("cpp-netlib uri tests")
+{
+    SECTION("test_empty_path")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56", ec);
+        REQUIRE_FALSE(ec);
+        CHECK(uri.encoded_path().empty());
+    }
+    SECTION("test_empty_path_with_query")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56?query", ec);
+        REQUIRE_FALSE(ec);
+        CHECK(uri.encoded_path().empty());
+    }
+    SECTION("test_empty_path_with_fragment")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56#fragment", ec);
+        REQUIRE_FALSE(ec);
+        CHECK(uri.encoded_path().empty());
+    }
+    SECTION("test_single_slash")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56/", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("/" == uri.encoded_path());
+    }
+    SECTION("test_single_slash_with_query")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56/?query", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("/" == uri.encoded_path());
+    }
+    SECTION("test_single_slash_with_fragment")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("http://123.34.23.56/#fragment", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("/" == uri.encoded_path());
+    }
+    SECTION("test_double_slash_empty_path_empty_everything")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("file://", ec);
+        REQUIRE(ec == jsoncons::utility::uri_errc::invalid_uri);
+        CHECK(uri.encoded_path().empty());
+    }
+    SECTION("test_triple_slash_empty_everything")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("file:///", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("/" == uri.encoded_path());
+    }
+    SECTION("test_triple_slash_with_path_name")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("file:///path", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("/path" == uri.encoded_path());
+    }
+    SECTION("test_rootless_1")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("mailto:john.doe@example.com", ec);
+        REQUIRE_FALSE(ec);
+        CHECK("john.doe@example.com" == uri.encoded_path());
+    }
+    SECTION("test_invalid_characters_in_path")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("mailto:jo%hn.doe@example.com", ec);
+        REQUIRE(ec);
+        REQUIRE(jsoncons::utility::uri_errc::invalid_characters_in_path == ec);
+        //std::cout << ec.message() << "\n";
+    }
+    SECTION("test_invalid_percent_encoded_characters_in_path_1")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("mailto:john.doe@example%G0.com", ec);
+        REQUIRE(ec);
+        REQUIRE(jsoncons::utility::uri_errc::invalid_characters_in_path == ec);
+        //std::cout << ec.message() << "\n";
+    }
+    SECTION("test_invalid_percent_encoded_characters_in_path_2")
+    {
+        std::error_code ec;
+        jsoncons::utility::uri uri = jsoncons::utility::uri::parse("mailto:john.doe@example%0G.com", ec);
+        REQUIRE(ec);
+        REQUIRE(jsoncons::utility::uri_errc::invalid_characters_in_path == ec);
+        //std::cout << ec.message() << "\n";
+    }
+}
+
+TEST_CASE("test uri resolve")
+{
+    SECTION("empty base-1")
+    {
+        std::string str = "./other.schema.json";
+        jsoncons::utility::uri uri{str};
+        auto uri2 = uri.resolve(jsoncons::utility::uri{ "" });
+        CHECK(str == uri2.string());
+    }
+    SECTION("empty base-2")
+    {
+        std::string str = "../../../../dir2/foo/bar/baz/main.schema.json";
+        jsoncons::utility::uri uri{str};
+        auto uri2 = uri.resolve(jsoncons::utility::uri{ "" });
+        CHECK(str == uri2.string());
     }
 }
 

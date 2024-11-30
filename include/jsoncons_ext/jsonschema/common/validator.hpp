@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_COMMON_VALIDATOR_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>

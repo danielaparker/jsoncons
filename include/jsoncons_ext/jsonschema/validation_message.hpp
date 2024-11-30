@@ -8,7 +8,7 @@
 #define JSONCONS_JSONSCHEMA_VALIDATION_MESSAGE_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <cassert>

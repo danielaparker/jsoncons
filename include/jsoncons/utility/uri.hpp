@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_URI_HPP
-#define JSONCONS_JSONSCHEMA_URI_HPP
+#ifndef JSONCONS_UTILITY_URI_HPP
+#define JSONCONS_UTILITY_URI_HPP
 
 #include <string> // std::string
 #include <algorithm> 
@@ -16,17 +16,18 @@
 #include <jsoncons/detail/write_number.hpp>
 #include <iostream>
 
-namespace jsoncons { 
+namespace jsoncons { namespace utility {
 
-    enum class uri_errc 
+    enum class uri_errc
     {
         success = 0,
         invalid_uri = 1,
+        invalid_characters_in_path = 2
     };
 
 
     class uri_error_category_impl
-       : public std::error_category
+        : public std::error_category
     {
     public:
         const char* name() const noexcept override
@@ -39,6 +40,8 @@ namespace jsoncons {
             {
                 case uri_errc::invalid_uri:
                     return "Invalid URI";
+                case uri_errc::invalid_characters_in_path:
+                    return "Invalid characters in path";
                 default:
                     return "Unknown uri error";
             }
@@ -46,27 +49,29 @@ namespace jsoncons {
     };
 
     inline
-    const std::error_category& uri_error_category()
+        const std::error_category& uri_error_category()
     {
-      static uri_error_category_impl instance;
-      return instance;
+        static uri_error_category_impl instance;
+        return instance;
     }
-    
-    inline 
-    std::error_code make_error_code(uri_errc result)
+
+    inline
+        std::error_code make_error_code(uri_errc result)
     {
-        return std::error_code(static_cast<int>(result),uri_error_category());
+        return std::error_code(static_cast<int>(result), uri_error_category());
     }
-}
+
+} // namespace utility
+} // namespace jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::uri_errc> : public true_type
+    struct is_error_code_enum<jsoncons::utility::uri_errc> : public true_type
     {
     };
-}
+} // namespace std
 
-namespace jsoncons {
+namespace jsoncons { namespace utility {
 
     struct uri_fragment_part_t
     {
@@ -687,9 +692,9 @@ namespace jsoncons {
                             default:
                                 if (!(is_pchar(c,s.data()+i, s.size() - i) || c == '/'))
                                 {
-                                    ec = uri_errc::invalid_uri;
+                                    ec = uri_errc::invalid_characters_in_path;
                                     return uri{};
-                                }
+                                }                                
                                 break;
                         }
                         break;
@@ -808,10 +813,11 @@ namespace jsoncons {
         static std::string merge_paths(const uri& base, const uri& relative)
         {
             std::string result;
-
-            if (base.encoded_path().empty()) 
+            
+            if (!base.encoded_authority().empty() && base.encoded_path().empty()) 
             {
                 result = "/";
+                result.append(relative.encoded_path().data(), relative.encoded_path().length());
             } 
             else 
             {
@@ -1145,6 +1151,10 @@ namespace jsoncons {
             return is_unreserved(c) || is_pct_encoded(s,length) || is_sub_delim(c) || c == ':' || c == '@';
         }
     };
+
+} // namespace utility
+  
+using uri = utility::uri;
 
 } // namespace jsoncons
 

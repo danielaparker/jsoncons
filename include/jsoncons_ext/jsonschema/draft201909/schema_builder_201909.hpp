@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
 #define JSONCONS_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
 
-#include <jsoncons/uri.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
@@ -524,7 +524,7 @@ namespace draft201909 {
                         JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
                     }
                     auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
+                    jsoncons::uri new_uri(uri, utility::uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {
