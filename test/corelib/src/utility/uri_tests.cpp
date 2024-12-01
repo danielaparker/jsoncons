@@ -216,6 +216,33 @@ TEST_CASE("uri base tests")
 
 TEST_CASE("uri resolve tests")
 {
+    SECTION("empty base")
+    {
+        jsoncons::uri base{ "" };
+        jsoncons::uri rel{"dir1/other.schema.json"};
+        jsoncons::uri uri = rel.resolve(base);
+        CHECK(uri.base().string() == "dir1/other.schema.json");
+        CHECK(uri.path() == "dir1/other.schema.json");
+    }
+
+    SECTION("base has no authority and no path")
+    {
+        jsoncons::uri base{ "https" };
+        jsoncons::uri rel{ "dir1/other.schema.json" };
+        jsoncons::uri uri = rel.resolve(base);
+        CHECK(uri.base().string() == "dir1/other.schema.json");
+        CHECK(uri.path() == "dir1/other.schema.json");
+    }
+
+    SECTION("base has authority and path")
+    {
+        jsoncons::uri base{ "https://root" };
+        jsoncons::uri rel{"dir1/other.schema.json"};
+        jsoncons::uri uri = rel.resolve(base);
+        CHECK(uri.base().string() == "https://root/dir1/other.schema.json");
+        CHECK(uri.path() == "/dir1/other.schema.json");
+    }
+    
     SECTION("folder/")
     {
         jsoncons::uri base_uri("http://localhost:1234/scope_change_defs2.json"); 

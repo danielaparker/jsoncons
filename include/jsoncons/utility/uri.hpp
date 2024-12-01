@@ -817,7 +817,7 @@ namespace jsoncons { namespace utility {
             if (!base.encoded_authority().empty() && base.encoded_path().empty()) 
             {
                 result = "/";
-                result.append(relative.encoded_path().data(), relative.encoded_path().length());
+                //result.append(relative.encoded_path().data(), relative.encoded_path().length());
             } 
             else 
             {
