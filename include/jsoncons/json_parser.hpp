@@ -57,7 +57,7 @@ class basic_json_parser : public ser_context, public virtual basic_parser_input<
 public:
     using char_type = CharT;
     using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
-    using chunk_reader_type = std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)>;
+    using read_chunk_type = std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)>;
 private:
 
     struct string_maps_to_double
@@ -100,7 +100,7 @@ private:
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<std::basic_string<char_type>,double>> string_double_map_;
 
-    chunk_reader_adaptor<char_type> chk_rdr_;
+    chunk_reader_adaptor<char_type> read_chunk_;
     chunk_reader<char_type>* chunk_rdr_;
     
     // Noncopyable and nonmoveable
@@ -113,8 +113,8 @@ public:
     {
     }
 
-    basic_json_parser(chunk_reader_type chunk_rdr, const TempAllocator& temp_alloc = TempAllocator())
-        : basic_json_parser(chunk_rdr, basic_json_decode_options<char_type>(), default_json_parsing(), 
+    basic_json_parser(read_chunk_type read_chunk, const TempAllocator& temp_alloc = TempAllocator())
+        : basic_json_parser(read_chunk, basic_json_decode_options<char_type>(), default_json_parsing(), 
             temp_alloc)
     {
     }
@@ -132,9 +132,9 @@ public:
     {
     }
 
-    basic_json_parser(chunk_reader_type chunk_rdr, const basic_json_decode_options<CharT>& options, 
+    basic_json_parser(read_chunk_type read_chunk, const basic_json_decode_options<CharT>& options, 
         const TempAllocator& temp_alloc = TempAllocator())
-        : basic_json_parser(chunk_rdr, options, options.err_handler(), temp_alloc)
+        : basic_json_parser(read_chunk, options, options.err_handler(), temp_alloc)
     {
     }
 
@@ -142,7 +142,7 @@ public:
     basic_json_parser(const basic_json_decode_options<char_type>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAllocator& temp_alloc = TempAllocator())
-       : basic_json_parser(&chk_rdr_, options, err_handler, temp_alloc)
+       : basic_json_parser(&read_chunk_, options, err_handler, temp_alloc)
     {
     }
 #endif
@@ -167,7 +167,7 @@ public:
          done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc),
-         chk_rdr_{},
+         read_chunk_{},
          chunk_rdr_(chunk_rdr)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
@@ -190,7 +190,7 @@ public:
         }
     }
 
-    basic_json_parser(chunk_reader_type chunk_rdr,
+    basic_json_parser(read_chunk_type read_chunk,
         const basic_json_decode_options<char_type>& options,
         std::function<bool(json_errc,const ser_context&)> err_handler, 
         const TempAllocator& temp_alloc = TempAllocator())
@@ -211,8 +211,8 @@ public:
          done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc),
-         chk_rdr_(chunk_rdr),
-         chunk_rdr_(&chk_rdr_)
+         read_chunk_(read_chunk),
+         chunk_rdr_(&read_chunk_)
     {
         string_buffer_.reserve(initial_string_buffer_capacity);
 

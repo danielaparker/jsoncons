@@ -34,26 +34,26 @@ temp_allocator_type        |TempAllocator
 
 #### Constructors
 
-    basic_json_parser(const TempAllocator& temp_alloc = TempAllocator());                     (1)
+    basic_json_parser(const TempAllocator& temp_alloc = TempAllocator());                      (1)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        const TempAllocator& temp_alloc = TempAllocator());                                   (2)
+        const TempAllocator& temp_alloc = TempAllocator());                                    (2)
 
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
-        const TempAllocator& temp_alloc = TempAllocator());                                   (3)   (deprecated since 0.171.0)
+        const TempAllocator& temp_alloc = TempAllocator());                                    (3)   (deprecated since 0.171.0)
 
     basic_json_parser(const basic_json_decode_options<CharT>& options, 
-        std::function<bool(json_errc,const ser_context&)> err_handler,                        (4)   (deprecated since 0.171.0) 
+        std::function<bool(json_errc,const ser_context&)> err_handler,                         (4)   (deprecated since 0.171.0) 
         const TempAllocator& temp_alloc = TempAllocator());                       
 
     basic_json_parser(
-        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> chunk_rdr, 
-        const TempAllocator& temp_alloc = TempAllocator());                                   (5)   (since 0.179.0)
+        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> read_chunk, 
+        const TempAllocator& temp_alloc = TempAllocator());                                    (5)   (since 1.0.0)
 
     basic_json_parser(
-        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> chunk_rdr, 
+        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> read_chunk, 
         const basic_json_decode_options<CharT>& options,
-        const TempAllocator& temp_alloc = TempAllocator());                                   (6)   (since 0.179.0)
+        const TempAllocator& temp_alloc = TempAllocator());                                    (6)   (since 1.0.0)
 
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
@@ -71,10 +71,10 @@ and a specified [err_handler](err_handler.md).
 #### Member functions
 
     void update(const string_view_type& sv)              
-    void update(const CharT* data, std::size_t length)             (deprecated in 0.179.0)
+    void update(const CharT* data, std::size_t length)             (deprecated in 1.0.0)
 Update the parser with a chunk of JSON
 
-    void set_buffer(const CharT* data, std::size_t length) final   (since 0.179.0)
+    void set_buffer(const CharT* data, std::size_t length) final   (since 1.0.0)
 Initializes the buffer to parse from with a chunk of JSON text
 
     bool done() const
@@ -190,7 +190,7 @@ B: inf
 C: -inf
 ```
 
-#### Incremental parsing (until 0.179.0)
+#### Incremental parsing (until 1.0.0)
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -252,7 +252,7 @@ Output:
 (7) [false,90]
 ```
 
-#### Incremental parsing (since 0.179.0)
+#### Incremental parsing (since 1.0.0)
 
 ```cpp
 #include <jsoncons/json.hpp>

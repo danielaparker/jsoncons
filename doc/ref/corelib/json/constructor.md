@@ -87,7 +87,7 @@ basic_json(byte_string_arg_t,
 
 basic_json(json_const_pointer_arg, const basic_json* j_ptr); (25) (since 0.156.0)
 
-basic_json(json_reference_arg, basic_json& j);               (26) (since 0.179.0)
+basic_json(json_reference_arg, basic_json& j);               (26) (since 1.0.0)
 ```
 
 (1) Constructs an empty json object. 

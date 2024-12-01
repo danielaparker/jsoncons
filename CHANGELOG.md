@@ -1,4 +1,4 @@
-0.179.0 (on master)
+1.0.0 (on master)
 -------
 
 Changes to basic_json::operator[]:

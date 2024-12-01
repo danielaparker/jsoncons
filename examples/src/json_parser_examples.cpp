@@ -107,9 +107,9 @@ void parse_nan_replacement_example()
     try
     {
 #if JSONCONS_VERSION_MAJOR == 0 && JSONCONS_VERSION_MINOR < 179
-        parser.update(s);     // until 0.179.0
+        parser.update(s);     // until 1.0.0
 #else        
-        parser.set_buffer(s.data(), s.size());   // since 0.179.0
+        parser.set_buffer(s.data(), s.size());   // since 1.0.0
 #endif        
         parser.parse_some(decoder);
         parser.finish_parse(decoder);
