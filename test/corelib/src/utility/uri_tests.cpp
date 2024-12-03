@@ -504,12 +504,14 @@ TEST_CASE("cpp-netib uri resolve tests")
         CHECK(uri.encoded_query() == jsoncons::string_view("q=1"));
         CHECK("http://a/g/x/y?q=1#s" == uri.string());
     }
+
     SECTION("remove_dot_segments1")
     {
         jsoncons::uri reference{"./g"};
         auto uri = reference.resolve(base_uri);
         CHECK("http://a/b/c/g" == uri.string());
     }
+
     SECTION("base_has_path__path_is_merged_1")
     {
         jsoncons::uri reference{"g/"};
@@ -697,4 +699,3 @@ TEST_CASE("cpp-netib uri resolve tests")
         CHECK("http://a/b/c/g#s/../x" == uri.string());
     }
 }
-

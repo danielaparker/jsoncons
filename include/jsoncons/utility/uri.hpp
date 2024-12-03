@@ -821,7 +821,7 @@ namespace jsoncons { namespace utility {
    3.  Finally, the output buffer is returned as the result of
        remove_dot_segments.
 */
-        static std::string remove_dot_segments(jsoncons::string_view path)
+        static std::string remove_dot_segments2(jsoncons::string_view path)
         {
             std::string input{path};
             std::string output;
@@ -889,6 +889,95 @@ namespace jsoncons { namespace utility {
                     {
                         output.append(input.data(), buflen);
                         input.erase(0, buflen);
+                    }
+                }
+            }
+
+            //std::cout << "path: " << path << ", output: " << output << "\n";
+            
+            return output;
+        }
+
+        static std::string remove_dot_segments(jsoncons::string_view path)
+        {
+            std::string input{path};
+            std::string output;
+             
+            std::size_t rel = 0;
+            const std::size_t buflen = input.size();
+            while (rel < buflen)
+            {
+                std::size_t len = buflen - rel;
+                if (len >= 3 && input[rel] == '.' && input[rel+1] == '.' && input[rel+2] == '/')
+                { 
+                    //input.erase(0,3);
+                    rel += 3;
+                }
+                else if (len >= 2 && input[rel] == '.' && input[rel+1] == '/')
+                {
+                    //input.erase(0,2);
+                    rel += 2;
+                }
+                else if (len >= 3 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '/')
+                { 
+                    //input.erase(0,2);
+                    rel += 2;
+                    input[rel] = '/';
+                }
+                else if (len == 2 && input[rel] == '/' && input[rel+1] == '.')
+                {
+                    //input.erase(0,1);
+                    ++rel;
+                    input[rel] = '/';
+                }
+                else if (len >= 4 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '.' && input[rel+3] == '/')
+                { 
+                    //input.erase(0,3);
+                    rel += 3;
+                    input[rel] = '/';
+                    auto rslash = output.rfind('/');
+                    if (rslash != std::string::npos)
+                    {
+                        output.erase(rslash);
+                    }
+                }
+                else if (len >= 3 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '.')
+                { 
+                    //input.erase(0,2);
+                    rel += 2;
+                    input[rel] = '/';
+                    auto rslash = output.rfind('/');
+                    if (rslash != std::string::npos)
+                    {
+                        output.erase(rslash);
+                    }
+                }
+                else if (len == 1 && input[rel] == '.')
+                {
+                    //input.erase(0,1);
+                    ++rel;
+                }
+                else if (len == 2 && input[rel] == '.' && input[rel+1] == '.')
+                {
+                    //input.erase(0,2);
+                    rel += 2;
+                }
+                else
+                {
+                    const auto first = input.data() + rel;
+                    const auto last = first+(len);
+                    auto it = std::find(first+1, last, '/');
+                    if (it != last)
+                    {
+                        output.append(first, it - first);
+                        //input.erase(0, it - first);
+                        rel += (it - first);
+                    }
+                    else
+                    {
+                        output.append(first, len);
+                        //input.erase(0, len);
+                        rel += len;
                     }
                 }
             }
