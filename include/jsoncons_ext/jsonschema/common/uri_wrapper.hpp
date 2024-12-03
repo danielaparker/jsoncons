@@ -18,7 +18,7 @@ namespace jsonschema {
 
     class uri_wrapper
     {
-        jsoncons::uri uri_;
+        jsoncons::utility::uri uri_;
         std::string identifier_;
         bool has_plain_name_fragment_;
     public:
@@ -29,7 +29,7 @@ namespace jsonschema {
 
         explicit uri_wrapper(const std::string& uri)
         {
-            uri_ = jsoncons::uri(uri);
+            uri_ = jsoncons::utility::uri(uri);
             if (!uri_.encoded_fragment().empty())
             {
                 identifier_ = uri_.fragment();
@@ -46,7 +46,7 @@ namespace jsonschema {
         explicit uri_wrapper(const uri& uri)
             : uri_{uri}
         {
-            uri_ = jsoncons::uri(uri);
+            uri_ = jsoncons::utility::uri(uri);
             if (!uri_.encoded_fragment().empty())
             {
                 identifier_ = uri_.fragment();
@@ -60,7 +60,7 @@ namespace jsonschema {
             }
         }
 
-        const jsoncons::uri& uri() const
+        const jsoncons::utility::uri& uri() const
         {
             return uri_;
         }
@@ -75,7 +75,7 @@ namespace jsonschema {
             return has_plain_name_fragment_;
         }
 
-        jsoncons::uri base() const
+        jsoncons::utility::uri base() const
         {
             return uri_.base();
         }
@@ -97,7 +97,7 @@ namespace jsonschema {
 
         uri_wrapper resolve(const uri_wrapper& uri) const
         {
-            return uri_wrapper(uri_.resolve(uri.uri_));
+            return uri.uri_.is_absolute() ? uri_wrapper{uri_.resolve(uri.uri_)} : *this;
         }
 
         int compare(const uri_wrapper& other) const
@@ -118,7 +118,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= field;
 
-            jsoncons::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
+            jsoncons::utility::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
 
             return uri_wrapper(std::move(new_uri));
         }
@@ -131,7 +131,7 @@ namespace jsonschema {
             jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= index;
 
-            jsoncons::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
+            jsoncons::utility::uri new_uri(uri_, utility::uri_fragment_part, pointer.to_string());
 
             return uri_wrapper(std::move(new_uri));
         }

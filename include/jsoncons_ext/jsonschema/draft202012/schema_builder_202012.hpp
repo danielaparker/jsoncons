@@ -239,12 +239,12 @@ namespace draft202012 {
         schema_validator_type make_object_schema_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            jsoncons::optional<jsoncons::uri> id = context.id();
+            jsoncons::optional<jsoncons::utility::uri> id = context.id();
             Json default_value{jsoncons::null_type()};
             std::vector<keyword_validator_type> validators;
             std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
             std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val;
-            jsoncons::optional<jsoncons::uri> dynamic_anchor;
+            jsoncons::optional<jsoncons::utility::uri> dynamic_anchor;
             std::map<std::string,schema_validator_type> defs;
             anchor_uri_map_type local_anchor_dict;
 
@@ -252,8 +252,8 @@ namespace draft202012 {
             if (it != sch.object_range().end()) 
             {
                 std::string value = it->value().template as<std::string>();
-                jsoncons::uri new_uri(context.get_base_uri(), utility::uri_fragment_part, value);
-                dynamic_anchor = jsoncons::optional<jsoncons::uri>(new_uri);
+                jsoncons::utility::uri new_uri(context.get_base_uri(), utility::uri_fragment_part, value);
+                dynamic_anchor = jsoncons::optional<jsoncons::utility::uri>(new_uri);
                 local_anchor_dict.emplace(value, context.get_base_uri());
             }
 
@@ -578,8 +578,8 @@ namespace draft202012 {
                     {
                         JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
                     }
-                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, utility::uri_fragment_part, anchor);
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::utility::uri{"#"};
+                    jsoncons::utility::uri new_uri(uri, utility::uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {
@@ -594,8 +594,8 @@ namespace draft202012 {
                     {
                         JSONCONS_THROW(schema_error("Invalid $dynamicAnchor " + anchor));
                     }
-                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
-                    jsoncons::uri new_uri(uri, utility::uri_fragment_part, anchor);
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::utility::uri{"#"};
+                    jsoncons::utility::uri new_uri(uri, utility::uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {

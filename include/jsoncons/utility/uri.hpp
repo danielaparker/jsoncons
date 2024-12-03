@@ -396,7 +396,7 @@ namespace jsoncons { namespace utility {
 
               if (!this->encoded_path().empty()) 
               {
-                  path = remove_dot_segments(this->encoded_path());
+                  path = remove_dot_segments(std::string(this->encoded_path()));
               }
 
               if (!this->encoded_query().empty()) 
@@ -426,7 +426,7 @@ namespace jsoncons { namespace utility {
               {
                   if (this->encoded_path().front() == '/') 
                   {
-                    path = remove_dot_segments(this->encoded_path());
+                    path = remove_dot_segments(std::string(this->encoded_path()));
                   } 
                   else 
                   {
@@ -561,6 +561,11 @@ namespace jsoncons { namespace utility {
                                 scheme = std::make_pair(start,i);
                                 state = parse_state::expect_first_slash;
                                 start = i;
+                                break;
+                            case '?':
+                                path = std::make_pair(start, i);
+                                state = parse_state::expect_query;
+                                start = i + 1;
                                 break;
                             case '#':
                                 userinfo = std::make_pair(start,start);
@@ -774,40 +779,123 @@ namespace jsoncons { namespace utility {
         {
         }
 
-        static std::string remove_dot_segments(const jsoncons::string_view& input)
-        {
-            std::string result = std::string(input);
 /*
-            std::size_t pos = 0;
-            while (pos < input.size()) 
-            {
-              if (input.compare(0, 3, "../")) 
-              {
-                network_boost::erase_head(input, 3);
-              } else if (network_boost::starts_with(input, "./")) {
-                network_boost::erase_head(input, 2);
-              } else if (network_boost::starts_with(input, "/./")) {
-                network_boost::replace_head(input, 3, "/");
-              } else if (input == "/.") {
-                network_boost::replace_head(input, 2, "/");
-              } else if (network_boost::starts_with(input, "/../")) {
-                network_boost::erase_head(input, 3);
-                remove_last_segment(result);
-              } else if (network_boost::starts_with(input, "/..")) {
-                network_boost::replace_head(input, 3, "/");
-                remove_last_segment(result);
-              } else if (network_boost::algorithm::all(input, [](char ch) { return ch == '.'; })) {
-                input.clear();
-              }
-              else {
-                int n = (input.front() == '/')? 1 : 0;
-                auto slash = network_boost::find_nth(input, "/", n);
-                result.append(std::begin(input), std::begin(slash));
-                input.erase(std::begin(input), std::begin(slash));
-              }
-            }
+5.2.4.  Remove Dot Segments
+
+   The pseudocode also refers to a "remove_dot_segments" routine for
+   interpreting and removing the special "." and ".." complete path
+   segments from a referenced path.  This is done after the path is
+   extracted from a reference, whether or not the path was relative, in
+   order to remove any invalid or extraneous dot-segments prior to
+   forming the target URI.  Although there are many ways to accomplish
+   this removal process, we describe a simple method using two string
+   buffers.
+
+   1.  The input buffer is initialized with the now-appended path
+       components and the output buffer is initialized to the empty
+       string.
+
+   2.  While the input buffer is not empty, loop as follows:
+
+       A.  If the input buffer begins with a prefix of "../" or "./",
+           then remove that prefix from the input buffer; otherwise,
+
+       B.  if the input buffer begins with a prefix of "/./" or "/.",
+           where "." is a complete path segment, then replace that
+           prefix with "/" in the input buffer; otherwise,
+
+       C.  if the input buffer begins with a prefix of "/../" or "/..",
+           where ".." is a complete path segment, then replace that
+           prefix with "/" in the input buffer and remove the last
+           segment and its preceding "/" (if any) from the output
+           buffer; otherwise,
+
+       D.  if the input buffer consists only of "." or "..", then remove
+           that from the input buffer; otherwise,
+
+       E.  move the first path segment in the input buffer to the end of
+           the output buffer, including the initial "/" character (if
+           any) and any subsequent characters up to, but not including,
+           the next "/" character or the end of the input buffer.
+
+   3.  Finally, the output buffer is returned as the result of
+       remove_dot_segments.
 */
-            return result;
+        static std::string remove_dot_segments(jsoncons::string_view path)
+        {
+            std::string input{path};
+            std::string output;
+                       
+            while (!input.empty())
+            {
+                const std::size_t buflen = input.size();
+                if (buflen >= 3 && input[0] == '.' && input[1] == '.' && input[2] == '/')
+                { 
+                    input.erase(0,3);
+                }
+                else if (buflen >= 2 && input[0] == '.' && input[1] == '/')
+                {
+                    input.erase(0,2);
+                }
+                else if (buflen >= 3 && input[0] == '/' && input[1] == '.' && input[2] == '/')
+                { 
+                    input.erase(0,2);
+                    input.front() = '/';
+                }
+                else if (buflen == 2 && input[0] == '/' && input[1] == '.')
+                {
+                    input.erase(0,1);
+                    input.front() = '/';
+                }
+                else if (buflen >= 4 && input[0] == '/' && input[1] == '.' && input[2] == '.' && input[3] == '/')
+                { 
+                    input.erase(0,3);
+                    input.front() = '/';
+                    auto rslash = output.rfind('/');
+                    if (rslash != std::string::npos)
+                    {
+                        output.erase(rslash);
+                    }
+                }
+                else if (buflen >= 3 && input[0] == '/' && input[1] == '.' && input[2] == '.')
+                { 
+                    input.erase(0,2);
+                    input.front() = '/';
+                    auto rslash = output.rfind('/');
+                    if (rslash != std::string::npos)
+                    {
+                        output.erase(rslash);
+                    }
+                }
+                else if (buflen == 1 && input[0] == '.')
+                {
+                    input.erase(0,1);
+                }
+                else if (buflen == 2 && input[0] == '.' && input[1] == '.')
+                {
+                    input.erase(0,2);
+                }
+                else
+                {
+                    const auto first = input.data();
+                    const auto last = first+buflen;
+                    auto it = std::find(first+1, last, '/');
+                    if (it != last)
+                    {
+                        output.append(first, it - input.data());
+                        input.erase(0, it - input.data());
+                    }
+                    else
+                    {
+                        output.append(input.data(), buflen);
+                        input.erase(0, buflen);
+                    }
+                }
+            }
+
+            //std::cout << "path: " << path << ", output: " << output << "\n";
+            
+            return output;
         }
 
         static std::string merge_paths(const uri& base, const uri& relative)
@@ -829,16 +917,7 @@ namespace jsoncons { namespace utility {
             {
                 result.append(relative.encoded_path().begin(), relative.encoded_path().end());
             }
-            return remove_dot_segments(jsoncons::string_view(result));
-        }
-
-        static void remove_last_segment(std::string& path) 
-        {
-            auto last_slash = path.rfind('/');
-            if (last_slash != std::string::npos)
-            {
-                path.erase(last_slash);
-            }
+            return remove_dot_segments(result);
         }
 
         static bool is_alpha(char ch)
