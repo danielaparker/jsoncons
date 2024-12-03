@@ -534,103 +534,167 @@ TEST_CASE("cpp-netib uri resolve tests")
         auto uri = reference.resolve(base_uri);
         CHECK("http://a/g/x?y=z#s" == uri.string());
     }
+    SECTION("path_is_empty_but_has_query__returns_base_with_ref_query")
+    {
+        jsoncons::uri reference{ "?y=z" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/d;p?y=z" == uri.string());
+    }
+    SECTION("path_is_empty_but_has_query_base_no_query__returns_base_with_ref_query")
+    {
+        jsoncons::uri reference{ "?y=z" };
+        auto uri = reference.resolve(jsoncons::uri{"http://a/b/c/d"});
+        CHECK("http://a/b/c/d?y=z" == uri.string());
+    }
+    SECTION("merge_path_with_query")
+    {
+        jsoncons::uri reference{ "g?y=z" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g?y=z" == uri.string());
+    }
+    SECTION("append_fragment")
+    {
+        jsoncons::uri reference{ "#s" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/d;p?q#s" == uri.string());
+    }
+    SECTION("merge_paths_with_fragment")
+    {
+        jsoncons::uri reference{ "g#s" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g#s" == uri.string());
+    }
+    SECTION("merge_paths_with_query_and_fragment")
+    {
+        jsoncons::uri reference{ "g?y=z#s" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g?y=z#s" == uri.string());
+    }
+    SECTION("merge_paths_with_semicolon_1")
+    {
+        jsoncons::uri reference{ ";x" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/;x" == uri.string());
+    }
+    SECTION("merge_paths_with_semicolon_2")
+    {
+        jsoncons::uri reference{ "g;x" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g;x" == uri.string());
+    }
+    SECTION("merge_paths_with_semicolon_3")
+    {
+        jsoncons::uri reference{ "g;x?y=z#s" };
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g;x?y=z#s" == uri.string());
+    }
     SECTION("abnormal_example_1")
     {
         jsoncons::uri reference{"../../../g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/g" == uri.string());
     }
     SECTION("abnormal_example_2")
     {
         jsoncons::uri reference{"../../../../g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/g" == uri.string());
     }
     SECTION("abnormal_example_3")
     {
         jsoncons::uri reference{"/./g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/g" == uri.string());
     }
     SECTION("abnormal_example_4")
     {
         jsoncons::uri reference{"/../g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/g" == uri.string());
     }
     SECTION("abnormal_example_5")
     {
         jsoncons::uri reference{"g."};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/g." == uri.string());
     }
     SECTION("abnormal_example_6")
     {
         jsoncons::uri reference{".g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/.g" == uri.string());
     }
     SECTION("abnormal_example_7")
     {
         jsoncons::uri reference{"g.."};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/g.." == uri.string());
     }
     SECTION("abnormal_example_8")
     {
         jsoncons::uri reference{"..g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/g" == uri.string());
     }
     SECTION("abnormal_example_9")
     {
         jsoncons::uri reference{"./../g"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/g" == uri.string());
     }
     SECTION("abnormal_example_10")
     {
         jsoncons::uri reference{"./g/."};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/g/" == uri.string());
     }
     SECTION("abnormal_example_11")
     {
         jsoncons::uri reference{"g/./h"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/g/h" == uri.string());
     }
     SECTION("abnormal_example_12")
     {
         jsoncons::uri reference{"g/../h"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/h" == uri.string());
     }
     SECTION("abnormal_example_13")
     {
         jsoncons::uri reference{"g;x=1/./y"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/g;x=1/y" == uri.string());
     }
     SECTION("abnormal_example_14")
     {
         jsoncons::uri reference{"g;x=1/../y"};
         auto uri = reference.resolve(base_uri);
-        //std::cout << "ref: " << reference.string() << ", base: " << base_uri.string() << "\n";
         CHECK("http://a/b/c/y" == uri.string());
+    }
+    SECTION("abnormal_example_15")
+    {
+        jsoncons::uri reference{"g?y/./x"};
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g?y/./x" == uri.string());
+    }
+    SECTION("abnormal_example_16")
+    {
+        jsoncons::uri reference{"g?y/../x"};
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g?y/../x" == uri.string());
+    }
+    SECTION("abnormal_example_17")
+    {
+        jsoncons::uri reference{"g#s/./x"};
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g#s/./x" == uri.string());
+    }
+    SECTION("abnormal_example_18")
+    {
+        jsoncons::uri reference{"g#s/../x"};
+        auto uri = reference.resolve(base_uri);
+        CHECK("http://a/b/c/g#s/../x" == uri.string());
     }
 }
 
