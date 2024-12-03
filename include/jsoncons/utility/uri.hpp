@@ -910,29 +910,24 @@ namespace jsoncons { namespace utility {
                 std::size_t len = buflen - rel;
                 if (len >= 3 && input[rel] == '.' && input[rel+1] == '.' && input[rel+2] == '/')
                 { 
-                    //input.erase(0,3);
                     rel += 3;
                 }
                 else if (len >= 2 && input[rel] == '.' && input[rel+1] == '/')
                 {
-                    //input.erase(0,2);
                     rel += 2;
                 }
                 else if (len >= 3 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '/')
                 { 
-                    //input.erase(0,2);
                     rel += 2;
                     input[rel] = '/';
                 }
                 else if (len == 2 && input[rel] == '/' && input[rel+1] == '.')
                 {
-                    //input.erase(0,1);
                     ++rel;
                     input[rel] = '/';
                 }
                 else if (len >= 4 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '.' && input[rel+3] == '/')
                 { 
-                    //input.erase(0,3);
                     rel += 3;
                     input[rel] = '/';
                     auto rslash = output.rfind('/');
@@ -943,7 +938,6 @@ namespace jsoncons { namespace utility {
                 }
                 else if (len >= 3 && input[rel] == '/' && input[rel+1] == '.' && input[rel+2] == '.')
                 { 
-                    //input.erase(0,2);
                     rel += 2;
                     input[rel] = '/';
                     auto rslash = output.rfind('/');
@@ -954,12 +948,10 @@ namespace jsoncons { namespace utility {
                 }
                 else if (len == 1 && input[rel] == '.')
                 {
-                    //input.erase(0,1);
                     ++rel;
                 }
                 else if (len == 2 && input[rel] == '.' && input[rel+1] == '.')
                 {
-                    //input.erase(0,2);
                     rel += 2;
                 }
                 else
@@ -970,13 +962,11 @@ namespace jsoncons { namespace utility {
                     if (it != last)
                     {
                         output.append(first, it - first);
-                        //input.erase(0, it - first);
                         rel += (it - first);
                     }
                     else
                     {
                         output.append(first, len);
-                        //input.erase(0, len);
                         rel += len;
                     }
                 }
