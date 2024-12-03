@@ -31,28 +31,28 @@ jobs:
 #        run: ctest --output-on-failure
 
 
-  xcode_12:
-    strategy:
-      fail-fast: false
-      matrix:
-        xcode: ['13','14']
-    runs-on: macos-12
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: ${{ matrix.xcode }}
-      - name: cmake
-        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
-      - name: build
-        working-directory: build/
-        run: cmake --build . 
-      - name: test
-        working-directory: build/
-        run: ctest --output-on-failure
+#  xcode_12:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        xcode: ['13','14']
+#    runs-on: macos-12
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          submodules: recursive
+#      - uses: maxim-lobanov/setup-xcode@v1
+#        with:
+#          xcode-version: ${{ matrix.xcode }}
+#      - name: cmake
+#        run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On 
+#      - name: build
+#        working-directory: build/
+#        run: cmake --build . 
+#      - name: test
+#        working-directory: build/
+#        run: ctest --output-on-failure
 
   xcode_2:
 
