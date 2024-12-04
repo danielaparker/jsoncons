@@ -831,7 +831,7 @@ namespace jsoncons { namespace utility {
             const std::size_t buflen = input.size();
             while (rel < buflen)
             {
-                auto span = jsoncons::span<char>(input.data()+rel, buflen - rel);
+                auto span = jsoncons::span<char>(&input[0]+rel, buflen - rel);
                 const std::size_t len = span.size();
                 if (len >= 3 && span[0] == '.' && span[1] == '.' && span[2] == '/')
                 { 
