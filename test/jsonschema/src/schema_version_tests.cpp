@@ -89,7 +89,7 @@ TEST_CASE("jsonschema version tests")
 
     SECTION("test 7")
     {
-        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_07), "#/properties/price/exclusiveMinimum: exclusiveMinimum must be a number value");
+        REQUIRE_THROWS_WITH(jsonschema::make_json_schema(schema_07), "https://jsoncons.com#/properties/price/exclusiveMinimum: exclusiveMinimum must be a number value");
     }
 }
 

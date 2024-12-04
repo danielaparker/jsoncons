@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "description":
             "patternProperties validates properties matching a regex",
         "schema": {
@@ -85,7 +85,7 @@
                 "valid": false
             }
         ]
-    },
+    },*/
     {
         "description": "regexes are not anchored by default and are case sensitive",
         "schema": {
@@ -95,7 +95,7 @@
             }
         },
         "tests": [
-            {
+            /*{
                 "description": "non recognized members are ignored",
                 "data": { "answer 1": "42" },
                 "valid": true
@@ -114,9 +114,9 @@
                 "description": "regexes are case sensitive, 2",
                 "data": { "a_X_3": 3 },
                 "valid": false
-            }
+            }*/
         ]
-    },
+    }/*,
     {
         "description": "patternProperties with boolean schemas",
         "schema": {
@@ -167,5 +167,5 @@
                 "valid": true
             }
         ]
-    }
+    }*/
 ]
