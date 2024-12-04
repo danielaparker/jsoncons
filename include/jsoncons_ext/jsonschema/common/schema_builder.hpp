@@ -89,16 +89,16 @@ namespace jsonschema {
         void build_schema() 
         {
             anchor_uri_map_type anchor_dict;
-
-            root_ = make_schema_validator(compilation_context{}, *root_schema_, {}, anchor_dict);
+            root_ = make_schema_validator(compilation_context(uri_wrapper(options_.default_base_uri())), *root_schema_, {}, anchor_dict);
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
         void build_schema(const std::string& retrieval_uri) 
         {
             anchor_uri_map_type anchor_dict;
             root_ = make_schema_validator(compilation_context(uri_wrapper(retrieval_uri)), *root_schema_, {}, anchor_dict);
         }
-        
+#endif        
         evaluation_options options() const
         {
             return options_;

@@ -132,7 +132,7 @@ TEST_CASE("jsonschema prefixItems report tests")
     {
         "valid": false,
         "evaluationPath": "/items",
-        "schemaLocation": "#/items",
+        "schemaLocation": "https://jsoncons.com#/items",
         "instanceLocation": "/4",
         "error": "Extra item at index '4' but the schema does not allow extra items."
     }
@@ -177,7 +177,7 @@ TEST_CASE("jsonschema items-additionalItems report tests")
     {
         "valid": false,
         "evaluationPath": "/additionalItems",
-        "schemaLocation": "#/additionalItems",
+        "schemaLocation": "https://jsoncons.com#/additionalItems",
         "instanceLocation": "/4",
         "error": "Extra item at index '4' but the schema does not allow extra items."
     }
@@ -220,7 +220,7 @@ TEST_CASE("jsonschema additionalProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#/additionalProperties",
+        "schemaLocation": "https://jsoncons.com#/additionalProperties",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -273,7 +273,7 @@ TEST_CASE("jsonschema unevaluatedProperties output tests")
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/something that doesn't belong",
-        "schemaLocation": "#",
+        "schemaLocation": "https://jsoncons.com",
         "instanceLocation": "/something that doesn't belong",
         "error": "Unevaluated property 'something that doesn't belong' but the schema does not allow unevaluated properties."
     }
@@ -318,7 +318,7 @@ TEST_CASE("jsonschema unevaluatedItems output tests")
     {
         "valid": false,
         "evaluationPath": "/unevaluatedProperties/2",
-        "schemaLocation": "#",
+        "schemaLocation": "https://jsoncons.com",
         "instanceLocation": "/2",
         "error": "Unevaluated item at index '2' but the schema does not allow unevaluated items."
     }
@@ -628,14 +628,14 @@ TEST_CASE("jsonschema more output tests 3")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/baz",
-        "schemaLocation": "example-schema#/additionalProperties",
+        "schemaLocation": "https://jsoncons.com/example-schema#/additionalProperties",
         "instanceLocation": "/baz",
         "error": "Additional property 'baz' not allowed by schema."
     },
     {
         "valid": false,
         "evaluationPath": "/required",
-        "schemaLocation": "example-schema#/required",
+        "schemaLocation": "https://jsoncons.com/example-schema#/required",
         "instanceLocation": "",
         "error": "Required property 'foo' not found."
     }
@@ -746,7 +746,7 @@ TEST_CASE("jsonschema additionalProperties with 'not true' output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#/additionalProperties",
+        "schemaLocation": "https://jsoncons.com#/additionalProperties",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -789,7 +789,7 @@ TEST_CASE("jsonschema additionalProperties with 'not {}' output tests")
     {
         "valid": false,
         "evaluationPath": "/additionalProperties/direction",
-        "schemaLocation": "#/additionalProperties",
+        "schemaLocation": "https://jsoncons.com#/additionalProperties",
         "instanceLocation": "/direction",
         "error": "Additional property 'direction' not allowed by schema."
     }
@@ -845,7 +845,7 @@ TEST_CASE("jsonschema with 'oneOf' output tests")
     {
         "valid": false,
         "evaluationPath": "/oneOf",
-        "schemaLocation": "/test_schema#/oneOf",
+        "schemaLocation": "https://jsoncons.com/test_schema#/oneOf",
         "instanceLocation": "",
         "error": "Must be valid against exactly one schema, but found 2 matching schemas at indices 0,1"
     }

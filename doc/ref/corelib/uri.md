@@ -35,10 +35,12 @@ Constructs a URI from the given components.
 #### Member functions
 
     bool is_absolute() const noexcept;
-Returns true if this URI is absolute, false otherwise.
+Returns true if this URI is absolute, false otherwise. An absolute URI is a URI that has
+a scheme part (the part after the colon), e.g. 'https://john.doe@www.example.com'.
 
     bool is_opaque() const noexcept; 
-Returns true if this URI is opaque, false otherwise.
+Returns true if this URI is opaque, false otherwise. An opaque URI is an absolute URI whose 
+scheme-specific part does not begin with a slash character ('/'), e.g. 'mailto:john.doe@example.com'.
 
     uri base() const noexcept; 
 

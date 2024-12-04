@@ -55,20 +55,9 @@ namespace jsonschema {
         {
         }
             
-        evaluation_options(const evaluation_options& other)
-            : default_version_(other.default_version_),
-              require_format_validation_(other.require_format_validation_),
-              compatibility_mode_(other.compatibility_mode_) 
-        {
-        }
+        evaluation_options(const evaluation_options& other) = default;
 
-        evaluation_options& operator=(const evaluation_options& other)
-        {
-            default_version_ = other.default_version_;
-            require_format_validation_ = other.require_format_validation_;
-            compatibility_mode_ = other.compatibility_mode_;
-            return *this;
-        }
+        evaluation_options& operator=(const evaluation_options& other) = default;
 
         bool require_format_validation() const
         {
