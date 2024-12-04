@@ -255,7 +255,7 @@ namespace jsoncons {
             }
         }
 
-        uri& operator=(const uri& other) noexcept
+        uri& operator=(const uri& other) 
         {
             if (&other != this)
             {
@@ -327,6 +327,11 @@ namespace jsoncons {
 
         string_view encoded_port() const noexcept { return string_view(uri_string_.data()+port_.first,(port_.second-port_.first)); }
 
+        std::string authority() const
+        {
+            return decode_part(encoded_authority());
+        }
+
         string_view encoded_authority() const noexcept { return string_view(uri_string_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
 
         std::string path() const
@@ -351,11 +356,6 @@ namespace jsoncons {
         string_view encoded_fragment() const noexcept 
         { 
             return string_view(uri_string_.data()+fragment_.first,(fragment_.second-fragment_.first)); 
-        }
-
-        std::string authority() const
-        {
-            return decode_part(encoded_authority());
         }
 
         uri resolve(const uri& base) const
