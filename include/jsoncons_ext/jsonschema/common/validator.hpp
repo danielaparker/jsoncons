@@ -426,11 +426,11 @@ namespace jsonschema {
 
         virtual bool recursive_anchor() const = 0;
 
-        virtual const jsoncons::optional<jsoncons::utility::uri>& id() const = 0;
+        virtual const jsoncons::optional<jsoncons::uri>& id() const = 0;
 
         virtual const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const = 0;
 
-        virtual const jsoncons::optional<jsoncons::utility::uri>& dynamic_anchor() const = 0;
+        virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
     };
 
 } // namespace jsonschema

@@ -56,12 +56,12 @@ namespace jsonschema {
             return schema_val_->recursive_anchor();
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& id() const final
+        const jsoncons::optional<jsoncons::uri>& id() const final
         {
             return schema_val_->id();
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& dynamic_anchor() const final
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return schema_val_->dynamic_anchor();
         }
@@ -119,9 +119,9 @@ namespace jsonschema {
         uri schema_location_;
         bool value_;
 
-        jsoncons::optional<jsoncons::utility::uri> id_;
+        jsoncons::optional<jsoncons::uri> id_;
 
-        jsoncons::optional<jsoncons::utility::uri> dynamic_anchor_;
+        jsoncons::optional<jsoncons::uri> dynamic_anchor_;
 
     public:
         boolean_schema_validator(const boolean_schema_validator&) = delete;
@@ -148,12 +148,12 @@ namespace jsonschema {
             return false;
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& id() const final
+        const jsoncons::optional<jsoncons::uri>& id() const final
         {
             return id_;
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& dynamic_anchor() const final
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
         }
@@ -209,14 +209,14 @@ namespace jsonschema {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri schema_location_;
-        jsoncons::optional<jsoncons::utility::uri> id_;
+        jsoncons::optional<jsoncons::uri> id_;
         std::vector<keyword_validator_type> validators_; 
         std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val_;
         std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val_;
         std::map<std::string,schema_validator_type> defs_;
         Json default_value_;
         bool recursive_anchor_;
-        jsoncons::optional<jsoncons::utility::uri> dynamic_anchor_;
+        jsoncons::optional<jsoncons::uri> dynamic_anchor_;
         anchor_schema_map_type anchor_dict_;
         bool always_succeeds_;
         bool always_fails_;
@@ -227,7 +227,7 @@ namespace jsonschema {
         object_schema_validator(object_schema_validator&&) = default;
         object_schema_validator& operator=(object_schema_validator&&) = default;
         object_schema_validator(const uri& schema_location,
-            const jsoncons::optional<jsoncons::utility::uri>& id,
+            const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value)
@@ -242,7 +242,7 @@ namespace jsonschema {
             init();
         }
         object_schema_validator(const uri& schema_location, 
-            const jsoncons::optional<jsoncons::utility::uri>& id,
+            const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators,
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
@@ -261,13 +261,13 @@ namespace jsonschema {
             init();
         }
         object_schema_validator(const uri& schema_location, 
-            const jsoncons::optional<jsoncons::utility::uri>& id,
+            const jsoncons::optional<jsoncons::uri>& id,
             std::vector<keyword_validator_type>&& validators, 
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
             std::map<std::string,schema_validator_type>&& defs,
             Json&& default_value,
-            jsoncons::optional<jsoncons::utility::uri>&& dynamic_anchor,
+            jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
             anchor_schema_map_type&& anchor_dict)
             : schema_location_(schema_location),
               id_(std::move(id)),
@@ -299,7 +299,7 @@ namespace jsonschema {
             return recursive_anchor_;
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& id() const final
+        const jsoncons::optional<jsoncons::uri>& id() const final
         {
             return id_;
         }
@@ -310,7 +310,7 @@ namespace jsonschema {
             return (it == anchor_dict_.end()) ? nullptr : it->second->referred_schema();
         }
 
-        const jsoncons::optional<jsoncons::utility::uri>& dynamic_anchor() const final
+        const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const final
         {
             return dynamic_anchor_;
         }

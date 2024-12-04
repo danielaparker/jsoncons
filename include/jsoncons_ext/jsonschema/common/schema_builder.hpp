@@ -16,13 +16,13 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <typename Json>
-    using schema_resolver = std::function<Json(const jsoncons::utility::uri & /*id*/)>;
+    using schema_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <typename Json>
     class schema_builder
     {
     public:
-        using schema_store_type = std::map<jsoncons::utility::uri, schema_validator<Json>*>;
+        using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
         using schema_builder_factory_type = std::function<std::unique_ptr<schema_builder<Json>>(const Json&,
             const evaluation_options&,schema_store_type*,const std::vector<schema_resolver<Json>>&,
             const std::unordered_map<std::string,bool>&)>;
@@ -46,8 +46,8 @@ namespace jsonschema {
         // Owns external schemas
         std::vector<schema_validator_type> schema_validators_;
     public:
-        std::vector<std::pair<jsoncons::utility::uri, ref_type*>> unresolved_refs_; 
-        std::map<jsoncons::utility::uri, Json> unknown_keywords_;
+        std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
+        std::map<jsoncons::uri, Json> unknown_keywords_;
 
     public:
 
@@ -195,7 +195,7 @@ namespace jsonschema {
             {
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto unresolved_refs = std::find_if(this->unresolved_refs_.begin(), this->unresolved_refs_.end(),
-                    [new_uri](const std::pair<jsoncons::utility::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
+                    [new_uri](const std::pair<jsoncons::uri,ref<Json>*>& pr) {return pr.first == new_uri.uri();});
                 if (unresolved_refs != this->unresolved_refs_.end())
                 {
                     anchor_uri_map_type anchor_dict2;

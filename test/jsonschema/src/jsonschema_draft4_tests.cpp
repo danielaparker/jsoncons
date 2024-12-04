@@ -16,7 +16,7 @@ namespace jsonschema = jsoncons::jsonschema;
 
 namespace {
 
-    json resolve(const jsoncons::utility::uri& uri)
+    json resolve(const jsoncons::uri& uri)
     {
         //std::cout << uri.string() << ", " << uri.path() << "\n";
         std::string pathname = "./jsonschema/JSON-Schema-Test-Suite/remotes";

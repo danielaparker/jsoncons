@@ -239,7 +239,7 @@ namespace draft201909 {
         schema_validator_type make_object_schema_validator( 
             const compilation_context& context, const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            jsoncons::optional<jsoncons::utility::uri> id = context.id();
+            jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{ jsoncons::null_type()};
             std::vector<keyword_validator_type> validators;
             std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val;
@@ -523,8 +523,8 @@ namespace draft201909 {
                     {
                         JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));
                     }
-                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::utility::uri{"#"};
-                    jsoncons::utility::uri new_uri(uri, utility::uri_fragment_part, anchor);
+                    auto uri = !new_uris.empty() ? new_uris.back().uri() : jsoncons::uri{"#"};
+                    jsoncons::uri new_uri(uri, uri_fragment_part, anchor);
                     uri_wrapper identifier{ new_uri };
                     if (std::find(new_uris.begin(), new_uris.end(), identifier) == new_uris.end())
                     {

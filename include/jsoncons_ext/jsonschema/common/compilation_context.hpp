@@ -67,7 +67,7 @@ namespace jsonschema {
             return base_uri_.uri();
         }
 
-        jsoncons::utility::uri make_schema_location(const std::string& keyword) const
+        jsoncons::uri make_schema_location(const std::string& keyword) const
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
@@ -79,14 +79,14 @@ namespace jsonschema {
             return uri{"#"};
         }
         
-        static jsoncons::utility::uri make_random_uri()
+        static jsoncons::uri make_random_uri()
         {
             std::random_device dev;
             std::mt19937 gen{ dev() };
             std::uniform_int_distribution<std::mt19937::result_type> dist(1, 10000);
 
             std::string str = "https:://jsoncons.com/" + std::to_string(dist(gen));
-            jsoncons::utility::uri uri{str};
+            jsoncons::uri uri{str};
             return uri;
         }
     };

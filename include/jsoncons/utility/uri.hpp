@@ -16,7 +16,7 @@
 #include <jsoncons/detail/write_number.hpp>
 #include <iostream>
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
 
     enum class uri_errc
     {
@@ -61,17 +61,16 @@ namespace jsoncons { namespace utility {
         return std::error_code(static_cast<int>(result), uri_error_category());
     }
 
-} // namespace utility
 } // namespace jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::utility::uri_errc> : public true_type
+    struct is_error_code_enum<jsoncons::uri_errc> : public true_type
     {
     };
 } // namespace std
 
-namespace jsoncons { namespace utility {
+namespace jsoncons {
 
     struct uri_fragment_part_t
     {
@@ -1234,10 +1233,6 @@ namespace jsoncons { namespace utility {
             return is_unreserved(c) || is_pct_encoded(s,length) || is_sub_delim(c) || c == ':' || c == '@';
         }
     };
-
-} // namespace utility
-  
-using uri = utility::uri;
 
 } // namespace jsoncons
 

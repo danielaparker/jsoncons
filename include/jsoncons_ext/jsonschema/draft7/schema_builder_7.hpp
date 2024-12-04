@@ -201,7 +201,7 @@ namespace draft7 {
         schema_validator_type make_object_schema_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
-            jsoncons::optional<jsoncons::utility::uri> id = context.id();
+            jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{ jsoncons::null_type() };
             std::vector<keyword_validator_type> validators;
             std::map<std::string,schema_validator_type> defs;
