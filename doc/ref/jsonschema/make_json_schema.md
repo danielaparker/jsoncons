@@ -57,7 +57,7 @@ Returns a [json_schema<Json>](json_schema.md) that represents a compiled JSON Sc
     <td>resolve</td>
     <td>A function object with the signature of <code>resolve</code> being equivalent to 
     <pre>
-    Json fun(const <a href="../corelib/uri.md">jsoncons::uri</a>& uri)  
+    Json fun(const <a href="../corelib/uri.md">jsoncons::uri</a>& uri);  
     </pre>
     If unable to resolve the resource, it should return <code>Json::null()</code>.
     </td>   
