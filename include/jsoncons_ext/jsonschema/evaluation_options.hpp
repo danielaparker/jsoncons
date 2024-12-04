@@ -46,10 +46,12 @@ namespace jsonschema {
         std::string default_version_;
         bool require_format_validation_;
         bool compatibility_mode_;
+        std::string default_base_uri_;
     public:
         evaluation_options()
             : default_version_{schema_version::draft202012()}, 
-              require_format_validation_(false), compatibility_mode_(false)
+              require_format_validation_(false), compatibility_mode_(false),
+              default_base_uri_("https://jsoncons.com")
         {
         }
             
@@ -95,6 +97,16 @@ namespace jsonschema {
         evaluation_options& default_version(const std::string& version) 
         {
             default_version_ = version;
+            return *this;
+        }
+
+        const std::string& default_base_uri() const
+        {
+            return default_base_uri_;
+        }
+        evaluation_options& default_base_uri(const std::string& base_uri) 
+        {
+            default_base_uri_ = base_uri;
             return *this;
         }
 

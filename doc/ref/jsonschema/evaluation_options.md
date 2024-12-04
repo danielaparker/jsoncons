@@ -40,6 +40,12 @@ and 2020-12 implementations support the Draft 7 "definitions" and
     evaluation_options& require_format_validation(bool value); 
 Determines whether `format` is an assertion. The default is `false`. 
 
+    const std::string& default_base_uri() const;
+    evaluation_options& default_base_uri(const std::string& base_uri);         (since 1.0.0) 
+Get or set a default base URI. In the case that a schema does not have 
+an `$id` with an absolute URI, the default base URI will be used to resolve
+relative references. It defaults to 'https://jsoncons.com'.
+
 #### Non-member functions
 
     bool operator==(const evaluation_options& lhs, const evaluation_options& rhs);

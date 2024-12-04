@@ -821,9 +821,8 @@ namespace jsoncons {
        remove_dot_segments.
 */
 
-        static std::string remove_dot_segments(jsoncons::string_view path)
+        static std::string remove_dot_segments(std::string input)
         {
-            std::string input{path};
             std::string output;
              
             std::size_t rel = 0;
@@ -920,7 +919,7 @@ namespace jsoncons {
             {
                 result.append(relative.encoded_path().begin(), relative.encoded_path().end());
             }
-            return remove_dot_segments(result);
+            return remove_dot_segments(std::move(result));
         }
 
         static bool is_alpha(char ch)
