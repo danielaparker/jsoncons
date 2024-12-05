@@ -535,7 +535,12 @@ namespace jsoncons {
             }
             return decoded;
         }
+<<<<<<< Updated upstream
         static uri parse(const std::string& s, std::error_code& ec)
+=======
+        
+        static uri parse(const std::string& str, std::error_code& ec)
+>>>>>>> Stashed changes
         {
             part_type scheme;
             part_type userinfo;
