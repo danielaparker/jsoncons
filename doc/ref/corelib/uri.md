@@ -10,11 +10,11 @@ The class `uri` represents a Uniform Resource Identifier (URI) reference.
 
     uri();
 
-    uri(const std::string& s);
-Constructs a URI by parsing the given string.
+    explicit uri(const std::string& str);
+Constructs a `uri` by parsing the given string.
 
     uri(const std::string& uri);
-Constructs a URI by parsing the given string.
+Constructs a `uri` by parsing the given string.
 
     uri(jsoncons::string_view scheme,
         jsoncons::string_view userinfo,
@@ -23,7 +23,7 @@ Constructs a URI by parsing the given string.
         jsoncons::string_view path,
         jsoncons::string_view query,
         jsoncons::string_view fragment)
-Constructs a URI from the given non-encoded parts.
+Constructs a `uri` from the given non-encoded parts.
 
     uri(const uri& other);
 
@@ -89,6 +89,9 @@ scheme-specific part does not begin with a slash character ('/'), e.g. 'mailto:j
     uri resolve(const uri& base) const;
 
     const std::string& string() const;
+
+    static uri parse(const std::string& str, std::error_code& ec);
+Creates a `uri` by parsing the given string.
 
 ### Examples
   

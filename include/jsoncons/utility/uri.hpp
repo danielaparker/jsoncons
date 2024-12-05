@@ -128,10 +128,10 @@ namespace jsoncons {
             }
         }
 
-        /*explicit*/ uri(const std::string& uri)
+        explicit uri(const std::string& str)
         {
             std::error_code ec;
-            *this = parse(uri, ec);
+            *this = parse(str, ec);
             if (ec)
             {
                 JSONCONS_THROW(std::system_error(ec));
@@ -531,7 +531,7 @@ namespace jsoncons {
             }
             return decoded;
         }
-        static uri parse(const std::string& s, std::error_code& ec)
+        static uri parse(const std::string& str, std::error_code& ec)
         {
             part_type scheme;
             part_type userinfo;
@@ -544,9 +544,9 @@ namespace jsoncons {
             std::size_t start = 0;
 
             parse_state state = parse_state::expect_scheme;
-            for (std::size_t i = 0; i < s.size(); ++i)
+            for (std::size_t i = 0; i < str.size(); ++i)
             {
-                char c = s[i];
+                char c = str[i];
                 switch (state)
                 {
                     case parse_state::expect_scheme:
@@ -690,7 +690,7 @@ namespace jsoncons {
                                 start = i+1;
                                 break;
                             default:
-                                if (!(is_pchar(c,s.data()+i, s.size() - i) || c == '/'))
+                                if (!(is_pchar(c,str.data()+i, str.size() - i) || c == '/'))
                                 {
                                     ec = uri_errc::invalid_characters_in_path;
                                     return uri{};
@@ -720,36 +720,36 @@ namespace jsoncons {
                     userinfo = std::make_pair(start,start);
                     host = std::make_pair(start,start);
                     port = std::make_pair(start,start);
-                    path = std::make_pair(start,s.size());
-                    query = std::make_pair(s.size(), s.size());
-                    fragment = std::make_pair(s.size(), s.size());
+                    path = std::make_pair(start,str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_userinfo:
                     userinfo = std::make_pair(start,start);
-                    host = std::make_pair(start,s.size());
-                    port = std::make_pair(s.size(), s.size());
-                    path = std::make_pair(s.size(), s.size());
-                    query = std::make_pair(s.size(), s.size());
-                    fragment = std::make_pair(s.size(), s.size());
+                    host = std::make_pair(start,str.size());
+                    port = std::make_pair(str.size(), str.size());
+                    path = std::make_pair(str.size(), str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_path:
-                    path = std::make_pair(start,s.size());
-                    query = std::make_pair(s.size(), s.size());
-                    fragment = std::make_pair(s.size(), s.size());
+                    path = std::make_pair(start,str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_query:
-                    query = std::make_pair(start,s.size());
-                    fragment = std::make_pair(s.size(), s.size());
+                    query = std::make_pair(start,str.size());
+                    fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_fragment:
-                    fragment = std::make_pair(start,s.size());
+                    fragment = std::make_pair(start,str.size());
                     break;
                 default:
                     ec = uri_errc::invalid_uri;
                     break;
             }
 
-            return uri(s, scheme, userinfo, host, port, path, query, fragment);
+            return uri(str, scheme, userinfo, host, port, path, query, fragment);
         }
 
     private:

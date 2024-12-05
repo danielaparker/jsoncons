@@ -180,23 +180,23 @@ namespace jsonschema {
     template <typename Json>
     Json meta_resolver(const jsoncons::uri& uri)
     {
-        if (uri.base() == schema_version::draft202012())
+        if (uri.base() == jsoncons::uri{schema_version::draft202012()})
         {
             return jsoncons::jsonschema::draft202012::schema_draft202012<Json>::get_schema();
         }
-        else if (uri.base() == schema_version::draft201909())
+        else if (uri.base() == jsoncons::uri{schema_version::draft201909()})
         {
             return jsoncons::jsonschema::draft201909::schema_draft201909<Json>::get_schema();
         }
-        else if (uri.base() == schema_version::draft7())
+        else if (uri.base() == jsoncons::uri{schema_version::draft7()})
         {
             return jsoncons::jsonschema::draft7::schema_draft7<Json>::get_schema();
         }
-        else if (uri.base() == schema_version::draft6())
+        else if (uri.base() == jsoncons::uri{schema_version::draft6()})
         {
             return jsoncons::jsonschema::draft6::schema_draft6<Json>::get_schema();
         }
-        else if (uri.base() == schema_version::draft4())
+        else if (uri.base() == jsoncons::uri{schema_version::draft4()})
         {
             return jsoncons::jsonschema::draft4::schema_draft4<Json>::get_schema();
         }
@@ -209,7 +209,7 @@ namespace jsonschema {
 #if !defined(JSONCONS_NO_DEPRECATED)
     template <typename Json,typename ResolveURI>
     JSONCONS_DEPRECATED_MSG("Instead, set `default_base_uri` in options")
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,std::string>::value,json_schema<Json>>::type
+    typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json sch, const std::string& retrieval_uri, const ResolveURI& resolve, 
         evaluation_options options = evaluation_options{})
     {
@@ -244,7 +244,7 @@ namespace jsonschema {
 #endif
 
     template <typename Json,typename ResolveURI>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,std::string>::value,json_schema<Json>>::type
+    typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json sch, const ResolveURI& resolve, 
         evaluation_options options = evaluation_options{})
     {
