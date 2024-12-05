@@ -42,9 +42,7 @@ to a [json_visitor](../../corelib/basic_json_visitor.md).
     <td>reporter</td>
     <td>A function object with signature equivalent to 
     <pre>
-           walk_result fun(const validation_message& msg)</pre>
-which accepts an argument of type <a href="../validation_message.md">validation_message</a> and
-returns a <a href="../walk_result.md">walk_result</a>.
+           <a href="../walk_result.md">walk_result</a> fun(const <a href="../validation_message.md">validation_message</a>& msg);</pre>
 </td> 
   </tr>
   <tr>

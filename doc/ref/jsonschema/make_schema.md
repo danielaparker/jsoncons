@@ -32,8 +32,7 @@ Returns a `shared_ptr` to a `json_schema<Json>`.
     <td>resolver</td>
     <td>A function object with the signature of <code>resolver</code> being equivalent to 
     <pre>
-    Json fun(const jsoncons::uri& uri)   
-    </pre></td>   
+    Json fun(const <a href="../corelib/uri.md">jsoncons::uri</a>& uri);</pre></td>   
   </tr>
 </table>
 
