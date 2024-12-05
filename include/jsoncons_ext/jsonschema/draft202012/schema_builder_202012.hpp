@@ -512,11 +512,10 @@ namespace draft202012 {
             
             for (const auto& prop : sch.object_range())
             {
-                std::string sub_keys[] = {prop.key()};
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
-                        this->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
+                        this->make_cross_draft_schema_validator(context, prop.value(), {}, anchor_dict)));
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>(parent, std::move(schema_location),

@@ -101,12 +101,11 @@ TEST_CASE("jsonschema draft7 tests")
 {
     SECTION("issues")
     {
-        jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/patternProperties.json");
-        //jsonschema_tests("./jsonschema/issues/draft7/issue-520.json",
-        //    jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
-        //        require_format_validation(true));
+        jsonschema_tests("./jsonschema/issues/draft7/issue-520.json",
+            jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()).
+                require_format_validation(true));
     }
-#if 0
+
     SECTION("tests")
     {
         jsonschema_tests("./jsonschema/JSON-Schema-Test-Suite/tests/draft7/additionalItems.json");
@@ -241,5 +240,4 @@ TEST_CASE("jsonschema draft7 tests")
 
         CHECK_FALSE(compiled.is_valid(instance));
     }
-#endif
 }

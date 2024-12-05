@@ -338,8 +338,7 @@ namespace jsonschema {
 
             for (const auto& prop : sch.object_range())
             {
-                std::string sub_keys[] =
-                {"properties", prop.key()};
+                std::string sub_keys[] = {"properties", prop.key()};
                 properties.emplace(std::make_pair(prop.key(), 
                     this->make_cross_draft_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
