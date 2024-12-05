@@ -469,7 +469,7 @@ namespace jsonschema {
         virtual std::unique_ptr<type_validator<Json>> make_type_validator(const compilation_context& context,
             const Json& sch, const Json& parent)
         {
-            std::string schema_location = context.get_base_uri().string();
+            uri schema_location = context.get_base_uri();
             std::vector<json_schema_type> expected_types;
 
             switch (sch.type()) 

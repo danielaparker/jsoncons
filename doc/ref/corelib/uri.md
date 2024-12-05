@@ -52,10 +52,12 @@ Returns the decoded userinfo part of this URI.
 Returns the encoded userinfo part of this URI.
 
     jsoncons::string_view host() const noexcept;
-Returns the host part of this URI.
+
+    jsoncons::string_view encoded_host() const noexcept;
 
     jsoncons::string_view port() const noexcept;
-Returns the port number of this URI.
+
+    jsoncons::string_view encoded_port() const noexcept;
 
     std::string authority() const;
 Returns the decoded authority part of this URI.
@@ -67,36 +69,29 @@ Returns the encoded authority part of this URI.
 Returns the decoded path part of this URI.
 
     jsoncons::string_view encoded_path() const noexcept;
-Returns the encoded path part of this URI.
 
     std::string query() const;
-Returns the decoded query part of this URI.
 
     jsoncons::string_view encoded_query() const noexcept;
-Returns the encoded query part of this URI.
+
+    std::string query() const;
+
+    jsoncons::string_view encoded_query() const noexcept;
 
     std::string fragment() const;
-Returns the decoded fragment part of this URI.
 
     jsoncons::string_view encoded_fragment() const noexcept;
-Returns the encoded fragment part of this URI.
-
-    bool is_absolute() const noexcept;
-Returns true if this URI is absolute, false otherwise. An absolute URI is a URI that has
-a scheme part (the part after the colon), e.g. 'https://john.doe@www.example.com'.
-
-    bool is_opaque() const noexcept; 
-Returns true if this URI is opaque, false otherwise. An opaque URI is an absolute URI whose 
-scheme-specific part does not begin with a slash character ('/'), e.g. 'mailto:john.doe@example.com'.
-
-    uri base() const noexcept; 
-Returns the base uri. This includes the scheme, userinfo, host, port, and path parts, but excludes the query and fragment parts.
 
     uri resolve(const uri& base) const;
 Resolves a uri reference against a base URI.
 
     const std::string& string() const;
 Returns a URI string.
+
+    static uri parse(const std::string& str, std::error_code& ec);
+Creates a `uri` by parsing the given string.
+
+    const std::string& string() const;
 
     static uri parse(const std::string& str, std::error_code& ec);
 Creates a `uri` by parsing the given string.

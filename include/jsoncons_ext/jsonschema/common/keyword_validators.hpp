@@ -2799,7 +2799,7 @@ namespace jsonschema {
                             {
                                 result = reporter.error(validation_message(this->keyword_name(),
                                     this_context.eval_path(), 
-                                    additional_properties_->schema_location().string(),
+                                    additional_properties_->schema_location(),
                                     instance_location, 
                                     "Additional property '" + prop.key() + "' found but was invalid."));
                                 if (result == walk_result::abort)

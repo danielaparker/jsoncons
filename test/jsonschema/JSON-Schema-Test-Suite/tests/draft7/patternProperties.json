@@ -95,7 +95,7 @@
             }
         },
         "tests": [
-            /*{
+            {
                 "description": "non recognized members are ignored",
                 "data": { "answer 1": "42" },
                 "valid": true
@@ -114,7 +114,7 @@
                 "description": "regexes are case sensitive, 2",
                 "data": { "a_X_3": 3 },
                 "valid": false
-            }*/
+            }
         ]
     },
     {
