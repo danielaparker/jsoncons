@@ -13,9 +13,6 @@ The class `uri` represents a Uniform Resource Identifier (URI) reference.
     explicit uri(const std::string& str);
 Constructs a `uri` by parsing the given string.
 
-    uri(const std::string& uri);
-Constructs a `uri` by parsing the given string.
-
     uri(jsoncons::string_view scheme,
         jsoncons::string_view userinfo,
         jsoncons::string_view host,
@@ -37,13 +34,15 @@ Move constructor.
 #### Assignment
     
     uri& operator=(const uri& other);
+Copy assignment.
     
     uri& operator=(uri&& other) noexcept;
+Move assignment.
 
 #### Member functions
 
     jsoncons::string_view scheme() const noexcept;
-Returns the scheme part of this URI. The scheme is the first part of the URI, before the : character.
+Returns the scheme part of this URI. The scheme is the first part of the URI, before the `:` character.
 
     std::string userinfo() const;
 Returns the decoded userinfo part of this URI.
@@ -52,12 +51,10 @@ Returns the decoded userinfo part of this URI.
 Returns the encoded userinfo part of this URI.
 
     jsoncons::string_view host() const noexcept;
-
-    jsoncons::string_view encoded_host() const noexcept;
+Returns the host part of this URI.
 
     jsoncons::string_view port() const noexcept;
-
-    jsoncons::string_view encoded_port() const noexcept;
+Returns the port number of this URI.
 
     std::string authority() const;
 Returns the decoded authority part of this URI.
@@ -69,18 +66,19 @@ Returns the encoded authority part of this URI.
 Returns the decoded path part of this URI.
 
     jsoncons::string_view encoded_path() const noexcept;
+Returns the encoded path part of this URI.
 
     std::string query() const;
+Returns the decoded query part of this URI.
 
     jsoncons::string_view encoded_query() const noexcept;
-
-    std::string query() const;
-
-    jsoncons::string_view encoded_query() const noexcept;
+Returns the encoded query part of this URI.
 
     std::string fragment() const;
+Returns the decoded fragment part of this URI.
 
     jsoncons::string_view encoded_fragment() const noexcept;
+Returns the encoded fragment part of this URI.
 
     uri resolve(const uri& base) const;
 Resolves a uri reference against a base URI.
@@ -89,12 +87,8 @@ Resolves a uri reference against a base URI.
 Returns a URI string.
 
     static uri parse(const std::string& str, std::error_code& ec);
-Creates a `uri` by parsing the given string.
-
-    const std::string& string() const;
-
-    static uri parse(const std::string& str, std::error_code& ec);
-Creates a `uri` by parsing the given string.
+Creates a `uri` by parsing the given string. If a parse error is
+encountered, returns a default constructed `uri` and sets `ec`.
 
 ### Examples
   
