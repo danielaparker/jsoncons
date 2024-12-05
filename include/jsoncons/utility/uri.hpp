@@ -321,11 +321,7 @@ namespace jsoncons {
 
         string_view host() const noexcept { return string_view(uri_string_.data()+host_.first,(host_.second-host_.first)); }
 
-        string_view encoded_host() const noexcept { return string_view(uri_string_.data()+host_.first,(host_.second-host_.first)); }
-
         string_view port() const noexcept { return string_view(uri_string_.data()+port_.first,(port_.second-port_.first)); }
-
-        string_view encoded_port() const noexcept { return string_view(uri_string_.data()+port_.first,(port_.second-port_.first)); }
 
         std::string authority() const
         {

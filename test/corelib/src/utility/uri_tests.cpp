@@ -370,8 +370,8 @@ TEST_CASE("uri parsing tests")
         jsoncons::uri id = jsoncons::uri::parse(str, ec);
         
         /*std::cout << "authority: [" << id.encoded_authority() << "]\n";
-        std::cout << "host: [" << id.encoded_host() << "]\n";
-        std::cout << "port: [" << id.encoded_port() << "]\n";
+        std::cout << "host: [" << id.host() << "]\n";
+        std::cout << "port: [" << id.port() << "]\n";
         std::cout << "path: [" << id.encoded_path() << "]\n";
         */
 
