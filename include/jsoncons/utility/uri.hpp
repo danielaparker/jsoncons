@@ -354,29 +354,94 @@ namespace jsoncons {
             return string_view(uri_string_.data()+fragment_.first,(fragment_.second-fragment_.first)); 
         }
 
-        uri resolve(const uri& base) const
+        bool has_fragment() const
+        {
+            return !encoded_fragment().empty();
+        }
+
+        uri resolve(const uri& reference) const
         {
             // This implementation uses the psuedo-code given in
             // http://tools.ietf.org/html/rfc3986#section-5.2.2
 
-            if (is_absolute() && !is_opaque()) 
+            if (reference.is_absolute() && !reference.is_opaque()) 
             {
-                return *this;
+                return reference;
             }
 
-            if (is_opaque()) 
+            if (reference.is_opaque()) 
             {
-                return *this;
+                return reference;
             }
 
             std::string userinfo, host, port, path, query, fragment;
 
-            if (!encoded_authority().empty()) 
+            if (!reference.encoded_authority().empty()) 
             {
               // g -> http://g
-              if (!this->encoded_userinfo().empty()) 
+              if (!reference.encoded_userinfo().empty()) 
               {
-                  userinfo = std::string(this->encoded_userinfo());
+                  userinfo = std::string(reference.encoded_userinfo());
+              }
+
+              if (!reference.host().empty()) 
+              {
+                  host = std::string(reference.host());
+              }
+
+              if (!reference.port().empty()) 
+              {
+                  port = std::string(reference.port());
+              }
+
+              if (!reference.encoded_path().empty()) 
+              {
+                  path = remove_dot_segments(std::string(reference.encoded_path()));
+              }
+
+              if (!reference.encoded_query().empty()) 
+              {
+                  query = std::string(reference.encoded_query());
+              }
+            } 
+            else 
+            {
+              if (reference.encoded_path().empty()) 
+              {
+                if (!encoded_path().empty()) 
+                {
+                    path = std::string(encoded_path());
+                }
+
+                if (!reference.encoded_query().empty()) 
+                {
+                    query = std::string(reference.encoded_query());
+                } 
+                else if (!encoded_query().empty()) 
+                {
+                    query = std::string(encoded_query());
+                }
+              } 
+              else 
+              {
+                  if (reference.encoded_path().front() == '/') 
+                  {
+                    path = remove_dot_segments(std::string(reference.encoded_path()));
+                  } 
+                  else 
+                  {
+                      path = merge_paths(*this, reference);
+                  }
+
+                  if (!reference.encoded_query().empty()) 
+                  {
+                      query = std::string(reference.encoded_query());
+                  }
+              }
+
+              if (!encoded_userinfo().empty()) 
+              {
+                  userinfo = std::string(encoded_userinfo());
               }
 
               if (!this->host().empty()) 
@@ -388,74 +453,14 @@ namespace jsoncons {
               {
                   port = std::string(this->port());
               }
-
-              if (!this->encoded_path().empty()) 
-              {
-                  path = remove_dot_segments(std::string(this->encoded_path()));
-              }
-
-              if (!this->encoded_query().empty()) 
-              {
-                  query = std::string(this->encoded_query());
-              }
-            } 
-            else 
-            {
-              if (this->encoded_path().empty()) 
-              {
-                if (!base.encoded_path().empty()) 
-                {
-                    path = std::string(base.encoded_path());
-                }
-
-                if (!this->encoded_query().empty()) 
-                {
-                    query = std::string(this->encoded_query());
-                } 
-                else if (!base.encoded_query().empty()) 
-                {
-                    query = std::string(base.encoded_query());
-                }
-              } 
-              else 
-              {
-                  if (this->encoded_path().front() == '/') 
-                  {
-                    path = remove_dot_segments(std::string(this->encoded_path()));
-                  } 
-                  else 
-                  {
-                      path = merge_paths(base, *this);
-                  }
-
-                  if (!this->encoded_query().empty()) 
-                  {
-                      query = std::string(this->encoded_query());
-                  }
-              }
-
-              if (!base.encoded_userinfo().empty()) 
-              {
-                  userinfo = std::string(base.encoded_userinfo());
-              }
-
-              if (!base.host().empty()) 
-              {
-                  host = std::string(base.host());
-              }
-
-              if (!base.port().empty()) 
-              {
-                  port = std::string(base.port());
-              }
             }
 
-            if (!this->encoded_fragment().empty()) 
+            if (!reference.encoded_fragment().empty()) 
             {
-                fragment = std::string(this->encoded_fragment());
+                fragment = std::string(reference.encoded_fragment());
             }
 
-            return uri(std::string(base.scheme()), userinfo, host, port, path, query, fragment);
+            return uri(std::string(scheme()), userinfo, host, port, path, query, fragment);
         }
 
         int compare(const uri& other) const

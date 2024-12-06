@@ -164,9 +164,9 @@ namespace draft7 {
                         }
 
                         Json default_value{ jsoncons::null_type() };
-                        uri_wrapper relative(it->value().template as<std::string>()); 
-                        auto id = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                        validators.push_back(this->get_or_create_reference(sch, id));
+                        uri relative(it->value().template as<std::string>()); 
+                        auto id = context.get_base_uri().resolve(relative);
+                        validators.push_back(this->get_or_create_reference(sch, uri_wrapper{id}));
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
                             new_context.get_base_uri(), context.id(),
                             std::move(validators), std::move(defs), std::move(default_value));
@@ -371,11 +371,13 @@ namespace draft7 {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    uri_wrapper relative(it->value().template as<std::string>()); 
-                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
-                    id = new_uri.uri();
+                    uri relative(it->value().template as<std::string>()); 
+                    auto resolved = parent.get_base_uri().resolve(relative);
+                    id = resolved;
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
+                    
+                    uri_wrapper new_uri{resolved};
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
                     {
                         new_uris.emplace_back(new_uri); 

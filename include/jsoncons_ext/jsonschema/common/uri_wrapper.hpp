@@ -95,11 +95,6 @@ namespace jsonschema {
             return identifier_;
         }
 
-        uri_wrapper resolve(const uri_wrapper& uri) const
-        {
-            return uri.uri_.is_absolute() ? uri_wrapper{uri_.resolve(uri.uri_)} : *this;
-        }
-
         int compare(const uri_wrapper& other) const
         {
             int result = uri_.compare(other.uri_);

@@ -288,19 +288,18 @@ namespace draft201909 {
             it = sch.find("$ref");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri_wrapper relative(it->value().template as<std::string>()); 
-                auto resolved = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                validators.push_back(this->get_or_create_reference(sch, resolved));
+                uri relative{it->value().template as<std::string>()}; 
+                auto resolved = context.get_base_uri().resolve(relative);
+                validators.push_back(this->get_or_create_reference(sch, uri_wrapper{resolved}));
             }
 
             it = sch.find("$recursiveRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri_wrapper relative(it->value().template as<std::string>());
-                auto ref = relative.resolve(uri_wrapper
-                { context.get_base_uri()});
-                auto orig = jsoncons::make_unique<recursive_ref_validator_type>(sch, ref.uri().base()); 
-                this->unresolved_refs_.emplace_back(ref.uri(), orig.get());
+                uri relative(it->value().template as<std::string>());
+                auto ref = context.get_base_uri().resolve(relative);
+                auto orig = jsoncons::make_unique<recursive_ref_validator_type>(sch, ref.base()); 
+                this->unresolved_refs_.emplace_back(ref, orig.get());
                 validators.push_back(std::move(orig));
             }
             
@@ -500,13 +499,14 @@ namespace draft201909 {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    uri_wrapper relative(it->value().template as<std::string>()); 
+                    uri relative(it->value().template as<std::string>()); 
                     if (relative.has_fragment())
                     {
                         JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
                     }
-                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
-                    id = new_uri.uri();
+                    auto resolved = parent.get_base_uri().resolve(relative);
+                    id = resolved;
+                    uri_wrapper new_uri{resolved};
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

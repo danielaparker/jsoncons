@@ -288,19 +288,19 @@ namespace draft202012 {
             it = sch.find("$ref");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri_wrapper relative(it->value().template as<std::string>()); 
-                auto ref = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                validators.push_back(this->get_or_create_reference(sch, ref));
+                uri relative(it->value().template as<std::string>()); 
+                auto ref = context.get_base_uri().resolve(relative)                   ;
+                validators.push_back(this->get_or_create_reference(sch, uri_wrapper(ref)));
             }
 
             it = sch.find("$dynamicRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
                 std::string value = it->value().template as<std::string>();
-                uri_wrapper relative(value); 
-                auto ref = relative.resolve(uri_wrapper{ context.get_base_uri() });
-                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(sch, ref.uri().base(), ref);
-                this->unresolved_refs_.emplace_back(ref.uri(), orig.get());
+                uri relative(value); 
+                auto ref = context.get_base_uri().resolve(relative)                   ;
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(sch, ref.base(), uri_wrapper{ref});
+                this->unresolved_refs_.emplace_back(ref, orig.get());
                 validators.push_back(std::move(orig));
             }
 
@@ -555,13 +555,14 @@ namespace draft202012 {
                 if (it != sch.object_range().end()) 
                 {
                     std::string str = it->value().template as<std::string>();
-                    uri_wrapper relative(str); 
+                    uri relative(str); 
                     if (relative.has_fragment())
                     {
                         JSONCONS_THROW(schema_error(str + ": Draft 2019-09 does not allow $id with fragment"));
                     }
-                    uri_wrapper new_uri = relative.resolve(uri_wrapper{ parent.get_base_uri() });
-                    id = new_uri.uri();
+                    auto resolved = parent.get_base_uri().resolve(relative);
+                    id = resolved;
+                    uri_wrapper new_uri{resolved};
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())

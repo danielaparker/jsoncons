@@ -80,8 +80,8 @@ Returns the decoded fragment part of this URI.
     jsoncons::string_view encoded_fragment() const noexcept;
 Returns the encoded fragment part of this URI.
 
-    uri resolve(const uri& base) const;
-Resolves a uri reference against a base URI.
+    uri resolve(const uri& reference) const;
+Resolve `reference` as a URI relative to this URI.
 
     const std::string& string() const;
 Returns a URI string.
