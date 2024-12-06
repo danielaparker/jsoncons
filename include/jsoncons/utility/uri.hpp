@@ -150,8 +150,8 @@ namespace jsoncons {
             jsoncons::string_view host,
             jsoncons::string_view port,
             jsoncons::string_view path,
-            jsoncons::string_view query,
-            jsoncons::string_view fragment)
+            jsoncons::string_view query = "",
+            jsoncons::string_view fragment = "")
         {
             if (!scheme.empty()) 
             {

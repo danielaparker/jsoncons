@@ -40,7 +40,7 @@ For earlier releases, please refer to [jsonschema (until 0.174.0)](https://githu
   </tr>
   <tr>
     <td><a href="make_schema.md">make_schema</a></td>
-    <td>Loads a JSON Schema and returns a shared pointer to a <code>json_schema</code>. Deprecated (since 0.174.0)
+    <td>Loads a JSON Schema and returns a shared pointer to a <code>json_schema</code>. Deprecated since 0.174.0. Removed in 1.0.0.
   </tr>
 
 </table>

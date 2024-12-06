@@ -18,8 +18,8 @@ Constructs a `uri` by parsing the given string.
         jsoncons::string_view host,
         jsoncons::string_view port,
         jsoncons::string_view path,
-        jsoncons::string_view query,
-        jsoncons::string_view fragment)
+        jsoncons::string_view query = "",
+        jsoncons::string_view fragment = "")
 Constructs a `uri` from the given unescaped parts.
  
     uri(const uri& other, uri_fragment_part_t, jsoncons::string_view fragment);

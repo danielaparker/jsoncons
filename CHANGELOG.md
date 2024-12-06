@@ -15,15 +15,28 @@ constructed value with static storage duration if no such key already exists.
 
 Changes to basic_json_parser:
 
-Until 0.179.0, a buffer of text is supplied to the parser with a call to `update()`
+Until 1.0.0, a buffer of text is supplied to the parser with a call to `update()`
 followed by a call to `parse_some()`. Once the parser reaches the end of the buffer,
 additional JSON text can be supplied to the parser with another call to `update()`,
-followed by another call to `parse_some()`. See [Incremental parsing (until 0.179.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-until-01790). 
+followed by another call to `parse_some()`. See [Incremental parsing (until 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-until-01790). 
 
 Since 0.179, an initial buffer of text is supplied to the parse with a call to
 `set_buffer`, and parsing commences with a call to `parse_some`. The parser can be
 constructed with a user provided chunk reader to obtain additional JSON text
-as needed. See [Incremental parsing (since 0.179.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790). 
+as needed. See [Incremental parsing (since 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790). 
+
+Defect fixes:
+
+- Fixed a bug in jmespath avg function via PR #560
+
+- Fixed a number of issues in `uri::resolve`, used in jsonschema, related to abnormal references,
+particulay ones containing dots in path segments. 
+
+Removal of deprecated jsonschema classes and functions
+
+- The jsonschema function `make_schema`, classes `json_validator` and `validation_output`,
+header file `json_validator.hpp` and example `legacy_jsonschema_examples.cpp`, 
+deprecated in 0.174.0, have been removed.
 
 Enhancements:
 
@@ -36,6 +49,8 @@ constructed with
 ```
 json j{jsoncons::null_arg};
 ```
+
+- Custom jmespath functions are now supported via PR #560
 
 0.178.0
 -------
