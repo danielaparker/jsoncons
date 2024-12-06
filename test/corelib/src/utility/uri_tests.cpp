@@ -16,13 +16,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         std::cout << uri.string() << "\n";
 
         CHECK(uri.scheme() == jsoncons::string_view("https"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("john.doe@www.example.com:123"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("john.doe@www.example.com:123"));
         CHECK(uri.userinfo() == jsoncons::string_view("john.doe"));
         CHECK(uri.host() == jsoncons::string_view("www.example.com"));
         CHECK(uri.port() == jsoncons::string_view("123"));
         CHECK(uri.path() == jsoncons::string_view("/forum/questions/"));
-        CHECK(uri.encoded_query() == jsoncons::string_view("tag=networking&order=newest"));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view("top"));
+        CHECK(uri.raw_query() == jsoncons::string_view("tag=networking&order=newest"));
+        CHECK(uri.raw_fragment() == jsoncons::string_view("top"));
         CHECK(uri.base().string() == "https://john.doe@www.example.com:123/forum/questions/");
         CHECK(uri.is_absolute());
     }
@@ -33,13 +33,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("ldap"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("2001:db8::7"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("2001:db8::7"));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view("2001:db8::7"));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("/c=GB"));
-        CHECK(uri.encoded_query() == jsoncons::string_view("objectClass?one"));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("/c=GB"));
+        CHECK(uri.raw_query() == jsoncons::string_view("objectClass?one"));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("mailto:John.Doe@example.com")
@@ -49,13 +49,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("mailto"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.raw_authority() == jsoncons::string_view(""));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view(""));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("John.Doe@example.com"));
-        CHECK(uri.encoded_query() == jsoncons::string_view(""));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("John.Doe@example.com"));
+        CHECK(uri.raw_query() == jsoncons::string_view(""));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("news:comp.infosystems.www.servers.unix")
@@ -65,13 +65,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("news"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.raw_authority() == jsoncons::string_view(""));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view(""));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("comp.infosystems.www.servers.unix"));
-        CHECK(uri.encoded_query() == jsoncons::string_view(""));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("comp.infosystems.www.servers.unix"));
+        CHECK(uri.raw_query() == jsoncons::string_view(""));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("tel:+1-816-555-1212")
@@ -81,13 +81,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("tel"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.raw_authority() == jsoncons::string_view(""));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view(""));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("+1-816-555-1212"));
-        CHECK(uri.encoded_query() == jsoncons::string_view(""));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("+1-816-555-1212"));
+        CHECK(uri.raw_query() == jsoncons::string_view(""));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("telnet://192.0.2.16:80/")
@@ -97,13 +97,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("telnet"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("192.0.2.16:80"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("192.0.2.16:80"));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view("192.0.2.16"));
         CHECK(uri.port() == jsoncons::string_view("80"));
-        CHECK(uri.encoded_path() == jsoncons::string_view("/"));
-        CHECK(uri.encoded_query() == jsoncons::string_view(""));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("/"));
+        CHECK(uri.raw_query() == jsoncons::string_view(""));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("urn:oasis:names:specification:docbook:dtd:xml:4.1.2")
@@ -113,13 +113,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("urn"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.raw_authority() == jsoncons::string_view(""));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view(""));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("oasis:names:specification:docbook:dtd:xml:4.1.2"));
-        CHECK(uri.encoded_query() == jsoncons::string_view(""));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("oasis:names:specification:docbook:dtd:xml:4.1.2"));
+        CHECK(uri.raw_query() == jsoncons::string_view(""));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
     SECTION("urn:example:foo-bar-baz-qux?+CCResolve:cc=uk")
@@ -129,13 +129,13 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("urn"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view(""));
+        CHECK(uri.raw_authority() == jsoncons::string_view(""));
         CHECK(uri.userinfo() == jsoncons::string_view(""));
         CHECK(uri.host() == jsoncons::string_view(""));
         CHECK(uri.port() == jsoncons::string_view(""));
-        CHECK(uri.encoded_path() == jsoncons::string_view("example:foo-bar-baz-qux"));
-        CHECK(uri.encoded_query() == jsoncons::string_view("+CCResolve:cc=uk"));
-        CHECK(uri.encoded_fragment() == jsoncons::string_view(""));
+        CHECK(uri.raw_path() == jsoncons::string_view("example:foo-bar-baz-qux"));
+        CHECK(uri.raw_query() == jsoncons::string_view("+CCResolve:cc=uk"));
+        CHECK(uri.raw_fragment() == jsoncons::string_view(""));
         CHECK(uri.is_absolute());
     }
 }
@@ -149,13 +149,13 @@ TEST_CASE("uri fragment tests")
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme().empty());
-        CHECK(uri.encoded_authority().empty());
+        CHECK(uri.raw_authority().empty());
         CHECK(uri.userinfo().empty());
         CHECK(uri.host().empty());
         CHECK(uri.port().empty());
-        CHECK(uri.encoded_path().empty());
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment() == jsoncons::string_view("/definitions/nonNegativeInteger"));
+        CHECK(uri.raw_path().empty());
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment() == jsoncons::string_view("/definitions/nonNegativeInteger"));
         CHECK(!uri.is_absolute());
     }
 }
@@ -169,13 +169,13 @@ TEST_CASE("uri base tests")
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("json-schema.org"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("json-schema.org"));
         CHECK(uri.userinfo().empty());
         CHECK(uri.host() == jsoncons::string_view("json-schema.org"));
         CHECK(uri.port().empty());
-        CHECK(uri.encoded_path() == jsoncons::string_view("/draft-07/schema"));
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment().empty());
+        CHECK(uri.raw_path() == jsoncons::string_view("/draft-07/schema"));
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment().empty());
         CHECK(uri.is_absolute());
     }
     SECTION("folder/")
@@ -185,13 +185,13 @@ TEST_CASE("uri base tests")
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme().empty());
-        CHECK(uri.encoded_authority().empty());
+        CHECK(uri.raw_authority().empty());
         CHECK(uri.userinfo().empty());
         CHECK(uri.host().empty());
         CHECK(uri.port().empty());
-        CHECK(uri.encoded_path() == jsoncons::string_view("folder/"));
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment().empty());
+        CHECK(uri.raw_path() == jsoncons::string_view("folder/"));
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment().empty());
         CHECK(!uri.is_absolute());
     }
     SECTION("name.json#/definitions/orNull")
@@ -201,13 +201,13 @@ TEST_CASE("uri base tests")
         jsoncons::uri uri(s); 
 
         CHECK(uri.scheme().empty());
-        CHECK(uri.encoded_authority().empty());
+        CHECK(uri.raw_authority().empty());
         CHECK(uri.userinfo().empty());
         CHECK(uri.host().empty());
         CHECK(uri.port().empty());
-        CHECK(uri.encoded_path() == jsoncons::string_view("name.json"));
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment() == jsoncons::string_view("/definitions/orNull"));
+        CHECK(uri.raw_path() == jsoncons::string_view("name.json"));
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment() == jsoncons::string_view("/definitions/orNull"));
         CHECK(!uri.is_absolute());
     }
 }
@@ -248,13 +248,13 @@ TEST_CASE("uri resolve tests")
         jsoncons::uri uri =  base_uri.resolve(relative_uri);
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("localhost:1234"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("localhost:1234"));
         CHECK(uri.userinfo().empty());
         CHECK(uri.host() == jsoncons::string_view("localhost"));
         CHECK(uri.port() == jsoncons::string_view("1234"));
-        CHECK(uri.encoded_path() == jsoncons::string_view("/folder/"));
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment().empty());
+        CHECK(uri.raw_path() == jsoncons::string_view("/folder/"));
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment().empty());
         CHECK(uri.is_absolute());
     }
 
@@ -266,13 +266,13 @@ TEST_CASE("uri resolve tests")
         jsoncons::uri uri =  base_uri.resolve(relative_uri);
 
         CHECK(uri.scheme() == jsoncons::string_view("http"));
-        CHECK(uri.encoded_authority() == jsoncons::string_view("localhost:1234"));
+        CHECK(uri.raw_authority() == jsoncons::string_view("localhost:1234"));
         CHECK(uri.userinfo().empty());
         CHECK(uri.host() == jsoncons::string_view("localhost"));
         CHECK(uri.port() == jsoncons::string_view("1234"));
-        CHECK(uri.encoded_path() == jsoncons::string_view("/folder/folderInteger.json"));
-        CHECK(uri.encoded_query().empty());
-        CHECK(uri.encoded_fragment().empty());
+        CHECK(uri.raw_path() == jsoncons::string_view("/folder/folderInteger.json"));
+        CHECK(uri.raw_query().empty());
+        CHECK(uri.raw_fragment().empty());
         CHECK(uri.is_absolute());
     }
 }
@@ -365,10 +365,10 @@ TEST_CASE("uri parsing tests")
         std::error_code ec;
         jsoncons::uri id = jsoncons::uri::parse(str, ec);
         
-        /*std::cout << "authority: [" << id.encoded_authority() << "]\n";
+        /*std::cout << "authority: [" << id.raw_authority() << "]\n";
         std::cout << "host: [" << id.host() << "]\n";
         std::cout << "port: [" << id.port() << "]\n";
-        std::cout << "path: [" << id.encoded_path() << "]\n";
+        std::cout << "path: [" << id.raw_path() << "]\n";
         */
 
         //CHECK(ec);       
@@ -382,70 +382,70 @@ TEST_CASE("cpp-netlib uri tests")
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56", ec);
         REQUIRE_FALSE(ec);
-        CHECK(uri.encoded_path().empty());
+        CHECK(uri.raw_path().empty());
     }
     SECTION("test_empty_path_with_query")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56?query", ec);
         REQUIRE_FALSE(ec);
-        CHECK(uri.encoded_path().empty());
+        CHECK(uri.raw_path().empty());
     }
     SECTION("test_empty_path_with_fragment")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56#fragment", ec);
         REQUIRE_FALSE(ec);
-        CHECK(uri.encoded_path().empty());
+        CHECK(uri.raw_path().empty());
     }
     SECTION("test_single_slash")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56/", ec);
         REQUIRE_FALSE(ec);
-        CHECK("/" == uri.encoded_path());
+        CHECK("/" == uri.raw_path());
     }
     SECTION("test_single_slash_with_query")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56/?query", ec);
         REQUIRE_FALSE(ec);
-        CHECK("/" == uri.encoded_path());
+        CHECK("/" == uri.raw_path());
     }
     SECTION("test_single_slash_with_fragment")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("http://123.34.23.56/#fragment", ec);
         REQUIRE_FALSE(ec);
-        CHECK("/" == uri.encoded_path());
+        CHECK("/" == uri.raw_path());
     }
     SECTION("test_double_slash_empty_path_empty_everything")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("file://", ec);
         REQUIRE(ec == jsoncons::uri_errc::invalid_uri);
-        CHECK(uri.encoded_path().empty());
+        CHECK(uri.raw_path().empty());
     }
     SECTION("test_triple_slash_empty_everything")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("file:///", ec);
         REQUIRE_FALSE(ec);
-        CHECK("/" == uri.encoded_path());
+        CHECK("/" == uri.raw_path());
     }
     SECTION("test_triple_slash_with_path_name")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("file:///path", ec);
         REQUIRE_FALSE(ec);
-        CHECK("/path" == uri.encoded_path());
+        CHECK("/path" == uri.raw_path());
     }
     SECTION("test_rootless_1")
     {
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("mailto:john.doe@example.com", ec);
         REQUIRE_FALSE(ec);
-        CHECK("john.doe@example.com" == uri.encoded_path());
+        CHECK("john.doe@example.com" == uri.raw_path());
     }
     SECTION("test_invalid_characters_in_path")
     {
@@ -496,7 +496,7 @@ TEST_CASE("cpp-netib uri resolve tests")
         jsoncons::uri reference{"g/x/y?q=1#s"};
         jsoncons::uri base{"http://a/"};
         auto uri = base.resolve(reference);
-        CHECK(uri.encoded_query() == jsoncons::string_view("q=1"));
+        CHECK(uri.raw_query() == jsoncons::string_view("q=1"));
         CHECK("http://a/g/x/y?q=1#s" == uri.string());
     }
 
