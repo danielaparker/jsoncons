@@ -98,14 +98,14 @@ namespace jmespath {
     template <typename Json>
     class dynamic_resources
     {
-        typedef typename Json::char_type char_type;
-        typedef typename Json::char_traits_type char_traits_type;
-        typedef std::basic_string<char_type,char_traits_type> string_type;
-        typedef typename Json::string_view_type string_view_type;
+    public:
+        using char_type = typename Json::char_type;
+        using char_traits_type = typename Json::char_traits_type;
+        using string_type = std::basic_string<char_type,char_traits_type>;
+        using string_view_type = typename Json::string_view_type;
         using reference = typename Json::const_reference;
         using pointer = typename Json::pointer;
-        typedef typename Json::const_pointer const_pointer;
-
+    private:
         std::vector<std::unique_ptr<Json>> temp_storage_;
 
     public:
@@ -187,8 +187,9 @@ namespace jmespath {
     template <typename Json,typename JsonReference>
     class expression_base
     {
+    public:
         using reference = JsonReference;
-
+    private:
         std::size_t precedence_level_;
         bool is_right_associative_;
         bool is_projection_;
@@ -234,10 +235,10 @@ namespace jmespath {
     template <typename Json>
     class parameter
     {
+    public:
         using reference = const Json&;
-        using pointer = typename Json::const_pointer;
         using expression_type = expression_base<Json,reference>;
-
+    private:
         parameter_kind type_;
 
         union
