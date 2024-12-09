@@ -231,12 +231,12 @@ namespace jmespath {
 
     enum class parameter_kind{value, expression};
 
-    template <typename Json,typename JsonReference>
+    template <typename Json>
     class parameter
     {
-        using expression_base_type = expression_base<Json,JsonReference>;
-        typedef JsonReference reference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
+        using reference = const Json&;
+        using pointer = typename Json::const_pointer;
+        using expression_base_type = expression_base<Json,reference>;
 
         parameter_kind type_;
 
@@ -248,7 +248,7 @@ namespace jmespath {
 
     public:
 
-        parameter(const parameter<Json,JsonReference>& other) noexcept
+        parameter(const parameter<Json>& other) noexcept
             : type_(other.type_)
         {
             switch (type_)
@@ -602,7 +602,7 @@ namespace jmespath {
         typedef JsonReference reference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         typedef typename Json::const_pointer const_pointer;
-        using parameter_type = parameter<Json,JsonReference>;
+        using parameter_type = parameter<Json>;
         using expression_base_type = expression_base<Json,JsonReference>;
 
         static bool is_false(reference ref)
