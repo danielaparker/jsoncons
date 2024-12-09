@@ -242,7 +242,7 @@ namespace jmespath {
 
         union
         {
-            expression_base_type* expression_;
+            std::reference_wrapper<expression_base_type> expression_;
             pointer value_;
         };
 
@@ -270,7 +270,7 @@ namespace jmespath {
         }
 
         parameter(expression_base_type* expression) noexcept
-            : type_(parameter_kind::expression), expression_(expression)
+            : type_(parameter_kind::expression), expression_(*expression)
         {
         }
 
@@ -311,7 +311,7 @@ namespace jmespath {
 
         const expression_base_type& expression() const
         {
-            return *expression_;
+            return expression_;
         }
     };
 
