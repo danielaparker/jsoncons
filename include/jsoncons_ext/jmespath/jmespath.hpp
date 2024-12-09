@@ -23,87 +23,6 @@
 namespace jsoncons { 
 namespace jmespath {
 
-    enum class parameter_kind{value, expression};
-
-    class parameter
-    {
-        parameter_kind type_;
-
-        union
-        {
-            expression_base* expression_;
-            pointer value_;
-        };
-
-    public:
-
-        parameter(const parameter& other) noexcept
-            : type_(other.type_)
-        {
-            switch (type_)
-            {
-                case parameter_kind::expression:
-                    expression_ = other.expression_;
-                    break;
-                case parameter_kind::value:
-                    value_ = other.value_;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        parameter(reference value) noexcept
-            : type_(parameter_kind::value), value_(std::addressof(value))
-        {
-        }
-
-        parameter(expression_base* expression) noexcept
-            : type_(parameter_kind::expression), expression_(expression)
-        {
-        }
-
-        parameter& operator=(const parameter& other)
-        {
-            if (&other != this)
-            {
-                type_ = other.type_;
-                switch (type_)
-                {
-                    case parameter_kind::expression:
-                        expression_ = other.expression_;
-                        break;
-                    case parameter_kind::value:
-                        value_ = other.value_;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return *this;
-        }
-
-        bool is_value() const
-        {
-            return type_ == parameter_kind::value;
-        }
-
-        bool is_expression() const
-        {
-            return type_ == parameter_kind::expression;
-        }
-
-        const Json& value() const
-        {
-            return *value_;
-        }
-
-        const expression_base& expression() const
-        {
-            return *expression_;
-        }
-    };
-
     enum class operator_kind
     {
         default_op, // Identifier, CurrentNode, Index, MultiSelectList, MultiSelectHash, FunctionExpression
@@ -682,6 +601,89 @@ namespace jmespath {
                 return std::string("to_string not implemented");
             }
         };  
+
+        // parameter
+
+        enum class parameter_kind{value, expression};
+
+        class parameter
+        {
+            parameter_kind type_;
+
+            union
+            {
+                expression_base* expression_;
+                pointer value_;
+            };
+
+        public:
+
+            parameter(const parameter& other) noexcept
+                : type_(other.type_)
+            {
+                switch (type_)
+                {
+                    case parameter_kind::expression:
+                        expression_ = other.expression_;
+                        break;
+                    case parameter_kind::value:
+                        value_ = other.value_;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            parameter(reference value) noexcept
+                : type_(parameter_kind::value), value_(std::addressof(value))
+            {
+            }
+
+            parameter(expression_base* expression) noexcept
+                : type_(parameter_kind::expression), expression_(expression)
+            {
+            }
+
+            parameter& operator=(const parameter& other)
+            {
+                if (&other != this)
+                {
+                    type_ = other.type_;
+                    switch (type_)
+                    {
+                        case parameter_kind::expression:
+                            expression_ = other.expression_;
+                            break;
+                        case parameter_kind::value:
+                            value_ = other.value_;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return *this;
+            }
+
+            bool is_value() const
+            {
+                return type_ == parameter_kind::value;
+            }
+
+            bool is_expression() const
+            {
+                return type_ == parameter_kind::expression;
+            }
+
+            const Json& value() const
+            {
+                return *value_;
+            }
+
+            const expression_base& expression() const
+            {
+                return *expression_;
+            }
+        };
 
         // function_base
         class function_base
