@@ -21,11 +21,11 @@ namespace myspace
 #define json_const_pointer_arg jsoncons::json_const_pointer_arg
 
   using function_base = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::function_base;
-  using dynamic_resources = jsoncons::jmespath::detail::dynamic_resources<Json, JsonReference>;
+  using dynamic_resources = jsoncons::jmespath::dynamic_resources<Json, JsonReference>;
   using static_resources = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::static_resources;
-  using parameter = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::parameter;
+  using parameter = jsoncons::jmespath::parameter<Json, JsonReference>;
   using string_type = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::string_type;
-  using expression_base = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::expression_base;
+  //using expression_base = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::expression_base;
   using customer_get_function = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::static_resources::customer_get_function;
 
   bool is_integer(JsonReference value)

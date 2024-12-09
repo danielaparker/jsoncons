@@ -93,6 +93,228 @@ namespace jmespath {
         }
     };
 
+    // dynamic_resources
+
+    template <typename Json,typename JsonReference>
+    class dynamic_resources
+    {
+        typedef typename Json::char_type char_type;
+        typedef typename Json::char_traits_type char_traits_type;
+        typedef std::basic_string<char_type,char_traits_type> string_type;
+        typedef typename Json::string_view_type string_view_type;
+        typedef JsonReference reference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+        typedef typename Json::const_pointer const_pointer;
+
+        std::vector<std::unique_ptr<Json>> temp_storage_;
+
+    public:
+        ~dynamic_resources()
+        {
+        }
+
+        reference number_type_name() 
+        {
+            static Json number_type_name(JSONCONS_STRING_CONSTANT(char_type, "number"));
+
+            return number_type_name;
+        }
+
+        reference boolean_type_name()
+        {
+            static Json boolean_type_name(JSONCONS_STRING_CONSTANT(char_type, "boolean"));
+
+            return boolean_type_name;
+        }
+
+        reference string_type_name()
+        {
+            static Json string_type_name(JSONCONS_STRING_CONSTANT(char_type, "string"));
+
+            return string_type_name;
+        }
+
+        reference object_type_name()
+        {
+            static Json object_type_name(JSONCONS_STRING_CONSTANT(char_type, "object"));
+
+            return object_type_name;
+        }
+
+        reference array_type_name()
+        {
+            static Json array_type_name(JSONCONS_STRING_CONSTANT(char_type, "array"));
+
+            return array_type_name;
+        }
+
+        reference null_type_name()
+        {
+            static Json null_type_name(JSONCONS_STRING_CONSTANT(char_type, "null"));
+
+            return null_type_name;
+        }
+
+        reference true_value() const
+        {
+            static const Json true_value(true, semantic_tag::none);
+            return true_value;
+        }
+
+        reference false_value() const
+        {
+            static const Json false_value(false, semantic_tag::none);
+            return false_value;
+        }
+
+        reference null_value() const
+        {
+            static const Json null_value(null_type(), semantic_tag::none);
+            return null_value;
+        }
+
+        template <typename... Args>
+        Json* create_json(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_storage_.emplace_back(std::move(temp));
+            return ptr;
+        }
+    };
+
+    // expression_base
+    template <typename Json,typename JsonReference>
+    class expression_base
+    {
+        using reference = JsonReference;
+
+        std::size_t precedence_level_;
+        bool is_right_associative_;
+        bool is_projection_;
+    public:
+        expression_base(operator_kind oper, bool is_projection)
+            : precedence_level_(operator_table::precedence_level(oper)), 
+              is_right_associative_(operator_table::is_right_associative(oper)), 
+              is_projection_(is_projection)
+        {
+        }
+
+        std::size_t precedence_level() const
+        {
+            return precedence_level_;
+        }
+
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
+
+        bool is_projection() const 
+        {
+            return is_projection_;
+        }
+
+        virtual ~expression_base() = default;
+
+        virtual reference evaluate(reference val, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const = 0;
+
+        virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
+
+        virtual std::string to_string(std::size_t = 0) const
+        {
+            return std::string("to_string not implemented");
+        }
+    };  
+
+    // parameter
+
+    enum class parameter_kind{value, expression};
+
+    template <typename Json,typename JsonReference>
+    class parameter
+    {
+        using expression_base_type = expression_base<Json,JsonReference>;
+        typedef JsonReference reference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value, typename Json::const_pointer, typename Json::pointer>::type;
+
+        parameter_kind type_;
+
+        union
+        {
+            expression_base_type* expression_;
+            pointer value_;
+        };
+
+    public:
+
+        parameter(const parameter<Json,JsonReference>& other) noexcept
+            : type_(other.type_)
+        {
+            switch (type_)
+            {
+                case parameter_kind::expression:
+                    expression_ = other.expression_;
+                    break;
+                case parameter_kind::value:
+                    value_ = other.value_;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        parameter(reference value) noexcept
+            : type_(parameter_kind::value), value_(std::addressof(value))
+        {
+        }
+
+        parameter(expression_base_type* expression) noexcept
+            : type_(parameter_kind::expression), expression_(expression)
+        {
+        }
+
+        parameter& operator=(const parameter& other)
+        {
+            if (&other != this)
+            {
+                type_ = other.type_;
+                switch (type_)
+                {
+                    case parameter_kind::expression:
+                        expression_ = other.expression_;
+                        break;
+                    case parameter_kind::value:
+                        value_ = other.value_;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return *this;
+        }
+
+        bool is_value() const
+        {
+            return type_ == parameter_kind::value;
+        }
+
+        bool is_expression() const
+        {
+            return type_ == parameter_kind::expression;
+        }
+
+        const Json& value() const
+        {
+            return *value_;
+        }
+
+        const expression_base_type& expression() const
+        {
+            return *expression_;
+        }
+    };
+
     enum class token_kind 
     {
         current_node,
@@ -369,96 +591,6 @@ namespace jmespath {
         expect_and
     };
 
-    // dynamic_resources
-
-    template <typename Json,typename JsonReference>
-    class dynamic_resources
-    {
-        typedef typename Json::char_type char_type;
-        typedef typename Json::char_traits_type char_traits_type;
-        typedef std::basic_string<char_type,char_traits_type> string_type;
-        typedef typename Json::string_view_type string_view_type;
-        typedef JsonReference reference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        typedef typename Json::const_pointer const_pointer;
-
-        std::vector<std::unique_ptr<Json>> temp_storage_;
-
-    public:
-        ~dynamic_resources()
-        {
-        }
-
-        reference number_type_name() 
-        {
-            static Json number_type_name(JSONCONS_STRING_CONSTANT(char_type, "number"));
-
-            return number_type_name;
-        }
-
-        reference boolean_type_name()
-        {
-            static Json boolean_type_name(JSONCONS_STRING_CONSTANT(char_type, "boolean"));
-
-            return boolean_type_name;
-        }
-
-        reference string_type_name()
-        {
-            static Json string_type_name(JSONCONS_STRING_CONSTANT(char_type, "string"));
-
-            return string_type_name;
-        }
-
-        reference object_type_name()
-        {
-            static Json object_type_name(JSONCONS_STRING_CONSTANT(char_type, "object"));
-
-            return object_type_name;
-        }
-
-        reference array_type_name()
-        {
-            static Json array_type_name(JSONCONS_STRING_CONSTANT(char_type, "array"));
-
-            return array_type_name;
-        }
-
-        reference null_type_name()
-        {
-            static Json null_type_name(JSONCONS_STRING_CONSTANT(char_type, "null"));
-
-            return null_type_name;
-        }
-
-        reference true_value() const
-        {
-            static const Json true_value(true, semantic_tag::none);
-            return true_value;
-        }
-
-        reference false_value() const
-        {
-            static const Json false_value(false, semantic_tag::none);
-            return false_value;
-        }
-
-        reference null_value() const
-        {
-            static const Json null_value(null_type(), semantic_tag::none);
-            return null_value;
-        }
-
-        template <typename... Args>
-        Json* create_json(Args&& ... args)
-        {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_storage_.emplace_back(std::move(temp));
-            return ptr;
-        }
-    };
-
     template <typename Json,typename JsonReference>
     class jmespath_evaluator 
     {
@@ -470,6 +602,8 @@ namespace jmespath {
         typedef JsonReference reference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         typedef typename Json::const_pointer const_pointer;
+        using parameter_type = parameter<Json,JsonReference>;
+        using expression_base_type = expression_base<Json,JsonReference>;
 
         static bool is_false(reference ref)
         {
@@ -561,130 +695,6 @@ namespace jmespath {
             }
         };
 
-        // expression_base
-        class expression_base
-        {
-            std::size_t precedence_level_;
-            bool is_right_associative_;
-            bool is_projection_;
-        public:
-            expression_base(operator_kind oper, bool is_projection)
-                : precedence_level_(operator_table::precedence_level(oper)), 
-                  is_right_associative_(operator_table::is_right_associative(oper)), 
-                  is_projection_(is_projection)
-            {
-            }
-
-            std::size_t precedence_level() const
-            {
-                return precedence_level_;
-            }
-
-            bool is_right_associative() const
-            {
-                return is_right_associative_;
-            }
-
-            bool is_projection() const 
-            {
-                return is_projection_;
-            }
-
-            virtual ~expression_base() = default;
-
-            virtual reference evaluate(reference val, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const = 0;
-
-            virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
-
-            virtual std::string to_string(std::size_t = 0) const
-            {
-                return std::string("to_string not implemented");
-            }
-        };  
-
-        // parameter
-
-        enum class parameter_kind{value, expression};
-
-        class parameter
-        {
-            parameter_kind type_;
-
-            union
-            {
-                expression_base* expression_;
-                pointer value_;
-            };
-
-        public:
-
-            parameter(const parameter& other) noexcept
-                : type_(other.type_)
-            {
-                switch (type_)
-                {
-                    case parameter_kind::expression:
-                        expression_ = other.expression_;
-                        break;
-                    case parameter_kind::value:
-                        value_ = other.value_;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            parameter(reference value) noexcept
-                : type_(parameter_kind::value), value_(std::addressof(value))
-            {
-            }
-
-            parameter(expression_base* expression) noexcept
-                : type_(parameter_kind::expression), expression_(expression)
-            {
-            }
-
-            parameter& operator=(const parameter& other)
-            {
-                if (&other != this)
-                {
-                    type_ = other.type_;
-                    switch (type_)
-                    {
-                        case parameter_kind::expression:
-                            expression_ = other.expression_;
-                            break;
-                        case parameter_kind::value:
-                            value_ = other.value_;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                return *this;
-            }
-
-            bool is_value() const
-            {
-                return type_ == parameter_kind::value;
-            }
-
-            bool is_expression() const
-            {
-                return type_ == parameter_kind::expression;
-            }
-
-            const Json& value() const
-            {
-                return *value_;
-            }
-
-            const expression_base& expression() const
-            {
-                return *expression_;
-            }
-        };
-
         // function_base
         class function_base
         {
@@ -702,7 +712,7 @@ namespace jmespath {
 
             virtual ~function_base() = default;
 
-            virtual reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>&, std::error_code& ec) const = 0;
+            virtual reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>&, std::error_code& ec) const = 0;
 
             virtual std::string to_string(std::size_t = 0) const
             {
@@ -718,7 +728,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -758,7 +768,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -802,7 +812,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -839,7 +849,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -892,7 +902,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -938,7 +948,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -975,7 +985,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1034,7 +1044,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1074,7 +1084,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1129,7 +1139,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1191,7 +1201,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1239,7 +1249,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1294,7 +1304,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1356,7 +1366,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 if (args.empty())
                 {
@@ -1411,7 +1421,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1453,7 +1463,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1505,7 +1515,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1566,7 +1576,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1602,7 +1612,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1638,7 +1648,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1682,7 +1692,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1728,7 +1738,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1767,7 +1777,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1804,7 +1814,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1867,7 +1877,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -1895,7 +1905,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code&) const override
+            reference evaluate(std::vector<parameter_type>& args, dynamic_resources<Json,JsonReference>& resources, std::error_code&) const override
             {
                 for (auto& param : args)
                 {
@@ -1922,7 +1932,7 @@ namespace jmespath {
 
             union
             {
-                std::unique_ptr<expression_base> expression_;
+                std::unique_ptr<expression_base_type> expression_;
                 const unary_operator* unary_operator_;
                 const binary_operator* binary_operator_;
                 const function_base* function_;
@@ -2002,10 +2012,10 @@ namespace jmespath {
                 new (&key_) string_type(key);
             }
 
-            token(std::unique_ptr<expression_base>&& expression)
+            token(std::unique_ptr<expression_base_type>&& expression)
                 : type_(token_kind::expression)
             {
-                new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
+                new (&expression_) std::unique_ptr<expression_base_type>(std::move(expression));
             }
 
             token(const unary_operator* expression) noexcept
@@ -2182,7 +2192,7 @@ namespace jmespath {
                 switch (type_)
                 {
                     case token_kind::expression:
-                        new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                        new (&expression_) std::unique_ptr<expression_base_type>(std::move(other.expression_));
                         break;
                     case token_kind::key:
                         new (&key_) string_type(std::move(other.key_));
@@ -2286,8 +2296,8 @@ namespace jmespath {
         static pointer evaluate_tokens(reference doc, const std::vector<token>& output_stack, dynamic_resources<Json,JsonReference>& resources, std::error_code& ec)
         {
             pointer root_ptr = std::addressof(doc);
-            std::vector<parameter> stack;
-            std::vector<parameter> arg_stack;
+            std::vector<parameter_type> stack;
+            std::vector<parameter_type> arg_stack;
             for (std::size_t i = 0; i < output_stack.size(); ++i)
             {
                 auto& t = output_stack[i];
@@ -2615,15 +2625,15 @@ namespace jmespath {
         };
 
         // basic_expression
-        class basic_expression :  public expression_base
+        class basic_expression :  public expression_base_type
         {
         public:
             basic_expression()
-                : expression_base(operator_kind::default_op, false)
+                : expression_base_type(operator_kind::default_op, false)
             {
             }
 
-            void add_expression(std::unique_ptr<expression_base>&&) override
+            void add_expression(std::unique_ptr<expression_base_type>&&) override
             {
             }
         };
@@ -2734,17 +2744,17 @@ namespace jmespath {
         };
 
         // projection_base
-        class projection_base : public expression_base
+        class projection_base : public expression_base_type
         {
         protected:
-            std::vector<std::unique_ptr<expression_base>> expressions_;
+            std::vector<std::unique_ptr<expression_base_type>> expressions_;
         public:
             projection_base(operator_kind oper)
-                : expression_base(oper, true)
+                : expression_base_type(oper, true)
             {
             }
 
-            void add_expression(std::unique_ptr<expression_base>&& expr) override
+            void add_expression(std::unique_ptr<expression_base_type>&& expr) override
             {
                 if (!expressions_.empty() && expressions_.back()->is_projection() && 
                     (expr->precedence_level() < expressions_.back()->precedence_level() ||
