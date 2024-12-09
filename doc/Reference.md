@@ -14,7 +14,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 #### Streaming API for JSON (StAJ)
 
 [staj_cursor](ref/corelib/staj_cursor.md)  
-[staj_event](ref/corelib/staj_event.md)  
+[basic_staj_event](ref/corelib/basic_staj_event.md)  
 [staj_object_iterator](ref/corelib/staj_object_iterator.md)  
 [staj_array_iterator](ref/corelib/staj_array_iterator.md)  
 
