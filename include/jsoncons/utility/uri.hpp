@@ -984,68 +984,68 @@ namespace jsoncons {
             const std::size_t buflen = input.size();
             while (rel < buflen)
             {
-                auto span = jsoncons::span<char>(&input[0]+rel, buflen - rel);
-                const std::size_t len = span.size();
-                if (len >= 3 && span[0] == '.' && span[1] == '.' && span[2] == '/')
+                char* data = &input[0]+rel;
+                const std::size_t length = buflen - rel;
+
+                if (length >= 3 && data[0] == '.' && data[1] == '.' && data[2] == '/')
                 { 
                     rel += 3;
                 }
-                else if (len >= 2 && span[0] == '.' && span[1] == '/')
+                else if (length >= 2 && data[0] == '.' && data[1] == '/')
                 {
                     rel += 2;
                 }
-                else if (len >= 3 && span[0] == '/' && span[1] == '.' && span[2] == '/')
+                else if (length >= 3 && data[0] == '/' && data[1] == '.' && data[2] == '/')
                 { 
                     rel += 2;
-                    span[2] = '/';
+                    data[2] = '/';
                 }
-                else if (len == 2 && span[0] == '/' && span[1] == '.')
+                else if (length == 2 && data[0] == '/' && data[1] == '.')
                 {
                     ++rel;
-                    span[1] = '/';
+                    data[1] = '/';
                 }
-                else if (len >= 4 && span[0] == '/' && span[1] == '.' && span[2] == '.' && span[3] == '/')
+                else if (length >= 4 && data[0] == '/' && data[1] == '.' && data[2] == '.' && data[3] == '/')
                 { 
                     rel += 3;
-                    span[3] = '/';
+                    data[3] = '/';
                     auto rslash = output.rfind('/');
                     if (rslash != std::string::npos)
                     {
                         output.erase(rslash);
                     }
                 }
-                else if (len >= 3 && span[0] == '/' && span[1] == '.' && span[2] == '.')
+                else if (length >= 3 && data[0] == '/' && data[1] == '.' && data[2] == '.')
                 { 
                     rel += 2;
-                    span[2] = '/';
+                    data[2] = '/';
                     auto rslash = output.rfind('/');
                     if (rslash != std::string::npos)
                     {
                         output.erase(rslash);
                     }
                 }
-                else if (len == 1 && span[0] == '.')
+                else if (length == 1 && data[0] == '.')
                 {
                     ++rel;
                 }
-                else if (len == 2 && span[0] == '.' && span[1] == '.')
+                else if (length == 2 && data[0] == '.' && data[1] == '.')
                 {
                     rel += 2;
                 }
                 else
                 {
-                    const auto first = span.data();
-                    const auto last = first+len;
-                    auto it = std::find(first+1, last, '/');
+                    const auto last = data+length;
+                    auto it = std::find(data+1, last, '/');
                     if (it != last)
                     {
-                        output.append(first, it - first);
-                        rel += (it - first);
+                        output.append(data, it - data);
+                        rel += (it - data);
                     }
                     else
                     {
-                        output.append(first, len);
-                        rel += len;
+                        output.append(data, length);
+                        rel += length;
                     }
                 }
             }
