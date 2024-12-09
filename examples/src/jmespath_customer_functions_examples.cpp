@@ -21,7 +21,7 @@ namespace myspace
 #define json_const_pointer_arg jsoncons::json_const_pointer_arg
 
   using function_base = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::function_base;
-  using dynamic_resources = jsoncons::jmespath::dynamic_resources<Json, JsonReference>;
+  using dynamic_resources = jsoncons::jmespath::dynamic_resources<Json>;
   using static_resources = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::static_resources;
   using parameter = jsoncons::jmespath::parameter<Json>;
   using string_type = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::string_type;
