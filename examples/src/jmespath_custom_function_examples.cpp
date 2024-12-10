@@ -96,7 +96,7 @@ public:
                     return resources.null_value();
                 }
 
-                const auto context = params[0].value();
+                const auto& context = params[0].value();
                 const auto countValue = get_value(context, resources, params[1]);
                 const auto& expr = params[2].expression();
                 const auto& argDefault = params[3];
@@ -114,7 +114,8 @@ public:
                     current_index = i;
                     std::error_code ec2;
 
-                    auto ele = expr.evaluate(context, resources, ec2);
+                    const auto& ele = expr.evaluate(context, resources, ec2); // must be reference
+                    std::cout << ec2.message() << "\n";
 
                     if (ele.is_null())
                     {
@@ -123,8 +124,8 @@ public:
                     }
                     else
                     {
-                        // result->emplace_back(ele); // ?: It may lead to an abnormal exit.
-                        result->emplace_back(*resources.create_json(deep_copy(ele)));
+                        result->emplace_back(ele); // okay if context is a reference 
+                        //result->emplace_back(*resources.create_json(deep_copy(ele)));
                     }
                 }
                 current_index = 0;
