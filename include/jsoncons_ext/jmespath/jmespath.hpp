@@ -316,6 +316,89 @@ namespace jmespath {
         }
     };
 
+    template <typename Json>
+    class custom_function
+    {
+    public:
+        using value_type = Json;
+        using char_type = typename Json::char_type;
+        using parameter_type = parameter<Json>;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
+        using string_type = typename Json::string_type;
+
+        string_type function_name_;
+        optional<std::size_t> arity_;
+        function_type f_;
+
+        custom_function(const string_type& function_name,
+                        const optional<std::size_t>& arity,
+                        const function_type& f)
+            : function_name_(function_name),
+              arity_(arity),
+              f_(f)
+        {
+        }
+
+        custom_function(string_type&& function_name,
+                        optional<std::size_t>&& arity,
+                        function_type&& f)
+            : function_name_(std::move(function_name)),
+              arity_(std::move(arity)),
+              f_(std::move(f))
+        {
+        }
+
+        custom_function(const custom_function&) = default;
+
+        custom_function(custom_function&&) = default;
+
+        const string_type& name() const 
+        {
+            return function_name_;
+        }
+
+        optional<std::size_t> arity() const 
+        {
+            return arity_;
+        }
+
+        const function_type& function() const 
+        {
+            return f_;
+        }
+    };
+
+    template <typename Json>
+    class custom_functions
+    {
+        using char_type = typename Json::char_type;
+        using string_type = typename Json::string_type;
+        using value_type = Json;
+        using parameter_type = parameter<Json>;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, dynamic_resources<Json>& resources, 
+            std::error_code& ec)>;
+        using const_iterator = typename std::vector<custom_function<Json>>::const_iterator;
+
+        std::vector<custom_function<Json>> functions_;
+    public:
+        void register_function(const string_type& name,
+            jsoncons::optional<std::size_t> arity,
+            const function_type& f)
+        {
+            functions_.emplace_back(name, arity, f);
+        }
+
+        const_iterator begin() const
+        {
+            return functions_.begin();
+        }
+
+        const_iterator end() const
+        {
+            return functions_.end();
+        }
+    };
+
     enum class token_kind 
     {
         current_node,
