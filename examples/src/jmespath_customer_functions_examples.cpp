@@ -20,12 +20,12 @@ namespace myspace
 #define json_array_arg jsoncons::json_array_arg
 #define json_const_pointer_arg jsoncons::json_const_pointer_arg
 
-  using function_base = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::function_base;
+  using function_base = jsoncons::jmespath::function_base<Json>;
   using dynamic_resources = jsoncons::jmespath::dynamic_resources<Json>;
-  using static_resources = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::static_resources;
+  using static_resources = jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources;
   using parameter = jsoncons::jmespath::parameter<Json>;
-  using string_type = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::string_type;
-  using customer_get_function = jsoncons::jmespath::detail::jmespath_evaluator<Json, JsonReference>::static_resources::customer_get_function;
+  using string_type = jsoncons::jmespath::detail::jmespath_evaluator<Json>::string_type;
+  using customer_get_function = jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources::customer_get_function;
 
   bool is_integer(JsonReference value)
   {
@@ -67,7 +67,7 @@ namespace myspace
   {
   public:
     current_date_time_function() : function_base(0) {}
-    JsonReference evaluate(std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
+    JsonReference evaluate(const std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
     {
       auto now = std::chrono::system_clock::now();
       auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
@@ -83,7 +83,7 @@ namespace myspace
   {
   public:
     current_index_function() : function_base(0) {}
-    JsonReference evaluate(std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
+    JsonReference evaluate(const std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
     {
       size_t index = current_index_function::index;
       JsonReference result = *resources.create_json(index);
@@ -104,7 +104,7 @@ namespace myspace
   {
   public:
     generate_array_function() : function_base(4) {} // context, size (or &expression), &expression, default (or &expression)
-    JsonReference evaluate(std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
+    JsonReference evaluate(const std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
     {
       JSONCONS_ASSERT(args.size() == *this->arity());
 
@@ -159,7 +159,7 @@ namespace myspace
   {
   public:
     add_function() : function_base(2) {}
-    JsonReference evaluate(std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
+    JsonReference evaluate(const std::vector<parameter> &args, dynamic_resources &resources, std::error_code &ec) const override
     {
       JSONCONS_ASSERT(args.size() == *this->arity());
 

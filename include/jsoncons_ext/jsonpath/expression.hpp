@@ -397,8 +397,7 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual Json evaluate(JsonReference, 
-                              std::error_code&) const = 0;
+        virtual Json evaluate(JsonReference, std::error_code&) const = 0;
     };
 
     template <typename Json>
@@ -425,8 +424,7 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        Json evaluate(JsonReference val, 
-                      std::error_code&) const override
+        Json evaluate(JsonReference val, std::error_code&) const override
         {
             return is_false(val) ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
@@ -440,8 +438,7 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        Json evaluate(JsonReference val, 
-                      std::error_code&) const override
+        Json evaluate(JsonReference val, std::error_code&) const override
         {
             if (val.is_int64())
             {
@@ -474,8 +471,7 @@ namespace detail {
         regex_operator(regex_operator&&) = default;
         regex_operator& operator=(regex_operator&&) = default;
 
-        Json evaluate(JsonReference val, 
-                             std::error_code&) const override
+        Json evaluate(JsonReference val, std::error_code&) const override
         {
             if (!val.is_string())
             {
@@ -507,10 +503,7 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual Json evaluate(JsonReference, 
-                             JsonReference, 
-
-                             std::error_code&) const = 0;
+        virtual Json evaluate(JsonReference, JsonReference, std::error_code&) const = 0;
 
         virtual std::string to_string(int = 0) const
         {
@@ -1026,7 +1019,7 @@ namespace detail {
         }
 
         virtual value_type evaluate(const std::vector<parameter_type>& args, 
-                                    std::error_code& ec) const = 0;
+            std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const
         {
@@ -1042,7 +1035,7 @@ namespace detail {
     };  
 
     template <typename Json>
-    class decorator_function : public function_base<Json>
+    class function_wrapper : public function_base<Json>
     {
     public:
         using value_type = Json;
@@ -1052,7 +1045,7 @@ namespace detail {
     private:
         function_type f_;
     public:
-        decorator_function(jsoncons::optional<std::size_t> arity,
+        function_wrapper(jsoncons::optional<std::size_t> arity,
             const function_type& f)
             : function_base<Json>(arity), f_(f)
         {
@@ -1079,7 +1072,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1147,7 +1140,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -2364,7 +2357,7 @@ namespace detail {
         using string_type = typename Json::string_type;
         using value_type = Json;
         using reference = JsonReference;
-        using function_base_type = function_base<Json>;
+        using function_type = function_base<Json>;
         using selector_type = jsonpath_selector<Json,JsonReference>;
 
         struct MyHash
@@ -2388,8 +2381,8 @@ namespace detail {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
 
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> functions_;
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> custom_functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_type>,MyHash> functions_;
+        std::unordered_map<string_type,std::unique_ptr<function_type>,MyHash> custom_functions_;
 
         static_resources(const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
@@ -2437,7 +2430,7 @@ namespace detail {
             for (const auto& item : functions)
             {
                 custom_functions_.emplace(item.name(),
-                                          jsoncons::make_unique<decorator_function<Json>>(item.arity(),item.function()));
+                                          jsoncons::make_unique<function_wrapper<Json>>(item.arity(),item.function()));
             }
         }
 
@@ -2459,7 +2452,7 @@ namespace detail {
         {
         }
 
-        const function_base_type* get_function(const string_type& name, std::error_code& ec) const
+        const function_type* get_function(const string_type& name, std::error_code& ec) const
         {
             auto it = functions_.find(name);
             if (it == functions_.end())
@@ -3246,10 +3239,10 @@ namespace detail {
         expression& operator=(expression&& expr) = default;
 
         value_type evaluate(dynamic_resources<Json,reference>& resources, 
-                                   reference root,
-                                   reference current,
-                                   result_options options,
-                                   std::error_code& ec) const override
+            reference root,
+            reference current,
+            result_options options,
+            std::error_code& ec) const override
         {
             std::vector<stack_item_type> stack;
             std::vector<parameter_type> arg_stack;
