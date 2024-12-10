@@ -78,7 +78,7 @@ namespace jsonpath {
         jsonpath_expression& operator=(const jsonpath_expression&) = delete;
         jsonpath_expression& operator=(jsonpath_expression&&) = default;
 
-        template <typename Json, typename BinaryCallback>
+        template <typename BinaryCallback>
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const string_type&,const_reference>::value,void>::type
         evaluate(const_reference root, BinaryCallback callback, result_options options = result_options()) const
         {
