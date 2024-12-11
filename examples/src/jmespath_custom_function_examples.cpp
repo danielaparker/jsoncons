@@ -16,6 +16,7 @@ namespace myspace {
 template <typename Json>
 class my_custom_functions : public jmespath::custom_functions<Json>
 {
+    using reference = const Json&;
     using pointer = const Json*;
 
     static thread_local size_t current_index;
@@ -57,10 +58,10 @@ public:
                     return resources.make_null();
                 }
 
-                const auto& context = params[0].value();
-                const auto countValue = get_value(context, resources, params[1]);
+                reference context = params[0].value();
+                reference countValue = get_value(context, resources, params[1]);
                 const auto& expr = params[2].expression();
-                const auto& argDefault = params[3];
+                auto argDefault = params[3];
 
                 if (!countValue.is_number())
                 {
@@ -106,8 +107,8 @@ public:
                     return resources.make_null();
                 }
 
-                const auto arg0 = params[0].value();
-                const auto arg1 = params[1].value();
+                reference arg0 = params[0].value();
+                reference arg1 = params[1].value();
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
@@ -128,7 +129,7 @@ public:
         );
     }
 
-    static const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& resources,
+    static reference get_value(reference context, jmespath::dynamic_resources<Json>& resources,
         const jmespath::parameter<Json>& param)
     {
         if (param.is_expression())
@@ -140,7 +141,7 @@ public:
         }
         else
         {
-            const Json& value = param.value();
+            reference value = param.value();
             return value;
         }
     }
