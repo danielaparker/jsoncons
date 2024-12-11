@@ -36,7 +36,7 @@ const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& re
     {
         const auto& expr = p.expression();
         std::error_code ec2;
-        const Json& value = expr.evaluate(context, resources, ec2);
+        auto value = expr.evaluate(context, resources, ec2);
         // if (value.is_object() || value.is_array())
         // {
         //     return *resources.create_json(deep_copy(value));
@@ -45,7 +45,7 @@ const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& re
         // {
         //     return value;
         // }
-        return value;
+        return *value;
     }
     else
     {
@@ -65,20 +65,20 @@ public:
             0,                                       // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> const Json&
+                std::error_code& ec) -> const Json*
             {
                 auto now = std::chrono::system_clock::now();
                 auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-                return *resources.create_json(milliseconds.count());
+                return resources.create_json(milliseconds.count());
             }
         );
         this->register_function("current_index", // function name
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> const Json&
+                std::error_code& ec) -> const Json*
             {
-                const Json& result = *resources.create_json(current_index);
+                auto result = resources.create_json(current_index);
                 return result;
             }
         );
@@ -86,14 +86,14 @@ public:
             4,                                    // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> const Json&
+                std::error_code& ec) -> const Json*
             {
                 JSONCONS_ASSERT(4 == params.size());
 
                 if (!(params[0].is_value() && params[2].is_expression()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return &(resources.null_value());
                 }
 
                 const auto& context = params[0].value();
@@ -104,7 +104,7 @@ public:
                 if (!countValue.is_number())
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return &(resources.null_value());
                 }
 
                 auto result = resources.create_json(jsoncons::json_array_arg);
@@ -114,37 +114,37 @@ public:
                     current_index = i;
                     std::error_code ec2;
 
-                    const auto& ele = expr.evaluate(context, resources, ec2); // must be reference
+                    auto ele = expr.evaluate(context, resources, ec2); // must be reference
                     std::cout << ec2.message() << "\n";
 
-                    if (ele.is_null())
+                    if (ele->is_null())
                     {
                         auto defaultVal = get_value(context, resources, argDefault);
                         result->emplace_back(defaultVal);
                     }
                     else
                     {
-                        result->emplace_back(ele); // okay if context is a reference 
+                        result->emplace_back(*ele); // okay if context is a reference 
                         //result->emplace_back(*resources.create_json(deep_copy(ele)));
                     }
                 }
                 current_index = 0;
 
-                return *result;
+                return result;
             }
         );
         this->register_function("add", // function name
             2,                         // number of arguments   
             [](jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> const Json&
+                std::error_code& ec) -> const Json*
             {
                 JSONCONS_ASSERT(2 == params.size());
 
                 if (!(params[0].is_value() && params[1].is_value()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return &(resources.null_value());
                 }
 
                 const auto arg0 = params[0].value();
@@ -152,18 +152,18 @@ public:
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return &(resources.null_value());
                 }
 
                 if (is_integer(arg0) && is_integer(arg1))
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
-                    return *resources.create_json(v);
+                    return resources.create_json(v);
                 }
                 else
                 {
                     double v = arg0.template as<double>() + arg1.template as<double>();
-                    return *resources.create_json(v);
+                    return resources.create_json(v);
                 }
             }
         );

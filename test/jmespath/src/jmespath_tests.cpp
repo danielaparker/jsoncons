@@ -98,7 +98,6 @@ TEST_CASE("jmespath-tests")
     SECTION("compliance")
     {
         jmespath_tests("./jmespath/input/compliance/syntax.json"); // OK
-
         jmespath_tests("./jmespath/input/compliance/basic.json"); // OK
         jmespath_tests("./jmespath/input/compliance/boolean.json"); // OK
         jmespath_tests("./jmespath/input/compliance/current.json"); // OK

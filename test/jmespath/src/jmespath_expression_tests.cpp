@@ -46,7 +46,6 @@ TEST_CASE("jmespath_expression tests")
         json result = expr.evaluate(doc);
         CHECK(result == json(75.0));
     }    
-
     SECTION("Test 2")
     {
         std::string jtext = R"(
@@ -73,7 +72,7 @@ TEST_CASE("jmespath_expression tests")
         auto expr3 = jmespath::make_expression<json>("nullable.value");
         json result3 = expr3.evaluate(doc);
         CHECK(result3 == json::null());
-    }    
+    }
 }
 
 TEST_CASE("jmespath issue") 
