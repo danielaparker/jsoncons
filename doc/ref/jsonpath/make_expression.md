@@ -55,6 +55,10 @@ jsonpath_expression<Json> make_expression(const allocator_set<Json::allocator_ty
     <td>JSONPath expression string</td> 
   </tr>
   <tr>
+    <td><code>funcs</code></td>
+    <td>Custom functions</td> 
+  </tr>
+  <tr>
     <td><code>ec</code></td>
     <td>out-parameter for reporting errors in the non-throwing overload</td> 
   </tr>

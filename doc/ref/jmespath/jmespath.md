@@ -124,8 +124,8 @@ int main()
         }        
     )";
 
-    auto expr = jmespath::make_expression<json>("people[?age > `20`].[name, age]"); // since 0.159.0
-    // auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]"); // until 0.159.0
+ // auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]"); // until 0.159.0
+    auto expr = jmespath::make_expression<json>("people[?age > `20`].[name, age]");              // since 0.159.0
 
     json doc = json::parse(jtext);
 

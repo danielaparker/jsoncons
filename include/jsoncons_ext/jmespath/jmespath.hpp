@@ -5403,21 +5403,21 @@ namespace jmespath {
     }
 
     template <typename Json>
-    jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+    jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
     {
         return jmespath_expression<Json>::compile(expr, funcs);
     }
 
     template <typename Json>
-    jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+    jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         std::error_code& ec)
     {
         return jmespath_expression<Json>::compile(expr, ec);
     }
 
     template <typename Json>
-    jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+    jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         const jsoncons::jmespath::custom_functions<Json>& funcs,
         std::error_code& ec)
     {

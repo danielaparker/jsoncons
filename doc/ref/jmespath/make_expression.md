@@ -4,11 +4,20 @@
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template <typename Json>
-jmespath_expression<Json> make_expression(const json::string_view_type& expr); (1)
+jmespath_expression<Json> make_expression(const json::string_view_type& expr);        (until 1.0.0)
+                                                                                 (1)
+template <typename Json>
+jmespath_expression<Json> make_expression(const Json::string_view_type& expr,         (since 1.0.0)
+    const custom_functions<Json>& funcs = custom_functions<Json>());
 
 template <typename Json>
-jmespath_expression<Json> make_expression(const json::string_view_type& expr,
-                                          std::error_code& ec); (2)
+jmespath_expression<Json> make_expression(const json::string_view_type& expr,    (2)
+    std::error_code& ec);                                                        
+
+template <typename Json>
+jmespath_expression<Json> make_expression(const Json::string_view_type& expr,    (3) (since 1.0.0)  
+    const custom_functions<Json>& funcs,
+    std::error_code& ec)
 ```
 
 Returns a compiled JMESPath expression for later evaluation.
@@ -19,6 +28,10 @@ Returns a compiled JMESPath expression for later evaluation.
   <tr>
     <td>expr</td>
     <td>JMESPath expression</td> 
+  </tr>
+  <tr>
+    <td>funcs</td>
+    <td>Custom functions</td> 
   </tr>
   <tr>
     <td>ec</td>
