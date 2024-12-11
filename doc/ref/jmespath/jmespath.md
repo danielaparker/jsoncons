@@ -164,12 +164,24 @@ namespace myspace {
 template <typename Json>
 class my_custom_functions : public jmespath::custom_functions<Json>
 {
+    using reference = const Json&;
     using pointer = const Json*;
 
     static thread_local size_t current_index;
 public:
     my_custom_functions()
     {
+        this->register_function("current_date_time", // function name
+            0,                                       // number of arguments   
+            [](const jsoncons::span<const jmespath::parameter<Json>> params,
+                jmespath::dynamic_resources<Json>& resources,
+                std::error_code& ec) -> pointer
+            {
+                auto now = std::chrono::system_clock::now();
+                auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+                return resources.make_json(milliseconds.count());
+            }
+        );
         this->register_function("current_index", // function name
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
@@ -194,10 +206,10 @@ public:
                     return resources.make_null();
                 }
 
-                const auto& context = params[0].value();
-                const auto countValue = get_value(context, resources, params[1]);
+                reference context = params[0].value();
+                reference countValue = get_value(context, resources, params[1]);
                 const auto& expr = params[2].expression();
-                const auto& argDefault = params[3];
+                auto argDefault = params[3];
 
                 if (!countValue.is_number())
                 {
@@ -243,8 +255,8 @@ public:
                     return resources.make_null();
                 }
 
-                const auto arg0 = params[0].value();
-                const auto arg1 = params[1].value();
+                reference arg0 = params[0].value();
+                reference arg1 = params[1].value();
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
@@ -265,7 +277,7 @@ public:
         );
     }
 
-    static const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& resources,
+    static reference get_value(reference context, jmespath::dynamic_resources<Json>& resources,
         const jmespath::parameter<Json>& param)
     {
         if (param.is_expression())
@@ -277,7 +289,7 @@ public:
         }
         else
         {
-            const Json& value = param.value();
+            reference value = param.value();
             return value;
         }
     }
