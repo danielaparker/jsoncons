@@ -93,7 +93,7 @@ public:
                 if (!(params[0].is_value() && params[2].is_expression()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return &(resources.null_value());
+                    return resources.null_value();
                 }
 
                 const auto& context = params[0].value();
@@ -104,7 +104,7 @@ public:
                 if (!countValue.is_number())
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return &(resources.null_value());
+                    return resources.null_value();
                 }
 
                 auto result = resources.create_json(jsoncons::json_array_arg);
@@ -144,7 +144,7 @@ public:
                 if (!(params[0].is_value() && params[1].is_value()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return &(resources.null_value());
+                    return resources.null_value();
                 }
 
                 const auto arg0 = params[0].value();
@@ -152,7 +152,7 @@ public:
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return &(resources.null_value());
+                    return resources.null_value();
                 }
 
                 if (is_integer(arg0) && is_integer(arg1))
