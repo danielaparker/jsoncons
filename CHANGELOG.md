@@ -50,7 +50,7 @@ constructed with
 json j{jsoncons::null_arg};
 ```
 
-- Custom jmespath functions are now supported via PR #560
+- Custom jmespath functions are now supported thanks to PR #560
 
 0.178.0
 -------

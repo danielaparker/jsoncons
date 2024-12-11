@@ -15,7 +15,7 @@ jmespath_expression<Json> make_expression(const json::string_view_type& expr,   
     std::error_code& ec);                                                        
 
 template <typename Json>
-jmespath_expression<Json> make_expression(const Json::string_view_type& expr,    (3) (since 1.0.0)  
+jmespath_expression<Json> make_expression(const Json::string_view_type& expr,    (3)   (since 1.0.0)  
     const custom_functions<Json>& funcs,
     std::error_code& ec)
 ```
