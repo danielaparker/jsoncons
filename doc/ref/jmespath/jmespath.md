@@ -171,17 +171,6 @@ class my_custom_functions : public jmespath::custom_functions<Json>
 public:
     my_custom_functions()
     {
-        this->register_function("current_date_time", // function name
-            0,                                       // number of arguments   
-            [](const jsoncons::span<const jmespath::parameter<Json>> params,
-                jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> pointer
-            {
-                auto now = std::chrono::system_clock::now();
-                auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-                return resources.make_json(milliseconds.count());
-            }
-        );
         this->register_function("current_index", // function name
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
