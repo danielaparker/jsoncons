@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <thread>
-
 #include <string>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
@@ -130,18 +129,18 @@ public:
     }
 
     static const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& resources,
-        const jmespath::parameter<Json>& p)
+        const jmespath::parameter<Json>& param)
     {
-        if (p.is_expression())
+        if (param.is_expression())
         {
-            const auto& expr = p.expression();
-            std::error_code ec2;
-            auto value = expr.evaluate(context, resources, ec2);
+            const auto& expr = param.expression();
+            std::error_code ec;
+            auto value = expr.evaluate(context, resources, ec);
             return *value;
         }
         else
         {
-            const Json& value = p.value();
+            const Json& value = param.value();
             return value;
         }
     }
@@ -151,6 +150,9 @@ template <typename Json>
 thread_local size_t my_custom_functions<Json>::current_index = 0;
 
 } // namespace myspace
+
+// for brevity
+using json = jsoncons::json;
    
 void jmespath_custom_function_example()
 {
@@ -176,12 +178,12 @@ void jmespath_custom_function_example()
           }        
     )";
   
-    auto expr = jmespath::make_expression("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
-        myspace::my_custom_functions<jsoncons::json>{});
+    auto expr = jmespath::make_expression<json>("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
+        myspace::my_custom_functions<json>{});
   
-    auto doc = jsoncons::json::parse(jtext);
+    auto doc = json::parse(jtext);
   
-    jsoncons::json result = expr.evaluate(doc);
+    auto result = expr.evaluate(doc);
   
     std::cout << pretty_print(result) << "\n\n";
 }

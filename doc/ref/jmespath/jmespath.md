@@ -31,7 +31,11 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
     
 ### Examples
 
-The examples below are from the [JMESPath front page](https://jmespath.org/) and the [JMESPath Tutorial](https://jmespath.org/tutorial.html).
+[search function](#eg1)  
+[jmespath_expression](#eg2)  
+[custom_functions](#eg3) (since 1.0.0) 
+
+ <div id="eg1"/>
 
 #### search function
 
@@ -49,6 +53,7 @@ namespace jmespath = jsoncons::jmespath;
 
 int main() 
 {
+    // This examples is from the JMESPath front page
     std::string jtext = R"(
     {
       "locations": [
@@ -75,6 +80,10 @@ Output:
     "WashingtonCities": "Bellevue, Olympia, Seattle"
 }
 ```
+
+Credit to [JMESPath](https://jmespath.org/) for this example
+
+ <div id="eg2"/>
 
 #### jmespath_expression
 
@@ -133,3 +142,276 @@ Output:
 ]
 ```
 
+Credit to [JMESPath Tutorial](https://jmespath.org/tutorial.html) for this Example
+
+ <div id="eg3"/>
+
+#### custom_functions
+(since 1.0.0)
+
+```cpp
+#include <chrono>
+#include <thread>
+#include <string>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jmespath/jmespath.hpp>
+
+// for brevity
+namespace jmespath = jsoncons::jmespath;
+
+// When adding custom functions, they are generally placed in their own project's source code and namespace.
+namespace myspace {
+
+template <typename Json>
+class my_custom_functions : public jmespath::custom_functions<Json>
+{
+    using pointer = const Json*;
+
+    static thread_local size_t current_index;
+public:
+    my_custom_functions()
+    {
+        this->register_function("current_index", // function name
+            0,                                   // number of arguments   
+            [](const jsoncons::span<const jmespath::parameter<Json>> params,
+                jmespath::dynamic_resources<Json>& resources,
+                std::error_code& ec) -> pointer
+            {
+                auto result = resources.make_json(current_index);
+                return result;
+            }
+        );
+        this->register_function("generate_array", // function name
+            4,                                    // number of arguments   
+            [](const jsoncons::span<const jmespath::parameter<Json>> params,
+                jmespath::dynamic_resources<Json>& resources,
+                std::error_code& ec) -> pointer
+            {
+                JSONCONS_ASSERT(4 == params.size());
+
+                if (!(params[0].is_value() && params[2].is_expression()))
+                {
+                    ec = jmespath::jmespath_errc::invalid_argument;
+                    return resources.make_null();
+                }
+
+                const auto& context = params[0].value();
+                const auto countValue = get_value(context, resources, params[1]);
+                const auto& expr = params[2].expression();
+                const auto& argDefault = params[3];
+
+                if (!countValue.is_number())
+                {
+                    ec = jmespath::jmespath_errc::invalid_argument;
+                    return resources.make_null();
+                }
+
+                auto result = resources.make_json(jsoncons::json_array_arg);
+                int count = countValue.template as<int>();
+                for (size_t i = 0; i < count; i++)
+                {
+                    current_index = i;
+                    std::error_code ec2;
+
+                    auto ele = expr.evaluate(context, resources, ec2); 
+
+                    if (ele->is_null())
+                    {
+                        auto defaultVal = get_value(context, resources, argDefault);
+                        result->emplace_back(defaultVal);
+                    }
+                    else
+                    {
+                        result->emplace_back(jsoncons::json_const_pointer_arg, ele); 
+                    }
+                }
+                current_index = 0;
+
+                return result;
+            }
+        );
+        this->register_function("add", // function name
+            2,                         // number of arguments   
+            [](jsoncons::span<const jmespath::parameter<Json>> params,
+                jmespath::dynamic_resources<Json>& resources,
+                std::error_code& ec) -> pointer
+            {
+                JSONCONS_ASSERT(2 == params.size());
+
+                if (!(params[0].is_value() && params[1].is_value()))
+                {
+                    ec = jmespath::jmespath_errc::invalid_argument;
+                    return resources.make_null();
+                }
+
+                const auto arg0 = params[0].value();
+                const auto arg1 = params[1].value();
+                if (!(arg0.is_number() && arg1.is_number()))
+                {
+                    ec = jmespath::jmespath_errc::invalid_argument;
+                    return resources.make_null();
+                }
+
+                if (arg0.is<int64_t>() && arg1.is<int64_t>())
+                {
+                    int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
+                    return resources.make_json(v);
+                }
+                else
+                {
+                    double v = arg0.template as<double>() + arg1.template as<double>();
+                    return resources.make_json(v);
+                }
+            }
+        );
+    }
+
+    static const Json& get_value(const Json& context, jmespath::dynamic_resources<Json>& resources,
+        const jmespath::parameter<Json>& param)
+    {
+        if (param.is_expression())
+        {
+            const auto& expr = param.expression();
+            std::error_code ec;
+            auto value = expr.evaluate(context, resources, ec);
+            return *value;
+        }
+        else
+        {
+            const Json& value = param.value();
+            return value;
+        }
+    }
+};
+
+template <typename Json>
+thread_local size_t my_custom_functions<Json>::current_index = 0;
+
+} // namespace myspace
+
+// for brevity
+using json = jsoncons::json;
+   
+int main()
+{
+    std::string jtext = R"(
+          {
+            "devices": [
+              {
+                "position": 1,
+                "id": "id-xxx",
+                "state": 1
+              },
+              {
+                "position": 5,
+                "id": "id-yyy",
+                "state": 1
+              },
+              {
+                "position": 9,
+                "id": "id-mmm",
+                "state": 2
+              }
+            ]
+          }        
+    )";
+  
+    auto expr = jmespath::make_expression<json>("generate_array(devices, `16`, &[?position==add(current_index(), `1`)] | [0], &{id: '', state: `0`, position: add(current_index(), `1`)})",
+        myspace::my_custom_functions<json>{});
+  
+    auto doc = json::parse(jtext);
+  
+    auto result = expr.evaluate(doc);
+  
+    std::cout << pretty_print(result) << "\n\n";
+}
+```
+
+Output:
+
+```
+[
+    {
+        "id": "id-xxx",
+        "position": 1,
+        "state": 1
+    },
+    {
+        "id": "",
+        "position": 2,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 3,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 4,
+        "state": 0
+    },
+    {
+        "id": "id-yyy",
+        "position": 5,
+        "state": 1
+    },
+    {
+        "id": "",
+        "position": 6,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 7,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 8,
+        "state": 0
+    },
+    {
+        "id": "id-mmm",
+        "position": 9,
+        "state": 2
+    },
+    {
+        "id": "",
+        "position": 10,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 11,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 12,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 13,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 14,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 15,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 16,
+        "state": 0
+    }
+]
+```
+
+Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this example
