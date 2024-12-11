@@ -33,7 +33,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 
 [search function](#eg1)  
 [jmespath_expression](#eg2)  
-[custom_functions](#eg3) (since 1.0.0) 
+[custom_functions (since 1.0.0)](#eg3)  
 
  <div id="eg1"/>
 
@@ -146,8 +146,7 @@ Credit to [JMESPath Tutorial](https://jmespath.org/tutorial.html) for this Examp
 
  <div id="eg3"/>
 
-#### custom_functions
-(since 1.0.0)
+#### custom_functions (since 1.0.0)
 
 ```cpp
 #include <chrono>
