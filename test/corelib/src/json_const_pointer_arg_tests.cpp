@@ -13,7 +13,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("json_const_pointer array tests")
+TEST_CASE("json_const_reference array tests")
 {
     json j = json::parse(R"( ["one", "two", "three"] )");
 
@@ -51,23 +51,23 @@ TEST_CASE("json_const_pointer array tests")
     SECTION("copy")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_const_pointer);
+        CHECK(v.storage_kind() == json_storage_kind::json_const_reference);
 
         json j2(v);
-        CHECK(j2.storage_kind() == json_storage_kind::json_const_pointer);
+        CHECK(j2.storage_kind() == json_storage_kind::json_const_reference);
     }
     SECTION("assignment")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.storage_kind() == json_storage_kind::json_const_pointer);
+        CHECK(v.storage_kind() == json_storage_kind::json_const_reference);
 
         json j2;
         j2 = v;
-        CHECK(j2.storage_kind() == json_storage_kind::json_const_pointer);
+        CHECK(j2.storage_kind() == json_storage_kind::json_const_reference);
     }
 }
 
-TEST_CASE("json_const_pointer object tests")
+TEST_CASE("json_const_reference object tests")
 {
     json j = json::parse(R"( {"one" : 1, "two" : 2, "three" : 3} )");
 
@@ -102,7 +102,7 @@ TEST_CASE("json_const_pointer object tests")
     }
 }
 
-TEST_CASE("json_const_pointer string tests")
+TEST_CASE("json_const_reference string tests")
 {
     json j = json("Hello World");
 
@@ -116,7 +116,7 @@ TEST_CASE("json_const_pointer string tests")
     }
 }
 
-TEST_CASE("json_const_pointer byte_string tests")
+TEST_CASE("json_const_reference byte_string tests")
 {
     std::string data = "abcdefghijk";
     json j(byte_string_arg, data);
@@ -129,7 +129,7 @@ TEST_CASE("json_const_pointer byte_string tests")
     }
 }
 
-TEST_CASE("json_const_pointer bool tests")
+TEST_CASE("json_const_reference bool tests")
 {
     json tru(true);
     json fal(false);
@@ -148,7 +148,7 @@ TEST_CASE("json_const_pointer bool tests")
     }
 }
 
-TEST_CASE("json_const_pointer int64 tests")
+TEST_CASE("json_const_reference int64 tests")
 {
     json j(-100);
 
@@ -160,7 +160,7 @@ TEST_CASE("json_const_pointer int64 tests")
     }
 }
 
-TEST_CASE("json_const_pointer uint64 tests")
+TEST_CASE("json_const_reference uint64 tests")
 {
     json j(100);
 
@@ -172,7 +172,7 @@ TEST_CASE("json_const_pointer uint64 tests")
     }
 }
 
-TEST_CASE("json_const_pointer half tests")
+TEST_CASE("json_const_reference half tests")
 {
     json j(half_arg, 100);
 
@@ -184,7 +184,7 @@ TEST_CASE("json_const_pointer half tests")
     }
 }
 
-TEST_CASE("json_const_pointer double tests")
+TEST_CASE("json_const_reference double tests")
 {
     json j(123.456);
 
@@ -232,7 +232,7 @@ namespace {
     }
 }
 
-TEST_CASE("json_const_pointer identifier tests")
+TEST_CASE("json_const_reference identifier tests")
 {
     json source = json::parse(R"(
     {"reservations": [{

@@ -40,7 +40,7 @@ deprecated in 0.174.0, have been removed.
 
 Enhancements:
 
-- New `basic_json(json_reference_arg_t, basic_json& j)` constructor to 
+- New `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
 allow a `basic_json` value to contain a non-owning view of another `basic_json`
 value.
 
