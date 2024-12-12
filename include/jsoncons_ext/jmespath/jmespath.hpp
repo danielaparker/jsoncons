@@ -210,7 +210,7 @@ namespace jmespath {
 
         reference evaluate(reference val, dynamic_resources<Json>& resources, std::error_code& ec) const
         {
-            return expr_->evaluate(val, resources, ec);
+            return *resources.create_json(deep_copy(expr_->evaluate(val, resources, ec)));
         }
     };
 
@@ -449,7 +449,8 @@ namespace jmespath {
         {
         }
 
-        reference evaluate(const std::vector<parameter_type>& params, dynamic_resources<Json>& resources,
+        reference evaluate(const std::vector<parameter_type>& params, 
+            dynamic_resources<Json>& resources,
             std::error_code& ec) const override
         {
             return f_(params, resources, ec);
