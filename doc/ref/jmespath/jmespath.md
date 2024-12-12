@@ -175,24 +175,24 @@ public:
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> pointer
+                std::error_code& ec) -> reference
             {
-                auto result = resources.make_json(current_index);
-                return result;
+                auto result = resources.create_json(current_index);
+                return *result;
             }
         );
         this->register_function("generate_array", // function name
             4,                                    // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> pointer
+                std::error_code& ec) -> reference
             {
                 JSONCONS_ASSERT(4 == params.size());
 
                 if (!(params[0].is_value() && params[2].is_expression()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.make_null();
+                    return resources.null_value();
                 }
 
                 reference context = params[0].value();
@@ -203,45 +203,45 @@ public:
                 if (!countValue.is_number())
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.make_null();
+                    return resources.null_value();
                 }
 
-                auto result = resources.make_json(jsoncons::json_array_arg);
+                auto result = resources.create_json(jsoncons::json_array_arg);
                 int count = countValue.template as<int>();
                 for (size_t i = 0; i < count; i++)
                 {
                     current_index = i;
                     std::error_code ec2;
 
-                    auto ele = expr.evaluate(context, resources, ec2); 
+                    reference ele = expr.evaluate(context, resources, ec2); 
 
-                    if (ele->is_null())
+                    if (ele.is_null())
                     {
                         auto defaultVal = get_value(context, resources, argDefault);
                         result->emplace_back(defaultVal);
                     }
                     else
                     {
-                        result->emplace_back(jsoncons::json_const_pointer_arg, ele); 
+                        result->emplace_back(ele); 
                     }
                 }
                 current_index = 0;
 
-                return result;
+                return *result;
             }
         );
         this->register_function("add", // function name
             2,                         // number of arguments   
             [](jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::dynamic_resources<Json>& resources,
-                std::error_code& ec) -> pointer
+                std::error_code& ec) -> reference
             {
                 JSONCONS_ASSERT(2 == params.size());
 
                 if (!(params[0].is_value() && params[1].is_value()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.make_null();
+                    return resources.null_value();
                 }
 
                 reference arg0 = params[0].value();
@@ -249,18 +249,18 @@ public:
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.make_null();
+                    return resources.null_value();
                 }
 
                 if (arg0.is<int64_t>() && arg1.is<int64_t>())
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
-                    return resources.make_json(v);
+                    return *resources.create_json(v);
                 }
                 else
                 {
                     double v = arg0.template as<double>() + arg1.template as<double>();
-                    return resources.make_json(v);
+                    return *resources.create_json(v);
                 }
             }
         );
@@ -273,8 +273,8 @@ public:
         {
             const auto& expr = param.expression();
             std::error_code ec;
-            auto value = expr.evaluate(context, resources, ec);
-            return *value;
+            reference value = expr.evaluate(context, resources, ec);
+            return value;
         }
         else
         {
@@ -325,93 +325,6 @@ int main()
   
     std::cout << pretty_print(result) << "\n\n";
 }
-```
-
-Output:
-
-```
-[
-    {
-        "id": "id-xxx",
-        "position": 1,
-        "state": 1
-    },
-    {
-        "id": "",
-        "position": 2,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 3,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 4,
-        "state": 0
-    },
-    {
-        "id": "id-yyy",
-        "position": 5,
-        "state": 1
-    },
-    {
-        "id": "",
-        "position": 6,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 7,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 8,
-        "state": 0
-    },
-    {
-        "id": "id-mmm",
-        "position": 9,
-        "state": 2
-    },
-    {
-        "id": "",
-        "position": 10,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 11,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 12,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 13,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 14,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 15,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 16,
-        "state": 0
-    }
-]
 ```
 
 Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this example

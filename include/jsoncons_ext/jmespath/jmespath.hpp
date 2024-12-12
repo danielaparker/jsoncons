@@ -191,6 +191,8 @@ namespace jmespath {
     public:
         using reference = const Json&;
 
+        virtual ~expr_base() = default;
+
         virtual reference evaluate(reference val, dynamic_resources<Json>& resources, std::error_code& ec) const = 0;
     };  
 
@@ -246,8 +248,6 @@ namespace jmespath {
         {
             return is_projection_;
         }
-
-        virtual ~expr_base_impl() = default;
 
         virtual void add_expression(std::unique_ptr<expr_base_impl>&& expressions) = 0;
 

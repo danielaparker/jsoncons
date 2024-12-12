@@ -85,7 +85,9 @@ public:
                     }
                     else
                     {
-                        result->emplace_back(ele); 
+                        result->emplace_back(ele);
+                        //result->emplace_back(jsoncons::json_const_pointer_arg, &ele); 
+                        //result->emplace_back(*resources.create_json(deep_copy(ele)));
                     }
                 }
                 current_index = 0;
