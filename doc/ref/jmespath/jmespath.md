@@ -327,4 +327,91 @@ int main()
 }
 ```
 
+Output:
+
+```json
+[
+    {
+        "id": "id-xxx",
+        "position": 1,
+        "state": 1
+    },
+    {
+        "id": "",
+        "position": 2,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 3,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 4,
+        "state": 0
+    },
+    {
+        "id": "id-yyy",
+        "position": 5,
+        "state": 1
+    },
+    {
+        "id": "",
+        "position": 6,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 7,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 8,
+        "state": 0
+    },
+    {
+        "id": "id-mmm",
+        "position": 9,
+        "state": 2
+    },
+    {
+        "id": "",
+        "position": 10,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 11,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 12,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 13,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 14,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 15,
+        "state": 0
+    },
+    {
+        "id": "",
+        "position": 16,
+        "state": 0
+    }
+]
+```
+
 Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this example
