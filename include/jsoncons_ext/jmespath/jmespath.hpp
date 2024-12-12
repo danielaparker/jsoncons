@@ -197,20 +197,34 @@ namespace jmespath {
     };  
 
     template <typename Json>
-    class expr_wrapper
+    class expr_wrapper : public expr_base<Json>
     {
     public:
         using reference = const Json&;
         using pointer = const Json*;
     private:
-        expr_base<Json>* expr_;
+        const expr_base<Json>* expr_;
     public:
-        expr_wrapper(reference expr)
+        expr_wrapper()
+            : expr_(nullptr)
+        {
+        }
+        expr_wrapper(const expr_base<Json>& expr)
             : expr_(std::addressof(expr))
         {
         }
+        expr_wrapper(const expr_wrapper& other)
+            : expr_(other.expr_)
+        {
+        }
+        
+        expr_wrapper& operator=(const expr_wrapper& other)
+        {
+            expr_ = other.expr_;
+            return *this;
+        }
 
-        reference evaluate(reference val, dynamic_resources<Json>& resources, std::error_code& ec) const
+        reference evaluate(reference val, dynamic_resources<Json>& resources, std::error_code& ec) const final
         {
             return *resources.create_json(deep_copy(expr_->evaluate(val, resources, ec)));
         }
@@ -266,14 +280,14 @@ namespace jmespath {
     {
     public:
         using reference = const Json&;
-        using expression_type = expr_base_impl<Json>;
+        using expression_type = expr_base<Json>;
     private:
         parameter_kind type_;
-
+    public:
         union
         {
-            std::reference_wrapper<const expression_type> expression_;
-            std::reference_wrapper<const Json> value_;
+            const expression_type* expression_;
+            const Json* value_;
         };
 
     public:
@@ -295,12 +309,12 @@ namespace jmespath {
         }
 
         parameter(reference value) noexcept
-            : type_(parameter_kind::value), value_(value)
+            : type_(parameter_kind::value), value_(std::addressof(value))
         {
         }
 
         parameter(const expression_type& expression) noexcept
-            : type_(parameter_kind::expression), expression_(expression)
+            : type_(parameter_kind::expression), expression_(std::addressof(expression))
         {
         }
 
@@ -336,12 +350,12 @@ namespace jmespath {
 
         const Json& value() const
         {
-            return value_;
+            return *value_;
         }
 
         const expression_type& expression() const
         {
-            return expression_;
+            return *expression_;
         }
     };
 
@@ -425,6 +439,11 @@ namespace jmespath {
         virtual reference evaluate(const std::vector<parameter_type>& params, dynamic_resources<Json>& resources, 
             std::error_code& ec) const = 0;
 
+        virtual bool is_custom() const
+        {
+            return false;
+        }
+        
         virtual std::string to_string(std::size_t = 0) const
         {
             return std::string("to_string not implemented");
@@ -447,6 +466,11 @@ namespace jmespath {
         function_wrapper(jsoncons::optional<std::size_t> arity, const function_type& f)
             : function_base<Json>(arity), f_(f)
         {
+        }
+        
+        bool is_custom() const final
+        {
+            return true;
         }
 
         reference evaluate(const std::vector<parameter_type>& params, 
@@ -2519,6 +2543,23 @@ namespace jmespath {
                         {
                             ec = jmespath_errc::invalid_arity;
                             return std::addressof(resources.null_value());
+                        }
+                        
+                        std::vector<expr_wrapper<Json>> expr_wrappers;
+                        if (t.function_->is_custom())
+                        {
+                            if (expr_wrappers.empty())
+                            {
+                                expr_wrappers.resize(arg_stack.size());
+                            }
+                            for (std::size_t i = 0; i < arg_stack.size(); ++i)
+                            {
+                                if (arg_stack[i].is_expression())
+                                {
+                                    expr_wrappers[i] = expr_wrapper<Json>{ *(arg_stack[i].expression_) };
+                                    arg_stack[i].expression_ = std::addressof(expr_wrappers[i]);
+                                }
+                            }
                         }
 
                         reference r = t.function_->evaluate(arg_stack, resources, ec);
