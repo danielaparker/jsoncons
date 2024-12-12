@@ -183,49 +183,16 @@ namespace jmespath {
         }
     };
 
-    // expression_base
+    
+    // expr_base
+    
     template <typename Json>
-    class expression_base
+    class expr_base
     {
     public:
         using reference = const Json&;
-    private:
-        std::size_t precedence_level_;
-        bool is_right_associative_;
-        bool is_projection_;
-    public:
-        expression_base(operator_kind oper, bool is_projection)
-            : precedence_level_(operator_table::precedence_level(oper)), 
-              is_right_associative_(operator_table::is_right_associative(oper)), 
-              is_projection_(is_projection)
-        {
-        }
-
-        std::size_t precedence_level() const
-        {
-            return precedence_level_;
-        }
-
-        bool is_right_associative() const
-        {
-            return is_right_associative_;
-        }
-
-        bool is_projection() const 
-        {
-            return is_projection_;
-        }
-
-        virtual ~expression_base() = default;
 
         virtual const Json* evaluate(reference val, dynamic_resources<Json>& resources, std::error_code& ec) const = 0;
-
-        virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
-
-        virtual std::string to_string(std::size_t = 0) const
-        {
-            return std::string("to_string not implemented");
-        }
     };  
 
     // parameter
@@ -237,13 +204,12 @@ namespace jmespath {
     {
     public:
         using reference = const Json&;
-        using expression_type = expression_base<Json>;
     private:
         parameter_kind type_;
 
         union
         {
-            std::reference_wrapper<const expression_type> expression_;
+            std::reference_wrapper<const expr_base<Json>> expression_;
             std::reference_wrapper<const Json> value_;
         };
 
@@ -270,7 +236,7 @@ namespace jmespath {
         {
         }
 
-        parameter(const expression_type& expression) noexcept
+        parameter(const expr_base<Json>& expression) noexcept
             : type_(parameter_kind::expression), expression_(expression)
         {
         }
@@ -310,11 +276,53 @@ namespace jmespath {
             return value_;
         }
 
-        const expression_type& expression() const
+        const expr_base<Json>& expression() const
         {
             return expression_;
         }
     };
+
+    template <typename Json>
+    class expr_common : public expr_base<Json>
+    {
+    public:
+        using reference = const Json&;
+    private:
+        std::size_t precedence_level_;
+        bool is_right_associative_;
+        bool is_projection_;
+    public:
+        expr_common(operator_kind oper, bool is_projection)
+            : precedence_level_(operator_table::precedence_level(oper)), 
+              is_right_associative_(operator_table::is_right_associative(oper)), 
+              is_projection_(is_projection)
+        {
+        }
+
+        std::size_t precedence_level() const
+        {
+            return precedence_level_;
+        }
+
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
+
+        bool is_projection() const 
+        {
+            return is_projection_;
+        }
+
+        virtual ~expr_common() = default;
+
+        virtual void add_expression(std::unique_ptr<expr_common>&& expressions) = 0;
+
+        virtual std::string to_string(std::size_t = 0) const
+        {
+            return std::string("to_string not implemented");
+        }
+    };  
 
     template <typename Json>
     class custom_function
@@ -686,7 +694,7 @@ namespace jmespath {
         lhs_expression,
         rhs_expression,
         sub_expression,
-        expression_type,
+        expression,
         comparator_expression,
         function_expression,
         argument,
@@ -747,7 +755,7 @@ namespace jmespath {
         using pointer = typename Json::const_pointer;
         using const_pointer = typename Json::const_pointer;
         using parameter_type = parameter<Json>;
-        using expression_type = expression_base<Json>;
+        using expression_type = expr_common<Json>;
         using function_type = function_base<Json>;
 
         static bool is_false(reference ref)
@@ -2744,7 +2752,7 @@ namespace jmespath {
         };
 
         // basic_expression
-        class basic_expression :  public expression_type
+        class basic_expression :  public expr_common<Json>
         {
         public:
             basic_expression()
@@ -2863,7 +2871,7 @@ namespace jmespath {
         };
 
         // projection_base
-        class projection_base : public expression_type
+        class projection_base : public expr_common<Json>
         {
         protected:
             std::vector<std::unique_ptr<expression_type>> expressions_;
@@ -3894,7 +3902,7 @@ namespace jmespath {
                             case '&':
                                 push_token(token(begin_expression_type_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expression_type;
+                                state_stack_.back() = path_state::expression;
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
@@ -3992,7 +4000,7 @@ namespace jmespath {
                         state_stack_.pop_back();
                         break;
 
-                    case path_state::expression_type:
+                    case path_state::expression:
                         push_token(end_expression_type_arg, ec);
                         push_token(argument_arg, ec);
                         if (ec) {return jmespath_expression();}
