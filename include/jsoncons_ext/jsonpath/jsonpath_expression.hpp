@@ -168,8 +168,6 @@ namespace jsonpath {
         using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
-        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
-        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
@@ -209,8 +207,6 @@ namespace jsonpath {
         using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
-        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
-        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
@@ -239,8 +235,6 @@ namespace jsonpath {
         using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
-        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
-        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
