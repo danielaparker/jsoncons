@@ -34,7 +34,6 @@ namespace jsonpath {
         using value_type = typename std::remove_cv<Json>::type;
         using reference = Json&;
         using const_reference = const Json&;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using allocator_type = typename value_type::allocator_type;
         using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
@@ -49,24 +48,34 @@ namespace jsonpath {
         using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
 
         using allocator_type = typename jsonpath_traits_type::allocator_type;
-        using evaluator_type = typename jsonpath_traits_type::evaluator_type;
         using char_type = typename jsonpath_traits_type::char_type;
         using string_type = typename jsonpath_traits_type::string_type;
         using string_view_type = typename jsonpath_traits_type::string_view_type;
-        using value_type = typename jsonpath_traits_type::value_type;
-        using reference = typename jsonpath_traits_type::reference;
-        using const_reference = typename jsonpath_traits_type::const_reference;
-        using path_expression_type = typename jsonpath_traits_type::path_expression_type;
+        
+        using value_type = typename jsonpath_traits2<Json>::value_type;
+        using reference = typename jsonpath_traits2<Json>::reference;
+        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        
+        using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
+        using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
+        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
+        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
     private:
         allocator_type alloc_;
-        std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>> static_resources_;
+        std::unique_ptr<const_static_resources_type> const_static_resources_;
+        const_path_expression_type const_expr_;
+        std::unique_ptr<static_resources_type> static_resources_;
         path_expression_type expr_;
     public:
         jsonpath_expression(const allocator_set<allocator_type,TempAllocator>& alloc_set,
-            std::unique_ptr<jsoncons::jsonpath::detail::static_resources<value_type,reference>>&& resources,
+            std::unique_ptr<const_static_resources_type>&& const_resources,
+            const_path_expression_type&& const_expr, 
+            std::unique_ptr<static_resources_type>&& resources,
             path_expression_type&& expr)
             : alloc_(alloc_set.get_allocator()),
+              const_static_resources_(std::move(const_resources)), 
+              const_expr_(std::move(const_expr)),
               static_resources_(std::move(resources)), 
               expr_(std::move(expr))
         {
@@ -82,34 +91,32 @@ namespace jsonpath {
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const string_type&,const_reference>::value,void>::type
         evaluate(const_reference root, BinaryCallback callback, result_options options = result_options()) const
         {
-            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources{alloc_};
-            auto f = [&callback](const path_node_type& path, reference val)
+            jsoncons::jsonpath::detail::dynamic_resources<Json,const_reference> resources{alloc_};
+            auto f = [&callback](const path_node_type& path, const_reference val)
             {
                 callback(to_basic_string(path), val);
             };
-            expr_.evaluate(resources, const_cast<reference>(root), path_node_type{}, const_cast<reference>(root), f, options | result_options::path);
+            const_expr_.evaluate(resources, root, path_node_type{}, root, f, options | result_options::path);
         }
 
         value_type evaluate(const_reference root, result_options options = result_options()) const
         {
             if ((options & result_options::path) == result_options::path)
             {
-                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, const_reference> resources{ alloc_ };
 
                 value_type result(json_array_arg, semantic_tag::none, alloc_);
-                auto callback = [&result](const path_node_type& p, reference)
+                auto callback = [&result](const path_node_type& p, const_reference)
                 {
                     result.emplace_back(to_basic_string(p));
                 };
-                expr_.evaluate(resources, const_cast<reference>(root), 
-                    path_node_type{}, const_cast<reference>(root), callback, options);
+                const_expr_.evaluate(resources, root, path_node_type{}, root, callback, options);
                 return result;
             }
             else
             {
-                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
-                return expr_.evaluate(resources, const_cast<reference>(root), 
-                    path_node_type{}, const_cast<reference>(root), options);
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, const_reference> resources{ alloc_ };
+                return const_expr_.evaluate(resources, root, path_node_type{}, root, options);
             }
         }
 
@@ -117,22 +124,20 @@ namespace jsonpath {
         {
             if ((options & result_options::path) == result_options::path)
             {
-                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, const_reference> resources{ alloc_ };
 
                 value_type result(json_array_arg, semantic_tag::none, alloc_);
-                auto callback = [&result](const path_node_type& p, reference)
+                auto callback = [&result](const path_node_type& p, const_reference)
                 {
                     result.emplace_back(to_basic_string(p));
                 };
-                expr_.evaluate(resources, const_cast<reference>(root), 
-                    path_node_type{}, const_cast<reference>(root), callback, options);
+                const_expr_.evaluate(resources, root, path_node_type{}, root, callback, options);
                 return result;
             }
             else
             {
-                jsoncons::jsonpath::detail::dynamic_resources<value_type, reference> resources{ alloc_ };
-                return expr_.evaluate(resources, const_cast<reference>(root), 
-                    path_node_type{}, const_cast<reference>(root), options);
+                jsoncons::jsonpath::detail::dynamic_resources<value_type, const_reference> resources{ alloc_ };
+                return const_expr_.evaluate(resources, root, path_node_type{}, root, options);
             }
         }
 
@@ -140,8 +145,8 @@ namespace jsonpath {
         typename std::enable_if<extension_traits::is_binary_function_object<BinaryCallback,const path_node_type&,const_reference>::value,void>::type
         select(const_reference root, BinaryCallback callback, result_options options = result_options()) const
         {
-            jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(root), path_node_type{}, const_cast<reference>(root), callback, options | result_options::path);
+            jsoncons::jsonpath::detail::dynamic_resources<value_type,const_reference> resources{alloc_};
+            const_expr_.evaluate(resources, root, path_node_type{}, root, callback, options | result_options::path);
         }
 
         template <typename BinaryCallback>
@@ -166,8 +171,8 @@ namespace jsonpath {
                 result.emplace_back(path);
             };
 
-            jsoncons::jsonpath::detail::dynamic_resources<value_type,reference> resources{alloc_};
-            expr_.evaluate(resources, const_cast<reference>(root), path_node_type{}, const_cast<reference>(root), callback, options);
+            jsoncons::jsonpath::detail::dynamic_resources<value_type,const_reference> resources{alloc_};
+            const_expr_.evaluate(resources, root, path_node_type{}, root, callback, options);
 
             return result;
         }
@@ -177,17 +182,27 @@ namespace jsonpath {
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
+        using value_type = typename jsonpath_traits2<Json>::value_type;
+        using reference = typename jsonpath_traits2<Json>::reference;
+        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
+        using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
+        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
+        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
+        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
+        using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
-        using value_type = typename jsonpath_traits_type::value_type;
-        using reference = typename jsonpath_traits_type::reference;
-        using evaluator_type = typename jsonpath_traits_type::evaluator_type;
+        auto const_static_resources = jsoncons::make_unique<const_static_resources_type>(funcs);
+        const_evaluator_type const_evaluator;
+        auto const_expr = const_evaluator.compile(*const_static_resources, path);
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
+        auto static_resources = jsoncons::make_unique<static_resources_type>(funcs);
         evaluator_type evaluator;
         auto expr = evaluator.compile(*static_resources, path);
 
-        return jsonpath_expression<Json>(jsoncons::combine_allocators(), std::move(static_resources), std::move(expr));
+        return jsonpath_expression<Json>(jsoncons::combine_allocators(), 
+            std::move(const_static_resources), std::move(const_expr), 
+            std::move(static_resources), std::move(expr));
     }
 
     template <typename Json>
@@ -206,22 +221,31 @@ namespace jsonpath {
     template <typename Json,typename TempAllocator >
     jsonpath_expression<Json> make_expression(const allocator_set<typename Json::allocator_type,TempAllocator>& alloc_set, 
         const typename Json::string_view_type& path, 
-        const custom_functions<Json>& functions = custom_functions<Json>())
+        const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
+        using value_type = typename jsonpath_traits2<Json>::value_type;
+        using reference = typename jsonpath_traits2<Json>::reference;
+        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
+        using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
+        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
+        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
+        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
+        using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
-        using value_type = typename jsonpath_traits_type::value_type;
-        using reference = typename jsonpath_traits_type::reference;
-        using evaluator_type = typename jsonpath_traits_type::evaluator_type;
-        using path_expression_type = typename jsonpath_traits_type::path_expression_type;
-
-        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(functions, 
+        auto const_static_resources = jsoncons::make_unique<const_static_resources_type>(funcs,
             alloc_set.get_allocator());
+        const_evaluator_type const_evaluator{alloc_set.get_allocator()};
+        auto const_expr = const_evaluator.compile(*const_static_resources, path);
 
+        auto static_resources = jsoncons::make_unique<static_resources_type>(funcs,
+            alloc_set.get_allocator());
         evaluator_type evaluator{alloc_set.get_allocator()};
-        path_expression_type expr = evaluator.compile(*resources, path);
-        return jsonpath_expression<Json>(alloc_set, std::move(resources), std::move(expr));
+        auto expr = evaluator.compile(*static_resources, path);
 
+        return jsonpath_expression<Json>(alloc_set, 
+            std::move(const_static_resources), std::move(const_expr), 
+            std::move(static_resources), std::move(expr));
     }
 
     template <typename Json,typename TempAllocator >
@@ -229,19 +253,27 @@ namespace jsonpath {
         const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {
-        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
+        using value_type = typename jsonpath_traits2<Json>::value_type;
+        using reference = typename jsonpath_traits2<Json>::reference;
+        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
+        using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
+        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
+        using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
+        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
+        using const_evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, const_reference>;
 
-        using value_type = typename jsonpath_traits_type::value_type;
-        using reference = typename jsonpath_traits_type::reference;
-        using evaluator_type = typename jsonpath_traits_type::evaluator_type;
-        using path_expression_type = typename jsonpath_traits_type::path_expression_type;
+        auto const_static_resources = jsoncons::make_unique<const_static_resources_type>(funcs);
+        const_evaluator_type const_evaluator{alloc_set.get_allocator()};
+        auto const_expr = const_evaluator.compile(*const_static_resources, path, ec);
 
-        auto resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, 
-            alloc_set.get_allocator());
+        auto static_resources = jsoncons::make_unique<static_resources_type>(funcs);
         evaluator_type evaluator{alloc_set.get_allocator()};
-        path_expression_type expr = evaluator.compile(*resources, path, ec);
+        auto expr = evaluator.compile(*static_resources, path, ec);
 
-        return jsonpath_expression<Json>(alloc_set, std::move(resources), std::move(expr));
+        return jsonpath_expression<Json>(alloc_set, 
+            std::move(const_static_resources), std::move(const_expr), 
+            std::move(static_resources), std::move(expr));
     }
 
     template <typename Json>
