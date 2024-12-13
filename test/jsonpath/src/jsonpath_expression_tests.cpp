@@ -17,7 +17,7 @@
 #include <unordered_set> // std::unordered_set
 #include <fstream>
 
-using namespace jsoncons;
+namespace jsonpath = jsoncons::jsonpath;
 
 TEST_CASE("jsonpath make_expression::evaluate tests")
 {
@@ -56,12 +56,12 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
     {
         int count = 0;
 
-        const json root = json::parse(input);
-        const json original = root;
+        const auto root = jsoncons::json::parse(input);
+        const auto original = root;
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
-        auto op = [&](const std::string& /*location*/, const json& book)
+        auto op = [&](const std::string& /*location*/, const jsoncons::json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -79,14 +79,14 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
     {
         int count = 0;
 
-        const json root = json::parse(input);
-        const json original = root;
+        const auto root = jsoncons::json::parse(input);
+        const auto original = root;
 
         std::error_code ec;
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]", ec);
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]", ec);
         CHECK_FALSE(ec);
 
-        auto op = [&](const std::string& /*location*/, const json& book)
+        auto op = [&](const std::string& /*location*/, const jsoncons::json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -102,8 +102,8 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 
     SECTION("with json_const_pointer_arg")
     {
-        json root = json::parse(input);
-        jsoncons::json nested_json = jsoncons::json::parse(R"(
+        auto root = jsoncons::json::parse(input);
+        auto nested_json = jsoncons::json::parse(R"(
 {
     "category": "religion",
     "title" : "How the Gospels Became History: Jesus and Mediterranean Myths",
@@ -112,14 +112,14 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
 }
         )");
 
-        root["books"].emplace_back(json_const_pointer_arg, &nested_json);    
+        root["books"].emplace_back(jsoncons::json_const_pointer_arg, &nested_json);    
 
         std::error_code ec;
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]", ec);
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]", ec);
         CHECK_FALSE(ec);
 
         std::size_t count = 0;
-        auto op = [&count](const std::string& /*location*/, const json& book)
+        auto op = [&](const std::string& /*location*/, const jsoncons::json& book)
         {
             if (book.at("category") == "religion")
             {
@@ -170,11 +170,11 @@ TEST_CASE("jsonpath_expression::select tests")
     {
         int count = 0;
 
-        const json root = json::parse(input);
+        const auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
-        auto op = [&](const jsonpath::path_node& /*path*/, const json& value)
+        auto op = [&](const jsonpath::path_node& /*path*/, const jsoncons::json& value)
         {
             if (value.at("category") == "memoir" && !value.contains("price"))
             {
@@ -224,9 +224,9 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
@@ -239,9 +239,9 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations of selected values")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','title']");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]['category','title']");
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
@@ -263,9 +263,9 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations, nodups, sort_descending")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','category','title','title']");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]['category','category','title','title']");
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root,jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
@@ -287,9 +287,9 @@ TEST_CASE("jsonpath_expression::select_path tests")
 
     SECTION("Return locations, sort_descending")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]['category','category','title','title']");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]['category','category','title','title']");
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root, jsonpath::result_options::sort_descending);
 
@@ -353,11 +353,11 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("Update in place")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
-        auto op = [](const jsonpath::path_node& /*location*/, json& book)
+        auto op = [](const jsonpath::path_node& /*location*/, jsoncons::json& book)
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
@@ -373,9 +373,9 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("Return locations of selected values")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
         std::vector<jsonpath::json_location> paths = expr.select_paths(root);
 
@@ -392,12 +392,12 @@ TEST_CASE("jsonpath_expression::update tests")
 
     SECTION("update default sort order")
     {
-        json root = json::parse(input);
+        auto root = jsoncons::json::parse(input);
 
-        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]");
+        auto expr = jsoncons::jsonpath::make_expression<jsoncons::json>("$.books[*]");
 
         std::vector<jsonpath::path_node> path_nodes;
-        auto callback2 = [&](const jsonpath::path_node& base_node, json&)
+        auto callback2 = [&](const jsonpath::path_node& base_node, jsoncons::json&)
         {
             path_nodes.push_back(base_node);
         };
@@ -447,13 +447,13 @@ TEST_CASE("jsonpath_expression remove")
 
     SECTION("test 1")
     {
-        json doc = json::parse(input);
+        auto doc = jsoncons::json::parse(input);
 
-        json expected = doc;
+        auto expected = doc;
         expected["books"].erase(expected["books"].array_range().begin()+3);
         expected["books"].erase(expected["books"].array_range().begin(),expected["books"].array_range().begin()+2);
 
-        std::size_t n = jsoncons::jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
+        std::size_t n = jsonpath::remove(doc, "$.books[1,1,3,3,0,0]");
 
         CHECK(n == 3);
         REQUIRE(doc.at("books").size() == 1);
