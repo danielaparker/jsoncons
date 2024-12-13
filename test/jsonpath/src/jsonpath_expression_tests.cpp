@@ -99,6 +99,38 @@ TEST_CASE("jsonpath make_expression::evaluate tests")
         CHECK(count == 1);
         CHECK(root == original);
     }
+
+    SECTION("with json_const_pointer_arg")
+    {
+        json root = json::parse(input);
+        jsoncons::json nested_json = jsoncons::json::parse(R"(
+{
+    "category": "religion",
+    "title" : "How the Gospels Became History: Jesus and Mediterranean Myths",
+    "author" : "M. David Litwa",
+    "price" : 60.89
+}
+        )");
+
+        root["books"].emplace_back(json_const_pointer_arg, &nested_json);    
+
+        std::error_code ec;
+        auto expr = jsoncons::jsonpath::make_expression<json>("$.books[*]", ec);
+        CHECK_FALSE(ec);
+
+        std::size_t count = 0;
+        auto op = [&count](const std::string& /*location*/, const json& book)
+        {
+            if (book.at("category") == "religion")
+            {
+                ++count;
+            }
+        };
+
+        expr.evaluate(root, op);
+
+        CHECK(count == 1);
+    }
 }
 
 TEST_CASE("jsonpath_expression::select tests")
