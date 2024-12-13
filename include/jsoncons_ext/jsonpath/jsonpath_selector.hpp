@@ -210,11 +210,11 @@ namespace detail {
         }
 
         void tail_select(dynamic_resources<Json,JsonReference>& resources,
-                           reference root,
-                           const path_node_type& last, 
-                           reference current,
-                           node_receiver_type& receiver,
-                           result_options options) const
+            reference root,
+            const path_node_type& last, 
+            reference current,
+            node_receiver_type& receiver,
+            result_options options) const
         {
             if (!tail_)
             {
@@ -227,11 +227,11 @@ namespace detail {
         }
 
         reference evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
-                                reference root,
-                                const path_node_type& last, 
-                                reference current, 
-                                result_options options,
-                                std::error_code& ec) const
+            reference root,
+            const path_node_type& last, 
+            reference current, 
+            result_options options,
+            std::error_code& ec) const
         {
             if (!tail_)
             {
@@ -284,11 +284,11 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    reference root,
-                    const path_node_type& last, 
-                    reference current,
-                    node_receiver_type& receiver,
-                    result_options options) const override
+            reference root,
+            const path_node_type& last, 
+            reference current,
+            node_receiver_type& receiver,
+            result_options options) const override
         {
             if (current.is_object())
             {
