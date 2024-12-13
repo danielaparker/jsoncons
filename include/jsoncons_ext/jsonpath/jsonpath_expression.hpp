@@ -24,43 +24,24 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    template <typename Json>
-    struct jsonpath_traits
-    {
-        using char_type = typename Json::char_type;
-        using string_type = typename Json::string_type;
-        using string_view_type = typename Json::string_view_type;
-        using element_type = Json;
-        using value_type = typename std::remove_cv<Json>::type;
-        using reference = Json&;
-        using const_reference = const Json&;
-        using allocator_type = typename value_type::allocator_type;
-        using evaluator_type = typename jsoncons::jsonpath::detail::jsonpath_evaluator<value_type, reference>;
-        using path_node_type = basic_path_node<typename Json::char_type>;
-        using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
-        using path_pointer = const path_node_type*;
-    };
-
     template <typename Json,typename TempAllocator =std::allocator<char>>
     class jsonpath_expression
     {
     public:
-        using jsonpath_traits_type = jsoncons::jsonpath::jsonpath_traits<Json>;
-
-        using allocator_type = typename jsonpath_traits_type::allocator_type;
-        using char_type = typename jsonpath_traits_type::char_type;
-        using string_type = typename jsonpath_traits_type::string_type;
-        using string_view_type = typename jsonpath_traits_type::string_view_type;
+        using allocator_type = typename jsonpath_traits<Json>::allocator_type;
+        using char_type = typename jsonpath_traits<Json>::char_type;
+        using string_type = typename jsonpath_traits<Json>::string_type;
+        using string_view_type = typename jsonpath_traits<Json>::string_view_type;
         
-        using value_type = typename jsonpath_traits2<Json>::value_type;
-        using reference = typename jsonpath_traits2<Json>::reference;
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using value_type = typename jsonpath_traits<Json>::value_type;
+        using reference = typename jsonpath_traits<Json>::reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
         using const_path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,const_reference>;
-        using path_node_type = typename jsonpath_traits_type::path_node_type;
+        using path_node_type = basic_path_node<typename Json::char_type>;
     private:
         allocator_type alloc_;
         std::unique_ptr<const_static_resources_type> const_static_resources_;
@@ -182,9 +163,9 @@ namespace jsonpath {
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs = jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>())
     {
-        using value_type = typename jsonpath_traits2<Json>::value_type;
-        using reference = typename jsonpath_traits2<Json>::reference;
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using value_type = typename jsonpath_traits<Json>::value_type;
+        using reference = typename jsonpath_traits<Json>::reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
@@ -223,9 +204,9 @@ namespace jsonpath {
         const typename Json::string_view_type& path, 
         const custom_functions<Json>& funcs = custom_functions<Json>())
     {
-        using value_type = typename jsonpath_traits2<Json>::value_type;
-        using reference = typename jsonpath_traits2<Json>::reference;
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using value_type = typename jsonpath_traits<Json>::value_type;
+        using reference = typename jsonpath_traits<Json>::reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;
@@ -253,9 +234,9 @@ namespace jsonpath {
         const typename Json::string_view_type& path,
         const jsoncons::jsonpath::custom_functions<typename jsonpath_traits<Json>::value_type>& funcs, std::error_code& ec)
     {
-        using value_type = typename jsonpath_traits2<Json>::value_type;
-        using reference = typename jsonpath_traits2<Json>::reference;
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using value_type = typename jsonpath_traits<Json>::value_type;
+        using reference = typename jsonpath_traits<Json>::reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         using static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,reference>;
         using const_static_resources_type = jsoncons::jsonpath::detail::static_resources<value_type,const_reference>;
         using path_expression_type = jsoncons::jsonpath::detail::path_expression<value_type,reference>;

@@ -25,8 +25,12 @@ namespace jsoncons {
 namespace jsonpath {
 
     template <typename Json>
-    struct jsonpath_traits2
+    struct jsonpath_traits
     {
+        using allocator_type = typename Json::allocator_type;
+        using char_type = typename Json::char_type;
+        using string_type = typename Json::string_type;
+        using string_view_type = typename Json::string_view_type;
         using value_type = typename std::remove_const<Json>::type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
@@ -386,7 +390,7 @@ namespace detail {
     template <typename Json>
     struct unary_operator
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         
         std::size_t precedence_level_;
         bool is_right_associative_;
@@ -432,7 +436,7 @@ namespace detail {
     class unary_not_operator final : public unary_operator<Json>
     {
     public:
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
         unary_not_operator()
             : unary_operator<Json>(1, true)
@@ -448,7 +452,7 @@ namespace detail {
     class unary_minus_operator final : public unary_operator<Json>
     {
     public:
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
         unary_minus_operator()
             : unary_operator<Json>(1, true)
@@ -475,7 +479,7 @@ namespace detail {
     template <typename Json>
     class regex_operator final : public unary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         std::basic_regex<char_type> pattern_;
@@ -502,7 +506,7 @@ namespace detail {
     template <typename Json>
     struct binary_operator
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         std::size_t precedence_level_;
         bool is_right_associative_;
 
@@ -539,7 +543,7 @@ namespace detail {
     template <typename Json>
     class or_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         or_operator()
@@ -578,7 +582,7 @@ namespace detail {
     template <typename Json>
     class and_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         and_operator()
@@ -614,7 +618,7 @@ namespace detail {
     template <typename Json>
     class eq_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         eq_operator()
@@ -643,7 +647,7 @@ namespace detail {
     template <typename Json>
     class ne_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         ne_operator()
@@ -672,7 +676,7 @@ namespace detail {
     template <typename Json>
     class lt_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         lt_operator()
@@ -709,7 +713,7 @@ namespace detail {
     template <typename Json>
     class lte_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         lte_operator()
@@ -746,7 +750,7 @@ namespace detail {
     template <typename Json>
     class gt_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         gt_operator()
@@ -785,7 +789,7 @@ namespace detail {
     template <typename Json>
     class gte_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         gte_operator()
@@ -822,7 +826,7 @@ namespace detail {
     template <typename Json>
     class plus_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         plus_operator()
@@ -866,7 +870,7 @@ namespace detail {
     template <typename Json>
     class minus_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         minus_operator()
@@ -910,7 +914,7 @@ namespace detail {
     template <typename Json>
     class mult_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         mult_operator()
@@ -954,7 +958,7 @@ namespace detail {
     template <typename Json>
     class div_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         div_operator()
@@ -1000,7 +1004,7 @@ namespace detail {
     template <typename Json>
     class modulus_operator final : public binary_operator<Json>
     {
-        using const_reference = typename jsonpath_traits2<Json>::const_reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
 
     public:
         modulus_operator()
