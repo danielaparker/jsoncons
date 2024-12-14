@@ -255,7 +255,8 @@ namespace jsoncons {
                     {
                         for (auto&& item : current.array_range())
                         {
-                            if (item.size() > 0) // non-empty object or array
+                            if ((item.storage_kind() == json_storage_kind::array || item.storage_kind() == json_storage_kind::object)
+                                && !item.empty()) // non-empty object or array
                             {
                                 elements_.push_back(std::move(item));
                             }
@@ -267,7 +268,8 @@ namespace jsoncons {
                     {
                         for (auto&& kv : current.object_range())
                         {
-                            if (kv.value().size() > 0) // non-empty object or array
+                            if ((kv.value().storage_kind() == json_storage_kind::array || kv.value().storage_kind() == json_storage_kind::object)
+                                && !kv.value().empty()) // non-empty object or array
                             {
                                 elements_.push_back(std::move(kv.value()));
                             }
