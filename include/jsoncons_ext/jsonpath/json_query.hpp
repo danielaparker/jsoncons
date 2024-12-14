@@ -89,7 +89,7 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs);
         evaluator_type evaluator;
         path_expression_type expr = evaluator.compile(*static_resources, path);
 
@@ -117,7 +117,7 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, alloc_set.get_allocator());
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, alloc_set.get_allocator());
         evaluator_type evaluator{alloc_set.get_allocator()};
         path_expression_type expr = evaluator.compile(*static_resources, path);
 
@@ -143,7 +143,7 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs);
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs);
         evaluator_type evaluator;
         path_expression_type expr = evaluator.compile(*static_resources, path);
 
@@ -171,7 +171,7 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>(funcs, alloc_set.get_allocator());
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>(funcs, alloc_set.get_allocator());
         evaluator_type evaluator{alloc_set.get_allocator()};
         path_expression_type expr = evaluator.compile(*static_resources, path);
 
@@ -198,7 +198,7 @@ namespace jsonpath {
         using path_expression_type = typename jsonpath_traits_type::path_expression_type;
         using path_node_type = typename jsonpath_traits_type::path_node_type;
 
-        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type,reference>>();
+        auto static_resources = jsoncons::make_unique<jsoncons::jsonpath::detail::static_resources<value_type>>();
         evaluator_type evaluator;
         path_expression_type expr = evaluator.compile(*static_resources, path);
 

@@ -2399,16 +2399,18 @@ namespace detail {
         }
     };
 
-    template <typename Json,typename JsonReference>
+    template <typename Json>
     struct static_resources
     {
         using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
         using string_type = typename Json::string_type;
         using value_type = Json;
-        using reference = JsonReference;
+        using reference = typename jsonpath_traits<Json>::reference;
+        using const_reference = typename jsonpath_traits<Json>::const_reference;
         using function_base_type = function_base<Json>;
-        using selector_type = jsonpath_selector<Json,JsonReference>;
+        using selector_type = jsonpath_selector<Json,reference>;
+        using const_selector_type = jsonpath_selector<Json,const_reference>;
 
         struct MyHash
         {
@@ -2428,6 +2430,7 @@ namespace detail {
 
         allocator_type alloc_;
         std::vector<std::unique_ptr<selector_type>> selectors_;
+        std::vector<std::unique_ptr<const_selector_type>> const_selectors_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json>>> unary_operators_;
 
@@ -2623,7 +2626,16 @@ namespace detail {
         }
 
         template <typename T>
-        selector_type* new_selector(T&& val)
+        typename std::enable_if<std::is_const<typename std::remove_reference<typename T::reference>::type>::value,const_selector_type*>::type    
+        new_selector(T&& val)
+        {
+            const_selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
+            return const_selectors_.back().get();
+        }
+
+        template <typename T>
+        typename std::enable_if<!std::is_const<typename std::remove_reference<typename T::reference>::type>::value,selector_type*>::type    
+        new_selector(T&& val)
         {
             selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
             return selectors_.back().get();

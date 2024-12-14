@@ -155,7 +155,7 @@ namespace detail {
             return column_;
         }
 
-        path_expression_type compile(static_resources<value_type,reference>& resources, const string_view_type& path)
+        path_expression_type compile(static_resources<value_type>& resources, const string_view_type& path)
         {
             std::error_code ec;
             auto result = compile(resources, path, ec);
@@ -166,7 +166,7 @@ namespace detail {
             return result;
         }
 
-        path_expression_type compile(static_resources<value_type,reference>& resources, 
+        path_expression_type compile(static_resources<value_type>& resources, 
                                      const string_view_type& path, 
                                      std::error_code& ec)
         {
@@ -2151,7 +2151,7 @@ namespace detail {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void push_token(jsoncons::jsonpath::detail::static_resources<value_type,reference>& resources, token_type&& tok, std::error_code& ec)
+        void push_token(jsoncons::jsonpath::detail::static_resources<value_type>& resources, token_type&& tok, std::error_code& ec)
         {
             //std::cout << tok.to_string() << "\n";
             switch (tok.token_kind())
