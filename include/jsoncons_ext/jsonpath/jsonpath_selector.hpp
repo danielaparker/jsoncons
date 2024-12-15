@@ -458,7 +458,7 @@ namespace detail {
         {
             if (resources.is_cached(id_))
             {
-                return resources.retrieve_from_cache(id_);
+                return resources.get_from_cache(id_);
             }
             else
             {

@@ -2285,7 +2285,7 @@ namespace detail {
         {
             cache_.emplace(id, std::addressof(val));
         }
-        reference retrieve_from_cache(std::size_t id) 
+        reference get_from_cache(std::size_t id) 
         {
             return *cache_[id];
         }
