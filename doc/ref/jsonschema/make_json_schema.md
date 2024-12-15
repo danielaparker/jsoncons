@@ -27,7 +27,7 @@ json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175
     evaluation_options options = evaluation_options{});         
                                                                (3)
 template <typename Json>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) (deprecated in 1.0.0)
+json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) 
     const std::string& retrieval_uri,                          
     evaluation_options options = evaluation_options{});         
 
@@ -38,7 +38,7 @@ json_schema<Json> make_json_schema(const Json& sch,                 (until 0.175
     evaluation_options options = evaluation_options{});         
                                                                (4)
 template <typename Json,class ResolveURI>
-json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) (deprecated in 1.0.0)
+json_schema<Json> make_json_schema(Json sch,                        (since 0.175.0) 
     const std::string& retrieval_uri,                          
     const ResolveURI& resolve, 
     evaluation_options options = evaluation_options{});         

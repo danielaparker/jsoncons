@@ -22,7 +22,8 @@ namespace jsoncons {
     {
         success = 0,
         invalid_uri = 1,
-        invalid_characters_in_path = 2
+        invalid_character_in_scheme = 2,
+        invalid_character_in_path = 3
     };
 
 
@@ -40,7 +41,9 @@ namespace jsoncons {
             {
                 case uri_errc::invalid_uri:
                     return "Invalid URI";
-                case uri_errc::invalid_characters_in_path:
+                case uri_errc::invalid_character_in_scheme:
+                    return "Invalid characters in scheme";
+                case uri_errc::invalid_character_in_path:
                     return "Invalid characters in path";
                 default:
                     return "Unknown uri error";
@@ -702,8 +705,12 @@ namespace jsoncons {
 
             std::size_t start = 0;
 
+            bool valid_scheme = !str.empty() && isalpha(str[0]);
+            
             parse_state state = parse_state::expect_scheme;
-            for (std::size_t i = 0; i < str.size(); ++i)
+            
+            bool done = false;
+            for (std::size_t i = 0; !done && i < str.size(); ++i)
             {
                 char c = str[i];
                 switch (state)
@@ -712,9 +719,17 @@ namespace jsoncons {
                         switch (c)
                         {
                             case ':':
-                                scheme = std::make_pair(start,i);
-                                state = parse_state::expect_first_slash;
-                                start = i;
+                                if (!valid_scheme)
+                                {
+                                    ec = uri_errc::invalid_character_in_scheme;
+                                    done = true;
+                                }
+                                else
+                                {
+                                    scheme = std::make_pair(start,i);
+                                    state = parse_state::expect_first_slash;
+                                    start = i;
+                                }
                                 break;
                             case '?':
                                 path = std::make_pair(start, i);
@@ -728,9 +743,13 @@ namespace jsoncons {
                                 path = std::make_pair(start,i);
                                 query = std::make_pair(i,i);
                                 state = parse_state::expect_fragment;
-                                start = i+1;
+                                start = i+1; 
                                 break;
                             default:
+                                if (!(isalnum(c) || c == '+' || c == '.' || c == '-'))
+                                {
+                                    valid_scheme = false;
+                                }
                                 break;
                         }
                         break;
@@ -851,7 +870,7 @@ namespace jsoncons {
                             default:
                                 if (!(is_pchar(c,str.data()+i, str.size() - i) || c == '/'))
                                 {
-                                    ec = uri_errc::invalid_characters_in_path;
+                                    ec = uri_errc::invalid_character_in_path;
                                     return uri{};
                                 }                                
                                 break;

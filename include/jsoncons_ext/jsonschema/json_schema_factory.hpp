@@ -206,9 +206,7 @@ namespace jsonschema {
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
     template <typename Json,typename ResolveURI>
-    JSONCONS_DEPRECATED_MSG("Instead, set `default_base_uri` in options")
     typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,jsoncons::uri>::value,json_schema<Json>>::type
     make_json_schema(Json sch, const std::string& retrieval_uri, const ResolveURI& resolve, 
         evaluation_options options = evaluation_options{})
@@ -226,7 +224,6 @@ namespace jsonschema {
     }
 
     template <typename Json>
-    JSONCONS_DEPRECATED_MSG("Instead, set `default_base_uri` in options")
     json_schema<Json> make_json_schema(Json sch, const std::string& retrieval_uri, 
         evaluation_options options = evaluation_options{})
     {
@@ -241,7 +238,6 @@ namespace jsonschema {
         schema_builder->build_schema(retrieval_uri);
         return json_schema<Json>(schema_builder->get_schema_validator());
     }
-#endif
 
     template <typename Json,typename ResolveURI>
     typename std::enable_if<extension_traits::is_unary_function_object_exact<ResolveURI,Json,jsoncons::uri>::value,json_schema<Json>>::type

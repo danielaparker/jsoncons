@@ -967,7 +967,7 @@ namespace jsonschema {
         error_reporter& reporter)
     {
         std::error_code ec;
-        uri::parse(str, ec);
+        auto u = uri::parse(str, ec);
         if (ec)
         {
             walk_result result = reporter.error(validation_message("uri",
@@ -975,6 +975,18 @@ namespace jsonschema {
                 schema_location, 
                 instance_location, 
                 "'" + str + "' is not a valid URI."));
+            if (result == walk_result::abort)
+            {
+                return result;
+            }
+        }
+        else if (!u.is_absolute())
+        {
+            walk_result result = reporter.error(validation_message("uri",
+                eval_path,
+                schema_location, 
+                instance_location, 
+                "'" + str + "' is not an absolute URI."));
             if (result == walk_result::abort)
             {
                 return result;

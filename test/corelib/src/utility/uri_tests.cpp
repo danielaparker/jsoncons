@@ -452,7 +452,7 @@ TEST_CASE("cpp-netlib uri tests")
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("mailto:jo%hn.doe@example.com", ec);
         REQUIRE(ec);
-        REQUIRE(jsoncons::uri_errc::invalid_characters_in_path == ec);
+        REQUIRE(jsoncons::uri_errc::invalid_character_in_path == ec);
         //std::cout << ec.message() << "\n";
     }
     SECTION("test_invalid_percent_encoded_characters_in_path_1")
@@ -460,7 +460,7 @@ TEST_CASE("cpp-netlib uri tests")
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("mailto:john.doe@example%G0.com", ec);
         REQUIRE(ec);
-        REQUIRE(jsoncons::uri_errc::invalid_characters_in_path == ec);
+        REQUIRE(jsoncons::uri_errc::invalid_character_in_path == ec);
         //std::cout << ec.message() << "\n";
     }
     SECTION("test_invalid_percent_encoded_characters_in_path_2")
@@ -468,7 +468,7 @@ TEST_CASE("cpp-netlib uri tests")
         std::error_code ec;
         jsoncons::uri uri = jsoncons::uri::parse("mailto:john.doe@example%0G.com", ec);
         REQUIRE(ec);
-        REQUIRE(jsoncons::uri_errc::invalid_characters_in_path == ec);
+        REQUIRE(jsoncons::uri_errc::invalid_character_in_path == ec);
         //std::cout << ec.message() << "\n";
     }
 }
