@@ -384,9 +384,6 @@ namespace jsonpath {
 
 namespace detail {
 
-    template <typename Json,typename JsonReference>
-    class dynamic_resources;
-
     template <typename Json>
     struct unary_operator
     {
@@ -1069,7 +1066,7 @@ namespace detail {
         }
 
         virtual value_type evaluate(const std::vector<parameter_type>& args, 
-                                    std::error_code& ec) const = 0;
+            std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const
         {
@@ -1122,7 +1119,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1190,7 +1187,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1252,7 +1249,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1313,7 +1310,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1379,7 +1376,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1443,7 +1440,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1495,7 +1492,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1547,7 +1544,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1621,7 +1618,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1676,7 +1673,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1734,7 +1731,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1804,7 +1801,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1875,7 +1872,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+                 std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1931,7 +1928,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -1991,7 +1988,7 @@ namespace detail {
         }
 
         value_type evaluate(const std::vector<parameter_type>& args, 
-                            std::error_code& ec) const override
+            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
@@ -2263,7 +2260,6 @@ namespace detail {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = basic_path_node<typename Json::char_type>;
-        using path_component_value_pair_type = path_component_value_pair<Json,JsonReference>;
 
         allocator_type alloc_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
@@ -2376,18 +2372,18 @@ namespace detail {
         }
 
         virtual void select(dynamic_resources<Json,JsonReference>& resources,
-                            reference root,
-                            const path_node_type& base_path, 
-                            reference val, 
-                            node_receiver_type& receiver,
-                            result_options options) const = 0;
+            reference root,
+            const path_node_type& base_path, 
+            reference val, 
+            node_receiver_type& receiver,
+            result_options options) const = 0;
 
         virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
-                                   reference root,
-                                   const path_node_type& base_path, 
-                                   reference current, 
-                                   result_options options,
-                                   std::error_code& ec) const = 0;
+            reference root,
+            const path_node_type& base_path, 
+            reference current, 
+            result_options options,
+            std::error_code& ec) const = 0;
 
         virtual void append_selector(jsonpath_selector*) 
         {
@@ -2667,11 +2663,10 @@ namespace detail {
         virtual ~expression_base() noexcept = default;
 
         virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                                           reference root,
-                                           //const path_node_type& path, 
-                                           reference val, 
-                                           result_options options,
-                                           std::error_code& ec) const = 0;
+            reference root,
+            reference val, 
+            result_options options,
+            std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const = 0;
     };
@@ -3122,10 +3117,10 @@ namespace detail {
         path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                      reference root,
-                      const path_node_type& path, 
-                      reference instance,
-                      result_options options) const
+            reference root,
+            const path_node_type& path, 
+            reference instance,
+            result_options options) const
         {
             Json result(json_array_arg, semantic_tag::none, alloc_);
 
@@ -3152,11 +3147,11 @@ namespace detail {
         template <typename Callback>
         typename std::enable_if<extension_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                 reference root,
-                 const path_node_type& path, 
-                 reference current, 
-                 Callback callback,
-                 result_options options) const
+            reference root,
+            const path_node_type& path, 
+            reference current, 
+            Callback callback,
+            result_options options) const
         {
             std::error_code ec;
 
@@ -3301,10 +3296,10 @@ namespace detail {
         expression& operator=(expression&& expr) = default;
 
         value_type evaluate(dynamic_resources<Json,reference>& resources, 
-                                   reference root,
-                                   reference current,
-                                   result_options options,
-                                   std::error_code& ec) const override
+            reference root,
+            reference current,
+            result_options options,
+            std::error_code& ec) const override
         {
             std::vector<stack_item_type> stack;
             std::vector<parameter_type> arg_stack;
@@ -3364,18 +3359,7 @@ namespace detail {
                             break;
                         case jsonpath_token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
-                            //std::cout << "argument stack items " << stack.size() << "\n";
-                            //for (auto& item : stack)
-                            //{
-                            //    std::cout << *item.to_pointer(resources) << "\n";
-                            //}
-                            //std::cout << "\n";
                             arg_stack.emplace_back(std::move(stack.back()));
-                            //for (auto& item : arg_stack)
-                            //{
-                            //    std::cout << *item << "\n";
-                            //}
-                            //std::cout << "\n";
                             stack.pop_back();
                             break;
                         case jsonpath_token_kind::function:
@@ -3385,12 +3369,6 @@ namespace detail {
                                 ec = jsonpath_errc::invalid_arity;
                                 return Json::null();
                             }
-                            //std::cout << "function arg stack:\n";
-                            //for (auto& item : arg_stack)
-                            //{
-                            //    std::cout << *item << "\n";
-                            //}
-                            //std::cout << "\n";
 
                             value_type val = tok.function_->evaluate(arg_stack, ec);
                             if (ec)
