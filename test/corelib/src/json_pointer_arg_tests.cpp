@@ -33,6 +33,23 @@ TEST_CASE("json_reference array tests")
         CHECK(json::null() == v[4]);
         CHECK(v[4].is_null());
     }
+
+    SECTION("compare with json_const_pointer_arg")
+    {
+        json other{ j };
+        json j1(json_pointer_arg, &other);
+        json j2(json_const_pointer_arg, &other);
+        
+        CHECK(j1 == j2);
+        CHECK(j == j1);
+        CHECK(j == j2);
+
+        j[0] = "one";
+
+        CHECK(j1 == j2);
+        CHECK_FALSE(j == j1);
+        CHECK_FALSE(j == j2);
+    }
     SECTION("capacity()")
     {
         json v(json_pointer_arg, &j);
@@ -143,6 +160,23 @@ TEST_CASE("json_reference object tests")
         REQUIRE(v.is_object());
         CHECK(v.size() == 3);
         CHECK_FALSE(v.empty());
+    }
+
+    SECTION("compare with json_const_pointer_arg")
+    {
+        json other{ j };
+        json j1(json_pointer_arg, &other);
+        json j2(json_const_pointer_arg, &other);
+
+        CHECK(j1 == j2);
+        CHECK(j == j1);
+        CHECK(j == j2);
+
+        j["one"] = 4;
+
+        CHECK(j1 == j2);
+        CHECK_FALSE(j == j1);
+        CHECK_FALSE(j == j2);
     }
     SECTION("at()")
     {
