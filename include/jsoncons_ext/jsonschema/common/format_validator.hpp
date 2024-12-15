@@ -974,7 +974,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location, 
                 instance_location, 
-                "'" + str + "': " + e.message()));
+                "'" + str + "': " + ec.message()));
             if (result == walk_result::abort)
             {
                 return result;

@@ -120,7 +120,7 @@ The implementation understands the following [formats](https://json-schema.org/u
 | json-pointer  |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | regex         | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
 | time          |           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; |
-| uri           | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | (since 1.0.0)
+| uri (since 1.0.0)| &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | &#x1F7E2; | 
 
 Any other format type is ignored.
 
