@@ -7,9 +7,9 @@
         },
         "tests": [
             {
-                "description": "an invalid relative URI Reference",
-                "data": "/abc",
-                "valid": false
+                "description": "a valid URL with many special characters",
+                "data": "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com",
+                "valid": true
             }
         ]
     }

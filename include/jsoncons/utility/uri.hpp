@@ -708,6 +708,7 @@ namespace jsoncons {
             bool valid_scheme = !str.empty() && isalpha(str[0]);
             
             parse_state state = parse_state::expect_scheme;
+            std::size_t colon_pos = 0; 
             
             bool done = false;
             for (std::size_t i = 0; !done && i < str.size(); ++i)
@@ -813,15 +814,32 @@ namespace jsoncons {
                                 start = i+1;
                                 break;
                             case ':':
-                                userinfo = std::make_pair(start,start);
-                                host = std::make_pair(start,i);
-                                state = parse_state::expect_port;
-                                start = i+1;
+                                colon_pos = i;
+                                state = parse_state::expect_password;
                                 break;
                             case '/':
                                 userinfo = std::make_pair(start,start);
                                 host = std::make_pair(start,i);
                                 port = std::make_pair(i,i);
+                                state = parse_state::expect_path;
+                                start = i;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case parse_state::expect_password:
+                        switch (c)
+                        {
+                            case '@':
+                                userinfo = std::make_pair(start,i);
+                                state = parse_state::expect_host;
+                                start = i+1;
+                                break;
+                            case '/':
+                                userinfo = std::make_pair(start,start);
+                                host = std::make_pair(start,colon_pos);
+                                port = std::make_pair(colon_pos+1,i);
                                 state = parse_state::expect_path;
                                 start = i;
                                 break;
@@ -910,6 +928,27 @@ namespace jsoncons {
                     query = std::make_pair(str.size(), str.size());
                     fragment = std::make_pair(str.size(), str.size());
                     break;
+                case parse_state::expect_password:
+                    userinfo = std::make_pair(start,start);
+                    host = std::make_pair(start,colon_pos);
+                    port = std::make_pair(colon_pos+1, str.size());
+                    path = std::make_pair(str.size(), str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
+                    break;
+                case parse_state::expect_host:
+                    host = std::make_pair(start, str.size());
+                    port = std::make_pair(str.size(), str.size());
+                    path = std::make_pair(str.size(), str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
+                    break;
+                case parse_state::expect_port:
+                    port = std::make_pair(start, str.size());
+                    path = std::make_pair(str.size(), str.size());
+                    query = std::make_pair(str.size(), str.size());
+                    fragment = std::make_pair(str.size(), str.size());
+                    break;
                 case parse_state::expect_path:
                     path = std::make_pair(start,str.size());
                     query = std::make_pair(str.size(), str.size());
@@ -937,6 +976,7 @@ namespace jsoncons {
                                 expect_authority,
                                 expect_host_ipv6,
                                 expect_userinfo,
+                                expect_password,
                                 expect_host,
                                 expect_port,
                                 expect_path,
