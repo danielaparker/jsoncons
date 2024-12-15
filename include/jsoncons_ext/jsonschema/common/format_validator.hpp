@@ -974,7 +974,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location, 
                 instance_location, 
-                "'" + str + "' is not a valid URI."));
+                "'" + str + "': " + e.message()));
             if (result == walk_result::abort)
             {
                 return result;

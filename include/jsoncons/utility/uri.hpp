@@ -23,7 +23,9 @@ namespace jsoncons {
         success = 0,
         invalid_uri = 1,
         invalid_character_in_scheme = 2,
-        invalid_character_in_path = 3
+        invalid_character_in_userinfo = 3,
+        invalid_character_in_host = 4,
+        invalid_character_in_path = 5
     };
 
 
@@ -43,6 +45,10 @@ namespace jsoncons {
                     return "Invalid URI";
                 case uri_errc::invalid_character_in_scheme:
                     return "Invalid characters in scheme";
+                case uri_errc::invalid_character_in_userinfo:
+                    return "Invalid characters in userinfo";
+                case uri_errc::invalid_character_in_host:
+                    return "Invalid characters in host";
                 case uri_errc::invalid_character_in_path:
                     return "Invalid characters in path";
                 default:
@@ -706,6 +712,8 @@ namespace jsoncons {
             std::size_t start = 0;
 
             bool valid_scheme = !str.empty() && isalpha(str[0]);
+            bool valid_userinfo = true;
+            bool valid_host = true;
             
             parse_state state = parse_state::expect_scheme;
             std::size_t colon_pos = 0; 
@@ -809,9 +817,15 @@ namespace jsoncons {
                         switch (c)
                         {
                             case '@':
+                                if (!valid_userinfo)
+                                {
+                                    ec = uri_errc::invalid_character_in_userinfo;
+                                    return uri{};
+                                }
                                 userinfo = std::make_pair(start,i);
                                 state = parse_state::expect_host;
                                 start = i+1;
+                                valid_host = true;
                                 break;
                             case ':':
                                 colon_pos = i;
@@ -825,6 +839,11 @@ namespace jsoncons {
                                 start = i;
                                 break;
                             default:
+                                if (c == ' ')
+                                {
+                                    valid_userinfo = false;
+                                    valid_host = false;
+                                }
                                 break;
                         }
                         break;
@@ -832,11 +851,21 @@ namespace jsoncons {
                         switch (c)
                         {
                             case '@':
+                                if (!valid_userinfo)
+                                {
+                                    ec = uri_errc::invalid_character_in_userinfo;
+                                    return uri{};
+                                }
                                 userinfo = std::make_pair(start,i);
                                 state = parse_state::expect_host;
                                 start = i+1;
                                 break;
                             case '/':
+                                if (!valid_host)
+                                {
+                                    ec = uri_errc::invalid_character_in_host;
+                                    return uri{};
+                                }
                                 userinfo = std::make_pair(start,start);
                                 host = std::make_pair(start,colon_pos);
                                 port = std::make_pair(colon_pos+1,i);
@@ -844,6 +873,11 @@ namespace jsoncons {
                                 start = i;
                                 break;
                             default:
+                                if (c == ' ')
+                                {
+                                    valid_userinfo = false;
+                                    valid_host = false;
+                                }
                                 break;
                         }
                         break;
@@ -851,6 +885,11 @@ namespace jsoncons {
                         switch (c)
                         {
                             case ':':
+                                if (!valid_host)
+                                {
+                                    ec = uri_errc::invalid_character_in_host;
+                                    return uri{};
+                                }
                                 host = std::make_pair(start,i);
                                 state = parse_state::expect_port;
                                 start = i+1;
@@ -922,6 +961,11 @@ namespace jsoncons {
                     break;
                 case parse_state::expect_userinfo:
                     userinfo = std::make_pair(start,start);
+                    if (!valid_host)
+                    {
+                        ec = uri_errc::invalid_character_in_host;
+                        return uri{};
+                    }
                     host = std::make_pair(start,str.size());
                     port = std::make_pair(str.size(), str.size());
                     path = std::make_pair(str.size(), str.size());
@@ -930,6 +974,11 @@ namespace jsoncons {
                     break;
                 case parse_state::expect_password:
                     userinfo = std::make_pair(start,start);
+                    if (!valid_host)
+                    {
+                        ec = uri_errc::invalid_character_in_host;
+                        return uri{};
+                    }
                     host = std::make_pair(start,colon_pos);
                     port = std::make_pair(colon_pos+1, str.size());
                     path = std::make_pair(str.size(), str.size());
@@ -937,6 +986,11 @@ namespace jsoncons {
                     fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_host:
+                    if (!valid_host)
+                    {
+                        ec = uri_errc::invalid_character_in_host;
+                        return uri{};
+                    }
                     host = std::make_pair(start, str.size());
                     port = std::make_pair(str.size(), str.size());
                     path = std::make_pair(str.size(), str.size());
