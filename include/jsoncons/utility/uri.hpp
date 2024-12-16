@@ -25,7 +25,8 @@ namespace jsoncons {
         invalid_character_in_scheme = 2,
         invalid_character_in_userinfo = 3,
         invalid_character_in_host = 4,
-        invalid_character_in_path = 5
+        invalid_character_in_path = 5,
+        invalid_character_in_fragment = 6
     };
 
 
@@ -51,6 +52,8 @@ namespace jsoncons {
                     return "Invalid characters in host";
                 case uri_errc::invalid_character_in_path:
                     return "Invalid characters in path";
+                case uri_errc::invalid_character_in_fragment:
+                    return "Invalid characters in fragment";
                 default:
                     return "Unknown uri error";
             }
@@ -144,7 +147,7 @@ namespace jsoncons {
             }
         }
 
-        explicit uri(const std::string& str)
+        explicit uri(jsoncons::string_view str)
         {
             std::error_code ec;
             *this = parse(str, ec);
@@ -699,15 +702,15 @@ namespace jsoncons {
             }
             return decoded;
         }
-        static uri parse(const std::string& str, std::error_code& ec)
+        static uri parse(string_view str, std::error_code& ec)
         {
-            part_type scheme;
-            part_type userinfo;
-            part_type host;
-            part_type port;
-            part_type path;
-            part_type query;
-            part_type fragment;
+            part_type scheme = std::make_pair(0,0);
+            part_type userinfo = std::make_pair(0,0);
+            part_type host = std::make_pair(0,0);
+            part_type port = std::make_pair(0,0);
+            part_type path = std::make_pair(0,0);
+            part_type query = std::make_pair(0,0);
+            part_type fragment = std::make_pair(0,0);
 
             std::size_t start = 0;
 
@@ -715,15 +718,31 @@ namespace jsoncons {
             bool valid_userinfo = true;
             bool valid_host = true;
             
-            parse_state state = parse_state::expect_scheme;
+            parse_state state = parse_state::start;
             std::size_t colon_pos = 0; 
             
             bool done = false;
-            for (std::size_t i = 0; !done && i < str.size(); ++i)
+            std::size_t i = 0;
+            while (i < str.size())
             {
                 char c = str[i];
                 switch (state)
                 {
+                    case parse_state::start:
+                        switch (c)
+                        {
+                            case '/':
+                                state = parse_state::expect_path;
+                                break;
+                            case '#':
+                                state = parse_state::expect_fragment;
+                                start = ++i; 
+                                break;
+                            default:
+                                state = parse_state::expect_scheme;
+                                break;
+                        }
+                        break;
                     case parse_state::expect_scheme:
                         switch (c)
                         {
@@ -739,11 +758,13 @@ namespace jsoncons {
                                     state = parse_state::expect_first_slash;
                                     start = i;
                                 }
+                                ++i;
                                 break;
                             case '?':
                                 path = std::make_pair(start, i);
                                 state = parse_state::expect_query;
                                 start = i + 1;
+                                ++i;
                                 break;
                             case '#':
                                 userinfo = std::make_pair(start,start);
@@ -753,11 +774,17 @@ namespace jsoncons {
                                 query = std::make_pair(i,i);
                                 state = parse_state::expect_fragment;
                                 start = i+1; 
+                                ++i;
                                 break;
                             default:
                                 if (!(isalnum(c) || c == '+' || c == '.' || c == '-'))
                                 {
                                     valid_scheme = false;
+                                }
+                                if (++i == str.size()) // end of string, haven't found a colon, try path
+                                {
+                                    i = 0;
+                                    state = parse_state::expect_path;
                                 }
                                 break;
                         }
@@ -767,10 +794,12 @@ namespace jsoncons {
                         {
                             case '/':
                                 state = parse_state::expect_second_slash;
+                                ++i;
                                 break;
                             default:
                                 start = i;
                                 state = parse_state::expect_path;
+                                ++i;
                                 break;
                         }
                         break;
@@ -780,8 +809,10 @@ namespace jsoncons {
                             case '/':
                                 state = parse_state::expect_authority;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
+                                ++i;
                                 break;
                         }
                         break;
@@ -791,11 +822,12 @@ namespace jsoncons {
                             case '[':
                                 state = parse_state::expect_host_ipv6;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
                                 state = parse_state::expect_userinfo;
                                 start = i;
-                                --i;
+                                // i unchanged;
                                 break;
                         }
                         break;
@@ -808,8 +840,10 @@ namespace jsoncons {
                                 port = std::make_pair(i,i);
                                 state = parse_state::expect_path;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
+                                ++i;
                                 break;
                         }
                         break;
@@ -826,10 +860,12 @@ namespace jsoncons {
                                 state = parse_state::expect_host;
                                 start = i+1;
                                 valid_host = true;
+                                ++i;
                                 break;
                             case ':':
                                 colon_pos = i;
                                 state = parse_state::expect_password;
+                                ++i;
                                 break;
                             case '/':
                                 userinfo = std::make_pair(start,start);
@@ -837,6 +873,7 @@ namespace jsoncons {
                                 port = std::make_pair(i,i);
                                 state = parse_state::expect_path;
                                 start = i;
+                                ++i;
                                 break;
                             default:
                                 if (c == ' ')
@@ -844,6 +881,7 @@ namespace jsoncons {
                                     valid_userinfo = false;
                                     valid_host = false;
                                 }
+                                ++i;
                                 break;
                         }
                         break;
@@ -859,6 +897,7 @@ namespace jsoncons {
                                 userinfo = std::make_pair(start,i);
                                 state = parse_state::expect_host;
                                 start = i+1;
+                                ++i;
                                 break;
                             case '/':
                                 if (!valid_host)
@@ -871,6 +910,7 @@ namespace jsoncons {
                                 port = std::make_pair(colon_pos+1,i);
                                 state = parse_state::expect_path;
                                 start = i;
+                                ++i;
                                 break;
                             default:
                                 if (c == ' ')
@@ -878,6 +918,7 @@ namespace jsoncons {
                                     valid_userinfo = false;
                                     valid_host = false;
                                 }
+                                ++i;
                                 break;
                         }
                         break;
@@ -893,8 +934,10 @@ namespace jsoncons {
                                 host = std::make_pair(start,i);
                                 state = parse_state::expect_port;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
+                                ++i;
                                 break;
                         }
                         break;
@@ -905,8 +948,10 @@ namespace jsoncons {
                                 port = std::make_pair(start,i);
                                 state = parse_state::expect_path;
                                 start = i;
+                                ++i;
                                 break;
                             default:
+                                ++i;
                                 break;
                         }
                         break;
@@ -917,20 +962,34 @@ namespace jsoncons {
                                 path = std::make_pair(start,i);
                                 state = parse_state::expect_query;
                                 start = i+1;
+                                ++i;
                                 break;
                             case '#':
                                 path = std::make_pair(start,i);
                                 query = std::make_pair(i,i);
                                 state = parse_state::expect_fragment;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
-                                if (!(is_pchar(c,str.data()+i, str.size() - i) || c == '/'))
+                            {
+                                auto first = str.cbegin() + i;
+                                auto result = is_pchar(first, str.cend());
+                                if (result.second)
+                                {
+                                    i += (result.first - first);
+                                }
+                                else if (c == '/')
+                                {
+                                    ++i;
+                                }
+                                else
                                 {
                                     ec = uri_errc::invalid_character_in_path;
                                     return uri{};
-                                }                                
+                                }
                                 break;
+                            }
                         }
                         break;
                     case parse_state::expect_query:
@@ -940,12 +999,15 @@ namespace jsoncons {
                                 query = std::make_pair(start,i);
                                 state = parse_state::expect_fragment;
                                 start = i+1;
+                                ++i;
                                 break;
                             default:
+                                ++i;
                                 break;
                         }
                         break;
                     case parse_state::expect_fragment:
+                        ++i;
                         break;
                 }
             }
@@ -1014,28 +1076,35 @@ namespace jsoncons {
                     break;
                 case parse_state::expect_fragment:
                     fragment = std::make_pair(start,str.size());
+                    if (!validate_fragment(string_view{str.data() + fragment.first, (fragment.second - fragment.first)}))
+                    {
+                        ec = uri_errc::invalid_character_in_fragment;
+                        return uri{};
+                    }
                     break;
                 default:
                     ec = uri_errc::invalid_uri;
                     break;
             }
 
-            return uri(str, scheme, userinfo, host, port, path, query, fragment);
+            return uri(std::string(str), scheme, userinfo, host, port, path, query, fragment);
         }
 
     private:
-        enum class parse_state {expect_scheme,
-                                expect_first_slash,
-                                expect_second_slash,
-                                expect_authority,
-                                expect_host_ipv6,
-                                expect_userinfo,
-                                expect_password,
-                                expect_host,
-                                expect_port,
-                                expect_path,
-                                expect_query,
-                                expect_fragment};
+        enum class parse_state {
+            start,
+            expect_scheme,
+            expect_first_slash,
+            expect_second_slash,
+            expect_authority,
+            expect_host_ipv6,
+            expect_userinfo,
+            expect_password,
+            expect_host,
+            expect_port,
+            expect_path,
+            expect_query,
+            expect_fragment};
 
         uri(const std::string& uri, part_type scheme, part_type userinfo, 
             part_type host, part_type port, part_type path, 
@@ -1495,9 +1564,59 @@ namespace jsoncons {
             return is_unreserved(c) || is_pct_encoded(s,length) || c == ';' || c == ':' || c == '&' || c == '=' || c == '+' || c == '$' || c == ',';
         }
 
-        static bool is_pchar(char c, const char* s, std::size_t length)
+        static std::pair<string_view::const_iterator,bool> is_pct_encoded(string_view::const_iterator first, 
+            string_view::const_iterator last)
         {
-            return is_unreserved(c) || is_pct_encoded(s,length) || is_sub_delim(c) || c == ':' || c == '@';
+            if ((last-first) < 3)
+            {
+                return std::pair<string_view::const_iterator,bool>{first+1,false};
+            }
+            bool result = first[0] == '%' && is_hex(first[1]) && is_hex(first[2]);
+            
+            return result ? std::pair<string_view::const_iterator,bool>{first+3,true} : std::pair<string_view::const_iterator,bool>{first+1,false};
+        }
+
+        static std::pair<string_view::const_iterator,bool> is_pchar(string_view::iterator first, string_view::iterator last)
+        {
+            JSONCONS_ASSERT(first != last);
+            
+            const char c = *first;
+            if (is_unreserved(c))
+            {
+                return std::pair<string_view::const_iterator,bool>{first+1,true};
+            }
+            auto result = is_pct_encoded(first,last);
+            if (result.second)
+            {
+                return result;
+            }
+            
+            return std::pair<string_view::const_iterator,bool>{first+1,is_sub_delim(c) || c == ':' || c == '@'};
+        }
+        
+        static bool validate_fragment(string_view fragment)
+        {
+            if (fragment.length() == 0)
+            {
+                return true;
+            }
+            bool valid = true;
+            
+            auto cur = fragment.begin();
+            auto last = fragment.end();
+            while (valid && cur != last)
+            {
+                auto result = is_pchar(cur,last);
+                if (!result.second && !(*cur == '?' || *cur == '/'))
+                {
+                    valid = false;
+                }
+                else
+                {
+                    cur = result.first;
+                }
+            }
+            return valid;
         }
     };
 

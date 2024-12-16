@@ -10,7 +10,7 @@ The class `uri` represents a Uniform Resource Identifier (URI) reference.
 
     uri();
 
-    explicit uri(const std::string& str);
+    explicit uri(jsoncons::string_view str);
 Constructs a `uri` by parsing the given string.
 
     uri(jsoncons::string_view scheme,
@@ -122,7 +122,7 @@ Resolve `reference` as a URI relative to this URI.
     const std::string& string() const noexcept;
 Returns a URI string.
 
-    static uri parse(const std::string& str, std::error_code& ec);
+    static uri parse(jsoncons::string_view str, std::error_code& ec);
 Creates a `uri` by parsing the given string. If a parse error is
 encountered, returns a default constructed `uri` and sets `ec`.
 

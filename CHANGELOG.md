@@ -52,7 +52,7 @@ json j{jsoncons::null_arg};
 
 - Custom jmespath functions are now supported thanks to PR #560
 
-- jsonschema now understands the uri format
+- jsonschema now understands the 'uri' and 'uri-reference' formats
 
 0.178.0
 -------
