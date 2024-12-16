@@ -996,6 +996,29 @@ namespace jsonschema {
     }
 
     inline
+    walk_result uri_reference_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
+        const jsonpointer::json_pointer& instance_location, 
+        const std::string& str,
+        error_reporter& reporter)
+    {
+        std::error_code ec;
+        auto u = uri::parse(str, ec);
+        if (ec)
+        {
+            walk_result result = reporter.error(validation_message("uri",
+                eval_path,
+                schema_location, 
+                instance_location, 
+                "'" + str + "': " + ec.message()));
+            if (result == walk_result::abort)
+            {
+                return result;
+            }
+        }
+        return walk_result::advance;
+    }
+
+    inline
     walk_result jsonpointer_check(const jsonpointer::json_pointer& eval_path, const uri& schema_location,
         const jsonpointer::json_pointer& instance_location, 
         const std::string& str,

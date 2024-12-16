@@ -640,6 +640,10 @@ namespace jsonschema {
             {
                 format_check = uri_check;
             } 
+            else if (format == "uri-reference") 
+            {
+                format_check = uri_reference_check;
+            } 
             else
             {
                 // Not supported - ignore
