@@ -721,7 +721,6 @@ namespace jsoncons {
             parse_state state = parse_state::start;
             std::size_t colon_pos = 0; 
             
-            bool done = false;
             std::size_t i = 0;
             while (i < str.size())
             {
@@ -750,7 +749,7 @@ namespace jsoncons {
                                 if (!valid_scheme)
                                 {
                                     ec = uri_errc::invalid_character_in_scheme;
-                                    done = true;
+                                    return uri{};
                                 }
                                 else
                                 {
