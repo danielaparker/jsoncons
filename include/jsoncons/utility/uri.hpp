@@ -1013,14 +1013,6 @@ namespace jsoncons {
             }
             switch (state)
             {
-                case parse_state::expect_scheme:
-                    userinfo = std::make_pair(start,start);
-                    host = std::make_pair(start,start);
-                    port = std::make_pair(start,start);
-                    path = std::make_pair(start,str.size());
-                    query = std::make_pair(str.size(), str.size());
-                    fragment = std::make_pair(str.size(), str.size());
-                    break;
                 case parse_state::expect_userinfo:
                     userinfo = std::make_pair(start,start);
                     if (!valid_host)
