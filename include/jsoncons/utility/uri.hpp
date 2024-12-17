@@ -714,8 +714,6 @@ namespace jsoncons {
 
             std::size_t start = 0;
 
-            bool valid_scheme = !str.empty() && isalpha(str[0]);
-            
             parse_state state = parse_state::start;
             std::size_t colon_pos = 0; 
             
@@ -744,7 +742,7 @@ namespace jsoncons {
                         switch (c)
                         {
                             case ':':
-                                if (!valid_scheme)
+                                if (!validate_scheme(string_view{str.data() + start, i-start}))
                                 {
                                     ec = uri_errc::invalid_character_in_scheme;
                                     return uri{};
@@ -774,10 +772,6 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             default:
-                                if (!(isalnum(c) || c == '+' || c == '.' || c == '-'))
-                                {
-                                    valid_scheme = false;
-                                }
                                 if (++i == str.size()) // end of string, haven't found a colon, try path
                                 {
                                     i = 0;
@@ -1634,6 +1628,28 @@ namespace jsoncons {
             while (valid && cur != last)
             {
                 if (*cur == ' ')
+                {
+                    valid = false;
+                }
+                ++cur;
+            }
+            return valid;
+        }
+
+        static bool validate_scheme(string_view scheme)
+        {
+            if (scheme.length() == 0)
+            {
+                return true;
+            }
+        
+            bool valid = isalpha(scheme[0]);
+            auto cur = scheme.begin();
+            auto last = scheme.end();
+            while (valid && cur != last)
+            {
+                char c  = *cur;
+                if (!(isalnum(c) || c == '+' || c == '.' || c == '-'))
                 {
                     valid = false;
                 }
