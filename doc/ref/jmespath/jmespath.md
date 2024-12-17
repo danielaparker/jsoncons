@@ -177,7 +177,7 @@ public:
                 jmespath::eval_context<Json>& context,
                 std::error_code& ec) -> reference
             {
-                auto result = resources.create_json(current_index);
+                auto result = context.create_json(current_index);
                 return *result;
             }
         );
@@ -192,7 +192,7 @@ public:
                 if (!(params[0].is_value() && params[2].is_expression()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
                 reference ctx = params[0].value();
@@ -203,10 +203,10 @@ public:
                 if (!countValue.is_number())
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
-                auto result = resources.create_json(jsoncons::json_array_arg);
+                auto result = context.create_json(jsoncons::json_array_arg);
                 int count = countValue.template as<int>();
                 for (size_t i = 0; i < count; i++)
                 {
@@ -241,7 +241,7 @@ public:
                 if (!(params[0].is_value() && params[1].is_value()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
                 reference arg0 = params[0].value();
@@ -249,18 +249,18 @@ public:
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
                 if (arg0.is<int64_t>() && arg1.is<int64_t>())
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
-                    return *resources.create_json(v);
+                    return *context.create_json(v);
                 }
                 else
                 {
                     double v = arg0.template as<double>() + arg1.template as<double>();
-                    return *resources.create_json(v);
+                    return *context.create_json(v);
                 }
             }
         );
