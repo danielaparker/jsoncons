@@ -367,7 +367,7 @@ namespace jmespath {
         using reference = const Json&;
         using char_type = typename Json::char_type;
         using parameter_type = parameter<Json>;
-        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, 
+        using custom_function_type = std::function<Json(jsoncons::span<const parameter_type>, 
             eval_context<Json>&, std::error_code& ec)>;
         using string_type = typename Json::string_type;
 
@@ -458,7 +458,7 @@ namespace jmespath {
         using reference = const Json&;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
-        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, 
+        using custom_function_type = std::function<Json(jsoncons::span<const parameter_type>, 
             eval_context<Json>&, std::error_code& ec)>;
     private:
         custom_function_type f_;
@@ -477,7 +477,9 @@ namespace jmespath {
             eval_context<Json>& context,
             std::error_code& ec) const override
         {
-            return f_(params, context, ec);
+            auto val = f_(params, context, ec);
+            auto ptr = context.create_json(std::move(val));
+            return *ptr;
         }
     };
 
@@ -489,7 +491,7 @@ namespace jmespath {
         using value_type = Json;
         using reference = const Json&;
         using parameter_type = parameter<Json>;
-        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, eval_context<Json>& context, 
+        using custom_function_type = std::function<Json(jsoncons::span<const parameter_type>, eval_context<Json>& context, 
             std::error_code& ec)>;
         using const_iterator = typename std::vector<custom_function<Json>>::const_iterator;
 

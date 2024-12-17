@@ -27,28 +27,27 @@ public:
             0,                                       // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::eval_context<Json>& context,
-                std::error_code& ec) -> reference
+                std::error_code& ec) -> Json
             {
                 auto now = std::chrono::system_clock::now();
                 auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-                return *context.create_json(milliseconds.count());
+                return Json{milliseconds.count()};
             }
         );
         this->register_function("current_index", // function name
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::eval_context<Json>& context,
-                std::error_code& ec) -> reference
+                std::error_code& ec) -> Json
             {
-                auto result = context.create_json(current_index);
-                return *result;
+                return Json{current_index};
             }
         );
         this->register_function("generate_array", // function name
             4,                                    // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::eval_context<Json>& context,
-                std::error_code& ec) -> reference
+                std::error_code& ec) -> Json
             {
                 JSONCONS_ASSERT(4 == params.size());
 
@@ -69,7 +68,7 @@ public:
                     return context.null_value();
                 }
 
-                auto result = context.create_json(jsoncons::json_array_arg);
+                Json result{jsoncons::json_array_arg};
                 int count = countValue.template as<int>();
                 for (size_t i = 0; i < count; i++)
                 {
@@ -81,23 +80,23 @@ public:
                     if (ele.is_null())
                     {
                         auto defaultVal = get_value(ctx, context, argDefault);
-                        result->emplace_back(defaultVal);
+                        result.emplace_back(std::move(defaultVal));
                     }
                     else
                     {
-                        result->emplace_back(ele);
+                        result.emplace_back(ele);
                     }
                 }
                 current_index = 0;
 
-                return *result;
+                return result;
             }
         );
         this->register_function("add", // function name
             2,                         // number of arguments   
             [](jsoncons::span<const jmespath::parameter<Json>> params,
                 jmespath::eval_context<Json>& context,
-                std::error_code& ec) -> reference
+                std::error_code& ec) -> Json
             {
                 JSONCONS_ASSERT(2 == params.size());
 
@@ -118,12 +117,12 @@ public:
                 if (arg0.is<int64_t>() && arg1.is<int64_t>())
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
-                    return *context.create_json(v);
+                    return Json(v);
                 }
                 else
                 {
                     double v = arg0.template as<double>() + arg1.template as<double>();
-                    return *context.create_json(v);
+                    return Json(v);
                 }
             }
         );
@@ -136,13 +135,11 @@ public:
         {
             const auto& expr = param.expression();
             std::error_code ec;
-            reference value = expr.evaluate(ctx, context, ec);
-            return value;
+            return expr.evaluate(ctx, context, ec);
         }
         else
         {
-            reference value = param.value();
-            return value;
+            return param.value();
         }
     }
 };
