@@ -25,14 +25,22 @@ Since 0.179, an initial buffer of text is supplied to the parse with a call to
 constructed with a user provided chunk reader to obtain additional JSON text
 as needed. See [Incremental parsing (since 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790). 
 
-Defect fixes:
+Fixed bugs:
 
-- Fixed a bug in jmespath avg function via PR #560
+- Git Issue #554: [jsonpath] evaluation throws on json containing json_const_pointer
+
+- Git PR #560: [jmespath] When there are elements and the sum is indeed zero, avg function should return average value returned instead of a null value.
+
+- Git Issue #561: json_string_reader doesnot work correctly for empty string or string with all blanks
+
+- Git Issue #564: fix basic_json compare of double and non-numeric string
+
+Fixed other issues: 
 
 - Fixed a number of issues in `uri::resolve`, used in jsonschema, related to abnormal references,
 particulay ones containing dots in path segments. 
 
-Removal of deprecated jsonschema classes and functions
+Removed deprecated jsonschema classes and functions
 
 - The jsonschema function `make_schema`, classes `json_validator` and `validation_output`,
 header file `json_validator.hpp` and example `legacy_jsonschema_examples.cpp`, 

@@ -269,17 +269,17 @@ TEST_CASE("test_byte_strings_equal")
 
 TEST_CASE("json comparator equals tests")
 {
-    json var1(semantic_tag::none);
-    json var2{ json::object(), semantic_tag::none };
-    CHECK((var1 == var1 && var2 == var2));
-    CHECK((var1 == var2 && var2 == var1));
+    json j1(semantic_tag::none);
+    json j2{ json::object(), semantic_tag::none };
+    CHECK((j1 == j1 && j2 == j2));
+    CHECK((j1 == j2 && j2 == j1));
 
     json var3{semantic_tag::none };
-    CHECK((var3 == var1 && var1 == var3));
+    CHECK((var3 == j1 && j1 == var3));
     json var4{ json::object({{"first",1},{"second",2}}), semantic_tag::none };
     json var5{ json::object({ { "first",1 },{ "second",2 } }), semantic_tag::none };
     CHECK((var3 != var4 && var4 != var3));
-    CHECK((var2 != var4 && var4 != var2));
+    CHECK((j2 != var4 && var4 != j2));
     CHECK(var4 == var4);
     CHECK(var4 == var5);
     CHECK(var5 == var4);
@@ -316,7 +316,7 @@ TEST_CASE("json comparator equals tests")
     CHECK(var17 == var16);
 }
 
-TEST_CASE("basic_json number comparators")
+TEST_CASE("basic_json number compare")
 {
     SECTION("unsigned unsigned")
     {
@@ -507,6 +507,70 @@ TEST_CASE("basic_json number comparators")
         CHECK_FALSE(a <= b); // value and value
         CHECK_FALSE(b > a); // value and value
         CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("double and bigint string")
+    {
+        json a{std::numeric_limits<double>::max()};
+        json b{std::to_string(std::numeric_limits<uint64_t>::lowest()), semantic_tag::bigint};
+
+        CHECK_FALSE(a == b); 
+        CHECK(a != b);
+        CHECK(a > b);
+        CHECK(a >= b);
+        CHECK(b < a);
+        CHECK(b <= a);
+        CHECK_FALSE(a < b); 
+        CHECK_FALSE(a <= b);
+        CHECK_FALSE(b > a); 
+        CHECK_FALSE(b >= a);
+    }
+    SECTION("bigint string and double")
+    {
+        json a{ std::to_string(std::numeric_limits<uint64_t>::max()), semantic_tag::bigint };
+        json b{ std::numeric_limits<double>::lowest() };
+
+        CHECK_FALSE(a == b);
+        CHECK(a != b);
+        CHECK(a > b);
+        CHECK(a >= b);
+        CHECK(b < a);
+        CHECK(b <= a);
+        CHECK_FALSE(a < b);
+        CHECK_FALSE(a <= b);
+        CHECK_FALSE(b > a);
+        CHECK_FALSE(b >= a);
+    }
+    SECTION("double and non-numeric string")
+    {
+        json a{ std::numeric_limits<double>::max() };
+        json b{ "Hello world" };
+
+        CHECK_FALSE(a == b);
+        CHECK(a != b);
+        CHECK_FALSE(a > b);
+        CHECK_FALSE(a >= b);
+        CHECK_FALSE(b < a);
+        CHECK_FALSE(b <= a);
+        CHECK(a < b);
+        CHECK(a <= b);
+        CHECK(b > a);
+        CHECK(b >= a);
+    }
+    SECTION("non-numeric string and double")
+    {
+        json a{"Hello world"};
+        json b{ std::numeric_limits<double>::lowest() };
+
+        CHECK_FALSE(a == b);
+        CHECK(a != b);
+        CHECK(a > b);
+        CHECK(a >= b);
+        CHECK(b < a);
+        CHECK(b <= a);
+        CHECK_FALSE(a < b);
+        CHECK_FALSE(a <= b);
+        CHECK_FALSE(b > a);
+        CHECK_FALSE(b >= a);
     }
 }
 

@@ -1695,7 +1695,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            if (is_string_storage(rhs.storage_kind()))
+                            if (is_string_storage(rhs.storage_kind()) && is_number_tag(rhs.tag()))
                             {
                                 double val1 = as_double();
                                 double val2 = rhs.as_double();
