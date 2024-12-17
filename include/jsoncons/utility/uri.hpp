@@ -890,7 +890,7 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             case '/':
-                                if (!validate_host(string_view{str.data() + start, colon_pos}))
+                                if (!validate_host(string_view{str.data() + start, colon_pos-start}))
                                 {
                                     ec = uri_errc::invalid_character_in_host;
                                     return uri{};
@@ -1025,7 +1025,7 @@ namespace jsoncons {
                     fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_host:
-                    if (!validate_host(string_view{str.data() + start, str.size()}))
+                    if (!validate_host(string_view{str.data() + start, str.size()-start}))
                     {
                         ec = uri_errc::invalid_character_in_host;
                         return uri{};
