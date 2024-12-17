@@ -26,28 +26,28 @@ public:
         this->register_function("current_date_time", // function name
             0,                                       // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
-                jmespath::dynamic_resources<Json>& resources,
+                jmespath::eval_context<Json>& context,
                 std::error_code& ec) -> reference
             {
                 auto now = std::chrono::system_clock::now();
                 auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-                return *resources.create_json(milliseconds.count());
+                return *context.create_json(milliseconds.count());
             }
         );
         this->register_function("current_index", // function name
             0,                                   // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
-                jmespath::dynamic_resources<Json>& resources,
+                jmespath::eval_context<Json>& context,
                 std::error_code& ec) -> reference
             {
-                auto result = resources.create_json(current_index);
+                auto result = context.create_json(current_index);
                 return *result;
             }
         );
         this->register_function("generate_array", // function name
             4,                                    // number of arguments   
             [](const jsoncons::span<const jmespath::parameter<Json>> params,
-                jmespath::dynamic_resources<Json>& resources,
+                jmespath::eval_context<Json>& context,
                 std::error_code& ec) -> reference
             {
                 JSONCONS_ASSERT(4 == params.size());
@@ -55,32 +55,32 @@ public:
                 if (!(params[0].is_value() && params[2].is_expression()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
-                reference context = params[0].value();
-                reference countValue = get_value(context, resources, params[1]);
+                reference ctx = params[0].value();
+                reference countValue = get_value(ctx, context, params[1]);
                 const auto& expr = params[2].expression();
                 auto argDefault = params[3];
 
                 if (!countValue.is_number())
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
-                auto result = resources.create_json(jsoncons::json_array_arg);
+                auto result = context.create_json(jsoncons::json_array_arg);
                 int count = countValue.template as<int>();
                 for (size_t i = 0; i < count; i++)
                 {
                     current_index = i;
                     std::error_code ec2;
 
-                    reference ele = expr.evaluate(context, resources, ec2); 
+                    reference ele = expr.evaluate(ctx, context, ec2); 
 
                     if (ele.is_null())
                     {
-                        auto defaultVal = get_value(context, resources, argDefault);
+                        auto defaultVal = get_value(ctx, context, argDefault);
                         result->emplace_back(defaultVal);
                     }
                     else
@@ -96,7 +96,7 @@ public:
         this->register_function("add", // function name
             2,                         // number of arguments   
             [](jsoncons::span<const jmespath::parameter<Json>> params,
-                jmespath::dynamic_resources<Json>& resources,
+                jmespath::eval_context<Json>& context,
                 std::error_code& ec) -> reference
             {
                 JSONCONS_ASSERT(2 == params.size());
@@ -104,7 +104,7 @@ public:
                 if (!(params[0].is_value() && params[1].is_value()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
                 reference arg0 = params[0].value();
@@ -112,31 +112,31 @@ public:
                 if (!(arg0.is_number() && arg1.is_number()))
                 {
                     ec = jmespath::jmespath_errc::invalid_argument;
-                    return resources.null_value();
+                    return context.null_value();
                 }
 
                 if (arg0.is<int64_t>() && arg1.is<int64_t>())
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
-                    return *resources.create_json(v);
+                    return *context.create_json(v);
                 }
                 else
                 {
                     double v = arg0.template as<double>() + arg1.template as<double>();
-                    return *resources.create_json(v);
+                    return *context.create_json(v);
                 }
             }
         );
     }
 
-    static reference get_value(reference context, jmespath::dynamic_resources<Json>& resources,
+    static reference get_value(reference ctx, jmespath::eval_context<Json>& context,
         const jmespath::parameter<Json>& param)
     {
         if (param.is_expression())
         {
             const auto& expr = param.expression();
             std::error_code ec;
-            reference value = expr.evaluate(context, resources, ec);
+            reference value = expr.evaluate(ctx, context, ec);
             return value;
         }
         else

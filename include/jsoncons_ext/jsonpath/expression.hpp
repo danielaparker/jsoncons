@@ -2252,7 +2252,7 @@ namespace detail {
     };
 
     template <typename Json,typename JsonReference>
-    class dynamic_resources
+    class eval_context
     {
         using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
@@ -2267,7 +2267,7 @@ namespace detail {
         std::unordered_map<std::size_t,pointer> cache_;
         string_type length_label_;
     public:
-        dynamic_resources(const allocator_type& alloc = allocator_type())
+        eval_context(const allocator_type& alloc = allocator_type())
             : alloc_(alloc), length_label_{JSONCONS_CSTRING_CONSTANT(char_type, "length"), alloc}
         {
         }
@@ -2371,14 +2371,14 @@ namespace detail {
             return true;
         }
 
-        virtual void select(dynamic_resources<Json,JsonReference>& resources,
+        virtual void select(eval_context<Json,JsonReference>& context,
             reference root,
             const path_node_type& base_path, 
             reference val, 
             node_receiver_type& receiver,
             result_options options) const = 0;
 
-        virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        virtual reference evaluate(eval_context<Json,JsonReference>& context,
             reference root,
             const path_node_type& base_path, 
             reference current, 
@@ -2662,7 +2662,7 @@ namespace detail {
 
         virtual ~expression_base() noexcept = default;
 
-        virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
+        virtual value_type evaluate(eval_context<Json,JsonReference>& context,
             reference root,
             reference val, 
             result_options options,
@@ -2801,14 +2801,14 @@ namespace detail {
             construct(std::move(other));
         }
 
-        const Json& get_value(const_reference_arg_t, dynamic_resources<Json,JsonReference>&) const
+        const Json& get_value(const_reference_arg_t, eval_context<Json,JsonReference>&) const
         {
             return value_;
         }
 
-        Json& get_value(reference_arg_t, dynamic_resources<Json,JsonReference>& resources) const
+        Json& get_value(reference_arg_t, eval_context<Json,JsonReference>& context) const
         {
-            return *resources.create_json(value_);
+            return *context.create_json(value_);
         }
 
 #if defined(__GNUC__) && JSONCONS_GCC_AVAILABLE(12,0,0)
@@ -3116,7 +3116,7 @@ namespace detail {
 
         path_expression& operator=(path_expression&& expr) = default;
 
-        Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
+        Json evaluate(eval_context<Json,JsonReference>& context, 
             reference root,
             const path_node_type& path, 
             reference instance,
@@ -3130,7 +3130,7 @@ namespace detail {
                 {
                     result.emplace_back(to_basic_string(pathp)); 
                 };
-                evaluate(resources, root, path, instance, callback, options);
+                evaluate(context, root, path, instance, callback, options);
             }
             else
             {
@@ -3138,7 +3138,7 @@ namespace detail {
                 {
                     result.push_back(val);
                 };
-                evaluate(resources, root, path, instance, callback, options);
+                evaluate(context, root, path, instance, callback, options);
             }
 
             return result;
@@ -3146,7 +3146,7 @@ namespace detail {
 
         template <typename Callback>
         typename std::enable_if<extension_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
-        evaluate(dynamic_resources<Json,JsonReference>& resources, 
+        evaluate(eval_context<Json,JsonReference>& context, 
             reference root,
             const path_node_type& path, 
             reference current, 
@@ -3162,7 +3162,7 @@ namespace detail {
             if (selector_ != nullptr && (options & require_more) != result_options())
             {
                 path_value_receiver<Json,JsonReference> receiver{alloc_};
-                selector_->select(resources, root, path, current, receiver, options);
+                selector_->select(context, root, path, current, receiver, options);
 
                 if (receiver.nodes.size() > 1) 
                 {
@@ -3231,7 +3231,7 @@ namespace detail {
             else
             {
                 callback_receiver<Callback,Json,JsonReference> receiver(callback, alloc_);
-                selector_->select(resources, root, path, current, receiver, options);
+                selector_->select(context, root, path, current, receiver, options);
             }
         }
 
@@ -3295,7 +3295,7 @@ namespace detail {
 
         expression& operator=(expression&& expr) = default;
 
-        value_type evaluate(dynamic_resources<Json,reference>& resources, 
+        value_type evaluate(eval_context<Json,reference>& context, 
             reference root,
             reference current,
             result_options options,
@@ -3320,7 +3320,7 @@ namespace detail {
                     { 
                         case jsonpath_token_kind::literal:
                         {
-                            stack.emplace_back(std::addressof(tok.get_value(reference_arg_type(), resources)));
+                            stack.emplace_back(std::addressof(tok.get_value(reference_arg_type(), context)));
                             break;
                         }
                         case jsonpath_token_kind::unary_operator:
@@ -3382,7 +3382,7 @@ namespace detail {
                         }
                         case jsonpath_token_kind::expression:
                         {
-                            value_type val = tok.expression_->evaluate(resources, root, current, options, ec);
+                            value_type val = tok.expression_->evaluate(context, root, current, options, ec);
                             stack.emplace_back(std::move(val));
                             break;
                         }
@@ -3411,7 +3411,7 @@ namespace detail {
                             //}
                             //std::cout << "selector item: " << *ptr << "\n";
 
-                            reference val = tok.selector_->evaluate(resources, root, path_node_type{}, item.value(), options, ec);
+                            reference val = tok.selector_->evaluate(context, root, path_node_type{}, item.value(), options, ec);
 
                             stack.pop_back();
                             stack.emplace_back(stack_item_type(std::addressof(val)));

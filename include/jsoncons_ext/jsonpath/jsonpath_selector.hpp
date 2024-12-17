@@ -137,7 +137,7 @@ namespace detail {
         using string_type = typename Json::string_type;
         using path_node_type = basic_path_node<typename Json::char_type>;
 
-        static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+        static const path_node_type& generate(eval_context<Json,JsonReference>& context,
             const path_node_type& last, 
             std::size_t index, 
             result_options options) 
@@ -145,7 +145,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.create_path_node(&last, index);
+                return *context.create_path_node(&last, index);
             }
             else
             {
@@ -153,7 +153,7 @@ namespace detail {
             }
         }
 
-        static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+        static const path_node_type& generate(eval_context<Json,JsonReference>& context,
             const path_node_type& last, 
             const string_view_type& identifier, 
             result_options options) 
@@ -161,7 +161,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.create_path_node(&last, identifier);
+                return *context.create_path_node(&last, identifier);
             }
             else
             {
@@ -209,7 +209,7 @@ namespace detail {
             }
         }
 
-        void tail_select(dynamic_resources<Json,JsonReference>& resources,
+        void tail_select(eval_context<Json,JsonReference>& context,
             reference root,
             const path_node_type& last, 
             reference current,
@@ -222,11 +222,11 @@ namespace detail {
             }
             else
             {
-                tail_->select(resources, root, last, current, receiver, options);
+                tail_->select(context, root, last, current, receiver, options);
             }
         }
 
-        reference evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate_tail(eval_context<Json,JsonReference>& context,
             reference root,
             const path_node_type& last, 
             reference current, 
@@ -239,7 +239,7 @@ namespace detail {
             }
             else
             {
-                return tail_->evaluate(resources, root, last, current, options, ec);
+                return tail_->evaluate(context, root, last, current, options, ec);
             }
         }
 
@@ -283,7 +283,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
             reference root,
             const path_node_type& last, 
             reference current,
@@ -295,8 +295,8 @@ namespace detail {
                 auto it = current.find(identifier_);
                 if (it != current.object_range().end())
                 {
-                    this->tail_select(resources, root, 
-                                        path_generator_type::generate(resources, last, identifier_, options),
+                    this->tail_select(context, root, 
+                                        path_generator_type::generate(context, last, identifier_, options),
                                         it->value(), receiver, options);
                 }
             }
@@ -309,33 +309,33 @@ namespace detail {
                     std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
                     if (index < current.size())
                     {
-                        this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, index, options),
+                        this->tail_select(context, root, 
+                                            path_generator_type::generate(context, last, index, options),
                                             current[index], receiver, options);
                     }
                 }
-                else if (identifier_ == resources.length_label() && current.size() >= 0)
+                else if (identifier_ == context.length_label() && current.size() >= 0)
                 {
-                    pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
-                    this->tail_select(resources, root, 
-                                        path_generator_type::generate(resources, last, identifier_, options), 
+                    pointer ptr = context.create_json(current.size(), semantic_tag::none, context.get_allocator());
+                    this->tail_select(context, root, 
+                                        path_generator_type::generate(context, last, identifier_, options), 
                                         *ptr, 
                                         receiver, options);
                 }
             }
-            else if (current.is_string() && identifier_ == resources.length_label())
+            else if (current.is_string() && identifier_ == context.length_label())
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.create_json(count, semantic_tag::none, resources.get_allocator());
-                this->tail_select(resources, root, 
-                                    path_generator_type::generate(resources, last, identifier_, options), 
+                pointer ptr = context.create_json(count, semantic_tag::none, context.get_allocator());
+                this->tail_select(context, root, 
+                                    path_generator_type::generate(context, last, identifier_, options), 
                                     *ptr, receiver, options);
             }
             //std::cout << "end identifier_selector\n";
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
@@ -347,13 +347,13 @@ namespace detail {
                 auto it = current.find(identifier_);
                 if (it != current.object_range().end())
                 {
-                    return this->evaluate_tail(resources, root, 
-                                               path_generator_type::generate(resources, last, identifier_, options),
+                    return this->evaluate_tail(context, root, 
+                                               path_generator_type::generate(context, last, identifier_, options),
                                               it->value(), options, ec);
                 }
                 else
                 {
-                    return resources.null_value();
+                    return context.null_value();
                 }
             }
             else if (current.is_array())
@@ -365,40 +365,40 @@ namespace detail {
                     std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
                     if (index < current.size())
                     {
-                        return this->evaluate_tail(resources, root, 
-                                                   path_generator_type::generate(resources, last, index, options),
+                        return this->evaluate_tail(context, root, 
+                                                   path_generator_type::generate(context, last, index, options),
                                                    current[index], options, ec);
                     }
                     else
                     {
-                        return resources.null_value();
+                        return context.null_value();
                     }
                 }
-                else if (identifier_ == resources.length_label() && current.size() > 0)
+                else if (identifier_ == context.length_label() && current.size() > 0)
                 {
-                    pointer ptr = resources.create_json(current.size(), semantic_tag::none, resources.get_allocator());
-                    return this->evaluate_tail(resources, root, 
-                                               path_generator_type::generate(resources, last, identifier_, options), 
+                    pointer ptr = context.create_json(current.size(), semantic_tag::none, context.get_allocator());
+                    return this->evaluate_tail(context, root, 
+                                               path_generator_type::generate(context, last, identifier_, options), 
                                                *ptr, 
                                                options, ec);
                 }
                 else
                 {
-                    return resources.null_value();
+                    return context.null_value();
                 }
             }
-            else if (current.is_string() && identifier_ == resources.length_label())
+            else if (current.is_string() && identifier_ == context.length_label())
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.create_json(count, semantic_tag::none, resources.get_allocator());
-                return this->evaluate_tail(resources, root, 
-                                           path_generator_type::generate(resources, last, identifier_, options), 
+                pointer ptr = context.create_json(count, semantic_tag::none, context.get_allocator());
+                return this->evaluate_tail(context, root, 
+                                           path_generator_type::generate(context, last, identifier_, options), 
                                            *ptr, options, ec);
             }
             else
             {
-                return resources.null_value();
+                return context.null_value();
             }
         }
 
@@ -439,33 +439,33 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference,
                     node_receiver_type& receiver,
                     result_options options) const override
         {
-                this->tail_select(resources, root, last, root, receiver, options);
+                this->tail_select(context, root, last, root, receiver, options);
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference, 
                            result_options options,
                            std::error_code& ec) const override
         {
-            if (resources.is_cached(id_))
+            if (context.is_cached(id_))
             {
-                return resources.get_from_cache(id_);
+                return context.get_from_cache(id_);
             }
             else
             {
-                auto& ref = this->evaluate_tail(resources, root, last, root, options, ec);
+                auto& ref = this->evaluate_tail(context, root, last, root, options, ec);
                 if (!ec)
                 {
-                    resources.add_to_cache(id_, ref);
+                    context.add_to_cache(id_, ref);
                 }
 
                 return ref;
@@ -505,18 +505,18 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current,
                     node_receiver_type& receiver,
                     result_options options) const override
         {
-            this->tail_select(resources,  
+            this->tail_select(context,  
                                 root, last, current, receiver, options);
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
@@ -524,7 +524,7 @@ namespace detail {
                            std::error_code& ec) const override
         {
             //std::cout << "current_node_selector: " << current << "\n";
-            return this->evaluate_tail(resources,  
+            return this->evaluate_tail(context,  
                                 root, last, current, options, ec);
         }
 
@@ -566,7 +566,7 @@ namespace detail {
             ancestor_depth_ = ancestor_depth;
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference,
@@ -586,12 +586,12 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root,*ancestor);
                 if (ptr != nullptr)
                 {
-                    this->tail_select(resources, root, *ancestor, *ptr, receiver, options);
+                    this->tail_select(context, root, *ancestor, *ptr, receiver, options);
                 }
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference, 
@@ -611,16 +611,16 @@ namespace detail {
                 pointer ptr = jsoncons::jsonpath::select(root, *ancestor);
                 if (ptr != nullptr)
                 {
-                    return this->evaluate_tail(resources, root, *ancestor, *ptr, options, ec);
+                    return this->evaluate_tail(context, root, *ancestor, *ptr, options, ec);
                 }
                 else
                 {
-                    return resources.null_value();
+                    return context.null_value();
                 }
             }
             else
             {
-                return resources.null_value();
+                return context.null_value();
             }
         }
 
@@ -659,7 +659,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current,
@@ -672,8 +672,8 @@ namespace detail {
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t i = static_cast<std::size_t>(index_);
-                    this->tail_select(resources, root, 
-                                        path_generator_type::generate(resources, last, i, options), 
+                    this->tail_select(context, root, 
+                                        path_generator_type::generate(context, last, i, options), 
                                         current.at(i), receiver, options);
                 }
                 else 
@@ -682,15 +682,15 @@ namespace detail {
                     if (index >= 0 && index < slen)
                     {
                         std::size_t i = static_cast<std::size_t>(index);
-                        this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, i, options), 
+                        this->tail_select(context, root, 
+                                            path_generator_type::generate(context, last, i, options), 
                                             current.at(i), receiver, options);
                     }
                 }
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
@@ -703,8 +703,8 @@ namespace detail {
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t i = static_cast<std::size_t>(index_);
-                    return this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, last, i, options), 
+                    return this->evaluate_tail(context, root, 
+                                        path_generator_type::generate(context, last, i, options), 
                                         current.at(i), options, ec);
                 }
                 else 
@@ -713,19 +713,19 @@ namespace detail {
                     if (index >= 0 && index < slen)
                     {
                         std::size_t i = static_cast<std::size_t>(index);
-                        return this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, last, i, options), 
+                        return this->evaluate_tail(context, root, 
+                                            path_generator_type::generate(context, last, i, options), 
                                             current.at(i), options, ec);
                     }
                     else
                     {
-                        return resources.null_value();
+                        return context.null_value();
                     }
                 }
             }
             else
             {
-                return resources.null_value();
+                return context.null_value();
             }
         }
     };
@@ -749,7 +749,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current,
@@ -760,8 +760,8 @@ namespace detail {
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    this->tail_select(resources, root, 
-                                        path_generator_type::generate(resources, last, i, options), current[i], 
+                    this->tail_select(context, root, 
+                                        path_generator_type::generate(context, last, i, options), current[i], 
                                         receiver, options);
                 }
             }
@@ -769,24 +769,24 @@ namespace detail {
             {
                 for (auto& member : current.object_range())
                 {
-                    this->tail_select(resources, root, 
-                                        path_generator_type::generate(resources, last, member.key(), options), 
+                    this->tail_select(context, root, 
+                                        path_generator_type::generate(context, last, member.key(), options), 
                                         member.value(), receiver, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
+            auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
-            select(resources, root, last, current, receiver, options);
+            select(context, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -824,7 +824,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current,
@@ -833,35 +833,35 @@ namespace detail {
         {
             if (current.is_array())
             {
-                this->tail_select(resources, root, last, current, receiver, options);
+                this->tail_select(context, root, last, current, receiver, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    select(resources, root, 
-                           path_generator_type::generate(resources, last, i, options), current[i], receiver, options);
+                    select(context, root, 
+                           path_generator_type::generate(context, last, i, options), current[i], receiver, options);
                 }
             }
             else if (current.is_object())
             {
-                this->tail_select(resources, root, last, current, receiver, options);
+                this->tail_select(context, root, last, current, receiver, options);
                 for (auto& item : current.object_range())
                 {
-                    select(resources, root, 
-                           path_generator_type::generate(resources, last, item.key(), options), item.value(), receiver, options);
+                    select(context, root, 
+                           path_generator_type::generate(context, last, item.key(), options), item.value(), receiver, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
+            auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
-            select(resources, root, last, current, receiver, options);
+            select(context, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -920,7 +920,7 @@ namespace detail {
             }
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current, 
@@ -929,20 +929,20 @@ namespace detail {
         {
             for (auto& selector : selectors_)
             {
-                selector->select(resources, root, last, current, receiver, options);
+                selector->select(context, root, last, current, receiver, options);
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
+            auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
-            select(resources,root,last,current,receiver,options);
+            select(context,root,last,current,receiver,options);
             return *jptr;
         }
 
@@ -986,7 +986,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current, 
@@ -998,12 +998,12 @@ namespace detail {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     std::error_code ec;
-                    value_type r = expr_.evaluate(resources, root, current[i], options, ec);
+                    value_type r = expr_.evaluate(context, root, current[i], options, ec);
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, i, options), 
+                        this->tail_select(context, root, 
+                                            path_generator_type::generate(context, last, i, options), 
                                             current[i], receiver, options);
                     }
                 }
@@ -1013,28 +1013,28 @@ namespace detail {
                 for (auto& member : current.object_range())
                 {
                     std::error_code ec;
-                    value_type r = expr_.evaluate(resources, root, member.value(), options, ec);
+                    value_type r = expr_.evaluate(context, root, member.value(), options, ec);
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, member.key(), options), 
+                        this->tail_select(context, root, 
+                                            path_generator_type::generate(context, last, member.key(), options), 
                                             member.value(), receiver, options);
                     }
                 }
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
+            auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);
-            select(resources, root, last, current, receiver, options);
+            select(context, root, last, current, receiver, options);
             return *jptr;
         }
 
@@ -1076,7 +1076,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current, 
@@ -1084,28 +1084,28 @@ namespace detail {
                     result_options options) const override
         {
             std::error_code ec;
-            value_type j = expr_.evaluate(resources, root, current, options, ec);
+            value_type j = expr_.evaluate(context, root, current, options, ec);
 
             if (!ec)
             {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->tail_select(resources, root, 
-                                      path_generator_type::generate(resources, last, start, options),
+                    this->tail_select(context, root, 
+                                      path_generator_type::generate(context, last, start, options),
                                       current.at(start), receiver, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
                     auto sv = j.as_string_view();
-                    this->tail_select(resources, root, 
-                                      path_generator_type::generate(resources, last, sv, options),
+                    this->tail_select(context, root, 
+                                      path_generator_type::generate(context, last, sv, options),
                                       current.at(j.as_string_view()), receiver, options);
                 }
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
@@ -1114,27 +1114,27 @@ namespace detail {
         {
             //std::cout << "index_expression_selector current: " << current << "\n";
 
-            value_type j = expr_.evaluate(resources, root, current, options, ec);
+            value_type j = expr_.evaluate(context, root, current, options, ec);
 
             if (!ec)
             {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    return this->evaluate_tail(resources, root, last, current.at(start), options, ec);
+                    return this->evaluate_tail(context, root, last, current.at(start), options, ec);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    return this->evaluate_tail(resources, root, last, current.at(j.as_string_view()), options, ec);
+                    return this->evaluate_tail(context, root, last, current.at(j.as_string_view()), options, ec);
                 }
                 else
                 {
-                    return resources.null_value();
+                    return context.null_value();
                 }
             }
             else
             {
-                return resources.null_value();
+                return context.null_value();
             }
         }
 
@@ -1174,7 +1174,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current,
@@ -1200,8 +1200,8 @@ namespace detail {
                     for (int64_t i = start; i < end; i += step)
                     {
                         std::size_t j = static_cast<std::size_t>(i);
-                        this->tail_select(resources, root, 
-                                            path_generator_type::generate(resources, last, j, options), 
+                        this->tail_select(context, root, 
+                                            path_generator_type::generate(context, last, j, options), 
                                             current[j], receiver, options);
                     }
                 }
@@ -1220,24 +1220,24 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         if (j < current.size())
                         {
-                            this->tail_select(resources, root, 
-                                                path_generator_type::generate(resources, last,j,options), current[j], receiver, options);
+                            this->tail_select(context, root, 
+                                                path_generator_type::generate(context, last,j,options), current[j], receiver, options);
                         }
                     }
                 }
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code&) const override
         {
-            auto jptr = resources.create_json(json_array_arg, semantic_tag::none, resources.get_allocator());
+            auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> accum(jptr);
-            select(resources, root, last, current, accum, options);
+            select(context, root, last, current, accum, options);
             return *jptr;
         }
     };
@@ -1263,7 +1263,7 @@ namespace detail {
         {
         }
 
-        void select(dynamic_resources<Json,JsonReference>& resources,
+        void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
                     reference current, 
@@ -1271,29 +1271,29 @@ namespace detail {
                     result_options options) const override
         {
             std::error_code ec;
-            value_type ref = expr_.evaluate(resources, root, current, options, ec);
+            value_type ref = expr_.evaluate(context, root, current, options, ec);
             if (!ec)
             {
-                this->tail_select(resources, root, last, *resources.create_json(std::move(ref)), receiver, options);
+                this->tail_select(context, root, last, *context.create_json(std::move(ref)), receiver, options);
             }
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        reference evaluate(eval_context<Json,JsonReference>& context,
                            reference root,
                            const path_node_type& last, 
                            reference current, 
                            result_options options,
                            std::error_code& ec) const override
         {
-            value_type ref = expr_.evaluate(resources, root, current, options, ec);
+            value_type ref = expr_.evaluate(context, root, current, options, ec);
             if (!ec)
             {
-                return this->evaluate_tail(resources, root, last, *resources.create_json(std::move(ref)), 
+                return this->evaluate_tail(context, root, last, *context.create_json(std::move(ref)), 
                                     options, ec);
             }
             else
             {
-                return resources.null_value();
+                return context.null_value();
             }
         }
 
