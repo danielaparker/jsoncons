@@ -367,17 +367,17 @@ namespace jmespath {
         using reference = const Json&;
         using char_type = typename Json::char_type;
         using parameter_type = parameter<Json>;
-        using function_type = std::function<reference(jsoncons::span<const parameter_type>, 
+        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, 
             dynamic_resources<Json>&, std::error_code& ec)>;
         using string_type = typename Json::string_type;
 
         string_type function_name_;
         optional<std::size_t> arity_;
-        function_type f_;
+        custom_function_type f_;
 
         custom_function(const string_type& function_name,
                         const optional<std::size_t>& arity,
-                        const function_type& f)
+                        const custom_function_type& f)
             : function_name_(function_name),
               arity_(arity),
               f_(f)
@@ -386,7 +386,7 @@ namespace jmespath {
 
         custom_function(string_type&& function_name,
                         optional<std::size_t>&& arity,
-                        function_type&& f)
+                        custom_function_type&& f)
             : function_name_(std::move(function_name)),
               arity_(std::move(arity)),
               f_(std::move(f))
@@ -407,7 +407,7 @@ namespace jmespath {
             return arity_;
         }
 
-        const function_type& function() const 
+        const custom_function_type& function() const 
         {
             return f_;
         }
@@ -458,12 +458,12 @@ namespace jmespath {
         using reference = const Json&;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
-        using function_type = std::function<reference(jsoncons::span<const parameter_type>, 
+        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, 
             dynamic_resources<Json>&, std::error_code& ec)>;
     private:
-        function_type f_;
+        custom_function_type f_;
     public:
-        function_wrapper(jsoncons::optional<std::size_t> arity, const function_type& f)
+        function_wrapper(jsoncons::optional<std::size_t> arity, const custom_function_type& f)
             : function_base<Json>(arity), f_(f)
         {
         }
@@ -489,7 +489,7 @@ namespace jmespath {
         using value_type = Json;
         using reference = const Json&;
         using parameter_type = parameter<Json>;
-        using function_type = std::function<reference(jsoncons::span<const parameter_type>, dynamic_resources<Json>& resources, 
+        using custom_function_type = std::function<reference(jsoncons::span<const parameter_type>, dynamic_resources<Json>& resources, 
             std::error_code& ec)>;
         using const_iterator = typename std::vector<custom_function<Json>>::const_iterator;
 
@@ -497,7 +497,7 @@ namespace jmespath {
     public:
         void register_function(const string_type& name,
             jsoncons::optional<std::size_t> arity,
-            const function_type& f)
+            const custom_function_type& f)
         {
             functions_.emplace_back(name, arity, f);
         }
@@ -894,11 +894,11 @@ namespace jmespath {
             }
         };
 
-        class abs_function : public function_type
+        class abs_function : public function_base<Json>
         {
         public:
             abs_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -934,11 +934,11 @@ namespace jmespath {
             }
         };
 
-        class avg_function : public function_type
+        class avg_function : public function_base<Json>
         {
         public:
             avg_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -978,11 +978,11 @@ namespace jmespath {
             }
         };
 
-        class ceil_function : public function_type
+        class ceil_function : public function_base<Json>
         {
         public:
             ceil_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1015,11 +1015,11 @@ namespace jmespath {
             }
         };
 
-        class contains_function : public function_type
+        class contains_function : public function_base<Json>
         {
         public:
             contains_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1068,11 +1068,11 @@ namespace jmespath {
             }
         };
 
-        class ends_with_function : public function_type
+        class ends_with_function : public function_base<Json>
         {
         public:
             ends_with_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1114,11 +1114,11 @@ namespace jmespath {
             }
         };
 
-        class floor_function : public function_type
+        class floor_function : public function_base<Json>
         {
         public:
             floor_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1151,11 +1151,11 @@ namespace jmespath {
             }
         };
 
-        class join_function : public function_type
+        class join_function : public function_base<Json>
         {
         public:
             join_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1210,11 +1210,11 @@ namespace jmespath {
             }
         };
 
-        class length_function : public function_type
+        class length_function : public function_base<Json>
         {
         public:
             length_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1250,11 +1250,11 @@ namespace jmespath {
             }
         };
 
-        class max_function : public function_type
+        class max_function : public function_base<Json>
         {
         public:
             max_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1305,11 +1305,11 @@ namespace jmespath {
             }
         };
 
-        class max_by_function : public function_type
+        class max_by_function : public function_base<Json>
         {
         public:
             max_by_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1367,11 +1367,11 @@ namespace jmespath {
             }
         };
 
-        class map_function : public function_type
+        class map_function : public function_base<Json>
         {
         public:
             map_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1415,11 +1415,11 @@ namespace jmespath {
             }
         };
 
-        class min_function : public function_type
+        class min_function : public function_base<Json>
         {
         public:
             min_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1470,11 +1470,11 @@ namespace jmespath {
             }
         };
 
-        class min_by_function : public function_type
+        class min_by_function : public function_base<Json>
         {
         public:
             min_by_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1532,11 +1532,11 @@ namespace jmespath {
             }
         };
 
-        class merge_function : public function_type
+        class merge_function : public function_base<Json>
         {
         public:
             merge_function()
-                : function_type(jsoncons::optional<std::size_t>())
+                : function_base<Json>(jsoncons::optional<std::size_t>())
             {
             }
 
@@ -1587,11 +1587,11 @@ namespace jmespath {
             }
         };
 
-        class type_function : public function_type
+        class type_function : public function_base<Json>
         {
         public:
             type_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1629,11 +1629,11 @@ namespace jmespath {
             }
         };
 
-        class sort_function : public function_type
+        class sort_function : public function_base<Json>
         {
         public:
             sort_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1681,11 +1681,11 @@ namespace jmespath {
             }
         };
 
-        class sort_by_function : public function_type
+        class sort_by_function : public function_base<Json>
         {
         public:
             sort_by_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1742,11 +1742,11 @@ namespace jmespath {
             }
         };
 
-        class keys_function final : public function_type
+        class keys_function final : public function_base<Json>
         {
         public:
             keys_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1778,11 +1778,11 @@ namespace jmespath {
             }
         };
 
-        class values_function final : public function_type
+        class values_function final : public function_base<Json>
         {
         public:
             values_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1814,11 +1814,11 @@ namespace jmespath {
             }
         };
 
-        class reverse_function final : public function_type
+        class reverse_function final : public function_base<Json>
         {
         public:
             reverse_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1858,11 +1858,11 @@ namespace jmespath {
             }
         };
 
-        class starts_with_function : public function_type
+        class starts_with_function : public function_base<Json>
         {
         public:
             starts_with_function()
-                : function_type(2)
+                : function_base<Json>(2)
             {
             }
 
@@ -1904,11 +1904,11 @@ namespace jmespath {
             }
         };
 
-        class sum_function : public function_type
+        class sum_function : public function_base<Json>
         {
         public:
             sum_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1943,11 +1943,11 @@ namespace jmespath {
             }
         };
 
-        class to_array_function final : public function_type
+        class to_array_function final : public function_base<Json>
         {
         public:
             to_array_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -1980,11 +1980,11 @@ namespace jmespath {
             }
         };
 
-        class to_number_function final : public function_type
+        class to_number_function final : public function_base<Json>
         {
         public:
             to_number_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -2043,11 +2043,11 @@ namespace jmespath {
             }
         };
 
-        class to_string_function final : public function_type
+        class to_string_function final : public function_base<Json>
         {
         public:
             to_string_function()
-                : function_type(1)
+                : function_base<Json>(1)
             {
             }
 
@@ -2071,11 +2071,11 @@ namespace jmespath {
             }
         };
 
-        class not_null_function final : public function_type
+        class not_null_function final : public function_base<Json>
         {
         public:
             not_null_function()
-                : function_type(jsoncons::optional<std::size_t>())
+                : function_base<Json>(jsoncons::optional<std::size_t>())
             {
             }
 
