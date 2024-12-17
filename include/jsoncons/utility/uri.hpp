@@ -704,19 +704,17 @@ namespace jsoncons {
         }
         static uri parse(string_view str, std::error_code& ec)
         {
-            part_type scheme = std::make_pair(0,0);
-            part_type userinfo = std::make_pair(0,0);
-            part_type host = std::make_pair(0,0);
-            part_type port = std::make_pair(0,0);
-            part_type path = std::make_pair(0,0);
-            part_type query = std::make_pair(0,0);
-            part_type fragment = std::make_pair(0,0);
+            part_type scheme{ 0,0 };
+            part_type userinfo{0,0};
+            part_type host{0,0};
+            part_type port{0,0};
+            part_type path{0,0};
+            part_type query{0,0};
+            part_type fragment{0,0};
 
             std::size_t start = 0;
 
             bool valid_scheme = !str.empty() && isalpha(str[0]);
-            bool valid_userinfo = true;
-            bool valid_host = true;
             
             parse_state state = parse_state::start;
             std::size_t colon_pos = 0; 
@@ -850,7 +848,7 @@ namespace jsoncons {
                         switch (c)
                         {
                             case '@':
-                                if (!valid_userinfo)
+                                if (!validate_userinfo(string_view{str.data() + start, i-start}))
                                 {
                                     ec = uri_errc::invalid_character_in_userinfo;
                                     return uri{};
@@ -858,7 +856,6 @@ namespace jsoncons {
                                 userinfo = std::make_pair(start,i);
                                 state = parse_state::expect_host;
                                 start = i+1;
-                                valid_host = true;
                                 ++i;
                                 break;
                             case ':':
@@ -875,11 +872,6 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             default:
-                                if (c == ' ')
-                                {
-                                    valid_userinfo = false;
-                                    valid_host = false;
-                                }
                                 ++i;
                                 break;
                         }
@@ -888,9 +880,9 @@ namespace jsoncons {
                         switch (c)
                         {
                             case '@':
-                                if (!valid_userinfo)
+                                if (!validate_host(string_view{str.data() + start, i-start}))
                                 {
-                                    ec = uri_errc::invalid_character_in_userinfo;
+                                    ec = uri_errc::invalid_character_in_host;
                                     return uri{};
                                 }
                                 userinfo = std::make_pair(start,i);
@@ -899,7 +891,7 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             case '/':
-                                if (!valid_host)
+                                if (!validate_host(string_view{str.data() + start, colon_pos}))
                                 {
                                     ec = uri_errc::invalid_character_in_host;
                                     return uri{};
@@ -912,11 +904,6 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             default:
-                                if (c == ' ')
-                                {
-                                    valid_userinfo = false;
-                                    valid_host = false;
-                                }
                                 ++i;
                                 break;
                         }
@@ -925,7 +912,7 @@ namespace jsoncons {
                         switch (c)
                         {
                             case ':':
-                                if (!valid_host)
+                                if (!validate_host(string_view{str.data() + start, i-start}))
                                 {
                                     ec = uri_errc::invalid_character_in_host;
                                     return uri{};
@@ -1014,7 +1001,7 @@ namespace jsoncons {
             {
                 case parse_state::expect_userinfo:
                     userinfo = std::make_pair(start,start);
-                    if (!valid_host)
+                    if (!validate_host(string_view{str.data() + start, str.size()-start}))
                     {
                         ec = uri_errc::invalid_character_in_host;
                         return uri{};
@@ -1027,7 +1014,7 @@ namespace jsoncons {
                     break;
                 case parse_state::expect_password:
                     userinfo = std::make_pair(start,start);
-                    if (!valid_host)
+                    if (!validate_host(string_view{str.data() + start, colon_pos-start}))
                     {
                         ec = uri_errc::invalid_character_in_host;
                         return uri{};
@@ -1039,7 +1026,7 @@ namespace jsoncons {
                     fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_host:
-                    if (!valid_host)
+                    if (!validate_host(string_view{str.data() + start, str.size()}))
                     {
                         ec = uri_errc::invalid_character_in_host;
                         return uri{};
@@ -1606,6 +1593,51 @@ namespace jsoncons {
                 {
                     cur = result.first;
                 }
+            }
+            return valid;
+        }       
+
+        static bool validate_userinfo(string_view userinfo)
+        {
+            if (userinfo.length() == 0)
+            {
+                return true;
+            }
+            
+            bool valid = true;
+            auto cur = userinfo.begin();
+            auto last = userinfo.end();
+            while (valid && cur != last)
+            {
+                auto unreserved = is_unreserved(*cur);
+                auto pct_encoded = is_pct_encoded(cur,last);
+                auto sub_delim = is_sub_delim(*cur);
+                if (!unreserved && !pct_encoded.second && !sub_delim && !(*cur == ':'))
+                {
+                    valid = false;
+                }
+                cur = pct_encoded.second ? pct_encoded.first : ++cur;
+            }
+            return valid;
+        }
+
+        static bool validate_host(string_view userinfo)
+        {
+            if (userinfo.length() == 0)
+            {
+                return true;
+            }
+
+            bool valid = true;
+            auto cur = userinfo.begin();
+            auto last = userinfo.end();
+            while (valid && cur != last)
+            {
+                if (*cur == ' ')
+                {
+                    valid = false;
+                }
+                ++cur;
             }
             return valid;
         }
