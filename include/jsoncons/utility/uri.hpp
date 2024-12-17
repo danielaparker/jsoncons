@@ -525,6 +525,11 @@ namespace jsoncons {
             return !raw_fragment().empty();
         }
 
+        uri resolve(string_view reference) const
+        {
+            return resolve(uri(reference));
+        }
+        
         uri resolve(const uri& reference) const
         {
             // This implementation uses the psuedo-code given in
@@ -1610,7 +1615,14 @@ namespace jsoncons {
                 {
                     valid = false;
                 }
-                cur = pct_encoded.second ? pct_encoded.first : ++cur;
+                if (pct_encoded.second)
+                {
+                    cur = pct_encoded.first;
+                }
+                else
+                {
+                    ++cur;
+                }
             }
             return valid;
         }
@@ -1656,6 +1668,11 @@ namespace jsoncons {
                 ++cur;
             }
             return valid;
+        }
+        
+        friend std::ostream& operator<<(std::ostream& os, const uri& a_uri)
+        {
+            return os << a_uri.string();
         }
     };
 

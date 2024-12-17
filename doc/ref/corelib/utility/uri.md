@@ -116,6 +116,9 @@ Returns true if this URI has a query part, otherwise false.
     bool has_fragment() const noexcept;
 Returns true if this URI has a fragment part, otherwise false.
 
+    uri resolve(jsoncons::string_view reference) const;
+Resolve `reference` as a URI relative to this URI.
+
     uri resolve(const uri& reference) const;
 Resolve `reference` as a URI relative to this URI.
 
@@ -126,6 +129,38 @@ Returns a URI string.
 Creates a `uri` by parsing the given string. If a parse error is
 encountered, returns a default constructed `uri` and sets `ec`.
 
+    friend std::ostream& operator<<(std::ostream& os, const uri& uri_);
+
 ### Examples
   
+```cpp
+#include <jsoncons/utility/uri.hpp>
+
+int main()
+{
+#include <jsoncons/utility/uri.hpp>
+
+int main()
+{
+    jsoncons::uri uri{ "https://github.com/danielaparker/jsoncons/" };
+
+    auto uri1 = uri.resolve("tree/master/doc/ref/corelib/utility/uri.md");
+    std::cout << "(1) " << uri1 << "\n";
+
+    auto uri2 = uri1.resolve("../../../../../../blob/master/include/jsoncons/utility/uri.hpp");
+    std::cout << "(2) " << uri2 << "\n";
+
+    auto uri3 = uri2.resolve("file:///~calendar");
+    std::cout << "(3) " << uri3 << "\n";
+}
+}
+```
+
+Output:
+
+```
+(1) https://github.com/danielaparker/jsoncons/tree/master/doc/ref/corelib/utility/uri.md
+(2) https://github.com/danielaparker/jsoncons/blob/master/include/jsoncons/utility/uri.hpp
+(3) file:///~calendar
+```
 
