@@ -144,7 +144,7 @@ int main()
 {
     jsoncons::uri uri{ "https://github.com/danielaparker/jsoncons/" };
 
-    auto uri1 = uri.resolve("tree/master/doc/ref/corelib/utility/uri.md");
+    auto uri1 = uri.resolve("tree/master/doc/ref/corelib/utility/uri.md#Examples");
     std::cout << "(1) " << uri1 << "\n";
 
     auto uri2 = uri1.resolve("../../../../../../blob/master/include/jsoncons/utility/uri.hpp");
@@ -159,7 +159,7 @@ int main()
 Output:
 
 ```
-(1) https://github.com/danielaparker/jsoncons/tree/master/doc/ref/corelib/utility/uri.md
+(1) https://github.com/danielaparker/jsoncons/tree/master/doc/ref/corelib/utility/uri.md#Examples
 (2) https://github.com/danielaparker/jsoncons/blob/master/include/jsoncons/utility/uri.hpp
 (3) file:///~calendar
 ```
