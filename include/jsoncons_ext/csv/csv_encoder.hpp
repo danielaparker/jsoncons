@@ -70,9 +70,10 @@ private:
     {
         stack_item_kind item_kind_;
         std::size_t count_;
+        std::string pathname_;
 
         stack_item(stack_item_kind item_kind) noexcept
-           : item_kind_(item_kind), count_(0)
+           : item_kind_(item_kind), pathname_{}, count_(0)
         {
         }
 
@@ -93,10 +94,10 @@ private:
 
     std::vector<stack_item> stack_;
     jsoncons::detail::write_double fp_;
-    std::vector<string_type,string_allocator_type> strings_buffer_;
 
+    std::vector<string_type,string_allocator_type> strings_buffer_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
-    string_type name_;
+
     std::size_t column_index_;
     std::vector<std::size_t> row_counts_;
 
@@ -139,7 +140,6 @@ public:
         stack_.clear();
         strings_buffer_.clear();
         buffered_line_.clear();
-        name_.clear();
         column_index_ = 0;
         row_counts_.clear();
     }
@@ -192,6 +192,10 @@ private:
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
+            case stack_item_kind::object:
+                //std::cout << "visit_begin_object: " << stack_.back().pathname_ << "\n";
+                stack_.emplace_back(stack_item_kind::object);
+                return true;
             default: // error
                 ec = csv_errc::source_error;
                 return false;
@@ -205,34 +209,37 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
-                if (stack_[0].count_ == 0)
+                if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::row_mapping)
                 {
+                    if (stack_[0].count_ == 0)
+                    {
+                        for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
+                        {
+                            if (i > 0)
+                            {
+                                sink_.push_back(options_.field_delimiter());
+                            }
+                            sink_.append(strings_buffer_[i].data(),
+                                          strings_buffer_[i].length());
+                        }
+                        sink_.append(options_.line_delimiter().data(),
+                                      options_.line_delimiter().length());
+                    }
                     for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        sink_.append(strings_buffer_[i].data(),
-                                      strings_buffer_[i].length());
+                        auto it = buffered_line_.find(strings_buffer_[i]);
+                        if (it != buffered_line_.end())
+                        {
+                            sink_.append(it->second.data(),it->second.length());
+                            it->second.clear();
+                        }
                     }
-                    sink_.append(options_.line_delimiter().data(),
-                                  options_.line_delimiter().length());
+                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 }
-                for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
-                {
-                    if (i > 0)
-                    {
-                        sink_.push_back(options_.field_delimiter());
-                    }
-                    auto it = buffered_line_.find(strings_buffer_[i]);
-                    if (it != buffered_line_.end())
-                    {
-                        sink_.append(it->second.data(),it->second.length());
-                        it->second.clear();
-                    }
-                }
-                sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 break;
             case stack_item_kind::column_mapping:
              {
@@ -345,12 +352,16 @@ private:
         {
             case stack_item_kind::object:
             {
-                name_ = string_type(name);
-                buffered_line_[string_type(name)] = std::basic_string<CharT>();
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
-                {
-                    strings_buffer_.emplace_back(name);
-                }
+                stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+                stack_.back().pathname_.push_back('/');
+                stack_.back().pathname_.append(std::string(name));
+                //std::cout << "visit_key: " << stack_.back().pathname_ << "\n";
+                
+                //buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                //if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                //{
+                //    strings_buffer_.emplace_back(stack_.back().pathname_);
+                //}
                 break;
             }
             case stack_item_kind::column_mapping:
@@ -380,7 +391,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -429,7 +445,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -534,7 +555,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -586,7 +612,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -638,7 +669,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -687,7 +723,12 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                auto it = buffered_line_.find(name_);
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                }
+                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = buffered_line_.find(stack_.back().pathname_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
