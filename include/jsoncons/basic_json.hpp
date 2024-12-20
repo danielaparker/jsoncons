@@ -1586,7 +1586,7 @@ namespace jsoncons {
                     }
                     break;
                 case json_storage_kind::null:
-                    return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                    return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                 case json_storage_kind::empty_object:
                     switch (rhs.storage_kind())
                     {
@@ -1599,7 +1599,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::boolean:
@@ -1612,7 +1612,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::int64:
@@ -1641,7 +1641,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::uint64:
@@ -1669,7 +1669,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::float64:
@@ -1704,7 +1704,7 @@ namespace jsoncons {
                             }
                             else
                             {
-                                return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                                return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                             }
                     }
                     break;
@@ -1743,7 +1743,7 @@ namespace jsoncons {
                                 }
                                 else
                                 {
-                                    return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                                    return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                                 }
                         }
                     }
@@ -1761,7 +1761,7 @@ namespace jsoncons {
                             case json_storage_kind::json_reference:
                                 return compare(rhs.cast<json_reference_storage>().value());
                             default:
-                                return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                                return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                         }
                     }
                     break;
@@ -1777,7 +1777,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::array:
@@ -1795,7 +1795,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 case json_storage_kind::object:
@@ -1815,7 +1815,7 @@ namespace jsoncons {
                         case json_storage_kind::json_reference:
                             return compare(rhs.cast<json_reference_storage>().value());
                         default:
-                            return static_cast<int>(storage_kind()) - static_cast<int>((int)rhs.storage_kind());
+                            return static_cast<int>(storage_kind()) - static_cast<int>(rhs.storage_kind());
                     }
                     break;
                 default:
