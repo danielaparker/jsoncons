@@ -397,7 +397,6 @@ namespace jsoncons {
 
         using key_type = typename policy_type::template member_key<char_type,char_traits_type,char_allocator_type>;
 
-
         using reference = basic_json&;
         using const_reference = const basic_json&;
         using pointer = basic_json*;

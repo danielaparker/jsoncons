@@ -95,8 +95,8 @@ private:
     std::vector<stack_item> stack_;
     jsoncons::detail::write_double fp_;
 
-    std::vector<string_type,string_allocator_type> strings_buffer_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
+    std::vector<string_type,string_allocator_type> column_names_;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
 
     std::size_t column_index_;
     std::vector<std::size_t> row_counts_;
@@ -121,7 +121,7 @@ public:
         fp_(options.float_format(), options.precision()),
         column_index_(0)
     {
-        jsoncons::csv::detail::parse_column_names(options.column_names(), strings_buffer_);
+        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
     }
 
     ~basic_csv_encoder() noexcept
@@ -138,8 +138,8 @@ public:
     void reset()
     {
         stack_.clear();
-        strings_buffer_.clear();
-        buffered_line_.clear();
+        column_names_.clear();
+        cname_value_map_.clear();
         column_index_ = 0;
         row_counts_.clear();
     }
@@ -213,26 +213,26 @@ private:
                 {
                     if (stack_[0].count_ == 0)
                     {
-                        for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
+                        for (std::size_t i = 0; i < column_names_.size(); ++i)
                         {
                             if (i > 0)
                             {
                                 sink_.push_back(options_.field_delimiter());
                             }
-                            sink_.append(strings_buffer_[i].data(),
-                                          strings_buffer_[i].length());
+                            sink_.append(column_names_[i].data(),
+                                          column_names_[i].length());
                         }
                         sink_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
                     }
-                    for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
+                    for (std::size_t i = 0; i < column_names_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = buffered_line_.find(strings_buffer_[i]);
-                        if (it != buffered_line_.end())
+                        auto it = cname_value_map_.find(column_names_[i]);
+                        if (it != cname_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -243,7 +243,7 @@ private:
                 break;
             case stack_item_kind::column_mapping:
              {
-                 for (const auto& item : strings_buffer_)
+                 for (const auto& item : column_names_)
                  {
                      sink_.append(item.data(), item.size());
                      sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
@@ -274,15 +274,15 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 if (stack_[0].count_ == 0)
                 {
-                    for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
+                    for (std::size_t i = 0; i < column_names_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        sink_.append(strings_buffer_[i].data(),strings_buffer_[i].length());
+                        sink_.append(column_names_[i].data(),column_names_[i].length());
                     }
-                    if (strings_buffer_.size() > 0)
+                    if (column_names_.size() > 0)
                     {
                         sink_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
@@ -295,18 +295,18 @@ private:
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
                 row_counts_.push_back(1);
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
                 return true;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }                
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 begin_value(bo);
                 stack_.emplace_back(stack_item_kind::column_multi_valued_field);
                 return true;
@@ -357,23 +357,23 @@ private:
                 stack_.back().pathname_.append(std::string(name));
                 //std::cout << "visit_key: " << stack_.back().pathname_ << "\n";
                 
-                //buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
+                //cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 //if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 //{
-                //    strings_buffer_.emplace_back(stack_.back().pathname_);
+                //    column_names_.emplace_back(stack_.back().pathname_);
                 //}
                 break;
             }
             case stack_item_kind::column_mapping:
             {
-                if (strings_buffer_.empty())
+                if (column_names_.empty())
                 {
-                    strings_buffer_.emplace_back(name);
+                    column_names_.emplace_back(name);
                 }
                 else
                 {
-                    strings_buffer_[0].push_back(options_.field_delimiter());
-                    strings_buffer_[0].append(string_type(name));
+                    column_names_[0].push_back(options_.field_delimiter());
+                    column_names_[0].append(string_type(name));
                 }
                 break;
             }
@@ -393,11 +393,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -417,17 +417,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_null_value(bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_null_value(bo);
                 break;
             }
@@ -447,11 +447,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -471,17 +471,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_string_value(sv,bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_string_value(sv,bo);
                 break;
             }
@@ -557,11 +557,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -581,17 +581,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_double_value(val, context, bo, ec);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_double_value(val, context, bo, ec);
                 break;
             }
@@ -614,11 +614,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -638,17 +638,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_int64_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_int64_value(val, bo);
                 break;
             }
@@ -671,11 +671,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -695,17 +695,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
@@ -725,11 +725,11 @@ private:
             {
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.emplace_back(stack_.back().pathname_);
+                    column_names_.emplace_back(stack_.back().pathname_);
                 }
-                buffered_line_[stack_.back().pathname_] = std::basic_string<CharT>();
-                auto it = buffered_line_.find(stack_.back().pathname_);
-                if (it != buffered_line_.end())
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -749,17 +749,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_counts_.back())
+                if (column_names_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.emplace_back();
+                    column_names_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_bool_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_bool_value(val, bo);
                 break;
             }
