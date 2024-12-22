@@ -52,10 +52,10 @@ private:
     {
         cbor_container_type type_;
         std::size_t length_;
-        std::size_t count_;
+        std::size_t index_;
 
         stack_item(cbor_container_type type, std::size_t length = 0) noexcept
-           : type_(type), length_(length), count_(0)
+           : type_(type), length_(length), index_(0)
         {
         }
 
@@ -66,7 +66,7 @@ private:
 
         std::size_t count() const
         {
-            return count_;
+            return is_object() ? index_/2 : index_;
         }
 
         bool is_object() const
@@ -328,10 +328,9 @@ private:
         return true;
     }
 
-    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
     {
-        write_string(name);
-        return true;
+        return visit_string(name, semantic_tag::none, context, ec);
     }
 
     bool visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
@@ -1732,7 +1731,7 @@ private:
     {
         if (!stack_.empty())
         {
-            ++stack_.back().count_;
+            ++stack_.back().index_;
         }
     }
 };
