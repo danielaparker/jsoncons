@@ -28,16 +28,27 @@ TEST_CASE("serialize array to msgpack")
     //encoder.end_object();
     encoder.flush();
 
-    JSONCONS_TRY
-    {
-        json result = msgpack::decode_msgpack<json>(v);
-        std::cout << result << std::endl;
-    }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    json result;
+    REQUIRE_NOTHROW(result = msgpack::decode_msgpack<json>(v));
 } 
+ 
+TEST_CASE("serialize object to msgpack")
+{
+    SECTION("definite length")
+    {
+        std::vector<uint8_t> v;
+        msgpack::msgpack_bytes_encoder encoder(v);
+        encoder.begin_object(2);
+        encoder.uint64_value(1);
+        encoder.string_value("value1");
+        encoder.uint64_value(2);
+        encoder.string_value("value2");
+        REQUIRE_NOTHROW(encoder.end_object());
+        encoder.flush();
+        json result; 
+        REQUIRE_NOTHROW(result = msgpack::decode_msgpack<json>(v));
+    }
+}
 
 TEST_CASE("Too many and too few items in MessagePack object or array")
 {

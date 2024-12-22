@@ -36,16 +36,16 @@ TEST_CASE("cbor encode multi dim array test")
     encoder.end_multi_dim();
 
     byte_string_view bstr(v);
-    std::cout << "bstr: " << bstr << "\n\n";
+    //std::cout << "bstr: " << bstr << "\n\n";
 
-    for (auto ch : bstr)
-    {
-        std::cout << (int)ch << " ";
-    }
-    std::cout << "\n\n";
+    //for (auto ch : bstr)
+    //{
+    //    std::cout << (int)ch << " ";
+    //}
+    //std::cout << "\n\n";
 
     auto j = cbor::decode_cbor<json>(v);
-    std::cout << pretty_print(j) << "\n\n";
+    //std::cout << pretty_print(j) << "\n\n";
 
 }
 
@@ -84,24 +84,15 @@ TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
     cbor::cbor_bytes_encoder encoder(v);
-    //encoder.begin_object(1);
     encoder.begin_array(3);
     encoder.bool_value(true);
     encoder.bool_value(false);
     encoder.null_value();
     encoder.end_array();
-    //encoder.end_object();
     encoder.flush();
 
-    JSONCONS_TRY
-    {
-        json result = cbor::decode_cbor<json>(v);
-        //std::cout << result << std::endl;
-    }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
 }
 
 TEST_CASE("test_serialize_indefinite_length_array")
@@ -118,16 +109,28 @@ TEST_CASE("test_serialize_indefinite_length_array")
     encoder.end_array();
     encoder.flush();
 
-    JSONCONS_TRY
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
+}
+ 
+TEST_CASE("serialize object to cbor")
+{
+    SECTION("definite length")
     {
-        json result = cbor::decode_cbor<json>(v);
-        //std::cout << result << std::endl;
+        std::vector<uint8_t> v;
+        cbor::cbor_bytes_encoder encoder(v);
+        encoder.begin_object(2);
+        encoder.uint64_value(1);
+        encoder.string_value("value1");
+        encoder.uint64_value(2);
+        encoder.string_value("value2");
+        REQUIRE_NOTHROW(encoder.end_object());
+        encoder.flush();
+        json result;
+        REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
     }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-} 
+}
+ 
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
@@ -141,15 +144,9 @@ TEST_CASE("test_serialize_bignum")
     encoder.end_array();
     encoder.flush();
 
-    JSONCONS_TRY
-    {
-        json result = cbor::decode_cbor<json>(v);
-        CHECK(result[0].as<std::string>() == std::string("18446744073709551616"));
-    }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    json result;
+    REQUIRE_NOTHROW(result = cbor::decode_cbor<json>(v));
+    CHECK(result[0].as<std::string>() == std::string("18446744073709551616"));
 } 
 
 TEST_CASE("test_serialize_negative_bignum1")
@@ -529,3 +526,5 @@ TEMPLATE_TEST_CASE("test_cbor_encoder_reset", "",
     f.encoder.flush();
     CHECK(f.bytes2() == expected_full);
 }
+
+
