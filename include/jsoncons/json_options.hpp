@@ -24,8 +24,9 @@ enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 enum class line_split_kind  : uint8_t {same_line=1, new_line, multi_line};
 
-enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
-};
+enum class bignum_chars_format : uint8_t {raw, number=raw, base10, base64, base64url};
+
+using bigint_chars_format = bignum_chars_format;
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
@@ -304,7 +305,7 @@ private:
     bool pad_inside_array_brackets_:1;
     float_chars_format float_format_;
     byte_string_chars_format byte_string_format_;
-    bigint_chars_format bigint_format_;
+    bignum_chars_format bignum_format_;
     line_split_kind line_splits_;
     line_split_kind object_object_line_splits_;
     line_split_kind object_array_line_splits_;
@@ -324,7 +325,7 @@ public:
           pad_inside_array_brackets_(false),
           float_format_(float_chars_format::general),
           byte_string_format_(byte_string_chars_format::none),
-          bigint_format_(bigint_chars_format::base10),
+          bignum_format_(bignum_chars_format::raw),
           line_splits_(line_split_kind::multi_line),
           object_object_line_splits_(line_split_kind{}),
           object_array_line_splits_(line_split_kind{}),
@@ -349,7 +350,7 @@ public:
           pad_inside_array_brackets_(other.pad_inside_array_brackets_),
           float_format_(other.float_format_),
           byte_string_format_(other.byte_string_format_),
-          bigint_format_(other.bigint_format_),
+          bignum_format_(other.bignum_format_),
           line_splits_(other.line_splits_),
           object_object_line_splits_(other.object_object_line_splits_),
           object_array_line_splits_(other.object_array_line_splits_),
@@ -369,7 +370,12 @@ protected:
 public:
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
-    bigint_chars_format bigint_format() const  {return bigint_format_;}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    bigint_chars_format bigint_format() const  {return bignum_format_;}
+#endif    
+
+    bignum_chars_format bignum_format() const  {return bignum_format_;}
 
     line_split_kind line_splits() const  {return line_splits_;}
 
@@ -462,7 +468,7 @@ public:
     using basic_json_decode_options<CharT>::err_handler;
 
     using basic_json_encode_options<CharT>::byte_string_format;
-    using basic_json_encode_options<CharT>::bigint_format;
+    using basic_json_encode_options<CharT>::bignum_format;
     using basic_json_encode_options<CharT>::line_splits;
     using basic_json_encode_options<CharT>::object_object_line_splits;
     using basic_json_encode_options<CharT>::array_object_line_splits;
@@ -542,7 +548,12 @@ public:
 
     basic_json_options&  byte_string_format(byte_string_chars_format value) {this->byte_string_format_ = value; return *this;}
 
-    basic_json_options&  bigint_format(bigint_chars_format value) {this->bigint_format_ = value; return *this;}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    basic_json_options&  bigint_format(bigint_chars_format value) {this->bignum_format_ = value; return *this;}
+#endif    
+
+    basic_json_options&  bignum_format(bignum_chars_format value) {this->bignum_format_ = value; return *this;}
 
     basic_json_options& line_splits(line_split_kind value) {this->line_splits_ = value; return *this;}
 

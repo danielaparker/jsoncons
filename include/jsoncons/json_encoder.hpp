@@ -684,7 +684,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bigint_format() == bigint_chars_format::number)
+                    if (options_.bignum_format() == bignum_chars_format::raw)
                     {
                         write_bigint_value(sv);
                 break;
@@ -950,15 +950,15 @@ namespace detail {
 
         void write_bigint_value(const string_view_type& sv)
         {
-            switch (options_.bigint_format())
+            switch (options_.bignum_format())
             {
-                case bigint_chars_format::number:
+                case bignum_chars_format::raw:
                 {
                     sink_.append(sv.data(),sv.size());
                     column_ += sv.size();
                     break;
                 }
-                case bigint_chars_format::base64:
+                case bignum_chars_format::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -981,7 +981,7 @@ namespace detail {
                     column_ += (length+2);
                     break;
                 }
-                case bigint_chars_format::base64url:
+                case bignum_chars_format::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1270,14 +1270,14 @@ namespace detail {
 
         void write_bigint_value(const string_view_type& sv)
         {
-            switch (options_.bigint_format())
+            switch (options_.bignum_format())
             {
-                case bigint_chars_format::number:
+                case bignum_chars_format::raw:
                 {
                     sink_.append(sv.data(),sv.size());
                     break;
                 }
-                case bigint_chars_format::base64:
+                case bignum_chars_format::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1298,7 +1298,7 @@ namespace detail {
                     sink_.push_back('\"');
                     break;
                 }
-                case bigint_chars_format::base64url:
+                case bignum_chars_format::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1344,7 +1344,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bigint_format() == bigint_chars_format::number)
+                    if (options_.bignum_format() == bignum_chars_format::raw)
                     {
                         write_bigint_value(sv);
                         break;
@@ -1377,7 +1377,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bigint_format() == bigint_chars_format::number)
+                    if (options_.bignum_format() == bignum_chars_format::raw)
                     {
                         write_bigint_value(sv);
                         break;

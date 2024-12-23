@@ -31,7 +31,7 @@ spaces_around_colon| |Indicates [space option](spaces_option.md) for name separa
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
 pad_inside_object_braces| |Default is `false`
 pad_inside_array_brackets| |Default is `false`
-bigint_format| |Overrides [bignum format](bigint_chars_format.md) when serializing json. The default is [bigint_chars_format::base10](bigint_chars_format.md). 
+bignum_format| |Overrides [bignum format](bignum_chars_format.md) when serializing json. The default is [bignum_chars_format::raw](bignum_chars_format.md). 
 byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 float_format| |Overrides [floating point format](float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
 precision| |Overrides floating point precision when serializing json. The default is shortest representation.
@@ -132,9 +132,9 @@ Default is `false`
     basic_json_options& pad_inside_array_brackets(bool value)
 Default is `false`
 
-    basic_json_options& bigint_format(bigint_chars_format value)
-Overrides [bignum format](bigint_chars_format.md) when serializing json.
-The default is [bigint_chars_format::base10](bigint_chars_format.md). 
+    basic_json_options& bignum_format(bignum_chars_format value)
+Overrides [bignum format](bignum_chars_format.md) when serializing json.
+The default is [bignum_chars_format::base10](bignum_chars_format.md). 
 
     basic_json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.

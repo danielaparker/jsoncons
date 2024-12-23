@@ -266,7 +266,7 @@ void playing_around()
     // Print JSON representation with different options
     auto options = json_options{}
         .byte_string_format(byte_string_chars_format::base64)
-        .bigint_format(bigint_chars_format::base64url);
+        .bignum_format(bignum_chars_format::base64url);
     std::cout << "(5)\n";
     std::cout << pretty_print(j, options) << "\n\n";
 

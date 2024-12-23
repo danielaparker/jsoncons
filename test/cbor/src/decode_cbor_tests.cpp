@@ -259,21 +259,21 @@ TEST_CASE("dump cbor to string test")
 
     std::string s1;
     auto options1 = json_options{}
-        .bigint_format(bigint_chars_format::number);
+        .bignum_format(bignum_chars_format::raw);
     j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
     //std::cout << s1 << std::endl;
 
     std::string s2;
     auto options2 = json_options{}
-        .bigint_format(bigint_chars_format::base10);
+        .bignum_format(bignum_chars_format::base10);
     j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
     //std::cout << s2 << std::endl;
 
     std::string s3;
     auto options3 = json_options{}
-        .bigint_format(bigint_chars_format::base64url);
+        .bignum_format(bignum_chars_format::base64url);
     j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
     //std::cout << s3 << std::endl;
@@ -301,21 +301,21 @@ TEST_CASE("test_dump_to_stream")
 
     std::ostringstream os1;
     auto options1 = json_options{}
-        .bigint_format(bigint_chars_format::number);
+        .bignum_format(bignum_chars_format::raw);
     j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
     //std::cout << os1.str() << std::endl;
 
     std::ostringstream os2;
     auto options2 = json_options{}
-        .bigint_format(bigint_chars_format::base10);
+        .bignum_format(bignum_chars_format::base10);
     j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
     //std::cout << os2.str() << std::endl;
 
     std::ostringstream os3;
     auto options3 = json_options{}
-        .bigint_format(bigint_chars_format::base64url);
+        .bignum_format(bignum_chars_format::base64url);
     j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
     //std::cout << os3.str() << std::endl;
