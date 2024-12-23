@@ -222,8 +222,7 @@ TEST_CASE("as_string_test")
 
     std::string s7;
     j[7].dump(s7);
-    CHECK(std::string("\"18446744073709551616\"") == s7);
-    CHECK(std::string("18446744073709551616") == j[7].as_string());
+    CHECK(std::string("18446744073709551616") == s7);
 
     std::string s8;
     j[8].dump(s8);
@@ -232,8 +231,7 @@ TEST_CASE("as_string_test")
 
     std::string s9;
     j[9].dump(s9);
-    CHECK(std::string("\"-18446744073709551617\"") == s9);
-    CHECK(std::string("-18446744073709551617") == j[9].as_string());
+    CHECK(std::string("-18446744073709551617") == s9);
 
 }
 
@@ -254,7 +252,7 @@ TEST_CASE("dump cbor to string test")
 
     std::string s0;
     j.dump(s0);
-    CHECK("[\"-18446744073709551617\"]" == s0);
+    CHECK("[-18446744073709551617]" == s0);
     //std::cout << s0 << std::endl;
 
     std::string s1;
@@ -296,7 +294,7 @@ TEST_CASE("test_dump_to_stream")
 
     std::ostringstream os0;
     j.dump(os0);
-    CHECK("[\"-18446744073709551617\"]" == os0.str());
+    CHECK("[-18446744073709551617]" == os0.str());
     //std::cout << os0.str() << std::endl;
 
     std::ostringstream os1;
