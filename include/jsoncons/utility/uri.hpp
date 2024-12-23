@@ -91,12 +91,12 @@ namespace jsoncons {
 
     constexpr uri_fragment_part_t uri_fragment_part{};
 
-    struct uri_raw_parts_t
+    struct uri_encoded_part_t
     {
-        explicit uri_raw_parts_t() = default; 
+        explicit uri_encoded_part_t() = default; 
     };
 
-    constexpr uri_raw_parts_t uri_raw_parts{};
+    constexpr uri_encoded_part_t uri_encoded_part{};
 
     class uri
     {
@@ -272,7 +272,7 @@ namespace jsoncons {
             }
         }
 
-        uri(uri_raw_parts_t,
+        uri(uri_encoded_part_t,
             jsoncons::string_view scheme,
             jsoncons::string_view userinfo,
             jsoncons::string_view host,
@@ -433,7 +433,7 @@ namespace jsoncons {
 
         bool is_opaque() const noexcept 
         {
-          return is_absolute() && !raw_authority().empty();
+          return is_absolute() && !encoded_authority().empty();
         }
 
         uri base() const noexcept 
@@ -445,10 +445,10 @@ namespace jsoncons {
 
         std::string userinfo() const 
         {
-            return decode_part(raw_userinfo());
+            return decode_part(encoded_userinfo());
         }
 
-        string_view raw_userinfo() const noexcept { return string_view(uri_string_.data()+userinfo_.first,(userinfo_.second-userinfo_.first)); }
+        string_view encoded_userinfo() const noexcept { return string_view(uri_string_.data()+userinfo_.first,(userinfo_.second-userinfo_.first)); }
 
         string_view host() const noexcept { return string_view(uri_string_.data()+host_.first,(host_.second-host_.first)); }
 
@@ -456,31 +456,31 @@ namespace jsoncons {
 
         std::string authority() const
         {
-            return decode_part(raw_authority());
+            return decode_part(encoded_authority());
         }
 
-        string_view raw_authority() const noexcept { return string_view(uri_string_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
+        string_view encoded_authority() const noexcept { return string_view(uri_string_.data()+userinfo_.first,(port_.second-userinfo_.first)); }
 
         std::string path() const
         {
-            return decode_part(raw_path());
+            return decode_part(encoded_path());
         }
 
-        string_view raw_path() const noexcept { return string_view(uri_string_.data()+path_.first,(path_.second-path_.first)); }
+        string_view encoded_path() const noexcept { return string_view(uri_string_.data()+path_.first,(path_.second-path_.first)); }
 
         std::string query() const
         {
-            return decode_part(raw_query());
+            return decode_part(encoded_query());
         }
 
-        string_view raw_query() const noexcept { return string_view(uri_string_.data()+query_.first,(query_.second-query_.first)); }
+        string_view encoded_query() const noexcept { return string_view(uri_string_.data()+query_.first,(query_.second-query_.first)); }
 
         std::string fragment() const
         {
-            return decode_part(raw_fragment());
+            return decode_part(encoded_fragment());
         }
 
-        string_view raw_fragment() const noexcept 
+        string_view encoded_fragment() const noexcept 
         { 
             return string_view(uri_string_.data()+fragment_.first,(fragment_.second-fragment_.first)); 
         }
@@ -492,12 +492,12 @@ namespace jsoncons {
 
         bool has_userinfo() const noexcept
         {
-            return !raw_userinfo().empty();
+            return !encoded_userinfo().empty();
         }
 
         bool has_authority() const noexcept
         {
-            return !raw_authority().empty();
+            return !encoded_authority().empty();
         }
 
         bool has_host() const noexcept
@@ -512,17 +512,17 @@ namespace jsoncons {
 
         bool has_path() const noexcept
         {
-            return !raw_path().empty();
+            return !encoded_path().empty();
         }
 
         bool has_query() const noexcept
         {
-            return !raw_query().empty();
+            return !encoded_query().empty();
         }
 
         bool has_fragment() const noexcept
         {
-            return !raw_fragment().empty();
+            return !encoded_fragment().empty();
         }
 
         uri resolve(string_view reference) const
@@ -552,7 +552,7 @@ namespace jsoncons {
               // g -> http://g
               if (reference.has_userinfo()) 
               {
-                  userinfo = std::string(reference.raw_userinfo());
+                  userinfo = std::string(reference.encoded_userinfo());
               }
 
               if (reference.has_host()) 
@@ -567,12 +567,12 @@ namespace jsoncons {
 
               if (reference.has_path()) 
               {
-                  path = remove_dot_segments(std::string(reference.raw_path()));
+                  path = remove_dot_segments(std::string(reference.encoded_path()));
               }
 
               if (reference.has_query()) 
               {
-                  query = std::string(reference.raw_query());
+                  query = std::string(reference.encoded_query());
               }
             } 
             else 
@@ -581,23 +581,23 @@ namespace jsoncons {
               {
                 if (has_path()) 
                 {
-                    path = std::string(raw_path());
+                    path = std::string(encoded_path());
                 }
 
                 if (reference.has_query()) 
                 {
-                    query = std::string(reference.raw_query());
+                    query = std::string(reference.encoded_query());
                 } 
                 else if (has_query()) 
                 {
-                    query = std::string(raw_query());
+                    query = std::string(encoded_query());
                 }
               } 
               else 
               {
-                  if (reference.raw_path().front() == '/') 
+                  if (reference.encoded_path().front() == '/') 
                   {
-                    path = remove_dot_segments(std::string(reference.raw_path()));
+                    path = remove_dot_segments(std::string(reference.encoded_path()));
                   } 
                   else 
                   {
@@ -606,13 +606,13 @@ namespace jsoncons {
 
                   if (reference.has_query()) 
                   {
-                      query = std::string(reference.raw_query());
+                      query = std::string(reference.encoded_query());
                   }
               }
 
               if (has_userinfo()) 
               {
-                  userinfo = std::string(raw_userinfo());
+                  userinfo = std::string(encoded_userinfo());
               }
 
               if (has_host()) 
@@ -628,27 +628,27 @@ namespace jsoncons {
 
             if (reference.has_fragment()) 
             {
-                fragment = std::string(reference.raw_fragment());
+                fragment = std::string(reference.encoded_fragment());
             }
 
-            return uri(uri_raw_parts, std::string(scheme()), userinfo, host, port, path, query, fragment);
+            return uri(uri_encoded_part, std::string(scheme()), userinfo, host, port, path, query, fragment);
         }
 
         int compare(const uri& other) const
         {
             int result = scheme().compare(other.scheme());
             if (result != 0) return result;
-            result = raw_userinfo().compare(other.raw_userinfo());
+            result = encoded_userinfo().compare(other.encoded_userinfo());
             if (result != 0) return result;
             result = host().compare(other.host());
             if (result != 0) return result;
             result = port().compare(other.port());
             if (result != 0) return result;
-            result = raw_path().compare(other.raw_path());
+            result = encoded_path().compare(other.encoded_path());
             if (result != 0) return result;
-            result = raw_query().compare(other.raw_query());
+            result = encoded_query().compare(other.encoded_query());
             if (result != 0) return result;
-            result = raw_fragment().compare(other.raw_fragment());
+            result = encoded_fragment().compare(other.encoded_fragment());
 
             return result;
         }
@@ -1218,20 +1218,20 @@ namespace jsoncons {
         {
             std::string result;
             
-            if (!base.raw_authority().empty() && base.raw_path().empty()) 
+            if (!base.encoded_authority().empty() && base.encoded_path().empty()) 
             {
                 result = "/";
-                //result.append(relative.raw_path().data(), relative.raw_path().length());
+                //result.append(relative.encoded_path().data(), relative.encoded_path().length());
             } 
             else 
             {
-                const auto& base_path = base.raw_path();
+                const auto& base_path = base.encoded_path();
                 auto last_slash = base_path.rfind('/');
                 result.append(std::string(base_path.substr(0,last_slash+1)));
             }
-            if (!relative.raw_path().empty()) 
+            if (!relative.encoded_path().empty()) 
             {
-                result.append(relative.raw_path().begin(), relative.raw_path().end());
+                result.append(relative.encoded_path().begin(), relative.encoded_path().end());
             }
             return remove_dot_segments(std::move(result));
         }
