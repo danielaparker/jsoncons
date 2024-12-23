@@ -30,7 +30,7 @@ namespace jsonschema {
         explicit uri_wrapper(const std::string& uri)
         {
             uri_ = jsoncons::uri(uri);
-            if (!uri_.raw_fragment().empty())
+            if (!uri_.encoded_fragment().empty())
             {
                 identifier_ = uri_.fragment();
                 std::error_code ec;
@@ -47,7 +47,7 @@ namespace jsonschema {
             : uri_{uri}
         {
             uri_ = jsoncons::uri(uri);
-            if (!uri_.raw_fragment().empty())
+            if (!uri_.encoded_fragment().empty())
             {
                 identifier_ = uri_.fragment();
                 std::error_code ec;
@@ -67,7 +67,7 @@ namespace jsonschema {
 
         bool has_fragment() const
         {
-            return !uri_.raw_fragment().empty();
+            return !uri_.encoded_fragment().empty();
         }
 
         bool has_plain_name_fragment() const
@@ -123,7 +123,7 @@ namespace jsonschema {
             if (has_plain_name_fragment())
                 return *this;
 
-            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.raw_fragment()));
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.encoded_fragment()));
             pointer /= index;
 
             jsoncons::uri new_uri(uri_, uri_fragment_part, pointer.to_string());
