@@ -1,7 +1,7 @@
 ### jsoncons::bigint
 
 ```cpp
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 
 typedef basic_bigint<Allocator = std::allocator<uint8_t>> bigint;
 ```

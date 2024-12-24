@@ -119,7 +119,6 @@ add_executable(unit_tests
                msgpack/src/msgpack_encoder_tests.cpp
                msgpack/src/msgpack_tests.cpp
                msgpack/src/msgpack_timestamp_tests.cpp
-               corelib/src/bigint_tests.cpp
                corelib/src/source_adaptor_tests.cpp
                corelib/src/byte_string_tests.cpp
                corelib/src/value_converter_tests.cpp
@@ -128,6 +127,7 @@ add_executable(unit_tests
                corelib/src/detail/span_tests.cpp
                corelib/src/detail/string_view_tests.cpp
                corelib/src/utility/heap_string_tests.cpp
+               corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/uri_tests.cpp
                corelib/src/detail/to_integer_tests.cpp
                corelib/src/double_round_trip_tests.cpp

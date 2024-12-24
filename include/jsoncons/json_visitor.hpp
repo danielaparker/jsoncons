@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>

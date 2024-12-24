@@ -20,7 +20,7 @@
 #include <type_traits> // std::enable_if
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/extension_traits.hpp>
 #include <string>

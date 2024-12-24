@@ -29,7 +29,7 @@
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_array.hpp>
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_decoder.hpp>

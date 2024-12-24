@@ -17,7 +17,7 @@
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>

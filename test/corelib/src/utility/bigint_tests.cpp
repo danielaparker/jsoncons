@@ -4,7 +4,7 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
-#include <jsoncons/bigint.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
