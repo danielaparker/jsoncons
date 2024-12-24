@@ -1,9 +1,9 @@
-### jsoncons::bignum_chars_format 
+### jsoncons::bignum_format_kind 
 
 ```cpp
 #include <jsoncons/json_options.hpp>
 
-enum class bignum_chars_format : uint8_t {raw, 
+enum class bignum_format_kind : uint8_t {raw, 
     number=raw,   (deprecated) 
     base10, 
     base64, 
@@ -31,15 +31,15 @@ int main()
     std::cout << "(1) " << print(j) << "\n\n";
 
     auto options2 = json_options{}
-        .bignum_format(bignum_chars_format::number);
+        .bignum_format(bignum_format_kind::raw);
     std::cout << "(2) " << print(j, options2) << "\n\n";
 
     auto options3 = json_options{}
-        .bignum_format(bignum_chars_format::base64);
+        .bignum_format(bignum_format_kind::base64);
     std::cout << "(3) " << print(j, options3) << "\n\n";
 
     auto options4 = json_options{}
-    .bignum_format(bignum_chars_format::base64url);
+    .bignum_format(bignum_format_kind::base64url);
     std::cout << "(4) " << print(j, options4) << "\n\n";
 }
 ```
@@ -70,15 +70,15 @@ int main()
     std::cout << "(1) " << print(j) << "\n\n";
 
     auto options2 = json_options{}
-        .bignum_format(bignum_chars_format::raw);
+        .bignum_format(bignum_format_kind::raw);
     std::cout << "(2) " << print(j, options2) << "\n\n";
 
     auto options3 = json_options{}
-        .bignum_format(bignum_chars_format::base64);
+        .bignum_format(bignum_format_kind::base64);
     std::cout << "(3) " << print(j, options3) << "\n\n";
 
     auto options4 = json_options{}
-        .bignum_format(bignum_chars_format::base64url);
+        .bignum_format(bignum_format_kind::base64url);
     std::cout << "(4) " << print(j, options4) << "\n\n";
 }
 ```

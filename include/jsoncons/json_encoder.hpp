@@ -684,7 +684,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bignum_format() == bignum_chars_format::raw)
+                    if (options_.bignum_format() == bignum_format_kind::raw)
                     {
                         write_bigint_value(sv);
                 break;
@@ -952,13 +952,13 @@ namespace detail {
         {
             switch (options_.bignum_format())
             {
-                case bignum_chars_format::raw:
+                case bignum_format_kind::raw:
                 {
                     sink_.append(sv.data(),sv.size());
                     column_ += sv.size();
                     break;
                 }
-                case bignum_chars_format::base64:
+                case bignum_format_kind::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -981,7 +981,7 @@ namespace detail {
                     column_ += (length+2);
                     break;
                 }
-                case bignum_chars_format::base64url:
+                case bignum_format_kind::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1272,12 +1272,12 @@ namespace detail {
         {
             switch (options_.bignum_format())
             {
-                case bignum_chars_format::raw:
+                case bignum_format_kind::raw:
                 {
                     sink_.append(sv.data(),sv.size());
                     break;
                 }
-                case bignum_chars_format::base64:
+                case bignum_format_kind::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1298,7 +1298,7 @@ namespace detail {
                     sink_.push_back('\"');
                     break;
                 }
-                case bignum_chars_format::base64url:
+                case bignum_format_kind::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     bool is_neg = n < 0;
@@ -1344,7 +1344,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bignum_format() == bignum_chars_format::raw)
+                    if (options_.bignum_format() == bignum_format_kind::raw)
                     {
                         write_bigint_value(sv);
                         break;
@@ -1377,7 +1377,7 @@ namespace detail {
                 case semantic_tag::bigdec:
                 {
                     // output lossless number
-                    if (options_.bignum_format() == bignum_chars_format::raw)
+                    if (options_.bignum_format() == bignum_format_kind::raw)
                     {
                         write_bigint_value(sv);
                         break;

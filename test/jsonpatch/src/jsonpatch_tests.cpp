@@ -196,7 +196,7 @@ TEST_CASE("from diff with null and lossless number")
     
     auto options = json_options{}
         .lossless_number(true)
-        .bignum_format(jsoncons::bignum_chars_format::raw)
+        .bignum_format(jsoncons::bignum_format_kind::raw)
         .byte_string_format(jsoncons::byte_string_chars_format::base64);
 
     const char* json1 = "{\"hello\":123.4, \"hello2\":null}";
