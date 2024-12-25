@@ -4,10 +4,9 @@
 - API Changes
 
     - Non-const `basic_json::operator[const string_view_type& key]` no longer returns a proxy type. The rationale for this change is given in Git Issue #315.
-    The new behavior for the non-const overload of `operator[](const string_view_type& key)` is consistent with the standard library 
-    `std::map` behavior, which is to return a reference to the value that is associated with `key`, inserting a default 
-    constructed value with the key if no such key already exists.
-    The new behavior for the const overload of `operator[](const string_view_type& key)` is to return 
+    The new behavior for the non-const overload of `operator[](const string_view_type& key)` is to return a reference to the value that is associated with `key`, inserting a default 
+    constructed value with the key if no such key already exists, which is consistent with the standard library 
+    `std::map` behavior. The new behavior for the const overload of `operator[](const string_view_type& key)` is to return 
     a const reference to the value that is associated with `key`, returning a const reference to a default 
     constructed value with static storage duration if no such key already exists.
 
