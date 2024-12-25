@@ -13,7 +13,7 @@ TEST_CASE("uri tests (https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
 
         jsoncons::uri uri(s); 
 
-        std::cout << uri.string() << "\n";
+        //std::cout << uri.string() << "\n";
 
         CHECK(uri.scheme() == jsoncons::string_view("https"));
         CHECK(uri.encoded_authority() == jsoncons::string_view("john.doe@www.example.com:123"));
@@ -693,5 +693,39 @@ TEST_CASE("cpp-netib uri resolve tests")
         jsoncons::uri reference{"g#s/../x"};
         auto uri = base_uri.resolve(reference);
         CHECK("http://a/b/c/g#s/../x" == uri.string());
+    }
+}
+
+
+TEST_CASE("cpp-netib uri_encoding_test.cpp")
+{
+    SECTION("is_absolute_uri__returns_other")
+    {
+        std::string scheme = "https";
+        std::string userinfo = "!#$&'()*+,/:;=?@[]";
+        //std::string host = "!#$&'()*+,/:;=?@[]";
+        std::string host = "www.example.com";
+        std::string port = "10";
+        std::string path = "!#$&'()*+,/:;=?@[]";
+        std::string query = "!#$&'()*+,/:;=?@[]";
+        std::string fragment = "!#$&'()*+,/:;=?@[]";
+        
+        jsoncons::uri uri{scheme,
+            userinfo,
+            host,
+            port,
+            path,
+            query,
+            fragment
+        };
+        
+        CHECK("!%23$&'()*+,%2F:;=%3F%40%5B%5D" == uri.encoded_userinfo());
+        //CHECK("%21%23%24%26%27%28%29%2A%2B%2C%2F:%3B%3D%3F%40[]" == uri.encoded_host());
+        CHECK("10" == uri.port());
+        CHECK("/!%23$&'()*+,/:;=%3F@%5B%5D" == uri.encoded_path());
+        CHECK("!%23$&'()*+,/:;=?@[]" == uri.encoded_query());
+        CHECK("!%23$&'()*+,/:;=?@[]" == uri.encoded_fragment());
+        
+        //std::cout << uri << "\n";
     }
 }

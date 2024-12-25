@@ -23,10 +23,11 @@ namespace jsoncons {
         success = 0,
         invalid_uri = 1,
         invalid_character_in_scheme = 2,
-        invalid_character_in_userinfo = 3,
-        invalid_character_in_host = 4,
-        invalid_character_in_path = 5,
-        invalid_character_in_fragment = 6
+        invalid_port = 3,
+        invalid_character_in_userinfo = 4,
+        invalid_character_in_host = 5,
+        invalid_character_in_path = 6,
+        invalid_character_in_fragment = 7
     };
 
 
@@ -46,6 +47,8 @@ namespace jsoncons {
                     return "Invalid URI";
                 case uri_errc::invalid_character_in_scheme:
                     return "Invalid characters in scheme";
+                case uri_errc::invalid_port:
+                    return "'port' argument must be a number >= 0 and < 65536";
                 case uri_errc::invalid_character_in_userinfo:
                     return "Invalid characters in userinfo";
                 case uri_errc::invalid_character_in_host:
@@ -202,6 +205,11 @@ namespace jsoncons {
 
                 if (!port.empty()) 
                 {
+                    if (!validate_port(port))
+                    {
+                        JSONCONS_THROW(std::system_error(uri_errc::invalid_port));
+                    }
+
                     uri_string_.append(":");
                     port_.first = uri_string_.length();
                     uri_string_.append(port.data(), port.size());
@@ -890,9 +898,15 @@ namespace jsoncons {
                                 ++i;
                                 break;
                             case '/':
+                            {
                                 if (!validate_host(string_view{str.data() + start, colon_pos-start}))
                                 {
                                     ec = uri_errc::invalid_character_in_host;
+                                    return uri{};
+                                }
+                                if (!validate_port(string_view{str.data() + (colon_pos+1), i-(colon_pos+1)}))
+                                {
+                                    ec = uri_errc::invalid_port;
                                     return uri{};
                                 }
                                 userinfo = std::make_pair(start,start);
@@ -902,6 +916,7 @@ namespace jsoncons {
                                 start = i;
                                 ++i;
                                 break;
+                            }
                             default:
                                 ++i;
                                 break;
@@ -930,6 +945,11 @@ namespace jsoncons {
                         switch (c)
                         {
                             case '/':
+                                if (!validate_port(string_view{str.data() + start, i-start}))
+                                {
+                                    ec = uri_errc::invalid_port;
+                                    return uri{};
+                                }
                                 port = std::make_pair(start,i);
                                 state = parse_state::expect_path;
                                 start = i;
@@ -1019,6 +1039,11 @@ namespace jsoncons {
                         return uri{};
                     }
                     host = std::make_pair(start,colon_pos);
+                    if (!validate_port(string_view{str.data() + (colon_pos+1), str.size() - (colon_pos+1)}))
+                    {
+                        ec = uri_errc::invalid_port;
+                        return uri{};
+                    }
                     port = std::make_pair(colon_pos+1, str.size());
                     path = std::make_pair(str.size(), str.size());
                     query = std::make_pair(str.size(), str.size());
@@ -1037,6 +1062,11 @@ namespace jsoncons {
                     fragment = std::make_pair(str.size(), str.size());
                     break;
                 case parse_state::expect_port:
+                    if (!validate_port(string_view{str.data() + start, str.size() - start}))
+                    {
+                        ec = uri_errc::invalid_port;
+                        return uri{};
+                    }
                     port = std::make_pair(start, str.size());
                     path = std::make_pair(str.size(), str.size());
                     query = std::make_pair(str.size(), str.size());
@@ -1627,6 +1657,13 @@ namespace jsoncons {
             return valid;
         }
 
+        static bool validate_port(string_view port)
+        {
+            uint16_t p;
+            auto result = jsoncons::detail::to_integer(port.data(), port.length(), p);
+            return static_cast<bool>(result);
+        }
+        
         static bool validate_host(string_view userinfo)
         {
             if (userinfo.length() == 0)
