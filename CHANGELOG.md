@@ -32,7 +32,7 @@
 
     - Git PR #560: [jmespath] When there are elements and the sum is indeed zero, avg function should return average value returned instead of a null value.
 
-    - Git Issue #561: json_string_reader doesnot work correctly for empty string or string with all blanks
+    - Git Issue #561: json_string_reader does not work correctly for empty string or string with all blanks
 
     - Git Issue #564: Fixed basic_json compare of double and non-numeric string
 
@@ -49,14 +49,14 @@
 
 - Enhancements:
 
-    - New `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
+    - Added `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
     allow a `basic_json` value to contain a non-owning view of another `basic_json`
     value.
 
     - Added constant `null_arg` so that a null json value can be 
     constructed with
     ```
-    json j{jsoncons::null_arg};
+        json j{jsoncons::null_arg};
     ```
 
     - Custom jmespath functions are now supported thanks to PR #560
