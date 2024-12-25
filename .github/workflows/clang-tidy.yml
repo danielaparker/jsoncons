@@ -23,6 +23,6 @@ jobs:
 
     - run: sudo apt-get install -yq clang-tidy
 
-    - run: find include/ -name '*.hpp' 
+    - run: find include/ -name '*.hpp' clang-tidy --quiet '{}' -- --std=c++17
 
-    - run: find test/ -name '*.cpp' | xargs -I '{}' clang-tidy --quiet '{}' -- --std=c++17 -Iinclude 
+    - run: find test/ -name '*.cpp' | xargs -I '{}' clang-tidy --quiet '{}' -- --std=c++17 -Iinclude -Itest/thirdparty
