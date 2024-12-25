@@ -1,0 +1,43 @@
+# The Art of C++
+# https://github.com/taocpp
+
+# Copyright (c) 2016-2023 Dr. Colin Hirsch and Daniel Frey
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+
+Checks: >-
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-special-member-functions,
+  google-build-explicit-make-pair,
+  google-build-namespaces,
+  google-default-arguments,
+  google-global-names-in-headers,
+  google-readability-casting,
+  llvm-*,
+  -llvm-namespace-comment,
+  misc-*,
+  -misc-no-recursion,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-alias-decls,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-concat-nested-namespaces,
+  -modernize-raw-string-literal,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-avoid-const-params-in-decls,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+
+CheckOptions:
+  - { key: readability-identifier-naming.ClassCase,     value: lower_case }
+  - { key: readability-identifier-naming.FunctionCase,  value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase, value: lower_case }
+  - { key: readability-identifier-naming.StructCase,    value: aNy_CasE   } # PEGTL rules
+  - { key: readability-identifier-naming.VariableCase,  value: lower_case }
+
+WarningsAsErrors: '*'
