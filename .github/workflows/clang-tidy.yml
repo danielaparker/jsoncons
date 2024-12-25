@@ -25,4 +25,4 @@ jobs:
 
     - run: find include/ -name '*.hpp' 
 
-    - run: find src/ -name '*.cpp' | xargs -I '{}' clang-tidy --quiet '{}' -- --std=c++17 -Iinclude 
+    - run: find test/ -name '*.cpp' | xargs -I '{}' clang-tidy --quiet '{}' -- --std=c++17 -Iinclude 
