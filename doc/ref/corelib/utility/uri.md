@@ -22,17 +22,6 @@ Constructs a `uri` by parsing the given string.
         jsoncons::string_view fragment = "")
 Constructs a `uri` from the given parts. It is assumed that the parts
 are not already %-encoded, encoding is performed during construction.
-
-    uri(jsoncons::uri_encoded_part_t,
-        jsoncons::string_view scheme,
-        jsoncons::string_view userinfo,
-        jsoncons::string_view host,
-        jsoncons::string_view port,
-        jsoncons::string_view path,
-        jsoncons::string_view query = "",
-        jsoncons::string_view fragment = "")
-Constructs a `uri` from the given parts. It is assumed that the parts
-are already %-encoded.
  
     uri(const uri& other, uri_fragment_part_t, jsoncons::string_view fragment);
 Constructs a `uri` from `other`, replacing it's fragment part with `fragment`.
