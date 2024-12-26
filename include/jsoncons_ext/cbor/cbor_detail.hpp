@@ -4,24 +4,25 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_DETAIL_HPP
-#define JSONCONS_CBOR_CBOR_DETAIL_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
+#define JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
 #include <iterator> // std::forward_iterator_tag
 #include <limits> // std::numeric_limits
+#include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 
 // 0x00..0x17 (0..23)
-#define JSONCONS_CBOR_0x00_0x17 \
+#define JSONCONS_EXT_CBOR_0x00_0x17 \
     0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
 
-#define JSONCONS_CBOR_ARRAY_TAGS \
+#define JSONCONS_EXT_CBOR_ARRAY_TAGS \
     0x40:case 0x41:case 0x42:case 0x43:case 0x44:case 0x45:case 0x46:case 0x47:case 0x48:case 0x49:case 0x4a:case 0x4b:case 0x4c:case 0x4d:case 0x4e:case 0x4f:case 0x50:case 0x51:case 0x52:case 0x53:case 0x54:case 0x55:case 0x56:case 0x57    
 
 namespace jsoncons { namespace cbor { namespace detail {

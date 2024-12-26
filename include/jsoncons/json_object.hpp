@@ -7,23 +7,24 @@
 #ifndef JSONCONS_JSON_OBJECT_HPP
 #define JSONCONS_JSON_OBJECT_HPP
 
-#include <string>
-#include <vector>
-#include <tuple>
-#include <exception>
-#include <cstring>
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
-#include <utility>
+#include <cassert> // assert
+#include <cstring>
+#include <exception>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
-#include <utility> // std::move
-#include <cassert> // assert
-#include <unordered_set>
+#include <string>
+#include <tuple>
 #include <type_traits> // std::enable_if
-#include <jsoncons/json_exception.hpp>
+#include <unordered_set>
+#include <utility>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_array.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 
@@ -1712,4 +1713,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_OBJECT_HPP

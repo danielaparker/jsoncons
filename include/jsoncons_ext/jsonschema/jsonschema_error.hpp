@@ -4,11 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
  
-#ifndef JSONCONS_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
-#define JSONCONS_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
+#define JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
+
+#include <system_error>
 
 #include <jsoncons/json_exception.hpp>
-#include <system_error>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -44,4 +45,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_ERROR_HPP

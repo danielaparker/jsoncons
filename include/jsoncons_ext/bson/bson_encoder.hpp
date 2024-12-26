@@ -4,24 +4,25 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_ENCODER_HPP
-#define JSONCONS_BSON_BSON_ENCODER_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_ENCODER_HPP
+#define JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 
-#include <string>
-#include <vector>
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
-#include <jsoncons_ext/bson/bson_error.hpp>
-#include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
+#include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -572,4 +573,4 @@ using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
 using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
 }}
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

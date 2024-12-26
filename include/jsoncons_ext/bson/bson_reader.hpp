@@ -4,20 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_READER_HPP
-#define JSONCONS_BSON_BSON_READER_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_READER_HPP
+#define JSONCONS_EXT_BSON_BSON_READER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -84,4 +85,4 @@ using bson_bytes_reader = basic_bson_reader<jsoncons::bytes_source>;
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_READER_HPP

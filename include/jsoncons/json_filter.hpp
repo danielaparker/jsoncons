@@ -606,4 +606,4 @@ using wrename_object_key_filter = basic_rename_object_key_filter<wchar_t>;
 
 }
 
-#endif
+#endif // JSONCONS_JSON_FILTER_HPP

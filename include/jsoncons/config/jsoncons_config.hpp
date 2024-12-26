@@ -7,10 +7,11 @@
 #ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
-#include <type_traits>
 #include <limits>
-#include <jsoncons/config/compiler_support.hpp>
+#include <type_traits>
+
 #include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>

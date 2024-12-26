@@ -4,20 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
-#define JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <type_traits> // std::is_const
-#include <limits> // std::numeric_limits
-#include <utility> // std::move
-#include <regex>
 #include <algorithm> // std::reverse
+#include <limits> // std::numeric_limits
+#include <memory>
+#include <regex>
+#include <string>
+#include <type_traits> // std::is_const
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/expression.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
 
 namespace jsoncons { 

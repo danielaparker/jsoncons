@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_LOCATION_PARSER_HPP
-#define JSONCONS_JSONPATH_JSON_LOCATION_PARSER_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSON_LOCATION_PARSER_HPP
+#define JSONCONS_EXT_JSONPATH_JSON_LOCATION_PARSER_HPP
 
 #include <string>
 #include <vector>

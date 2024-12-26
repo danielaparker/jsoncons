@@ -4,22 +4,24 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_EXPRESSION_HPP
-#define JSONCONS_JSONPATH_EXPRESSION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
+#define JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 
-#include <string> // std::basic_string
-#include <vector> // std::vector
-#include <unordered_map> // std::unordered_map
-#include <unordered_set> // std::unordered_set
 #include <limits> // std::numeric_limits
 #include <set> // std::set
+#include <string> // std::basic_string
+#include <unordered_map> // std::unordered_map
+#include <unordered_set> // std::unordered_set
 #include <utility> // std::move
+#include <vector> // std::vector
+
+#include <jsoncons/json_type.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
+
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
-#include <jsoncons/json_type.hpp>
-#include <jsoncons_ext/jsonpath/path_node.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
@@ -3454,4 +3456,4 @@ namespace detail {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP

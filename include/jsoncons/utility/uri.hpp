@@ -7,14 +7,15 @@
 #ifndef JSONCONS_UTILITY_URI_HPP
 #define JSONCONS_UTILITY_URI_HPP
 
-#include <string> // std::string
 #include <algorithm> 
+#include <iostream>
 #include <sstream> 
+#include <string> // std::string
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>
-#include <iostream>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { 
 
@@ -1716,4 +1717,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_UTILITY_URI_HPP

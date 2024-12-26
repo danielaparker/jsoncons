@@ -1,13 +1,20 @@
+// Copyright 2013-2024 Daniel Parker
+// Distributed under the Boost license, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// See https://github.com/danielaparker/jsoncons for latest version
+
 #ifndef JSONCONS_DETAIL_SPAN_HPP
 #define JSONCONS_DETAIL_SPAN_HPP
 
-#include <utility> // std::swap
-#include <memory> // std::addressof
-#include <type_traits> // std::enable_if, std::true_type, std::false_type
-#include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/extension_traits.hpp>
 #include <iterator>
 #include <limits>
+#include <memory> // std::addressof
+#include <type_traits> // std::enable_if, std::true_type, std::false_type
+#include <utility> // std::swap
+
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons
 {
@@ -185,4 +192,4 @@ namespace detail
 } // namespace detail
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_SPAN_HPP

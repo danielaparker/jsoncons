@@ -7,12 +7,13 @@
 #ifndef JSONCONS_UTILITY_HEAP_STRING_HPP
 #define JSONCONS_UTILITY_HEAP_STRING_HPP
 
+#include <cstring> // std::memcpy
+#include <exception>
+#include <memory> // std::allocator
+#include <ostream>
 #include <stdexcept>
 #include <string>
-#include <exception>
-#include <ostream>
-#include <cstring> // std::memcpy
-#include <memory> // std::allocator
+
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
@@ -195,4 +196,4 @@ namespace utility {
 } // namespace utility
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_UTILITY_HEAP_STRING_HPP

@@ -20,4 +20,4 @@ class basic_json;
 
 }
 
-#endif
+#endif // JSONCONS_JSON_FWD_HPP

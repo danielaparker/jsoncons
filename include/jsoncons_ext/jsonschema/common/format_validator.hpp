@@ -4,19 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
 
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/validator.hpp>
 #include <cassert>
+#include <iostream>
 #include <set>
 #include <sstream>
-#include <iostream>
-#include <cassert>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/common/validator.hpp>
+
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
@@ -1219,4 +1220,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_FORMAT_VALIDATOR_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_FORMAT_VALIDATOR_HPP

@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_PARSER_HPP
-#define JSONCONS_CBOR_CBOR_PARSER_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_PARSER_HPP
+#define JSONCONS_EXT_CBOR_CBOR_PARSER_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility> // std::move
 #include <bitset> // std::bitset
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <memory>
+#include <string>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/cbor/cbor_error.hpp>
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_options.hpp>
 #include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_error.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -891,7 +892,7 @@ private:
         uint8_t info = get_additional_information_value(initial_b);
         switch (info)
         {
-            case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+            case JSONCONS_EXT_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
             {
                 val = info;
                 break;
@@ -959,7 +960,7 @@ private:
                 source_.ignore(1);
                 switch (info)
                 {
-                    case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+                    case JSONCONS_EXT_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
                     {
                         val = static_cast<int8_t>(- 1 - info);
                         break;

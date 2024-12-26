@@ -7,17 +7,18 @@
 #ifndef JSONCONS_EXTENSION_TRAITS_HPP
 #define JSONCONS_EXTENSION_TRAITS_HPP
 
+#include <array> // std::array
+#include <climits> // CHAR_BIT
+#include <cmath>
+#include <cstddef> // std::byte
+#include <exception>
+#include <iterator> // std::iterator_traits
+#include <memory>
 #include <stdexcept>
 #include <string>
-#include <cmath>
 #include <type_traits> // std::enable_if, std::true_type
-#include <memory>
-#include <iterator> // std::iterator_traits
-#include <exception>
-#include <array> // std::array
-#include <cstddef> // std::byte
 #include <utility> // std::declval
-#include <climits> // CHAR_BIT
+
 #include <jsoncons/config/compiler_support.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
@@ -919,4 +920,4 @@ namespace impl {
 } // extension_traits
 } // jsoncons
 
-#endif
+#endif // JSONCONS_EXTENSION_TRAITS_HPP

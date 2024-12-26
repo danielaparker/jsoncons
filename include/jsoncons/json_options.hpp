@@ -7,13 +7,14 @@
 #ifndef JSONCONS_JSON_OPTIONS_HPP
 #define JSONCONS_JSON_OPTIONS_HPP
 
-#include <string>
-#include <limits> // std::numeric_limits
 #include <cwchar>
 #include <functional>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_error.hpp>
+#include <limits> // std::numeric_limits
+#include <string>
+
 #include <jsoncons/extension_traits.hpp>
+#include <jsoncons/json_error.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/ser_context.hpp>
 
 namespace jsoncons {
@@ -697,4 +698,4 @@ using json_options = basic_json_options<char>;
 using wjson_options = basic_json_options<wchar_t>;
 
 }
-#endif
+#endif // JSONCONS_JSON_OPTIONS_HPP

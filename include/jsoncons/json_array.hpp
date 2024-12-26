@@ -7,20 +7,21 @@
 #ifndef JSONCONS_JSON_ARRAY_HPP
 #define JSONCONS_JSON_ARRAY_HPP
 
-#include <string>
-#include <vector>
-#include <exception>
-#include <cstring>
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
-#include <utility>
+#include <cassert> // assert
+#include <cstring>
+#include <exception>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
-#include <utility> // std::move
-#include <cassert> // assert
+#include <string>
 #include <type_traits> // std::enable_if
-#include <jsoncons/json_exception.hpp>
+#include <utility>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/allocator_holder.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 
@@ -286,4 +287,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_ARRAY_HPP

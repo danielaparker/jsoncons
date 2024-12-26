@@ -10,13 +10,14 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/ser_context.hpp>
-#include <jsoncons/json_options.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_options.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/bigint.hpp>
 
 namespace jsoncons {
 
@@ -1064,4 +1065,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_VISITOR_HPP

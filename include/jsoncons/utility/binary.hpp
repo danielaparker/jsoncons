@@ -7,3 +7,5 @@ namespace jsoncons { namespace utility {
 
 } // utility
 } // jsoncons
+
+#endif // JSONCONS_UTILITY_BINARY_HPP

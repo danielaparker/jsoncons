@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -147,4 +148,4 @@ namespace std {
     };
 }
 
-#endif
+#endif // JSONCONS_JSON_ERROR_HPP

@@ -7,17 +7,18 @@
 #ifndef JSONCONS_DECODE_TRAITS_HPP
 #define JSONCONS_DECODE_TRAITS_HPP
 
-#include <string>
-#include <tuple>
 #include <array>
 #include <memory>
+#include <string>
+#include <tuple>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/json_decoder.hpp>
-#include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/staj_cursor.hpp>
+
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/extension_traits.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/staj_cursor.hpp>
 
 namespace jsoncons {
 
@@ -647,5 +648,5 @@ namespace jsoncons {
 
 } // jsoncons
 
-#endif
+#endif // JSONCONS_DECODE_TRAITS_HPP
 

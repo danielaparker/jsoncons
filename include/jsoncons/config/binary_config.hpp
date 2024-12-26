@@ -223,4 +223,4 @@ namespace binary {
 } // binary
 } // jsoncons
 
-#endif
+#endif // JSONCONS_CONFIG_BINARY_CONFIG_HPP

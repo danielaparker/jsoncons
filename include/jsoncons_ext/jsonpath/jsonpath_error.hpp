@@ -4,11 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSONPATH_ERROR_HPP
-#define JSONCONS_JSONPATH_JSONPATH_ERROR_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
+
+#include <system_error>
 
 #include <jsoncons/json_exception.hpp>
-#include <system_error>
 
 namespace jsoncons { namespace jsonpath {
 

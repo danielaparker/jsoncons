@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
-#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -745,4 +746,4 @@ private:
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP

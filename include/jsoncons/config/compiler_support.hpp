@@ -4,14 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_COMPILER_SUPPORT_HPP
-#define JSONCONS_COMPILER_SUPPORT_HPP
+#ifndef JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
+#define JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
 
-#include <stdexcept>
-#include <string>
 #include <cmath>
 #include <exception>
 #include <ostream>
+#include <stdexcept>
+#include <string>
 
 #if defined(__GNUC__)
 #   if defined(__GNUC_PATCHLEVEL__)
@@ -417,4 +417,4 @@ namespace jsoncons {
 #endif
         
         
-#endif // JSONCONS_COMPILER_SUPPORT_HPP
+#endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP

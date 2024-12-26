@@ -4,16 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_OPTIONS_HPP
-#define JSONCONS_CSV_CSV_OPTIONS_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
+#define JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
 
-#include <string>
-#include <vector>
-#include <utility> // std::pair
-#include <unordered_map> // std::unordered_map
-#include <map>
-#include <limits> // std::numeric_limits
 #include <cwchar>
+#include <limits> // std::numeric_limits
+#include <map>
+#include <string>
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::pair
+#include <vector>
+
 #include <jsoncons/json_options.hpp>
 
 namespace jsoncons { namespace csv {
@@ -941,4 +942,5 @@ using csv_options = basic_csv_options<char>;
 using wcsv_options = basic_csv_options<wchar_t>;
 
 }}
-#endif
+
+#endif // JSONCONS_EXT_CSV_CSV_OPTIONS_HPP

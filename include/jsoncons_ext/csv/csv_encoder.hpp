@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_ENCODER_HPP
-#define JSONCONS_CSV_CSV_ENCODER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_ENCODER_HPP
+#define JSONCONS_EXT_CSV_CSV_ENCODER_HPP
 
 #include <array> // std::array
-#include <string>
-#include <vector>
-#include <ostream>
-#include <utility> // std::move
-#include <unordered_map> // std::unordered_map
-#include <memory> // std::allocator
 #include <limits> // std::numeric_limits
+#include <memory> // std::allocator
+#include <ostream>
+#include <string>
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -939,4 +940,4 @@ using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std:
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_CSV_CSV_ENCODER_HPP

@@ -8,10 +8,11 @@
 #define JSONCONS_ENCODE_JSON_HPP
 
 #include <iostream>
+#include <istream> // std::basic_istream
+#include <memory>
 #include <string>
 #include <tuple>
-#include <memory>
-#include <istream> // std::basic_istream
+
 #include <jsoncons/encode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
 
@@ -286,5 +287,5 @@ namespace jsoncons {
 
 } // jsoncons
 
-#endif
+#endif // JSONCONS_ENCODE_JSON_HPP
 

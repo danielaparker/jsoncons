@@ -7,10 +7,11 @@
 #ifndef JSONCONS_DETAIL_OPTIONAL_HPP
 #define JSONCONS_DETAIL_OPTIONAL_HPP
 
-#include <new> // placement new
 #include <memory>
-#include <utility> // std::swap
+#include <new> // placement new
 #include <type_traits>
+#include <utility> // std::swap
+
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons 
@@ -484,4 +485,4 @@ namespace detail
 } // namespace detail
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_OPTIONAL_HPP

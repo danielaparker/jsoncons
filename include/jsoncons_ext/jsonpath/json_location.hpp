@@ -4,21 +4,22 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
-#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
+#define JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <type_traits> // std::is_const
-#include <limits> // std::numeric_limits
-#include <utility> // std::move
 #include <algorithm> // std::reverse
+#include <limits> // std::numeric_limits
+#include <memory>
+#include <string>
+#include <type_traits> // std::is_const
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 
 namespace jsonpath { 

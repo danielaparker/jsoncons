@@ -8,6 +8,7 @@
 #define JSONCONS_TAG_TYPE_HPP
 
 #include <ostream>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -238,4 +239,4 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
 
 }
 
-#endif
+#endif // JSONCONS_TAG_TYPE_HPP

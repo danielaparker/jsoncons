@@ -7,14 +7,15 @@
 #ifndef JSONCONS_SINK_HPP
 #define JSONCONS_SINK_HPP
 
+#include <cmath>
+#include <cstring> // std::memcpy
+#include <exception>
+#include <memory> // std::addressof
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <ostream>
-#include <cmath>
-#include <exception>
-#include <memory> // std::addressof
-#include <cstring> // std::memcpy
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/extension_traits.hpp>
 
@@ -286,4 +287,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_SINK_HPP

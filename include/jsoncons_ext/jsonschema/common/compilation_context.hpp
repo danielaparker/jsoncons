@@ -4,16 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
+
+#include <random>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
-#include <random>
+#include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -94,4 +95,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_COMPILATION_CONTEXT_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMPILATION_CONTEXT_HPP

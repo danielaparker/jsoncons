@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_CURSOR_HPP
-#define JSONCONS_BSON_BSON_CURSOR_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_CURSOR_HPP
+#define JSONCONS_EXT_BSON_BSON_CURSOR_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 
 namespace jsoncons { 
@@ -259,5 +260,5 @@ using bson_bytes_cursor = basic_bson_cursor<jsoncons::bytes_source>;
 } // namespace bson
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_CURSOR_HPP
 

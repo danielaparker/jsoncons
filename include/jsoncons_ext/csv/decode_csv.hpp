@@ -4,14 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_DECODE_CSV_HPP
-#define JSONCONS_CSV_DECODE_CSV_HPP
+#ifndef JSONCONS_EXT_CSV_DECODE_CSV_HPP
+#define JSONCONS_EXT_CSV_DECODE_CSV_HPP
 
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons_ext/csv/csv_cursor.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
-#include <jsoncons_ext/csv/csv_cursor.hpp>
 
 namespace jsoncons { 
 namespace csv {
@@ -206,4 +206,4 @@ namespace csv {
 } // namespace csv 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CSV_DECODE_CSV_HPP

@@ -4,14 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONMERGEPATCH_JSONMERGEPATCH_HPP
-#define JSONCONS_JSONMERGEPATCH_JSONMERGEPATCH_HPP
+#ifndef JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
+#define JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
 
-#include <string>
-#include <vector> 
-#include <memory>
 #include <algorithm> // std::min
+#include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector> 
+
 #include <jsoncons/json.hpp>
 
 namespace jsoncons { 

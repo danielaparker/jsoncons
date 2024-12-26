@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_EVENT_READER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_EVENT_READER_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_event_reader.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_event_reader.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
 namespace jsoncons { 
@@ -252,5 +253,5 @@ namespace msgpack {
 } // namespace msgpack
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
 

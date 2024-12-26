@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_TYPE_HPP
 
 #include <ostream>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -223,4 +224,4 @@ namespace jsoncons {
 
 } // jsoncons
 
-#endif
+#endif // JSONCONS_JSON_TYPE_HPP

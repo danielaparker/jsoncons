@@ -7,12 +7,13 @@
 #ifndef JSON_EXCEPTION_HPP
 #define JSON_EXCEPTION_HPP
 
-#include <string> // std::string
 #include <sstream> // std::ostringstream
+#include <string> // std::string
 #include <system_error> // std::error_code
-#include <jsoncons/unicode_traits.hpp> // unicode_traits::convert
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/extension_traits.hpp>
+#include <jsoncons/unicode_traits.hpp> // unicode_traits::convert
 
 namespace jsoncons {
 
@@ -217,4 +218,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSON_EXCEPTION_HPP

@@ -4,10 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_ERROR_HPP
-#define JSONCONS_BSON_BSON_ERROR_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_ERROR_HPP
+#define JSONCONS_EXT_BSON_BSON_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
@@ -100,4 +101,4 @@ namespace std {
     };
 }
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

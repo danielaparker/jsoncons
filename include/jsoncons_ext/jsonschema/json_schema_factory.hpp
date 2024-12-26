@@ -4,14 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
-#define JSONCONS_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
+#define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
+#include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
+#include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
 #include <jsoncons_ext/jsonschema/draft4/schema_builder_4.hpp>
 #include <jsoncons_ext/jsonschema/draft6/schema_builder_6.hpp>
 #include <jsoncons_ext/jsonschema/draft7/schema_builder_7.hpp>
-#include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
-#include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -275,4 +275,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_SCHEMA_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_SCHEMA_HPP

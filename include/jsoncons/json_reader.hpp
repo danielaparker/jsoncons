@@ -7,17 +7,18 @@
 #ifndef JSONCONS_JSON_READER_HPP
 #define JSONCONS_JSON_READER_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
 #include <utility> // std::move
-#include <jsoncons/source.hpp>
+#include <vector>
+
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
 
 namespace jsoncons {
@@ -381,5 +382,5 @@ namespace jsoncons {
 
 }
 
-#endif
+#endif // JSONCONS_JSON_READER_HPP
 

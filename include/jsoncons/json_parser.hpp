@@ -7,21 +7,22 @@
 #ifndef JSONCONS_JSON_PARSER_HPP
 #define JSONCONS_JSON_PARSER_HPP
 
+#include <functional> // std::function
+#include <limits> // std::numeric_limits
 #include <memory> // std::allocator
-#include <string>
-#include <vector>
 #include <stdexcept>
+#include <string>
 #include <system_error>
 #include <unordered_map>
-#include <limits> // std::numeric_limits
-#include <functional> // std::function
+#include <vector>
+
+#include <jsoncons/chunk_reader.hpp>
+#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/json_error.hpp>
-#include <jsoncons/chunk_reader.hpp>
-#include <jsoncons/detail/parse_number.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \
         case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b: \
@@ -2606,5 +2607,5 @@ using json_parser = basic_json_parser<char>;
 using wjson_parser = basic_json_parser<wchar_t>;
 }
 
-#endif
+#endif // JSONCONS_JSON_PARSER_HPP
 

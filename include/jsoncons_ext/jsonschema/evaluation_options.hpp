@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_EVALUATION_OPTIONS_HPP
-#define JSONCONS_JSONSCHEMA_EVALUATION_OPTIONS_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_EVALUATION_OPTIONS_HPP
+#define JSONCONS_EXT_JSONSCHEMA_EVALUATION_OPTIONS_HPP
 
 #include <string>
 
@@ -110,4 +110,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_COMMON_SCHEMA_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_HPP

@@ -4,16 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_VALIDATOR_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_VALIDATOR_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_VALIDATOR_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_VALIDATOR_HPP
+
+#include <unordered_set>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/validation_message.hpp>
-#include <unordered_set>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -436,4 +437,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_KEYWORD_VALIDATOR_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_KEYWORD_VALIDATOR_HPP

@@ -4,17 +4,18 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATCH_JSONPATCH_HPP
-#define JSONCONS_JSONPATCH_JSONPATCH_HPP
+#ifndef JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP
+#define JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP
 
-#include <string>
-#include <vector> 
-#include <memory>
 #include <algorithm> // std::min
+#include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector> 
+
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 namespace jsoncons { namespace jsonpatch {
 

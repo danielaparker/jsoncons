@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_PARSER_HPP
-#define JSONCONS_BSON_BSON_PARSER_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_PARSER_HPP
+#define JSONCONS_EXT_BSON_BSON_PARSER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
-#include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -647,4 +648,4 @@ private:
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_PARSER_HPP

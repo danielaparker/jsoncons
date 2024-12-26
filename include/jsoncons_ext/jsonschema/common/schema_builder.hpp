@@ -4,13 +4,14 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
 #include <memory>
-#include <jsoncons_ext/jsonschema/evaluation_options.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/evaluation_options.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -1010,4 +1011,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_COMMON_SCHEMA_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_HPP

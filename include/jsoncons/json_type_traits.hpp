@@ -7,29 +7,29 @@
 #ifndef JSONCONS_JSON_TYPE_TRAITS_HPP
 #define JSONCONS_JSON_TYPE_TRAITS_HPP
 
-#include <chrono>
-#include <array>
-#include <string>
-#include <vector>
-#include <valarray>
-#include <exception>
-#include <cstring>
-#include <utility>
 #include <algorithm> // std::swap
-#include <limits> // std::numeric_limits
-#include <type_traits> // std::enable_if
+#include <array>
+#include <bitset> // std::bitset
+#include <chrono>
+#include <cstring>
+#include <exception>
+#include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <jsoncons/json_type.hpp>
-#include <jsoncons/utility/bigint.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <limits> // std::numeric_limits
+#include <map>
+#include <memory>
 #include <string>
 #include <tuple>
-#include <map>
-#include <functional>
-#include <memory>
-#include <bitset> // std::bitset
+#include <type_traits> // std::enable_if
+#include <utility>
+#include <valarray>
+#include <vector>
+
 #include <jsoncons/conv_error.hpp>
+#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
@@ -1900,4 +1900,4 @@ namespace variant_detail
 
 } // jsoncons
 
-#endif
+#endif // JSONCONS_JSON_TYPE_TRAITS_HPP

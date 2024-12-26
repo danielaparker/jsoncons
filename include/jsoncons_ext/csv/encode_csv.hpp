@@ -4,12 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_ENCODE_CSV_HPP
-#define JSONCONS_CSV_ENCODE_CSV_HPP
+#ifndef JSONCONS_EXT_CSV_ENCODE_CSV_HPP
+#define JSONCONS_EXT_CSV_ENCODE_CSV_HPP
 
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 namespace jsoncons { 
 namespace csv {
@@ -119,4 +119,4 @@ namespace csv {
 } // namespace csv 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CSV_ENCODE_CSV_HPP

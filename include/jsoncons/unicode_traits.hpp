@@ -17,11 +17,12 @@
 #define JSONCONS_UNICODE_TRAITS_HPP
 
 #include <cstring>
-#include <string>
 #include <iterator>
-#include <type_traits>
-#include <system_error>
 #include <limits>
+#include <string>
+#include <system_error>
+#include <type_traits>
+
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/extension_traits.hpp>
 
@@ -1326,5 +1327,5 @@ namespace jsoncons { namespace unicode_traits {
 } // unicode_traits
 } // jsoncons
 
-#endif
+#endif //JSONCONS_UNICODE_TRAITS_HPP
 
