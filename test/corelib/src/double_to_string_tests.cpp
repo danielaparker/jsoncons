@@ -1,14 +1,16 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
+#include <ctime>
+#include <sstream>
+#include <utility>
+#include <vector>
+
+#include <catch/catch.hpp>
+
+#include <jsoncons/extension_traits.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/extension_traits.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

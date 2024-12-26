@@ -1,10 +1,12 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
-#include <jsoncons/json.hpp>
 #include <random>
+
+#include <catch/catch.hpp>
+
 #include <common/test_utilities.hpp>
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 

@@ -1,11 +1,13 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <catch/catch.hpp>
-#include <iostream>
 #include <cstdio>
+#include <iostream>
+
+#include <catch/catch.hpp>
+
+#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/json_exception.hpp>
 
 using namespace jsoncons;
 

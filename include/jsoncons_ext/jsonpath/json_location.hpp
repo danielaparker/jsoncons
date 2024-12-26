@@ -8,7 +8,6 @@
 #define JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
 
 #include <algorithm> // std::reverse
-#include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
 #include <type_traits> // std::is_const

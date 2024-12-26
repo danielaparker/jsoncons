@@ -1,14 +1,16 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
-#include <catch/catch.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
 #include <ctime>
 #include <map>
+#include <sstream>
+#include <utility>
+#include <vector>
+
+#include <catch/catch.hpp>
+
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_encoder.hpp>
 
 using namespace jsoncons;
 
