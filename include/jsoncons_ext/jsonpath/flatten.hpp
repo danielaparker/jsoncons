@@ -16,7 +16,9 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/json_location.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { namespace jsonpath {

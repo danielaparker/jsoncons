@@ -192,7 +192,7 @@ void csv_decode_without_type_inference()
            .infer_types(false);
     ojson j = csv::decode_csv<ojson>(s,options);
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 
 void read_write_csv_tasks()
@@ -370,7 +370,7 @@ void decode_csv_string()
            .column_types("string,string,string,float");
     json j = csv::decode_csv<json>(s,options);
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 
 void decode_csv_stream()
@@ -389,7 +389,7 @@ void decode_csv_stream()
 
     ojson j = csv::decode_csv<ojson>(is,options);
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 
 void encode_csv_file_from_books()
@@ -680,6 +680,6 @@ int main()
 
     csv_source_to_cpp_object();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -339,6 +339,6 @@ int main()
     as_a_strongly_typed_cpp_structure();
     with_cursor_level_access();
     as_a_filtered_stream_of_json_events();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

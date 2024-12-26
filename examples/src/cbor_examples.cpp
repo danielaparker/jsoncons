@@ -111,7 +111,7 @@ void cbor_reputon_example()
         std::cout << element.at("rated").as<std::string>() << ", ";
         std::cout << element.at("rating").as<double>() << "\n";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // Get a CBOR value for a nested data item with jsonpointer
     std::error_code ec;
@@ -121,7 +121,7 @@ void cbor_reputon_example()
         std::cout << "(3) " << rated.as_string() << "\n";
     }
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void decode_cbor_byte_string()
@@ -136,7 +136,7 @@ void decode_cbor_byte_string()
     std::cout << "(1) "<< bytes << "\n\n";
 
     // byte string value to JSON text becomes base64url
-    std::cout << "(2) " << j << std::endl;
+    std::cout << "(2) " << j << '\n';
 }
 
 void decode_byte_string_with_encoding_hint()
@@ -152,7 +152,7 @@ void decode_byte_string_with_encoding_hint()
     std::cout << "(1) "<< bytes << "\n\n";
 
     // byte string value to JSON text becomes base64
-    std::cout << "(2) " << j << std::endl;
+    std::cout << "(2) " << j << '\n';
 }
 
 void encode_cbor_byte_string()
@@ -166,7 +166,7 @@ void encode_cbor_byte_string()
     std::cout << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
-    std::cout << "(2) " << j2 << std::endl;
+    std::cout << "(2) " << j2 << '\n';
 }
 
 void encode_byte_string_with_encoding_hint()
@@ -180,7 +180,7 @@ void encode_byte_string_with_encoding_hint()
     std::cout << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
-    std::cout << "(2) " << j2 << std::endl;
+    std::cout << "(2) " << j2 << '\n';
 }
 
 void query_cbor()
@@ -601,7 +601,7 @@ int main()
     working_with_cbor1();
     std::cout << "\n";
     working_with_cbor2();
-    std::cout << std::endl;
+    std::cout << '\n';
     encode_to_cbor_buffer();
     query_cbor();
 

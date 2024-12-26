@@ -50,7 +50,7 @@ TEST_CASE("test replace tests")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     SECTION("test 1")

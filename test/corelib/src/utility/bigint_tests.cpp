@@ -97,8 +97,8 @@ TEST_CASE("test_longlong")
 
     bigint val(n);
 
-    //std::cout << "long long " << n << " == " << val << std::endl;
-    //std::cout << val.to_string(16) << std::endl;
+    //std::cout << "long long " << n << " == " << val << '\n';
+    //std::cout << val.to_string(16) << '\n';
 }
 
 TEST_CASE("test_bignum2")
@@ -106,7 +106,7 @@ TEST_CASE("test_bignum2")
     std::string v = "10000000000000000";
     bigint val = bigint::from_string(v.data());
 
-    //std::cout << val << std::endl;
+    //std::cout << val << '\n';
 }
 
 TEST_CASE("test_logical_operations")
@@ -206,7 +206,7 @@ TEST_CASE("test_traits3")
     //{
     //    //std::cout << std::hex << (int)c;
     //}
-    //std::cout << std::endl;
+    //std::cout << '\n';
 
     json j(x);
 

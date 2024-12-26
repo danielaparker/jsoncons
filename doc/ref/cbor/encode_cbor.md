@@ -79,7 +79,7 @@ int main()
 
     ojson j2 = cbor::decode_cbor<ojson>(cont);
 
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 }
 ```
 Output:
@@ -132,7 +132,7 @@ int main()
     std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
-    std::cout << "(2) " << j2 << std::endl;
+    std::cout << "(2) " << j2 << '\n';
 }
 ```
 Output:
@@ -162,7 +162,7 @@ int main()
     std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
-    std::cout << "(2) " << j2 << std::endl;
+    std::cout << "(2) " << j2 << '\n';
 }
 ```
 Output:

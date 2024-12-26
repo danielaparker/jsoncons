@@ -102,7 +102,7 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK_FALSE(ec); //-V521
 
-        //std::cout << visitor.get_result() << "" << std::endl;
+        //std::cout << visitor.get_result() << "" << '\n';
     }
 
     SECTION("issue 21663b")
@@ -232,7 +232,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         //reader.read(ec);
-        //std::cout << ec.message() << "" << std::endl;
+        //std::cout << ec.message() << "" << '\n';
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == cbor::cbor_errc::max_nesting_depth_exceeded));  //-V521
     }
@@ -296,7 +296,7 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == csv::csv_errc::source_error)); //-V521
 
-        //std::cout << visitor.get_result() << "" << std::endl;
+        //std::cout << visitor.get_result() << "" << '\n';
     }
 
     // Fuzz target: fuzz_cbor
@@ -517,7 +517,7 @@ TEST_CASE("oss-fuzz issues")
         }
         catch (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
 
@@ -724,7 +724,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         }
         catch (const std::exception& e)
         {
-            std::cout << e.what() << "" << std::endl;
+            std::cout << e.what() << "" << '\n';
         }
     }
 */
@@ -749,7 +749,7 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         }
         catch (const std::exception& e)
         {
-            std::cout << e.what() << "" << std::endl;
+            std::cout << e.what() << "" << '\n';
         }
     }
 }

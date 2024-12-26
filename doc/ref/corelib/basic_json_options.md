@@ -179,7 +179,7 @@ json obj;
 obj["field1"] = std::sqrt(-1.0);
 obj["field2"] = 1.79e308*1000;
 obj["field3"] = -1.79e308*1000;
-std::cout << obj << std::endl;
+std::cout << obj << '\n';
 ```
 Output:
 ```json
@@ -197,7 +197,7 @@ auto options = json_options{}
     .nan_to_num("null");        // default is "null"
     .inf_to_num("1e9999");      // default is "null"
 
-std::cout << pretty_print(obj,options) << std::endl;
+std::cout << pretty_print(obj,options) << '\n';
 ```
 
 Output:
@@ -266,18 +266,18 @@ j["verts"] = json(json_array_arg, {1, 2, 3});
 j["normals"] = json(json_array_arg, {1, 0, 1});
 j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-std::cout << "Default (same line)" << std::endl;
-std::cout << pretty_print(j) << std::endl;
+std::cout << "Default (same line)" << '\n';
+std::cout << pretty_print(j) << '\n';
 
-std::cout << "New line" << std::endl;
+std::cout << "New line" << '\n';
 auto options1 = json_options{}
     .object_array_line_splits(line_split_kind::new_line);
-std::cout << pretty_print(j,options1) << std::endl;
+std::cout << pretty_print(j,options1) << '\n';
 
-std::cout << "Multi line" << std::endl;
+std::cout << "Multi line" << '\n';
 auto options2 = json_options{}
     .object_array_line_splits(line_split_kind::multi_line);
-std::cout << pretty_print(j,options2) << std::endl;
+std::cout << pretty_print(j,options2) << '\n';
 ```
 
 Output:
@@ -343,18 +343,18 @@ Multi line
                                       json(json_array_arg, {2}),
                                       json(json_array_arg, {4,3})});
 
-    std::cout << "Default (new line)" << std::endl;
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << "Default (new line)" << '\n';
+    std::cout << pretty_print(j) << '\n';
 
-    std::cout << "Same line" << std::endl;
+    std::cout << "Same line" << '\n';
     auto options1 = json_options{}
         .array_array_line_splits(line_split_kind::same_line);
-    std::cout << pretty_print(j, options1) << std::endl;
+    std::cout << pretty_print(j, options1) << '\n';
 
-    std::cout << "Multi line" << std::endl;
+    std::cout << "Multi line" << '\n';
     auto options2 = json_options{}
         .array_array_line_splits(line_split_kind::multi_line);
-    std::cout << pretty_print(j, options2) << std::endl;
+    std::cout << pretty_print(j, options2) << '\n';
 ```
 
 Output:

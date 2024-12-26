@@ -105,7 +105,7 @@ int main()
         std::cout << e.what() << "\n";
     }
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 

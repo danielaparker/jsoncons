@@ -22,6 +22,7 @@
 
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_type.hpp>
 
 namespace jsoncons {
 

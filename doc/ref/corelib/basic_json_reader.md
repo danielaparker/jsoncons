@@ -169,7 +169,7 @@ try
 }
 catch (const ser_error& e)
 {
-    std::cout << e.what() << std::endl;
+    std::cout << e.what() << '\n';
 }
 
 ```
@@ -197,7 +197,7 @@ else
 {
     std::cerr << ec.message() 
               << " at line " << reader.line() 
-              << " and column " << reader.column() << std::endl;
+              << " and column " << reader.column() << '\n';
 }
 ```
 Output:
@@ -230,7 +230,7 @@ while (!reader.eof())
     if (!reader.eof())
     {
         json j = decoder.get_result();
-        std::cout << j << std::endl;
+        std::cout << j << '\n';
     }
 }
 ```

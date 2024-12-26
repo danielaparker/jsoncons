@@ -446,7 +446,7 @@ int main()
         std::cout << element.at("rated").as<std::string>() << ", ";
         std::cout << element.at("rating").as<double>() << "\n";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // Get a CBOR value for a nested data item with jsonpointer
     std::error_code ec;
@@ -456,7 +456,7 @@ int main()
         std::cout << "(3) " << rated.as_string() << "\n";
     }
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 ```
 Output:

@@ -193,42 +193,42 @@ using namespace jsoncons;
 int main()
 {
     json j1; // An empty object
-    std::cout << "(1) " << j1 << std::endl;
+    std::cout << "(1) " << j1 << '\n';
 
     json j2(json_object_arg, {{"baz", "qux"}, {"foo", "bar"}}); // An object 
-    std::cout << "(2) " << j2 << std::endl;
+    std::cout << "(2) " << j2 << '\n';
 
     json j3(json_array_arg, {"bar", "baz"}); // An array 
-    std::cout << "(3) " << j3 << std::endl;
+    std::cout << "(3) " << j3 << '\n';
   
     json j4(json::null()); // A null value
-    std::cout << "(4) " << j4 << std::endl;
+    std::cout << "(4) " << j4 << '\n';
     
     json j5(true); // A boolean value
-    std::cout << "(5) " << j5 << std::endl;
+    std::cout << "(5) " << j5 << '\n';
 
     double x = 1.0/7.0;
 
     json j6(x); // A double value
-    std::cout << "(6) " << j6 << std::endl;
+    std::cout << "(6) " << j6 << '\n';
 
     json j8("Hello"); // A text string
-    std::cout << "(8) " << j8 << std::endl;
+    std::cout << "(8) " << j8 << '\n';
 
     std::vector<int> v = {10,20,30};
     json j9 = v; // From a sequence container
-    std::cout << "(9) " << j9 << std::endl;
+    std::cout << "(9) " << j9 << '\n';
 
     std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
     json j10 = m; // From an associative container
-    std::cout << "(10) " << j10 << std::endl;
+    std::cout << "(10) " << j10 << '\n';
 
     std::vector<uint8_t> bytes = {'H','e','l','l','o'};
     json j11(byte_string_arg, bytes); // A byte string
-    std::cout << "(11) " << j11 << std::endl;
+    std::cout << "(11) " << j11 << '\n';
 
     json j12(half_arg, 0x3bff);
-    std::cout << "(12) " << j12.as_double() << std::endl;
+    std::cout << "(12) " << j12.as_double() << '\n';
 }
 ```
 Output:

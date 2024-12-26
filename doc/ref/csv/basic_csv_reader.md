@@ -120,7 +120,7 @@ csv_stream_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
-std::cout << pretty_print(countries) << std::endl;
+std::cout << pretty_print(countries) << '\n';
 ```
 #### Output 
 ```json
@@ -162,7 +162,7 @@ csv_stream_reader reader(is,decoder,options);
 reader.read();
 json employees = decoder.get_result();
 
-std::cout << pretty_print(employees) << std::endl;
+std::cout << pretty_print(employees) << '\n';
 ```
 
 #### Output
@@ -221,7 +221,7 @@ csv_stream_reader reader(is,decoder,options);
 reader.read();
 json countries = decoder.get_result();
 
-std::cout << pretty_print(countries) << std::endl;
+std::cout << pretty_print(countries) << '\n';
 ```
 
 #### Output 

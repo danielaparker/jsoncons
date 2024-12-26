@@ -163,21 +163,21 @@ int main()
     }
     catch (const ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     json j = decoder.get_result(); // performs move
     if (j["A"].is<double>())
     {
-        std::cout << "A: " << j["A"].as<double>() << std::endl;
+        std::cout << "A: " << j["A"].as<double>() << '\n';
     }
     if (j["B"].is<double>())
     {
-        std::cout << "B: " << j["B"].as<double>() << std::endl;
+        std::cout << "B: " << j["B"].as<double>() << '\n';
     }
     if (j["C"].is<double>())
     {
-        std::cout << "C: " << j["C"].as<double>() << std::endl;
+        std::cout << "C: " << j["C"].as<double>() << '\n';
     }
 }
 ```
@@ -229,7 +229,7 @@ int main()
     }
     catch (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 ```
@@ -295,7 +295,7 @@ int main()
     }
     catch (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 ```

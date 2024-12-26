@@ -15,7 +15,7 @@ using namespace jsoncons;
 
 TEST_CASE("test_string_to_double")
 {
-    std::cout << "sizeof(json): " << sizeof(json) << std::endl; 
+    std::cout << "sizeof(json): " << sizeof(json) << '\n'; 
 
     const char* s1 = "0.0";
     json j1 = json::parse(s1);

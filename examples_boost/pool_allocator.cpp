@@ -28,6 +28,6 @@ void pool_allocator_examples()
 
     cust_json j = decoder.get_result();
 
-    std::cout << j << std::endl;
+    std::cout << j << '\n';
 }
 

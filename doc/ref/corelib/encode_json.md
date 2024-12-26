@@ -107,11 +107,11 @@ int main()
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    std::cout << "(1)\n" << std::endl; 
+    std::cout << "(1)\n" << '\n'; 
     encode_json(employees,std::cout);
     std::cout << "\n\n";
 
-    std::cout << "(2) Again, with pretty print\n" << std::endl; 
+    std::cout << "(2) Again, with pretty print\n" << '\n'; 
 
     encode_json(employees, std::cout, indenting::indent);
 }

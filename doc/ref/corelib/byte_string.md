@@ -85,7 +85,7 @@ for (auto b : bytes)
 }
 std::cout << "\n\n";
 
-std::cout << "(3) " << j << std::endl;
+std::cout << "(3) " << j << '\n';
 ```
 
 Output:
@@ -112,7 +112,7 @@ for (auto b : bytes)
 }
 std::cout << "\n\n";
 
-std::cout << "(3) " << j << std::endl;
+std::cout << "(3) " << j << '\n';
 ```
 
 Output:

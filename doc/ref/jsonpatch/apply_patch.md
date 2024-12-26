@@ -49,7 +49,7 @@ int main()
     std::error_code ec;
     jsonpatch::apply_patch(target,patch,ec);
 
-    std::cout << pretty_print(target) << std::endl;
+    std::cout << pretty_print(target) << '\n';
 }
 ```
 Output:
@@ -86,8 +86,8 @@ int main()
     std::error_code ec;
     jsonpatch::apply_patch(target, patch, ec);
 
-    std::cout << "(1) " << ec.message() << std::endl;
-    std::cout << "(2) " << target << std::endl;
+    std::cout << "(1) " << ec.message() << '\n';
+    std::cout << "(2) " << target << '\n';
 }
 ```
 Output:

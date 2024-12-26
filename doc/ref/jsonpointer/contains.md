@@ -57,8 +57,8 @@ int main()
        }
     )");
 
-    std::cout << "(1) " << jsonpointer::contains(j, "/foo/0") << std::endl;
-    std::cout << "(2) " << jsonpointer::contains(j, "e^g") << std::endl;
+    std::cout << "(1) " << jsonpointer::contains(j, "/foo/0") << '\n';
+    std::cout << "(2) " << jsonpointer::contains(j, "e^g") << '\n';
 }
 ```
 Output:

@@ -7,7 +7,6 @@
 #ifndef JSONCONS_EXT_JSONPATH_JSON_QUERY_HPP
 #define JSONCONS_EXT_JSONPATH_JSON_QUERY_HPP
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>
 

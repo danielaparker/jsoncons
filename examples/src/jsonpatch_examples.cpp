@@ -27,17 +27,17 @@ void jsonpatch_add_add()
     std::error_code ec;
     jsonpatch::apply_patch(doc, patch, ec);
 
-    std::cout << "(1)\n" << pretty_print(doc) << std::endl;
+    std::cout << "(1)\n" << pretty_print(doc) << '\n';
 
     // Create a JSON Patch
 
     auto patch2 = jsonpatch::from_diff(doc2,doc);
 
-    std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
+    std::cout << "(2)\n" << pretty_print(patch2) << '\n';
 
     jsonpatch::apply_patch(doc2,patch2,ec);
 
-    std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
+    std::cout << "(3)\n" << pretty_print(doc2) << '\n';
 }
 
 void jsonpatch_add_add_add_failed1()
@@ -60,8 +60,8 @@ void jsonpatch_add_add_add_failed1()
     }
     catch (const jsonpatch::jsonpatch_error& e)
     {
-        std::cout << "(1) " << e.what() << std::endl;
-        std::cout << "(2) " << target << std::endl;
+        std::cout << "(1) " << e.what() << '\n';
+        std::cout << "(2) " << target << '\n';
     }
 }
 
@@ -82,8 +82,8 @@ void jsonpatch_add_add_add_failed2()
     std::error_code ec;
     jsonpatch::apply_patch(target, patch, ec);
 
-    std::cout << "(1) " << std::error_code(ec).message() << std::endl;
-    std::cout << "(2) " << target << std::endl;
+    std::cout << "(1) " << std::error_code(ec).message() << '\n';
+    std::cout << "(2) " << target << '\n';
 }
 
 void create_a_json_patch()
@@ -101,8 +101,8 @@ void create_a_json_patch()
     std::error_code ec;
     jsonpatch::apply_patch(source, patch, ec);
 
-    std::cout << "(1)\n" << pretty_print(patch) << std::endl;
-    std::cout << "(2)\n" << pretty_print(source) << std::endl;
+    std::cout << "(1)\n" << pretty_print(patch) << '\n';
+    std::cout << "(2)\n" << pretty_print(source) << '\n';
 }
 
 int main()
@@ -112,6 +112,6 @@ int main()
     jsonpatch_add_add();
     jsonpatch_add_add_add_failed2();
     jsonpatch_add_add_add_failed1();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

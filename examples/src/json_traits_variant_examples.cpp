@@ -390,6 +390,6 @@ int main()
     distinguish_by_type();
 #endif
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

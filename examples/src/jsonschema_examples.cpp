@@ -335,7 +335,7 @@ void validate_before_decode_example()
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
-            std::cout << output << std::endl;
+            std::cout << output << '\n';
 
             // Verify that output is valid
             json test = json::parse(output);

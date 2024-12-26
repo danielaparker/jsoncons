@@ -15,6 +15,7 @@
 #include <vector>
 
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_object.hpp>
 #include <jsoncons/json_visitor.hpp>
 
 namespace jsoncons {

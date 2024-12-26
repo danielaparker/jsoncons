@@ -19,47 +19,47 @@ using namespace jsoncons;
 
 void container_example1()
 {
-    std::cout << "Convert from and to standard library containers\n" << std::endl;
+    std::cout << "Convert from and to standard library containers\n" << '\n';
 
     {
         std::vector<int> v{1, 2, 3, 4};
         json j(v);
-        std::cout << "(1) "<< j << std::endl;
+        std::cout << "(1) "<< j << '\n';
         std::deque<int> d = j.as<std::deque<int>>();
     }
 
     std::vector<unsigned long> vec2{1ul, 2ul, 3ul, 4ul};
     json j_vec2(vec2);
-    std::cout << j_vec2 << std::endl;
+    std::cout << j_vec2 << '\n';
 
     std::deque<double> deque1{1.123, 2.234, 3.456, 4.567};
     json j_deque1(deque1);
-    std::cout << j_deque1 << std::endl;
+    std::cout << j_deque1 << '\n';
 
     std::list<bool> list1{true, true, false, true};
     json j_list1(list1);
-    std::cout << j_list1 << std::endl;
+    std::cout << j_list1 << '\n';
 
     std::forward_list<int64_t>flist1 {12345678909876, 23456789098765, 34567890987654, 45678909876543};
     json j_flist1(flist1);
-    std::cout << j_flist1 << std::endl;
+    std::cout << j_flist1 << '\n';
 
     std::array<unsigned long, 4> array1 {{1, 2, 3, 4}};
     json j_array1(array1);
 
     std::set<std::string> set1{"one", "two", "three", "four"};
     json j_set1(set1); 
-    std::cout << j_set1 << std::endl;
+    std::cout << j_set1 << '\n';
     // ["four", "one", "three", "two"]
 
     std::unordered_set<std::string> uset1{"one", "two", "three", "four"};
     json j_uset1(uset1); 
-    std::cout << j_uset1 << std::endl;
+    std::cout << j_uset1 << '\n';
     // maybe ["two", "three", "four", "one"]
 
     std::multiset<std::string> mset1{"one", "two", "one", "four"};
     json j_mset1(mset1); // only one entry for "one" is used
-    std::cout << j_mset1 << std::endl;
+    std::cout << j_mset1 << '\n';
     // maybe ["one", "two", "four"]
 
     std::unordered_multiset<std::string> umset1 {"one", "two", "one", "four"};
@@ -69,13 +69,13 @@ void container_example1()
     {
         std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
         json j(m);
-        std::cout << "(1) " << j << std::endl;
+        std::cout << "(1) " << j << '\n';
         std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
     }
 
     std::unordered_map<std::string, double> umap1{ {"one", 1.2}, {"two", 2.3}, {"three", 3.4} };
     json j_umap1(umap1);
-    std::cout << j_umap1 << std::endl;
+    std::cout << j_umap1 << '\n';
 
     std::cout << "\n\n";
 }
@@ -104,6 +104,6 @@ int main()
     std::cout << "\nContainer examples\n\n";
     container_example1();
     map_with_integer_key_example();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

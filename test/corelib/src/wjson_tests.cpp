@@ -62,10 +62,10 @@ TEST_CASE("wjson pretty print tests")
     actualStr << jsoncons::pretty_print(testBlock);
 
     std::wostringstream expectedStr;
-    expectedStr << L"{" << std::endl;
-    expectedStr << L"    \"bar\": false, " << std::endl;
-    expectedStr << L"    \"baz\": true, " << std::endl;
-    expectedStr << L"    \"foo\": true" << std::endl;
+    expectedStr << L"{" << '\n';
+    expectedStr << L"    \"bar\": false, " << '\n';
+    expectedStr << L"    \"baz\": true, " << '\n';
+    expectedStr << L"    \"foo\": true" << '\n';
     expectedStr << L"}";
 
     CHECK(actualStr.str().size() == expectedStr.str().size());

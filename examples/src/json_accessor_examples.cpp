@@ -59,7 +59,7 @@ void byte_string_from_initializer_list()
     }
     std::cout << "\n\n";
 
-    std::cout << "(3) " << j << std::endl;
+    std::cout << "(3) " << j << '\n';
 }
 
 void byte_string_from_char_array()
@@ -95,23 +95,23 @@ void introspection_example()
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
         return;
     }
     json val = json::parse(is);
     std::cout << std::boolalpha;
-    std::cout << "Is this an object? " << val.is_object() << ", or an array? " << val.is_array() << std::endl;
+    std::cout << "Is this an object? " << val.is_object() << ", or an array? " << val.is_array() << '\n';
 
     if (val.at("books").is_array())
     {
         std::size_t index = 0;
         for (const auto& book : val.at("books").array_range())
         {
-            std::cout << "Is element " << index++ << " an object? " << book.is_object() << std::endl;
+            std::cout << "Is element " << index++ << " an object? " << book.is_object() << '\n';
             if (book.is_object())
             {
                 for (auto it = book.object_range().begin(); it != book.object_range().end(); ++it){
-                    std::cout << "Is member " << it->key() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << std::endl;
+                    std::cout << "Is member " << it->key() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << '\n';
 
                 }
             }
@@ -154,7 +154,7 @@ void reverse_object_iterator()
 
     for (auto it = j.object_range().crbegin(); it != j.object_range().crend(); ++it)
     {
-        std::cout << it->key() << " => " << it->value().as<std::string>() << std::endl;
+        std::cout << it->key() << " => " << it->value().as<std::string>() << '\n';
     }
     std::cout << "\n";
 }

@@ -59,11 +59,11 @@ NY,LON,TOR;LON
     {
         json j = csv::decode_csv<json>(s,options);
         CHECK(expected == j);
-        //std::cout << pretty_print(j) << std::endl;
+        //std::cout << pretty_print(j) << '\n';
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
     }
 }
 
@@ -101,11 +101,11 @@ NY,LON,TOR;LON
     {
         json j = csv::decode_csv<json>(s,options);
         CHECK(expected == j);
-        //std::cout << pretty_print(j) << std::endl;
+        //std::cout << pretty_print(j) << '\n';
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
     }
 }
 

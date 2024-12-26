@@ -170,7 +170,7 @@ namespace detail {
                         jsonpointer::add(target,it->path,it->value,ec);
                         if (ec)
                         {
-                            //std::cout << "add: " << it->path << std::endl;
+                            //std::cout << "add: " << it->path << '\n';
                             break;
                         }
                     }
@@ -179,7 +179,7 @@ namespace detail {
                         jsonpointer::remove(target,it->path,ec);
                         if (ec)
                         {
-                            //std::cout << "remove: " << it->path << std::endl;
+                            //std::cout << "remove: " << it->path << '\n';
                             break;
                         }
                     }
@@ -188,7 +188,7 @@ namespace detail {
                         jsonpointer::replace(target,it->path,it->value,ec);
                         if (ec)
                         {
-                            //std::cout << "replace: " << it->path << std::endl;
+                            //std::cout << "replace: " << it->path << '\n';
                             break;
                         }
                     }

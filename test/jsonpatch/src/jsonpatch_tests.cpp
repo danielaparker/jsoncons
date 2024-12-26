@@ -21,7 +21,7 @@ void check_patch(Json& target, const Json& patch, const std::error_code& expecte
     jsonpatch::apply_patch(target, patch, ec);
     if (ec != expected_ec || expected != target)
     {
-        std::cout << "target:\n" << target << std::endl;
+        std::cout << "target:\n" << target << '\n';
     }
     CHECK(ec == expected_ec); //-V521
     CHECK(target == expected); //-V521

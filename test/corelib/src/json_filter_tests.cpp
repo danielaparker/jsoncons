@@ -142,7 +142,7 @@ TEST_CASE("test_rename_name")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
     CHECK(j["store"]["book"][0]["price"].as<double>() == Approx(31.96).epsilon(0.001));
 

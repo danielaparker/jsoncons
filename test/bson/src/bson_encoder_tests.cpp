@@ -36,7 +36,7 @@ namespace {
         }
         JSONCONS_CATCH (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
 }
@@ -247,7 +247,7 @@ TEST_CASE("serialize object to bson")
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 

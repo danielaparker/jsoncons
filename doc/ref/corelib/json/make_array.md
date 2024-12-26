@@ -27,7 +27,7 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 json a = json::make_array(10,0); // angle brackets can be omitted when N = 1
 a[1] = 1;
 a[2] = 2;
-std::cout << pretty_print(a) << std::endl;
+std::cout << pretty_print(a) << '\n';
 ```
 Output:
 ```json
@@ -49,7 +49,7 @@ a[2][1] = 0.18;
 a[2][2] = 0.009;
 a[2][3] = -0.005;
 
-std::cout << pretty_print(a) << std::endl;
+std::cout << pretty_print(a) << '\n';
 ```
 Output:
 ```json
@@ -64,7 +64,7 @@ Output:
 json a = json::make_array<3>(4,3,2,0);
 a[0][2][0] = 2;
 a[0][2][1] = 3;
-std::cout << pretty_print(a) << std::endl;
+std::cout << pretty_print(a) << '\n';
 ```
 Output:
 ```json

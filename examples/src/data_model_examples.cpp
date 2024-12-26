@@ -110,6 +110,6 @@ int main()
     std::cout << "\ndata model examples\n\n";
     data_model_example2();
     data_model_example1();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

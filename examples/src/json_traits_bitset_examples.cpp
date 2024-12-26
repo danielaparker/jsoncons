@@ -48,6 +48,6 @@ int main()
     json_example();
     cbor_example();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

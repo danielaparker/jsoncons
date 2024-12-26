@@ -605,7 +605,7 @@ std::string Hello World
 ```cpp
 std::vector<int> v{1, 2, 3, 4};
 json j(v);
-std::cout << "(1) "<< j << std::endl;
+std::cout << "(1) "<< j << '\n';
 std::deque<int> d = j.as<std::deque<int>>();
 ```
 Output:
@@ -620,7 +620,7 @@ Output:
 ```cpp
 std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
 json j(m);
-std::cout << j << std::endl;
+std::cout << j << '\n';
 std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
 ```
 Output:

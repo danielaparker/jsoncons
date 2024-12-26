@@ -80,7 +80,7 @@ int main()
 
     ojson j2 = decode_msgpack<ojson>(cont);
 
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 }
 ```
 Output:

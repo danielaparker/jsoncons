@@ -710,7 +710,7 @@ void search_for_and_replace_a_value()
     };
     jsonpath::json_replace(j, "$.books[?(@.isbn == '0048080489')].price", f); // (since 0.161.0)
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 
 void union_example() 

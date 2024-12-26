@@ -1982,63 +1982,63 @@ namespace jsoncons {
     {
         bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_object" << std::endl; 
+            std::cout << "visit_begin_object" << '\n'; 
             return true;
         }
 
         bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_object " << length << std::endl; 
+            std::cout << "visit_begin_object " << length << '\n'; 
             return true;
         }
 
         bool visit_end_object(const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_end_object" << std::endl; 
+            std::cout << "visit_end_object" << '\n'; 
             return true;
         }
 
         bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_array" << std::endl;
+            std::cout << "visit_begin_array" << '\n';
             return true;
         }
 
         bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_array " << length << std::endl; 
+            std::cout << "visit_begin_array " << length << '\n'; 
             return true;
         }
 
         bool visit_end_array(const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_end_array" << std::endl; 
+            std::cout << "visit_end_array" << '\n'; 
             return true;
         }
 
         bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_string " << s << std::endl; 
+            std::cout << "visit_string " << s << '\n'; 
             return true;
         }
         bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_int64 " << val << std::endl; 
+            std::cout << "visit_int64 " << val << '\n'; 
             return true;
         }
         bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_uint64 " << val << std::endl; 
+            std::cout << "visit_uint64 " << val << '\n'; 
             return true;
         }
         bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_bool " << val << std::endl; 
+            std::cout << "visit_bool " << val << '\n'; 
             return true;
         }
         bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_null " << std::endl; 
+            std::cout << "visit_null " << '\n'; 
             return true;
         }
 
@@ -2047,12 +2047,12 @@ namespace jsoncons {
                                     const ser_context&, 
                                     std::error_code&) override  
         {
-            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
+            std::cout << "visit_typed_array uint16_t " << tag << '\n'; 
             for (auto val : s)
             {
-                std::cout << val << "" << std::endl;
+                std::cout << val << "" << '\n';
             }
-            std::cout << "" << std::endl;
+            std::cout << "" << '\n';
             return true;
         }
 
@@ -2061,12 +2061,12 @@ namespace jsoncons {
             const ser_context&,
             std::error_code&) override
         {
-            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << '\n';
             for (auto val : s)
             {
-                std::cout << val << "" << std::endl;
+                std::cout << val << "" << '\n';
             }
-            std::cout << "" << std::endl;
+            std::cout << "" << '\n';
             return true;
         }
     };

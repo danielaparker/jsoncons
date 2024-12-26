@@ -25,7 +25,7 @@ arr.emplace_back(10);
 arr.emplace_back(20);
 arr.emplace_back(30);
 
-std::cout << arr << std::endl;
+std::cout << arr << '\n';
 ```
 Output:
 

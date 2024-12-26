@@ -56,7 +56,7 @@ TEST_CASE("jsonpath.jsonpath select_paths test")
         for (const auto& loc : result)
         {
             std::string s = jsonpath::to_string(loc);
-            std::cout << s << std::endl;
+            std::cout << s << '\n';
         }
 
         std::vector<jsonpath::json_location> locations;

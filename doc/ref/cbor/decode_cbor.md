@@ -88,7 +88,7 @@ int main()
     cbor::encode_cbor(j1, v);
 
     ojson j2 = cbor::decode_cbor<ojson>(v);
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 }
 ```
 Output:
@@ -140,7 +140,7 @@ int main()
 
     json j2 = cbor::decode_cbor<json>(is);
 
-    std::cout << pretty_print(j2) << std::endl; 
+    std::cout << pretty_print(j2) << '\n'; 
 }
 ```
 Output:
@@ -178,7 +178,7 @@ int main()
     std::cout << "(1) "<< byte_string_view(bstr) << "\n\n";
 
     // byte string value to JSON text becomes base64url
-    std::cout << "(2) " << j << std::endl;
+    std::cout << "(2) " << j << '\n';
 }
 ```
 Output:
@@ -209,7 +209,7 @@ int main()
     std::cout << "(1) "<< bs << "\n\n";
 
     // byte string value to JSON text becomes base64
-    std::cout << "(2) " << j << std::endl;
+    std::cout << "(2) " << j << '\n';
 }
 ```
 Output:

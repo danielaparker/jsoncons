@@ -65,7 +65,7 @@ TEST_CASE("test_exception_rbrace")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        //std::cout << e.what() << std::endl;
+        //std::cout << e.what() << '\n';
         CHECK(e.code() == json_errc::expected_comma_or_rbrace);
         CHECK(17 == e.line());
         CHECK(6 == e.column());
@@ -104,7 +104,7 @@ TEST_CASE("test_exception_unicode_eof")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        //std::cout << e.what() << std::endl;
+        //std::cout << e.what() << '\n';
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
         CHECK(5 == e.column());
@@ -124,7 +124,7 @@ TEST_CASE("test_exception_tru_eof")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        //std::cout << e.what() << std::endl;
+        //std::cout << e.what() << '\n';
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
         CHECK(5 == e.column());
@@ -144,7 +144,7 @@ TEST_CASE("test_exception_fals_eof")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        //std::cout << e.what() << std::endl;
+        //std::cout << e.what() << '\n';
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
         CHECK(6 == e.column());
@@ -164,7 +164,7 @@ TEST_CASE("test_exception_nul_eof")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        //std::cout << e.what() << std::endl;
+        //std::cout << e.what() << '\n';
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
         CHECK(5 == e.column());

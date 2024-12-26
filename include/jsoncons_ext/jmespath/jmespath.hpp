@@ -5050,7 +5050,7 @@ namespace jmespath {
 
             //for (auto& t : output_stack_)
             //{
-            //    std::cout << t.to_string() << std::endl;
+            //    std::cout << t.to_string() << '\n';
             //}
 
             return jmespath_expression(std::move(resources_), std::move(output_stack_));

@@ -76,7 +76,7 @@ int main()
 
     for (const auto& pair : employees)
     {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
+        std::cout << pair.first << ": " << std::get<1>(pair.second) << '\n';
     }
 }
 ```

@@ -32,19 +32,19 @@ ojson j1 = ojson::parse(R"(
 
     ojson j2 = msgpack::decode_msgpack<ojson>(v);
 
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 
     json j3 = msgpack::decode_msgpack<json>(v);
 
-    std::cout << pretty_print(j3) << std::endl;
+    std::cout << pretty_print(j3) << '\n';
 
-    std::cout << std::endl;
+    std::cout << '\n';
 
     //wjson j4 = msgpack::decode_msgpack<wjson>(v);
 
-    //std::wcout << pretty_print(j4) << std::endl;
+    //std::wcout << pretty_print(j4) << '\n';
 
-    //std::cout << std::endl;
+    //std::cout << '\n';
 }
 
 void example2()
@@ -80,9 +80,9 @@ void example2()
 
     ojson j2 = msgpack::decode_msgpack<ojson>(v);
 
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void ext_example()
@@ -179,6 +179,6 @@ int main()
     duration_example1();
     duration_example2();
     duration_example3();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

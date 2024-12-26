@@ -111,11 +111,11 @@ int main()
     jsonpointer::replace(target, "/baz", json("boo"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -146,11 +146,11 @@ int main()
     jsonpointer::replace(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << pretty_print(target) << std::endl;
+        std::cout << pretty_print(target) << '\n';
     }
 }
 ```

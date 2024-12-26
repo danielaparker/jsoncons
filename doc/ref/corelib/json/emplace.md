@@ -34,7 +34,7 @@ a.emplace_back("Toronto");
 a.emplace_back("Vancouver");
 a.emplace(a.array_range().begin(),"Montreal");
 
-std::cout << a << std::endl;
+std::cout << a << '\n';
 ```
 Output:
 

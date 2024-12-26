@@ -12,14 +12,14 @@ Throws `std::domain_error` if not an array.
 #### Creating an array of elements 
 ```cpp
 json cities(json_array_arg);       // an empty array
-std::cout << cities << std::endl;  // output is "[]"
+std::cout << cities << '\n';  // output is "[]"
 
 cities.push_back("Toronto");  
 cities.push_back("Vancouver");
 // Insert "Montreal" at beginning of array
 cities.insert(cities.array_range().begin(),"Montreal");  
 
-std::cout << cities << std::endl;
+std::cout << cities << '\n';
 ```
 Output:
 ```
@@ -31,15 +31,15 @@ Output:
 json cities(json_array_arg);  
 cities.reserve(10);  // storage is reserved
 std::cout << "capacity=" << cities.capacity() 
-          << ", size=" << cities.size() << std::endl;
+          << ", size=" << cities.size() << '\n';
 
 cities.push_back("Toronto");  
 cities.push_back("Vancouver");
 cities.insert(cities.array_range().begin(),"Montreal");
 std::cout << "capacity=" << cities.capacity() 
-          << ", size=" << cities.size() << std::endl;
+          << ", size=" << cities.size() << '\n';
 
-std::cout << cities << std::endl;
+std::cout << cities << '\n';
 ```
 Output:
 ```

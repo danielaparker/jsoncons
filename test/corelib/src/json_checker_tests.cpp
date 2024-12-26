@@ -114,7 +114,7 @@ TEST_CASE("test_fail6")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -153,7 +153,7 @@ TEST_CASE("test_fail8")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::extra_character);
 }
@@ -173,7 +173,7 @@ TEST_CASE("test_fail9")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::extra_comma);
 }
@@ -212,7 +212,7 @@ TEST_CASE("test_fail11")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_comma_or_rbrace);
 }
@@ -232,7 +232,7 @@ TEST_CASE("test_fail12")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -252,7 +252,7 @@ TEST_CASE("test_fail13")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::leading_zero);
 }
@@ -272,7 +272,7 @@ TEST_CASE("test_fail14")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::invalid_number);
 }
@@ -292,7 +292,7 @@ TEST_CASE("test_fail15")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_escaped_character);
 }
@@ -312,7 +312,7 @@ TEST_CASE("test_fail16")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -332,7 +332,7 @@ TEST_CASE("test_fail17")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_escaped_character);
 }
@@ -353,7 +353,7 @@ TEST_CASE("test_fail18")
     JSONCONS_CATCH (const ser_error& e)
     {
          err = e.code();
-         //std::cout << in_file << " " << e.what() << std::endl;
+         //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::max_nesting_depth_exceeded);
 }
@@ -373,7 +373,7 @@ TEST_CASE("test_fail19")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_colon);
 }
@@ -393,7 +393,7 @@ TEST_CASE("test_fail20")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -413,7 +413,7 @@ TEST_CASE("test_fail21")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_colon);
 }
@@ -433,7 +433,7 @@ TEST_CASE("test_fail22")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_comma_or_rbracket);
 }
@@ -453,7 +453,7 @@ TEST_CASE("test_fail23")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::invalid_value);
 }
@@ -473,7 +473,7 @@ TEST_CASE("test_fail24")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     // Single quote
     CHECK(err == jsoncons::json_errc::single_quote);
@@ -494,7 +494,7 @@ TEST_CASE("test_fail25")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_character_in_string);
 }
@@ -514,7 +514,7 @@ TEST_CASE("test_fail26")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_escaped_character);
 }
@@ -534,7 +534,7 @@ TEST_CASE("test_fail27")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_character_in_string);
 }
@@ -554,7 +554,7 @@ TEST_CASE("test_fail28")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::illegal_escaped_character);
 }
@@ -574,7 +574,7 @@ TEST_CASE("test_fail29")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -594,7 +594,7 @@ TEST_CASE("test_fail30")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -614,7 +614,7 @@ TEST_CASE("test_fail31")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_value);
 }
@@ -634,7 +634,7 @@ TEST_CASE("test_fail32")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::unexpected_eof);
 }
@@ -654,7 +654,7 @@ TEST_CASE("test_fail33")
     JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
-        //std::cout << in_file << " " << e.what() << std::endl;
+        //std::cout << in_file << " " << e.what() << '\n';
     }
     CHECK(err == jsoncons::json_errc::expected_comma_or_rbracket);
 }
@@ -671,7 +671,7 @@ TEST_CASE("test_pass1")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << in_file << " " << e.what() << std::endl;
+        std::cout << in_file << " " << e.what() << '\n';
         throw;
     }
 }
@@ -688,7 +688,7 @@ TEST_CASE("test_pass2")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << in_file << " " << e.what() << std::endl;
+        std::cout << in_file << " " << e.what() << '\n';
         throw;
     }
 }
@@ -705,7 +705,7 @@ TEST_CASE("test_pass3")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << in_file << " " << e.what() << std::endl;
+        std::cout << in_file << " " << e.what() << '\n';
         throw;
     }
 }

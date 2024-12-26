@@ -80,15 +80,15 @@ namespace ns
     deal["ObservationDates"].push_back(date(2014,2,28));    
 
     date maturity = deal["Maturity"].as<date>();
-    std::cout << "Maturity: " << maturity << std::endl << std::endl;
+    std::cout << "Maturity: " << maturity << '\n' << '\n';
 
-    std::cout << "Observation dates: " << std::endl << std::endl;
+    std::cout << "Observation dates: " << '\n' << '\n';
 
     for (auto observation_date: deal["ObservationDates"].array_range())
     {
-        std::cout << observation_date << std::endl;
+        std::cout << observation_date << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 ```
 Output:

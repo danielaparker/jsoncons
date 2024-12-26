@@ -75,14 +75,14 @@ void basics_json_example1()
     booklist.insert(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
-    std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+    std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << '\n';
 
     //Loop through the booklist elements using a range-based for loop    
     for (auto book : booklist.array_range())
     {
         std::cout << book["title"].as<std::string>()
                   << ","
-                  << book["price"].as<double>() << std::endl;
+                  << book["price"].as<double>() << '\n';
     }
 
     // The second book
@@ -93,7 +93,7 @@ void basics_json_example1()
     {
         std::cout << member.key()
                   << ","
-                  << member.value() << std::endl;
+                  << member.value() << '\n';
     }
 
     auto it = book.find("author");
@@ -142,23 +142,23 @@ void basics_json_example2()
       
     // (1) The authors of books that cost less than $12
     json result = json_query(booklist, "$[*][?(@.price < 12)].author");
-    std::cout << "(1) " << result << std::endl;
+    std::cout << "(1) " << result << '\n';
 
     // (2) The number of books
     result = json_query(booklist, "$.length");
-    std::cout << "(2) " << result << std::endl;
+    std::cout << "(2) " << result << '\n';
 
     // (3) The third book
     result = json_query(booklist, "$[2]");
-    std::cout << "(3) " << std::endl << pretty_print(result) << std::endl;
+    std::cout << "(3) " << '\n' << pretty_print(result) << '\n';
 
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
-    std::cout << "(4) " << result << std::endl;
+    std::cout << "(4) " << result << '\n';
 
     // (5) The titles of all books that have ratings
     result = json_query(booklist, "$[*][?(@.ratings)].title");
-    std::cout << "(5) " << result << std::endl;
+    std::cout << "(5) " << result << '\n';
 }
 
 int main()
@@ -166,6 +166,6 @@ int main()
     std::cout << "\nBasics\n\n";
     basics_json_example1();
     basics_json_example2();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

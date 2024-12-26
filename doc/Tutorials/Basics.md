@@ -76,7 +76,7 @@ auto pos = booklist.add(booklist.array_range().begin(),std::move(book3));
 booklist.add(pos+1,std::move(book4));    
 
 // See what's left of book1, 2, 3 and 4 (expect nulls)
-std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << '\n';
 
 
 ++
@@ -85,7 +85,7 @@ for (const auto& book : booklist.array_range())
 {
     std::cout << book["title"].as<std::string>()
               << ","
-              << book["price"].as<double>() << std::endl;
+              << book["price"].as<double>() << '\n';
 }
 
 // The second book
@@ -96,7 +96,7 @@ for (const auto& member : book.object_range())
 {
     std::cout << member.key()
               << ","
-              << member.value() << std::endl;
+              << member.value() << '\n';
 }
 
 auto it = book.find("author");
@@ -197,27 +197,27 @@ is >> booklist;
 //  
 // (1) The authors of books that cost less than $12
 json result = json_query(booklist, "$[*][?(@.price < 12)].author");
-std::cout << result << std::endl;
+std::cout << result << '\n';
 
 // (2) The number of books
 result = json_query(booklist, "$.length");
-std::cout << result << std::endl;
+std::cout << result << '\n';
 
 // (3) The third book
 result = json_query(booklist, "$[2]");
-std::cout << std::endl << pretty_print(result) << std::endl;
+std::cout << '\n' << pretty_print(result) << '\n';
 
 // (4) The authors of books that were published in 2004
 result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
-std::cout << result << std::endl;
+std::cout << result << '\n';
 
 // (5) The titles of all books that have ratings
 result = json_query(booklist, "$[*][?(@.ratings)].title");
-std::cout << result << std::endl;
+std::cout << result << '\n';
 
 // (6) All authors and titles of books
 result = json_query(booklist, "$..['author','title']");
-std::cout << pretty_print(result) << std::endl;
+std::cout << pretty_print(result) << '\n';
 ```
 Result:
 ```json
@@ -324,7 +324,7 @@ auto pos = booklist.add(booklist.array_range().begin(),std::move(book3));
 booklist.add(pos+1,std::move(book4));    
 
 // See what's left of book1, 2, 3 and 4 (expect nulls)
-std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
+std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << '\n';
 
 ++
 //Loop through the booklist elements using a range-based for loop    
@@ -332,7 +332,7 @@ for (const auto& book : booklist.array_range())
 {
     std::wcout << book[L"title"].as<std::wstring>()
                << L","
-               << book[L"price"].as<double>() << std::endl;
+               << book[L"price"].as<double>() << '\n';
 }
 
 // The second book
@@ -343,7 +343,7 @@ for (const auto& member : book.object_range())
 {
     std::wcout << member.key()
                << L","
-               << member.value() << std::endl;
+               << member.value() << '\n';
 }
 
 auto it = book.find(L"author");
@@ -394,27 +394,27 @@ is >> booklist;
 //  
 // (1) The authors of books that cost less than $12
 wjson result = json_query(booklist, L"$[*][?(@.price < 12)].author");
-std::wcout << result << std::endl;
+std::wcout << result << '\n';
 
 // (2) The number of books
 result = json_query(booklist, L"$.length");
-std::wcout << result << std::endl;
+std::wcout << result << '\n';
 
 // (3) The third book
 result = json_query(booklist, L"$[2]");
-std::wcout << pretty_print(result) << std::endl;
+std::wcout << pretty_print(result) << '\n';
 
 // (4) The authors of books that were published in 2004
 result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
-std::wcout << result << std::endl;
+std::wcout << result << '\n';
 
 // (5) The titles of all books that have ratings
 result = json_query(booklist, L"$[*][?(@.ratings)].title");
-std::wcout << result << std::endl;
+std::wcout << result << '\n';
 
 // (6) All authors and titles of books
 result = json_query(booklist, L"$..['author','title']");
-std::wcout << pretty_print(result) << std::endl;
+std::wcout << pretty_print(result) << '\n';
 ```
 Result:
 ```json

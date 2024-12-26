@@ -10,6 +10,7 @@
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 

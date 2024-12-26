@@ -45,7 +45,7 @@ a.try_emplace("object1",json());
 a.try_emplace("field1","value1");
 a["object1"].try_emplace("field2","value2");
 
-std::cout << a << std::endl;
+std::cout << a << '\n';
 ```
 Output:
 

@@ -114,7 +114,7 @@ TEST_CASE("csv_test_empty_values_with_defaults x")
     reader.read();
     json val = decoder.get_result();
 
-    //std::cout << pretty_print(val) << std::endl;
+    //std::cout << pretty_print(val) << '\n';
 
     CHECK(val[0]["string-f"].as<std::string>() == "");
 }
@@ -180,7 +180,7 @@ TEST_CASE("csv ignore_empty_value")
 2017-01-08,"Bond",0.0063,0.0076,,0.0112
 2017-01-08,"Bond",0.0063,0.0076,0.0084,
 )";
-    //std::cout << bond_yields << std::endl << "\n\n";
+    //std::cout << bond_yields << '\n' << "\n\n";
 
     SECTION("m_columns")
     {
@@ -287,7 +287,7 @@ TEST_CASE("csv_test_empty_values_with_defaults")
     reader.read();
     json val = decoder.get_result();
 
-    //std::cout << pretty_print(val) << std::endl;
+    //std::cout << pretty_print(val) << '\n';
 
     CHECK(val[0]["bool-f"].as<bool>() == false);
     CHECK(val[0]["bool-f"].is<bool>());
@@ -971,15 +971,15 @@ TEST_CASE("serialize_tab_delimited_file")
 
     std::stringstream ss;
     csv::csv_stream_encoder encoder(ss,options);
-    //std::cout << pretty_print(employees1) << std::endl;
+    //std::cout << pretty_print(employees1) << '\n';
     employees1.dump(encoder);
-    //std::cout << ss.str() << std::endl;
+    //std::cout << ss.str() << '\n';
 
     json_decoder<ojson> encoder2;
     csv::csv_stream_reader reader2(ss,encoder2,options);
     reader2.read();
     ojson employees2 = encoder2.get_result();
-    //std::cout << pretty_print(employees2) << std::endl;
+    //std::cout << pretty_print(employees2) << '\n';
 
     CHECK(employees1.size() == employees2.size());
 
@@ -1038,7 +1038,7 @@ TEST_CASE("csv_test1_array_3cols_grouped2")
     reader.read();
     json val = decoder.get_result();
 
-    //std::cout << val << std::endl;
+    //std::cout << val << '\n';
 /*
     REQUIRE(options.column_types().size() == 4);
     CHECK(options.column_types()[0].first == csv::csv_column_type::integer_t);
@@ -1106,7 +1106,7 @@ TEST_CASE("csv_test1_repeat2")
         .column_types("[integer,string]*");
     //for (auto x : options1.column_types())
     //{
-    //    std::cout << (int)x.col_type << " " << x.level << " " << x.rep_count << std::endl;
+    //    std::cout << (int)x.col_type << " " << x.level << " " << x.rep_count << '\n';
     //}
 }
 
@@ -1140,7 +1140,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF")); //-V521
     CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
-    //std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << '\n';
 }
 
 TEST_CASE("empty_line_test_2")
@@ -1210,7 +1210,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF")); //-V521
     CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
-    //std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << '\n';
 }
 
 TEST_CASE("line_with_one_space_and_trim")
@@ -1244,7 +1244,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF")); //-V521
     CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
-    //std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << '\n';
 }
 
 TEST_CASE("Test decode_csv, terminating newline")
@@ -1491,7 +1491,7 @@ TEST_CASE("csv detect bom")
         std::string stop_id = it->value().as<std::string>();
         CHECK((stop_id == "8220B007612")); //-V521
     } JSONCONS_CATCH (const std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 /*

@@ -157,7 +157,7 @@ while (!reader.eof())
     if (!reader.eof())
     {
         json j = decoder.get_result();
-        std::cout << j << std::endl;
+        std::cout << j << '\n';
     }
 }
 ```
@@ -369,7 +369,7 @@ if (ec)
     std::cout << ec.message() 
               << " on line " << reader.line()
               << " and column " << reader.column()
-              << std::endl;
+              << '\n';
 }
 ```
 Output:
@@ -395,7 +395,7 @@ std::string s = R"(
 
 // Default
 json j = json::parse(s);
-std::cout << "(1) " << j << std::endl;
+std::cout << "(1) " << j << '\n';
 
 // Strict
 try
@@ -410,7 +410,7 @@ try
 }
 catch (const ser_error& e)
 {
-    std::cout << "(2) " << e.what() << std::endl;
+    std::cout << "(2) " << e.what() << '\n';
 }
 ```
 Output:
@@ -434,7 +434,7 @@ try
 }
 catch (const ser_error& e)
 {
-     std::cout << e.what() << std::endl;
+     std::cout << e.what() << '\n';
 }
 ```
 Output:
@@ -457,16 +457,16 @@ ojson j = ojson::parse(R"(
     "country" : "Canada"
 }
 )");
-std::cout << "(1)\n" << pretty_print(j) << std::endl;
+std::cout << "(1)\n" << pretty_print(j) << '\n';
 
 // Insert "postal_code" at end
 j.insert_or_assign("postal_code", "M5H 2N2");
-std::cout << "(2)\n" << pretty_print(j) << std::endl;
+std::cout << "(2)\n" << pretty_print(j) << '\n';
 
 // Insert "province" before "country"
 auto it = j.find("country");
 j.insert_or_assign(it,"province","Ontario");
-std::cout << "(3)\n" << pretty_print(j) << std::endl;
+std::cout << "(3)\n" << pretty_print(j) << '\n';
 ```
 Output:
 ```
@@ -599,9 +599,9 @@ j.dump(std::cout, indenting::indent); // pretty print
 ```
 or
 ```
-std::cout << j << std::endl; // compressed
+std::cout << j << '\n'; // compressed
 
-std::cout << pretty_print(j) << std::endl; // pretty print
+std::cout << pretty_print(j) << '\n'; // pretty print
 ```
 
 <div id="B3"/>
@@ -618,9 +618,9 @@ j.dump(std::cout, options, indenting::indent); // pretty print
 ```
 or
 ```
-std::cout << print(j, options) << std::endl; // compressed
+std::cout << print(j, options) << '\n'; // compressed
 
-std::cout << pretty_print(j, options) << std::endl; // pretty print
+std::cout << pretty_print(j, options) << '\n'; // pretty print
 ```
 
 <div id="B4"/>
@@ -642,15 +642,15 @@ auto options = json_options{}
 std::ostringstream os;
 os << pretty_print(j, options);
 
-std::cout << "(1)\n" << os.str() << std::endl;
+std::cout << "(1)\n" << os.str() << '\n';
 
 json j2 = json::parse(os.str(),options);
 
-std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
-std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
-std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+std::cout << "\n(2) " << j2["field1"].as<double>() << '\n';
+std::cout << "(3) " << j2["field2"].as<double>() << '\n';
+std::cout << "(4) " << j2["field3"].as<double>() << '\n';
 
-std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+std::cout << "\n(5)\n" << pretty_print(j2,options) << '\n';
 ```
 
 Output:
@@ -3205,7 +3205,7 @@ for (std::size_t i = 0; i < a.size(); ++i)
         }
     }
 }
-std::cout << pretty_print(j) << std::endl;
+std::cout << pretty_print(j) << '\n';
 ```
 Output:
 ```json
@@ -3428,24 +3428,24 @@ int main()
 
     // Using index or `at` accessors
     std::string result1 = j["reputons"][0]["rated"].as<std::string>();
-    std::cout << "(1) " << result1 << std::endl;
+    std::cout << "(1) " << result1 << '\n';
     std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
-    std::cout << "(2) " << result2 << std::endl;
+    std::cout << "(2) " << result2 << '\n';
 
     // Using JSON Pointer
     std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
-    std::cout << "(3) " << result3 << std::endl;
+    std::cout << "(3) " << result3 << '\n';
 
     // Using JSONPath
     json result4 = jsonpath::json_query(j, "$.reputons.0.rated");
     if (result4.size() > 0)
     {
-        std::cout << "(4) " << result4[0].as<std::string>() << std::endl;
+        std::cout << "(4) " << result4[0].as<std::string>() << '\n';
     }
     json result5 = jsonpath::json_query(j, "$..0.rated");
     if (result5.size() > 0)
     {
-        std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
+        std::cout << "(5) " << result5[0].as<std::string>() << '\n';
     }
 }
 ```
@@ -3516,7 +3516,7 @@ json j(json_array_arg, {1,2,3,4});
 
 for (auto val : j.array_range())
 {
-    std::cout << val << std::endl;
+    std::cout << val << '\n';
 }
 ```
 
@@ -3533,13 +3533,13 @@ json j(json_object_arg, {
 
 for (const auto& member : j.object_range())
 {
-    std::cout << member.key() << " => " << member.value() << std::endl;
+    std::cout << member.key() << " => " << member.value() << '\n';
 }
 
 // or, since 0.176.0, using C++ 17 structured binding
 for (const auto& [key, value] : j.object_range())
 {
-    std::cout << key << " => " << value << std::endl;
+    std::cout << key << " => " << value << '\n';
 }
 ```
 
@@ -3556,7 +3556,7 @@ cities.push_back("Vancouver");
 // Insert "Montreal" at beginning of array
 cities.insert(cities.array_range().begin(),"Montreal");  
 
-std::cout << cities << std::endl;
+std::cout << cities << '\n';
 ```
 Output:
 ```
@@ -3592,7 +3592,7 @@ json j = json::parse(R"(
 )");
 
 j.merge(std::move(another));
-std::cout << pretty_print(j) << std::endl;
+std::cout << pretty_print(j) << '\n';
 ```
 Output:
 ```json
@@ -3654,7 +3654,7 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;    
+        std::cout << e.what() << '\n';    
     }
 }
 ```
@@ -3779,13 +3779,13 @@ int main()
     //json_reader reader(is, filter1);        // (until 0.164.0)
     json_stream_reader reader(is, filter1);   // (since 0.164.0)
     reader.read();
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // or 
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 ```
 Output:
@@ -3843,7 +3843,7 @@ int main()
     };
     jsonpath::json_replace(j, "$.books[?(@.isbn == '0048080489')].price", f); // (since 0.161.0)
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 ```
 Output:

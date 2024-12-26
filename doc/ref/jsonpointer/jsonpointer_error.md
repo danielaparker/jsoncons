@@ -46,7 +46,7 @@ int main()
         std::cout << "Caught jsonpointer_error with category " 
                   << e.code().category().name() 
                           << ", code " << e.code().value() 
-                  << " and message " << e.what() << std::endl;
+                  << " and message " << e.what() << '\n';
     }
 }
 ```
