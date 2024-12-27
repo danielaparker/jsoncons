@@ -375,9 +375,6 @@ second schema, defined in an external file `name-defs.json`,
 }
 ```
 
-jsoncons needs to know how to turn a URI reference to `name-defs.json` into a JSON Schema document,
-and for that it needs you to provide a `ResolveURI`.
-
 ```cpp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
@@ -387,8 +384,7 @@ and for that it needs you to provide a `ResolveURI`.
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema; 
 
-// Until 0.174.0, throw a `schema_error` instead of returning json::null() 
-json resolver(const jsoncons::uri& uri)
+json resolve(const jsoncons::uri& uri)
 {
     std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
@@ -398,7 +394,7 @@ json resolver(const jsoncons::uri& uri)
     std::fstream is(pathname.c_str());
     if (!is)
     {
-        return json::null();
+        return json::null(); // Since 0.174.0. Until 0.174.0, throw a `schema_error` 
     }
 
     return json::parse(is);        
@@ -429,7 +425,7 @@ int main()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve);
 
         auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
@@ -566,7 +562,7 @@ int main()
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
-            std::cout << output << '\n';
+            std::cout << output << std::endl;
 
             // Verify that output is valid
             json test = json::parse(output);
@@ -629,7 +625,7 @@ int main()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;
