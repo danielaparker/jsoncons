@@ -16,10 +16,9 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
-namespace jsoncons
-{
-namespace detail
-{
+namespace jsoncons {
+namespace detail {
+
     constexpr std::size_t dynamic_extent = (std::numeric_limits<std::size_t>::max)();
 
     template< typename T, std::size_t Extent = dynamic_extent>

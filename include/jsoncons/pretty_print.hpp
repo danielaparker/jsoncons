@@ -84,6 +84,6 @@ json_printable<Json> pretty_print(const Json& j,
     return json_printable<Json>(j, options, indenting::indent);
 }
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_PRETTY_PRINT_HPP

@@ -3,9 +3,8 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace utility {
+namespace jsoncons { 
 
-} // utility
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_BINARY_HPP

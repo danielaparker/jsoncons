@@ -70,13 +70,14 @@ std::error_code make_error_code(csv_errc result)
     return std::error_code(static_cast<int>(result),csv_error_category());
 }
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::csv::csv_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif // JSONCONS_EXT_CSV_CSV_ERROR_HPP

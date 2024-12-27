@@ -87,13 +87,14 @@ std::error_code make_error_code(cbor_errc e)
 }
 
 
-}}
+} // namespace cbor
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::cbor::cbor_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif

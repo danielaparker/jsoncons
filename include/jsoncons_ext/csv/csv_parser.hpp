@@ -2131,7 +2131,8 @@ private:
 using csv_parser = basic_csv_parser<char>;
 using wcsv_parser = basic_csv_parser<wchar_t>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_CSV_CSV_PARSER_HPP
 

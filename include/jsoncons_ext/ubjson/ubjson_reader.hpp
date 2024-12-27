@@ -83,6 +83,7 @@ using ubjson_stream_reader = basic_ubjson_reader<jsoncons::binary_stream_source>
 
 using ubjson_bytes_reader = basic_ubjson_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_UBJSON_UBJSON_READER_HPP

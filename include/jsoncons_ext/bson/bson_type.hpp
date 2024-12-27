@@ -40,6 +40,7 @@ namespace jsoncons { namespace bson {
 
     enum class bson_container_type {document, array};
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_BSON_BSON_TYPE_HPP

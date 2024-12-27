@@ -285,7 +285,7 @@ namespace jsoncons {
 
 //end legacy
 
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_ENCODE_JSON_HPP
 

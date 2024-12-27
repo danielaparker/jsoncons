@@ -198,6 +198,6 @@ namespace ubjson {
     }
 
 } // ubjson
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_UBJSON_DECODE_UBJSON_HPP

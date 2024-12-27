@@ -1958,6 +1958,7 @@ private:
     }
 };
 
-}}
+} // namespace cbor
+} // namespace jsoncons
 
 #endif

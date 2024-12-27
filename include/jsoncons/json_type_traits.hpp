@@ -1076,7 +1076,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             {
             }
         };
-    } // namespace detail
+    } // namespace tuple_detail
 
     template <typename Json,typename... E>
     struct json_type_traits<Json, std::tuple<E...>>
@@ -1898,6 +1898,6 @@ namespace variant_detail
         }
     };
 
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_JSON_TYPE_TRAITS_HPP

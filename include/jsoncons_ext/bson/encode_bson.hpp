@@ -140,6 +140,6 @@ namespace bson {
     }
       
 } // bson
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_BSON_DECODE_BSON_HPP

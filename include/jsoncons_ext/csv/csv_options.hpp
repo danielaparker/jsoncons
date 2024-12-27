@@ -108,7 +108,8 @@ void parse_column_names(const std::basic_string<CharT>& names,
         cont.push_back(buffer);
         buffer.clear();
     }
-}
+
+} // namespace detail
 
 template <typename CharT,typename Container>
 void parse_column_types(const std::basic_string<CharT>& types, 
@@ -941,6 +942,7 @@ public:
 using csv_options = basic_csv_options<char>;
 using wcsv_options = basic_csv_options<wchar_t>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_CSV_CSV_OPTIONS_HPP

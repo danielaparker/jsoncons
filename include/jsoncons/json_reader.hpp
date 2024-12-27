@@ -380,7 +380,7 @@ namespace jsoncons {
     using json_stream_reader = basic_json_reader<char,stream_source<char>>;
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_JSON_READER_HPP
 

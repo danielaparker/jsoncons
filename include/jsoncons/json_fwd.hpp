@@ -18,6 +18,6 @@ template <typename CharT,
           typename Allocator = std::allocator<CharT>>
 class basic_json;
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_JSON_FWD_HPP

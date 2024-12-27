@@ -89,6 +89,8 @@ size_t min_length_for_stringref(uint64_t index)
     return n;
 }
 
-}}}
+} // namespace detail 
+} // namespace cbor
+} // namespace jsoncons
 
 #endif

@@ -491,6 +491,7 @@ private:
 using ubjson_stream_encoder = basic_ubjson_encoder<jsoncons::binary_stream_sink>;
 using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_UBJSON_UBJSON_ENCODER_HPP

@@ -222,6 +222,6 @@ namespace jsoncons {
         return os;
     }
 
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_JSON_TYPE_HPP

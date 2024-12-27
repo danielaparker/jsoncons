@@ -144,7 +144,7 @@ namespace jsoncons { namespace bson {
         }
     };
 
-    namespace detail {
+namespace detail {
 
         inline
         const uint16_t* get_hex_char_pairs(std::true_type) // big endian
@@ -230,7 +230,7 @@ namespace jsoncons { namespace bson {
             data[11] = gHexCharPairs[bytes[11]];
         }
 
-    } // namsepace detail
+} // namespace detail
 
     template <typename StringT>
     inline 

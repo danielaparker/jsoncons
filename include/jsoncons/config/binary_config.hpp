@@ -221,7 +221,7 @@ namespace binary {
         return val2;
     }
 
-} // binary
-} // jsoncons
+} // namespace binary
+} // namespace jsoncons
 
 #endif // JSONCONS_CONFIG_BINARY_CONFIG_HPP

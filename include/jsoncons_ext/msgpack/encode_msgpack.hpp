@@ -138,6 +138,6 @@ namespace msgpack {
     }
 
 } // msgpack
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_MSGPACK_ENCODE_MSGPACK_HPP

@@ -89,13 +89,14 @@ std::error_code make_error_code(ubjson_errc e)
 }
 
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::ubjson::ubjson_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif // JSONCONS_EXT_UBJSON_UBJSON_ERROR_HPP

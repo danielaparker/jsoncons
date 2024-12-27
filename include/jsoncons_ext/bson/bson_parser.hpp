@@ -646,6 +646,7 @@ private:
     }
 };
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_BSON_BSON_PARSER_HPP

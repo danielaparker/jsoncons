@@ -72,14 +72,14 @@ namespace jsoncons { namespace jsonpatch {
     }
 
 } // jsonpatch
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::jsonpatch::jsonpatch_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace jsonpatch {
 
@@ -116,7 +116,8 @@ namespace jsoncons { namespace jsonpatch {
             return std::system_error::what();
         }
     };
+    
 } // jsonpatch
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_ERROR_HPP

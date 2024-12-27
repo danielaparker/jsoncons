@@ -32,6 +32,6 @@ public:
     }
 };
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_ALLOCATOR_HOLDER_HPP

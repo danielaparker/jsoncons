@@ -938,6 +938,7 @@ using csv_string_encoder = basic_csv_encoder<char,jsoncons::string_sink<std::str
 using csv_wstream_encoder = basic_csv_encoder<wchar_t>;
 using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_CSV_CSV_ENCODER_HPP

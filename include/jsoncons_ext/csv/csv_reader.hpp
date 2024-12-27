@@ -181,6 +181,7 @@ namespace jsoncons { namespace csv {
     using csv_stream_reader = basic_csv_reader<char,stream_source<char>>;
     using wcsv_stream_reader = basic_csv_reader<wchar_t,stream_source<wchar_t>>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_CSV_CSV_READER_HPP

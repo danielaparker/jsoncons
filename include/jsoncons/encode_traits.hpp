@@ -373,7 +373,7 @@ namespace jsoncons {
         }
     };
 
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_ENCODE_TRAITS_HPP
 

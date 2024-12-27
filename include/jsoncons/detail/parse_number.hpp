@@ -69,7 +69,7 @@ namespace std {
     struct is_error_code_enum<jsoncons::detail::to_integer_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace detail {
 
@@ -1042,6 +1042,7 @@ public:
 };
 #endif
 
-}}
+} // namespace detail
+} // namespace jsoncons
 
 #endif // JSONCONS_DETAIL_PARSE_NUMBER_HPP

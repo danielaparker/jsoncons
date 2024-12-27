@@ -92,13 +92,14 @@ std::error_code make_error_code(bson_errc result)
 }
 
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::bson::bson_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

@@ -107,6 +107,7 @@ using msgpack_stream_reader = basic_msgpack_reader<jsoncons::binary_stream_sourc
 
 using msgpack_bytes_reader = basic_msgpack_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace msgpack
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP

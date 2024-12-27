@@ -35,6 +35,6 @@ constexpr versioning_info version()
     return versioning_info{JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH};
 }
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_CONFIG_VERSION_HPP

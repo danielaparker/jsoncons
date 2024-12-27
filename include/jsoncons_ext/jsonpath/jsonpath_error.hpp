@@ -165,14 +165,14 @@ namespace jsoncons { namespace jsonpath {
     }
 
 } // jsonpath
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::jsonpath::jsonpath_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace jsonpath {
 
@@ -245,6 +245,7 @@ namespace jsoncons { namespace jsonpath {
         }
     };
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP

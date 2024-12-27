@@ -72,6 +72,8 @@ namespace jsoncons { namespace jsonpath {
         }
         return count;
     }
-}}
+    
+} // namespace jsonpath
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_JSONPATH_UTILITIES_HPP

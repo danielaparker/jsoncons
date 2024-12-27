@@ -744,6 +744,7 @@ private:
     }
 };
 
-}}
+} // namespace msgpack
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP

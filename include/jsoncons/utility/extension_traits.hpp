@@ -918,6 +918,6 @@ namespace impl {
 
     
 } // extension_traits
-} // jsoncons
+} // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_EXTENSION_TRAITS_HPP

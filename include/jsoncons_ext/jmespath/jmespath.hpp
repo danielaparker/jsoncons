@@ -735,7 +735,7 @@ namespace jmespath {
         }
     };
 
-    namespace detail {
+namespace detail {
      
     enum class path_state 
     {
@@ -5437,7 +5437,7 @@ namespace jmespath {
         }
     };
 
-    } // detail
+} // namespace detail
 
     template <typename Json>
     using jmespath_expression = typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::jmespath_expression;

@@ -101,5 +101,7 @@ public:
     }
 };
 
-}}
+} // namespace cbor
+} // namespace jsoncons
+
 #endif

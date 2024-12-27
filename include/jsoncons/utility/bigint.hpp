@@ -32,7 +32,6 @@ Chichester: John Wiley.
 
 */
 
-
 namespace detail {
 
     template <typename Allocator>
@@ -1622,6 +1621,6 @@ private:
 
 using bigint = basic_bigint<std::allocator<uint8_t>>;
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_UTILITY_BIGINT_HPP

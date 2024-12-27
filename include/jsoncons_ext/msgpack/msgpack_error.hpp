@@ -83,13 +83,14 @@ std::error_code make_error_code(msgpack_errc e)
 }
 
 
-}}
+} // namespace msgpack
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::msgpack::msgpack_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif // JSONCONS_EXT_MSGPACK_MSGPACK_ERROR_HPP

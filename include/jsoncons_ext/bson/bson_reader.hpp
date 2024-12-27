@@ -83,6 +83,7 @@ public:
 using bson_stream_reader = basic_bson_reader<jsoncons::binary_stream_source>;
 using bson_bytes_reader = basic_bson_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_BSON_BSON_READER_HPP

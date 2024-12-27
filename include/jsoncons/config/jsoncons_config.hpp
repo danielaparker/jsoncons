@@ -115,7 +115,7 @@ namespace jsoncons {
     template <typename T,typename... Args>
     typename unique_if<T>::value_is_array_of_known_bound
     make_unique(Args&&...) = delete;
-} // jsoncons
+} // namespace jsoncons
 
 #else
 
@@ -241,7 +241,7 @@ namespace binary {
     }
 
 } // binary
-} // jsoncons
+} // namespace jsoncons
 
 namespace jsoncons {
 
@@ -287,7 +287,7 @@ namespace jsoncons {
         return jsoncons::wstring_view(w);
     }
 
-} // jsoncons
+} // namespace jsoncons
 
 #define JSONCONS_EXPAND(X) X    
 #define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)

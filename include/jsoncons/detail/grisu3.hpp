@@ -308,6 +308,7 @@ bool grisu3(double v, char *buffer, int *length, int *K)
     return result;
 }
 
-}} // namespace detail namespace jsoncons 
+} // namespace detail
+} // namespace jsoncons
 
 #endif // JSONCONS_DETAIL_GRISU3_HPP

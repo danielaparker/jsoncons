@@ -223,7 +223,7 @@ namespace jsoncons {
         return i.value();
     }
 
-} // jsoncons
+} // namespace jsoncons
 
 namespace std
 {

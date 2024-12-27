@@ -697,5 +697,6 @@ private:
 using json_options = basic_json_options<char>;
 using wjson_options = basic_json_options<wchar_t>;
 
-}
+} // namespace jsoncons
+
 #endif // JSONCONS_JSON_OPTIONS_HPP

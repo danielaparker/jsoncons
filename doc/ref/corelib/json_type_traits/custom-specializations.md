@@ -264,7 +264,7 @@ struct json_type_traits<Json, own_vector>
 template <> 
 struct is_json_type_traits_declared<own_vector> : public std::true_type 
 {}; 
-} // jsoncons
+} // namespace jsoncons
 
 using jsoncons::json;
 
@@ -368,7 +368,7 @@ namespace jsoncons {
             return a;
         }
     };
-} // jsoncons
+} // namespace jsoncons
 
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;

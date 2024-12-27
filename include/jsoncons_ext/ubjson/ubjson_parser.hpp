@@ -876,6 +876,7 @@ private:
     }
 };
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
 #endif

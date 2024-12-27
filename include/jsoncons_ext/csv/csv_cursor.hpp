@@ -335,7 +335,8 @@ using csv_string_cursor = basic_csv_cursor<char,jsoncons::string_source<char>>;
 using wcsv_stream_cursor = basic_csv_cursor<wchar_t,jsoncons::stream_source<wchar_t>>;
 using wcsv_string_cursor = basic_csv_cursor<wchar_t,jsoncons::string_source<wchar_t>>;
 
-}}
+} // namespace csv
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_CSV_CSV_CURSOR_HPP
 

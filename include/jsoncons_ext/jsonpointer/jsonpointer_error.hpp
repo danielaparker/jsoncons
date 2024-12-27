@@ -108,13 +108,14 @@ std::error_code make_error_code(jsonpointer_errc result)
     return std::error_code(static_cast<int>(result),jsonpointer_error_category());
 }
 
-}}
+} // namespace jsonpointer
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::jsonpointer::jsonpointer_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif

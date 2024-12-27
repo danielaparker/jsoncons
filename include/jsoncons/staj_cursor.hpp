@@ -741,7 +741,7 @@ using wstaj_cursor = basic_staj_cursor<wchar_t>;
 using staj_filter_view = basic_staj_filter_view<char>;
 using wstaj_filter_view = basic_staj_filter_view<wchar_t>;
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_STAJ_CURSOR_HPP
 

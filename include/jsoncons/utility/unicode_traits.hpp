@@ -281,14 +281,14 @@ namespace jsoncons { namespace unicode_traits {
     }
 
 } // unicode_traits
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::unicode_traits::conv_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace unicode_traits {
 
@@ -1325,7 +1325,7 @@ namespace jsoncons { namespace unicode_traits {
     }
 
 } // unicode_traits
-} // jsoncons
+} // namespace jsoncons
 
 #endif //JSONCONS_UTILITY_UNICODE_TRAITS_HPP
 

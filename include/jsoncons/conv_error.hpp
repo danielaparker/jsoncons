@@ -126,7 +126,8 @@ namespace std {
     struct is_error_code_enum<jsoncons::conv_errc> : public true_type
     {
     };
-}
+
+} // namespace std
 
 namespace jsoncons {
 
@@ -196,7 +197,8 @@ namespace detail {
             }
         }
     };
-} // detail
+    
+} // namespace detail
 
 extern inline
 const std::error_category& conv_error_category()
@@ -211,6 +213,6 @@ std::error_code make_error_code(conv_errc result)
     return std::error_code(static_cast<int>(result),conv_error_category());
 }
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_CONV_ERROR_HPP

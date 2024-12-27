@@ -373,7 +373,7 @@ struct json_type_traits<Json, own_vector> {
 template <> 
 struct is_json_type_traits_declared<own_vector> : public std::true_type 
 {}; 
-} // jsoncons
+} // namespace jsoncons
 
 TEST_CASE("own_vector json_type_traits")
 {

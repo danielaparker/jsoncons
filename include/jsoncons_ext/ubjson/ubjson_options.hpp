@@ -84,6 +84,7 @@ public:
     }
 };
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_UBJSON_UBJSON_OPTIONS_HPP

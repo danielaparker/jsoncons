@@ -237,6 +237,6 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     return os;
 }
 
-}
+} // namespace jsoncons
 
 #endif // JSONCONS_TAG_TYPE_HPP

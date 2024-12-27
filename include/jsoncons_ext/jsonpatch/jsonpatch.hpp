@@ -294,7 +294,8 @@ namespace detail {
 
         return result;
     }
-}
+
+} // namespace detail
 
 template <typename Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec)
@@ -581,6 +582,7 @@ void apply_patch(Json& target, const Json& patch)
     }
 }
 
-}}
+} // namespace jsonpatch
+} // namespace jsoncons
 
 #endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP

@@ -572,5 +572,7 @@ private:
 using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
 using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-}}
+} // namespace bson
+} // namespace jsoncons
+
 #endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

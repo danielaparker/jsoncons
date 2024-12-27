@@ -1740,5 +1740,7 @@ private:
 using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
 using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-}}
+} // namespace cbor
+} // namespace jsoncons
+
 #endif

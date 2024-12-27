@@ -139,13 +139,14 @@ namespace jsoncons {
         return std::error_code(static_cast<int>(result),json_error_category());
     }
 
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::json_errc> : public true_type
     {
     };
-}
+
+} // namespace std
 
 #endif // JSONCONS_JSON_ERROR_HPP
