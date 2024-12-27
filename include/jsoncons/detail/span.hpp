@@ -14,7 +14,7 @@
 #include <utility> // std::swap
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons
 {

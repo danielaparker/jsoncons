@@ -377,4 +377,4 @@ namespace jsoncons { namespace jsonpath {
     }
 }}
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_FLATTEN_HPP

@@ -11,4 +11,4 @@
 #include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_HPP

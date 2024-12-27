@@ -12,8 +12,8 @@
 #include <system_error> // std::error_code
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/extension_traits.hpp>
-#include <jsoncons/unicode_traits.hpp> // unicode_traits::convert
+#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
 namespace jsoncons {
 

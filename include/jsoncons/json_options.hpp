@@ -12,7 +12,7 @@
 #include <limits> // std::numeric_limits
 #include <string>
 
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/ser_context.hpp>

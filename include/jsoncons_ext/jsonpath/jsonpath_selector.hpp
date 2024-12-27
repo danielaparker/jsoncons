@@ -1317,4 +1317,4 @@ namespace detail {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_SELECTOR_HPP

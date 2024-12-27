@@ -101,4 +101,4 @@ namespace mergepatch {
 } // namespace mergepatch
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP

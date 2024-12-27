@@ -583,4 +583,4 @@ void apply_patch(Json& target, const Json& patch)
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP

@@ -21,7 +21,7 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {

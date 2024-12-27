@@ -20,7 +20,7 @@
 
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 
 
