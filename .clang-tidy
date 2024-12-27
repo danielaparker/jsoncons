@@ -71,7 +71,7 @@ Checks: '*,
          -readability-magic-numbers,
          -readability-redundant-access-specifiers,
          -readability-simplify-boolean-expr,
-         -readability-uppercase-literal-suffix',
+         -readability-uppercase-literal-suffix,
 
          -readability-hicpp-named-parameter
 
