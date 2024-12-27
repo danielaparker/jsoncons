@@ -89,7 +89,7 @@ namespace draft201909 {
     public:
         schema_builder_201909(Json&& sch, const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<Json>>& resolvers,
+            const std::vector<resolve_uri_type<Json>>& resolvers,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
             : schema_builder<Json>(schema_version::draft201909(), 
                 std::move(sch), builder_factory, options, schema_store_ptr, resolvers, vocabulary),
