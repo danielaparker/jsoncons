@@ -48,8 +48,8 @@ namespace draft6 {
     public:
         schema_builder_6(Json&& sch, const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<resolve_uri_type<Json>>& resolvers) 
-            : schema_builder<Json>(schema_version::draft6(), std::move(sch), builder_factory, options, schema_store_ptr, resolvers)
+            const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
+            : schema_builder<Json>(schema_version::draft6(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
         {
             init();
         }

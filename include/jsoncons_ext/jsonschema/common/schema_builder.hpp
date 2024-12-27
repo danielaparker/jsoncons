@@ -39,7 +39,7 @@ namespace jsonschema {
         schema_builder_factory_type builder_factory_;
         evaluation_options options_;
         schema_store_type* schema_store_ptr_;
-        std::vector<resolve_uri_type<Json>> resolvers_;
+        std::vector<resolve_uri_type<Json>> resolve_funcs_;
         std::unordered_map<std::string,bool> vocabulary_;
 
         schema_validator_type root_;       
@@ -54,9 +54,9 @@ namespace jsonschema {
 
         schema_builder(const std::string& version, Json&& root_schema, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<resolve_uri_type<Json>>& resolvers)
+            const std::vector<resolve_uri_type<Json>>& resolve_funcs)
             : spec_version_(version), builder_factory_(builder_factory), options_(std::move(options)),
-              schema_store_ptr_(schema_store_ptr), resolvers_(resolvers)
+              schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
             root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
@@ -64,10 +64,10 @@ namespace jsonschema {
 
         schema_builder(const std::string& version, Json&& root_schema, const schema_builder_factory_type& builder_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<resolve_uri_type<Json>>& resolvers,
+            const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary)
             : spec_version_(version), builder_factory_(builder_factory), options_(std::move(options)),
-              schema_store_ptr_(schema_store_ptr), resolvers_(resolvers), vocabulary_(vocabulary)
+              schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs), vocabulary_(vocabulary)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
             root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
@@ -130,7 +130,7 @@ namespace jsonschema {
                 if (schema_store_ptr_->find(loc) == schema_store_ptr_->end()) // registry for this file is empty
                 {
                     bool found = false;
-                    for (auto it = resolvers_.begin(); it != resolvers_.end() && !found; ++it)
+                    for (auto it = resolve_funcs_.begin(); it != resolve_funcs_.end() && !found; ++it)
                     {
                         Json external_sch = (*it)(loc);
 
@@ -309,7 +309,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto schema_builder = builder_factory_(std::move(sch), options_, schema_store_ptr_, resolvers_, vocabulary_);
+                            auto schema_builder = builder_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
                             schema_builder->build_schema(context.get_base_uri().string());
                             schema_val = schema_builder->get_schema_validator();
                         }
