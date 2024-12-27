@@ -89,10 +89,10 @@ namespace draft202012 {
     public:
         schema_builder_202012(Json&& sch, const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<Json>>& resolvers,
+            const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
             : schema_builder<Json>(schema_version::draft202012(), std::move(sch),
-                builder_factory, options, schema_store_ptr, resolvers, vocabulary),
+                builder_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
             if (!vocabulary.empty())

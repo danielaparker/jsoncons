@@ -53,9 +53,9 @@ TEST_CASE("jsonschema $recursiveRef tests")
 
     json strict_tree_schema = json::parse(strict_tree_schema_str);
     
-    auto resolver = [tree_schema](const jsoncons::uri& uri)
+    auto resolve = [tree_schema](const jsoncons::uri& uri)
         {
-            //std::cout << "resolver: " << uri.string() << "\n";
+            //std::cout << "resolve: " << uri.string() << "\n";
             if (uri.string() == "https://example.com/tree")
             {
                 return tree_schema;
@@ -65,7 +65,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
                 return json::null();
             }
         };
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolve); 
 
     SECTION("instance with misspelled field")
     {
@@ -141,9 +141,9 @@ TEST_CASE("jsonschema $dynamicRef tests")
 
     json strict_tree_schema = json::parse(strict_tree_schema_str);
     
-    auto resolver = [tree_schema](const jsoncons::uri& uri)
+    auto resolve = [tree_schema](const jsoncons::uri& uri)
         {
-            //std::cout << "resolver: " << uri.string() << "\n";
+            //std::cout << "resolve: " << uri.string() << "\n";
             if (uri.string() == "https://example.com/tree")
             {
                 return tree_schema;
@@ -153,7 +153,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
                 return json::null();
             }
         };
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolver); 
+    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(strict_tree_schema, resolve); 
 
     SECTION("instance with misspelled field")
     {
