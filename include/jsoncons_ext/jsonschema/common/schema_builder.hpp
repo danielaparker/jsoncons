@@ -132,7 +132,7 @@ namespace jsonschema {
                     bool found = false;
                     for (auto it = resolvers_.begin(); it != resolvers_.end() && !found; ++it)
                     {
-                        Json external_sch = (*it)(loc.base());
+                        Json external_sch = (*it)(loc);
 
                         if (external_sch.is_object() || external_sch.is_bool())
                         {

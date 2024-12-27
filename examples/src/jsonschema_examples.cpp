@@ -106,7 +106,7 @@ void validate_three_ways()
 }
 
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
-json resolver(const jsoncons::uri& uri)
+json resolve(const jsoncons::uri& uri)
 {
     std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
@@ -147,7 +147,7 @@ void uriresolver_example()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve);
 
         auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
@@ -189,7 +189,7 @@ void defaults_example()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;

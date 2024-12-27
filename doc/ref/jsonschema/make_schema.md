@@ -14,11 +14,11 @@ std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
 
 template <typename Json,class ResolveURI>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
-    const std::string& retrieval_uri, const ResolveURI& resolver);  (3) (since 0.173.0)
+    const std::string& retrieval_uri, const ResolveURI& resolve);    (3) (since 0.173.0)
 
 template <typename Json,class ResolveURI>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, 
-    const ResolveURI& resolver);                                    (4)
+    const ResolveURI& resolve);                                      (4)
 ```
 
 Returns a `shared_ptr` to a `json_schema<Json>`.
