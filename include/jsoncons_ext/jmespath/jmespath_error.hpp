@@ -213,4 +213,4 @@ namespace std {
     };
 }
 
-#endif
+#endif // JSONCONS_EXT_JMESPATH_JMESPATH_ERROR_HPP

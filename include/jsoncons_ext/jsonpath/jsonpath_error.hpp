@@ -247,4 +247,4 @@ namespace jsoncons { namespace jsonpath {
 
 }}
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP

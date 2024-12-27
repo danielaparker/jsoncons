@@ -259,4 +259,4 @@ namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP

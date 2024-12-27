@@ -15,7 +15,7 @@
 #include <utility>
 
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 

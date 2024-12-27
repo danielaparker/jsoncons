@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXTENSION_TRAITS_HPP
-#define JSONCONS_EXTENSION_TRAITS_HPP
+#ifndef JSONCONS_UTILITY_EXTENSION_TRAITS_HPP
+#define JSONCONS_UTILITY_EXTENSION_TRAITS_HPP
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
@@ -920,4 +920,4 @@ namespace impl {
 } // extension_traits
 } // jsoncons
 
-#endif // JSONCONS_EXTENSION_TRAITS_HPP
+#endif // JSONCONS_UTILITY_EXTENSION_TRAITS_HPP

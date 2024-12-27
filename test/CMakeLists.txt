@@ -129,6 +129,8 @@ add_executable(unit_tests
                corelib/src/utility/heap_string_tests.cpp
                corelib/src/utility/bigint_tests.cpp
                corelib/src/utility/uri_tests.cpp
+               corelib/src/utility/extension_traits_tests.cpp
+               corelib/src/utility/unicode_conv_tests.cpp
                corelib/src/detail/to_integer_tests.cpp
                corelib/src/double_round_trip_tests.cpp
                corelib/src/double_to_string_tests.cpp
@@ -180,11 +182,9 @@ add_executable(unit_tests
                corelib/src/short_string_tests.cpp
                corelib/src/source_tests.cpp
                corelib/src/staj_iterator_tests.cpp
-               corelib/src/extension_traits_tests.cpp
                corelib/src/polymorphic_allocator_tests.cpp
                corelib/src/scoped_allocator_adaptor_tests.cpp
                corelib/src/string_to_double_tests.cpp
-               corelib/src/unicode_conv_tests.cpp
                corelib/src/wjson_tests.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp

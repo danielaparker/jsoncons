@@ -119,4 +119,4 @@ namespace jsoncons { namespace jsonpatch {
 } // jsonpatch
 } // jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_ERROR_HPP

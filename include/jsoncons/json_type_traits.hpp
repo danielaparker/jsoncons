@@ -26,7 +26,7 @@
 #include <vector>
 
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/utility/bigint.hpp>

@@ -18,7 +18,7 @@
 #include <jsoncons/json_error.hpp> // json_errc
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {
 

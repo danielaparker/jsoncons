@@ -12,7 +12,7 @@
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp> // from_integer
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/tag_type.hpp>
 
