@@ -1701,7 +1701,7 @@ private:
                 case csv_column_type::integer_t:
                     {
                         std::basic_istringstream<CharT,std::char_traits<CharT>,char_allocator_type> iss{buffer_};
-                        int64_t val;
+                        int64_t val{};
                         iss >> val;
                         if (!iss.fail())
                         {
@@ -1732,7 +1732,7 @@ private:
                         else
                         {
                             std::basic_istringstream<CharT, std::char_traits<CharT>, char_allocator_type> iss{ buffer_ };
-                            double val;
+                            double val{};
                             iss >> val;
                             if (!iss.fail())
                             {

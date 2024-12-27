@@ -4569,7 +4569,7 @@ namespace detail {
                             {
                                 if (!buffer.empty())
                                 {
-                                    int64_t val;
+                                    int64_t val{};
                                     auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {

@@ -2418,7 +2418,7 @@ private:
 
     void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        uint64_t val;
+        uint64_t val{};
         auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {

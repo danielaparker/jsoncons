@@ -595,7 +595,7 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            int64_t val;
+            int64_t val{};
             auto r = jsoncons::detail::to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
