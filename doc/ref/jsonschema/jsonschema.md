@@ -351,10 +351,24 @@ Output:
 
 <div id="eg3"/>
 
-#### Resolving references to schemas defined in external files
+#### Resolving references to schemas defined in external files  
 
-In this example, the main schema defines a reference using the `$ref` property to a
-second schema defined in an external file, `name-defs.json`,
+In this example, the main schema is
+
+```json
+{
+    "$id" : "https://www.example.com",
+    "$schema": "https://json-schema.org/draft/2020-12/main_schema",
+    "$id": "http://localhost:1234/draft2020-12/object",
+    "type": "object",
+    "properties": {
+        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
+    }
+}
+```
+
+The main schema defines a reference using the `$ref` keyword to a
+second schema defined in an external file, `name-defs.json`,  
 
 ```json
 {
@@ -376,45 +390,36 @@ second schema defined in an external file, `name-defs.json`,
 }
 ```
 
+jsoncons allows you to write a resolve function object to handle the URI
+of the external file and translate it into a physical pathname.
+
 ```cpp
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <fstream>
-
-// for brevity
-using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; 
-
-json resolve(const jsoncons::uri& uri)
-{
-    std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
-
-    std::string pathname = "./input/jsonschema";
-    pathname += std::string(uri.path());
-
-    std::fstream is(pathname.c_str());
-    if (!is)
+auto resolve = [](const jsoncons::uri& uri) -> json
     {
-        return json::null();
-    }
+        std::cout << "Requested URI: " << uri.string() << "\n";
+        std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-    return json::parse(is);        
-}
+        std::string pathname = "./input/jsonschema";
+        pathname += std::string(uri.path());
 
+        std::fstream is(pathname.c_str());
+        if (!is)
+        {
+            return json::null();
+        }
+
+        return json::parse(is);
+    };
+```
+
+When building the main schema, the schema builder needs to resolve the URI 'https://www.example.com/name-defs.json#/$defs/orNull'. 
+The user does not need to supply that specific subschema, it is enough to supply the schema document '/name-defs.json'. 
+The schema builder than processes that schema document and makes multiple entries into an internal validator registry, 
+including an entry for 'https://www.example.com/name-defs.json#/$defs/orNull'.
+
+```cpp
 int main()
 { 
-    std::string main_schema = R"(
-{
-    "$id" : "https://www.example.com",
-    "$schema": "https://json-schema.org/draft/2020-12/main_schema",
-    "$id": "http://localhost:1234/draft2020-12/object",
-    "type": "object",
-    "properties": {
-        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
-    }
-}
-    )";
-
     json schema = json::parse(main_schema);    
 
     // Data
@@ -452,6 +457,7 @@ int main()
 ```
 Output:
 ```
+Requested URI: https://www.example.com/name-defs.json#/$defs/orNull
 base: https://www.example.com/name-defs.json, path: /name-defs.json
 
 /name: Must be valid against at least one schema, but found no matching schemas

@@ -106,21 +106,6 @@ void validate_three_ways()
 }
 
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
-json resolve(const jsoncons::uri& uri)
-{
-    std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
-
-    std::string pathname = "./input/jsonschema";
-    pathname += std::string(uri.path());
-
-    std::fstream is(pathname.c_str());
-    if (!is)
-    {
-        return json::null();
-    }
-
-    return json::parse(is);        
-}
 
 void resolve_uri_example()
 { 
@@ -135,6 +120,23 @@ void resolve_uri_example()
     }
 }
     )";
+    
+    auto resolve = [](const jsoncons::uri& uri) -> json
+        {
+            std::cout << "Requested URI: " << uri.string() << "\n";
+            std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
+
+            std::string pathname = "./input/jsonschema";
+            pathname += std::string(uri.path());
+
+            std::fstream is(pathname.c_str());
+            if (!is)
+            {
+                return json::null();
+            }
+
+            return json::parse(is);
+        };
     
     json schema = json::parse(main_schema);    
 
@@ -192,7 +194,7 @@ void defaults_example()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;
