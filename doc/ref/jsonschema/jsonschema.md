@@ -143,7 +143,7 @@ the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test
 
 [Three ways of validating](#eg1)  
 [Format validation](#eg2)  
-[Using a ResolveURI to resolve references to schemas defined in external files](#eg3)  
+[Resolving references to schemas defined in external files](#eg3)  
 [Validate before decoding JSON into C++ class objects](#eg4)  
 [Default values](#eg5)  
 
@@ -351,13 +351,14 @@ Output:
 
 <div id="eg3"/>
 
-#### Using a ResolveURI to resolve references to schemas defined in external files
+#### Resolving references to schemas defined in external files
 
 In this example, the main schema defines a reference using the `$ref` property to a
-second schema, defined in an external file `name-defs.json`,
+second schema defined in an external file, `name-defs.json`,
 
 ```json
 {
+    "$id" : "https://www.example.com",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$defs": {
         "orNull": {
@@ -388,13 +389,13 @@ json resolve(const jsoncons::uri& uri)
 {
     std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-    std::string pathname = "./input/jsonschema/";
+    std::string pathname = "./input/jsonschema";
     pathname += std::string(uri.path());
 
     std::fstream is(pathname.c_str());
     if (!is)
     {
-        return json::null(); // Since 0.174.0. Until 0.174.0, throw a `schema_error` 
+        return json::null();
     }
 
     return json::parse(is);        
@@ -402,16 +403,19 @@ json resolve(const jsoncons::uri& uri)
 
 int main()
 { 
-    json schema = json::parse(R"(
+    std::string main_schema = R"(
 {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": "http://localhost:1234/draft2020-12/object",
-            "type": "object",
-            "properties": {
-                "name": {"$ref": "name-defs.json#/$defs/orNull"}
-            }
-        }
-    )");
+    "$id" : "https://www.example.com",
+    "$schema": "https://json-schema.org/draft/2020-12/main_schema",
+    "$id": "http://localhost:1234/draft2020-12/object",
+    "type": "object",
+    "properties": {
+        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
+    }
+}
+    )";
+
+    json schema = json::parse(main_schema);    
 
     // Data
     json data = json::parse(R"(
@@ -448,7 +452,7 @@ int main()
 ```
 Output:
 ```
-base: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name-defs.json
+base: https://www.example.com/name-defs.json, path: /name-defs.json
 
 /name: Must be valid against at least one schema, but found no matching schemas
     Expected null, found object

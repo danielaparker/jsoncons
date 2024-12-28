@@ -110,7 +110,7 @@ json resolve(const jsoncons::uri& uri)
 {
     std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-    std::string pathname = "./input/jsonschema/";
+    std::string pathname = "./input/jsonschema";
     pathname += std::string(uri.path());
 
     std::fstream is(pathname.c_str());
@@ -122,18 +122,21 @@ json resolve(const jsoncons::uri& uri)
     return json::parse(is);        
 }
 
-void uriresolver_example()
+void resolve_uri_example()
 { 
-    json schema = json::parse(R"(
+    std::string main_schema = R"(
 {
+    "$id" : "https://www.example.com",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "http://localhost:1234/draft2020-12/object",
     "type": "object",
     "properties": {
-        "name": {"$ref": "name-defs.json#/$defs/orNull"}
+        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
     }
 }
-    )");
+    )";
+    
+    json schema = json::parse(main_schema);    
 
     // Data
     json data = json::parse(R"(
@@ -604,7 +607,6 @@ int main()
     std::cout << "\nJSON Schema Examples\n\n";
     validate_three_ways();
     std::cout << "\n";
-    uriresolver_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
@@ -619,6 +621,8 @@ int main()
     cross_schema_example();
     
     walk_example();
+    
+    resolve_uri_example();
     
     std::cout << "\n";
 }
