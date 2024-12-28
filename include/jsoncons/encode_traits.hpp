@@ -173,11 +173,11 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
-            if (ec) return;
+            if (ec) {return;}
             encode_traits<T1,CharT>::encode(val.first, encoder, proto, ec);
-            if (ec) return;
+            if (ec) {return;}
             encode_traits<T2,CharT>::encode(val.second, encoder, proto, ec);
-            if (ec) return;
+            if (ec) {return;}
             encoder.end_array(ser_context(),ec);
         }
     };
@@ -199,7 +199,7 @@ namespace jsoncons {
                                std::error_code& ec)
             {
                 encode_traits<element_type,char_type>::encode(std::get<Size-Pos>(tuple), encoder, proto, ec);
-                if (ec) return;
+                if (ec) {return;}
                 next::encode(tuple, encoder, proto, ec);
             }
         };
@@ -232,9 +232,9 @@ namespace jsoncons {
         {
             using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
             encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
-            if (ec) return;
+            if (ec) {return;}
             helper::encode(val, encoder, proto, ec);
-            if (ec) return;
+            if (ec) {return;}
             encoder.end_array(ser_context(),ec);
         }
     };
@@ -256,11 +256,11 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
-            if (ec) return;
+            if (ec) {return;}
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 encode_traits<value_type,CharT>::encode(*it, encoder, proto, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
             encoder.end_array(ser_context(), ec);
         }
@@ -299,11 +299,11 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
-            if (ec) return;
+            if (ec) {return;}
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 encode_traits<value_type,CharT>::encode(*it, encoder, proto, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
             encoder.end_array(ser_context(),ec);
         }
@@ -329,15 +329,15 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
-            if (ec) return;
+            if (ec) {return;}
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 encoder.key(it->first);
                 encode_traits<mapped_type,CharT>::encode(it->second, encoder, proto, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
             encoder.end_object(ser_context(), ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     };
 
@@ -359,17 +359,17 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
-            if (ec) return;
+            if (ec) {return;}
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 std::basic_string<typename Json::char_type> s;
                 jsoncons::detail::from_integer(it->first,s);
                 encoder.key(s);
                 encode_traits<mapped_type,CharT>::encode(it->second, encoder, proto, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
             encoder.end_object(ser_context(), ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     };
 

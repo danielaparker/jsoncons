@@ -237,7 +237,7 @@ namespace cbor {
                 while (!parser_.stopped())
                 {
                     parser_.parse(event_receiver_, ec);
-                    if (ec) return;
+                    if (ec) {return;}
                 }
             }
         }

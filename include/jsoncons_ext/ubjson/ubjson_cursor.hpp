@@ -226,7 +226,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(cursor_visitor_, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 
@@ -236,7 +236,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(visitor, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 };

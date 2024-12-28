@@ -317,7 +317,7 @@ public:
         if (source_.eof())
         {
             parser_.check_done(ec);
-            if (ec) return;
+            if (ec) {return;}
         }
         else
         {
@@ -326,7 +326,7 @@ public:
                 if (parser_.source_exhausted())
                 {
                     auto s = source_.read_buffer(ec);
-                    if (ec) return;
+                    if (ec) {return;}
                     if (s.size() > 0)
                     {
                         parser_.set_buffer(s.data(),s.size());
@@ -335,7 +335,7 @@ public:
                 if (!parser_.source_exhausted())
                 {
                     parser_.check_done(ec);
-                    if (ec) return;
+                    if (ec) {return;}
                 }
             }
             while (!eof());
@@ -433,16 +433,16 @@ private:
             if (parser_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
-                if (ec) return;
+                if (ec) {return;}
                 if (s.size() > 0)
                 {
                     parser_.set_buffer(s.data(),s.size());
-                    if (ec) return;
+                    if (ec) {return;}
                 }
             }
             bool eof = parser_.source_exhausted() && source_.eof();
             parser_.parse_some(visitor, ec);
-            if (ec) return;
+            if (ec) {return;}
             if (eof)
             {
                 if (parser_.enter())

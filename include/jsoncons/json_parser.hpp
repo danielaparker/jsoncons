@@ -679,14 +679,14 @@ public:
                             ++input_ptr_;
                             ++position_;
                             begin_object(visitor, ec);
-                            if (ec) return;
+                            if (ec) {return;}
                             break;
                         case '[':
                             saved_position_ = position_;
                             ++input_ptr_;
                             ++position_;
                             begin_array(visitor, ec);
-                            if (ec) return;
+                            if (ec) {return;}
                             break;
                         case '\"':
                             saved_position_ = position_;
@@ -694,7 +694,7 @@ public:
                             ++position_;
                             string_buffer_.clear();
                             parse_string(visitor, ec);
-                            if (ec) return;
+                            if (ec) {return;}
                             break;
                         case '-':
                             string_buffer_.clear();
@@ -777,18 +777,18 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 end_object(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case ']':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 end_array(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case ',':
                                 begin_member_or_element(ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 ++input_ptr_;
                                 ++position_;
                                 break;
@@ -846,7 +846,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 end_object(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -855,7 +855,7 @@ public:
                                 push_state(json_parse_state::member_name);
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -911,7 +911,7 @@ public:
                                 push_state(json_parse_state::member_name);
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '}':
                                 more_ = err_handler_(json_errc::extra_comma, *this);
@@ -924,7 +924,7 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 end_object(visitor, ec);  // Recover
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1021,14 +1021,14 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 begin_object(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '[':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 begin_array(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -1036,7 +1036,7 @@ public:
                                 ++position_;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '-':
                                 string_buffer_.clear();
@@ -1084,7 +1084,7 @@ public:
                                         return;
                                     }
                                     end_array(visitor, ec);  // Recover
-                                    if (ec) return;
+                                    if (ec) {return;}
                                 }
                                 else
                                 {
@@ -1148,21 +1148,21 @@ public:
                                 ++input_ptr_;
                                 ++position_;
                                 begin_object(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '[':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 begin_array(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case ']':
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
                                 end_array(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '\"':
                                 saved_position_ = position_;
@@ -1170,7 +1170,7 @@ public:
                                 ++position_;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
-                                if (ec) return;
+                                if (ec) {return;}
                                 break;
                             case '-':
                                 string_buffer_.clear();
@@ -1599,12 +1599,12 @@ zero:
             case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 skip_space(ec);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 ++input_ptr_;
                 ++position_;
                 push_state(state_);
@@ -1613,7 +1613,7 @@ zero:
             case '}':
             case ']':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case '.':
@@ -1628,9 +1628,9 @@ zero:
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (ec) {return;}
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -1664,12 +1664,12 @@ integer:
             case '\r':case '\n':
             case ' ':case '\t':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 skip_space(ec);
                 return;
             case '/': 
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -1678,7 +1678,7 @@ integer:
             case '}':
             case ']':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1698,9 +1698,9 @@ integer:
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (ec) {return;}
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -1751,12 +1751,12 @@ fraction2:
             case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 skip_space(ec);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -1764,19 +1764,19 @@ fraction2:
                 return;
             case '}':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (ec) {return;}
                 ++input_ptr_;
                 ++position_;
                 return;
@@ -1869,12 +1869,12 @@ exp3:
             case '\r':case '\n':
             case ' ':case '\t':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 skip_space(ec);
                 return;
             case '/': 
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 push_state(state_);
                 ++input_ptr_;
                 ++position_;
@@ -1882,19 +1882,19 @@ exp3:
                 return;
             case '}':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(visitor, ec);
-                if (ec) return;
+                if (ec) {return;}
                 begin_member_or_element(ec);
-                if (ec) return;
+                if (ec) {return;}
                 ++input_ptr_;
                 ++position_;
                 return;

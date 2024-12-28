@@ -561,9 +561,9 @@ namespace jsoncons {
                     return val;
                 }
                 auto key = cursor.current().template get<key_type>(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 cursor.next(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 val.emplace(std::move(key),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
                 cursor.next(ec);
@@ -618,7 +618,7 @@ namespace jsoncons {
                     return val;
                 }
                 auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 key_type n{0};
                 auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
                 if (r.ec != jsoncons::detail::to_integer_errc())
@@ -627,7 +627,7 @@ namespace jsoncons {
                     return val;
                 }
                 cursor.next(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
                 cursor.next(ec);

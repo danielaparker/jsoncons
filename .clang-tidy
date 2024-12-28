@@ -4,10 +4,11 @@
 
 # See https://github.com/danielaparker/jsoncons for latest version
 
-# TODO: The first three checks are only removed to get the CI going. They have to be addressed at some point.
-
 Checks: '*,
          -bugprone-branch-clone,
+         -hicpp-named-parameter,
+         -readability-named-parameter,
+         -bugprone-throw-keyword-missing,
 
          -portability-template-virtual-member-function,
          -bugprone-use-after-move,

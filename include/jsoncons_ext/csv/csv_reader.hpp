@@ -134,7 +134,7 @@ namespace jsoncons { namespace csv {
             if (parser_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
-                if (ec) return;
+                if (ec) {return;}
                 if (s.size() > 0)
                 {
                     parser_.set_buffer(s.data(),s.size());
@@ -165,7 +165,7 @@ namespace jsoncons { namespace csv {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
             auto s = source_.read_buffer(ec);
-            if (ec) return false;
+            if (ec) {return false;}
             if (s.size() > 0)
             {
                 parser_.set_buffer(s.data(),s.size());

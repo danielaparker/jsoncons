@@ -238,7 +238,7 @@ private:
             while (!parser_.stopped())
             {
                 parser_.parse(cursor_handler_adaptor_, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
         }
     }
@@ -268,7 +268,7 @@ private:
             while (!parser_.stopped())
             {
                 parser_.parse(cursor_handler_adaptor_, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
         }
     }

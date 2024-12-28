@@ -288,13 +288,13 @@ namespace jsoncons {
             }        
             parser_.reset();
             auto s = source_.read_buffer(ec);
-            if (ec) return;
+            if (ec) {return;}
             if (s.size() > 0)
             {
                 parser_.set_buffer(s.data(),s.size());
             }
             parser_.parse_some(visitor_, ec);
-            if (ec) return;
+            if (ec) {return;}
             if (!parser_.enter() && !parser_.accept())
             {
                 ec = json_errc::unexpected_eof;
@@ -360,7 +360,7 @@ namespace jsoncons {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
             auto s = source_.read_buffer(ec);
-            if (ec) return false;
+            if (ec) {return false;}
             if (s.size() > 0)
             {
                 parser_.set_buffer(s.data(),s.size());
