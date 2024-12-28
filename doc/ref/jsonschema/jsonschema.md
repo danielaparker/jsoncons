@@ -357,8 +357,8 @@ In this example, the main schema is
 
 ```json
 {
-    "$id" : "https://www.example.com",
-    "$schema": "https://json-schema.org/draft/2020-12/main_schema",
+    "$id" : "https://www.example.com/main",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "http://localhost:1234/draft2020-12/object",
     "type": "object",
     "properties": {
@@ -372,7 +372,7 @@ second schema defined in an external file, `name-defs.json`,
 
 ```json
 {
-    "$id" : "https://www.example.com",
+    "$id" : "https://www.example.com/other",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$defs": {
         "orNull": {
@@ -436,7 +436,7 @@ int main()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve);
 
-        auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto report = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
             std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
             for (const auto& detail : msg.details())
@@ -446,8 +446,8 @@ int main()
             return jsonschema::walk_result::advance;
         };
 
-        // Will call reporter for each schema violation
-        compiled.validate(data, reporter);
+        // Will call report function object for each schema violation
+        compiled.validate(data, report);
     }
     catch (const std::exception& e)
     {
