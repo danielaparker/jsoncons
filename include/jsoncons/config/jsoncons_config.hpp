@@ -7,12 +7,58 @@
 #ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
-#include <limits>
-#include <type_traits>
+#include <cfloat> 
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <stdexcept>
+#include <type_traits> // std::enable_if
 
-#include <jsoncons/config/binary_config.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 
+namespace jsoncons {
+
+    class assertion_error : public std::runtime_error
+    {
+    public:
+        assertion_error(const std::string& s) noexcept
+            : std::runtime_error(s)
+        {
+        }
+        const char* what() const noexcept override
+        {
+            return std::runtime_error::what();
+        }
+    };
+
+} // namespace jsoncons
+
+#define JSONCONS_STR2(x)  #x
+#define JSONCONS_STR(x)  JSONCONS_STR2(x)
+
+#ifdef _DEBUG
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__))); }
+#else
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
+            JSONCONS_STR( 0 ))); }
+#endif // _DEBUG
+
+#if defined(JSONCONS_HAS_2017)
+#  define JSONCONS_FALLTHROUGH [[fallthrough]]
+#elif defined(__clang__)
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__) && ((__GNUC__ >= 7))
+#  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
+#elif defined (__GNUC__)
+#  define JSONCONS_FALLTHROUGH // FALLTHRU
+#else
+#  define JSONCONS_FALLTHROUGH
+#endif
+        
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
@@ -126,122 +172,6 @@ namespace jsoncons
 }
 
 #endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
-
-namespace jsoncons {
-namespace binary {
-
-    // native_to_big
-
-    template <typename T,typename OutputIt,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::big,void>::type
-    native_to_big(T val, OutputIt d_first)
-    {
-        uint8_t buf[sizeof(T)];
-        std::memcpy(buf, &val, sizeof(T));
-        for (auto item : buf)
-        {
-            *d_first++ = item;
-        }
-    }
-
-    template <typename T,typename OutputIt,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::little,void>::type
-    native_to_big(T val, OutputIt d_first)
-    {
-        T val2 = byte_swap(val);
-        uint8_t buf[sizeof(T)];
-        std::memcpy(buf, &val2, sizeof(T));
-        for (auto item : buf)
-        {
-            *d_first++ = item;
-        }
-    }
-
-    // native_to_little
-
-    template <typename T,typename OutputIt,typename Endian = endian>
-    typename std::enable_if<Endian::native == Endian::little,void>::type
-    native_to_little(T val, OutputIt d_first)
-    {
-        uint8_t buf[sizeof(T)];
-        std::memcpy(buf, &val, sizeof(T));
-        for (auto item : buf)
-        {
-            *d_first++ = item;
-        }
-    }
-
-    template <typename T,typename OutputIt,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::big, void>::type
-    native_to_little(T val, OutputIt d_first)
-    {
-        T val2 = byte_swap(val);
-        uint8_t buf[sizeof(T)];
-        std::memcpy(buf, &val2, sizeof(T));
-        for (auto item : buf)
-        {
-            *d_first++ = item;
-        }
-    }
-
-    // big_to_native
-
-    template <typename T,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::big,T>::type
-    big_to_native(const uint8_t* first, std::size_t count)
-    {
-        if (sizeof(T) > count)
-        {
-            return T{};
-        }
-        T val;
-        std::memcpy(&val,first,sizeof(T));
-        return val;
-    }
-
-    template <typename T,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::little,T>::type
-    big_to_native(const uint8_t* first, std::size_t count)
-    {
-        if (sizeof(T) > count)
-        {
-            return T{};
-        }
-        T val;
-        std::memcpy(&val,first,sizeof(T));
-        return byte_swap(val);
-    }
-
-    // little_to_native
-
-    template <typename T,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::little,T>::type
-    little_to_native(const uint8_t* first, std::size_t count)
-    {
-        if (sizeof(T) > count)
-        {
-            return T{};
-        }
-        T val;
-        std::memcpy(&val,first,sizeof(T));
-        return val;
-    }
-
-    template <typename T,typename Endian=endian>
-    typename std::enable_if<Endian::native == Endian::big,T>::type
-    little_to_native(const uint8_t* first, std::size_t count)
-    {
-        if (sizeof(T) > count)
-        {
-            return T{};
-        }
-        T val;
-        std::memcpy(&val,first,sizeof(T));
-        return byte_swap(val);
-    }
-
-} // binary
-} // namespace jsoncons
 
 namespace jsoncons {
 
