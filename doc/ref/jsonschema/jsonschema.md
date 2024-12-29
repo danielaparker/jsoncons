@@ -369,7 +369,7 @@ In this example, the main schema is defined by
     )";
 ```
 
-The main schema defines a reference using the `$ref` keyword to a
+The main schema includes a reference using the `$ref` keyword to a
 second schema defined in an external file, `name-defs.json`,  
 
 ```json
