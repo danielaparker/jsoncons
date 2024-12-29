@@ -11,7 +11,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cstring> // std::memcpy
 #include <limits>
 #include <memory>
 #include <stdexcept>

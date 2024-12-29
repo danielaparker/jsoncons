@@ -12,6 +12,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <cstring> // std::memcpy
 
 #if defined(__GNUC__)
 #   if defined(__GNUC_PATCHLEVEL__)
