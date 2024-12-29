@@ -565,13 +565,13 @@ namespace detail {
                 return rhs;
             }
         }
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 //s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("or operator");
             return s;
@@ -601,13 +601,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("and operator");
             return s;
@@ -630,13 +630,13 @@ namespace detail {
             return lhs == rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("equal operator");
             return s;
@@ -659,13 +659,13 @@ namespace detail {
             return lhs != rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("not equal operator");
             return s;
@@ -696,13 +696,13 @@ namespace detail {
             return Json::null();
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("less than operator");
             return s;
@@ -733,13 +733,13 @@ namespace detail {
             return Json::null();
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("less than or equal operator");
             return s;
@@ -772,13 +772,13 @@ namespace detail {
             return Json::null();
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("greater than operator");
             return s;
@@ -809,13 +809,13 @@ namespace detail {
             return Json::null();
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("greater than or equal operator");
             return s;
@@ -853,13 +853,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("plus operator");
             return s;
@@ -897,13 +897,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("minus operator");
             return s;
@@ -941,13 +941,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("multiply operator");
             return s;
@@ -987,13 +987,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("divide operator");
             return s;
@@ -1033,13 +1033,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("modulus operator");
             return s;
@@ -1070,13 +1070,13 @@ namespace detail {
         virtual value_type evaluate(const std::vector<parameter_type>& args, 
             std::error_code& ec) const = 0;
 
-        virtual std::string to_string(int level = 0) const
+        virtual std::string to_string(int level) const
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("function");
             return s;
@@ -1162,13 +1162,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("contains function");
             return s;
@@ -1224,13 +1224,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("ends_with function");
             return s;
@@ -1286,13 +1286,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("starts_with function");
             return s;
@@ -1343,13 +1343,13 @@ namespace detail {
             return value_type(sum, semantic_tag::none);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("sum function");
             return s;
@@ -1414,13 +1414,13 @@ namespace detail {
             return j;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("tokenize function");
             return s;
@@ -1468,13 +1468,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("ceil function");
             return s;
@@ -1520,13 +1520,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("floor function");
             return s;
@@ -1594,13 +1594,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("to_number function");
             return s;
@@ -1649,13 +1649,13 @@ namespace detail {
             return value_type(prod, semantic_tag::none);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("prod function");
             return s;
@@ -1707,13 +1707,13 @@ namespace detail {
             return value_type(sum / static_cast<double>(arg0.size()), semantic_tag::none);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("to_string function");
             return s;
@@ -1777,13 +1777,13 @@ namespace detail {
             return arg0.at(index);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("min function");
             return s;
@@ -1848,13 +1848,13 @@ namespace detail {
             return arg0.at(index);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("max function");
             return s;
@@ -1903,13 +1903,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("abs function");
             return s;
@@ -1960,13 +1960,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("length function");
             return s;
@@ -2016,13 +2016,13 @@ namespace detail {
             return result;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("keys function");
             return s;
@@ -2670,7 +2670,7 @@ namespace detail {
             result_options options,
             std::error_code& ec) const = 0;
 
-        virtual std::string to_string(int level = 0) const = 0;
+        virtual std::string to_string(int level) const = 0;
     };
 
     template <typename Json,typename JsonReference>
@@ -2981,7 +2981,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level) const
         {
             std::string s;
             switch (token_kind_)
@@ -2990,7 +2990,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(level*2, ' ');
+                        s.append(std::size_t(level*2), ' ');
                     }
                     s.append("root node");
                     break;
@@ -2998,7 +2998,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(level*2, ' ');
+                        s.append(std::size_t(level*2), ' ');
                     }
                     s.append("current node");
                     break;
@@ -3006,7 +3006,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(level*2, ' ');
+                        s.append(std::size_t(level*2), ' ');
                     }
                     s.append("argument");
                     break;
@@ -3021,7 +3021,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(level*2, ' ');
+                        s.append(std::size_t(level*2), ' ');
                     }
                     auto sbuf = value_.to_string();
                     unicode_traits::convert(sbuf.data(), sbuf.size(), s);
@@ -3037,7 +3037,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(level*2, ' ');
+                        s.append(std::size_t(level*2), ' ');
                     }
                     s.append("token kind: ");
                     s.append(jsoncons::jsonpath::detail::to_string(token_kind_));
@@ -3243,7 +3243,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("expression ");
             if (selector_ != nullptr)
@@ -3438,7 +3438,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("expression ");
             for (const auto& item : token_list_)

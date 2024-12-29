@@ -56,17 +56,11 @@ namespace detail {
                 auto len = *start_ >= 0 ? *start_ : (static_cast<int64_t>(size) + *start_);
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
-            else
+            if (step_ >= 0)
             {
-                if (step_ >= 0)
-                {
-                    return 0;
-                }
-                else 
-                {
-                    return static_cast<int64_t>(size);
-                }
+                return 0;
             }
+            return static_cast<int64_t>(size);
         }
 
         int64_t get_stop(std::size_t size) const
@@ -212,13 +206,13 @@ namespace detail {
             return tail_->evaluate(context, root, last, current, options, ec);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             if (tail_)
             {
@@ -320,12 +314,9 @@ namespace detail {
                                                path_generator_type::generate(context, last, identifier_, options),
                                               it->value(), options, ec);
                 }
-                else
-                {
-                    return context.null_value();
-                }
+                return context.null_value();
             }
-            else if (current.is_array())
+            if (current.is_array())
             {
                 int64_t n{0};
                 auto r = jsoncons::detail::decimal_to_integer(identifier_.data(), identifier_.size(), n);
@@ -356,7 +347,7 @@ namespace detail {
                     return context.null_value();
                 }
             }
-            else if (current.is_string() && identifier_ == context.length_label())
+            if (current.is_string() && identifier_ == context.length_label())
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
@@ -365,19 +356,16 @@ namespace detail {
                                            path_generator_type::generate(context, last, identifier_, options), 
                                            *ptr, options, ec);
             }
-            else
-            {
-                return context.null_value();
-            }
+            return context.null_value();
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("identifier selector ");
             unicode_traits::convert(identifier_.data(),identifier_.size(),s);
@@ -443,13 +431,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("root_selector ");
             s.append(base_selector<Json,JsonReference>::to_string(level+1));
@@ -499,13 +487,13 @@ namespace detail {
                                 root, last, current, options, ec);
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("current_node_selector");
             s.append(base_selector<Json,JsonReference>::to_string(level+1));
@@ -595,13 +583,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("parent_node_selector");
             s.append(base_selector<Json,JsonReference>::to_string(level+1));
@@ -761,13 +749,13 @@ namespace detail {
             return *jptr;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("wildcard selector");
             s.append(base_selector<Json,JsonReference>::to_string(level));
@@ -836,13 +824,13 @@ namespace detail {
             return *jptr;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("wildcard selector");
             s.append(base_selector<Json,JsonReference>::to_string(level));
@@ -917,13 +905,13 @@ namespace detail {
             return *jptr;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("union selector ");
             for (auto& selector : selectors_)
@@ -1009,13 +997,13 @@ namespace detail {
             return *jptr;
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("filter selector ");
             s.append(expr_.to_string(level+1));
@@ -1109,13 +1097,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("bracket expression selector ");
             s.append(expr_.to_string(level+1));
@@ -1268,13 +1256,13 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const override
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)
             {
                 s.append("\n");
-                s.append(level*2, ' ');
+                s.append(std::size_t(level*2), ' ');
             }
             s.append("function_selector ");
             s.append(expr_.to_string(level+1));
