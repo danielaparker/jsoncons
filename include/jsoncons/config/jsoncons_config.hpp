@@ -11,7 +11,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <type_traits> // std::enable_if
