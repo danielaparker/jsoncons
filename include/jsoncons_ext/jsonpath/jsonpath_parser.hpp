@@ -2097,7 +2097,7 @@ namespace detail {
             //std::cout << "\nTokens\n\n";
             //for (const auto& tok : output_stack_)
             //{
-            //    std::cout << tok.to_string() << "\n";
+            //    std::cout << tok.to_string(0) << "\n";
             //}
             //std::cout << "\n";
 
@@ -2154,7 +2154,7 @@ namespace detail {
 
         void push_token(jsoncons::jsonpath::detail::static_resources<value_type>& resources, token_type&& tok, std::error_code& ec)
         {
-            //std::cout << tok.to_string() << "\n";
+            //std::cout << tok.to_string(0) << "\n";
             switch (tok.token_kind())
             {
                 case jsonpath_token_kind::begin_filter:
@@ -2166,7 +2166,7 @@ namespace detail {
                     //std::cout << "push_token end_filter 1\n";
                     //for (const auto& tok2 : output_stack_)
                     //{
-                    //    std::cout << tok2.to_string() << "\n";
+                    //    std::cout << tok2.to_string(0) << "\n";
                     //}
                     //std::cout << "\n\n";
                     unwind_rparen(ec);
@@ -2201,7 +2201,7 @@ namespace detail {
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)
                     //{
-                    //    std::cout << tok2.to_string() << "\n";
+                    //    std::cout << tok2.to_string(0) << "\n";
                     //}
                     //std::cout << "\n\n";
                     break;
@@ -2216,7 +2216,7 @@ namespace detail {
                     //std::cout << "jsonpath_token_kind::end_index_expression\n";
                     //for (const auto& t : output_stack_)
                     //{
-                    //    std::cout << t.to_string() << "\n";
+                    //    std::cout << t.to_string(0) << "\n";
                     //}
                     //std::cout << "/jsonpath_token_kind::end_index_expression\n";
                     unwind_rparen(ec);
@@ -2255,7 +2255,7 @@ namespace detail {
                     //std::cout << "jsonpath_token_kind::end_index_expression\n";
                     //for (const auto& t : output_stack_)
                     //{
-                    //    std::cout << t.to_string() << "\n";
+                    //    std::cout << t.to_string(0) << "\n";
                     //}
                     //std::cout << "/jsonpath_token_kind::end_index_expression\n";
                     unwind_rparen(ec);

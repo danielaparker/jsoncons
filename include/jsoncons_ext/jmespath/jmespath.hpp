@@ -2889,7 +2889,7 @@ namespace detail {
                 {
                     return context.null_value();
                 }
-                int64_t slen = static_cast<int64_t>(val.size());
+                auto slen = static_cast<int64_t>(val.size());
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(index_);

@@ -571,7 +571,7 @@ namespace detail {
             if (level > 0)
             {
                 //s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("or operator");
             return s;
@@ -607,7 +607,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("and operator");
             return s;
@@ -636,7 +636,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("equal operator");
             return s;
@@ -665,7 +665,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("not equal operator");
             return s;
@@ -702,7 +702,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("less than operator");
             return s;
@@ -739,7 +739,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("less than or equal operator");
             return s;
@@ -778,7 +778,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("greater than operator");
             return s;
@@ -815,7 +815,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("greater than or equal operator");
             return s;
@@ -859,7 +859,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("plus operator");
             return s;
@@ -903,7 +903,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("minus operator");
             return s;
@@ -947,7 +947,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("multiply operator");
             return s;
@@ -993,7 +993,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("divide operator");
             return s;
@@ -1039,7 +1039,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("modulus operator");
             return s;
@@ -1076,7 +1076,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("function");
             return s;
@@ -1168,7 +1168,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("contains function");
             return s;
@@ -1230,7 +1230,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("ends_with function");
             return s;
@@ -1292,7 +1292,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("starts_with function");
             return s;
@@ -1349,7 +1349,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("sum function");
             return s;
@@ -1420,7 +1420,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("tokenize function");
             return s;
@@ -1474,7 +1474,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("ceil function");
             return s;
@@ -1526,7 +1526,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("floor function");
             return s;
@@ -1600,7 +1600,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("to_number function");
             return s;
@@ -1655,7 +1655,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("prod function");
             return s;
@@ -1713,7 +1713,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("to_string function");
             return s;
@@ -1783,7 +1783,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("min function");
             return s;
@@ -1854,7 +1854,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("max function");
             return s;
@@ -1909,7 +1909,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("abs function");
             return s;
@@ -1966,7 +1966,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("length function");
             return s;
@@ -2022,7 +2022,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("keys function");
             return s;
@@ -2990,7 +2990,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(std::size_t(level*2), ' ');
+                        s.append(std::size_t(level)*2, ' ');
                     }
                     s.append("root node");
                     break;
@@ -2998,7 +2998,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(std::size_t(level*2), ' ');
+                        s.append(std::size_t(level)*2, ' ');
                     }
                     s.append("current node");
                     break;
@@ -3006,7 +3006,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(std::size_t(level*2), ' ');
+                        s.append(std::size_t(level)*2, ' ');
                     }
                     s.append("argument");
                     break;
@@ -3021,7 +3021,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(std::size_t(level*2), ' ');
+                        s.append(std::size_t(level)*2, ' ');
                     }
                     auto sbuf = value_.to_string();
                     unicode_traits::convert(sbuf.data(), sbuf.size(), s);
@@ -3037,7 +3037,7 @@ namespace detail {
                     if (level > 0)
                     {
                         s.append("\n");
-                        s.append(std::size_t(level*2), ' ');
+                        s.append(std::size_t(level)*2, ' ');
                     }
                     s.append("token kind: ");
                     s.append(jsoncons::jsonpath::detail::to_string(token_kind_));
@@ -3243,7 +3243,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("expression ");
             if (selector_ != nullptr)
@@ -3438,7 +3438,7 @@ namespace detail {
             if (level > 0)
             {
                 s.append("\n");
-                s.append(std::size_t(level*2), ' ');
+                s.append(std::size_t(level)*2, ' ');
             }
             s.append("expression ");
             for (const auto& item : token_list_)

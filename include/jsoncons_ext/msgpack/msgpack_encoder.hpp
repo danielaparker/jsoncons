@@ -304,8 +304,8 @@ namespace msgpack {
                         bigint q;
                         bigint rem;
                         n.divide(millis_in_second, q, rem, true);
-                        int64_t seconds = static_cast<int64_t>(q);
-                        int64_t nanoseconds = static_cast<int64_t>(rem) * nanos_in_milli;
+                        auto seconds = static_cast<int64_t>(q);
+                        auto nanoseconds = static_cast<int64_t>(rem) * nanos_in_milli;
                         if (nanoseconds < 0)
                         {
                             nanoseconds = -nanoseconds; 
@@ -326,8 +326,8 @@ namespace msgpack {
                         bigint q;
                         bigint rem;
                         n.divide(nanos_in_second, q, rem, true);
-                        int64_t seconds = static_cast<int64_t>(q);
-                        int64_t nanoseconds = static_cast<int64_t>(rem);
+                        auto seconds = static_cast<int64_t>(q);
+                        auto nanoseconds = static_cast<int64_t>(rem);
                         if (nanoseconds < 0)
                         {
                             nanoseconds = -nanoseconds; 

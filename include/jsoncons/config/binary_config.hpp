@@ -77,7 +77,7 @@ namespace binary {
     #else
         uint64_t v;
         std::memcpy(&v, &val, sizeof(v));
-        int64_t sign = static_cast<int64_t>(v >> 63 << 15);
+        auto sign = static_cast<int64_t>(v >> 63 << 15);
         int64_t exp = (v >> 52) & 0x7ff;
         int64_t mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
         exp -= 1023;
