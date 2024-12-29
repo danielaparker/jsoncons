@@ -18,6 +18,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons_ext/msgpack/msgpack_type.hpp>

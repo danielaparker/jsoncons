@@ -18,6 +18,7 @@
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 

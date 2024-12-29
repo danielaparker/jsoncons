@@ -16,6 +16,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>
