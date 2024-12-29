@@ -353,7 +353,7 @@ Output:
 
 #### Resolving references to schemas defined in external files  
 
-In this example, the main schema is
+In this example, the main schema is defined by
 
 ```cpp
     std::string main_schema = R"(
@@ -369,7 +369,7 @@ In this example, the main schema is
     )";
 ```
 
-The main schema defines a reference using the `$ref` keyword to a
+The main schema includes a reference using the `$ref` keyword to a
 second schema defined in an external file, `name-defs.json`,  
 
 ```json
