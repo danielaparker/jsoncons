@@ -7,9 +7,15 @@
 #ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
+#include <cfloat> 
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstring> // std::memcpy
 #include <limits>
+#include <memory>
 #include <stdexcept>
-#include <type_traits>
+#include <type_traits> // std::enable_if
 
 #include <jsoncons/config/compiler_support.hpp>
 
