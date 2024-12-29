@@ -456,12 +456,14 @@ namespace detail {
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_receiver_type = typename supertype::node_receiver_type;
 
-        current_node_selector()
-        {
-        }
-        
+        current_node_selector() = default;
+        current_node_selector(const current_node_selector&) = default;
+        current_node_selector(current_node_selector&&) = default;       
         ~current_node_selector() = default;
 
+        current_node_selector& operator=(const current_node_selector&) = default;
+        current_node_selector& operator=(current_node_selector&&) = default;              
+        
         void select(eval_context<Json,JsonReference>& context,
                     reference root,
                     const path_node_type& last, 
@@ -522,8 +524,13 @@ namespace detail {
             : ancestor_depth_(ancestor_depth)
         {
         }
+        parent_node_selector(const parent_node_selector&) = default;
+        parent_node_selector(parent_node_selector&&) = default;
         
         ~parent_node_selector() = default;
+
+        parent_node_selector& operator=(const parent_node_selector&) = default;
+        parent_node_selector& operator=(parent_node_selector&&) = default;
 
         void select(eval_context<Json,JsonReference>& context,
                     reference root,
@@ -624,7 +631,7 @@ namespace detail {
                 auto slen = static_cast<int64_t>(current.size());
                 if (index_ >= 0 && index_ < slen)
                 {
-                    std::size_t i = static_cast<std::size_t>(index_);
+                    auto i = static_cast<std::size_t>(index_);
                     this->tail_select(context, root, 
                                         path_generator_type::generate(context, last, i, options), 
                                         current.at(i), receiver, options);
@@ -634,7 +641,7 @@ namespace detail {
                     int64_t index = slen + index_;
                     if (index >= 0 && index < slen)
                     {
-                        std::size_t i = static_cast<std::size_t>(index);
+                        auto i = static_cast<std::size_t>(index);
                         this->tail_select(context, root, 
                                             path_generator_type::generate(context, last, i, options), 
                                             current.at(i), receiver, options);
@@ -655,31 +662,22 @@ namespace detail {
                 auto slen = static_cast<int64_t>(current.size());
                 if (index_ >= 0 && index_ < slen)
                 {
-                    std::size_t i = static_cast<std::size_t>(index_);
+                    auto i = static_cast<std::size_t>(index_);
                     return this->evaluate_tail(context, root, 
                                         path_generator_type::generate(context, last, i, options), 
                                         current.at(i), options, ec);
                 }
-                else 
+                int64_t index = slen + index_;
+                if (index >= 0 && index < slen)
                 {
-                    int64_t index = slen + index_;
-                    if (index >= 0 && index < slen)
-                    {
-                        std::size_t i = static_cast<std::size_t>(index);
-                        return this->evaluate_tail(context, root, 
-                                            path_generator_type::generate(context, last, i, options), 
-                                            current.at(i), options, ec);
-                    }
-                    else
-                    {
-                        return context.null_value();
-                    }
+                    auto i = static_cast<std::size_t>(index);
+                    return this->evaluate_tail(context, root, 
+                                        path_generator_type::generate(context, last, i, options), 
+                                        current.at(i), options, ec);
                 }
-            }
-            else
-            {
                 return context.null_value();
             }
+            return context.null_value();
         }
     };
 
@@ -1076,19 +1074,13 @@ namespace detail {
                     std::size_t start = j.template as<std::size_t>();
                     return this->evaluate_tail(context, root, last, current.at(start), options, ec);
                 }
-                else if (j.is_string() && current.is_object())
+                if (j.is_string() && current.is_object())
                 {
                     return this->evaluate_tail(context, root, last, current.at(j.as_string_view()), options, ec);
                 }
-                else
-                {
-                    return context.null_value();
-                }
-            }
-            else
-            {
                 return context.null_value();
             }
+            return context.null_value();
         }
 
         std::string to_string(int level) const override
@@ -1242,12 +1234,9 @@ namespace detail {
             if (!ec)
             {
                 return this->evaluate_tail(context, root, last, *context.create_json(std::move(ref)), 
-                                    options, ec);
+                    options, ec);
             }
-            else
-            {
-                return context.null_value();
-            }
+            return context.null_value();
         }
 
         std::string to_string(int level) const override

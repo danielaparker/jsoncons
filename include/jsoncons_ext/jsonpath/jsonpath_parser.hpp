@@ -146,12 +146,12 @@ namespace detail {
         {
         }
 
-        std::size_t line() const
+        std::size_t line() const final
         {
             return line_;
         }
 
-        std::size_t column() const
+        std::size_t column() const final
         {
             return column_;
         }
@@ -1446,20 +1446,19 @@ namespace detail {
                                     ec = jsonpath_errc::invalid_number;
                                     return path_expression_type(alloc_);
                                 }
-                                else
-                                {
-                                    int64_t n{0};
-                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
-                                    if (!r)
-                                    {
-                                        ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type(alloc_);
-                                    }
-                                    push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                    if (ec) {return path_expression_type(alloc_);}
 
-                                    buffer.clear();
+                                int64_t n{0};
+                                auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
+                                if (!r)
+                                {
+                                    ec = jsonpath_errc::invalid_number;
+                                    return path_expression_type(alloc_);
                                 }
+                                push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
+
+                                buffer.clear();
+                                
                                 push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type(alloc_);}
                                 buffer.clear();
@@ -1724,20 +1723,19 @@ namespace detail {
                                     ec = jsonpath_errc::invalid_number;
                                     return path_expression_type(alloc_);
                                 }
-                                else
+                                
+                                int64_t n{0};
+                                auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
+                                if (!r)
                                 {
-                                    int64_t n{0};
-                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
-                                    if (!r)
-                                    {
-                                        ec = jsonpath_errc::invalid_number;
-                                        return path_expression_type(alloc_);
-                                    }
-                                    push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                                    if (ec) {return path_expression_type(alloc_);}
-
-                                    buffer.clear();
+                                    ec = jsonpath_errc::invalid_number;
+                                    return path_expression_type(alloc_);
                                 }
+                                push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
+                                if (ec) {return path_expression_type(alloc_);}
+
+                                buffer.clear();
+                                
                                 state_stack_.pop_back(); // bracket_specifier
                                 break;
                             }
@@ -2120,7 +2118,9 @@ namespace detail {
                     break;
                 case '\r':
                     if (p_+1 < end_input_ && *(p_+1) == '\n')
+                    {
                         ++p_;
+                    }
                     ++line_;
                     column_ = 1;
                     ++p_;

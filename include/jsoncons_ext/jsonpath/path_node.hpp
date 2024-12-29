@@ -35,19 +35,18 @@ namespace jsonpath {
         std::size_t size_;
         path_node_kind node_kind_;
         string_view_type name_;
-        std::size_t index_;
+        std::size_t index_{0};
 
     public:
         basic_path_node()
             : parent_(nullptr), size_(1),
-              node_kind_(path_node_kind::root), 
-              index_(0)
+              node_kind_(path_node_kind::root)
         {
         }
 
         basic_path_node(const basic_path_node* parent, string_view_type name)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(path_node_kind::name), name_(name), index_(0)
+              node_kind_(path_node_kind::name), name_(name)
         {
         }
 
@@ -57,23 +56,13 @@ namespace jsonpath {
         {
         }
 
-        basic_path_node(const basic_path_node& other)
-            : parent_(other.parent_), size_(other.size()),
-              node_kind_(other.node_kind_),
-              name_(other.name_),
-              index_(other.index_)
-        {
-        }
+        basic_path_node(const basic_path_node& other) = default;
+        basic_path_node(basic_path_node&& other) = default;
+        
+        ~basic_path_node() = default;
 
-        basic_path_node& operator=(const basic_path_node& other)
-        {
-            parent_ = other.parent_;
-            size_ = other.size();
-            node_kind_ = other.node_kind_;
-            index_ = other.index_;
-            name_ = other.name_;
-            return *this;
-        }
+        basic_path_node& operator=(const basic_path_node& other) = default;
+        basic_path_node& operator=(basic_path_node&& other) = default;
 
         const basic_path_node* parent() const { return parent_;}
 
@@ -97,7 +86,7 @@ namespace jsonpath {
             return index_;
         }
 
-        void swap(basic_path_node& node)
+        void swap(basic_path_node& node) noexcept
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
