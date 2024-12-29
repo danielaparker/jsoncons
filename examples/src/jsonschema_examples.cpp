@@ -126,8 +126,7 @@ void resolve_uri_example()
             std::cout << "Requested URI: " << uri.string() << "\n";
             std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-            std::string pathname = "./input/jsonschema";
-            pathname += std::string(uri.path());
+            std::string pathname = "./input/jsonschema" + std::string(uri.path());
 
             std::fstream is(pathname.c_str());
             if (!is)
