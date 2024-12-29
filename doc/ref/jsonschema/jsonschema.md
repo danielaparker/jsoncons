@@ -353,7 +353,7 @@ Output:
 
 #### Resolving references to schemas defined in external files  
 
-In this example, the main schema is
+In this example, the main schema is defined by
 
 ```cpp
     std::string main_schema = R"(
