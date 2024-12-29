@@ -314,9 +314,9 @@ private:
     line_split_kind array_object_line_splits_;
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
-    int8_t precision_;
-    uint8_t indent_size_;
-    std::size_t line_length_limit_;
+    int8_t precision_{0};
+    uint8_t indent_size_{indent_size_default};
+    std::size_t line_length_limit_{line_length_limit_default};
     string_type new_line_chars_;
 public:
     basic_json_encode_options()
@@ -333,10 +333,7 @@ public:
           array_array_line_splits_(line_split_kind{}),
           array_object_line_splits_(line_split_kind{}),
           spaces_around_colon_(spaces_option::space_after),
-          spaces_around_comma_(spaces_option::space_after),
-          precision_(0),
-          indent_size_(indent_size_default),
-          line_length_limit_(line_length_limit_default)
+          spaces_around_comma_(spaces_option::space_after)
     {
         new_line_chars_.push_back('\n');
     }
@@ -365,6 +362,8 @@ public:
           new_line_chars_(std::move(other.new_line_chars_))
     {
     }
+    
+    ~basic_json_encode_options() = default;
 protected:
     basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
     basic_json_encode_options& operator=(basic_json_encode_options&&) = default;

@@ -32,10 +32,9 @@ namespace jsonschema {
     // Interface for validation error handlers
     class error_reporter
     {
-        std::size_t error_count_;
+        std::size_t error_count_{0};
     public:
         error_reporter()
-            : error_count_(0)
         {
         }
 
@@ -70,11 +69,10 @@ namespace jsonschema {
 
     class range
     {
-        std::size_t start_;
-        std::size_t end_;
+        std::size_t start_{0};
+        std::size_t end_{0};
     public:
         range()
-            : start_(0), end_(0)
         {
         }
     

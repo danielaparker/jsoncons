@@ -43,12 +43,12 @@ private:
     struct stack_item
     {
         jsoncons::bson::bson_container_type type_;
-        std::size_t offset_;
-        std::size_t name_offset_;
-        std::size_t index_;
+        std::size_t offset_{0};
+        std::size_t name_offset_{0};
+        std::size_t index_{0};
 
         stack_item(jsoncons::bson::bson_container_type type, std::size_t offset) noexcept
-           : type_(type), offset_(offset), name_offset_(0), index_(0)
+           : type_(type), offset_(offset)
         {
         }
 

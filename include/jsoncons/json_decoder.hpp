@@ -43,13 +43,13 @@ private:
     struct structure_info
     {
         structure_type type_;
-        std::size_t container_index_;
+        std::size_t container_index_{0};
 
         structure_info(structure_type type, std::size_t offset) noexcept
             : type_(type), container_index_(offset)
         {
         }
-
+        ~structure_info() = default;
     };
 
     using temp_allocator_type = TempAllocator;

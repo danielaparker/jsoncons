@@ -220,12 +220,12 @@ namespace detail {
         class encoding_context
         {
             container_type type_;
-            std::size_t count_;
+            std::size_t count_{0};
             line_split_kind line_splits_;
             bool indent_before_;
             bool new_line_after_;
-            std::size_t begin_pos_;
-            std::size_t data_pos_;
+            std::size_t begin_pos_{0};
+            std::size_t data_pos_{0};
         public:
             encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
                              std::size_t begin_pos, std::size_t data_pos) noexcept
@@ -235,6 +235,9 @@ namespace detail {
             }
 
             encoding_context(const encoding_context&) = default;
+            
+            ~encoding_context() = default;
+            
             encoding_context& operator=(const encoding_context&) = default;
 
             void set_position(std::size_t pos)

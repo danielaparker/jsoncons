@@ -469,8 +469,8 @@ private:
     bool lossless_number_:1;
     char_type comment_starter_;
     csv_mapping_kind mapping_;
-    std::size_t header_lines_;
-    std::size_t max_lines_;
+    std::size_t header_lines_{0};
+    std::size_t max_lines_{(std::numeric_limits<std::size_t>::max)()};
     string_type column_types_;
     string_type column_defaults_;
 public:
@@ -486,9 +486,7 @@ public:
           infer_types_(true),
           lossless_number_(false),
           comment_starter_('\0'),
-          mapping_(),
-          header_lines_(0),
-          max_lines_((std::numeric_limits<std::size_t>::max)())
+          mapping_()
     {}
 
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;

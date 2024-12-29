@@ -531,12 +531,14 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::size_t max_length_;
+        std::size_t max_length_{0};
     public:
         max_length_validator(const Json& schema, const uri& schema_location, std::size_t max_length)
             : keyword_validator_base<Json>("maxLength", schema, schema_location), max_length_(max_length)
         {
         }
+        
+        ~max_length_validator() = default;
 
     private:
 

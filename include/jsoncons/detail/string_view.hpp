@@ -28,7 +28,7 @@ namespace detail {
     {
     private:
         const CharT* data_;
-        std::size_t length_;
+        std::size_t length_{0};
     public:
         using value_type = CharT;
         using const_reference = const CharT&;
@@ -40,7 +40,7 @@ namespace detail {
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         constexpr basic_string_view() noexcept
-            : data_(nullptr), length_(0)
+            : data_(nullptr)
         {
         }
         constexpr basic_string_view(const CharT* data, std::size_t length)
@@ -59,6 +59,8 @@ namespace detail {
             : data_(s.data()), length_(s.length())
         {
         }
+        
+        ~basic_string_view() = default;
 
         JSONCONS_CPP14_CONSTEXPR basic_string_view& operator=( const basic_string_view& view ) noexcept
         {

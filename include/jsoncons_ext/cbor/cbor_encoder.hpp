@@ -52,13 +52,15 @@ private:
     struct stack_item
     {
         cbor_container_type type_;
-        std::size_t length_;
-        std::size_t index_;
+        std::size_t length_{0};
+        std::size_t index_{0};
 
         stack_item(cbor_container_type type, std::size_t length = 0) noexcept
-           : type_(type), length_(length), index_(0)
+           : type_(type), length_(length)
         {
         }
+        
+        ~stack_item() = default; 
 
         std::size_t length() const
         {

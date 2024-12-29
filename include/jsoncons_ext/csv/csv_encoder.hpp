@@ -70,12 +70,14 @@ private:
     struct stack_item
     {
         stack_item_kind item_kind_;
-        std::size_t count_;
+        std::size_t count_{0};
 
         stack_item(stack_item_kind item_kind) noexcept
-           : item_kind_(item_kind), count_(0)
+           : item_kind_(item_kind)
         {
         }
+        
+        ~stack_item() = default;
 
         bool is_object() const
         {
@@ -98,7 +100,7 @@ private:
 
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
-    std::size_t column_index_;
+    std::size_t column_index_{0};
     std::vector<std::size_t> row_counts_;
 
     // Noncopyable and nonmoveable
@@ -118,8 +120,7 @@ public:
         options_(options),
         alloc_(alloc),
         stack_(),
-        fp_(options.float_format(), options.precision()),
-        column_index_(0)
+        fp_(options.float_format(), options.precision())
     {
         jsoncons::csv::detail::parse_column_names(options.column_names(), strings_buffer_);
     }

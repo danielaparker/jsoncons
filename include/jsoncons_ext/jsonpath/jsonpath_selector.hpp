@@ -439,6 +439,8 @@ namespace detail {
             : base_selector<Json,JsonReference>(), id_(id)
         {
         }
+        
+        ~root_selector() = default;
 
         void select(eval_context<Json,JsonReference>& context,
                     reference root,

@@ -16,16 +16,16 @@ namespace jsoncons {
 
     class conv_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_;
-        std::size_t column_number_;
+        std::size_t line_number_{0};
+        std::size_t column_number_{0};
         mutable std::string what_;
     public:
         conv_error(std::error_code ec)
-            : std::system_error(ec), line_number_(0), column_number_(0)
+            : std::system_error(ec)
         {
         }
         conv_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+            : std::system_error(ec, what_arg)
         {
         }
         conv_error(std::error_code ec, std::size_t position)

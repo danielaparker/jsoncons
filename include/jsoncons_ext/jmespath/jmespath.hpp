@@ -238,7 +238,7 @@ namespace jmespath {
     public:
         using reference = const Json&;
     private:
-        std::size_t precedence_level_;
+        std::size_t precedence_level_{0};
         bool is_right_associative_;
         bool is_projection_;
     public:
@@ -248,6 +248,8 @@ namespace jmespath {
               is_projection_(is_projection)
         {
         }
+        
+        ~expr_base_impl() = default;
 
         std::size_t precedence_level() const
         {
@@ -3654,8 +3656,8 @@ namespace detail {
             }
         };
     private:
-        std::size_t line_;
-        std::size_t column_;
+        std::size_t line_{1};
+        std::size_t column_{1};
         const char_type* begin_input_;
         const char_type* end_input_;
         const char_type* p_;
@@ -3668,12 +3670,13 @@ namespace detail {
 
     public:
         jmespath_evaluator(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
-            : line_(1), column_(1),
-              begin_input_(nullptr), end_input_(nullptr),
+            : begin_input_(nullptr), end_input_(nullptr),
               p_(nullptr),
               resources_{funcs}
         {
         }
+        
+        ~jmespath_evaluator() = default;
 
         std::size_t line() const
         {

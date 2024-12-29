@@ -29,16 +29,18 @@ enum class parse_mode {root,accept,array,map_key,map_value};
 struct parse_state 
 {
     parse_mode mode; 
-    std::size_t length;
-    std::size_t index;
+    std::size_t length{0};
+    std::size_t index{0};
 
     parse_state(parse_mode mode, std::size_t length) noexcept
-        : mode(mode), length(length), index(0)
+        : mode(mode), length(length)
     {
     }
 
     parse_state(const parse_state&) = default;
     parse_state(parse_state&&) = default;
+    
+    ~parse_state() = default;
 };
 
 template <typename Source,typename Allocator=std::allocator<char>>

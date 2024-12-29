@@ -44,12 +44,13 @@ public:
 class ubjson_decode_options : public virtual ubjson_options_common
 {
     friend class ubjson_options;
-    std::size_t max_items_;
+    std::size_t max_items_{1 << 24};
 public:
-    ubjson_decode_options() :
-         max_items_(1 << 24)
+    ubjson_decode_options()
     {
     }
+    
+    ~ubjson_decode_options() = default;
 
     std::size_t max_items() const
     {

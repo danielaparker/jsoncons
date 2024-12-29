@@ -34,22 +34,22 @@ namespace jsonpath {
     private:
         bool has_name_;
         string_type name_;
-        std::size_t index_;
+        std::size_t index_{0};
 
     public:
         basic_path_element(const char_type* name, std::size_t length, 
             const Allocator& alloc = Allocator())
-            : has_name_(true), name_(name, length, alloc), index_(0)
+            : has_name_(true), name_(name, length, alloc)
         {
         }
 
         explicit basic_path_element(const string_type& name)
-            : has_name_(true), name_(name), index_(0)
+            : has_name_(true), name_(name)
         {
         }
 
         explicit basic_path_element(string_type&& name)
-            : has_name_(true), name_(std::move(name)), index_(0)
+            : has_name_(true), name_(std::move(name))
         {
         }
 

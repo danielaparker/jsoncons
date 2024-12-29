@@ -59,9 +59,9 @@ namespace utility {
         using pointer = typename allocator_traits_type::pointer;
 
         pointer p_;
-        std::size_t length_;
-        uint8_t offset_;
-        uint8_t align_pad_;
+        std::size_t length_{0};
+        uint8_t offset_{0};
+        uint8_t align_pad_{0};
 
         ~heap_string() noexcept = default;
 
@@ -71,7 +71,7 @@ namespace utility {
         Extra extra() const { return this->extra_; }
 
         heap_string(Extra extra, const Allocator& alloc)
-            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr), length_(0), offset_(0), align_pad_(0)
+            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr)
         {
         }
 

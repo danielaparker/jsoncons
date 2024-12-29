@@ -29,13 +29,13 @@ enum class parse_mode {root,accept,document,array,value};
 struct parse_state 
 {
     parse_mode mode; 
-    std::size_t length;
-    std::size_t pos;
+    std::size_t length{0};
+    std::size_t pos{0};
     uint8_t type;
-    std::size_t index;
+    std::size_t index{0};
 
     parse_state(parse_mode mode_, std::size_t length_, std::size_t pos_, uint8_t type_ = 0) noexcept
-        : mode(mode_), length(length_), pos(pos_), type(type_), index(0)
+        : mode(mode_), length(length_), pos(pos_), type(type_)
     {
     }
 

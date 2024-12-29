@@ -53,19 +53,21 @@ private:
     staj_cursor_state state_;
     typed_array_view data_;
     jsoncons::span<const size_t> shape_;
-    std::size_t index_;
+    std::size_t index_{0};
 public:
     basic_staj_visitor()
         : pred_(accept), event_(staj_event_type::null_value),
-          state_(), data_(), shape_(), index_(0)
+          state_(), data_(), shape_()
     {
     }
 
     basic_staj_visitor(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
         : pred_(pred), event_(staj_event_type::null_value),
-          state_(), data_(), shape_(), index_(0)
+          state_(), data_(), shape_()
     {
     }
+    
+    ~basic_staj_visitor() = default;
 
     void reset()
     {

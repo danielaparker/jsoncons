@@ -30,16 +30,18 @@ struct parse_state
 {
     parse_mode mode; 
     std::size_t length;
-    std::size_t index;
     bool pop_stringref_map_stack;
+    std::size_t index{0};
 
     parse_state(parse_mode mode, std::size_t length, bool pop_stringref_map_stack = false) noexcept
-        : mode(mode), length(length), index(0), pop_stringref_map_stack(pop_stringref_map_stack)
+        : mode(mode), length(length), pop_stringref_map_stack(pop_stringref_map_stack)
     {
     }
 
     parse_state(const parse_state&) = default;
     parse_state(parse_state&&) = default;
+    
+    ~parse_state() = default;
 };
 
 template <typename Source,typename Allocator=std::allocator<char>>

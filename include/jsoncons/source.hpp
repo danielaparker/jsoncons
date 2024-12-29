@@ -82,30 +82,30 @@ namespace jsoncons {
         basic_null_istream<char_type> null_is_;
         std::basic_istream<char_type>* stream_ptr_;
         std::basic_streambuf<char_type>* sbuf_;
-        std::size_t position_;
+        std::size_t position_{0};
         std::vector<value_type> buffer_;
         const value_type* buffer_data_;
-        std::size_t buffer_length_;
+        std::size_t buffer_length_{0};
 
         // Noncopyable 
         stream_source(const stream_source&) = delete;
         stream_source& operator=(const stream_source&) = delete;
     public:
         stream_source()
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(1), buffer_data_(buffer_.data()), buffer_length_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
+              buffer_(1), buffer_data_(buffer_.data())
         {
         }
 
         stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_size)
-            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
-              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
+              buffer_(buf_size), buffer_data_(buffer_.data())
         {
         }
 
         stream_source(stream_source&& other) noexcept
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
+              buffer_(), buffer_data_(buffer_.data())
         {
             if (other.stream_ptr_ != &other.null_is_)
             {
@@ -119,9 +119,7 @@ namespace jsoncons {
             }
         }
 
-        ~stream_source()
-        {
-        }
+        ~stream_source() = default;
 
         stream_source& operator=(stream_source&& other) noexcept
         {
@@ -411,9 +409,9 @@ namespace jsoncons {
 
         IteratorT current_;
         IteratorT end_;
-        std::size_t position_;
+        std::size_t position_{0};
         std::vector<value_type> buffer_;
-        std::size_t buffer_length_;
+        std::size_t buffer_length_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
@@ -424,11 +422,13 @@ namespace jsoncons {
     public:
 
         iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
-            : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
+            : current_(first), end_(last), buffer_(buf_size)
         {
         }
 
         iterator_source(iterator_source&& other) = default;
+        
+        ~iterator_source() = default;
 
         iterator_source& operator=(iterator_source&& other) = default;
 

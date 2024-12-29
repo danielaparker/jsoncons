@@ -178,20 +178,20 @@ namespace jsoncons { namespace jsonpath {
 
     class jsonpath_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_;
-        std::size_t column_number_;
+        std::size_t line_number_{0};
+        std::size_t column_number_{0};
         mutable std::string what_;
     public:
         jsonpath_error(std::error_code ec)
-            : std::system_error(ec), line_number_(0), column_number_(0)
+            : std::system_error(ec)
         {
         }
         jsonpath_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+            : std::system_error(ec, what_arg)
         {
         }
         jsonpath_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec), line_number_(0), column_number_(position)
+            : std::system_error(ec), column_number_(position)
         {
         }
         jsonpath_error(std::error_code ec, std::size_t line, std::size_t column)
@@ -201,6 +201,8 @@ namespace jsoncons { namespace jsonpath {
         jsonpath_error(const jsonpath_error& other) = default;
 
         jsonpath_error(jsonpath_error&& other) = default;
+        
+        ~jsonpath_error() = default;
 
         const char* what() const noexcept override
         {

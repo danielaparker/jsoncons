@@ -26,12 +26,12 @@ enum class parse_mode {root,accept,array,indefinite_array,strongly_typed_array,m
 struct parse_state 
 {
     parse_mode mode; 
-    std::size_t length;
+    std::size_t length{0};
     uint8_t type;
-    std::size_t index;
+    std::size_t index{0};
 
     parse_state(parse_mode mode, std::size_t length, uint8_t type = 0) noexcept
-        : mode(mode), length(length), type(type), index(0)
+        : mode(mode), length(length), type(type)
     {
     }
 
