@@ -355,7 +355,8 @@ Output:
 
 In this example, the main schema is
 
-```json
+```cpp
+    std::string main_schema = R"(
 {
     "$id" : "https://www.example.com/main",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -365,6 +366,7 @@ In this example, the main schema is
         "name": {"$ref": "/name-defs.json#/$defs/orNull"}
     }
 }
+    )";
 ```
 
 The main schema defines a reference using the `$ref` keyword to a
