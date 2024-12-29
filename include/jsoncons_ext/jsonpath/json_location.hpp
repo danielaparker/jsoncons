@@ -536,7 +536,9 @@ namespace jsonpath {
                         break;
                     case '\r':
                         if ((p_+1 < end_input_) && (*(p_+1) == '\n'))
+                        {
                             ++p_;
+                        }
                         ++line_;
                         column_ = 1;
                         ++p_;

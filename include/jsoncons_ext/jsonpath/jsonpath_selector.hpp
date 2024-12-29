@@ -30,7 +30,7 @@ namespace detail {
         int64_t step_;
 
         slice()
-            : start_(), stop_(), step_(1)
+            : step_(1)
         {
         }
 
@@ -39,35 +39,15 @@ namespace detail {
         {
         }
 
-        slice(const slice& other)
-            : start_(other.start_), stop_(other.stop_), step_(other.step_)
-        {
-        }
+        slice(const slice& other) = default;
 
-        slice& operator=(const slice& rhs) 
-        {
-            if (this != &rhs)
-            {
-                if (rhs.start_)
-                {
-                    start_ = rhs.start_;
-                }
-                else
-                {
-                    start_.reset();
-                }
-                if (rhs.stop_)
-                {
-                    stop_ = rhs.stop_;
-                }
-                else
-                {
-                    stop_.reset();
-                }
-                step_ = rhs.step_;
-            }
-            return *this;
-        }
+        slice(slice&& other) = default;
+
+        slice& operator=(const slice& other) = default;
+
+        slice& operator=(slice&& other) = default;
+        
+        ~slice() = default;
 
         int64_t get_start(std::size_t size) const
         {
@@ -96,10 +76,7 @@ namespace detail {
                 auto len = *stop_ >= 0 ? *stop_ : (static_cast<int64_t>(size) + *stop_);
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
-            else
-            {
-                return step_ >= 0 ? static_cast<int64_t>(size) : -1;
-            }
+            return step_ >= 0 ? static_cast<int64_t>(size) : -1;
         }
 
         int64_t step() const
@@ -148,10 +125,7 @@ namespace detail {
             {
                 return *context.create_path_node(&last, index);
             }
-            else
-            {
-                return last;
-            }
+            return last;
         }
 
         static const path_node_type& generate(eval_context<Json,JsonReference>& context,
@@ -164,10 +138,7 @@ namespace detail {
             {
                 return *context.create_path_node(&last, identifier);
             }
-            else
-            {
-                return last;
-            }
+            return last;
         }
     };
 
@@ -238,10 +209,7 @@ namespace detail {
             {
                 return current;
             }
-            else
-            {
-                return tail_->evaluate(context, root, last, current, options, ec);
-            }
+            return tail_->evaluate(context, root, last, current, options, ec);
         }
 
         std::string to_string(int level = 0) const override

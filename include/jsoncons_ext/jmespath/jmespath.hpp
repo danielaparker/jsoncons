@@ -659,7 +659,7 @@ namespace jmespath {
         int64_t step_;
 
         slice()
-            : start_(), stop_(), step_(1)
+            : step_(1)
         {
         }
 
@@ -668,35 +668,15 @@ namespace jmespath {
         {
         }
 
-        slice(const slice& other)
-            : start_(other.start_), stop_(other.stop_), step_(other.step_)
-        {
-        }
+        slice(const slice& other) = default;
 
-        slice& operator=(const slice& rhs) 
-        {
-            if (this != &rhs)
-            {
-                if (rhs.start_)
-                {
-                    start_ = rhs.start_;
-                }
-                else
-                {
-                    start_.reset();
-                }
-                if (rhs.stop_)
-                {
-                    stop_ = rhs.stop_;
-                }
-                else
-                {
-                    stop_.reset();
-                }
-                step_ = rhs.step_;
-            }
-            return *this;
-        }
+        slice(slice&& other) = default;
+
+        slice& operator=(const slice& other) = default;
+
+        slice& operator=(slice&& other) = default;
+
+        ~slice() = default;
 
         int64_t get_start(std::size_t size) const
         {
