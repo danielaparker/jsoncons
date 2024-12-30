@@ -176,6 +176,14 @@ public:
     {
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
+    
+    basic_json_cursor(const basic_json_cursor&) = delete;
+    basic_json_cursor(basic_json_cursor&&) = default;
+    
+    ~basic_json_cursor() = default;
+
+    basic_json_cursor& operator=(const basic_json_cursor&) = delete;
+    basic_json_cursor& operator=(basic_json_cursor&&) = default;
 
     void reset()
     {

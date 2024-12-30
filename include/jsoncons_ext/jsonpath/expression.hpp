@@ -16,6 +16,7 @@
 #include <vector> // std::vector
 
 #include <jsoncons/json_type.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
 
@@ -217,6 +218,8 @@ namespace jsonpath {
         {
         }
 
+        value_or_pointer(const value_or_pointer& other) = delete;
+
         value_or_pointer(value_or_pointer&& other) noexcept
             : is_value_(other.is_value_)
         {
@@ -237,6 +240,8 @@ namespace jsonpath {
                 val_.~value_type();
             }
         }
+
+        value_or_pointer& operator=(const value_or_pointer& other) noexcept = delete;
 
         value_or_pointer& operator=(value_or_pointer&& other) noexcept
         {
@@ -292,7 +297,13 @@ namespace jsonpath {
             }
         }
 
+        parameter(const parameter& other) noexcept = default;
+
         parameter(parameter&& other) noexcept = default;
+        
+        ~parameter() = default; 
+
+        parameter& operator=(const parameter& other) noexcept = default;
 
         parameter& operator=(parameter&& other) noexcept = default;
 
@@ -329,7 +340,7 @@ namespace jsonpath {
                         optional<std::size_t>&& arity,
                         function_type&& f)
             : function_name_(std::move(function_name)),
-              arity_(std::move(arity)),
+              arity_(arity),
               f_(std::move(f))
         {
         }
@@ -400,8 +411,14 @@ namespace detail {
               is_right_associative_(is_right_associative)
         {
         }
+        
+        unary_operator(const unary_operator& other) = default;
+        unary_operator(unary_operator&& other) = default;
 
         virtual ~unary_operator() = default;
+
+        unary_operator& operator=(const unary_operator& other) = default;
+        unary_operator& operator=(unary_operator&& other) = default;
 
         std::size_t precedence_level() const 
         {
@@ -488,9 +505,6 @@ namespace detail {
               pattern_(std::move(pattern))
         {
         }
-
-        regex_operator(regex_operator&&) = default;
-        regex_operator& operator=(regex_operator&&) = default;
 
         Json evaluate(const_reference val, std::error_code&) const override
         {

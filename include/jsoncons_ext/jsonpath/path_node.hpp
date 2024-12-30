@@ -236,7 +236,6 @@ namespace jsonpath {
             nodes[--len] = p;
             p = p->parent();
         }
-        while (p != nullptr);
 
         Json* current = std::addressof(root);
         for (auto node : nodes)
@@ -281,7 +280,6 @@ namespace jsonpath {
             nodes[--len] = p;
             p = p->parent();
         }
-        while (p != nullptr);
 
         for (auto node : nodes)
         {

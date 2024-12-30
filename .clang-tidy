@@ -5,6 +5,7 @@
 # See https://github.com/danielaparker/jsoncons for latest version
 
 Checks: '*,
+         - readability-avoid-nested-conditional-operator,
          -google-readability-casting,
          -bugprone-branch-clone,
          -hicpp-named-parameter,

@@ -63,6 +63,8 @@ namespace jsonpath {
         jsonpath_expression(const jsonpath_expression&) = delete;
         jsonpath_expression(jsonpath_expression&&) = default;
 
+        ~jsonpath_expression() = default;
+
         jsonpath_expression& operator=(const jsonpath_expression&) = delete;
         jsonpath_expression& operator=(jsonpath_expression&&) = default;
 
@@ -92,11 +94,8 @@ namespace jsonpath {
                 const_expr_.evaluate(context, root, path_node_type{}, root, callback, options);
                 return result;
             }
-            else
-            {
-                jsoncons::jsonpath::detail::eval_context<value_type, const_reference> context{ alloc_ };
-                return const_expr_.evaluate(context, root, path_node_type{}, root, options);
-            }
+            jsoncons::jsonpath::detail::eval_context<value_type, const_reference> context{ alloc_ };
+            return const_expr_.evaluate(context, root, path_node_type{}, root, options);
         }
 
         value_type select(const_reference root, result_options options = result_options()) const
@@ -113,11 +112,8 @@ namespace jsonpath {
                 const_expr_.evaluate(context, root, path_node_type{}, root, callback, options);
                 return result;
             }
-            else
-            {
-                jsoncons::jsonpath::detail::eval_context<value_type, const_reference> context{ alloc_ };
-                return const_expr_.evaluate(context, root, path_node_type{}, root, options);
-            }
+            jsoncons::jsonpath::detail::eval_context<value_type, const_reference> context{ alloc_ };
+            return const_expr_.evaluate(context, root, path_node_type{}, root, options);
         }
 
         template <typename BinaryCallback>

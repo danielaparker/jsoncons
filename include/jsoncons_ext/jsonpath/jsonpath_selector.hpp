@@ -1144,7 +1144,7 @@ namespace detail {
                     }
                     for (int64_t i = start; i < end; i += step)
                     {
-                        std::size_t j = static_cast<std::size_t>(i);
+                        auto j = static_cast<std::size_t>(i);
                         this->tail_select(context, root, 
                                             path_generator_type::generate(context, last, j, options), 
                                             current[j], receiver, options);
@@ -1162,7 +1162,7 @@ namespace detail {
                     }
                     for (int64_t i = start; i > end; i += step)
                     {
-                        std::size_t j = static_cast<std::size_t>(i);
+                        auto j = static_cast<std::size_t>(i);
                         if (j < current.size())
                         {
                             this->tail_select(context, root, 
