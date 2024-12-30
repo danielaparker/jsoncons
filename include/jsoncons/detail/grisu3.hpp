@@ -42,8 +42,6 @@ minor modifications.
 #include <cstring> // std::memmove
 #include <stdlib.h>
 
-#include <jsoncons/detail/write_number.hpp>
-
 namespace jsoncons { namespace detail {
 
 // diy_fp

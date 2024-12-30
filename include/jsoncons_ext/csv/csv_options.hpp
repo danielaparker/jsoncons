@@ -257,7 +257,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
     }
 }
 
-} // detail
+} // namespace detail
 
 template <typename CharT>
 class basic_csv_options;

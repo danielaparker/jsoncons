@@ -198,7 +198,7 @@ namespace msgpack {
         return val;
     }
 
-} // msgpack
+} // namespace msgpack
 } // namespace jsoncons
 
 #endif // JSONCONS_EXT_MSGPACK_DECODE_MSGPACK_HPP

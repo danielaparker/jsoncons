@@ -164,7 +164,7 @@ namespace jsoncons { namespace jsonpath {
         return std::error_code(static_cast<int>(result),jsonpath_error_category());
     }
 
-} // jsonpath
+} // namespace jsonpath
 } // namespace jsoncons
 
 namespace std {

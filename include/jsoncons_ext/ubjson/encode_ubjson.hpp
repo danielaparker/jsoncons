@@ -137,7 +137,7 @@ namespace ubjson {
         }
     }
 
-} // ubjson
+} // namespace ubjson
 } // namespace jsoncons
 
 #endif // JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP

@@ -481,14 +481,11 @@ namespace detail {
             {
                 return Json(-val.template as<int64_t>(), semantic_tag::none);
             }
-            else if (val.is_double())
+            if (val.is_double())
             {
                 return Json(-val.as_double(), semantic_tag::none);
             }
-            else
-            {
-                return Json::null();
-            }
+            return Json::null();
         }
     };
 
@@ -546,9 +543,6 @@ namespace detail {
         {
             return "binary operator";
         }
-
-    protected:
-        ~binary_operator() = default;
     };
 
     // Implementations
@@ -609,10 +603,7 @@ namespace detail {
             {
                 return rhs;
             }
-            else
-            {
-                return lhs;
-            }
+            return lhs;
         }
 
         std::string to_string(int level) const override
@@ -703,7 +694,7 @@ namespace detail {
             {
                 return lhs < rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
-            else if (lhs.is_string() && rhs.is_string())
+            if (lhs.is_string() && rhs.is_string())
             {
                 return lhs < rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
@@ -740,7 +731,7 @@ namespace detail {
             {
                 return lhs <= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
-            else if (lhs.is_string() && rhs.is_string())
+            if (lhs.is_string() && rhs.is_string())
             {
                 return lhs <= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
@@ -779,7 +770,7 @@ namespace detail {
             {
                 return lhs > rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
-            else if (lhs.is_string() && rhs.is_string())
+            if (lhs.is_string() && rhs.is_string())
             {
                 return lhs > rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
@@ -816,7 +807,7 @@ namespace detail {
             {
                 return lhs >= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
-            else if (lhs.is_string() && rhs.is_string())
+            if (lhs.is_string() && rhs.is_string())
             {
                 return lhs >= rhs ? Json(true, semantic_tag::none) : Json(false, semantic_tag::none);
             }
@@ -853,18 +844,15 @@ namespace detail {
             {
                 return Json::null();
             }
-            else if (lhs.is_int64() && rhs.is_int64())
+            if (lhs.is_int64() && rhs.is_int64())
             {
                 return Json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())), semantic_tag::none);
             }
-            else if (lhs.is_uint64() && rhs.is_uint64())
+            if (lhs.is_uint64() && rhs.is_uint64())
             {
                 return Json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()), semantic_tag::none);
             }
-            else
-            {
-                return Json((lhs.as_double() + rhs.as_double()), semantic_tag::none);
-            }
+            return Json((lhs.as_double() + rhs.as_double()), semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -897,18 +885,15 @@ namespace detail {
             {
                 return Json::null();
             }
-            else if (lhs.is_int64() && rhs.is_int64())
+            if (lhs.is_int64() && rhs.is_int64())
             {
                 return Json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())), semantic_tag::none);
             }
-            else if (lhs.is_uint64() && rhs.is_uint64())
+            if (lhs.is_uint64() && rhs.is_uint64())
             {
                 return Json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()), semantic_tag::none);
             }
-            else
-            {
-                return Json((lhs.as_double() - rhs.as_double()), semantic_tag::none);
-            }
+            return Json((lhs.as_double() - rhs.as_double()), semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -941,18 +926,15 @@ namespace detail {
             {
                 return Json::null();
             }
-            else if (lhs.is_int64() && rhs.is_int64())
+            if (lhs.is_int64() && rhs.is_int64())
             {
                 return Json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())), semantic_tag::none);
             }
-            else if (lhs.is_uint64() && rhs.is_uint64())
+            if (lhs.is_uint64() && rhs.is_uint64())
             {
                 return Json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()), semantic_tag::none);
             }
-            else
-            {
-                return Json((lhs.as_double() * rhs.as_double()), semantic_tag::none);
-            }
+            return Json((lhs.as_double() * rhs.as_double()), semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -987,18 +969,15 @@ namespace detail {
             {
                 return Json::null();
             }
-            else if (lhs.is_int64() && rhs.is_int64())
+            if (lhs.is_int64() && rhs.is_int64())
             {
                 return Json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())), semantic_tag::none);
             }
-            else if (lhs.is_uint64() && rhs.is_uint64())
+            if (lhs.is_uint64() && rhs.is_uint64())
             {
                 return Json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()), semantic_tag::none);
             }
-            else
-            {
-                return Json((lhs.as_double() / rhs.as_double()), semantic_tag::none);
-            }
+            return Json((lhs.as_double() / rhs.as_double()), semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -1033,18 +1012,15 @@ namespace detail {
             {
                 return Json::null();
             }
-            else if (lhs.is_int64() && rhs.is_int64())
+            if (lhs.is_int64() && rhs.is_int64())
             {
                 return Json(((lhs.template as<int64_t>() % rhs.template as<int64_t>())), semantic_tag::none);
             }
-            else if (lhs.is_uint64() && rhs.is_uint64())
+            if (lhs.is_uint64() && rhs.is_uint64())
             {
                 return Json((lhs.template as<uint64_t>() % rhs.template as<uint64_t>()), semantic_tag::none);
             }
-            else
-            {
-                return Json(fmod(lhs.as_double(), rhs.as_double()), semantic_tag::none);
-            }
+            return Json(fmod(lhs.as_double(), rhs.as_double()), semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -1074,7 +1050,13 @@ namespace detail {
         {
         }
 
+        function_base(const function_base&) = default;
+        function_base(function_base&&) = default;
+        
         virtual ~function_base() noexcept = default;
+
+        function_base& operator=(const function_base&) = default;
+        function_base& operator=(function_base&&) = default;
 
         jsoncons::optional<std::size_t> arity() const
         {
@@ -1232,10 +1214,7 @@ namespace detail {
             {
                 return value_type(true, semantic_tag::none);
             }
-            else
-            {
-                return value_type(false, semantic_tag::none);
-            }
+            return value_type(false, semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -1294,10 +1273,7 @@ namespace detail {
             {
                 return value_type(true, semantic_tag::none);
             }
-            else
-            {
-                return value_type(false, semantic_tag::none);
-            }
+            return value_type(false, semantic_tag::none);
         }
 
         std::string to_string(int level) const override
@@ -1590,7 +1566,7 @@ namespace detail {
                     {
                         return value_type(sn, semantic_tag::none);
                     }
-                    jsoncons::detail::chars_to to_double;
+                    jsoncons::detail::chars_to to_double{};
                     try
                     {
                         auto s = arg0.as_string();
@@ -2405,7 +2381,7 @@ namespace detail {
         {
         }
 
-        virtual std::string to_string(int = 0) const
+        virtual std::string to_string(int) const
         {
             return std::string();
         }
@@ -2528,15 +2504,9 @@ namespace detail {
                     ec = jsonpath_errc::unknown_function;
                     return nullptr;
                 }
-                else
-                {
-                    return it2->second.get();
-                }
+                return it2->second.get();
             }
-            else
-            {
-                return it->second.get();
-            }
+            return it->second.get();
         }
 
         const unary_operator<Json>* get_unary_not() const

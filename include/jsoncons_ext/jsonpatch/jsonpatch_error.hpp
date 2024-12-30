@@ -71,7 +71,7 @@ namespace jsoncons { namespace jsonpatch {
         return std::error_code(static_cast<int>(result),jsonpatch_error_category());
     }
 
-} // jsonpatch
+} // namespace jsonpatch
 } // namespace jsoncons
 
 namespace std {
@@ -117,7 +117,7 @@ namespace jsoncons { namespace jsonpatch {
         }
     };
     
-} // jsonpatch
+} // namespace jsonpatch
 } // namespace jsoncons
 
 #endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_ERROR_HPP

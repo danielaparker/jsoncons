@@ -197,7 +197,7 @@ namespace bson {
         return val;
     }
   
-} // bson
+} // namespace bson
 } // namespace jsoncons
 
 #endif // JSONCONS_EXT_BSON_DECODE_BSON_HPP
