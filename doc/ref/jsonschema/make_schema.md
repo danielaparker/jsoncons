@@ -12,13 +12,13 @@ template <typename Json>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
     const std::string& retrieval_uri);                               (2) (since 0.173.0)
 
-template <typename Json,class ResolveURI>
+template <typename Json,class URIResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
-    const std::string& retrieval_uri, const ResolveURI& resolve);    (3) (since 0.173.0)
+    const std::string& retrieval_uri, const URIResolver& resolver);    (3) (since 0.173.0)
 
-template <typename Json,class ResolveURI>
+template <typename Json,class URIResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, 
-    const ResolveURI& resolve);                                      (4)
+    const URIResolver& resolver);                                      (4)
 ```
 
 Returns a `shared_ptr` to a `json_schema<Json>`.
@@ -31,7 +31,7 @@ Returns a `shared_ptr` to a `json_schema<Json>`.
     <td>JSON Schema</td> 
   </tr>
   <tr>
-    <td>resolve</td>
+    <td>resolver</td>
     <td>A function object with the signature of <code>resolver</code> being equivalent to 
     <pre>
     Json fun(const <a href="../corelib/utility/uri.md">jsoncons::uri</a>& uri);</pre></td>   

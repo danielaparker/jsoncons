@@ -1529,7 +1529,7 @@ private:
         else
         {
             bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
-            for (auto p = data.begin(); more && p != data.end(); ++p)
+            for (const auto* p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
             }
@@ -1556,19 +1556,17 @@ private:
             write_byte_string_value(byte_string_view(v));
             return true;
         }
-        else
+        
+        bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
+        for (auto p = data.begin(); more && p != data.end(); ++p)
         {
-            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
-            for (auto p = data.begin(); more && p != data.end(); ++p)
-            {
-                more = this->double_value(*p,semantic_tag::none,context, ec);
-            }
-            if (more)
-            {
-                more = this->end_array(context, ec);
-            }
-            return more;
+            more = this->double_value(*p,semantic_tag::none,context, ec);
         }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
     }
 /*
     bool visit_typed_array(const jsoncons::span<const float128_type>&, 

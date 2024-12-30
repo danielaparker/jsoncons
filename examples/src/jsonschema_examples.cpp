@@ -121,7 +121,7 @@ void resolve_uri_example()
 }
     )";
     
-    auto resolve = [](const jsoncons::uri& uri) -> json
+    auto resolver = [](const jsoncons::uri& uri) -> json
         {
             std::cout << "Requested URI: " << uri.string() << "\n";
             std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
@@ -151,7 +151,7 @@ void resolve_uri_example()
     try
     {
         // Throws schema_error if JSON Schema compilation fails
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolve);
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
         auto report = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {

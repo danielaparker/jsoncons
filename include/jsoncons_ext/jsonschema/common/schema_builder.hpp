@@ -353,7 +353,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("maxLength");
             if (!sch.is_number())
             {
-                std::string message("maxLength must be a number value");
+                const std::string message("maxLength must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
@@ -366,7 +366,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("minLength");
             if (!sch.is_number())
             {
-                std::string message("minLength must be an integer value");
+                const std::string message("minLength must be an integer value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
@@ -409,7 +409,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("maximum");
             if (!sch.is_number())
             {
-                std::string message("maximum must be a number value");
+                const std::string message("maximum must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             return jsoncons::make_unique<maximum_validator<Json>>(parent, schema_location, sch);
@@ -421,7 +421,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("exclusiveMaximum");
             if (!sch.is_number())
             {
-                std::string message("exclusiveMaximum must be a number value");
+                const std::string message("exclusiveMaximum must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             return jsoncons::make_unique<exclusive_maximum_validator<Json>>(parent, schema_location, sch);
@@ -434,7 +434,7 @@ namespace jsonschema {
                 
             if (!sch.is_number())
             {
-                std::string message("minimum must be an integer");
+                const std::string message("minimum must be an integer");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             return jsoncons::make_unique<minimum_validator<Json>>(parent, schema_location, sch);
@@ -446,7 +446,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("exclusiveMinimum");
             if (!sch.is_number())
             {
-                std::string message("exclusiveMinimum must be a number value");
+                const std::string message("exclusiveMinimum must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             return jsoncons::make_unique<exclusive_minimum_validator<Json>>(parent, schema_location, sch);
@@ -458,7 +458,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("multipleOf");
             if (!sch.is_number())
             {
-                std::string message("multipleOf must be a number value");
+                const std::string message("multipleOf must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<double>();
@@ -559,7 +559,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("contentEncoding");
             if (!sch.is_string())
             {
-                std::string message("contentEncoding must be a string");
+                const std::string message("contentEncoding must be a string");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::string>();
@@ -572,7 +572,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("contentMediaType");
             if (!sch.is_string())
             {
-                std::string message("contentMediaType must be a string");
+                const std::string message("contentMediaType must be a string");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             
@@ -582,7 +582,7 @@ namespace jsonschema {
             {
                 if (!it->value().is_string())
                 {
-                    std::string message("contentEncoding must be a string");
+                    const std::string message("contentEncoding must be a string");
                     JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
                 }
 
@@ -671,7 +671,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("maxItems");
             if (!sch.is_number())
             {
-                std::string message("maxItems must be a number value");
+                const std::string message("maxItems must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
@@ -684,7 +684,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("minItems");
             if (!sch.is_number())
             {
-                std::string message("minItems must be a number value");
+                const std::string message("minItems must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
@@ -697,7 +697,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("maxProperties");
             if (!sch.is_number())
             {
-                std::string message("maxProperties must be a number value");
+                const std::string message("maxProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
@@ -710,7 +710,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("minProperties");
             if (!sch.is_number())
             {
-                std::string message("minProperties must be a number value");
+                const std::string message("minProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();

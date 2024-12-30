@@ -303,7 +303,7 @@ namespace draft4 {
             uri schema_location = context.make_schema_location("maximum");
             if (!sch.is_number())
             {
-                std::string message("maximum must be a number value");
+                const std::string message("maximum must be a number value");
                 JSONCONS_THROW(schema_error(message));
             }
             
@@ -334,7 +334,7 @@ namespace draft4 {
 
             if (!sch.is_number())
             {
-                std::string message("minimum must be an integer");
+                const std::string message("minimum must be an integer");
                 JSONCONS_THROW(schema_error(message));
             }
 

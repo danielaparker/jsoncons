@@ -25,6 +25,8 @@
     to `bignum_format_kind::raw`. Rationale: `bigint_chars_format` was misnamed, as it applied to `bigdec` as well as `bigint` numbers, and
     defaulting to `bigint_chars_format::base10` produced surprising results for users of our lossless number option. 
 
+    - The URI argument passed to the jsonschema ResolveURI function object now included the fragment part of the URI.
+
 - Fixed bugs:
 
     - Git Issue #554: [jsonpath] evaluation throws on json containing json_const_pointer
