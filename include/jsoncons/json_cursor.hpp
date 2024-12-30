@@ -43,10 +43,6 @@ private:
     basic_staj_visitor<CharT> cursor_visitor_;
     bool done_;
 
-    // Noncopyable and nonmoveable
-    basic_json_cursor(const basic_json_cursor&) = delete;
-    basic_json_cursor& operator=(const basic_json_cursor&) = delete;
-
 public:
 
     // Constructors that throw parse exceptions
@@ -181,6 +177,8 @@ public:
     basic_json_cursor(basic_json_cursor&&) = default;
     
     ~basic_json_cursor() = default;
+
+    // Noncopyable and nonmoveable
 
     basic_json_cursor& operator=(const basic_json_cursor&) = delete;
     basic_json_cursor& operator=(basic_json_cursor&&) = default;
