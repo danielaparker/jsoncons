@@ -297,15 +297,15 @@ namespace jsonpath {
             }
         }
 
-        parameter(const parameter& other) noexcept = default;
+        parameter(const parameter& other) = default;
 
-        parameter(parameter&& other) noexcept = default;
+        parameter(parameter&& other) = default;
         
         ~parameter() = default; 
 
-        parameter& operator=(const parameter& other) noexcept = default;
+        parameter& operator=(const parameter& other) = default;
 
-        parameter& operator=(parameter&& other) noexcept = default;
+        parameter& operator=(parameter&& other) = default;
 
         const Json& value() const
         {
@@ -327,6 +327,9 @@ namespace jsonpath {
         optional<std::size_t> arity_;
         function_type f_;
 
+        custom_function(const custom_function&) = default;
+        custom_function(custom_function&&) = default;
+
         custom_function(const string_type& function_name,
                         const optional<std::size_t>& arity,
                         const function_type& f)
@@ -344,12 +347,11 @@ namespace jsonpath {
               f_(std::move(f))
         {
         }
-
-        custom_function(const custom_function&) = default;
-
-        custom_function(custom_function&&) = default;
         
         ~custom_function() = default; 
+
+        custom_function& operator=(const custom_function&) = default;
+        custom_function& operator=(custom_function&&) = default;
 
         const string_type& name() const 
         {
@@ -1052,7 +1054,7 @@ namespace detail {
         function_base(const function_base&) = default;
         function_base(function_base&&) = default;
         
-        virtual ~function_base() noexcept = default;
+        virtual ~function_base() = default;
 
         function_base& operator=(const function_base&) = default;
         function_base& operator=(function_base&&) = default;
@@ -1565,7 +1567,7 @@ namespace detail {
                     {
                         return value_type(sn, semantic_tag::none);
                     }
-                    const const jsoncons::detail::chars_to to_double;
+                    const jsoncons::detail::chars_to to_double;
                     try
                     {
                         auto s = arg0.as_string();
@@ -2196,7 +2198,14 @@ namespace detail {
         using reference = JsonReference;
         using path_node_type = basic_path_node<typename Json::char_type>;
 
-        virtual ~node_receiver() noexcept = default;
+        node_receiver() = default;
+        node_receiver(const node_receiver&) = default;
+        node_receiver(node_receiver&&) = default;
+
+        virtual ~node_receiver() = default;
+
+        node_receiver& operator=(const node_receiver&) = default;
+        node_receiver& operator=(node_receiver&&) = default;
 
         virtual void add(const path_node_type& base_path, reference value) = 0;
     };
@@ -2347,7 +2356,7 @@ namespace detail {
         {
         }
 
-        virtual ~jsonpath_selector() noexcept = default;
+        virtual ~jsonpath_selector() = default;
 
         bool is_path() const 
         {
@@ -2642,7 +2651,7 @@ namespace detail {
         expression_base(const expression_base&) = default;
         expression_base(expression_base&&) = default;
 
-        virtual ~expression_base() noexcept = default;
+        virtual ~expression_base() = default;
 
         expression_base& operator=(const expression_base&) = default;
         expression_base& operator=(expression_base&&) = default;
@@ -2676,6 +2685,13 @@ namespace detail {
             Json value_;
         };
     public:
+
+        token(const token& other) = delete;
+
+        token(token&& other) noexcept
+        {
+            construct(std::move(other));
+        }
 
         token(const unary_operator<Json>* expr) noexcept
             : token_kind_(jsonpath_token_kind::unary_operator),
@@ -2781,11 +2797,6 @@ namespace detail {
         {
         }
 
-        token(token&& other) noexcept
-        {
-            construct(std::move(other));
-        }
-
         const Json& get_value(const_reference_arg_t, eval_context<Json,JsonReference>&) const
         {
             return value_;
@@ -2800,7 +2811,9 @@ namespace detail {
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
-        token& operator=(token&& other)
+        token& operator=(const token& other) = delete;
+
+        token& operator=(token&& other) noexcept
         {
 
             if (&other != this)
@@ -2918,7 +2931,7 @@ namespace detail {
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
-        void construct(token&& other)
+        void construct(token&& other) noexcept
         {
             token_kind_ = other.token_kind_;
             switch (token_kind_)

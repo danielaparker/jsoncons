@@ -47,7 +47,7 @@ namespace utility {
         {
         }
 
-        ~heap_string_base() noexcept = default;
+        ~heap_string_base() = default;
     };
 
     template <typename CharT,typename Extra,typename Allocator>
@@ -71,7 +71,7 @@ namespace utility {
         {
         }
 
-        ~heap_string() noexcept = default;
+        ~heap_string() = default;
 
         const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
         const char_type* data() const { return extension_traits::to_plain_pointer(p_); }

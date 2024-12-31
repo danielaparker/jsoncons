@@ -91,10 +91,10 @@ class basic_cbor_parser : public ser_context
         }
 
         mapped_string(const mapped_string&) = default;
-        mapped_string(mapped_string&&) noexcept = default;
+        mapped_string(mapped_string&&) = default;
 
         mapped_string& operator=(const mapped_string&) = default;
-        mapped_string& operator=(mapped_string&&) noexcept = default;
+        mapped_string& operator=(mapped_string&&) = default;
 
         mapped_string(const mapped_string& other, const allocator_type& alloc) 
             :  type(other.type), str(other.str,alloc), bytes(other.bytes,alloc)

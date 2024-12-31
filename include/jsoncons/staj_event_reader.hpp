@@ -631,7 +631,7 @@ namespace jsoncons {
     class basic_staj_event_reader
     {
     public:
-        virtual ~basic_staj_event_reader() noexcept = default;
+        virtual ~basic_staj_event_reader() = default;
 
         virtual void array_expected(std::error_code& ec)
         {

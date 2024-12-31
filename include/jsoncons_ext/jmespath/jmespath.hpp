@@ -2220,7 +2220,7 @@ namespace detail {
                 construct(std::move(other));
             }
 
-            token& operator=(token&& other)
+            token& operator=(token&& other) noexcept
             {
                 if (&other != this)
                 {

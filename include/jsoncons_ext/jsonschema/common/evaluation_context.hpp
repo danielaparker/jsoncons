@@ -78,7 +78,7 @@ namespace jsonschema {
         {
         }
 
-        evaluation_context(evaluation_context&& other)
+        evaluation_context(evaluation_context&& other) noexcept
             : dynamic_scope_{std::move(other.dynamic_scope_)},eval_path_{std::move(other.eval_path_)},
               flags_(other.flags_)
         {

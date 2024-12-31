@@ -12,7 +12,7 @@ namespace jsoncons {
 class ser_context
 {
 public:
-    virtual ~ser_context() noexcept = default;
+    virtual ~ser_context() = default;
 
     virtual size_t line() const
     {

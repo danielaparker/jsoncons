@@ -352,7 +352,7 @@ namespace jsoncons {
             return *this;
         }
 
-        sorted_json_object& operator=(sorted_json_object&& other)
+        sorted_json_object& operator=(sorted_json_object&& other) noexcept
         {
             other.swap(*this);
             return *this;

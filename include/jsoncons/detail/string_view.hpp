@@ -52,7 +52,7 @@ namespace detail {
             : data_(data), length_(Traits::length(data))
         {
         }
-        constexpr basic_string_view(const basic_string_view& other) noexcept = default;
+        constexpr basic_string_view(const basic_string_view& other) = default;
 
         template <typename Tr,typename Allocator>
         JSONCONS_CPP14_CONSTEXPR  basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept

@@ -202,7 +202,7 @@ namespace jsoncons { namespace jsonpath {
 
         jsonpath_error(jsonpath_error&& other) = default;
         
-        ~jsonpath_error() = default;
+        ~jsonpath_error() override = default;
 
         const char* what() const noexcept override
         {

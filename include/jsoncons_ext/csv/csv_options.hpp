@@ -315,7 +315,7 @@ protected:
     basic_csv_options_common& operator=(const basic_csv_options_common&) = default;
     //basic_csv_options_common& operator=(basic_csv_options_common&&) = default;
 
-    virtual ~basic_csv_options_common() noexcept = default;
+    virtual ~basic_csv_options_common() = default;
 public:
 
     char_type field_delimiter() const 
@@ -491,7 +491,7 @@ public:
 
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;
 
-    basic_csv_decode_options(basic_csv_decode_options&& other)
+    basic_csv_decode_options(basic_csv_decode_options&& other) noexcept
         : super_type(std::move(other)),
           assume_header_(other.assume_header_),
           ignore_empty_values_(other.ignore_empty_values_),
@@ -631,7 +631,7 @@ public:
 
     basic_csv_encode_options(const basic_csv_encode_options& other) = default;
 
-    basic_csv_encode_options(basic_csv_encode_options&& other)
+    basic_csv_encode_options(basic_csv_encode_options&& other) noexcept
         : super_type(std::move(other)),
           quote_style_(other.quote_style_),
           float_format_(other.float_format_),

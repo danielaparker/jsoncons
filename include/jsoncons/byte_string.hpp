@@ -366,7 +366,7 @@ namespace detail {
         template <typename Allocator>
         constexpr byte_string_view(const basic_byte_string<Allocator>& bytes);
 
-        constexpr byte_string_view(const byte_string_view&) noexcept = default;
+        constexpr byte_string_view(const byte_string_view&) = default;
 
         JSONCONS_CPP14_CONSTEXPR byte_string_view(byte_string_view&& other) noexcept
             : data_(nullptr), size_(0)

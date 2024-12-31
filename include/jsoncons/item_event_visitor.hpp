@@ -32,7 +32,7 @@ namespace jsoncons {
 
         basic_item_event_visitor() = default;
 
-        virtual ~basic_item_event_visitor() noexcept = default;
+        virtual ~basic_item_event_visitor() = default;
 
         void flush()
         {

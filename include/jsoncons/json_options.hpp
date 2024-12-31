@@ -103,7 +103,7 @@ protected:
         max_nesting_depth_(1024)
     {}
 
-    virtual ~basic_json_options_common() noexcept = default;
+    virtual ~basic_json_options_common() = default;
 
     basic_json_options_common(const basic_json_options_common&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;
@@ -268,7 +268,7 @@ public:
 
     basic_json_decode_options(const basic_json_decode_options&) = default;
 
-    basic_json_decode_options(basic_json_decode_options&& other)
+    basic_json_decode_options(basic_json_decode_options&& other) noexcept
         : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(std::move(other.err_handler_))
     {
     }
@@ -340,7 +340,7 @@ public:
 
     basic_json_encode_options(const basic_json_encode_options&) = default;
 
-    basic_json_encode_options(basic_json_encode_options&& other)
+    basic_json_encode_options(basic_json_encode_options&& other) noexcept
         : super_type(std::move(other)),
           escape_all_non_ascii_(other.escape_all_non_ascii_),
           escape_solidus_(other.escape_solidus_),

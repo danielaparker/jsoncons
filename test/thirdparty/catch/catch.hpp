@@ -509,8 +509,8 @@ namespace Catch {
 
         SourceLineInfo( SourceLineInfo const& other )            = default;
         SourceLineInfo& operator = ( SourceLineInfo const& )     = default;
-        SourceLineInfo( SourceLineInfo&& )              noexcept = default;
-        SourceLineInfo& operator = ( SourceLineInfo&& ) noexcept = default;
+        SourceLineInfo( SourceLineInfo&& )              = default;
+        SourceLineInfo& operator = ( SourceLineInfo&& ) = default;
 
         bool empty() const noexcept { return file[0] == '\0'; }
         bool operator == ( SourceLineInfo const& other ) const noexcept;
@@ -615,7 +615,7 @@ namespace Catch {
         size_type m_size = 0;
 
     public: // construction
-        constexpr StringRef() noexcept = default;
+        constexpr StringRef() = default;
 
         StringRef( char const* rawChars ) noexcept;
 
@@ -7402,7 +7402,7 @@ namespace Catch {
                     new(&data) T(other.stored_object());
                 }
 
-                ObjectStorage(ObjectStorage&& other)
+                ObjectStorage(ObjectStorage&& other) noexcept
                 {
                     new(&data) T(std::move(other.stored_object()));
                 }

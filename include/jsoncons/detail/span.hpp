@@ -104,9 +104,9 @@ namespace detail {
         {
         }
 
-        constexpr span(const span& other) noexcept = default;
+        constexpr span(const span& other) = default;
 
-        span& operator=( const span& other ) noexcept = default;
+        span& operator=( const span& other ) = default;
 
         constexpr pointer data() const noexcept
         {

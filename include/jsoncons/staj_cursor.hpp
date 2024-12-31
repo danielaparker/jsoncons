@@ -640,7 +640,7 @@ template <typename CharT>
 class basic_staj_cursor
 {
 public:
-    virtual ~basic_staj_cursor() noexcept = default;
+    virtual ~basic_staj_cursor() = default;
 
     virtual void array_expected(std::error_code& ec)
     {

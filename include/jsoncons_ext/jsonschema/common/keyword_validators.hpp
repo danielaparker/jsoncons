@@ -3811,7 +3811,7 @@ namespace jsonschema {
                         if (prop_it == results.evaluated_properties.end()) 
                         {
                             //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
-                            std::size_t error_count = reporter.error_count();
+                            const std::size_t error_count = reporter.error_count();
                             walk_result result = schema_val_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
                             if (result == walk_result::abort)
                             {
@@ -3922,7 +3922,7 @@ namespace jsonschema {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
                             //std::cout << "Not in evaluated properties: " << item.key() << "\n";
-                            std::size_t error_count = reporter.error_count();
+                            const std::size_t error_count = reporter.error_count();
                             walk_result result = schema_val_->validate(item_context, item, item_location, results, reporter, patch);
                             if (result == walk_result::abort)
                             {

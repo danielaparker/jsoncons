@@ -209,7 +209,7 @@ namespace detail
                                 !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, U>::value,
             optional&>::type
-        operator=(optional<U>&& other)
+        operator=(optional<U>&& other) noexcept
         {
             if (other) 
             {

@@ -39,7 +39,7 @@ namespace jsoncons { namespace jmespath {
 
         jmespath_error(jmespath_error&& other) = default;
         
-        ~jmespath_error() = default;
+        ~jmespath_error() override = default;
 
         const char* what() const noexcept override
         {

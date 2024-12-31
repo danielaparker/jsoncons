@@ -381,10 +381,8 @@ private:
         return true;
     }
 
-    bool visit_int64(int64_t val, 
-                        semantic_tag, 
-                        const ser_context&,
-                        std::error_code&) override
+    bool visit_int64(int64_t val, semantic_tag, const ser_context&, 
+        std::error_code&) override
     {
         if (val >= 0)
         {
@@ -410,7 +408,7 @@ private:
             {
                 // int 64 stores a 64-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::ubjson_type::int64_type);
-                binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(val,std::back_inserter(sink_));
             }
             else
             {
@@ -441,7 +439,7 @@ private:
             {
                 // int 64 stores a 64-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::ubjson_type::int64_type);
-                binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(val,std::back_inserter(sink_));
             }
         }
         end_value();
