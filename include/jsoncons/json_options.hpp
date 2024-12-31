@@ -550,6 +550,7 @@ public:
 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
     basic_json_options&  bigint_format(bigint_chars_format value) {this->bignum_format_ = value; return *this;}
 #endif    
 

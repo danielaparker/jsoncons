@@ -50,6 +50,8 @@
 
 - Enhancements:
 
+    - Added stream output operator (`<<`) to uri class.
+
     - Added `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
     allow a `basic_json` value to contain a non-owning view of another `basic_json`
     value.
