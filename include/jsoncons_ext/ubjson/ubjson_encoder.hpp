@@ -100,8 +100,17 @@ public:
          nesting_depth_(0)
     {
     }
-    
-    ~basic_ubjson_encoder() = default;
+
+    ~basic_ubjson_encoder() noexcept
+    {
+        JSONCONS_TRY
+        {
+            sink_.flush();
+        }
+        JSONCONS_CATCH(...)
+        {
+        }
+    }
 
     basic_ubjson_encoder& operator=(const basic_ubjson_encoder&) = delete;
     basic_ubjson_encoder& operator=(basic_ubjson_encoder&&) = delete;
@@ -116,17 +125,6 @@ public:
     {
         sink_ = std::move(sink);
         reset();
-    }
-
-    ~basic_ubjson_encoder() noexcept
-    {
-        JSONCONS_TRY
-        {
-            sink_.flush();
-        }
-        JSONCONS_CATCH(...)
-        {
-        }
     }
 
 private:
