@@ -78,7 +78,7 @@ public:
 inline
 const std::error_category& ubjson_error_category()
 {
-  static ubjson_error_category_impl instance;
+  static const ubjson_error_category_impl instance;
   return instance;
 }
 

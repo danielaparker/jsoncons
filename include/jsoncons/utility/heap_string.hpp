@@ -63,6 +63,14 @@ namespace utility {
         uint8_t offset_{0};
         uint8_t align_pad_{0};
 
+        heap_string(const heap_string&) = delete;
+        heap_string(heap_string&&) = delete;
+
+        heap_string(Extra extra, const Allocator& alloc)
+            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr)
+        {
+        }
+
         ~heap_string() noexcept = default;
 
         const char_type* c_str() const { return extension_traits::to_plain_pointer(p_); }
@@ -70,13 +78,8 @@ namespace utility {
         std::size_t length() const { return length_; }
         Extra extra() const { return this->extra_; }
 
-        heap_string(Extra extra, const Allocator& alloc)
-            : heap_string_base<Extra,Allocator>(extra, alloc), p_(nullptr)
-        {
-        }
-
-        heap_string(const heap_string&) = delete;
         heap_string& operator=(const heap_string&) = delete;
+        heap_string& operator=(heap_string&&) = delete;
 
     };
 

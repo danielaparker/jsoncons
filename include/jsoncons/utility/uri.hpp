@@ -67,7 +67,7 @@ namespace jsoncons {
     inline
         const std::error_category& uri_error_category()
     {
-        static uri_error_category_impl instance;
+        static const uri_error_category_impl instance;
         return instance;
     }
 

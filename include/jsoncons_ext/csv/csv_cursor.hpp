@@ -42,12 +42,12 @@ private:
     basic_csv_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
 
-    // Noncopyable and nonmoveable
-    basic_csv_cursor(const basic_csv_cursor&) = delete;
-    basic_csv_cursor& operator=(const basic_csv_cursor&) = delete;
-
 public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
+
+    // Noncopyable and nonmoveable
+    basic_csv_cursor(const basic_csv_cursor&) = delete;
+    basic_csv_cursor(basic_csv_cursor&&) = delete;
 
     // Constructors that throw parse exceptions
 
@@ -150,6 +150,11 @@ public:
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         initialize_with_string_view(sv, ec);
     }
+    
+    ~basic_csv_cursor() = default;
+
+    basic_csv_cursor& operator=(const basic_csv_cursor&) = delete;
+    basic_csv_cursor& operator=(basic_csv_cursor&&) = delete;
 
     template <typename Sourceable>
     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type

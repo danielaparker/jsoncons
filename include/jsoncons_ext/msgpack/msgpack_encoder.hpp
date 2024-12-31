@@ -76,20 +76,20 @@ namespace msgpack {
 
         std::vector<stack_item> stack_;
         int nesting_depth_;
+    public:
 
         // Noncopyable and nonmoveable
         basic_msgpack_encoder(const basic_msgpack_encoder&) = delete;
-        basic_msgpack_encoder& operator=(const basic_msgpack_encoder&) = delete;
-    public:
-        explicit basic_msgpack_encoder(Sink&& sink, 
-                                       const Allocator& alloc = Allocator())
+        basic_msgpack_encoder(basic_msgpack_encoder&&) = delete;
+
+        explicit basic_msgpack_encoder(Sink&& sink, const Allocator& alloc = Allocator())
            : basic_msgpack_encoder(std::forward<Sink>(sink), msgpack_encode_options(), alloc)
         {
         }
 
         explicit basic_msgpack_encoder(Sink&& sink, 
-                                       const msgpack_encode_options& options, 
-                                       const Allocator& alloc = Allocator())
+            const msgpack_encode_options& options, 
+            const Allocator& alloc = Allocator())
            : sink_(std::forward<Sink>(sink)),
              options_(options),
              alloc_(alloc),
@@ -101,6 +101,9 @@ namespace msgpack {
         {
             sink_.flush();
         }
+
+        basic_msgpack_encoder& operator=(const basic_msgpack_encoder&) = delete;
+        basic_msgpack_encoder& operator=(basic_msgpack_encoder&&) = delete;
 
         void reset()
         {

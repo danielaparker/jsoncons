@@ -4,7 +4,12 @@
 
 # See https://github.com/danielaparker/jsoncons for latest version
 
+# Revisit:
+#  fuchsia-virtual-inheritance
+
 Checks: '*,
+         - fuchsia-virtual-inheritance,
+         - modernize-return-braced-init-list,
          - readability-avoid-nested-conditional-operator,
          -google-readability-casting,
          -bugprone-branch-clone,

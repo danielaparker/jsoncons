@@ -2005,7 +2005,7 @@ namespace detail {
                         {
                             return *context.create_json(sval);
                         }
-                        jsoncons::detail::chars_to to_double;
+                        const jsoncons::detail::chars_to to_double;
                         try
                         {
                             auto s = arg0.as_string();
@@ -2497,7 +2497,7 @@ namespace detail {
                     }
                     case token_kind::unary_operator:
                     {
-                        JSONCONS_ASSERT(stack.size() >= 1);
+                        JSONCONS_ASSERT(!stack.empty());
                         pointer ptr = std::addressof(stack.back().value());
                         stack.pop_back();
                         reference r = t.unary_operator_->evaluate(*ptr, context, ec);

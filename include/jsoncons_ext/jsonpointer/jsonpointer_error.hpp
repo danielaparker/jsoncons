@@ -98,7 +98,7 @@ public:
 inline
 const std::error_category& jsonpointer_error_category()
 {
-  static jsonpointer_error_category_impl instance;
+  static const jsonpointer_error_category_impl instance;
   return instance;
 }
 

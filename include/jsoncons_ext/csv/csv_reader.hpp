@@ -43,9 +43,6 @@ namespace jsoncons { namespace csv {
         using temp_allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
 
-        basic_csv_reader(const basic_csv_reader&) = delete; 
-        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
-
         basic_default_json_visitor<CharT> default_visitor_;
         text_source_adaptor<Source> source_;
         basic_json_visitor<CharT>& visitor_;
@@ -58,6 +55,9 @@ namespace jsoncons { namespace csv {
         /*!
           \param is The input stream to read from
         */
+
+        basic_csv_reader(const basic_csv_reader&) = delete; 
+        basic_csv_reader(basic_csv_reader&&) = delete; 
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
@@ -113,6 +113,9 @@ namespace jsoncons { namespace csv {
         }
 
         ~basic_csv_reader() noexcept = default;
+
+        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
+        basic_csv_reader& operator = (basic_csv_reader&&) = delete; 
 
         void read()
         {

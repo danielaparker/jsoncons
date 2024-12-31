@@ -39,12 +39,12 @@ private:
     basic_item_event_visitor_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_cbor_cursor(const basic_cbor_cursor&) = delete;
-    basic_cbor_cursor& operator=(const basic_cbor_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_cbor_cursor(const basic_cbor_cursor&) = delete;
+    basic_cbor_cursor(basic_cbor_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_cbor_cursor(Sourceable&& source,
@@ -99,6 +99,11 @@ public:
             next(ec);
         }
     }
+
+    ~basic_cbor_cursor() = default;
+    
+    basic_cbor_cursor& operator=(const basic_cbor_cursor&) = delete;
+    basic_cbor_cursor& operator=(basic_cbor_cursor&&) = delete;
 
     void reset()
     {

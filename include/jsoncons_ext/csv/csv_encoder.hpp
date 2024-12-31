@@ -103,10 +103,11 @@ private:
     std::size_t column_index_{0};
     std::vector<std::size_t> row_counts_;
 
+public:
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
-    basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
-public:
+    basic_csv_encoder(basic_csv_encoder&&) = delete;
+
     basic_csv_encoder(Sink&& sink, 
                       const Allocator& alloc = Allocator())
        : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>(), alloc)
@@ -135,6 +136,8 @@ public:
         {
         }
     }
+    basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
+    basic_csv_encoder& operator=(basic_csv_encoder&&) = delete;
 
     void reset()
     {

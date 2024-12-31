@@ -60,7 +60,7 @@ public:
 inline
 const std::error_category& csv_error_category()
 {
-  static csv_error_category_impl instance;
+  static const csv_error_category_impl instance;
   return instance;
 }
 

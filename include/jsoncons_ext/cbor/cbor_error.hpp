@@ -76,7 +76,7 @@ public:
 inline
 const std::error_category& cbor_error_category()
 {
-  static cbor_error_category_impl instance;
+  static const cbor_error_category_impl instance;
   return instance;
 }
 

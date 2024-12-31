@@ -81,7 +81,7 @@ public:
 inline
 const std::error_category& bson_error_category()
 {
-  static bson_error_category_impl instance;
+  static const bson_error_category_impl instance;
   return instance;
 }
 

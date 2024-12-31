@@ -38,10 +38,6 @@ namespace msgpack {
         basic_item_event_receiver<char_type> event_receiver_;
         bool eof_;
 
-        // Noncopyable and nonmoveable
-        msgpack_event_reader(const msgpack_event_reader&) = delete;
-        msgpack_event_reader& operator=(const msgpack_event_reader&) = delete;
-
     public:
         using string_view_type = string_view;
 
@@ -58,6 +54,10 @@ namespace msgpack {
                 next();
             }
         }
+
+        // Noncopyable and nonmoveable
+        msgpack_event_reader(const msgpack_event_reader&) = delete;
+        msgpack_event_reader(msgpack_event_reader&&) = delete;
 
         // Constructors that set parse error codes
 
@@ -96,6 +96,11 @@ namespace msgpack {
                 next(ec);
             }
         }
+        
+        ~msgpack_event_reader() = default;
+
+        msgpack_event_reader& operator=(const msgpack_event_reader&) = delete;
+        msgpack_event_reader& operator=(msgpack_event_reader&&) = delete;
 
         void reset()
         {

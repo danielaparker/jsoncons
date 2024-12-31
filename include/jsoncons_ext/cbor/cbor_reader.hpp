@@ -107,6 +107,7 @@ using cbor_stream_reader = basic_cbor_reader<jsoncons::binary_stream_source>;
 
 using cbor_bytes_reader = basic_cbor_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace cbor_reader
+} // namespace jsoncons
 
 #endif

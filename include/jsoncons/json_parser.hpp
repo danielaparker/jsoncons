@@ -103,12 +103,13 @@ private:
 
     chunk_reader_adaptor<char_type> read_chunk_;
     chunk_reader<char_type>* chunk_rdr_;
-    
-    // Noncopyable and nonmoveable
-    basic_json_parser(const basic_json_parser&) = delete;
-    basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
+
+    // Noncopyable and nonmoveable
+    basic_json_parser(const basic_json_parser&) = delete;
+    basic_json_parser(basic_json_parser&&) = delete;
+
     basic_json_parser(const TempAllocator& temp_alloc = TempAllocator())
         : basic_json_parser(basic_json_decode_options<char_type>(), default_json_parsing(), temp_alloc)
     {
@@ -234,14 +235,15 @@ public:
             string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
     }
+    
+    ~basic_json_parser() = default;
+
+    basic_json_parser& operator=(const basic_json_parser&) = delete;
+    basic_json_parser& operator=(basic_json_parser&&) = delete;
 
     bool source_exhausted() const
     {
         return input_ptr_ == input_end_;
-    }
-
-    ~basic_json_parser() noexcept
-    {
     }
 
     json_parse_state parent() const

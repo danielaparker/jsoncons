@@ -51,7 +51,7 @@ namespace jsoncons { namespace detail {
     inline
     const std::error_category& to_integer_error_category()
     {
-      static to_integer_error_category_impl instance;
+      static const to_integer_error_category_impl instance;
       return instance;
     }
 

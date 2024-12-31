@@ -181,6 +181,7 @@ private:
         }
 
         short_storage& operator=(const short_storage& stor) = delete;
+        short_storage& operator=(short_storage&& stor) = delete;
     };
 
     struct dynamic_storage

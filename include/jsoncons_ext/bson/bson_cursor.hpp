@@ -39,12 +39,12 @@ private:
     basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_bson_cursor(const basic_bson_cursor&) = delete;
-    basic_bson_cursor& operator=(const basic_bson_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_bson_cursor(const basic_bson_cursor&) = delete;
+    basic_bson_cursor(basic_bson_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
@@ -97,6 +97,11 @@ public:
             next(ec);
         }
     }
+
+    ~basic_bson_cursor() = default;
+    
+    basic_bson_cursor& operator=(const basic_bson_cursor&) = delete;
+    basic_bson_cursor& operator=(basic_bson_cursor&&) = delete;
 
     void reset()
     {

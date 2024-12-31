@@ -129,7 +129,7 @@ namespace jsoncons {
     inline
     const std::error_category& json_error_category()
     {
-      static json_error_category_impl instance;
+      static const json_error_category_impl instance;
       return instance;
     }
 

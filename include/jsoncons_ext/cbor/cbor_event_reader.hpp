@@ -38,12 +38,12 @@ namespace cbor {
         basic_item_event_receiver<char_type> event_receiver_;
         bool eof_;
 
-        // Noncopyable and nonmoveable
-        cbor_event_reader(const cbor_event_reader&) = delete;
-        cbor_event_reader& operator=(const cbor_event_reader&) = delete;
-
     public:
         using string_view_type = string_view;
+
+        // Noncopyable and nonmoveable
+        cbor_event_reader(const cbor_event_reader&) = delete;
+        cbor_event_reader(cbor_event_reader&&) = delete;
 
         template <typename Sourceable>
         cbor_event_reader(Sourceable&& source,
@@ -96,6 +96,11 @@ namespace cbor {
                 next(ec);
             }
         }
+        
+        ~cbor_event_reader() = default;
+
+        cbor_event_reader& operator=(const cbor_event_reader&) = delete;
+        cbor_event_reader& operator=(cbor_event_reader&&) = delete;
 
         void reset()
         {

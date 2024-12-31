@@ -38,12 +38,12 @@ private:
     basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_ubjson_cursor(const basic_ubjson_cursor&) = delete;
-    basic_ubjson_cursor& operator=(const basic_ubjson_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_ubjson_cursor(const basic_ubjson_cursor&) = delete;
+    basic_ubjson_cursor(basic_ubjson_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_ubjson_cursor(Sourceable&& source,
@@ -96,6 +96,11 @@ public:
             next(ec);
         }
     }
+
+    ~basic_ubjson_cursor() = default;
+
+    basic_ubjson_cursor& operator=(const basic_ubjson_cursor&) = delete;
+    basic_ubjson_cursor& operator=(basic_ubjson_cursor&&) = delete;
 
     void reset()
     {

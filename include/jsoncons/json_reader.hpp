@@ -34,20 +34,23 @@ namespace jsoncons {
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& other_visitor_;
 
-        // noncopyable and nonmoveable
-        json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
-        json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
-
     public:
         json_utf8_to_other_visitor_adaptor()
             : other_visitor_(default_visitor_)
         {
         }
 
+        // noncopyable and nonmoveable
+        json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+        json_utf8_to_other_visitor_adaptor(json_utf8_to_other_visitor_adaptor<CharT>&&) = delete;
+
         json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor)
             : other_visitor_(other_visitor)
         {
         }
+
+        json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+        json_utf8_to_other_visitor_adaptor<CharT>& operator=(json_utf8_to_other_visitor_adaptor<CharT>&&) = delete;
 
     private:
 
@@ -164,11 +167,12 @@ namespace jsoncons {
         basic_json_parser<CharT,TempAllocator> parser_;
         bool eof_;
 
+    public:
+
         // Noncopyable and nonmoveable
         basic_json_reader(const basic_json_reader&) = delete;
-        basic_json_reader& operator=(const basic_json_reader&) = delete;
+        basic_json_reader(basic_json_reader&&) = delete;
 
-    public:
         template <typename Sourceable>
         explicit basic_json_reader(Sourceable&& source, const TempAllocator& temp_alloc = TempAllocator())
             : basic_json_reader(std::forward<Sourceable>(source),
@@ -268,6 +272,8 @@ namespace jsoncons {
         {
         }
 #endif
+        basic_json_reader& operator=(const basic_json_reader&) = delete;
+        basic_json_reader& operator=(basic_json_reader&&) = delete;
 
         void read_next()
         {

@@ -322,11 +322,12 @@ namespace detail {
         std::basic_string<CharT> open_array_bracket_str_;
         std::basic_string<CharT> close_array_bracket_str_;
         int nesting_depth_;
+    public:
 
         // Noncopyable and nonmoveable
         basic_json_encoder(const basic_json_encoder&) = delete;
-        basic_json_encoder& operator=(const basic_json_encoder&) = delete;
-    public:
+        basic_json_encoder(basic_json_encoder&&) = delete;
+
         basic_json_encoder(Sink&& sink, 
                            const Allocator& alloc = Allocator())
             : basic_json_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
@@ -406,6 +407,9 @@ namespace detail {
             {
             }
         }
+
+        basic_json_encoder& operator=(const basic_json_encoder&) = delete;
+        basic_json_encoder& operator=(basic_json_encoder&&) = delete;
 
         void reset()
         {
@@ -1124,11 +1128,12 @@ namespace detail {
         jsoncons::detail::write_double fp_;
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
         int nesting_depth_;
-
-        // Noncopyable
-        basic_compact_json_encoder(const basic_compact_json_encoder&) = delete;
-        basic_compact_json_encoder& operator=(const basic_compact_json_encoder&) = delete;
     public:
+
+        // Noncopyable and nonmoveable
+        basic_compact_json_encoder(const basic_compact_json_encoder&) = delete;
+        basic_compact_json_encoder(basic_compact_json_encoder&&) = delete;
+
         basic_compact_json_encoder(Sink&& sink, 
             const Allocator& alloc = Allocator())
             : basic_compact_json_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
@@ -1146,9 +1151,6 @@ namespace detail {
         {
         }
 
-        basic_compact_json_encoder(basic_compact_json_encoder&&) = default;
-        basic_compact_json_encoder& operator=(basic_compact_json_encoder&&) = default;
-
         ~basic_compact_json_encoder() noexcept
         {
             JSONCONS_TRY
@@ -1159,6 +1161,9 @@ namespace detail {
             {
             }
         }
+
+        basic_compact_json_encoder& operator=(const basic_compact_json_encoder&) = delete;
+        basic_compact_json_encoder& operator=(basic_compact_json_encoder&&) = delete;
 
         void reset()
         {

@@ -348,6 +348,8 @@ namespace jsonpath {
         custom_function(const custom_function&) = default;
 
         custom_function(custom_function&&) = default;
+        
+        ~custom_function() = default; 
 
         const string_type& name() const 
         {
@@ -539,7 +541,7 @@ namespace detail {
         virtual Json evaluate(const_reference lhs, const_reference rhs, 
             std::error_code&) const = 0;
 
-        virtual std::string to_string(int = 0) const
+        virtual std::string to_string(int) const
         {
             return "binary operator";
         }
@@ -568,10 +570,7 @@ namespace detail {
             {
                 return lhs;
             }
-            else
-            {
-                return rhs;
-            }
+            return rhs;
         }
         std::string to_string(int level) const override
         {
@@ -1566,7 +1565,7 @@ namespace detail {
                     {
                         return value_type(sn, semantic_tag::none);
                     }
-                    jsoncons::detail::chars_to to_double{};
+                    const const jsoncons::detail::chars_to to_double;
                     try
                     {
                         auto s = arg0.as_string();
@@ -2114,6 +2113,8 @@ namespace detail {
         path_value_pair(path_value_pair&& other) = default;
         path_value_pair& operator=(const path_value_pair&) = default;
         path_value_pair& operator=(path_value_pair&& other) = default;
+        
+        ~path_value_pair() = default;
 
         path_node_type path() const
         {
@@ -2425,6 +2426,9 @@ namespace detail {
         std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> functions_;
         std::unordered_map<string_type,std::unique_ptr<function_base_type>,MyHash> custom_functions_;
 
+        static_resources(const static_resources&) = delete;
+        static_resources(static_resources&&) = default;
+
         static_resources(const allocator_type& alloc = allocator_type())
             : alloc_(alloc)
         {
@@ -2474,24 +2478,11 @@ namespace detail {
                                           jsoncons::make_unique<decorator_function<Json>>(item.arity(),item.function()));
             }
         }
-
-        static_resources(const static_resources&) = delete;
+        
+        ~static_resources() = default;
 
         static_resources operator=(const static_resources&) = delete;
-
-        //static_resources(static_resources&&) = delete;
-
         static_resources operator=(static_resources&&) = delete;
-
-        static_resources(static_resources&& other) noexcept 
-            : alloc_(std::move(other.alloc_)),
-              selectors_(std::move(other.selectors_)),
-              temp_json_values_(std::move(other.temp_json_values_)),
-              unary_operators_(std::move(other.unary_operators_)),
-              functions_(std::move(other.functions_)),
-              custom_functions_(std::move(other.custom_functions_))
-        {
-        }
 
         const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
@@ -2646,7 +2637,13 @@ namespace detail {
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
 
+        expression_base(const expression_base&) = default;
+        expression_base(expression_base&&) = default;
+
         virtual ~expression_base() noexcept = default;
+
+        expression_base& operator=(const expression_base&) = default;
+        expression_base& operator=(expression_base&&) = default;
 
         virtual value_type evaluate(eval_context<Json,JsonReference>& context,
             reference root,
@@ -3098,8 +3095,12 @@ namespace detail {
         {
         }
 
+        path_expression(const path_expression& expr) = delete;
         path_expression(path_expression&& expr) = default;
 
+        ~path_expression() = default;
+        
+        path_expression& operator=(const path_expression& expr) = delete;
         path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(eval_context<Json,JsonReference>& context, 
@@ -3269,17 +3270,18 @@ namespace detail {
         {
         }
 
-        expression(expression&& expr)
-            : token_list_(std::move(expr.token_list_))
-        {
-        }
+        expression(const expression& expr) = delete;
+        expression(expression&& expr) = default;
 
         expression(std::vector<token_type>&& token_stack)
             : token_list_(std::move(token_stack))
         {
         }
 
+        expression& operator=(const expression& expr) = delete;
         expression& operator=(expression&& expr) = default;
+        
+        ~expression() = default;
 
         value_type evaluate(eval_context<Json,reference>& context, 
             reference root,
@@ -3311,7 +3313,7 @@ namespace detail {
                         }
                         case jsonpath_token_kind::unary_operator:
                         {
-                            JSONCONS_ASSERT(stack.size() >= 1);
+                            JSONCONS_ASSERT(!stack.empty());
                             auto item = std::move(stack.back());
                             stack.pop_back();
 

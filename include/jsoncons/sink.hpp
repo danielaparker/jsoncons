@@ -39,11 +39,10 @@ namespace jsoncons {
         const CharT* end_buffer_;
         CharT* p_;
 
+    public:
+
         // Noncopyable
         stream_sink(const stream_sink&) = delete;
-        stream_sink& operator=(const stream_sink&) = delete;
-
-    public:
         stream_sink(stream_sink&&) = default;
 
         stream_sink(std::basic_ostream<CharT>& os)
@@ -61,6 +60,7 @@ namespace jsoncons {
         }
 
         // Movable
+        stream_sink& operator=(const stream_sink&) = delete;
         stream_sink& operator=(stream_sink&&) = default;
 
         void flush()
@@ -123,11 +123,11 @@ namespace jsoncons {
         const uint8_t* end_buffer_;
         uint8_t* p_;
 
+    public:
+
         // Noncopyable
         binary_stream_sink(const binary_stream_sink&) = delete;
-        binary_stream_sink& operator=(const binary_stream_sink&) = delete;
 
-    public:
         binary_stream_sink(binary_stream_sink&&) = default;
 
         binary_stream_sink(std::basic_ostream<char>& os)
@@ -152,6 +152,7 @@ namespace jsoncons {
             stream_ptr_->flush();
         }
 
+        binary_stream_sink& operator=(const binary_stream_sink&) = delete;
         binary_stream_sink& operator=(binary_stream_sink&&) = default;
 
         void flush()
@@ -207,11 +208,11 @@ namespace jsoncons {
         using container_type = StringT;
     private:
         container_type* buf_ptr;
+    public:
 
         // Noncopyable
         string_sink(const string_sink&) = delete;
-        string_sink& operator=(const string_sink&) = delete;
-    public:
+
         string_sink(string_sink&& other) noexcept
             : buf_ptr(nullptr)
         {
@@ -222,6 +223,10 @@ namespace jsoncons {
             : buf_ptr(std::addressof(buf))
         {
         }
+        
+        ~string_sink() = default;
+
+        string_sink& operator=(const string_sink&) = delete;
 
         string_sink& operator=(string_sink&& other) noexcept
         {
@@ -261,18 +266,21 @@ namespace jsoncons {
         using value_type = typename Container::value_type;
     private:
         container_type* buf_ptr;
+    public:
 
         // Noncopyable
         bytes_sink(const bytes_sink&) = delete;
-        bytes_sink& operator=(const bytes_sink&) = delete;
-    public:
+
         bytes_sink(bytes_sink&&) = default;
 
         bytes_sink(container_type& buf)
             : buf_ptr(std::addressof(buf))
         {
         }
+        
+        ~bytes_sink() = default; 
 
+        bytes_sink& operator=(const bytes_sink&) = delete;
         bytes_sink& operator=(bytes_sink&&) = default;
 
         void flush()
