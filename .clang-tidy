@@ -8,9 +8,14 @@
 #  fuchsia-virtual-inheritance
 
 Checks: '*,
-         - fuchsia-virtual-inheritance,
-         - modernize-return-braced-init-list,
-         - readability-avoid-nested-conditional-operator,
+         -llvm-else-after-return,
+         -readability-else-after-return,
+         -cppcoreguidelines-avoid-c-arrays,
+         -hicpp-avoid-c-arrays,
+         -modernize-avoid-c-arrays,
+         -fuchsia-virtual-inheritance,
+         -modernize-return-braced-init-list,
+         -readability-avoid-nested-conditional-operator,
          -google-readability-casting,
          -bugprone-branch-clone,
          -hicpp-named-parameter,

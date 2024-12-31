@@ -605,7 +605,7 @@ namespace jsoncons { namespace bson {
         }
 
         /* Check for Infinity or NaN */
-        if (!isdigit (*str_read) && *str_read != '.') {
+        if (!isdigit(*str_read) && *str_read != '.') {
            if (detail::dec128_istreq (str_read, last, inf_str.data(), inf_str.data()+inf_str.length()) ||
                detail::dec128_istreq (str_read, last, infinity_str.data(), infinity_str.data()+infinity_str.length())) 
            {
