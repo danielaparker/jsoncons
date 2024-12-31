@@ -1,5 +1,5 @@
-1.0.0 (on master)
--------
+1.0.0
+-----
 
 - API Changes
 
@@ -19,8 +19,7 @@
     constructed with a user provided chunk reader to obtain additional JSON text
     as needed. See [Incremental parsing (since 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790). 
 
-    - enum `bigint_chars_format` is replaced by `bignum_format_kind`, and for backwards compatability, `bigint_chars_format`
-    is aliased to `bignum_format_kind`. Added `bignum_format` getter and setter functions to `basic_json_options`,
+    - enum `bigint_chars_format` is deprecated and replaced by `bignum_format_kind`. Added `bignum_format` getter and setter functions to `basic_json_options`,
     and deprecated `bigint_format` getter and setter functions. Changed default `bignum_format` from `bigint_chars_format::base10`
     to `bignum_format_kind::raw`. Rationale: `bigint_chars_format` was misnamed, as it applied to `bigdec` as well as `bigint` numbers, and
     defaulting to `bigint_chars_format::base10` produced surprising results for users of our lossless number option. 

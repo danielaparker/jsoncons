@@ -25,9 +25,17 @@ enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 enum class line_split_kind  : uint8_t {same_line=1, new_line, multi_line};
 
-enum class bignum_format_kind : uint8_t {raw, number=raw, base10, base64, base64url};
+enum class bignum_format_kind : uint8_t {raw, 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    number=raw, // deprecated, use raw instead 
+#endif    
+    base10, 
+    base64, 
+    base64url};
 
-using bigint_chars_format = bignum_format_kind;
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use bignum_format_kind") typedef bignum_format_kind bigint_chars_format;
+#endif
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
@@ -372,7 +380,8 @@ public:
 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    bigint_chars_format bigint_format() const  {return bignum_format_;}
+    JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
+    bignum_format_kind bigint_format() const  {return bignum_format_;}
 #endif    
 
     bignum_format_kind bignum_format() const  {return bignum_format_;}
@@ -551,7 +560,7 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
-    basic_json_options&  bigint_format(bigint_chars_format value) {this->bignum_format_ = value; return *this;}
+    basic_json_options&  bigint_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
 #endif    
 
     basic_json_options&  bignum_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}

@@ -5,7 +5,7 @@
 
 enum class bigint_chars_format : uint8_t {number, base10, base64, base64url};   (until 1.0.0)
 
-using bigint_chars_format= bignum_format_kind;                                 (since 1.0.0)
+using bigint_chars_format= bignum_format_kind;                                  (since 1.0.0)
 ```
 
 Specifies `bigint` formatting. 
