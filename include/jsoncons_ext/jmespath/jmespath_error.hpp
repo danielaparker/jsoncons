@@ -196,7 +196,7 @@ public:
 inline
 const std::error_category& jmespath_error_category()
 {
-  static const jmespath_error_category_impl instance;
+  static jmespath_error_category_impl instance;
   return instance;
 }
 

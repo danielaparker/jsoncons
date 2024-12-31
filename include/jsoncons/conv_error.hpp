@@ -203,7 +203,7 @@ namespace detail {
 extern inline
 const std::error_category& conv_error_category()
 {
-  static const detail::conv_error_category_impl instance;
+  static detail::conv_error_category_impl instance;
   return instance;
 }
 

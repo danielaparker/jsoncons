@@ -72,7 +72,7 @@ public:
 inline
 const std::error_category& msgpack_error_category()
 {
-  static const msgpack_error_category_impl instance;
+  static msgpack_error_category_impl instance;
   return instance;
 }
 

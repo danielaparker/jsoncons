@@ -154,7 +154,7 @@ namespace jsoncons { namespace jsonpath {
     inline
     const std::error_category& jsonpath_error_category()
     {
-      static const jsonpath_error_category_impl instance;
+      static jsonpath_error_category_impl instance;
       return instance;
     }
 

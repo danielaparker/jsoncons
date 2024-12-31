@@ -61,7 +61,7 @@ namespace jsoncons { namespace jsonpatch {
     inline
     const std::error_category& jsonpatch_error_category()
     {
-      static const jsonpatch_error_category_impl instance;
+      static jsonpatch_error_category_impl instance;
       return instance;
     }
 
