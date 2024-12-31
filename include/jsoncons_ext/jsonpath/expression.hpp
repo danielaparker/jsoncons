@@ -2637,6 +2637,8 @@ namespace detail {
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_node_type = basic_path_node<typename Json::char_type>;
 
+        expression_base() = default;
+        
         expression_base(const expression_base&) = default;
         expression_base(expression_base&&) = default;
 
