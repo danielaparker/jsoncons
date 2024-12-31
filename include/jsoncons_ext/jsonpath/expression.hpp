@@ -530,6 +530,8 @@ namespace detail {
               is_right_associative_(is_right_associative)
         {
         }
+        
+        virtual ~binary_operator() = default;
 
         std::size_t precedence_level() const 
         {

@@ -809,7 +809,7 @@ namespace detail {
             bool is_right_associative_;
 
         protected:
-            ~unary_operator() = default; // virtual destructor not needed
+            virtual ~unary_operator() = default; 
         public:
             unary_operator(operator_kind oper)
                 : precedence_level_(operator_table::precedence_level(oper)), 
@@ -847,7 +847,7 @@ namespace detail {
             std::size_t precedence_level_;
             bool is_right_associative_;
         protected:
-            ~binary_operator() = default; // virtual destructor not needed
+            virtual ~binary_operator() = default; 
         public:
             binary_operator(operator_kind oper)
                 : precedence_level_(operator_table::precedence_level(oper)), 
