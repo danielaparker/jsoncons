@@ -7,10 +7,11 @@
 #ifndef JSONCONS_DETAIL_OPTIONAL_HPP
 #define JSONCONS_DETAIL_OPTIONAL_HPP
 
-#include <new> // placement new
 #include <memory>
-#include <utility> // std::swap
+#include <new> // placement new
 #include <type_traits>
+#include <utility> // std::swap
+
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons 
@@ -208,7 +209,7 @@ namespace detail
                                 !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, U>::value,
             optional&>::type
-        operator=(optional<U>&& other)
+        operator=(optional<U>&& other) noexcept
         {
             if (other) 
             {
@@ -484,4 +485,4 @@ namespace detail
 } // namespace detail
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_OPTIONAL_HPP

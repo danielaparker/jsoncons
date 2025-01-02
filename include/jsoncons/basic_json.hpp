@@ -7,38 +7,39 @@
 #ifndef JSONCONS_BASIC_JSON_HPP
 #define JSONCONS_BASIC_JSON_HPP
 
-#include <limits> // std::numeric_limits
-#include <string>
-#include <vector>
-#include <exception>
-#include <cstring>
-#include <ostream> 
-#include <memory> // std::allocator
-#include <typeinfo>
-#include <cstring> // std::memcpy
 #include <algorithm> // std::swap
+#include <cstring>
+#include <cstring> // std::memcpy
+#include <exception>
 #include <initializer_list> // std::initializer_list
-#include <utility> // std::move
-#include <type_traits> // std::enable_if
 #include <istream> // std::basic_istream
-#include <jsoncons/json_fwd.hpp>
-#include <jsoncons/json_type.hpp>
-#include <jsoncons/config/version.hpp>
-#include <jsoncons/json_type.hpp>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/pretty_print.hpp>
-#include <jsoncons/json_object.hpp>
-#include <jsoncons/json_array.hpp>
-#include <jsoncons/bigint.hpp>
-#include <jsoncons/json_options.hpp>
-#include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_decoder.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/byte_string.hpp>
-#include <jsoncons/json_error.hpp>
+#include <limits> // std::numeric_limits
+#include <memory> // std::allocator
+#include <ostream> 
+#include <string>
+#include <type_traits> // std::enable_if
+#include <typeinfo>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/version.hpp>
+#include <jsoncons/json_array.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_error.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_fwd.hpp>
+#include <jsoncons/json_object.hpp>
+#include <jsoncons/json_options.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/pretty_print.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>
+
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator
 #endif
@@ -3482,7 +3483,7 @@ namespace jsoncons {
                 case json_storage_kind::short_str:
                 case json_storage_kind::long_str:
                 {
-                    jsoncons::detail::chars_to to_double;
+                    const jsoncons::detail::chars_to to_double;
                     // to_double() throws std::invalid_argument if conversion fails
                     return to_double(as_cstring(), as_string_view().length());
                 }
@@ -4743,4 +4744,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_BASIC_JSON_HPP

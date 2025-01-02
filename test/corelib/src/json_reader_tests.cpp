@@ -120,8 +120,8 @@ void test_json_reader_error(const std::string& text, const std::error_code& ec)
     {
         if (e.code() != ec)
         {
-            std::cout << text << std::endl;
-            std::cout << e.code().value() << " " << e.what() << std::endl; 
+            std::cout << text << '\n';
+            std::cout << e.code().value() << " " << e.what() << '\n'; 
         }
         CHECK(ec == e.code());
     }
@@ -136,10 +136,10 @@ void test_json_reader_ec(const std::string& text, const std::error_code& expecte
     json_stream_reader reader(is,decoder);
 
     reader.read(ec);
-    //std::cerr << text << std::endl;
+    //std::cerr << text << '\n';
     //std::cerr << ec.message() 
     //          << " at line " << reader.line() 
-    //          << " and column " << reader.column() << std::endl;
+    //          << " and column " << reader.column() << '\n';
 
     CHECK(ec);
     CHECK(ec == expected);
@@ -263,7 +263,7 @@ TEST_CASE("test_read_primitive_fail")
 TEST_CASE("test_read_multiple")
 {
     std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
-    //std::cout << in << std::endl;
+    //std::cout << in << '\n';
 
     std::istringstream is(in);
 

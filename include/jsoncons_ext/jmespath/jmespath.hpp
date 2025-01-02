@@ -4,19 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JMESPATH_JMESPATH_HPP
-#define JSONCONS_JMESPATH_JMESPATH_HPP
+#ifndef JSONCONS_EXT_JMESPATH_JMESPATH_HPP
+#define JSONCONS_EXT_JMESPATH_JMESPATH_HPP
 
-#include <string>
-#include <vector>
-#include <unordered_map> // std::unordered_map
-#include <memory>
-#include <type_traits> // std::is_const
-#include <limits> // std::numeric_limits
-#include <utility> // std::move
-#include <functional> // 
 #include <algorithm> // std::stable_sort, std::reverse
 #include <cmath> // std::abs
+#include <functional> // 
+#include <limits> // std::numeric_limits
+#include <memory>
+#include <string>
+#include <type_traits> // std::is_const
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 
@@ -237,7 +238,7 @@ namespace jmespath {
     public:
         using reference = const Json&;
     private:
-        std::size_t precedence_level_;
+        std::size_t precedence_level_{0};
         bool is_right_associative_;
         bool is_projection_;
     public:
@@ -247,6 +248,8 @@ namespace jmespath {
               is_projection_(is_projection)
         {
         }
+        
+        ~expr_base_impl() = default;
 
         std::size_t precedence_level() const
         {
@@ -656,7 +659,7 @@ namespace jmespath {
         int64_t step_;
 
         slice()
-            : start_(), stop_(), step_(1)
+            : step_(1)
         {
         }
 
@@ -665,35 +668,15 @@ namespace jmespath {
         {
         }
 
-        slice(const slice& other)
-            : start_(other.start_), stop_(other.stop_), step_(other.step_)
-        {
-        }
+        slice(const slice& other) = default;
 
-        slice& operator=(const slice& rhs) 
-        {
-            if (this != &rhs)
-            {
-                if (rhs.start_)
-                {
-                    start_ = rhs.start_;
-                }
-                else
-                {
-                    start_.reset();
-                }
-                if (rhs.stop_)
-                {
-                    stop_ = rhs.stop_;
-                }
-                else
-                {
-                    stop_.reset();
-                }
-                step_ = rhs.step_;
-            }
-            return *this;
-        }
+        slice(slice&& other) = default;
+
+        slice& operator=(const slice& other) = default;
+
+        slice& operator=(slice&& other) = default;
+
+        ~slice() = default;
 
         int64_t get_start(std::size_t size) const
         {
@@ -734,7 +717,7 @@ namespace jmespath {
         }
     };
 
-    namespace detail {
+namespace detail {
      
     enum class path_state 
     {
@@ -826,7 +809,7 @@ namespace jmespath {
             bool is_right_associative_;
 
         protected:
-            ~unary_operator() = default; // virtual destructor not needed
+            virtual ~unary_operator() = default; 
         public:
             unary_operator(operator_kind oper)
                 : precedence_level_(operator_table::precedence_level(oper)), 
@@ -864,7 +847,7 @@ namespace jmespath {
             std::size_t precedence_level_;
             bool is_right_associative_;
         protected:
-            ~binary_operator() = default; // virtual destructor not needed
+            virtual ~binary_operator() = default; 
         public:
             binary_operator(operator_kind oper)
                 : precedence_level_(operator_table::precedence_level(oper)), 
@@ -2022,7 +2005,7 @@ namespace jmespath {
                         {
                             return *context.create_json(sval);
                         }
-                        jsoncons::detail::chars_to to_double;
+                        const jsoncons::detail::chars_to to_double;
                         try
                         {
                             auto s = arg0.as_string();
@@ -2237,7 +2220,7 @@ namespace jmespath {
                 construct(std::move(other));
             }
 
-            token& operator=(token&& other)
+            token& operator=(token&& other) noexcept
             {
                 if (&other != this)
                 {
@@ -2514,7 +2497,7 @@ namespace jmespath {
                     }
                     case token_kind::unary_operator:
                     {
-                        JSONCONS_ASSERT(stack.size() >= 1);
+                        JSONCONS_ASSERT(!stack.empty());
                         pointer ptr = std::addressof(stack.back().value());
                         stack.pop_back();
                         reference r = t.unary_operator_->evaluate(*ptr, context, ec);
@@ -2906,7 +2889,7 @@ namespace jmespath {
                 {
                     return context.null_value();
                 }
-                int64_t slen = static_cast<int64_t>(val.size());
+                auto slen = static_cast<int64_t>(val.size());
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(index_);
@@ -3653,8 +3636,8 @@ namespace jmespath {
             }
         };
     private:
-        std::size_t line_;
-        std::size_t column_;
+        std::size_t line_{1};
+        std::size_t column_{1};
         const char_type* begin_input_;
         const char_type* end_input_;
         const char_type* p_;
@@ -3667,12 +3650,13 @@ namespace jmespath {
 
     public:
         jmespath_evaluator(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
-            : line_(1), column_(1),
-              begin_input_(nullptr), end_input_(nullptr),
+            : begin_input_(nullptr), end_input_(nullptr),
               p_(nullptr),
               resources_{funcs}
         {
         }
+        
+        ~jmespath_evaluator() = default;
 
         std::size_t line() const
         {
@@ -4568,7 +4552,7 @@ namespace jmespath {
                             {
                                 if (!buffer.empty())
                                 {
-                                    int64_t val;
+                                    int64_t val{};
                                     auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
@@ -5049,7 +5033,7 @@ namespace jmespath {
 
             //for (auto& t : output_stack_)
             //{
-            //    std::cout << t.to_string() << std::endl;
+            //    std::cout << t.to_string() << '\n';
             //}
 
             return jmespath_expression(std::move(resources_), std::move(output_stack_));
@@ -5436,7 +5420,7 @@ namespace jmespath {
         }
     };
 
-    } // detail
+} // namespace detail
 
     template <typename Json>
     using jmespath_expression = typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::jmespath_expression;
@@ -5501,4 +5485,4 @@ namespace jmespath {
 } // namespace jmespath
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JMESPATH_JMESPATH_HPP

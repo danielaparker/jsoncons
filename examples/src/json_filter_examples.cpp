@@ -52,7 +52,7 @@ private:
             {
                 std::cerr << "Incomplete name \"" << s
                    << "\" at line " << context.line()
-                   << " and column " << context.column() << std::endl;
+                   << " and column " << context.column() << '\n';
             }
         }
         else
@@ -109,13 +109,13 @@ void change_member_name_example()
     std::istringstream is(s);
     json_stream_reader reader(is, filter1);
     reader.read();
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 int main()
@@ -125,6 +125,6 @@ int main()
     name_fixup_example2();
     change_member_name_example();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

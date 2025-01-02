@@ -4,11 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_TYPE_HPP
-#define JSONCONS_BSON_BSON_TYPE_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_TYPE_HPP
+#define JSONCONS_EXT_BSON_BSON_TYPE_HPP
 
-#include <string>
 #include <memory>
+#include <string>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
@@ -39,6 +40,7 @@ namespace jsoncons { namespace bson {
 
     enum class bson_container_type {document, array};
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_TYPE_HPP

@@ -275,11 +275,11 @@ public:
     using typename From::string_view_type;
 private:
     To* destination_;
+public:
 
     // noncopyable
     json_visitor_adaptor_base(const json_visitor_adaptor_base&) = delete;
-    json_visitor_adaptor_base& operator=(const json_visitor_adaptor_base&) = delete;
-public:
+
     json_visitor_adaptor_base(To& visitor)
         : destination_(std::addressof(visitor))
     {
@@ -287,6 +287,8 @@ public:
 
     // moveable
     json_visitor_adaptor_base(json_visitor_adaptor_base&&) = default;
+
+    json_visitor_adaptor_base& operator=(const json_visitor_adaptor_base&) = delete;
     json_visitor_adaptor_base& operator=(json_visitor_adaptor_base&&) = default;
 
     To& destination()
@@ -506,19 +508,19 @@ class json_visitor_adaptor<From,To,typename std::enable_if<extension_traits::is_
 public:
     using typename From::string_view_type;
     using supertype::destination;
-private:
+public:
 
     // noncopyable
     json_visitor_adaptor(const json_visitor_adaptor&) = delete;
-    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
-public:
+    // moveable
+    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+
     json_visitor_adaptor(To& visitor)
         : supertype(visitor)
     {
     }
 
-    // moveable
-    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
     json_visitor_adaptor& operator=(json_visitor_adaptor&&) = default;
 
 private:
@@ -547,19 +549,19 @@ class json_visitor_adaptor<From,To,typename std::enable_if<!(extension_traits::i
 public:
     using typename From::string_view_type;
     using supertype::destination;
-private:
+public:
 
     // noncopyable
     json_visitor_adaptor(const json_visitor_adaptor&) = delete;
-    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
-public:
+    // moveable
+    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+
     json_visitor_adaptor(To& visitor)
         : supertype(visitor)
     {
     }
 
-    // moveable
-    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
     json_visitor_adaptor& operator=(json_visitor_adaptor&&) = default;
 
 private:
@@ -604,6 +606,6 @@ using wjson_filter = basic_json_filter<wchar_t>;
 using rename_object_key_filter = basic_rename_object_key_filter<char>;
 using wrename_object_key_filter = basic_rename_object_key_filter<wchar_t>;
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_FILTER_HPP

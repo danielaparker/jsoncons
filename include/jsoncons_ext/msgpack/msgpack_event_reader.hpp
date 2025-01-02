@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_EVENT_READER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_EVENT_READER_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_event_reader.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_event_reader.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
 namespace jsoncons { 
@@ -37,10 +38,6 @@ namespace msgpack {
         basic_item_event_receiver<char_type> event_receiver_;
         bool eof_;
 
-        // Noncopyable and nonmoveable
-        msgpack_event_reader(const msgpack_event_reader&) = delete;
-        msgpack_event_reader& operator=(const msgpack_event_reader&) = delete;
-
     public:
         using string_view_type = string_view;
 
@@ -57,6 +54,10 @@ namespace msgpack {
                 next();
             }
         }
+
+        // Noncopyable and nonmoveable
+        msgpack_event_reader(const msgpack_event_reader&) = delete;
+        msgpack_event_reader(msgpack_event_reader&&) = delete;
 
         // Constructors that set parse error codes
 
@@ -95,6 +96,11 @@ namespace msgpack {
                 next(ec);
             }
         }
+        
+        ~msgpack_event_reader() = default;
+
+        msgpack_event_reader& operator=(const msgpack_event_reader&) = delete;
+        msgpack_event_reader& operator=(msgpack_event_reader&&) = delete;
 
         void reset()
         {
@@ -231,7 +237,7 @@ namespace msgpack {
                 while (!parser_.stopped())
                 {
                     parser_.parse(event_receiver_, ec);
-                    if (ec) return;
+                    if (ec) {return;}
                 }
             }
         }
@@ -243,7 +249,7 @@ namespace msgpack {
                 while (!parser_.stopped())
                 {
                     parser_.parse(visitor, ec);
-                    if (ec) return;
+                    if (ec) {return;}
                 }
             }
         }
@@ -252,5 +258,5 @@ namespace msgpack {
 } // namespace msgpack
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
 

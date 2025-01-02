@@ -21,7 +21,7 @@ void check_patch(Json& target, const Json& patch, const std::error_code& expecte
     jsonpatch::apply_patch(target, patch, ec);
     if (ec != expected_ec || expected != target)
     {
-        std::cout << "target:\n" << target << std::endl;
+        std::cout << "target:\n" << target << '\n';
     }
     CHECK(ec == expected_ec); //-V521
     CHECK(target == expected); //-V521
@@ -196,7 +196,7 @@ TEST_CASE("from diff with null and lossless number")
     
     auto options = json_options{}
         .lossless_number(true)
-        .bigint_format(jsoncons::bigint_chars_format::number)
+        .bignum_format(jsoncons::bignum_format_kind::raw)
         .byte_string_format(jsoncons::byte_string_chars_format::base64);
 
     const char* json1 = "{\"hello\":123.4, \"hello2\":null}";

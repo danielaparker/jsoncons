@@ -4,12 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 
@@ -78,7 +78,7 @@ namespace jsonschema {
         {
         }
 
-        evaluation_context(evaluation_context&& other)
+        evaluation_context(evaluation_context&& other) noexcept
             : dynamic_scope_{std::move(other.dynamic_scope_)},eval_path_{std::move(other.eval_path_)},
               flags_(other.flags_)
         {
@@ -161,4 +161,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_COMPILATION_CONTEXT_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMPILATION_CONTEXT_HPP

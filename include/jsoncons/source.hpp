@@ -7,19 +7,20 @@
 #ifndef JSONCONS_SOURCE_HPP
 #define JSONCONS_SOURCE_HPP
 
-#include <stdexcept>
-#include <string>
-#include <vector>
-#include <istream>
-#include <memory> // std::addressof
 #include <cstring> // std::memcpy
 #include <exception>
-#include <iterator>
-#include <type_traits> // std::enable_if
 #include <functional>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <istream>
+#include <iterator>
+#include <memory> // std::addressof
+#include <stdexcept>
+#include <string>
+#include <type_traits> // std::enable_if
+#include <vector>
+
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 
 
@@ -28,14 +29,15 @@ namespace jsoncons {
     {
         class null_buffer : public std::basic_streambuf<CharT>
         {
-            null_buffer(const null_buffer&) = delete;
-            null_buffer& operator=(const null_buffer&) = delete;
         public:
             using typename std::basic_streambuf<CharT>::int_type;
             using typename std::basic_streambuf<CharT>::traits_type;
 
             null_buffer() = default;
+            null_buffer(const null_buffer&) = delete;
             null_buffer(null_buffer&&) = default;
+
+            null_buffer& operator=(const null_buffer&) = delete;
             null_buffer& operator=(null_buffer&&) = default;
 
             int_type overflow( int_type ch = typename std::basic_streambuf<CharT>::traits_type::eof() ) override
@@ -81,30 +83,24 @@ namespace jsoncons {
         basic_null_istream<char_type> null_is_;
         std::basic_istream<char_type>* stream_ptr_;
         std::basic_streambuf<char_type>* sbuf_;
-        std::size_t position_;
+        std::size_t position_{0};
         std::vector<value_type> buffer_;
         const value_type* buffer_data_;
-        std::size_t buffer_length_;
+        std::size_t buffer_length_{0};
+    public:
+
+        stream_source()
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
+              buffer_(1), buffer_data_(buffer_.data())
+        {
+        }
 
         // Noncopyable 
         stream_source(const stream_source&) = delete;
-        stream_source& operator=(const stream_source&) = delete;
-    public:
-        stream_source()
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(1), buffer_data_(buffer_.data()), buffer_length_(0)
-        {
-        }
-
-        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_size)
-            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
-              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0)
-        {
-        }
 
         stream_source(stream_source&& other) noexcept
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()),
+              buffer_(), buffer_data_(buffer_.data())
         {
             if (other.stream_ptr_ != &other.null_is_)
             {
@@ -118,9 +114,15 @@ namespace jsoncons {
             }
         }
 
-        ~stream_source()
+        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_size)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()),
+              buffer_(buf_size), buffer_data_(buffer_.data())
         {
         }
+
+        ~stream_source() = default;
+
+        stream_source& operator=(const stream_source&) = delete;
 
         stream_source& operator=(stream_source&& other) noexcept
         {
@@ -312,15 +314,16 @@ namespace jsoncons {
         const value_type* data_;
         const value_type* current_;
         const value_type* end_;
-
-        // Noncopyable 
-        string_source(const string_source&) = delete;
-        string_source& operator=(const string_source&) = delete;
     public:
         string_source()
             : data_(nullptr), current_(nullptr), end_(nullptr)
         {
         }
+
+        // Noncopyable 
+        string_source(const string_source&) = delete;
+
+        string_source(string_source&& other) = default;
 
         template <typename Sourceable>
         string_source(const Sourceable& s,
@@ -334,8 +337,7 @@ namespace jsoncons {
         {
         }
 
-        string_source(string_source&& other) = default;
-
+        string_source& operator=(const string_source&) = delete;
         string_source& operator=(string_source&& other) = default;
 
         bool eof() const
@@ -410,25 +412,27 @@ namespace jsoncons {
 
         IteratorT current_;
         IteratorT end_;
-        std::size_t position_;
+        std::size_t position_{0};
         std::vector<value_type> buffer_;
-        std::size_t buffer_length_;
+        std::size_t buffer_length_{0};
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
+    public:
 
         // Noncopyable 
         iterator_source(const iterator_source&) = delete;
-        iterator_source& operator=(const iterator_source&) = delete;
-    public:
-
-        iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
-            : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
-        {
-        }
 
         iterator_source(iterator_source&& other) = default;
 
+        iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
+            : current_(first), end_(last), buffer_(buf_size)
+        {
+        }
+        
+        ~iterator_source() = default;
+
+        iterator_source& operator=(const iterator_source&) = delete;
         iterator_source& operator=(iterator_source&& other) = default;
 
         bool eof() const
@@ -525,15 +529,16 @@ namespace jsoncons {
         const value_type* data_;
         const value_type* current_;
         const value_type* end_;
-
-        // Noncopyable 
-        bytes_source(const bytes_source&) = delete;
-        bytes_source& operator=(const bytes_source&) = delete;
     public:
         bytes_source()
             : data_(nullptr), current_(nullptr), end_(nullptr)
         {
         }
+
+        // Noncopyable 
+        bytes_source(const bytes_source&) = delete;
+
+        bytes_source(bytes_source&&) = default;
 
         template <typename Sourceable>
         bytes_source(const Sourceable& source,
@@ -544,8 +549,7 @@ namespace jsoncons {
         {
         }
 
-        bytes_source(bytes_source&&) = default;
-
+        bytes_source& operator=(const bytes_source&) = delete;
         bytes_source& operator=(bytes_source&&) = default;
 
         bool eof() const
@@ -626,18 +630,19 @@ namespace jsoncons {
 
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
+    public:
 
         // Noncopyable 
         binary_iterator_source(const binary_iterator_source&) = delete;
-        binary_iterator_source& operator=(const binary_iterator_source&) = delete;
-    public:
+
+        binary_iterator_source(binary_iterator_source&& other) = default;
+
         binary_iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
             : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
         {
         }
 
-        binary_iterator_source(binary_iterator_source&& other) = default;
-
+        binary_iterator_source& operator=(const binary_iterator_source&) = delete;
         binary_iterator_source& operator=(binary_iterator_source&& other) = default;
 
         bool eof() const
@@ -791,4 +796,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_SOURCE_HPP

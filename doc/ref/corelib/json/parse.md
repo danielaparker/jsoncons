@@ -87,7 +87,7 @@ try
 } 
 catch(const jsoncons::ser_error& e) 
 {
-    std::cout << e.what() << std::endl;
+    std::cout << e.what() << '\n';
 }
 ```
 Output:
@@ -107,9 +107,9 @@ auto options = json_options{}
 
 json j = json::parse(s,options);
 
-std::cout << "\n(1)\n" << pretty_print(j) << std::endl;
+std::cout << "\n(1)\n" << pretty_print(j) << '\n';
 
-std::cout << "\n(2)\n" << pretty_print(j,options) << std::endl;
+std::cout << "\n(2)\n" << pretty_print(j,options) << '\n';
 ```
 Output:
 ```
@@ -140,7 +140,7 @@ Input JSON file `example.json`:
 std::ifstream is("example.json");
 json j = json::parse(is);
 
-std::cout << pretty_print(j) << std::endl;
+std::cout << pretty_print(j) << '\n';
 ```
 
 Output:
@@ -251,7 +251,7 @@ int main()
     }
     catch (const std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        std::cerr << ex.what() << '\n';
     }
 }
 ```

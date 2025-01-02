@@ -68,7 +68,7 @@ namespace {
             {
                 aNormPath = buildNormalizedPath(current_);
             }
-            //std::cout << aNormPath << std::endl;
+            //std::cout << aNormPath << '\n';
             if (path_ == aNormPath)
             {
                 positions_.push_back(context.position());

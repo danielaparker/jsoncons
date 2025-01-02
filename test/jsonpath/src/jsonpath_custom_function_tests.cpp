@@ -29,7 +29,7 @@ TEST_CASE("jsonpath custom function test")
     }
     JSONCONS_CATCH (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     jsonpath::custom_functions<json> functions;

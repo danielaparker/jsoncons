@@ -53,17 +53,17 @@ int main()
 
     mergepatch::apply_merge_patch(doc, patch);
 
-    std::cout << "(1)\n" << pretty_print(doc) << std::endl;
+    std::cout << "(1)\n" << pretty_print(doc) << '\n';
 
     // Create a JSON Patch
 
     auto patch2 = mergepatch::from_diff(doc2,doc);
 
-    std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
+    std::cout << "(2)\n" << pretty_print(patch2) << '\n';
 
     mergepatch::apply_merge_patch(doc2,patch2);
 
-    std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
+    std::cout << "(3)\n" << pretty_print(doc2) << '\n';
 }
 ```
 Output:

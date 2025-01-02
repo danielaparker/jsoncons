@@ -7,22 +7,23 @@
 #ifndef JSONCONS_TYPED_ARRAY_VIEW_HPP
 #define JSONCONS_TYPED_ARRAY_VIEW_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <stdexcept>
-#include <system_error>
-#include <ios>
-#include <type_traits> // std::enable_if
 #include <array> // std::array
 #include <functional> // std::function
+#include <ios>
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <type_traits> // std::enable_if
+
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {
@@ -246,5 +247,5 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_TYPED_ARRAY_VIEW_HPP
 

@@ -4,19 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_ENCODER_HPP
-#define JSONCONS_CBOR_CBOR_ENCODER_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_ENCODER_HPP
+#define JSONCONS_EXT_CBOR_CBOR_ENCODER_HPP
 
-#include <string>
-#include <vector>
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 
@@ -51,13 +53,15 @@ private:
     struct stack_item
     {
         cbor_container_type type_;
-        std::size_t length_;
-        std::size_t index_;
+        std::size_t length_{0};
+        std::size_t index_{0};
 
         stack_item(cbor_container_type type, std::size_t length = 0) noexcept
-           : type_(type), length_(length), index_(0)
+           : type_(type), length_(length)
         {
         }
+        
+        ~stack_item() = default; 
 
         std::size_t length() const
         {
@@ -94,11 +98,12 @@ private:
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
     int nesting_depth_;
+public:
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
-    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
-public:
+    basic_cbor_encoder(basic_cbor_encoder&&) = delete;
+
     explicit basic_cbor_encoder(Sink&& sink, 
                                 const Allocator& alloc = Allocator())
        : basic_cbor_encoder(std::forward<Sink>(sink), cbor_encode_options(), alloc)
@@ -131,6 +136,9 @@ public:
         {
         }
     }
+
+    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
+    basic_cbor_encoder& operator=(basic_cbor_encoder&&) = delete;
 
     void reset()
     {
@@ -594,7 +602,7 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            int64_t val;
+            int64_t val{};
             auto r = jsoncons::detail::to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
@@ -1525,7 +1533,7 @@ private:
         else
         {
             bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
-            for (auto p = data.begin(); more && p != data.end(); ++p)
+            for (const auto* p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
             }
@@ -1552,19 +1560,17 @@ private:
             write_byte_string_value(byte_string_view(v));
             return true;
         }
-        else
+        
+        bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
+        for (auto p = data.begin(); more && p != data.end(); ++p)
         {
-            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
-            for (auto p = data.begin(); more && p != data.end(); ++p)
-            {
-                more = this->double_value(*p,semantic_tag::none,context, ec);
-            }
-            if (more)
-            {
-                more = this->end_array(context, ec);
-            }
-            return more;
+            more = this->double_value(*p,semantic_tag::none,context, ec);
         }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
     }
 /*
     bool visit_typed_array(const jsoncons::span<const float128_type>&, 
@@ -1739,5 +1745,7 @@ private:
 using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
 using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-}}
+} // namespace cbor
+} // namespace jsoncons
+
 #endif

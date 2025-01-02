@@ -22,7 +22,7 @@ using namespace jsoncons;
 
 void jsonpath_tests(const std::string& fpath)
 {
-    std::cout << "Test " << fpath << std::endl;
+    std::cout << "Test " << fpath << '\n';
 
     std::fstream is(fpath);
     if (!is)

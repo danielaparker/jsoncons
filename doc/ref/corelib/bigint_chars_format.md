@@ -1,12 +1,14 @@
-### jsoncons::bigint_chars_format
+### jsoncons::bigint_chars_format (deprecated in 1.0.0)
 
 ```cpp
 #include <jsoncons/json_options.hpp>
 
-enum class bigint_chars_format : uint8_t {number, base10, base64, base64url};
+enum class bigint_chars_format : uint8_t {number, base10, base64, base64url};   (until 1.0.0)
+
+using bigint_chars_format= bignum_format_kind;                                  (since 1.0.0)
 ```
 
-Specifies `bignum` formatting. 
+Specifies `bigint` formatting. 
 
 ### Examples
 
@@ -23,38 +25,32 @@ int main()
 
     json j(bigint::from_string(s.c_str()));
 
-    std::cout << "(default) ";
-    j.dump(std::cout);
-    std::cout << "\n\n";
+    std::cout << "(1) " << print(j) << "\n\n";
 
-    std::cout << "(integer) ";
-    auto options1 = json_options{}
+    auto options2 = json_options{}
         .bigint_format(bigint_chars_format::number);
-    j.dump(std::cout, options1);
-    std::cout << "\n\n";
+    std::cout << "(2) " << print(j, options2) << "\n\n";
 
-    std::cout << "(base64) ";
     auto options3 = json_options{}
         .bigint_format(bigint_chars_format::base64);
-    j.dump(std::cout, options3);
-    std::cout << "\n\n";
+    std::cout << "(3) " << print(j, options3) << "\n\n";
 
-    std::cout << "(base64url) ";
     auto options4 = json_options{}
-        .bigint_format(bigint_chars_format::base64url);
-    j.dump(std::cout, options4);
-    std::cout << "\n\n";
+    .bigint_format(bigint_chars_format::base64url);
+    std::cout << "(4) " << print(j, options4) << "\n\n";
 }
 ```
 Output:
 ```
-(default) "-18446744073709551617"
+(1) "-18446744073709551617"     (until 1.0.0)
 
-(integer) -18446744073709551617
+(1) -18446744073709551617       (since 1.0.0)
 
-(base64) "~AQAAAAAAAAAA"
+(2) -18446744073709551617
 
-(base64url) "~AQAAAAAAAAAA"
+(3) "~AQAAAAAAAAAA"
+
+(4) "~AQAAAAAAAAAA"
 ```
 
 #### Integer overflow during parsing
@@ -70,29 +66,31 @@ int main()
 
     json j = json::parse(s);
 
-    std::cout << "(1) ";
-    j.dump(std::cout);
-    std::cout << "\n\n";
+    std::cout << "(1) " << print(j) << "\n\n";
 
-    std::cout << "(2) ";
-    auto options1 = json_options{}
-        .bigint_format(bigint_chars_format::number);
-    j.dump(std::cout, options1);
-    std::cout << "\n\n";
-
-    std::cout << "(3) ";
     auto options2 = json_options{}
+        .bigint_format(bigint_chars_format::number);
+    std::cout << "(2) " << print(j, options2) << "\n\n";
+
+    auto options3 = json_options{}
+        .bigint_format(bigint_chars_format::base64);
+    std::cout << "(3) " << print(j, options3) << "\n\n";
+
+    auto options4 = json_options{}
         .bigint_format(bigint_chars_format::base64url);
-    j.dump(std::cout, options2);
-    std::cout << "\n\n";
+    std::cout << "(4) " << print(j, options4) << "\n\n";
 }
 ```
 Output:
 ```
-(1) "-18446744073709551617"
+(1) "-18446744073709551617"     (until 1.0.0)
+
+(1) -18446744073709551617       (since 1.0.0)
 
 (2) -18446744073709551617
 
-(3) "~AQAAAAAAAAAB"
+(3) "~AQAAAAAAAAAA"
+
+(4) "~AQAAAAAAAAAA"
 ```
 

@@ -4,21 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_LOCATION_HPP
-#define JSONCONS_JSONPATH_JSON_LOCATION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
+#define JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <type_traits> // std::is_const
-#include <limits> // std::numeric_limits
-#include <utility> // std::move
 #include <algorithm> // std::reverse
+#include <memory>
+#include <string>
+#include <type_traits> // std::is_const
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { 
 namespace jsonpath { 
@@ -34,22 +34,22 @@ namespace jsonpath {
     private:
         bool has_name_;
         string_type name_;
-        std::size_t index_;
+        std::size_t index_{0};
 
     public:
         basic_path_element(const char_type* name, std::size_t length, 
             const Allocator& alloc = Allocator())
-            : has_name_(true), name_(name, length, alloc), index_(0)
+            : has_name_(true), name_(name, length, alloc)
         {
         }
 
         explicit basic_path_element(const string_type& name)
-            : has_name_(true), name_(name), index_(0)
+            : has_name_(true), name_(name)
         {
         }
 
         explicit basic_path_element(string_type&& name)
-            : has_name_(true), name_(std::move(name)), index_(0)
+            : has_name_(true), name_(std::move(name))
         {
         }
 
@@ -61,7 +61,13 @@ namespace jsonpath {
 
         basic_path_element(const basic_path_element& other) = default;
 
+        basic_path_element(basic_path_element&& other) = default;
+        
+        ~basic_path_element() = default;
+
         basic_path_element& operator=(const basic_path_element& other) = default;
+
+        basic_path_element& operator=(basic_path_element&& other) = default;
 
         bool has_name() const
         {
@@ -96,9 +102,17 @@ namespace jsonpath {
                 {
                     diff = name_.compare(other.name_);
                 }
+                else if (index_ < other.index_)
+                {
+                    diff = -1;
+                }
+                else if (index_ > other.index_)
+                {
+                    diff = 1;
+                }
                 else
                 {
-                    diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
+                    diff = 0;
                 }
             }
             return diff;
@@ -521,8 +535,10 @@ namespace jsonpath {
                         ++column_;
                         break;
                     case '\r':
-                        if (p_+1 < end_input_ && *(p_+1) == '\n')
+                        if ((p_+1 < end_input_) && (*(p_+1) == '\n'))
+                        {
                             ++p_;
+                        }
                         ++line_;
                         column_ = 1;
                         ++p_;
@@ -590,6 +606,8 @@ namespace jsonpath {
             : elements_(std::move(elements))
         {
         }
+        
+        ~basic_json_location() = default;
 
         basic_json_location& operator=(const basic_json_location&) = default;
 
@@ -643,7 +661,15 @@ namespace jsonpath {
                 ++it1;
                 ++it2;
             }
-            return (elements_.size() < other.elements_.size()) ? -1 : (elements_.size() == other.elements_.size()) ? 0 : 1;
+            if (elements_.size() < other.elements_.size())
+            {
+                return -1;
+            }
+            if (elements_.size() > other.elements_.size())
+            {
+                return 1;
+            }
+            return 0;
         }
 
         // Modifiers
@@ -927,10 +953,7 @@ namespace jsonpath {
         {
             return std::make_pair(p_current,true);
         }
-        else
-        {
-            return std::make_pair(p_current, false);
-        }
+        return std::make_pair(p_current, false);
     }
 
     using json_location = basic_json_location<char>;
@@ -953,4 +976,4 @@ namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP

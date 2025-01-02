@@ -518,6 +518,6 @@ int main()
 #endif
     smart_pointer_traits_test();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

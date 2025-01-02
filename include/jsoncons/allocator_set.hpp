@@ -4,10 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_ALLOCATOR_STRATEGY_HPP
-#define JSONCONS_ALLOCATOR_STRATEGY_HPP
+#ifndef JSONCONS_ALLOCATOR_SET_HPP
+#define JSONCONS_ALLOCATOR_SET_HPP
 
 #include <memory>
+
 #include <jsoncons/tag_type.hpp>
 
 namespace jsoncons {
@@ -63,4 +64,4 @@ allocator_set<std::allocator<char>,TempAllocator> temp_allocator_only(const Temp
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_ALLOCATOR_SET_HPP

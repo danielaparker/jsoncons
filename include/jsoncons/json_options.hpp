@@ -7,13 +7,14 @@
 #ifndef JSONCONS_JSON_OPTIONS_HPP
 #define JSONCONS_JSON_OPTIONS_HPP
 
-#include <string>
-#include <limits> // std::numeric_limits
 #include <cwchar>
 #include <functional>
-#include <jsoncons/json_exception.hpp>
+#include <limits> // std::numeric_limits
+#include <string>
+
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/ser_context.hpp>
 
 namespace jsoncons {
@@ -24,8 +25,17 @@ enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 enum class line_split_kind  : uint8_t {same_line=1, new_line, multi_line};
 
-enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
-};
+enum class bignum_format_kind : uint8_t {raw, 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    number=raw, // deprecated, use raw instead 
+#endif    
+    base10, 
+    base64, 
+    base64url};
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use bignum_format_kind") typedef bignum_format_kind bigint_chars_format;
+#endif
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
@@ -101,7 +111,7 @@ protected:
         max_nesting_depth_(1024)
     {}
 
-    virtual ~basic_json_options_common() noexcept = default;
+    virtual ~basic_json_options_common() = default;
 
     basic_json_options_common(const basic_json_options_common&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;
@@ -266,7 +276,7 @@ public:
 
     basic_json_decode_options(const basic_json_decode_options&) = default;
 
-    basic_json_decode_options(basic_json_decode_options&& other)
+    basic_json_decode_options(basic_json_decode_options&& other) noexcept
         : super_type(std::move(other)), lossless_number_(other.lossless_number_), err_handler_(std::move(other.err_handler_))
     {
     }
@@ -304,7 +314,7 @@ private:
     bool pad_inside_array_brackets_:1;
     float_chars_format float_format_;
     byte_string_chars_format byte_string_format_;
-    bigint_chars_format bigint_format_;
+    bignum_format_kind bignum_format_;
     line_split_kind line_splits_;
     line_split_kind object_object_line_splits_;
     line_split_kind object_array_line_splits_;
@@ -312,9 +322,9 @@ private:
     line_split_kind array_object_line_splits_;
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
-    int8_t precision_;
-    uint8_t indent_size_;
-    std::size_t line_length_limit_;
+    int8_t precision_{0};
+    uint8_t indent_size_{indent_size_default};
+    std::size_t line_length_limit_{line_length_limit_default};
     string_type new_line_chars_;
 public:
     basic_json_encode_options()
@@ -324,24 +334,21 @@ public:
           pad_inside_array_brackets_(false),
           float_format_(float_chars_format::general),
           byte_string_format_(byte_string_chars_format::none),
-          bigint_format_(bigint_chars_format::base10),
+          bignum_format_(bignum_format_kind::raw),
           line_splits_(line_split_kind::multi_line),
           object_object_line_splits_(line_split_kind{}),
           object_array_line_splits_(line_split_kind{}),
           array_array_line_splits_(line_split_kind{}),
           array_object_line_splits_(line_split_kind{}),
           spaces_around_colon_(spaces_option::space_after),
-          spaces_around_comma_(spaces_option::space_after),
-          precision_(0),
-          indent_size_(indent_size_default),
-          line_length_limit_(line_length_limit_default)
+          spaces_around_comma_(spaces_option::space_after)
     {
         new_line_chars_.push_back('\n');
     }
 
     basic_json_encode_options(const basic_json_encode_options&) = default;
 
-    basic_json_encode_options(basic_json_encode_options&& other)
+    basic_json_encode_options(basic_json_encode_options&& other) noexcept
         : super_type(std::move(other)),
           escape_all_non_ascii_(other.escape_all_non_ascii_),
           escape_solidus_(other.escape_solidus_),
@@ -349,7 +356,7 @@ public:
           pad_inside_array_brackets_(other.pad_inside_array_brackets_),
           float_format_(other.float_format_),
           byte_string_format_(other.byte_string_format_),
-          bigint_format_(other.bigint_format_),
+          bignum_format_(other.bignum_format_),
           line_splits_(other.line_splits_),
           object_object_line_splits_(other.object_object_line_splits_),
           object_array_line_splits_(other.object_array_line_splits_),
@@ -363,13 +370,21 @@ public:
           new_line_chars_(std::move(other.new_line_chars_))
     {
     }
+    
+    ~basic_json_encode_options() = default;
 protected:
     basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
     basic_json_encode_options& operator=(basic_json_encode_options&&) = default;
 public:
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
-    bigint_chars_format bigint_format() const  {return bigint_format_;}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
+    bignum_format_kind bigint_format() const  {return bignum_format_;}
+#endif    
+
+    bignum_format_kind bignum_format() const  {return bignum_format_;}
 
     line_split_kind line_splits() const  {return line_splits_;}
 
@@ -462,7 +477,7 @@ public:
     using basic_json_decode_options<CharT>::err_handler;
 
     using basic_json_encode_options<CharT>::byte_string_format;
-    using basic_json_encode_options<CharT>::bigint_format;
+    using basic_json_encode_options<CharT>::bignum_format;
     using basic_json_encode_options<CharT>::line_splits;
     using basic_json_encode_options<CharT>::object_object_line_splits;
     using basic_json_encode_options<CharT>::array_object_line_splits;
@@ -542,7 +557,13 @@ public:
 
     basic_json_options&  byte_string_format(byte_string_chars_format value) {this->byte_string_format_ = value; return *this;}
 
-    basic_json_options&  bigint_format(bigint_chars_format value) {this->bigint_format_ = value; return *this;}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use bignum_format")
+    basic_json_options&  bigint_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
+#endif    
+
+    basic_json_options&  bignum_format(bignum_format_kind value) {this->bignum_format_ = value; return *this;}
 
     basic_json_options& line_splits(line_split_kind value) {this->line_splits_ = value; return *this;}
 
@@ -685,5 +706,6 @@ private:
 using json_options = basic_json_options<char>;
 using wjson_options = basic_json_options<wchar_t>;
 
-}
-#endif
+} // namespace jsoncons
+
+#endif // JSONCONS_JSON_OPTIONS_HPP

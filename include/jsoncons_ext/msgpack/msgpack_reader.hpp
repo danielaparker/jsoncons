@@ -4,20 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_READER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_READER_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/msgpack/msgpack_type.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
+#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -106,6 +107,7 @@ using msgpack_stream_reader = basic_msgpack_reader<jsoncons::binary_stream_sourc
 
 using msgpack_bytes_reader = basic_msgpack_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace msgpack
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP

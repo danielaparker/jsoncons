@@ -546,13 +546,13 @@ int main()
     //json_reader reader(is, filter1);        // (until 0.164.0)
     json_stream_reader reader(is, filter1);   // (since 0.164.0)
     reader.read();
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 ```
 Output:
@@ -636,7 +636,7 @@ private:
             {
                 std::cerr << "Incomplete name \"" << s
                    << "\" at line " << context.line()
-                   << " and column " << context.column() << std::endl;
+                   << " and column " << context.column() << '\n';
             }
         }
         else

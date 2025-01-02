@@ -14,20 +14,20 @@ void array_example1()
     {
         std::vector<int> v = {1,2,3,4};
         json a(v);
-        std::cout << a << std::endl;
+        std::cout << a << '\n';
     }
     {
         json j(json_array_arg, {1,true,"last"});
         auto d = j.as<std::deque<std::string>>();
         for (auto x : d)
         {
-            std::cout << x << std::endl;
+            std::cout << x << '\n';
         }
     }
     {
         std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
         json j(m);
-        std::cout << j << std::endl;
+        std::cout << j << '\n';
     }
     {
         json j;
@@ -38,7 +38,7 @@ void array_example1()
         auto um = j.as<std::unordered_map<std::string,int>>();
         for (const auto& x : um)
         {
-            std::cout << x.first << "=" << x.second << std::endl;
+            std::cout << x.first << "=" << x.second << '\n';
         }
     }
 }
@@ -56,7 +56,7 @@ void accessing_a_json_value_as_a_vector()
         }
         std::cout << v[i];
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void construct_json_from_vector()
@@ -80,24 +80,24 @@ void construct_json_from_vector()
 
     root["addresses"] = addresses;
 
-    std::cout << pretty_print(root) << std::endl;
+    std::cout << pretty_print(root) << '\n';
 
-    std::cout << "size=" << root["addresses"].size() << std::endl;
+    std::cout << "size=" << root["addresses"].size() << '\n';
     for (std::size_t i = 0; i < root["addresses"].size(); ++i)
     {
-        std::cout << root["addresses"][i] << std::endl;
+        std::cout << root["addresses"][i] << '\n';
     }
 }
 
 void add_element_to_array()
 {
     json cities(json_array_arg);  // an empty array
-    std::cout << cities << std::endl;  // output is "[]"
+    std::cout << cities << '\n';  // output is "[]"
     cities.push_back("Toronto");
     cities.push_back("Vancouver");
     cities.insert(cities.array_range().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
-    std::cout << cities << std::endl;
+    std::cout << cities << '\n';
 }
 
 void reverse_array_iterator()
@@ -109,7 +109,7 @@ void reverse_array_iterator()
 
     for (auto it = j.array_range().rbegin(); it != j.array_range().rend(); ++it)
     {
-        std::cout << it->as<std::string>() << std::endl;
+        std::cout << it->as<std::string>() << '\n';
     }
 }
 
@@ -117,21 +117,21 @@ void reserve_array_capacity()
 {
     json cities(json_array_arg);
     cities.reserve(10);  // storage is allocated
-    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
+    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << '\n';
 
     cities.push_back("Toronto");
     cities.push_back("Vancouver");
     cities.insert(cities.array_range().begin(),"Montreal");
-    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
+    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << '\n';
 
-    std::cout << cities << std::endl;
+    std::cout << cities << '\n';
 }
 
 void make_empty_array()
 {
-    std::cout << "empty array" <<std::endl;
+    std::cout << "empty array" <<'\n';
     json a(json_array_arg);
-    std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << '\n';
 }
 
 void array_range_based_for_loop()
@@ -156,32 +156,32 @@ void array_range_based_for_loop()
 
     for (const auto& book: booklist.array_range())
     {
-        std::cout << book["title"].as<std::string>() << std::endl;
+        std::cout << book["title"].as<std::string>() << '\n';
     } 
 }
 
 void make_1_dimensional_array_1()
 {
-    std::cout << "1 dimensional array 1" <<std::endl;
+    std::cout << "1 dimensional array 1" <<'\n';
     json a = json::make_array(10);
     a[1] = 1;
     a[2] = 2;
-    std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << '\n';
 }
 
 void make_1_dimensional_array_2()
 {
-    std::cout << "1 dimensional array 2" <<std::endl;
+    std::cout << "1 dimensional array 2" <<'\n';
     json a = json::make_array(10,0);
     a[1] = 1;
     a[2] = 2;
     a[3] = json(json_array_arg);
-    std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << '\n';
 }
 
 void make_2_dimensional_array()
 {
-    std::cout << "2 dimensional array" <<std::endl;
+    std::cout << "2 dimensional array" <<'\n';
     json a = json::make_array<2>(3,4,0);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
@@ -196,12 +196,12 @@ void make_2_dimensional_array()
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << '\n';
 }
 
 void make_3_dimensional_array()
 {
-    std::cout << "3 dimensional array" <<std::endl;
+    std::cout << "3 dimensional array" <<'\n';
     json a = json::make_array<3>(4,3,2,0);
 
     double val = 1.0;
@@ -216,7 +216,7 @@ void make_3_dimensional_array()
             }
         }
     }
-    std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << '\n';
 }
 
 int main()
@@ -240,7 +240,7 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 

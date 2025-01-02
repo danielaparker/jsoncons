@@ -51,7 +51,7 @@ x4=San Francisco
 ```cpp
 json j;
 j["field1"] = json::null();
-std::cout << j << std::endl;
+std::cout << j << '\n';
 ```
 Output: 
 ```json
@@ -76,7 +76,7 @@ person["address"] = std::move(address);
 
 doc["persons"].push_back(std::move(person));
 
-std::cout << pretty_print(doc) << std::endl;
+std::cout << pretty_print(doc) << '\n';
 ```
 Output:
 ```cpp

@@ -4,25 +4,26 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_READER_HPP
-#define JSONCONS_CSV_CSV_READER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_READER_HPP
+#define JSONCONS_EXT_CSV_CSV_READER_HPP
 
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <memory> // std::allocator
-#include <utility> // std::move
 #include <istream> // std::basic_istream
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons_ext/csv/csv_error.hpp>
-#include <jsoncons_ext/csv/csv_parser.hpp>
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
+#include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
+#include <jsoncons_ext/csv/csv_parser.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -42,9 +43,6 @@ namespace jsoncons { namespace csv {
         using temp_allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
 
-        basic_csv_reader(const basic_csv_reader&) = delete; 
-        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
-
         basic_default_json_visitor<CharT> default_visitor_;
         text_source_adaptor<Source> source_;
         basic_json_visitor<CharT>& visitor_;
@@ -57,6 +55,9 @@ namespace jsoncons { namespace csv {
         /*!
           \param is The input stream to read from
         */
+
+        basic_csv_reader(const basic_csv_reader&) = delete; 
+        basic_csv_reader(basic_csv_reader&&) = delete; 
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
@@ -111,7 +112,10 @@ namespace jsoncons { namespace csv {
         {
         }
 
-        ~basic_csv_reader() noexcept = default;
+        ~basic_csv_reader() = default;
+
+        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
+        basic_csv_reader& operator = (basic_csv_reader&&) = delete; 
 
         void read()
         {
@@ -133,7 +137,7 @@ namespace jsoncons { namespace csv {
             if (parser_.source_exhausted())
             {
                 auto s = source_.read_buffer(ec);
-                if (ec) return;
+                if (ec) {return;}
                 if (s.size() > 0)
                 {
                     parser_.set_buffer(s.data(),s.size());
@@ -164,7 +168,7 @@ namespace jsoncons { namespace csv {
             //std::cout << "UPDATE BUFFER\n";
             bool success = false;
             auto s = source_.read_buffer(ec);
-            if (ec) return false;
+            if (ec) {return false;}
             if (s.size() > 0)
             {
                 parser_.set_buffer(s.data(),s.size());
@@ -180,6 +184,7 @@ namespace jsoncons { namespace csv {
     using csv_stream_reader = basic_csv_reader<char,stream_source<char>>;
     using wcsv_stream_reader = basic_csv_reader<wchar_t,stream_source<wchar_t>>;
 
-}}
+} // namespace csv
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CSV_CSV_READER_HPP

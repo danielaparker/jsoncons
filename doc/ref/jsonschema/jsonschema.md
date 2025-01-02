@@ -143,7 +143,7 @@ the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test
 
 [Three ways of validating](#eg1)  
 [Format validation](#eg2)  
-[Using a ResolveURI to resolve references to schemas defined in external files](#eg3)  
+[Resolving references to schemas defined in external files](#eg3)  
 [Validate before decoding JSON into C++ class objects](#eg4)  
 [Default values](#eg5)  
 
@@ -351,13 +351,30 @@ Output:
 
 <div id="eg3"/>
 
-#### Using a ResolveURI to resolve references to schemas defined in external files
+#### Resolving references to schemas defined in external files  
 
-In this example, the main schema defines a reference using the `$ref` property to a
-second schema, defined in an external file `name-defs.json`,
+In this example, the main schema is defined by
+
+```cpp
+    std::string main_schema = R"(
+{
+    "$id" : "https://www.example.com/main",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "http://localhost:1234/draft2020-12/object",
+    "type": "object",
+    "properties": {
+        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
+    }
+}
+    )";
+```
+
+The main schema includes a reference using the `$ref` keyword to a
+second schema defined in an external file, `name-defs.json`,  
 
 ```json
 {
+    "$id" : "https://www.example.com/other",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$defs": {
         "orNull": {
@@ -375,47 +392,36 @@ second schema, defined in an external file `name-defs.json`,
 }
 ```
 
-jsoncons needs to know how to turn a URI reference to `name-defs.json` into a JSON Schema document,
-and for that it needs you to provide a `ResolveURI`.
+jsoncons allows you to write a resolver function object to handle the URI
+of the external file and translate it into a physical pathname.
 
 ```cpp
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <fstream>
-
-// for brevity
-using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; 
-
-// Until 0.174.0, throw a `schema_error` instead of returning json::null() 
-json resolver(const jsoncons::uri& uri)
-{
-    std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
-
-    std::string pathname = "./input/jsonschema/";
-    pathname += std::string(uri.path());
-
-    std::fstream is(pathname.c_str());
-    if (!is)
+auto resolver = [](const jsoncons::uri& uri) -> json
     {
-        return json::null();
-    }
+        std::cout << "Requested URI: " << uri.string() << "\n";
+        std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-    return json::parse(is);        
-}
+        std::string pathname = "./input/jsonschema" + std::string(uri.path());
 
+        std::fstream is(pathname.c_str());
+        if (!is)
+        {
+            return json::null();
+        }
+
+        return json::parse(is);
+    };
+```
+
+When building the main schema, the schema builder needs to resolve the URI 'https://www.example.com/name-defs.json#/$defs/orNull'. 
+The user does not need to supply that specific subschema, it is enough to supply the schema document '/name-defs.json'. 
+The schema builder than processes that schema document and makes multiple entries into an internal validator registry, 
+including an entry for 'https://www.example.com/name-defs.json#/$defs/orNull'.
+
+```cpp
 int main()
 { 
-    json schema = json::parse(R"(
-{
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": "http://localhost:1234/draft2020-12/object",
-            "type": "object",
-            "properties": {
-                "name": {"$ref": "name-defs.json#/$defs/orNull"}
-            }
-        }
-    )");
+    json schema = json::parse(main_schema);    
 
     // Data
     json data = json::parse(R"(
@@ -441,7 +447,7 @@ int main()
             return jsonschema::walk_result::advance;
         };
 
-        // Will call reporter for each schema violation
+        // Will call the message handler function object for each schema violation
         compiled.validate(data, reporter);
     }
     catch (const std::exception& e)
@@ -452,7 +458,8 @@ int main()
 ```
 Output:
 ```
-base: http://localhost:1234/draft2020-12/name-defs.json, path: /draft2020-12/name-defs.json
+Requested URI: https://www.example.com/name-defs.json#/$defs/orNull
+base: https://www.example.com/name-defs.json, path: /name-defs.json
 
 /name: Must be valid against at least one schema, but found no matching schemas
     Expected null, found object
@@ -629,7 +636,7 @@ int main()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;

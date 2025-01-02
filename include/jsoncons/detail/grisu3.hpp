@@ -31,17 +31,16 @@ minor modifications.
   OTHER DEALINGS IN THE SOFTWARE.
   */
 
-#ifndef JSONCONS_GRISU3_HPP
-#define JSONCONS_GRISU3_HPP 
+#ifndef JSONCONS_DETAIL_GRISU3_HPP
+#define JSONCONS_DETAIL_GRISU3_HPP 
 
 #pragma once
-#include <stdlib.h>
-#include <cinttypes>
-#include <cstdint>
 #include <cassert>
+#include <cinttypes>
 #include <cmath>
+#include <cstdint>
 #include <cstring> // std::memmove
-#include <jsoncons/detail/write_number.hpp>
+#include <stdlib.h>
 
 namespace jsoncons { namespace detail {
 
@@ -82,7 +81,7 @@ inline
 int k_comp(int e, int alpha, int /*gamma*/)
 {
     constexpr double d_1_log2_10 = 0.30102999566398114; //  1 / lg(10)
-	int x = alpha - e + 63;
+    int x = alpha - e + 63;
     return static_cast<int>(std::ceil(x * d_1_log2_10));
 }
 
@@ -201,7 +200,7 @@ void normalized_boundaries(double d, diy_fp_t *out_m_minus, diy_fp_t *out_m_plus
         mi.f = (v.f << 1) - 1;
         mi.e = v.e - 1;
     }
-	int x = mi.e - pl.e;
+    int x = mi.e - pl.e;
     mi.f <<= x;
     mi.e = pl.e;
     *out_m_plus = pl;
@@ -307,6 +306,7 @@ bool grisu3(double v, char *buffer, int *length, int *K)
     return result;
 }
 
-}} // namespace detail namespace jsoncons 
+} // namespace detail
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_GRISU3_HPP

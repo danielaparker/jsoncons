@@ -41,4 +41,4 @@ namespace detail {
 } // namespace detail
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_ENDIAN_HPP

@@ -130,7 +130,7 @@ json example = json::parse(R"(
 
     result = "bat";
 
-    //std::cout << example << std::endl;
+    //std::cout << example << '\n';
 }
 
 TEST_CASE("get_with_nonexistent_target")

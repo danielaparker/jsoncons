@@ -27,7 +27,7 @@ ojson o = ojson::parse(R"(
 }
 )");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json
@@ -42,7 +42,7 @@ Insert "postal_code" at end
 ```cpp
 o.insert_or_assign("postal_code", "M5H 2N2");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json
@@ -59,7 +59,7 @@ Insert "province" before "country"
 auto it = o.find("country");
 o.insert_or_assign(it,"province","Ontario");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json

@@ -37,6 +37,6 @@ int main()
     int128_example();
 #endif
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

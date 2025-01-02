@@ -38,7 +38,7 @@ void check_decode_ubjson(const std::vector<uint8_t>& expected, const std::vector
 {
     if (result.size() != expected.size())
     {
-        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
+        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << '\n';
     }
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < expected.size(); ++i)

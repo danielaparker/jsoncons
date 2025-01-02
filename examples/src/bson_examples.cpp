@@ -337,6 +337,6 @@ int main()
     encode_decimal128();
     regex_example();
     oid_example();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

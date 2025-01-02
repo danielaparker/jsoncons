@@ -68,6 +68,6 @@ int main()
 
     tuple_example();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -4,11 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSONPATH_ERROR_HPP
-#define JSONCONS_JSONPATH_JSONPATH_ERROR_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
+
+#include <system_error>
 
 #include <jsoncons/json_exception.hpp>
-#include <system_error>
 
 namespace jsoncons { namespace jsonpath {
 
@@ -163,34 +164,34 @@ namespace jsoncons { namespace jsonpath {
         return std::error_code(static_cast<int>(result),jsonpath_error_category());
     }
 
-} // jsonpath
-} // jsoncons
+} // namespace jsonpath
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::jsonpath::jsonpath_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace jsonpath {
 
     class jsonpath_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_;
-        std::size_t column_number_;
+        std::size_t line_number_{0};
+        std::size_t column_number_{0};
         mutable std::string what_;
     public:
         jsonpath_error(std::error_code ec)
-            : std::system_error(ec), line_number_(0), column_number_(0)
+            : std::system_error(ec)
         {
         }
         jsonpath_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+            : std::system_error(ec, what_arg)
         {
         }
         jsonpath_error(std::error_code ec, std::size_t position)
-            : std::system_error(ec), line_number_(0), column_number_(position)
+            : std::system_error(ec), column_number_(position)
         {
         }
         jsonpath_error(std::error_code ec, std::size_t line, std::size_t column)
@@ -200,6 +201,8 @@ namespace jsoncons { namespace jsonpath {
         jsonpath_error(const jsonpath_error& other) = default;
 
         jsonpath_error(jsonpath_error&& other) = default;
+        
+        ~jsonpath_error() override = default;
 
         const char* what() const noexcept override
         {
@@ -244,6 +247,7 @@ namespace jsoncons { namespace jsonpath {
         }
     };
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP

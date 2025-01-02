@@ -7,21 +7,22 @@
 #ifndef JSONCONS_BYTE_STRING_HPP
 #define JSONCONS_BYTE_STRING_HPP
 
-#include <sstream>
-#include <vector>
-#include <ostream>
 #include <cmath>
 #include <cstring> // std::memcmp
-#include <memory> // std::allocator
-#include <iterator>
 #include <exception>
-#include <iomanip> // std::setw
 #include <initializer_list>
+#include <iomanip> // std::setw
+#include <iterator>
+#include <memory> // std::allocator
+#include <ostream>
+#include <sstream>
 #include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 
@@ -365,7 +366,7 @@ namespace detail {
         template <typename Allocator>
         constexpr byte_string_view(const basic_byte_string<Allocator>& bytes);
 
-        constexpr byte_string_view(const byte_string_view&) noexcept = default;
+        constexpr byte_string_view(const byte_string_view&) = default;
 
         JSONCONS_CPP14_CONSTEXPR byte_string_view(byte_string_view&& other) noexcept
             : data_(nullptr), size_(0)
@@ -802,4 +803,4 @@ namespace detail {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_BYTE_STRING_HPP

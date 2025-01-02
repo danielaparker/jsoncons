@@ -4,20 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPOINTER_JSONPOINTER_HPP
-#define JSONCONS_JSONPOINTER_JSONPOINTER_HPP
+#ifndef JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
+#define JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
 #include <iostream>
 #include <iterator>
-#include <utility> // std::move
+#include <memory>
+#include <string>
 #include <system_error> // system_error
 #include <type_traits> // std::enable_if, std::true_type
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
-#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 

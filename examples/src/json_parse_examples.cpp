@@ -20,7 +20,7 @@ void parse_with_comment()
     // Default
     {
         auto j = json::parse(s);
-        std::cout << "(1) " << j << std::endl;
+        std::cout << "(1) " << j << '\n';
     }
     // Strict
     try
@@ -35,7 +35,7 @@ void parse_with_comment()
     }
     catch (const ser_error& e)
     {
-        std::cout << "(2) " << e.what() << std::endl;
+        std::cout << "(2) " << e.what() << '\n';
     }
 }
 
@@ -81,7 +81,7 @@ void parse_error_example()
     {
         std::cout << "Caught ser_error with category " << e.code().category().name() 
                   << ", code " << e.code().value() 
-                  << " and message " << e.what() << std::endl;
+                  << " and message " << e.what() << '\n';
     }
 }
 
@@ -96,7 +96,7 @@ void max_nesting_path_example()
     }
     catch (const ser_error& e)
     {
-         std::cout << e.what() << std::endl;
+         std::cout << e.what() << '\n';
     }
 }
 
@@ -129,7 +129,7 @@ void using_polymorphic_allocator()
     }
     catch (const std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        std::cerr << ex.what() << '\n';
     }
 }
 
@@ -139,7 +139,7 @@ int main()
 {
     try
     {
-        std::cout << "jsoncons version: " << version() << std::endl;
+        std::cout << "jsoncons version: " << version() << '\n';
 
         parse_error_example();
 
@@ -153,7 +153,7 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     return 0;

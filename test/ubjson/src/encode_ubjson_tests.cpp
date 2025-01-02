@@ -18,7 +18,7 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected, const json& j)
     ubjson::encode_ubjson(j, result);
     if (result.size() != expected.size())
     {
-        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
+        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << '\n';
     }
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < expected.size(); ++i)
@@ -28,7 +28,7 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected, const json& j)
             std::cout << "Different " << i << "\n"; 
             for (std::size_t k = 0; k < expected.size(); ++k)
             {
-                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << std::endl;
+                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << '\n';
             }
         }
         REQUIRE(result[i] == expected[i]);
@@ -39,7 +39,7 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected, const std::vector
 {
     if (result.size() != expected.size())
     {
-        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
+        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << '\n';
     }
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < expected.size(); ++i)
@@ -49,7 +49,7 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected, const std::vector
             std::cout << "Different " << i << "\n"; 
             for (std::size_t k = 0; k < expected.size(); ++k)
             {
-                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << std::endl;
+                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << '\n';
             }
         }
         REQUIRE(result[i] == expected[i]);

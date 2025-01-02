@@ -88,7 +88,7 @@ void read_mulitple_json_objects()
         if (!reader.eof())
         {
             json j = decoder.get_result();
-            std::cout << j << std::endl;
+            std::cout << j << '\n';
         }
     }
 }
@@ -114,7 +114,7 @@ void read_json_lines()
         if (!reader.eof())
         {
             json j = decoder.get_result();
-            std::cout << j << std::endl;
+            std::cout << j << '\n';
         }
     }
 }

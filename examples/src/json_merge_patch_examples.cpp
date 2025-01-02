@@ -38,17 +38,17 @@ void apply_json_merge_patch()
 
     mergepatch::apply_merge_patch(doc, patch);
 
-    std::cout << "(1)\n" << pretty_print(doc) << std::endl;
+    std::cout << "(1)\n" << pretty_print(doc) << '\n';
 
     // Create a JSON Patch
 
     auto patch2 = mergepatch::from_diff(doc2,doc);
 
-    std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
+    std::cout << "(2)\n" << pretty_print(patch2) << '\n';
 
     mergepatch::apply_merge_patch(doc2,patch2);
 
-    std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
+    std::cout << "(3)\n" << pretty_print(doc2) << '\n';
 }
 
 void create_json_merge_patch()
@@ -83,8 +83,8 @@ void create_json_merge_patch()
 
     mergepatch::apply_merge_patch(source, patch);
 
-    std::cout << "(1)\n" << pretty_print(patch) << std::endl;
-    std::cout << "(2)\n" << pretty_print(source) << std::endl;
+    std::cout << "(1)\n" << pretty_print(patch) << '\n';
+    std::cout << "(2)\n" << pretty_print(source) << '\n';
 }
 
 int main()
@@ -92,6 +92,6 @@ int main()
     std::cout << "\njson_merge_patch examples\n\n";
     create_json_merge_patch();
     apply_json_merge_patch();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -4,16 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_OPTIONS_HPP
-#define JSONCONS_CSV_CSV_OPTIONS_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
+#define JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
 
-#include <string>
-#include <vector>
-#include <utility> // std::pair
-#include <unordered_map> // std::unordered_map
-#include <map>
-#include <limits> // std::numeric_limits
 #include <cwchar>
+#include <limits> // std::numeric_limits
+#include <map>
+#include <string>
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::pair
+#include <vector>
+
 #include <jsoncons/json_options.hpp>
 
 namespace jsoncons { namespace csv {
@@ -107,7 +108,8 @@ void parse_column_names(const std::basic_string<CharT>& names,
         cont.push_back(buffer);
         buffer.clear();
     }
-}
+
+} // namespace detail
 
 template <typename CharT,typename Container>
 void parse_column_types(const std::basic_string<CharT>& types, 
@@ -255,7 +257,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
     }
 }
 
-} // detail
+} // namespace detail
 
 template <typename CharT>
 class basic_csv_options;
@@ -313,7 +315,7 @@ protected:
     basic_csv_options_common& operator=(const basic_csv_options_common&) = default;
     //basic_csv_options_common& operator=(basic_csv_options_common&&) = default;
 
-    virtual ~basic_csv_options_common() noexcept = default;
+    virtual ~basic_csv_options_common() = default;
 public:
 
     char_type field_delimiter() const 
@@ -467,8 +469,8 @@ private:
     bool lossless_number_:1;
     char_type comment_starter_;
     csv_mapping_kind mapping_;
-    std::size_t header_lines_;
-    std::size_t max_lines_;
+    std::size_t header_lines_{0};
+    std::size_t max_lines_{(std::numeric_limits<std::size_t>::max)()};
     string_type column_types_;
     string_type column_defaults_;
 public:
@@ -484,14 +486,12 @@ public:
           infer_types_(true),
           lossless_number_(false),
           comment_starter_('\0'),
-          mapping_(),
-          header_lines_(0),
-          max_lines_((std::numeric_limits<std::size_t>::max)())
+          mapping_()
     {}
 
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;
 
-    basic_csv_decode_options(basic_csv_decode_options&& other)
+    basic_csv_decode_options(basic_csv_decode_options&& other) noexcept
         : super_type(std::move(other)),
           assume_header_(other.assume_header_),
           ignore_empty_values_(other.ignore_empty_values_),
@@ -631,7 +631,7 @@ public:
 
     basic_csv_encode_options(const basic_csv_encode_options& other) = default;
 
-    basic_csv_encode_options(basic_csv_encode_options&& other)
+    basic_csv_encode_options(basic_csv_encode_options&& other) noexcept
         : super_type(std::move(other)),
           quote_style_(other.quote_style_),
           float_format_(other.float_format_),
@@ -940,5 +940,7 @@ public:
 using csv_options = basic_csv_options<char>;
 using wcsv_options = basic_csv_options<wchar_t>;
 
-}}
-#endif
+} // namespace jsonpath
+} // namespace jsoncons
+
+#endif // JSONCONS_EXT_CSV_CSV_OPTIONS_HPP

@@ -7,13 +7,15 @@
 #ifndef JSONCONS_JSON_DECODER_HPP
 #define JSONCONS_JSON_DECODER_HPP
 
-#include <string>
-#include <vector>
-#include <type_traits> // std::true_type
-#include <memory> // std::allocator
 #include <iterator> // std::make_move_iterator
+#include <memory> // std::allocator
+#include <string>
+#include <type_traits> // std::true_type
 #include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_object.hpp>
 #include <jsoncons/json_visitor.hpp>
 
 namespace jsoncons {
@@ -41,13 +43,13 @@ private:
     struct structure_info
     {
         structure_type type_;
-        std::size_t container_index_;
+        std::size_t container_index_{0};
 
         structure_info(structure_type type, std::size_t offset) noexcept
             : type_(type), container_index_(offset)
         {
         }
-
+        ~structure_info() = default;
     };
 
     using temp_allocator_type = TempAllocator;
@@ -381,4 +383,4 @@ private:
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_DECODER_HPP

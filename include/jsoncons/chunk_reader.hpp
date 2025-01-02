@@ -7,8 +7,8 @@
 #ifndef JSONCONS_CHUNK_READER_HPP
 #define JSONCONS_CHUNK_READER_HPP
 
-#include <system_error>
 #include <functional>
+#include <system_error>
 
 namespace jsoncons { 
 
@@ -64,4 +64,4 @@ using wparser_input = basic_parser_input<wchar_t>;
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_CHUNK_READER_HPP

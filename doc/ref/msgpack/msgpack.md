@@ -129,7 +129,7 @@ int main()
     // Decode MessagePack to ojson 
     ojson j2 = msgpack::decode_msgpack<ojson>(v);
 
-    std::cout << pretty_print(j2) << std::endl;
+    std::cout << pretty_print(j2) << '\n';
 
     // or to json (now alphabetically sorted)
     json j3 = msgpack::decode_msgpack<json>(v);

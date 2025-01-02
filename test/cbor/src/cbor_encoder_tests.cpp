@@ -75,7 +75,7 @@ json j = json::parse(R"(
 
     json j2 = cbor::decode_cbor<json>(is);
 
-    //std::cout << pretty_print(j2) << std::endl; 
+    //std::cout << pretty_print(j2) << '\n'; 
 
     CHECK(j == j2);
 }
@@ -170,7 +170,7 @@ TEST_CASE("test_serialize_negative_bignum1")
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 } 
 
@@ -192,14 +192,14 @@ TEST_CASE("test_serialize_negative_bignum2")
     {
         json result = cbor::decode_cbor<json>(v);
         auto options = json_options{}
-            .bigint_format(bigint_chars_format::number);
+            .bignum_format(bignum_format_kind::raw);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[-18446744073709551617]"));
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 } 
 
@@ -222,14 +222,14 @@ TEST_CASE("test_serialize_negative_bignum3")
     {
         json result = cbor::decode_cbor<json>(v);
         auto options = json_options{}
-            .bigint_format(bigint_chars_format::base64url);
+            .bignum_format(bignum_format_kind::base64url);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[\"~AQAAAAAAAAAA\"]"));
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 } 
 
@@ -248,7 +248,7 @@ TEST_CASE("serialize bigdec to cbor")
         }
         JSONCONS_CATCH (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
     SECTION("18446744073709551616e-5")
@@ -264,7 +264,7 @@ TEST_CASE("serialize bigdec to cbor")
         }
         JSONCONS_CATCH (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
     SECTION("-18446744073709551616e-5")
@@ -280,7 +280,7 @@ TEST_CASE("serialize bigdec to cbor")
         }
         JSONCONS_CATCH (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
     SECTION("-18446744073709551616e5")
@@ -296,7 +296,7 @@ TEST_CASE("serialize bigdec to cbor")
         }
         JSONCONS_CATCH (const std::exception& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
     }
 } 

@@ -5,22 +5,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
-#define JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
 
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
-#include <jsoncons_ext/jsonschema/common/validator.hpp>
-#include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 #include <cassert>
+#include <iostream>
 #include <set>
 #include <sstream>
-#include <iostream>
-#include <cassert>
 #include <unordered_set>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
+#include <jsoncons_ext/jsonschema/common/validator.hpp>
+
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
@@ -530,12 +531,14 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        std::size_t max_length_;
+        std::size_t max_length_{0};
     public:
         max_length_validator(const Json& schema, const uri& schema_location, std::size_t max_length)
             : keyword_validator_base<Json>("maxLength", schema, schema_location), max_length_(max_length)
         {
         }
+        
+        ~max_length_validator() = default;
 
     private:
 
@@ -3808,7 +3811,7 @@ namespace jsonschema {
                         if (prop_it == results.evaluated_properties.end()) 
                         {
                             //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
-                            std::size_t error_count = reporter.error_count();
+                            const std::size_t error_count = reporter.error_count();
                             walk_result result = schema_val_->validate(this_context, prop.value() , instance_location, results, reporter, patch);
                             if (result == walk_result::abort)
                             {
@@ -3919,7 +3922,7 @@ namespace jsonschema {
                             evaluation_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
                             //std::cout << "Not in evaluated properties: " << item.key() << "\n";
-                            std::size_t error_count = reporter.error_count();
+                            const std::size_t error_count = reporter.error_count();
                             walk_result result = schema_val_->validate(item_context, item, item_location, results, reporter, patch);
                             if (result == walk_result::abort)
                             {
@@ -3967,4 +3970,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP

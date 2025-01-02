@@ -282,13 +282,13 @@ TEST_CASE("ubjson_parser with json_diagnostics_visitor", "")
     parser.parse(visitor, ec);
     CHECK_FALSE(ec);
     std::ostringstream expected;
-    expected << "visit_begin_object"  << std::endl
-             << "  visit_key:foo"     << std::endl
-             << "  visit_begin_array" << std::endl
-             << "    visit_uint64:42" << std::endl
-             << "    visit_null"      << std::endl
-             << "  visit_end_array"   << std::endl
-             << "visit_end_object"    << std::endl;
+    expected << "visit_begin_object"  << '\n'
+             << "  visit_key:foo"     << '\n'
+             << "  visit_begin_array" << '\n'
+             << "    visit_uint64:42" << '\n'
+             << "    visit_null"      << '\n'
+             << "  visit_end_array"   << '\n'
+             << "visit_end_object"    << '\n';
     CHECK(os.str() == expected.str());
 }
 

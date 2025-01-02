@@ -396,5 +396,5 @@ int main()
     translate_ids_from_to_employees();
     tidy_member();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }

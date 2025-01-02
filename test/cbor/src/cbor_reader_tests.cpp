@@ -55,8 +55,8 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
     }
     JSONCONS_CATCH (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
-        std::cout << expected.to_string() << std::endl;
+        std::cout << e.what() << '\n';
+        std::cout << expected.to_string() << '\n';
     }
 }
 TEST_CASE("test_cbor_parsing")

@@ -8,22 +8,24 @@
 #define JSONCONS_CONV_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 
     class conv_error : public std::system_error, public virtual json_exception
     {
-        std::size_t line_number_;
-        std::size_t column_number_;
+        std::size_t line_number_{0};
+        std::size_t column_number_{0};
         mutable std::string what_;
     public:
         conv_error(std::error_code ec)
-            : std::system_error(ec), line_number_(0), column_number_(0)
+            : std::system_error(ec)
         {
         }
         conv_error(std::error_code ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+            : std::system_error(ec, what_arg)
         {
         }
         conv_error(std::error_code ec, std::size_t position)
@@ -124,7 +126,8 @@ namespace std {
     struct is_error_code_enum<jsoncons::conv_errc> : public true_type
     {
     };
-}
+
+} // namespace std
 
 namespace jsoncons {
 
@@ -194,7 +197,8 @@ namespace detail {
             }
         }
     };
-} // detail
+    
+} // namespace detail
 
 extern inline
 const std::error_category& conv_error_category()
@@ -209,6 +213,6 @@ std::error_code make_error_code(conv_errc result)
     return std::error_code(static_cast<int>(result),conv_error_category());
 }
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_CONV_ERROR_HPP

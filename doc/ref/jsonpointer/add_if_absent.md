@@ -111,11 +111,11 @@ int main()
     jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -143,11 +143,11 @@ int main()
     jsonpointer::add_if_absent(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -175,11 +175,11 @@ int main()
     jsonpointer::add_if_absent(target, "/foo/-", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -207,11 +207,11 @@ int main()
     jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -239,11 +239,11 @@ int main()
     jsonpointer::add(target, "/foo/3", json("qux"), ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```

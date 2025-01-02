@@ -7,17 +7,18 @@
 #ifndef JSONCONS_DECODE_TRAITS_HPP
 #define JSONCONS_DECODE_TRAITS_HPP
 
-#include <string>
-#include <tuple>
 #include <array>
 #include <memory>
+#include <string>
+#include <tuple>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
-#include <jsoncons/json_visitor.hpp>
+
+#include <jsoncons/conv_error.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/staj_cursor.hpp>
-#include <jsoncons/conv_error.hpp>
-#include <jsoncons/extension_traits.hpp>
 
 namespace jsoncons {
 
@@ -560,9 +561,9 @@ namespace jsoncons {
                     return val;
                 }
                 auto key = cursor.current().template get<key_type>(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 cursor.next(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 val.emplace(std::move(key),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
                 cursor.next(ec);
@@ -617,7 +618,7 @@ namespace jsoncons {
                     return val;
                 }
                 auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 key_type n{0};
                 auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
                 if (r.ec != jsoncons::detail::to_integer_errc())
@@ -626,7 +627,7 @@ namespace jsoncons {
                     return val;
                 }
                 cursor.next(ec);
-                if (ec) return val;
+                if (ec) {return val;}
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
                 cursor.next(ec);
@@ -645,7 +646,7 @@ namespace jsoncons {
         }
     };
 
-} // jsoncons
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DECODE_TRAITS_HPP
 

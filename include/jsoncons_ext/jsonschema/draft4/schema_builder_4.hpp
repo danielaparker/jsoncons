@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
-#define JSONCONS_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
 
-#include <jsoncons/utility/uri.hpp>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/json_schema.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
-#include <jsoncons_ext/jsonschema/draft4/schema_draft4.hpp>
 #include <cassert>
+#include <iostream>
 #include <set>
 #include <sstream>
-#include <iostream>
-#include <cassert>
+
+#include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/draft4/schema_draft4.hpp>
+#include <jsoncons_ext/jsonschema/json_schema.hpp>
+
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
 #endif
@@ -47,8 +48,8 @@ namespace draft4 {
     public:
         schema_builder_4(Json&& sch, const schema_builder_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
-            const std::vector<schema_resolver<Json>>& resolvers) 
-            : schema_builder<Json>(schema_version::draft4(), std::move(sch), builder_factory, options, schema_store_ptr, resolvers)
+            const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
+            : schema_builder<Json>(schema_version::draft4(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
         {
             init();
         }
@@ -302,7 +303,7 @@ namespace draft4 {
             uri schema_location = context.make_schema_location("maximum");
             if (!sch.is_number())
             {
-                std::string message("maximum must be a number value");
+                const std::string message("maximum must be a number value");
                 JSONCONS_THROW(schema_error(message));
             }
             
@@ -333,7 +334,7 @@ namespace draft4 {
 
             if (!sch.is_number())
             {
-                std::string message("minimum must be an integer");
+                const std::string message("minimum must be an integer");
                 JSONCONS_THROW(schema_error(message));
             }
 
@@ -460,4 +461,4 @@ namespace draft4 {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_DRAFT4_KEYWORD_FACTORY_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_DRAFT4_KEYWORD_FACTORY_HPP

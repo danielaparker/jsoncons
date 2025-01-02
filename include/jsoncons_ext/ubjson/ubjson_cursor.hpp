@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UBJSON_UBJSON_CURSOR_HPP
-#define JSONCONS_UBJSON_UBJSON_CURSOR_HPP
+#ifndef JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
+#define JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>
 
 namespace jsoncons { 
@@ -37,12 +38,12 @@ private:
     basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_ubjson_cursor(const basic_ubjson_cursor&) = delete;
-    basic_ubjson_cursor& operator=(const basic_ubjson_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_ubjson_cursor(const basic_ubjson_cursor&) = delete;
+    basic_ubjson_cursor(basic_ubjson_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_ubjson_cursor(Sourceable&& source,
@@ -95,6 +96,11 @@ public:
             next(ec);
         }
     }
+
+    ~basic_ubjson_cursor() = default;
+
+    basic_ubjson_cursor& operator=(const basic_ubjson_cursor&) = delete;
+    basic_ubjson_cursor& operator=(basic_ubjson_cursor&&) = delete;
 
     void reset()
     {
@@ -225,7 +231,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(cursor_visitor_, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 
@@ -235,7 +241,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(visitor, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 };

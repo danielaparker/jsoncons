@@ -7,18 +7,18 @@
 #ifndef JSONCONS_DETAIL_PARSE_NUMBER_HPP
 #define JSONCONS_DETAIL_PARSE_NUMBER_HPP
 
-#include <system_error>
+#include <cctype>
+#include <exception>
+#include <limits> // std::numeric_limits
+#include <locale>
 #include <stdexcept>
 #include <string>
-#include <vector>
-#include <locale>
-#include <string>
-#include <limits> // std::numeric_limits
+#include <system_error>
 #include <type_traits> // std::enable_if
-#include <exception>
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <cctype>
 
 namespace jsoncons { namespace detail {
 
@@ -69,7 +69,7 @@ namespace std {
     struct is_error_code_enum<jsoncons::detail::to_integer_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace detail {
 
@@ -1042,6 +1042,7 @@ public:
 };
 #endif
 
-}}
+} // namespace detail
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DETAIL_PARSE_NUMBER_HPP

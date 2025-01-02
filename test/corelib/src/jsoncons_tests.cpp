@@ -48,7 +48,7 @@ TEST_CASE("test_1")
 
     std::basic_ostringstream<char32_t> os;
 
-    std::cout << sizeof(json) << std::endl;
+    std::cout << sizeof(json) << '\n';
 
     //os << j << U"\n";
 }
@@ -160,7 +160,7 @@ TEST_CASE("test_to_string")
 TEST_CASE("test_u0000")
 {
     std::string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
-    //std::cout << "Input:    " << inputStr << std::endl;
+    //std::cout << "Input:    " << inputStr << '\n';
     json arr = json::parse(inputStr);
 
     std::string s = arr[0].as<std::string>();
@@ -174,7 +174,7 @@ TEST_CASE("test_u0000")
     os << arr;
     std::string s2 = os.str();
 
-    //std::cout << std::hex << "Output:   " << os.str() << std::endl;
+    //std::cout << std::hex << "Output:   " << os.str() << '\n';
 
 }
 TEST_CASE("test_uHHHH")
@@ -215,7 +215,7 @@ TEST_CASE("test_multiline_comments")
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
         return;
     }
     json j = json::parse(is);

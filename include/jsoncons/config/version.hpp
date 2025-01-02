@@ -4,13 +4,13 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_VERSION_HPP
-#define JSONCONS_VERSION_HPP
+#ifndef JSONCONS_CONFIG_VERSION_HPP
+#define JSONCONS_CONFIG_VERSION_HPP
  
 #include <iostream>
     
-#define JSONCONS_VERSION_MAJOR 0
-#define JSONCONS_VERSION_MINOR 179
+#define JSONCONS_VERSION_MAJOR 1
+#define JSONCONS_VERSION_MINOR 0
 #define JSONCONS_VERSION_PATCH 0
 
 namespace jsoncons {
@@ -35,6 +35,6 @@ constexpr versioning_info version()
     return versioning_info{JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH};
 }
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_CONFIG_VERSION_HPP

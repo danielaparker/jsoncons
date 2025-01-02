@@ -58,8 +58,8 @@ int main()
 
     mergepatch::apply_merge_patch(source, patch);
 
-    std::cout << "(1)\n" << pretty_print(patch) << std::endl;
-    std::cout << "(2)\n" << pretty_print(source) << std::endl;
+    std::cout << "(1)\n" << pretty_print(patch) << '\n';
+    std::cout << "(2)\n" << pretty_print(source) << '\n';
 }
 ```
 Output:

@@ -170,7 +170,7 @@ int main()
         .infer_types(false);
     ojson j = csv::decode_csv<ojson>(s,options);
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(j) << '\n';
 }
 ```
 Output:

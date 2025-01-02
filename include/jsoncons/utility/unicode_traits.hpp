@@ -13,17 +13,18 @@
  * Unicode Standard."
 */
 
-#ifndef JSONCONS_UNICODE_TRAITS_HPP
-#define JSONCONS_UNICODE_TRAITS_HPP
+#ifndef JSONCONS_UTILITY_UNICODE_TRAITS_HPP
+#define JSONCONS_UTILITY_UNICODE_TRAITS_HPP
 
 #include <cstring>
-#include <string>
 #include <iterator>
-#include <type_traits>
-#include <system_error>
 #include <limits>
+#include <string>
+#include <system_error>
+#include <type_traits>
+
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/extension_traits.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { namespace unicode_traits {
 
@@ -280,14 +281,14 @@ namespace jsoncons { namespace unicode_traits {
     }
 
 } // unicode_traits
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::unicode_traits::conv_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 namespace jsoncons { namespace unicode_traits {
 
@@ -1324,7 +1325,7 @@ namespace jsoncons { namespace unicode_traits {
     }
 
 } // unicode_traits
-} // jsoncons
+} // namespace jsoncons
 
-#endif
+#endif //JSONCONS_UTILITY_UNICODE_TRAITS_HPP
 

@@ -4,10 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_ERROR_HPP
-#define JSONCONS_CSV_CSV_ERROR_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_ERROR_HPP
+#define JSONCONS_EXT_CSV_CSV_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { namespace csv {
@@ -69,13 +70,14 @@ std::error_code make_error_code(csv_errc result)
     return std::error_code(static_cast<int>(result),csv_error_category());
 }
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::csv::csv_errc> : public true_type
     {
     };
-}
+} // namespace std
 
-#endif
+#endif // JSONCONS_EXT_CSV_CSV_ERROR_HPP

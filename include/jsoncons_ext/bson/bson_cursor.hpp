@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_CURSOR_HPP
-#define JSONCONS_BSON_BSON_CURSOR_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_CURSOR_HPP
+#define JSONCONS_EXT_BSON_BSON_CURSOR_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 
 namespace jsoncons { 
@@ -38,12 +39,12 @@ private:
     basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_bson_cursor(const basic_bson_cursor&) = delete;
-    basic_bson_cursor& operator=(const basic_bson_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_bson_cursor(const basic_bson_cursor&) = delete;
+    basic_bson_cursor(basic_bson_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_bson_cursor(Sourceable&& source,
@@ -96,6 +97,11 @@ public:
             next(ec);
         }
     }
+
+    ~basic_bson_cursor() = default;
+    
+    basic_bson_cursor& operator=(const basic_bson_cursor&) = delete;
+    basic_bson_cursor& operator=(basic_bson_cursor&&) = delete;
 
     void reset()
     {
@@ -238,7 +244,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(cursor_visitor_, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 
@@ -248,7 +254,7 @@ private:
         while (!parser_.stopped())
         {
             parser_.parse(visitor, ec);
-            if (ec) return;
+            if (ec) {return;}
         }
     }
 };
@@ -259,5 +265,5 @@ using bson_bytes_cursor = basic_bson_cursor<jsoncons::bytes_source>;
 } // namespace bson
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_CURSOR_HPP
 

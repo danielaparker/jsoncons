@@ -14,7 +14,7 @@ std::fstream fs(const wchar_t* filename)
 #### Unicode escaping
 ```cpp
 string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
-std::cout << "Input:    " << inputStr << std::endl;
+std::cout << "Input:    " << inputStr << '\n';
 
 json arr = json::parse(inputStr);
 std::string str = arr[0].as<std::string>();
@@ -28,11 +28,11 @@ for (std::size_t i = 0; i < str.size(); ++i)
     }
     std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
 }
-std::cout << "]" << std::endl;
+std::cout << "]" << '\n';
 
 std::ostringstream os;
 os << arr;
-std::cout << "Output:   " << os.str() << std::endl;
+std::cout << "Output:   " << os.str() << '\n';
 ```
 
 Output:
@@ -47,7 +47,7 @@ Note that just the two control characters are escaped on output.
 #### Reading escaped unicode into utf8 encodings and writing back escaped unicode
 ```cpp
 string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
-std::cout << "Input:    " << inputStr << std::endl;
+std::cout << "Input:    " << inputStr << '\n';
 
 json arr = json::parse(inputStr);
 std::string s = arr[0].as<string>();
@@ -59,14 +59,14 @@ for (std::size_t i = 0; i < s.size(); ++i)
     unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
     std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
 }
-std::cout << "]" << std::endl;
+std::cout << "]" << '\n';
 
 std::ostringstream os;
 auto options = json_options{}
     .escape_all_non_ascii(true);
 os << print(arr,options);
 std::string outputStr = os.str();
-std::cout << "Output:   " << os.str() << std::endl;
+std::cout << "Output:   " << os.str() << '\n';
 
 json arr2 = json::parse(outputStr);
 std::string s2 = arr2[0].as<string>();
@@ -78,7 +78,7 @@ for (std::size_t i = 0; i < s2.size(); ++i)
     unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
     std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
 }
-std::cout << "]" << std::endl;
+std::cout << "]" << '\n';
 ```
 
 Output:
@@ -100,11 +100,11 @@ auto options = json_options{}
 string output;
 value.dump(output,options);
 
-std::cout << "Input:" << std::endl;
-std::cout << input << std::endl;
-std::cout << std::endl;
-std::cout << "Output:" << std::endl;
-std::cout << output << std::endl;
+std::cout << "Input:" << '\n';
+std::cout << input << '\n';
+std::cout << '\n';
+std::cout << "Output:" << '\n';
+std::cout << output << '\n';
 ```
 Since all of the escaped unicode is non-ascii, we get back the same text as what we started with.
 ```
@@ -152,7 +152,7 @@ std::wistringstream is(input);
 wjson val = wjson::parse(is);
 
 wstring s = val[0].as<wstring>();
-std::cout << "length=" << s.length() << std::endl;
+std::cout << "length=" << s.length() << '\n';
 std::cout << "Hex dump: [";
 for (std::size_t i = 0; i < s.size(); ++i)
 {
@@ -161,7 +161,7 @@ for (std::size_t i = 0; i < s.size(); ++i)
     uint32_t u(s[i] >= 0 ? s[i] : 256 + s[i] );
     std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
 }
-std::cout << "]" << std::endl;
+std::cout << "]" << '\n';
 
 std::wofstream os("output/xxx.txt");
 os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16<wchar_t>));

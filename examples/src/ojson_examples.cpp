@@ -19,10 +19,10 @@ int main()
     }
     )");
 
-    std::cout << pretty_print(o) << std::endl;
+    std::cout << pretty_print(o) << '\n';
 
     o.insert_or_assign("postal_code", "M5H 2N2");
-    std::cout << pretty_print(o) << std::endl;
+    std::cout << pretty_print(o) << '\n';
 
     ojson o2 = o;
 
@@ -34,12 +34,12 @@ int main()
 
     o.insert_or_assign("unit_type","O");
 
-    std::cout << pretty_print(o) << std::endl;
+    std::cout << pretty_print(o) << '\n';
 
     o.erase("unit_type");
 
-    std::cout << pretty_print(o) << std::endl;
+    std::cout << pretty_print(o) << '\n';
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -106,16 +106,16 @@ TEST_CASE("cbor_view_test")
         (void)key;
         (void)jval;
 
-        //std::cout << key << ": " << jval << std::endl;
+        //std::cout << key << ": " << jval << '\n';
     }
-    //std::cout << std::endl;
+    //std::cout << '\n';
 
     for (auto element : reputons.array_range())
     {
         json j = element;
-        //std::cout << j << std::endl;
+        //std::cout << j << '\n';
     }
-    //std::cout << std::endl;
+    //std::cout << '\n';
 }
 
 TEST_CASE("jsonpointer_test")
@@ -155,7 +155,7 @@ TEST_CASE("jsonpointer_test")
     json j4 = j["reputons"];
     CHECK(reputons_0_rated == j4);
 
-    //std::cout << pretty_print(j3) << std::endl;
+    //std::cout << pretty_print(j3) << '\n';
 }
 
 TEST_CASE("as_string_test")
@@ -222,8 +222,7 @@ TEST_CASE("as_string_test")
 
     std::string s7;
     j[7].dump(s7);
-    CHECK(std::string("\"18446744073709551616\"") == s7);
-    CHECK(std::string("18446744073709551616") == j[7].as_string());
+    CHECK(std::string("18446744073709551616") == s7);
 
     std::string s8;
     j[8].dump(s8);
@@ -232,8 +231,7 @@ TEST_CASE("as_string_test")
 
     std::string s9;
     j[9].dump(s9);
-    CHECK(std::string("\"-18446744073709551617\"") == s9);
-    CHECK(std::string("-18446744073709551617") == j[9].as_string());
+    CHECK(std::string("-18446744073709551617") == s9);
 
 }
 
@@ -254,29 +252,29 @@ TEST_CASE("dump cbor to string test")
 
     std::string s0;
     j.dump(s0);
-    CHECK("[\"-18446744073709551617\"]" == s0);
-    //std::cout << s0 << std::endl;
+    CHECK("[-18446744073709551617]" == s0);
+    //std::cout << s0 << '\n';
 
     std::string s1;
     auto options1 = json_options{}
-        .bigint_format(bigint_chars_format::number);
+        .bignum_format(bignum_format_kind::raw);
     j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
-    //std::cout << s1 << std::endl;
+    //std::cout << s1 << '\n';
 
     std::string s2;
     auto options2 = json_options{}
-        .bigint_format(bigint_chars_format::base10);
+        .bignum_format(bignum_format_kind::base10);
     j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
-    //std::cout << s2 << std::endl;
+    //std::cout << s2 << '\n';
 
     std::string s3;
     auto options3 = json_options{}
-        .bigint_format(bigint_chars_format::base64url);
+        .bignum_format(bignum_format_kind::base64url);
     j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
-    //std::cout << s3 << std::endl;
+    //std::cout << s3 << '\n';
 } 
 
 TEST_CASE("test_dump_to_stream")
@@ -296,29 +294,29 @@ TEST_CASE("test_dump_to_stream")
 
     std::ostringstream os0;
     j.dump(os0);
-    CHECK("[\"-18446744073709551617\"]" == os0.str());
-    //std::cout << os0.str() << std::endl;
+    CHECK("[-18446744073709551617]" == os0.str());
+    //std::cout << os0.str() << '\n';
 
     std::ostringstream os1;
     auto options1 = json_options{}
-        .bigint_format(bigint_chars_format::number);
+        .bignum_format(bignum_format_kind::raw);
     j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
-    //std::cout << os1.str() << std::endl;
+    //std::cout << os1.str() << '\n';
 
     std::ostringstream os2;
     auto options2 = json_options{}
-        .bigint_format(bigint_chars_format::base10);
+        .bignum_format(bignum_format_kind::base10);
     j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
-    //std::cout << os2.str() << std::endl;
+    //std::cout << os2.str() << '\n';
 
     std::ostringstream os3;
     auto options3 = json_options{}
-        .bigint_format(bigint_chars_format::base64url);
+        .bignum_format(bignum_format_kind::base64url);
     j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
-    //std::cout << os3.str() << std::endl;
+    //std::cout << os3.str() << '\n';
 } 
 
 TEST_CASE("test_indefinite_length_object_iterator")

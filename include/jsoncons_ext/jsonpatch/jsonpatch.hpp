@@ -4,17 +4,18 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATCH_JSONPATCH_HPP
-#define JSONCONS_JSONPATCH_JSONPATCH_HPP
+#ifndef JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP
+#define JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP
 
-#include <string>
-#include <vector> 
-#include <memory>
 #include <algorithm> // std::min
+#include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector> 
+
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 namespace jsoncons { namespace jsonpatch {
 
@@ -169,7 +170,7 @@ namespace detail {
                         jsonpointer::add(target,it->path,it->value,ec);
                         if (ec)
                         {
-                            //std::cout << "add: " << it->path << std::endl;
+                            //std::cout << "add: " << it->path << '\n';
                             break;
                         }
                     }
@@ -178,7 +179,7 @@ namespace detail {
                         jsonpointer::remove(target,it->path,ec);
                         if (ec)
                         {
-                            //std::cout << "remove: " << it->path << std::endl;
+                            //std::cout << "remove: " << it->path << '\n';
                             break;
                         }
                     }
@@ -187,7 +188,7 @@ namespace detail {
                         jsonpointer::replace(target,it->path,it->value,ec);
                         if (ec)
                         {
-                            //std::cout << "replace: " << it->path << std::endl;
+                            //std::cout << "replace: " << it->path << '\n';
                             break;
                         }
                     }
@@ -293,7 +294,8 @@ namespace detail {
 
         return result;
     }
-}
+
+} // namespace detail
 
 template <typename Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec)
@@ -580,6 +582,7 @@ void apply_patch(Json& target, const Json& patch)
     }
 }
 
-}}
+} // namespace jsonpatch
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP

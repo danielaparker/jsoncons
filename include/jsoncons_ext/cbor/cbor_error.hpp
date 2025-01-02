@@ -4,10 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_ERROR_HPP
-#define JSONCONS_CBOR_CBOR_ERROR_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_ERROR_HPP
+#define JSONCONS_EXT_CBOR_CBOR_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 
@@ -86,13 +87,14 @@ std::error_code make_error_code(cbor_errc e)
 }
 
 
-}}
+} // namespace cbor
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::cbor::cbor_errc> : public true_type
     {
     };
-}
+} // namespace std
 
 #endif

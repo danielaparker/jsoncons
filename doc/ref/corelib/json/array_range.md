@@ -19,7 +19,7 @@ j.push_back("Vancouver");
 
 for (const auto& val : j.array_range())
 {
-    std::cout << val.as<std::string>() << std::endl;
+    std::cout << val.as<std::string>() << '\n';
 }
 ```
 Output:
@@ -35,7 +35,7 @@ json j(json_array_arg, {"Montreal", "Toronto", "Vancouver"});
 
 for (auto it = j.array_range().begin(); it != j.array_range().end(); ++it)
 {
-    std::cout << it->as<std::string>() << std::endl;
+    std::cout << it->as<std::string>() << '\n';
 }
 ```
 Output:
@@ -51,7 +51,7 @@ json j(json_array_arg, {"Montreal", "Toronto", "Vancouver"});
 
 for (auto it = j.array_range().rbegin(); it != j.array_range().rend(); ++it)
 {
-    std::cout << it->as<std::string>() << std::endl;
+    std::cout << it->as<std::string>() << '\n';
 }
 ```
 Output:

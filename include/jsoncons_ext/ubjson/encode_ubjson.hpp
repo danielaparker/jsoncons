@@ -4,16 +4,17 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UBJSON_ENCODE_UBJSON_HPP
-#define JSONCONS_UBJSON_ENCODE_UBJSON_HPP
+#ifndef JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP
+#define JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <type_traits> // std::enable_if
 #include <istream> // std::basic_istream
-#include <jsoncons/json.hpp>
+#include <memory>
+#include <string>
+#include <type_traits> // std::enable_if
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 #include <jsoncons_ext/ubjson/ubjson_reader.hpp>
 
@@ -136,7 +137,7 @@ namespace ubjson {
         }
     }
 
-} // ubjson
-} // jsoncons
+} // namespace ubjson
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP

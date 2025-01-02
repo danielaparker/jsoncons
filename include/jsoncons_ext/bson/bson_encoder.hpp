@@ -4,24 +4,26 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_ENCODER_HPP
-#define JSONCONS_BSON_BSON_ENCODER_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_ENCODER_HPP
+#define JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 
-#include <string>
-#include <vector>
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
-#include <jsoncons_ext/bson/bson_error.hpp>
-#include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
+#include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -42,12 +44,12 @@ private:
     struct stack_item
     {
         jsoncons::bson::bson_container_type type_;
-        std::size_t offset_;
-        std::size_t name_offset_;
-        std::size_t index_;
+        std::size_t offset_{0};
+        std::size_t name_offset_{0};
+        std::size_t index_{0};
 
         stack_item(jsoncons::bson::bson_container_type type, std::size_t offset) noexcept
-           : type_(type), offset_(offset), name_offset_(0), index_(0)
+           : type_(type), offset_(offset)
         {
         }
 
@@ -86,11 +88,12 @@ private:
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
     int nesting_depth_;
+public:
 
     // Noncopyable and nonmoveable
     basic_bson_encoder(const basic_bson_encoder&) = delete;
-    basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
-public:
+    basic_bson_encoder(basic_bson_encoder&&) = delete;
+
     explicit basic_bson_encoder(Sink&& sink, 
                                 const Allocator& alloc = Allocator())
        : basic_bson_encoder(std::forward<Sink>(sink),
@@ -113,6 +116,9 @@ public:
     {
         sink_.flush();
     }
+
+    basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
+    basic_bson_encoder& operator=(basic_bson_encoder&&) = delete;
 
     void reset()
     {
@@ -571,5 +577,7 @@ private:
 using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
 using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
-}}
-#endif
+} // namespace bson
+} // namespace jsoncons
+
+#endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

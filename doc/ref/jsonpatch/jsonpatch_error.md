@@ -54,8 +54,8 @@ int main()
     }
     catch (const jsonpatch::jsonpatch_error& e)
     {
-        std::cout << "(1) " << e.what() << std::endl;
-        std::cout << "(2) " << target << std::endl;
+        std::cout << "(1) " << e.what() << '\n';
+        std::cout << "(2) " << target << '\n';
     }
 }
 ```

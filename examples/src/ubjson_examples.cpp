@@ -47,7 +47,7 @@ void to_from_ubjson_using_basic_json()
         std::cout << element.at("rated").as<std::string>() << ", ";
         std::cout << element.at("rating").as<double>() << "\n";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // Get a UBJSON value for a nested data item with jsonpointer
     std::error_code ec;
@@ -57,7 +57,7 @@ void to_from_ubjson_using_basic_json()
         std::cout << "(3) " << rated.as_string() << "\n";
     }
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void to_from_ubjson_using_example_type()
@@ -215,6 +215,6 @@ int main()
     std::cout << "\n";
     working_with_ubjson_4();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

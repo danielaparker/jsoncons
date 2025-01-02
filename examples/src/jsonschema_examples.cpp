@@ -106,34 +106,38 @@ void validate_three_ways()
 }
 
 // Until 0.174.0, throw a `schema_error` instead of returning json::null() 
-json resolver(const jsoncons::uri& uri)
-{
-    std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-    std::string pathname = "./input/jsonschema/";
-    pathname += std::string(uri.path());
-
-    std::fstream is(pathname.c_str());
-    if (!is)
-    {
-        return json::null();
-    }
-
-    return json::parse(is);        
-}
-
-void uriresolver_example()
+void resolve_uri_example()
 { 
-    json schema = json::parse(R"(
+    std::string main_schema = R"(
 {
+    "$id" : "https://www.example.com/main",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "http://localhost:1234/draft2020-12/object",
     "type": "object",
     "properties": {
-        "name": {"$ref": "name-defs.json#/$defs/orNull"}
+        "name": {"$ref": "/name-defs.json#/$defs/orNull"}
     }
 }
-    )");
+    )";
+    
+    auto resolver = [](const jsoncons::uri& uri) -> json
+        {
+            std::cout << "Requested URI: " << uri.string() << "\n";
+            std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
+
+            std::string pathname = "./input/jsonschema" + std::string(uri.path());
+
+            std::fstream is(pathname.c_str());
+            if (!is)
+            {
+                return json::null();
+            }
+
+            return json::parse(is);
+        };
+    
+    json schema = json::parse(main_schema);    
 
     // Data
     json data = json::parse(R"(
@@ -149,7 +153,7 @@ void uriresolver_example()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        auto report = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
             std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
             for (const auto& detail : msg.details())
@@ -159,8 +163,8 @@ void uriresolver_example()
             return jsonschema::walk_result::advance;
         };
 
-        // Will call reporter for each schema violation
-        compiled.validate(data, reporter);
+        // Will call report function object for each schema violation
+        compiled.validate(data, report);
     }
     catch (const std::exception& e)
     {
@@ -189,7 +193,7 @@ void defaults_example()
         json data = json::parse("{}");
 
         // will throw schema_error if JSON Schema compilation fails 
-        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver); 
+        jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema); 
 
         // will throw a validation_error when a schema violation happens 
         json patch;
@@ -335,7 +339,7 @@ void validate_before_decode_example()
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
-            std::cout << output << std::endl;
+            std::cout << output << '\n';
 
             // Verify that output is valid
             json test = json::parse(output);
@@ -604,7 +608,6 @@ int main()
     std::cout << "\nJSON Schema Examples\n\n";
     validate_three_ways();
     std::cout << "\n";
-    uriresolver_example();
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     validate_before_decode_example();
@@ -619,6 +622,8 @@ int main()
     cross_schema_example();
     
     walk_example();
+    
+    resolve_uri_example();
     
     std::cout << "\n";
 }

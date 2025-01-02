@@ -7,18 +7,18 @@
 #ifndef JSONCONS_PRETTY_PRINT_HPP
 #define JSONCONS_PRETTY_PRINT_HPP
 
-#include <string>
+#include <cstring>
 #include <exception>
-#include <cstring>
-#include <ostream>
 #include <memory>
+#include <ostream>
+#include <string>
 #include <typeinfo>
-#include <cstring>
+
+#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_error.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json_error.hpp>
 
 namespace jsoncons {
 
@@ -84,6 +84,6 @@ json_printable<Json> pretty_print(const Json& j,
     return json_printable<Json>(j, options, indenting::indent);
 }
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_PRETTY_PRINT_HPP

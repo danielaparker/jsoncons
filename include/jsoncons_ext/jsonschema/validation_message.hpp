@@ -4,20 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSCHEMA_VALIDATION_MESSAGE_HPP
-#define JSONCONS_JSONSCHEMA_VALIDATION_MESSAGE_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_VALIDATION_MESSAGE_HPP
+#define JSONCONS_EXT_JSONSCHEMA_VALIDATION_MESSAGE_HPP
 
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/uri.hpp>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <cassert>
-#include <set>
-#include <sstream>
-#include <iostream>
 #include <cassert>
 #include <functional>
+#include <iostream>
+#include <set>
+#include <sstream>
 #include <unordered_set>
+
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/utility/uri.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -93,4 +93,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_JSONSCHEMA_JSON_VALIDATOR_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_JSON_VALIDATOR_HPP

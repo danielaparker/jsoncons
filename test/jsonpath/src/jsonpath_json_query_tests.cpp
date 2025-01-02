@@ -50,7 +50,7 @@ TEST_CASE("jsonpath json_query json test")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     SECTION("test 1")
@@ -123,7 +123,7 @@ TEST_CASE("jsonpath json_query wjson test")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     SECTION("test 1")

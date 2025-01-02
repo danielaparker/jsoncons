@@ -4,12 +4,13 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_OPTIONS_HPP
-#define JSONCONS_BSON_BSON_OPTIONS_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_OPTIONS_HPP
+#define JSONCONS_EXT_BSON_BSON_OPTIONS_HPP
 
-#include <string>
-#include <limits> // std::numeric_limits
 #include <cwchar>
+#include <limits> // std::numeric_limits
+#include <string>
+
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/bson/bson_type.hpp>
 
@@ -71,5 +72,7 @@ public:
     }
 };
 
-}}
-#endif
+} // namespace bson
+} // namespace jsoncons
+
+#endif // JSONCONS_EXT_BSON_BSON_OPTIONS_HPP

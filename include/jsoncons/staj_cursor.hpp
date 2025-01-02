@@ -7,25 +7,26 @@
 #ifndef JSONCONS_STAJ_CURSOR_HPP
 #define JSONCONS_STAJ_CURSOR_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <stdexcept>
-#include <system_error>
-#include <ios>
-#include <type_traits> // std::enable_if
 #include <array> // std::array
 #include <functional> // std::function
+#include <ios>
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <type_traits> // std::enable_if
+
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/typed_array_view.hpp>
-#include <jsoncons/value_converter.hpp>
 #include <jsoncons/staj_event.hpp>
+#include <jsoncons/typed_array_view.hpp>
+#include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {
 
@@ -52,19 +53,21 @@ private:
     staj_cursor_state state_;
     typed_array_view data_;
     jsoncons::span<const size_t> shape_;
-    std::size_t index_;
+    std::size_t index_{0};
 public:
     basic_staj_visitor()
         : pred_(accept), event_(staj_event_type::null_value),
-          state_(), data_(), shape_(), index_(0)
+          state_(), data_(), shape_()
     {
     }
 
     basic_staj_visitor(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
         : pred_(pred), event_(staj_event_type::null_value),
-          state_(), data_(), shape_(), index_(0)
+          state_(), data_(), shape_()
     {
     }
+    
+    ~basic_staj_visitor() = default;
 
     void reset()
     {
@@ -637,7 +640,7 @@ template <typename CharT>
 class basic_staj_cursor
 {
 public:
-    virtual ~basic_staj_cursor() noexcept = default;
+    virtual ~basic_staj_cursor() = default;
 
     virtual void array_expected(std::error_code& ec)
     {
@@ -740,7 +743,7 @@ using wstaj_cursor = basic_staj_cursor<wchar_t>;
 using staj_filter_view = basic_staj_filter_view<char>;
 using wstaj_filter_view = basic_staj_filter_view<wchar_t>;
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_STAJ_CURSOR_HPP
 

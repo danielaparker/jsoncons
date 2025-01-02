@@ -45,17 +45,17 @@ int main()
     std::error_code ec;
     jsonpatch::apply_patch(doc, patch, ec);
 
-    std::cout << "(1)\n" << pretty_print(doc) << std::endl;
+    std::cout << "(1)\n" << pretty_print(doc) << '\n';
 
     // Create a JSON Patch from two JSON documents
 
     auto patch2 = jsonpatch::from_diff(doc2,doc);
 
-    std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
+    std::cout << "(2)\n" << pretty_print(patch2) << '\n';
 
     jsonpatch::apply_patch(doc2, patch2, ec);
 
-    std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
+    std::cout << "(3)\n" << pretty_print(doc2) << '\n';
 }
 ```
 Output:

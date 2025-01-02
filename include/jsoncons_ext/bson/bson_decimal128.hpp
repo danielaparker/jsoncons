@@ -1,5 +1,5 @@
-#ifndef JSONCONS_BSON_BSON_DECIMAL128_HPP
-#define JSONCONS_BSON_BSON_DECIMAL128_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_DECIMAL128_HPP
+#define JSONCONS_EXT_BSON_BSON_DECIMAL128_HPP
 
 /*
  *  Implements decimal128_to_chars and decimal128_from_chars
@@ -27,12 +27,13 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <algorithm>
 #include <cstring>
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 #include <system_error>
-#include <algorithm>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
@@ -604,7 +605,7 @@ namespace jsoncons { namespace bson {
         }
 
         /* Check for Infinity or NaN */
-        if (!isdigit (*str_read) && *str_read != '.') {
+        if (!isdigit(*str_read) && *str_read != '.') {
            if (detail::dec128_istreq (str_read, last, inf_str.data(), inf_str.data()+inf_str.length()) ||
                detail::dec128_istreq (str_read, last, infinity_str.data(), infinity_str.data()+infinity_str.length())) 
            {
@@ -862,4 +863,4 @@ namespace jsoncons { namespace bson {
 } // namespace bson
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_DECIMAL128_HPP

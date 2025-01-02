@@ -194,7 +194,7 @@ TEST_CASE("test_ojson_merge")
         CHECK(expected == doc);
     }
 
-    //std::cout << doc << std::endl;
+    //std::cout << doc << '\n';
 }
 
 TEST_CASE("test_ojson_merge_move")
@@ -241,8 +241,8 @@ TEST_CASE("test_ojson_merge_move")
     }
 
 
-    //std::cout << "(1)\n" << doc << std::endl;
-    //std::cout << "(2)\n" << source << std::endl;
+    //std::cout << "(1)\n" << doc << '\n';
+    //std::cout << "(2)\n" << source << '\n';
 }
 
 TEST_CASE("ojson merge_or_update test")
@@ -287,7 +287,7 @@ TEST_CASE("ojson merge_or_update test")
         CHECK(expected == doc);
     }
 
-    //std::cout << doc << std::endl;
+    //std::cout << doc << '\n';
 }
 
 TEST_CASE("test_ojson_merge_or_update_move")

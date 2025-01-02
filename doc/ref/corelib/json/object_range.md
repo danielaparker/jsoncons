@@ -29,7 +29,7 @@ int main()
 
     for (const auto& member : j.object_range())
     {
-        std::cout << member.key() << " => " << member.value().as<std::string>() << std::endl;
+        std::cout << member.key() << " => " << member.value().as<std::string>() << '\n';
     }
 }
 ```
@@ -52,7 +52,7 @@ j["country"] = "Canada";
 
 for (auto it = j.object_range().crbegin(); it != j.object_range().crend(); ++it)
 {
-    std::cout << it->key() << " => " << it->value().as<std::string>() << std::endl;
+    std::cout << it->key() << " => " << it->value().as<std::string>() << '\n';
 }
 ```
 Output:

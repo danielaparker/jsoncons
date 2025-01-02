@@ -4,25 +4,26 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_PARSER_HPP
-#define JSONCONS_CSV_CSV_PARSER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_PARSER_HPP
+#define JSONCONS_EXT_CSV_CSV_PARSER_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <sstream>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <cctype>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <jsoncons/json_filter.hpp>
-#include <jsoncons/json.hpp>
+#include <memory> // std::allocator
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
+#include <jsoncons/chunk_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
-#include <jsoncons/chunk_reader.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -225,11 +226,11 @@ namespace detail {
         using parse_event_vector_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event_vector_type>;
     private:
         TempAllocator alloc_;
-        std::size_t name_index_;
-        int level_;
+        std::size_t name_index_{0};
+        int level_{0};
         cached_state state_;
-        std::size_t column_index_;
-        std::size_t row_index_;
+        std::size_t column_index_{0};
+        std::size_t row_index_{0};
 
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<parse_event_vector_type,parse_event_vector_allocator_type> cached_events_;
@@ -237,15 +238,13 @@ namespace detail {
 
         m_columns_filter(const TempAllocator& alloc)
             : alloc_(alloc),
-              name_index_(0), 
-              level_(0), 
               state_(cached_state::begin_object), 
-              column_index_(0), 
-              row_index_(0),
               column_names_(alloc),
               cached_events_(alloc)
         {
         }
+        
+        ~m_columns_filter() = default;
 
         void reset()
         {
@@ -526,19 +525,19 @@ private:
     csv_parse_state state_;
     basic_json_visitor<CharT>* visitor_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
-    std::size_t column_;
-    std::size_t line_;
-    int depth_;
+    std::size_t column_{1};
+    std::size_t line_{1};
+    int depth_{default_depth};
     const basic_csv_decode_options<CharT> options_;
-    std::size_t column_index_;
-    std::size_t level_;
-    std::size_t offset_;
+    std::size_t column_index_{0};
+    std::size_t level_{0};
+    std::size_t offset_{0};
     jsoncons::detail::chars_to to_double_; 
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
-    bool more_;
-    std::size_t header_line_;
+    bool more_{true};
+    std::size_t header_line_{1};
 
     detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
@@ -589,18 +588,10 @@ public:
          state_(csv_parse_state::start),
          visitor_(nullptr),
          err_handler_(err_handler),
-         column_(1),
-         line_(1),
-         depth_(default_depth),
          options_(options),
-         column_index_(0),
-         level_(0),
-         offset_(0),
          begin_input_(nullptr),
          input_end_(nullptr),
          input_ptr_(nullptr),
-         more_(true),
-         header_line_(1),
          m_columns_filter_(alloc),
          stack_(alloc),
          column_names_(alloc),
@@ -626,9 +617,7 @@ public:
         initialize();
     }
 
-    ~basic_csv_parser() noexcept
-    {
-    }
+    ~basic_csv_parser() = default;
 
     bool done() const
     {
@@ -1700,7 +1689,7 @@ private:
                 case csv_column_type::integer_t:
                     {
                         std::basic_istringstream<CharT,std::char_traits<CharT>,char_allocator_type> iss{buffer_};
-                        int64_t val;
+                        int64_t val{};
                         iss >> val;
                         if (!iss.fail())
                         {
@@ -1731,7 +1720,7 @@ private:
                         else
                         {
                             std::basic_istringstream<CharT, std::char_traits<CharT>, char_allocator_type> iss{ buffer_ };
-                            double val;
+                            double val{};
                             iss >> val;
                             if (!iss.fail())
                             {
@@ -2130,7 +2119,8 @@ private:
 using csv_parser = basic_csv_parser<char>;
 using wcsv_parser = basic_csv_parser<wchar_t>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CSV_CSV_PARSER_HPP
 

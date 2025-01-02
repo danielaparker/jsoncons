@@ -1,66 +1,82 @@
-1.0.0 (on master)
--------
+1.0.0
+-----
 
-Changes to basic_json::operator[]:
+- API Changes
 
-- Removed `basic_json` proxy type. The rationale for this change is given in #315.
+    - Non-const `basic_json::operator[const string_view_type& key]` no longer 
+    returns a proxy type.  The rationale for this change is given in Git Issue 
+    #315.  The new behavior for the non-const overload of `operator[](const 
+    string_view_type& key)` is to return a reference to the value that is 
+    associated with `key`, inserting a default constructed value with the key 
+    if no such key already exists, which is consistent with the standard 
+    library `std::map` behavior.  The new behavior for the const overload of 
+    `operator[](const string_view_type& key)` is to return a const reference 
+    to the value that is associated with `key`, returning a const reference to 
+    a default constructed value with static storage duration if no such key 
+    already exists.  
 
-- The new behavior for the non-const overload of operator[](const string_view_type&) will follow the standard library 
-`std::map` behavior, that is, return a reference to the value that is associated with the key, inserting a default 
-constructed value with the key if no such key already exists.
+    - Until 1.0.0, a buffer of text is supplied to `basic_json_parser` with a 
+    call to `update()` followed by a call to `parse_some()`.  Once the parser 
+    reaches the end of the buffer, additional JSON text can be supplied to the 
+    parser with another call to `update()`, followed by another call to 
+    `parse_some()`.  See [Incremental parsing (until 
+    1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-until-01790).  
+    Since 0.179, an initial buffer of text is supplied to the parse with a 
+    call to `set_buffer`, and parsing commences with a call to `parse_some`.  
+    The parser can be constructed with a user provided chunk reader to obtain 
+    additional JSON text as needed.  See [Incremental parsing (since 
+    1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790).  
 
-- The new behavior for the const overload of operator[](const string_view_type&) will be to return 
-a const reference to the value that is associated with key, returning a const reference to a default 
-constructed value with static storage duration if no such key already exists.
+    - enum `bigint_chars_format` is deprecated and replaced by 
+    `bignum_format_kind`.  Added `bignum_format` getter and setter functions 
+    to `basic_json_options`, and deprecated `bigint_format` getter and setter 
+    functions.  Changed default `bignum_format` from 
+    `bigint_chars_format::base10` to `bignum_format_kind::raw`.  Rationale: 
+    `bigint_chars_format` was misnamed, as it applied to `bigdec` as well as 
+    `bigint` numbers, and defaulting to `bigint_chars_format::base10` produced 
+    surprising results for users of our lossless number option.  
 
-Changes to basic_json_parser:
+    - The URI argument passed to the jsonschema ResolveURI function object now 
+    included the fragment part of the URI.  
 
-Until 1.0.0, a buffer of text is supplied to the parser with a call to `update()`
-followed by a call to `parse_some()`. Once the parser reaches the end of the buffer,
-additional JSON text can be supplied to the parser with another call to `update()`,
-followed by another call to `parse_some()`. See [Incremental parsing (until 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-until-01790). 
+- Fixed bugs:
 
-Since 0.179, an initial buffer of text is supplied to the parse with a call to
-`set_buffer`, and parsing commences with a call to `parse_some`. The parser can be
-constructed with a user provided chunk reader to obtain additional JSON text
-as needed. See [Incremental parsing (since 1.0.0)](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/corelib/basic_json_parser.md#incremental-parsing-since-01790). 
+    - Git Issue #554: [jsonpath] evaluation throws on json containing json_const_pointer
 
-Fixed bugs:
+    - Git PR #560: [jmespath] When there are elements and the sum is indeed zero, avg function should return average value returned instead of a null value.
 
-- Git Issue #554: [jsonpath] evaluation throws on json containing json_const_pointer
+    - Git Issue #561: json_string_reader does not work correctly for empty string or string with all blanks
 
-- Git PR #560: [jmespath] When there are elements and the sum is indeed zero, avg function should return average value returned instead of a null value.
+    - Git Issue #564: Fixed basic_json compare of double and non-numeric string
 
-- Git Issue #561: json_string_reader doesnot work correctly for empty string or string with all blanks
+    - Git Issue #570: Fixed writing fixed number of map value/value pairs using cbor_encoder and msgpack_encoder
 
-- Git Issue #564: fix basic_json compare of double and non-numeric string
+    - Fixed a number of issues in `uri::resolve`, used in jsonschema, related to abnormal references,
+    particulay ones containing dots in path segments. 
 
-Fixed other issues: 
+- Removed deprecated classes and functions:
 
-- Fixed a number of issues in `uri::resolve`, used in jsonschema, related to abnormal references,
-particulay ones containing dots in path segments. 
+    - The jsonschema function `make_schema`, classes `json_validator` and `validation_output`,
+    header file `json_validator.hpp` and example `legacy_jsonschema_examples.cpp`, 
+    deprecated in 0.174.0, have been removed.
 
-Removed deprecated jsonschema classes and functions
+- Enhancements:
 
-- The jsonschema function `make_schema`, classes `json_validator` and `validation_output`,
-header file `json_validator.hpp` and example `legacy_jsonschema_examples.cpp`, 
-deprecated in 0.174.0, have been removed.
+    - Added stream output operator (`<<`) to uri class.
 
-Enhancements:
+    - Added `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
+    allow a `basic_json` value to contain a non-owning view of another `basic_json`
+    value.
 
-- New `basic_json(json_pointer_arg_t, basic_json* j)` constructor to 
-allow a `basic_json` value to contain a non-owning view of another `basic_json`
-value.
+    - Added constant `null_arg` so that a null json value can be 
+    constructed with
+    ```
+        json j{jsoncons::null_arg};
+    ```
 
-- Added constant `null_arg` so that a null json value can be 
-constructed with
-```
-json j{jsoncons::null_arg};
-```
+    - Custom jmespath functions are now supported thanks to PR #560
 
-- Custom jmespath functions are now supported thanks to PR #560
-
-- jsonschema now understands the 'uri' and 'uri-reference' formats
+    - jsonschema now understands the 'uri' and 'uri-reference' formats
 
 0.178.0
 -------

@@ -16,17 +16,17 @@ void read_and_write_escaped_unicode()
     std::string output;
     value.dump(output,options);
 
-    std::cout << "Input:" << std::endl;
-    std::cout << input << std::endl;
-    std::cout << std::endl;
-    std::cout << "Output:" << std::endl;
-    std::cout << output << std::endl;
+    std::cout << "Input:" << '\n';
+    std::cout << input << '\n';
+    std::cout << '\n';
+    std::cout << "Output:" << '\n';
+    std::cout << output << '\n';
 }
 
 int main()
 {
     std::cout << "\nUnicode examples\n\n";
     read_and_write_escaped_unicode();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

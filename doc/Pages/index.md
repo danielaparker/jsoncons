@@ -389,7 +389,7 @@ for (const auto& book : books.array_range())
 {
     std::string author = book["author"].as<std::string>();
     std::string title = book["title"].as<std::string>();
-    std::cout << author << ", " << title << std::endl;
+    std::cout << author << ", " << title << '\n';
 }
 ```
 or begin-end iterators
@@ -400,7 +400,7 @@ for (auto it = books.array_range().begin();
 {
     std::string author = (*it)["author"].as<std::string>();
     std::string title = (*it)["title"].as<std::string>();
-    std::cout << author << ", " << title << std::endl;
+    std::cout << author << ", " << title << '\n';
 } 
 ```
 or a traditional for loop
@@ -410,7 +410,7 @@ for (std::size_t i = 0; i < books.size(); ++i)
     json& book = books[i];
     std::string author = book["author"].as<std::string>();
     std::string title = book["title"].as<std::string>();
-    std::cout << author << ", " << title << std::endl;
+    std::cout << author << ", " << title << '\n';
 }
 ```
 Output:
@@ -426,7 +426,7 @@ Loop through the members of the third book element, using a range-based for loop
 for (const auto& member : books[2].object_range())
 {
     std::cout << member.key() << "=" 
-              << member.value() << std::endl;
+              << member.value() << '\n';
 }
 ```
 
@@ -438,7 +438,7 @@ for (auto it = books[2].object_range().begin();
      ++it)
 {
     std::cout << (*it).key() << "=" 
-              << (*it).value() << std::endl;
+              << (*it).value() << '\n';
 } 
 ```
 Output:
@@ -475,7 +475,7 @@ else
 The default `json` constructor produces an empty json object. For example 
 ```cpp
 json image_sizing;
-std::cout << image_sizing << std::endl;
+std::cout << image_sizing << '\n';
 ```
 produces
 ```json
@@ -534,7 +534,7 @@ creates `"File Format Options"` as an object and puts `"Color Spaces"` in it.
 
 Serializing
 ```cpp
-std::cout << pretty_print(file_export) << std::endl;
+std::cout << pretty_print(file_export) << '\n';
 ```
 produces
 ```json
@@ -652,7 +652,7 @@ j["verts"] = json(json_array_arg, {1, 2, 3});
 j["normals"] = json(json_array_arg, {1, 0, 1});
 j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-std::cout << pretty_print(j) << std::endl;
+std::cout << pretty_print(j) << '\n';
 ```
 produces
 
@@ -670,7 +670,7 @@ To display the array scalar values on a new line, set the `object_array_line_spl
 ```cpp
 auto options = json_options{}
     .object_array_line_splits(line_split_kind::new_line);
-std::cout << pretty_print(val,options) << std::endl;
+std::cout << pretty_print(val,options) << '\n';
 ```
 produces
 ```json
@@ -690,7 +690,7 @@ To display the elements of array values on multiple lines, set the `object_array
 ```cpp
 auto options = json_options{}
     .object_array_line_splits(line_split_kind::multi_line);
-std::cout << pretty_print(val,options) << std::endl;
+std::cout << pretty_print(val,options) << '\n';
 ```
 produces
 ```json
@@ -741,13 +741,13 @@ int main()
     //json_reader reader(s, filter1);       // (until 0.164.0)
     json_string_reader reader(s, filter1);  // (since 0.164.0)
     reader.read();
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 ```
 Output:
@@ -802,27 +802,27 @@ json booklist = json::parse(is);
 
 // The authors of books that are cheaper than $10
 json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");
-std::cout << "(1) " << result1 << std::endl;
+std::cout << "(1) " << result1 << '\n';
 
 // The number of books
 json result2 = json_query(booklist, "$..book.length");
-std::cout << "(2) " << result2 << std::endl;
+std::cout << "(2) " << result2 << '\n';
 
 // The third book
 json result3 = json_query(booklist, "$..book[2]");
-std::cout << "(3)\n" << pretty_print(result3) << std::endl;
+std::cout << "(3)\n" << pretty_print(result3) << '\n';
 
 // All books whose author's name starts with Evelyn
 json result4 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
-std::cout << "(4)\n" << pretty_print(result4) << std::endl;
+std::cout << "(4)\n" << pretty_print(result4) << '\n';
 
 // The titles of all books that have isbn number
 json result5 = json_query(booklist, "$..book[?(@.isbn)].title");
-std::cout << "(5) " << result5 << std::endl;
+std::cout << "(5) " << result5 << '\n';
 
 // All authors and titles of books
 json result6 = json_query(booklist, "$['store']['book']..['author','title']");
-std::cout << "(6)\n" << pretty_print(result6) << std::endl;
+std::cout << "(6)\n" << pretty_print(result6) << '\n';
 ```
 Output:
 ```json
@@ -928,7 +928,7 @@ ojson o = ojson::parse(R"(
 }
 )");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json
@@ -943,7 +943,7 @@ Insert "postal_code" at end
 ```cpp
 o.insert_or_assign("postal_code", "M5H 2N2");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json
@@ -960,7 +960,7 @@ Insert "province" before "country"
 auto it = o.find("country");
 o.insert_or_assign(it,"province","Ontario");
 
-std::cout << pretty_print(o) << std::endl;
+std::cout << pretty_print(o) << '\n';
 ```
 Output:
 ```json

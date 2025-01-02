@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_ENCODER_HPP
-#define JSONCONS_CSV_CSV_ENCODER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_ENCODER_HPP
+#define JSONCONS_EXT_CSV_CSV_ENCODER_HPP
 
 #include <array> // std::array
-#include <string>
-#include <vector>
-#include <ostream>
-#include <utility> // std::move
-#include <unordered_map> // std::unordered_map
-#include <memory> // std::allocator
 #include <limits> // std::numeric_limits
+#include <memory> // std::allocator
+#include <ostream>
+#include <string>
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -70,12 +71,13 @@ private:
     {
         stack_item_kind item_kind_;
         std::size_t count_;
-        std::string pathname_;
 
         stack_item(stack_item_kind item_kind) noexcept
-           : item_kind_(item_kind), pathname_{}, count_(0)
+           : item_kind_(item_kind), count_(0)
         {
         }
+        
+        ~stack_item() = default;
 
         bool is_object() const
         {
@@ -95,16 +97,16 @@ private:
     std::vector<stack_item> stack_;
     jsoncons::detail::write_double fp_;
 
-    std::vector<string_type,string_allocator_type> column_names_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
-
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
+    string_type name_;
     std::size_t column_index_;
     std::vector<std::size_t> row_counts_;
 
+public:
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
-    basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
-public:
+    basic_csv_encoder(basic_csv_encoder&&) = delete;
+
     basic_csv_encoder(Sink&& sink, 
                       const Allocator& alloc = Allocator())
        : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>(), alloc)
@@ -118,8 +120,7 @@ public:
         options_(options),
         alloc_(alloc),
         stack_(),
-        fp_(options.float_format(), options.precision()),
-        column_index_(0)
+        fp_(options.float_format(), options.precision())
     {
         jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
     }
@@ -134,6 +135,8 @@ public:
         {
         }
     }
+    basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
+    basic_csv_encoder& operator=(basic_csv_encoder&&) = delete;
 
     void reset()
     {
@@ -978,6 +981,7 @@ using csv_string_encoder = basic_csv_encoder<char,jsoncons::string_sink<std::str
 using csv_wstream_encoder = basic_csv_encoder<wchar_t>;
 using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
-}}
+} // namespace jsonpath
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CSV_CSV_ENCODER_HPP

@@ -1,14 +1,16 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
+#include <ctime>
+#include <sstream>
+#include <utility>
+#include <vector>
+
+#include <catch/catch.hpp>
+
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/extension_traits.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <catch/catch.hpp>
 
 using namespace jsoncons;
 
@@ -28,7 +30,7 @@ TEST_CASE("test_double_to_string")
 {
     double x = 1.0e100;
     std::string s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
-    //std::cout << x << ": " << s << std::endl;
+    //std::cout << x << ": " << s << '\n';
     CHECK(s == std::string("1e+100"));
 
     x = 1.0e-100;
@@ -109,7 +111,7 @@ TEST_CASE("test_locale")
 
     double x = 123456789.0123;
     std::wstring s = float_to_string<wchar_t>(x, 13);
-    //std::wcout << std::setprecision(13) << x << L": " << s << std::endl;
+    //std::wcout << std::setprecision(13) << x << L": " << s << '\n';
     CHECK(std::wstring(L"123456789.0123") == s);
     _wsetlocale(LC_ALL, L"C");
 }
@@ -119,7 +121,7 @@ TEST_CASE("test_double_to_wstring")
 {
     double x = 1.0e100;
     std::wstring s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
-    //std::wcout << x << L":" << s << std::endl;
+    //std::wcout << x << L":" << s << '\n';
     CHECK(s == std::wstring(L"1e+100"));
 
     x = 1.0e-100;

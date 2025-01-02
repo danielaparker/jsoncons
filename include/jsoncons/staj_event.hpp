@@ -7,25 +7,26 @@
 #ifndef JSONCONS_STAJ_EVENT_HPP
 #define JSONCONS_STAJ_EVENT_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <stdexcept>
-#include <system_error>
-#include <ios>
-#include <type_traits> // std::enable_if
 #include <array> // std::array
 #include <functional> // std::function
+#include <ios>
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <type_traits> // std::enable_if
+
+#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_visitor.hpp>
-#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/typed_array_view.hpp>
+#include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>
-#include <jsoncons/item_event_visitor.hpp>
 
 namespace jsoncons {
 
@@ -139,7 +140,7 @@ class basic_staj_event
 {
     staj_event_type event_type_;
     semantic_tag tag_;
-    uint64_t ext_tag_;
+    uint64_t ext_tag_{0};
     union
     {
         bool bool_value_;
@@ -150,51 +151,51 @@ class basic_staj_event
         const CharT* string_data_;
         const uint8_t* byte_string_data_;
     } value_;
-    std::size_t length_;
+    std::size_t length_{0};
 public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(0)
+        : event_type_(event_type), tag_(tag), value_()
     {
     }
 
     basic_staj_event(staj_event_type event_type, std::size_t length, semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(length)
+        : event_type_(event_type), tag_(tag), value_(), length_(length)
     {
     }
 
     basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
+        : event_type_(staj_event_type::null_value), tag_(tag), value_()
     {
     }
 
     basic_staj_event(bool value, semantic_tag tag)
-        : event_type_(staj_event_type::bool_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::bool_value), tag_(tag)
     {
         value_.bool_value_ = value;
     }
 
     basic_staj_event(int64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::int64_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::int64_value), tag_(tag)
     {
         value_.int64_value_ = value;
     }
 
     basic_staj_event(uint64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::uint64_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::uint64_value), tag_(tag)
     {
         value_.uint64_value_ = value;
     }
 
     basic_staj_event(half_arg_t, uint16_t value, semantic_tag tag)
-        : event_type_(staj_event_type::half_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::half_value), tag_(tag)
     {
         value_.half_value_ = value;
     }
 
     basic_staj_event(double value, semantic_tag tag)
-        : event_type_(staj_event_type::double_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::double_value), tag_(tag)
     {
         value_.double_value_ = value;
     }
@@ -202,7 +203,7 @@ public:
     basic_staj_event(const string_view_type& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.length())
+        : event_type_(event_type), tag_(tag), length_(s.length())
     {
         value_.string_data_ = s.data();
     }
@@ -210,7 +211,7 @@ public:
     basic_staj_event(const byte_string_view& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.size())
+        : event_type_(event_type), tag_(tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
     }
@@ -222,6 +223,8 @@ public:
     {
         value_.byte_string_data_ = s.data();
     }
+    
+    ~basic_staj_event() = default;
 
     std::size_t size() const
     {
@@ -537,5 +540,5 @@ public:
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_STAJ_EVENT_HPP
 

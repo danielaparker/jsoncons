@@ -55,7 +55,7 @@ TEST_CASE("jsonschema $recursiveRef tests")
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
-            //std::cout << "resolver: " << uri.string() << "\n";
+            //std::cout << "resolve: " << uri.string() << "\n";
             if (uri.string() == "https://example.com/tree")
             {
                 return tree_schema;
@@ -143,7 +143,7 @@ TEST_CASE("jsonschema $dynamicRef tests")
     
     auto resolver = [tree_schema](const jsoncons::uri& uri)
         {
-            //std::cout << "resolver: " << uri.string() << "\n";
+            //std::cout << "resolve: " << uri.string() << "\n";
             if (uri.string() == "https://example.com/tree")
             {
                 return tree_schema;

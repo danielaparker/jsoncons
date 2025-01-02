@@ -1,5 +1,5 @@
-#ifndef JSONCONS_BSON_BSON_OID_HPP
-#define JSONCONS_BSON_BSON_OID_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_OID_HPP
+#define JSONCONS_EXT_BSON_BSON_OID_HPP
 
 /*
  *  Implements class oid_t and non member function bson_oid_to_string
@@ -27,14 +27,15 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <cstring>
 #include <ctype.h>
-#include <system_error>
-#include <algorithm>
 #include <string>
+#include <system_error>
 #include <type_traits>
-#include <array>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
@@ -143,7 +144,7 @@ namespace jsoncons { namespace bson {
         }
     };
 
-    namespace detail {
+namespace detail {
 
         inline
         const uint16_t* get_hex_char_pairs(std::true_type) // big endian
@@ -229,7 +230,7 @@ namespace jsoncons { namespace bson {
             data[11] = gHexCharPairs[bytes[11]];
         }
 
-    } // namsepace detail
+} // namespace detail
 
     template <typename StringT>
     inline 
@@ -242,4 +243,4 @@ namespace jsoncons { namespace bson {
 } // namespace bson
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_OID_HPP

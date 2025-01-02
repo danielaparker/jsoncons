@@ -243,7 +243,7 @@ TEST_CASE("test_array_of_array_of_string_string_array")
 ]
     )"_json;
 
-    //std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << '\n';
 }
 
 

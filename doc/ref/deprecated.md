@@ -11,6 +11,9 @@ __corelib__|&nbsp;|&nbsp;
 &nbsp;|`void update(string_view_type)`|Use `set_buffer` once or provide a chunk reader
 &nbsp;|`void update(const char_type*, std::size_t)`|Use `set_buffer` once or provide a chunk reader
 `basic_json_reader`|&nbsp;|&nbsp;
-
+&nbsp;|Constructors with `err_handler` parameter|Set `err_handler` in options instead
+`basic_json_options`|&nbsp;|&nbsp;
+&nbsp;|`bigint_chars_format`|`bignum_chars_format`
+&nbsp;|`bigint_chars_format::number`|`bignum_chars_format::raw`
 
 

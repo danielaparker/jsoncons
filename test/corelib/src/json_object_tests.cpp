@@ -377,7 +377,7 @@ TEST_CASE("test_proxy_get")
     std::string s1a = a["object1"].at("key1").as<std::string>();
     std::string s2 = a["object1"].get_value_or<json>("key2",json::null()).as<std::string>();
     CHECK(a["object1"].get_value_or<json>("key2", json::null()).is_null());
-    //std::cout << s2 << std::endl;
+    //std::cout << s2 << '\n';
     REQUIRE_THROWS_AS(a["object1"].at("key2").as<std::string>(), std::out_of_range);
 
     CHECK(std::string("value1") == s1);
@@ -1069,7 +1069,7 @@ TEST_CASE("test_json_merge")
         CHECK(j2 == original);
     }
 
-    //std::cout << j << std::endl;
+    //std::cout << j << '\n';
 }
 
 TEST_CASE("test_json_merge_move")

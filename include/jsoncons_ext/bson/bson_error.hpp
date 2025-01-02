@@ -4,10 +4,11 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_ERROR_HPP
-#define JSONCONS_BSON_BSON_ERROR_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_ERROR_HPP
+#define JSONCONS_EXT_BSON_BSON_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
@@ -91,13 +92,14 @@ std::error_code make_error_code(bson_errc result)
 }
 
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::bson::bson_errc> : public true_type
     {
     };
-}
+} // namespace std
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP

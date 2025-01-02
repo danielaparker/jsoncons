@@ -4,17 +4,18 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_PATH_NODE_HPP
-#define JSONCONS_JSONPATH_PATH_NODE_HPP
+#ifndef JSONCONS_EXT_JSONPATH_PATH_NODE_HPP
+#define JSONCONS_EXT_JSONPATH_PATH_NODE_HPP
 
+#include <algorithm> // std::reverse
+#include <functional>
 #include <string>
 #include <vector>
-#include <functional>
-#include <algorithm> // std::reverse
+
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons/json_type.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { 
@@ -34,19 +35,18 @@ namespace jsonpath {
         std::size_t size_;
         path_node_kind node_kind_;
         string_view_type name_;
-        std::size_t index_;
+        std::size_t index_{0};
 
     public:
         basic_path_node()
             : parent_(nullptr), size_(1),
-              node_kind_(path_node_kind::root), 
-              index_(0)
+              node_kind_(path_node_kind::root)
         {
         }
 
         basic_path_node(const basic_path_node* parent, string_view_type name)
             : parent_(parent), size_(parent == nullptr ? 1 : parent->size()+1), 
-              node_kind_(path_node_kind::name), name_(name), index_(0)
+              node_kind_(path_node_kind::name), name_(name)
         {
         }
 
@@ -56,23 +56,13 @@ namespace jsonpath {
         {
         }
 
-        basic_path_node(const basic_path_node& other)
-            : parent_(other.parent_), size_(other.size()),
-              node_kind_(other.node_kind_),
-              name_(other.name_),
-              index_(other.index_)
-        {
-        }
+        basic_path_node(const basic_path_node& other) = default;
+        basic_path_node(basic_path_node&& other) = default;
+        
+        ~basic_path_node() = default;
 
-        basic_path_node& operator=(const basic_path_node& other)
-        {
-            parent_ = other.parent_;
-            size_ = other.size();
-            node_kind_ = other.node_kind_;
-            index_ = other.index_;
-            name_ = other.name_;
-            return *this;
-        }
+        basic_path_node& operator=(const basic_path_node& other) = default;
+        basic_path_node& operator=(basic_path_node&& other) = default;
 
         const basic_path_node* parent() const { return parent_;}
 
@@ -96,7 +86,7 @@ namespace jsonpath {
             return index_;
         }
 
-        void swap(basic_path_node& node)
+        void swap(basic_path_node& node) noexcept
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
@@ -246,7 +236,6 @@ namespace jsonpath {
             nodes[--len] = p;
             p = p->parent();
         }
-        while (p != nullptr);
 
         Json* current = std::addressof(root);
         for (auto node : nodes)
@@ -291,7 +280,6 @@ namespace jsonpath {
             nodes[--len] = p;
             p = p->parent();
         }
-        while (p != nullptr);
 
         for (auto node : nodes)
         {
@@ -336,4 +324,4 @@ namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_JSONPATH_PATH_NODE_HPP

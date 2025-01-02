@@ -4,12 +4,13 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_OPTIONS_HPP
-#define JSONCONS_MSGPACK_MSGPACK_OPTIONS_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_OPTIONS_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_OPTIONS_HPP
 
-#include <string>
-#include <limits> // std::numeric_limits
 #include <cwchar>
+#include <limits> // std::numeric_limits
+#include <string>
+
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { namespace msgpack {
@@ -70,5 +71,7 @@ public:
     }
 };
 
-}}
-#endif
+} // namespace msgpack
+} // namespace jsoncons
+
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_OPTIONS_HPP

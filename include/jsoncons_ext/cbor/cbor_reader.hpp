@@ -4,19 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_READER_HPP
-#define JSONCONS_CBOR_CBOR_READER_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_READER_HPP
+#define JSONCONS_EXT_CBOR_CBOR_READER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
 
 namespace jsoncons { namespace cbor {
@@ -106,6 +107,7 @@ using cbor_stream_reader = basic_cbor_reader<jsoncons::binary_stream_source>;
 
 using cbor_bytes_reader = basic_cbor_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace cbor_reader
+} // namespace jsoncons
 
 #endif

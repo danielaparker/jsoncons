@@ -130,11 +130,11 @@ int main()
     try
     {
         json result = jsonpointer::get(j, "/1/author");
-        std::cout << "(1) " << result << std::endl;
+        std::cout << "(1) " << result << '\n';
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     // Using error codes to report errors
@@ -143,11 +143,11 @@ int main()
 
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << "(2) " << result << std::endl;
+        std::cout << "(2) " << result << '\n';
     }
 }
 ```
@@ -232,33 +232,33 @@ int main()
     try
     {
         const json& result1 = jsonpointer::get(j, "");
-        std::cout << "(1) " << result1 << std::endl;
+        std::cout << "(1) " << result1 << '\n';
         const json& result2 = jsonpointer::get(j, "/foo");
-        std::cout << "(2) " << result2 << std::endl;
+        std::cout << "(2) " << result2 << '\n';
         const json& result3 = jsonpointer::get(j, "/foo/0");
-        std::cout << "(3) " << result3 << std::endl;
+        std::cout << "(3) " << result3 << '\n';
         const json& result4 = jsonpointer::get(j, "/");
-        std::cout << "(4) " << result4 << std::endl;
+        std::cout << "(4) " << result4 << '\n';
         const json& result5 = jsonpointer::get(j, "/a~1b");
-        std::cout << "(5) " << result5 << std::endl;
+        std::cout << "(5) " << result5 << '\n';
         const json& result6 = jsonpointer::get(j, "/c%d");
-        std::cout << "(6) " << result6 << std::endl;
+        std::cout << "(6) " << result6 << '\n';
         const json& result7 = jsonpointer::get(j, "/e^f");
-        std::cout << "(7) " << result7 << std::endl;
+        std::cout << "(7) " << result7 << '\n';
         const json& result8 = jsonpointer::get(j, "/g|h");
-        std::cout << "(8) " << result8 << std::endl;
+        std::cout << "(8) " << result8 << '\n';
         const json& result9 = jsonpointer::get(j, "/i\\j");
-        std::cout << "(9) " << result9 << std::endl;
+        std::cout << "(9) " << result9 << '\n';
         const json& result10 = jsonpointer::get(j, "/k\"l");
-        std::cout << "(10) " << result10 << std::endl;
+        std::cout << "(10) " << result10 << '\n';
         const json& result11 = jsonpointer::get(j, "/ ");
-        std::cout << "(11) " << result11 << std::endl;
+        std::cout << "(11) " << result11 << '\n';
         const json& result12 = jsonpointer::get(j, "/m~0n");
-        std::cout << "(12) " << result12 << std::endl;
+        std::cout << "(12) " << result12 << '\n';
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
     }
 }
 ```

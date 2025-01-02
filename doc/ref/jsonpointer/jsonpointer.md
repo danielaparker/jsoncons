@@ -89,11 +89,11 @@ int main()
     try
     {
         json result = jsonpointer::get(j, "/1/author");
-        std::cout << "(1) " << result << std::endl;
+        std::cout << "(1) " << result << '\n';
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     // Using error codes to report errors
@@ -102,11 +102,11 @@ int main()
 
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << "(2) " << result << std::endl;
+        std::cout << "(2) " << result << '\n';
     }
 }
 ```

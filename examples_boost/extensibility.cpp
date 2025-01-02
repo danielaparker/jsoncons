@@ -200,7 +200,7 @@ void boost_date_conversions()
     assert(deal["observationDates"][0].as<date>() == date(2014,2,14));
     assert(deal["observationDates"][1].as<date>() == date(2014,2,21));
 
-    std::cout << pretty_print(deal) << std::endl;
+    std::cout << pretty_print(deal) << '\n';
 }
 
 void boost_matrix_conversions()

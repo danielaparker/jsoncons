@@ -4,22 +4,24 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_PARSER_HPP
-#define JSONCONS_CBOR_CBOR_PARSER_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_PARSER_HPP
+#define JSONCONS_EXT_CBOR_CBOR_PARSER_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility> // std::move
 #include <bitset> // std::bitset
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <memory>
+#include <string>
+#include <utility> // std::move
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/cbor/cbor_error.hpp>
-#include <jsoncons_ext/cbor/cbor_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_options.hpp>
 #include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons/utility/binary.hpp>
+#include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_error.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -29,16 +31,20 @@ struct parse_state
 {
     parse_mode mode; 
     std::size_t length;
-    std::size_t index;
     bool pop_stringref_map_stack;
+    std::size_t index{0};
 
     parse_state(parse_mode mode, std::size_t length, bool pop_stringref_map_stack = false) noexcept
-        : mode(mode), length(length), index(0), pop_stringref_map_stack(pop_stringref_map_stack)
+        : mode(mode), length(length), pop_stringref_map_stack(pop_stringref_map_stack)
     {
     }
 
     parse_state(const parse_state&) = default;
     parse_state(parse_state&&) = default;
+    parse_state& operator=(const parse_state&) = default;
+    parse_state& operator=(parse_state&&) = default;
+    
+    ~parse_state() = default;
 };
 
 template <typename Source,typename Allocator=std::allocator<char>>
@@ -85,8 +91,10 @@ class basic_cbor_parser : public ser_context
         }
 
         mapped_string(const mapped_string&) = default;
+        mapped_string(mapped_string&&) = default;
 
-        mapped_string(mapped_string&&) noexcept = default;
+        mapped_string& operator=(const mapped_string&) = default;
+        mapped_string& operator=(mapped_string&&) = default;
 
         mapped_string(const mapped_string& other, const allocator_type& alloc) 
             :  type(other.type), str(other.str,alloc), bytes(other.bytes,alloc)
@@ -98,9 +106,7 @@ class basic_cbor_parser : public ser_context
         {
         }
 
-        mapped_string& operator=(const mapped_string&) = default;
-
-        mapped_string& operator=(mapped_string&&) = default;
+        ~mapped_string() = default;
     };
 
     using mapped_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<mapped_string>;                           
@@ -118,8 +124,8 @@ class basic_cbor_parser : public ser_context
     Source source_;
     cbor_decode_options options_;
 
-    bool more_;
-    bool done_;
+    bool more_{true};
+    bool done_{false};
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
     uint64_t item_tag_;
@@ -173,8 +179,6 @@ public:
        : alloc_(alloc),
          source_(std::forward<Sourceable>(source)),
          options_(options),
-         more_(true), 
-         done_(false),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
          item_tag_(0),
@@ -186,6 +190,13 @@ public:
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
+    
+    basic_cbor_parser(const basic_cbor_parser&) = delete;
+    basic_cbor_parser(basic_cbor_parser&&) = delete;
+    basic_cbor_parser& operator=(const basic_cbor_parser&) = delete;
+    basic_cbor_parser& operator=(basic_cbor_parser&&) = delete;
+    
+    ~basic_cbor_parser() = default;
 
     void restart()
     {
@@ -891,7 +902,7 @@ private:
         uint8_t info = get_additional_information_value(initial_b);
         switch (info)
         {
-            case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+            case JSONCONS_EXT_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
             {
                 val = info;
                 break;
@@ -959,7 +970,7 @@ private:
                 source_.ignore(1);
                 switch (info)
                 {
-                    case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+                    case JSONCONS_EXT_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
                     {
                         val = static_cast<int8_t>(- 1 - info);
                         break;
@@ -1957,6 +1968,7 @@ private:
     }
 };
 
-}}
+} // namespace cbor
+} // namespace jsoncons
 
 #endif

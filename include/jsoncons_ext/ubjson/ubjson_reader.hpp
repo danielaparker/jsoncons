@@ -4,19 +4,20 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UBJSON_UBJSON_READER_HPP
-#define JSONCONS_UBJSON_UBJSON_READER_HPP
+#ifndef JSONCONS_EXT_UBJSON_UBJSON_READER_HPP
+#define JSONCONS_EXT_UBJSON_UBJSON_READER_HPP
 
-#include <string>
 #include <memory>
+#include <string>
 #include <utility> // std::move
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/ubjson/ubjson_type.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>
+#include <jsoncons_ext/ubjson/ubjson_type.hpp>
 
 namespace jsoncons { namespace ubjson {
 
@@ -82,6 +83,7 @@ using ubjson_stream_reader = basic_ubjson_reader<jsoncons::binary_stream_source>
 
 using ubjson_bytes_reader = basic_ubjson_reader<jsoncons::bytes_source>;
 
-}}
+} // namespace ubjson
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_UBJSON_UBJSON_READER_HPP

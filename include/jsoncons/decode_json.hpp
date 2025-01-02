@@ -8,13 +8,14 @@
 #define JSONCONS_DECODE_JSON_HPP
 
 #include <iostream>
+#include <istream> // std::basic_istream
+#include <memory>
 #include <string>
 #include <tuple>
-#include <memory>
-#include <istream> // std::basic_istream
+
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
-#include <jsoncons/allocator_set.hpp>
 
 namespace jsoncons {
 
@@ -205,7 +206,7 @@ namespace jsoncons {
     }
 
 
-} // jsoncons
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_DECODE_JSON_HPP
 

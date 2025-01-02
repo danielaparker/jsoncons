@@ -166,6 +166,6 @@ int main()
 
     distinguish_by_type_example();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -39,7 +39,7 @@ void incremental_parsing_example()
     }
     catch (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 
@@ -82,7 +82,7 @@ void incremental_parsing_example()
     }
     catch (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 }
 
@@ -117,21 +117,21 @@ void parse_nan_replacement_example()
     }
     catch (const jsoncons::ser_error& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     jsoncons::json j = decoder.get_result(); // performs move
     if (j["A"].is<double>())
     {
-        std::cout << "A: " << j["A"].as<double>() << std::endl;
+        std::cout << "A: " << j["A"].as<double>() << '\n';
     }
     if (j["B"].is<double>())
     {
-        std::cout << "B: " << j["B"].as<double>() << std::endl;
+        std::cout << "B: " << j["B"].as<double>() << '\n';
     }
     if (j["C"].is<double>())
     {
-        std::cout << "C: " << j["C"].as<double>() << std::endl;
+        std::cout << "C: " << j["C"].as<double>() << '\n';
     }
 }
 
@@ -142,7 +142,7 @@ int main()
     incremental_parsing_example();
     parse_nan_replacement_example();
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 

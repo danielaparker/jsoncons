@@ -76,11 +76,11 @@ int main()
     jsonpointer::remove(target, "/baz", ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```
@@ -108,11 +108,11 @@ int main()
     jsonpointer::remove(target, "/foo/1", ec);
     if (ec)
     {
-        std::cout << ec.message() << std::endl;
+        std::cout << ec.message() << '\n';
     }
     else
     {
-        std::cout << target << std::endl;
+        std::cout << target << '\n';
     }
 }
 ```

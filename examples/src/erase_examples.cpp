@@ -63,7 +63,7 @@ void erase1()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;    
+        std::cout << e.what() << '\n';    
     }
 }
 
@@ -100,7 +100,7 @@ void erase3()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;    
+        std::cout << e.what() << '\n';    
     }
 }
 
@@ -110,6 +110,6 @@ int main()
     erase1();
     erase2();
     erase3();
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 

@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_CURSOR_HPP
-#define JSONCONS_MSGPACK_MSGPACK_CURSOR_HPP
+#ifndef JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP
+#define JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP
 
-#include <memory> // std::allocator
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
+#include <memory> // std::allocator
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
 namespace jsoncons { 
@@ -38,12 +39,12 @@ private:
     basic_item_event_visitor_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
-    basic_msgpack_cursor(const basic_msgpack_cursor&) = delete;
-    basic_msgpack_cursor& operator=(const basic_msgpack_cursor&) = delete;
-
 public:
     using string_view_type = string_view;
+
+    // Noncopyable and nonmoveable
+    basic_msgpack_cursor(const basic_msgpack_cursor&) = delete;
+    basic_msgpack_cursor(basic_msgpack_cursor&&) = delete;
 
     template <typename Sourceable>
     basic_msgpack_cursor(Sourceable&& source,
@@ -99,6 +100,11 @@ public:
         }
     }
 
+    basic_msgpack_cursor& operator=(const basic_msgpack_cursor&) = delete;
+    basic_msgpack_cursor& operator=(basic_msgpack_cursor&&) = delete;
+
+    ~basic_msgpack_cursor() = default;
+    
     void reset()
     {
         parser_.reset();
@@ -237,7 +243,7 @@ private:
             while (!parser_.stopped())
             {
                 parser_.parse(cursor_handler_adaptor_, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
         }
     }
@@ -267,7 +273,7 @@ private:
             while (!parser_.stopped())
             {
                 parser_.parse(cursor_handler_adaptor_, ec);
-                if (ec) return;
+                if (ec) {return;}
             }
         }
     }
@@ -279,5 +285,5 @@ using msgpack_bytes_cursor = basic_msgpack_cursor<jsoncons::bytes_source>;
 } // namespace msgpack
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_MSGPACK_MSGPACK_CURSOR_HPP
 

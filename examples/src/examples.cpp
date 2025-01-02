@@ -18,7 +18,7 @@ void first_example_a()
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
         return;
     }
     json books = json::parse(is);
@@ -30,11 +30,11 @@ void first_example_a()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             double price = book["price"].as<double>();
-            std::cout << author << ", " << title << ", " << price << std::endl;
+            std::cout << author << ", " << title << ", " << price << '\n';
         }
         catch (const std::exception& e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << '\n';
         }
     }
 }
@@ -45,7 +45,7 @@ void first_example_b()
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
         return;
     }
     json books = json::parse(is);
@@ -57,11 +57,11 @@ void first_example_b()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price = book.get_value_or<std::string>("price", "N/A");
-            std::cout << author << ", " << title << ", " << price << std::endl;
+            std::cout << author << ", " << title << ", " << price << '\n';
         }
         catch (const std::exception& e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << '\n';
         }
     }
 }
@@ -97,11 +97,11 @@ void first_example_c()
             std::string title = book["title"].as<std::string>();
             std::string price;
             book.get_value_or<json>("price", "N/A").dump(price,options);
-            std::cout << author << ", " << title << ", " << price << std::endl;
+            std::cout << author << ", " << title << ", " << price << '\n';
         }
         catch (const ser_error& e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << '\n';
         }
     }
 }
@@ -112,7 +112,7 @@ void first_example_d()
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
         return;
     }
     json books = json::parse(is);
@@ -129,16 +129,16 @@ void first_example_d()
             if (book.contains("price") && book["price"].is_number())
             {
                 double price = book["price"].as<double>();
-                std::cout << author << ", " << title << ", " << price << std::endl;
+                std::cout << author << ", " << title << ", " << price << '\n';
             }
             else
             {
-                std::cout << author << ", " << title << ", " << "n/a" << std::endl;
+                std::cout << author << ", " << title << ", " << "n/a" << '\n';
             }
         }
         catch (const std::exception& e)
         {
-            std::cerr << e.what() << std::endl;
+            std::cerr << e.what() << '\n';
         }
     }
 
@@ -173,11 +173,11 @@ void second_example_a()
             books.push_back(std::move(book));
         }
 
-        std::cout << pretty_print(books) << std::endl;
+        std::cout << pretty_print(books) << '\n';
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
     }
 }
 
@@ -196,14 +196,14 @@ void object_range_based_for_loop()
 
     for (const auto& member : j.object_range())
     {
-        std::cout << member.key() << " => " << member.value().as<std::string>() << std::endl;
+        std::cout << member.key() << " => " << member.value().as<std::string>() << '\n';
     }
 
 #if defined(JSONCONS_HAS_2017)
     // or, since 0.176.0, using C++ 17 structured binding
     for (const auto& [key, value] : j.object_range())
     {
-        std::cout << key << " => " << value << std::endl;
+        std::cout << key << " => " << value << '\n';
     }
 #endif    
 }
@@ -227,7 +227,7 @@ void validation_example()
         std::cout << ec.message() 
                   << " on line " << reader.line()
                   << " and column " << reader.column()
-                  << std::endl;
+                  << '\n';
     }
 }
 
@@ -249,24 +249,24 @@ void get_example()
 
     // Using index or `at` accessors
     std::string result1 = j["reputons"][0]["rated"].as<std::string>();
-    std::cout << "(1) " << result1 << std::endl;
+    std::cout << "(1) " << result1 << '\n';
     std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
-    std::cout << "(2) " << result2 << std::endl;
+    std::cout << "(2) " << result2 << '\n';
 
     // Using JSON Pointer
     std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
-    std::cout << "(3) " << result3 << std::endl;
+    std::cout << "(3) " << result3 << '\n';
 
     // Using JSONPath
     json result4 = jsonpath::json_query(j, "$.reputons.0.rated");
     if (result4.size() > 0)
     {
-        std::cout << "(4) " << result4[0].as<std::string>() << std::endl;
+        std::cout << "(4) " << result4[0].as<std::string>() << '\n';
     }
     json result5 = jsonpath::json_query(j, "$..0.rated");
     if (result5.size() > 0)
     {
-        std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
+        std::cout << "(5) " << result5[0].as<std::string>() << '\n';
     }
 }
 
@@ -274,7 +274,7 @@ int main()
 {
     try
     {
-        std::cout << "jsoncons version: " << version() << std::endl;
+        std::cout << "jsoncons version: " << version() << '\n';
 
         first_example_a();
         first_example_b();
@@ -291,7 +291,7 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
     return 0;

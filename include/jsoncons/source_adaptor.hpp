@@ -4,20 +4,21 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BUFFER_READER_HPP
-#define JSONCONS_BUFFER_READER_HPP
+#ifndef JSONCONS_SOURCE_ADAPTOR_HPP
+#define JSONCONS_SOURCE_ADAPTOR_HPP
 
 #include <cstddef>
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <system_error>
 #include <memory> // std::allocator_traits
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
 #include <vector> // std::vector
-#include <jsoncons/unicode_traits.hpp>
+
 #include <jsoncons/json_error.hpp> // json_errc
-#include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {
 
@@ -144,5 +145,5 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_SOURCE_ADAPTOR_HPP
 

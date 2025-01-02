@@ -4,22 +4,24 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_PARSER_HPP
-#define JSONCONS_BSON_BSON_PARSER_HPP
+#ifndef JSONCONS_EXT_BSON_BSON_PARSER_HPP
+#define JSONCONS_EXT_BSON_BSON_PARSER_HPP
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility> // std::move
-#include <jsoncons/json.hpp>
-#include <jsoncons/source.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <vector>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons/utility/binary.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
-#include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -28,13 +30,13 @@ enum class parse_mode {root,accept,document,array,value};
 struct parse_state 
 {
     parse_mode mode; 
-    std::size_t length;
-    std::size_t pos;
+    std::size_t length{0};
+    std::size_t pos{0};
     uint8_t type;
-    std::size_t index;
+    std::size_t index{0};
 
     parse_state(parse_mode mode_, std::size_t length_, std::size_t pos_, uint8_t type_ = 0) noexcept
-        : mode(mode_), length(length_), pos(pos_), type(type_), index(0)
+        : mode(mode_), length(length_), pos(pos_), type(type_)
     {
     }
 
@@ -645,6 +647,7 @@ private:
     }
 };
 
-}}
+} // namespace bson
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_BSON_BSON_PARSER_HPP

@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_ERROR_HPP
 
 #include <system_error>
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -138,13 +139,14 @@ namespace jsoncons {
         return std::error_code(static_cast<int>(result),json_error_category());
     }
 
-} // jsoncons
+} // namespace jsoncons
 
 namespace std {
     template<>
     struct is_error_code_enum<jsoncons::json_errc> : public true_type
     {
     };
-}
 
-#endif
+} // namespace std
+
+#endif // JSONCONS_JSON_ERROR_HPP

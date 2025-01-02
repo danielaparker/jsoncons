@@ -10,13 +10,14 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include <jsoncons/json_exception.hpp>
-#include <jsoncons/bigint.hpp>
-#include <jsoncons/ser_context.hpp>
-#include <jsoncons/json_options.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_options.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/bigint.hpp>
 
 namespace jsoncons {
 
@@ -31,7 +32,7 @@ namespace jsoncons {
 
         basic_json_visitor() = default;
 
-        virtual ~basic_json_visitor() noexcept = default;
+        virtual ~basic_json_visitor() = default;
 
         void flush()
         {
@@ -952,7 +953,7 @@ namespace jsoncons {
         bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_begin_object_name << std::endl;
+            output_ << visit_begin_object_name << '\n';
             ++level_;
             return true;
         }
@@ -960,7 +961,7 @@ namespace jsoncons {
         bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_begin_object_name << separator_ << length << std::endl;
+            output_ << visit_begin_object_name << separator_ << length << '\n';
             ++level_;
             return true;
         }
@@ -969,14 +970,14 @@ namespace jsoncons {
         {
             --level_;
             indent();
-            output_ << visit_end_object_name << std::endl;
+            output_ << visit_end_object_name << '\n';
             return true;
         }
 
         bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_begin_array_name << std::endl;
+            output_ << visit_begin_array_name << '\n';
             ++level_;
             return true;
         }
@@ -984,7 +985,7 @@ namespace jsoncons {
         bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_begin_array_name << separator_  << length << std::endl;
+            output_ << visit_begin_array_name << separator_  << length << '\n';
             ++level_;
             return true;
         }
@@ -993,44 +994,44 @@ namespace jsoncons {
         {
             --level_;
             indent();
-            output_ << visit_end_array_name << std::endl;
+            output_ << visit_end_array_name << '\n';
             return true;
         }
 
         bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_key_name << separator_  << s << std::endl;
+            output_ << visit_key_name << separator_  << s << '\n';
             return true;
         }
         bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_string_name << separator_  << s << std::endl;
+            output_ << visit_string_name << separator_  << s << '\n';
             return true;
         }
         bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_int64_name << separator_  << val << std::endl;
+            output_ << visit_int64_name << separator_  << val << '\n';
             return true;
         }
         bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_uint64_name << separator_ << val << std::endl;
+            output_ << visit_uint64_name << separator_ << val << '\n';
             return true;
         }
         bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_bool_name << separator_ << val << std::endl;
+            output_ << visit_bool_name << separator_ << val << '\n';
             return true;
         }
         bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
         {
             indent();
-            output_ << visit_null_name << std::endl;
+            output_ << visit_null_name << '\n';
             return true;
         }
     };
@@ -1064,4 +1065,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_JSON_VISITOR_HPP

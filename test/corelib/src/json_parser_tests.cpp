@@ -20,7 +20,7 @@ TEST_CASE("Test cyrillic.json")
     std::fstream is(path);
     if (!is)
     {
-        std::cout << "Cannot open " << path << std::endl;
+        std::cout << "Cannot open " << path << '\n';
     }
     REQUIRE(is);
     json j = json::parse(is);
@@ -35,7 +35,7 @@ json source = json::parse(R"(
 }
 )");
 
-    std::cout << source << std::endl;
+    std::cout << source << '\n';
 }
 
 TEST_CASE("test_object_with_three_members")
@@ -311,13 +311,13 @@ TEST_CASE("test_diagnostics_visitor", "")
         parser.set_buffer(input.data(), input.size());
         parser.finish_parse(visitor);
         std::ostringstream expected;
-        expected << "visit_begin_object"  << std::endl
-                 << "  visit_key:foo"     << std::endl
-                 << "  visit_begin_array" << std::endl
-                 << "    visit_uint64:42" << std::endl
-                 << "    visit_null"      << std::endl
-                 << "  visit_end_array"   << std::endl
-                 << "visit_end_object"    << std::endl;
+        expected << "visit_begin_object"  << '\n'
+                 << "  visit_key:foo"     << '\n'
+                 << "  visit_begin_array" << '\n'
+                 << "    visit_uint64:42" << '\n'
+                 << "    visit_null"      << '\n'
+                 << "  visit_end_array"   << '\n'
+                 << "visit_end_object"    << '\n';
         CHECK(os.str() == expected.str());
     }
 
@@ -330,13 +330,13 @@ TEST_CASE("test_diagnostics_visitor", "")
         parser.set_buffer(input.data(), input.size());
         parser.finish_parse(visitor);
         std::wostringstream expected;
-        expected << L"visit_begin_object"  << std::endl
-                 << L"  visit_key:foo"     << std::endl
-                 << L"  visit_begin_array" << std::endl
-                 << L"    visit_uint64:42" << std::endl
-                 << L"    visit_null"      << std::endl
-                 << L"  visit_end_array"   << std::endl
-                 << L"visit_end_object"    << std::endl;
+        expected << L"visit_begin_object"  << '\n'
+                 << L"  visit_key:foo"     << '\n'
+                 << L"  visit_begin_array" << '\n'
+                 << L"    visit_uint64:42" << '\n'
+                 << L"    visit_null"      << '\n'
+                 << L"  visit_end_array"   << '\n'
+                 << L"visit_end_object"    << '\n';
         CHECK(os.str() == expected.str());
     }
 }

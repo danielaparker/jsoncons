@@ -4,22 +4,23 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BIGINT_HPP
-#define JSONCONS_BIGINT_HPP
+#ifndef JSONCONS_UTILITY_BIGINT_HPP
+#define JSONCONS_UTILITY_BIGINT_HPP
 
-#include <cstdint>
-#include <vector> // std::vector
-#include <iostream>
-#include <climits>
-#include <cassert> // assert
-#include <limits> // std::numeric_limits
 #include <algorithm> // std::max, std::min, std::reverse
-#include <string> // std::string
-#include <cstring> // std::memcpy
+#include <cassert> // assert
+#include <climits>
 #include <cmath> // std::fmod
-#include <memory> // std::allocator
+#include <cstdint>
+#include <cstring> // std::memcpy
 #include <initializer_list> // std::initializer_list
+#include <iostream>
+#include <limits> // std::numeric_limits
+#include <memory> // std::allocator
+#include <string> // std::string
 #include <type_traits> // std::enable_if
+#include <vector> // std::vector
+
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -30,7 +31,6 @@ Ammeraal, L. (1996) Algorithms and Data Structures in C++,
 Chichester: John Wiley.
 
 */
-
 
 namespace detail {
 
@@ -181,6 +181,7 @@ private:
         }
 
         short_storage& operator=(const short_storage& stor) = delete;
+        short_storage& operator=(short_storage&& stor) = delete;
     };
 
     struct dynamic_storage
@@ -1621,6 +1622,6 @@ private:
 
 using bigint = basic_bigint<std::allocator<uint8_t>>;
 
-}
+} // namespace jsoncons
 
-#endif
+#endif // JSONCONS_UTILITY_BIGINT_HPP
