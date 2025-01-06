@@ -271,6 +271,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row_mapping:
+                std::cout << "begin_array: row_mapping";
                 stack_.emplace_back(stack_item_kind::row);
                 if (stack_[0].count_ == 0)
                 {
@@ -327,6 +328,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
+                std::cout << "end_array: row";
                 sink_.append(options_.line_delimiter().data(),
                               options_.line_delimiter().length());
                 break;
