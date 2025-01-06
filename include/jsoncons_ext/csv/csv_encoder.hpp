@@ -193,7 +193,6 @@ private:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
             case stack_item_kind::object:
-                //std::cout << "visit_begin_object: " << stack_.back().pathname_ << "\n";
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
             default: // error
@@ -268,27 +267,11 @@ private:
             stack_.emplace_back(stack_item_kind::row_mapping);
             return true;
         }
+        
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row_mapping:
-                std::cout << "begin_array: row_mapping";
                 stack_.emplace_back(stack_item_kind::row);
-                if (stack_[0].count_ == 0)
-                {
-                    for (std::size_t i = 0; i < column_names_.size(); ++i)
-                    {
-                        if (i > 0)
-                        {
-                            sink_.push_back(options_.field_delimiter());
-                        }
-                        sink_.append(column_names_[i].data(),column_names_[i].length());
-                    }
-                    if (column_names_.size() > 0)
-                    {
-                        sink_.append(options_.line_delimiter().data(),
-                                      options_.line_delimiter().length());
-                    }
-                }
                 return true;
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object_multi_valued_field);
@@ -314,7 +297,8 @@ private:
             }
             case stack_item_kind::row:
                 begin_value(sink_);
-                stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                //stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                stack_.emplace_back(stack_item_kind::row);
                 return true;
             default: // error
                 ec = csv_errc::source_error;
@@ -328,9 +312,38 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-                std::cout << "end_array: row";
-                sink_.append(options_.line_delimiter().data(),
-                              options_.line_delimiter().length());
+                if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::row_mapping)
+                {
+                    if (stack_[0].count_ == 0)
+                    {
+                        for (std::size_t i = 0; i < column_names_.size(); ++i)
+                        {
+                            if (i > 0)
+                            {
+                                sink_.push_back(options_.field_delimiter());
+                            }
+                            sink_.append(column_names_[i].data(), column_names_[i].length());
+                        }
+                        sink_.append(options_.line_delimiter().data(), 
+                            options_.line_delimiter().length());
+                    }
+                    
+                    //std::cout << "visit_end_array: write row column_names: " << column_names_.size() << "\n";
+                    for (std::size_t i = 0; i < column_names_.size(); ++i)
+                    {
+                        if (i > 0)
+                        {
+                            sink_.push_back(options_.field_delimiter());
+                        }
+                        auto it = cname_value_map_.find(column_names_[i]);
+                        if (it != cname_value_map_.end())
+                        {
+                            sink_.append(it->second.data(),it->second.length());
+                            it->second.clear();
+                        }
+                    }
+                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                }
                 break;
             case stack_item_kind::column:
                 ++column_index_;
@@ -357,13 +370,6 @@ private:
                 stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
                 stack_.back().pathname_.push_back('/');
                 stack_.back().pathname_.append(std::string(name));
-                //std::cout << "visit_key: " << stack_.back().pathname_ << "\n";
-                
-                //cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
-                //if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
-                //{
-                //    column_names_.emplace_back(stack_.back().pathname_);
-                //}
                 break;
             }
             case stack_item_kind::column_mapping:
@@ -383,6 +389,19 @@ private:
                 break;
         }
         return true;
+    }
+    
+    void append_array_path_component()
+    {
+        std::basic_string<char_type, std::char_traits<char_type>, Allocator> buffer(alloc_);
+        stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+        stack_.back().pathname_.push_back('/');
+        jsoncons::detail::from_integer(stack_.back().count_, buffer);
+        stack_.back().pathname_.append(buffer);
+        if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+        {
+            column_names_.emplace_back(stack_.back().pathname_);
+        }
     }
 
     bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
@@ -414,6 +433,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_null_value(bo);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_null_value(sink_);
                 break;
@@ -468,6 +501,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_string_value(sv,bo);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_string_value(sv,sink_);
                 break;
@@ -578,6 +625,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_double_value(val, context, bo, ec);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_double_value(val, context, sink_, ec);
                 break;
@@ -635,6 +696,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_int64_value(val,bo);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_int64_value(val,sink_);
                 break;
@@ -692,6 +767,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_uint64_value(val, bo);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_uint64_value(val,sink_);
                 break;
@@ -746,6 +835,20 @@ private:
                 break;
             }
             case stack_item_kind::row:
+            {
+                append_array_path_component();
+                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                auto it = cname_value_map_.find(stack_.back().pathname_);
+                if (it != cname_value_map_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
+                    write_bool_value(val,bo);
+                    bo.flush();
+                    it->second.append(s);
+                }
+                break;
+            }
             case stack_item_kind::row_multi_valued_field:
                 write_bool_value(val,sink_);
                 break;
@@ -914,10 +1017,10 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-                if (stack_.back().count_ > 0)
-                {
-                    sink.push_back(options_.field_delimiter());
-                }
+                //if (stack_.back().count_ > 0)
+                //{
+                //    sink.push_back(options_.field_delimiter());
+                //}
                 break;
             case stack_item_kind::column:
             {
