@@ -13,7 +13,7 @@
 #include <string> // std::string
 #include <system_error> // std::error_code
 
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 

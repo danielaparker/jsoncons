@@ -14,6 +14,7 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/tag_type.hpp>
 
