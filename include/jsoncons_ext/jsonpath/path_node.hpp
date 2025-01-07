@@ -8,9 +8,9 @@
 #define JSONCONS_EXT_JSONPATH_PATH_NODE_HPP
 
 #include <algorithm> // std::reverse
-#include <allocator>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 

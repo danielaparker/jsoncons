@@ -7,7 +7,7 @@
 #ifndef JSONCONS_VALUE_CONVERTER_HPP
 #define JSONCONS_VALUE_CONVERTER_HPP
 
-#include <allocator>
+#include <memory>
 #include <string>
 #include <system_error> // std::error_code
 

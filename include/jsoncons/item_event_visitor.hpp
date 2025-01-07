@@ -7,9 +7,9 @@
 #ifndef JSONCONS_ITEM_EVENT_VISITOR_HPP
 #define JSONCONS_ITEM_EVENT_VISITOR_HPP
 
-#include <allocator>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <system_error>
 #include <vector>
