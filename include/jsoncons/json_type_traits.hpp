@@ -24,6 +24,8 @@
 #include <valarray>
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_type.hpp>

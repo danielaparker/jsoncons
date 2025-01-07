@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>

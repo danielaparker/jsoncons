@@ -11,6 +11,7 @@
 #include <istream> // std::basic_istream
 #include <tuple>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>

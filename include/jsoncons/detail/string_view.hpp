@@ -10,7 +10,6 @@
 #include <algorithm> // std::find, std::min, std::reverse
 #include <cmath>
 #include <cstddef>
-#include <istream> // std::basic_istream
 #include <iterator>
 #include <ostream>
 #include <stdexcept>

@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <functional>
 #include <ios>
-#include <istream> // std::basic_istream
 #include <memory> // std::allocator
 #include <system_error>
 
@@ -20,6 +19,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 

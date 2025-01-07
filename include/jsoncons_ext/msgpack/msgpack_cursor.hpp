@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <functional>
 #include <ios>
-#include <istream> // std::basic_istream
 #include <memory> // std::allocator
 #include <system_error>
 

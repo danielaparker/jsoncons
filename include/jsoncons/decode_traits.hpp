@@ -25,6 +25,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
+#include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/tag_type.hpp>
 

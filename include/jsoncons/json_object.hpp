@@ -21,6 +21,7 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_exception.hpp>

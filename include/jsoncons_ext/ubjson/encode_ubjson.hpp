@@ -7,7 +7,6 @@
 #ifndef JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP
 #define JSONCONS_EXT_UBJSON_ENCODE_UBJSON_HPP
 
-#include <istream> // std::basic_istream
 #include <ostream> // std::basic_ostream
 #include <type_traits> // std::enable_if
 

@@ -8,7 +8,6 @@
 #define JSONCONS_ENCODE_JSON_HPP
 
 #include <iostream>
-#include <istream> // std::basic_istream
 #include <system_error>
 #include <tuple>
 

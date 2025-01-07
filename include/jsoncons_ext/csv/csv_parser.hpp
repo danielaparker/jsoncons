@@ -26,6 +26,7 @@
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
+#include <jsoncons/staj_event.hpp>
 #include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/csv/csv_error.hpp>

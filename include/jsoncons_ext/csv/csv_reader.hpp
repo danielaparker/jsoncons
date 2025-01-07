@@ -9,7 +9,6 @@
 
 #include <cstddef>
 #include <functional>
-#include <istream> // std::basic_istream
 #include <memory> // std::allocator
 #include <system_error>
 #include <utility> // std::move

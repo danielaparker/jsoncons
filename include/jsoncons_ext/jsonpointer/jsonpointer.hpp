@@ -17,6 +17,8 @@
 #include <vector>
 
 #include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
