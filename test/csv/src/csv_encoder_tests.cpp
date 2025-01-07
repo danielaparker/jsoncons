@@ -59,7 +59,10 @@ true,1948-01-01T14:57:13,1.27,1948-01-01,63,14:57:13,Chicago Sun-Times
     
     SECTION("array of arrays to csv")
     {
-        std::string expected = R"()";
+        std::string expected = R"(/0,/1,/2,/3,/3/0,/3/0/0,/3/0/1
+Chicago Reader,1.0,1971-01-01T04:14:00,true,04:14:00,1971-01-01,40
+Chicago Sun-Times,1.27,1948-01-01T14:57:13,true,14:57:13,1948-01-01,63
+)";
 
         std::string jtext = R"(
 [
@@ -99,9 +102,7 @@ true,1948-01-01T14:57:13,1.27,1948-01-01,63,14:57:13,Chicago Sun-Times
         csv::csv_string_encoder encoder(buf);
         j.dump(encoder);
         
-        std::cout << buf << "\n";
-
-        //CHECK(expected == buf);
+        CHECK(expected == buf);
     }
 }
 

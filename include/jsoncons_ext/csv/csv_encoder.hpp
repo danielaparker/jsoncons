@@ -100,6 +100,7 @@ private:
 
     std::size_t column_index_;
     std::vector<std::size_t> row_counts_;
+    string_type buffer_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -119,7 +120,8 @@ public:
         alloc_(alloc),
         stack_(),
         fp_(options.float_format(), options.precision()),
-        column_index_(0)
+        column_index_(0),
+        buffer_(alloc)
     {
         jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
     }
@@ -393,12 +395,12 @@ private:
     
     void append_array_path_component()
     {
-        std::basic_string<char_type, std::char_traits<char_type>, Allocator> buffer(alloc_);
         stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
         stack_.back().pathname_.push_back('/');
-        jsoncons::detail::from_integer(stack_.back().count_, buffer);
-        stack_.back().pathname_.append(buffer);
-        if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+        buffer_.clear();
+        jsoncons::detail::from_integer(stack_.back().count_, buffer_);
+        stack_.back().pathname_.append(buffer_);
+        if (stack_[0].count_ == 0 && options_.column_names().empty())
         {
             column_names_.emplace_back(stack_.back().pathname_);
         }
@@ -412,11 +414,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -435,7 +440,10 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -480,11 +488,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -492,18 +503,17 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_string_value(sv,bo);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
-                    {
-                        it->second.push_back(options_.subfield_delimiter());
-                    }
-                    it->second.append(s);
+                    cname_value_map_[stack_.back().pathname_] = s;
                 }
                 break;
             }
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -604,11 +614,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -627,7 +640,10 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -675,11 +691,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -698,7 +717,10 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -746,11 +768,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -769,7 +794,10 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -814,11 +842,14 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
-                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                if (stack_[0].count_ == 0)
                 {
-                    column_names_.emplace_back(stack_.back().pathname_);
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -837,7 +868,10 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0)
+                {
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
                 {
@@ -1017,10 +1051,6 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-                //if (stack_.back().count_ > 0)
-                //{
-                //    sink.push_back(options_.field_delimiter());
-                //}
                 break;
             case stack_item_kind::column:
             {
