@@ -6,6 +6,7 @@
 #endif
 
 #include <jsoncons_ext/jsonpath/flatten.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <jsoncons/json.hpp>
 
 #include <iostream>
