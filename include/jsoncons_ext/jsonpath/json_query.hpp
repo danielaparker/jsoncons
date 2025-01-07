@@ -9,7 +9,10 @@
 
 #include <type_traits>
 
+#include <jsoncons/allocator_set.hpp>
+#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>

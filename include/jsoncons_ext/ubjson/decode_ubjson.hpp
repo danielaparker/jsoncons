@@ -11,6 +11,7 @@
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>

@@ -11,6 +11,7 @@
 #include <ostream> // std::basic_ostream
 #include <type_traits> // std::enable_if
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>

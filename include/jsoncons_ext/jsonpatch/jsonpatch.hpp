@@ -10,6 +10,7 @@
 #include <algorithm> // std::min
 #include <cstddef>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector> 
 

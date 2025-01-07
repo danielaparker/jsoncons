@@ -14,6 +14,7 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 

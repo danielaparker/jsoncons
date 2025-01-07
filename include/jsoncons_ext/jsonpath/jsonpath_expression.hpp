@@ -10,6 +10,7 @@
 #include <algorithm> // std::reverse
 #include <cstddef>
 #include <memory>
+#include <system_error>
 #include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>
@@ -241,7 +242,7 @@ namespace jsonpath {
     {
         std::size_t count = 0;
 
-        auto expr = jsonpath::make_expression<json>(path_string);
+        auto expr = jsonpath::make_expression<Json>(path_string);
         std::vector<jsonpath::json_location> locations = expr.select_paths(root,
             jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 

@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <iostream>
 #include <string> // std::string
+#include <system_error>
 #include <utility>
 
 #include <jsoncons/config/jsoncons_config.hpp>

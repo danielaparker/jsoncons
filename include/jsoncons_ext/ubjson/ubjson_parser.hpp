@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 
 #include <jsoncons/config/jsoncons_config.hpp>

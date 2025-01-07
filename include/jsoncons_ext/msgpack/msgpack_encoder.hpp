@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 

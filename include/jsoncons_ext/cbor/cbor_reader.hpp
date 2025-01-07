@@ -9,10 +9,13 @@
 
 #include <cstddef>
 #include <memory>
+#include <system_error>
 #include <utility> // std::move
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/source.hpp>
+
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>

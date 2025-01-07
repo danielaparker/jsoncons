@@ -10,8 +10,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <system_error>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 

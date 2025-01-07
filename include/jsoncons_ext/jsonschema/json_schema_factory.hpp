@@ -10,6 +10,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <jsoncons/config/compiler_support.hpp>
+
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
 #include <jsoncons_ext/jsonschema/draft4/schema_builder_4.hpp>

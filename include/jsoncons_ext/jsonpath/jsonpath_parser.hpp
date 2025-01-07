@@ -9,7 +9,9 @@
 
 #include <algorithm> // std::reverse
 #include <cstddef>
+#include <cstdint>
 #include <regex>
+#include <system_error>
 #include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>

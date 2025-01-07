@@ -24,12 +24,14 @@
 #include <valarray>
 #include <vector>
 
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/value_converter.hpp>
 
 #if defined(JSONCONS_HAS_STD_VARIANT)

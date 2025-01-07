@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <istream> // std::basic_istream
 #include <memory> // std::allocator
+#include <system_error>
 #include <utility> // std::move
 
 #include <jsoncons/json_decoder.hpp>

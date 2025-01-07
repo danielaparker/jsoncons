@@ -11,9 +11,11 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>

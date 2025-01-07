@@ -11,6 +11,7 @@
 #include <system_error> // std::error_code
 
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp> // from_integer
 #include <jsoncons/utility/extension_traits.hpp>

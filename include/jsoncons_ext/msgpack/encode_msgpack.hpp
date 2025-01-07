@@ -10,6 +10,7 @@
 #include <istream> // std::basic_istream
 #include <ostream> // std::basic_ostream
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>

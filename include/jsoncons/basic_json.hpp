@@ -17,6 +17,7 @@
 #include <ostream> 
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <type_traits> // std::enable_if
 #include <typeinfo>
 #include <utility> // std::move
@@ -24,6 +25,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_decoder.hpp>

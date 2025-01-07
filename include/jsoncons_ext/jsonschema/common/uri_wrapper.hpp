@@ -8,7 +8,9 @@
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>

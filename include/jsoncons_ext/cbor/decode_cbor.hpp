@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_filter.hpp>

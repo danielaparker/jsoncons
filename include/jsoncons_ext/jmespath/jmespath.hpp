@@ -15,10 +15,13 @@
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
+#include <system_error>
 #include <type_traits> // std::is_const
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::move
 #include <vector>
+
+#include <jsoncons/config/compiler_support.hpp>
 
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 

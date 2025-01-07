@@ -9,8 +9,10 @@
 
 #include <cstddef>
 #include <memory>
+#include <system_error>
 #include <utility> // std::move
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>

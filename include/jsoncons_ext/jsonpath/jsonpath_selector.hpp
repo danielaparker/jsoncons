@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 

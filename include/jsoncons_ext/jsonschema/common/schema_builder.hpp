@@ -12,6 +12,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <jsoncons/config/compiler_support.hpp>
+
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/evaluation_options.hpp>

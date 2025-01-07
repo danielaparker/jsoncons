@@ -10,7 +10,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <system_error>
 
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/tag_type.hpp>
 

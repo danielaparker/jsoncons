@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_HPP
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_HPP
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

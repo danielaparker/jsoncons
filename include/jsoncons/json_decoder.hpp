@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory> // std::allocator
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 

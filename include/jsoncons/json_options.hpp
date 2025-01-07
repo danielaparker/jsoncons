@@ -11,6 +11,7 @@
 #include <cwchar>
 #include <functional>
 #include <string>
+#include <system_error>
 
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/ser_context.hpp>

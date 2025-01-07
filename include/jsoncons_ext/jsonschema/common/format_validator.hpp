@@ -13,6 +13,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>

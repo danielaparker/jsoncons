@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <tuple>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
