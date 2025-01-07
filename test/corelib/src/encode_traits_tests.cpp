@@ -1,15 +1,14 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <vector>
-
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 
-#include <catch/catch.hpp>
-
 #include <jsoncons/json.hpp>
+
+#include <vector>
+#include <catch/catch.hpp>
 
 using jsoncons::json_type_traits;
 using jsoncons::json;

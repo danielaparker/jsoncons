@@ -2,8 +2,8 @@
 // Distributed under Boost license
 
 #include <jsoncons/utility/uri.hpp>
-#include <catch/catch.hpp>
 #include <iostream>
+#include <catch/catch.hpp>
 
 TEST_CASE("uri constructor tests")
 {

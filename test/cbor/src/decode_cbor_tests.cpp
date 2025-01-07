@@ -4,9 +4,11 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
-#include <jsoncons/json.hpp>
+
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons/json.hpp>
+
 #include <sstream>
 #include <vector>
 #include <utility>

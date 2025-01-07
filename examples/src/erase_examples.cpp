@@ -1,11 +1,13 @@
 // jsoncons_test.cpp : Defines the entry point for the console application.
 //
 
-#include <sstream>
-#include <algorithm>
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+#include <jsoncons/json.hpp>
+
+#include <sstream>
+#include <algorithm>
 
 // For brevity
 using jsoncons::json;

@@ -3,11 +3,11 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

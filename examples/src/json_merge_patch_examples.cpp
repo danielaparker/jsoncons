@@ -1,8 +1,8 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
+#include <jsoncons/json.hpp>
 
 using jsoncons::json;
 namespace mergepatch = jsoncons::mergepatch;

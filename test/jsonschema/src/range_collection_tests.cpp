@@ -6,10 +6,12 @@
 
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+#include <jsoncons_ext/jsonschema/common/validator.hpp>
+
+#include <jsoncons/json.hpp>
 #include <jsoncons/byte_string.hpp>
 
 #include <catch/catch.hpp>
-#include <jsoncons_ext/jsonschema/common/validator.hpp>
 
 using jsoncons::jsonschema::range;
 using jsoncons::jsonschema::range_collection;

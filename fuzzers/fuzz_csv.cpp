@@ -1,5 +1,8 @@
 #include <stdio.h>
+
 #include <jsoncons_ext/csv/csv.hpp>
+
+#include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 
 using namespace jsoncons;

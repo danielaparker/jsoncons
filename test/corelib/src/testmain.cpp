@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
-#include <catch/catch.hpp>
+
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <catch/catch.hpp>
 
 TEST_CASE("configuration")
 {

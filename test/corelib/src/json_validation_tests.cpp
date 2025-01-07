@@ -2,12 +2,12 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <map>
+#include <catch/catch.hpp>
 
 namespace ns {
 

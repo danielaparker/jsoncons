@@ -6,12 +6,12 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

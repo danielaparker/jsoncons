@@ -1,10 +1,10 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/detail/span.hpp>
 #include <iostream>
 #include <vector>
+#include <catch/catch.hpp>
 
 TEST_CASE("jsoncons::detail::span constructor tests")
 {

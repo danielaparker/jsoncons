@@ -5,12 +5,12 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <fstream>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

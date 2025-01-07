@@ -4,8 +4,10 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons/json.hpp>
+
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons/json.hpp>
+
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>

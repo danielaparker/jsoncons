@@ -1,8 +1,9 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons/json.hpp>
+
 #include <iomanip>
 
 using namespace jsoncons;

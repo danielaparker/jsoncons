@@ -8,7 +8,9 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <jsoncons/json.hpp>
 #include <jsoncons/byte_string.hpp>
 
 using jsoncons::json;

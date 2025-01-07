@@ -5,9 +5,11 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <iostream>
-#include <jsoncons/json.hpp>
+
 #include <jsoncons_ext/mergepatch/mergepatch.hpp>
-#include <catch/catch.hpp>
+
+#include <jsoncons/json.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -17,6 +19,8 @@
 #include <new>
 #include <unordered_set> // std::unordered_set
 #include <fstream>
+#include <catch/catch.hpp>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

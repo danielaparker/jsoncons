@@ -1,10 +1,12 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
-#include <catch/catch.hpp>
+
+#include <jsoncons/json.hpp>
+
 #include <iostream>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 #if 0
