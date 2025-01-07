@@ -7,6 +7,8 @@
 #ifndef JSONCONS_ITEM_EVENT_VISITOR_HPP
 #define JSONCONS_ITEM_EVENT_VISITOR_HPP
 
+#include <cstddef>
+
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_visitor.hpp>
 

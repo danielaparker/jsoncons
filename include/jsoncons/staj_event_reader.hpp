@@ -8,6 +8,7 @@
 #define JSONCONS_STAJ_EVENT_READER_HPP
 
 #include <array> // std::array
+#include <cstddef>
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator

@@ -9,6 +9,7 @@
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
+#include <cstddef>
 #include <cmath>
 #include <cstddef> // std::byte
 #include <exception>

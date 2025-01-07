@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_ENCODER_HPP
 
 #include <array> // std::array
+#include <cstddef>
 #include <cmath> // std::isfinite, std::isnan
 #include <limits> // std::numeric_limits
 #include <memory>

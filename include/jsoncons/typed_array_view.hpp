@@ -8,6 +8,7 @@
 #define JSONCONS_TYPED_ARRAY_VIEW_HPP
 
 #include <array> // std::array
+#include <cstddef>
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator

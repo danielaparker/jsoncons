@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSON_FILTER_HPP
 #define JSONCONS_JSON_FILTER_HPP
 
+#include <cstddef>
 #include <string>
 
 #include <jsoncons/json_visitor.hpp>
