@@ -12,6 +12,7 @@
 #include <set> // std::set
 #include <string> // std::basic_string
 #include <system_error>
+#include <type_traits>
 #include <unordered_map> // std::unordered_map
 #include <unordered_set> // std::unordered_set
 #include <utility> // std::move

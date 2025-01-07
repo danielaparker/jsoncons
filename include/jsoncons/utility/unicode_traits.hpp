@@ -25,6 +25,7 @@
 #include <type_traits>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { namespace unicode_traits {

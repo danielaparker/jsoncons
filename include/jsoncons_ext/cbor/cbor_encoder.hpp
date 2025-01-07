@@ -9,10 +9,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
 #include <system_error>
+#include <type_traits>
 #include <utility> // std::move
 #include <vector>
 

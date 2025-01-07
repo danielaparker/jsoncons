@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
-#define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_URI_WRAPPER_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_URI_WRAPPER_HPP
 
 #include <cstddef>
 #include <memory>
@@ -176,4 +176,4 @@ namespace jsonschema {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONSCHEMA_SCHEMA_LOCATION_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_COMMON_URI_WRAPPER_HPP

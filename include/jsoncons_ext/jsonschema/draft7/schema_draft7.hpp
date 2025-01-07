@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_SCHEMA_DRAFT7_HPP
-#define JSONCONS_EXT_JSONSCHEMA_SCHEMA_DRAFT7_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT7_SCHEMA_DRAFT7_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT7_SCHEMA_DRAFT7_HPP
 
 namespace jsoncons {
 namespace jsonschema {
@@ -195,4 +195,4 @@ namespace draft7 {
 } // namespace jsonschema
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONSCHEMA_SCHEMA_DRAFT7_HPP
+#endif // JSONCONS_EXT_JSONSCHEMA_DRAFT7_SCHEMA_DRAFT7_HPP

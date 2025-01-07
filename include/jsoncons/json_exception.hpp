@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSON_EXCEPTION_HPP
-#define JSON_EXCEPTION_HPP
+#ifndef JSONCONS_JSON_EXCEPTION_HPP
+#define JSONCONS_JSON_EXCEPTION_HPP
 
 #include <cstddef>
 #include <exception>
@@ -220,4 +220,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif // JSON_EXCEPTION_HPP
+#endif // JSONCONS_JSON_EXCEPTION_HPP

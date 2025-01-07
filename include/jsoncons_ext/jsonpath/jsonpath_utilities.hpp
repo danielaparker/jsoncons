@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONPATH_UTILITIES_HPP
-#define JSONCONS_EXT_JSONPATH_UTILITIES_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_UTILITIES_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_UTILITIES_HPP
 
 #include <cstddef>
 
@@ -69,4 +69,4 @@ namespace jsoncons { namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONPATH_UTILITIES_HPP
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_UTILITIES_HPP

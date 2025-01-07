@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <stdio.h> // snprintf
 #include <string>
+#include <type_traits>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/grisu3.hpp>

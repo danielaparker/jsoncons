@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/chunk_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_error.hpp>

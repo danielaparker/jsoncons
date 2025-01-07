@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string> // std::string
 #include <system_error>
+#include <type_traits>
 #include <utility>
 
 #include <jsoncons/config/jsoncons_config.hpp>

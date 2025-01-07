@@ -16,6 +16,7 @@
 #include <memory> // std::allocator
 #include <ostream>
 #include <sstream>
+#include <type_traits>
 #include <utility> // std::move
 #include <vector>
 

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <system_error>
+#include <type_traits>
 
 namespace jsoncons { namespace csv {
 

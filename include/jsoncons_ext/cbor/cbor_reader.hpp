@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CBOR_CBOR_READER_HPP
-#define JSONCONS_EXT_CBOR_CBOR_READER_HPP
+#ifndef JSONCONS_EXT_CBOR_CBOR_EVENT_READER_HPP
+#define JSONCONS_EXT_CBOR_CBOR_EVENT_READER_HPP
 
 #include <cstddef>
 #include <memory>
@@ -111,4 +111,4 @@ using cbor_bytes_reader = basic_cbor_reader<jsoncons::bytes_source>;
 } // namespace cbor_reader
 } // namespace jsoncons
 
-#endif
+#endif // JSONCONS_EXT_CBOR_CBOR_EVENT_READER_HPP

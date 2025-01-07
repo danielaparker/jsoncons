@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
-#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_PARSER_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_PARSER_HPP
 
 #include <algorithm> // std::reverse
 #include <cstddef>
@@ -20,7 +20,6 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/tag_type.hpp>
 
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
@@ -2490,4 +2489,4 @@ namespace detail {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_PARSER_HPP

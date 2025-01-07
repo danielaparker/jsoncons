@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <string>
 #include <system_error>
+#include <type_traits>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
-#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
 
 #include <algorithm> // std::reverse
 #include <cstddef>
@@ -257,4 +257,4 @@ namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
