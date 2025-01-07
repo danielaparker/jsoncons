@@ -17,19 +17,6 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 
-// allow to disable exceptions
-#if !defined(JSONCONS_NO_EXCEPTIONS)
-    #define JSONCONS_THROW(exception) throw exception
-    #define JSONCONS_RETHROW throw
-    #define JSONCONS_TRY try
-    #define JSONCONS_CATCH(exception) catch(exception)
-#else
-    #define JSONCONS_THROW(exception) std::terminate()
-    #define JSONCONS_RETHROW std::terminate()
-    #define JSONCONS_TRY if (true)
-    #define JSONCONS_CATCH(exception) if (false)
-#endif
-
 namespace jsoncons {
 
     class assertion_error : public std::runtime_error
