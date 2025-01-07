@@ -15,6 +15,7 @@
 #include <jsoncons/encode_traits.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_cursor.hpp>
+#include <jsoncons/basic_json.hpp>
 
 namespace jsoncons {
 

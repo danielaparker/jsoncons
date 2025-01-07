@@ -13,6 +13,7 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/basic_json.hpp>
 
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
