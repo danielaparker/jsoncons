@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_JSONPATH_JSON_LOCATION_HPP
 
 #include <algorithm> // std::reverse
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <type_traits> // std::is_const
@@ -15,7 +16,6 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
