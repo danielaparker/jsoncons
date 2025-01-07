@@ -11,6 +11,7 @@
 #include <cassert>
 #include <cstddef>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <system_error>
@@ -18,6 +19,8 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/byte_string.hpp>
+#include <jsoncons/json_reader.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/uri.hpp>

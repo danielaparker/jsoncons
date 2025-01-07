@@ -10,6 +10,7 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/decode_traits.hpp>
 
 #include <jsoncons_ext/csv/csv_cursor.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
