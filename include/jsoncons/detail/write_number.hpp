@@ -7,9 +7,9 @@
 #ifndef JSONCONS_DETAIL_WRITE_NUMBER_HPP
 #define JSONCONS_DETAIL_WRITE_NUMBER_HPP
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cmath>
 #include <limits> // std::numeric_limits
 #include <locale>
 #include <stdexcept>
@@ -19,8 +19,9 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 
 namespace detail {

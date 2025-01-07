@@ -17,6 +17,18 @@
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
+#if !defined(JSONCONS_NO_EXCEPTIONS)
+    #define JSONCONS_THROW(exception) throw exception
+    #define JSONCONS_RETHROW throw
+    #define JSONCONS_TRY try
+    #define JSONCONS_CATCH(exception) catch(exception)
+#else
+    #define JSONCONS_THROW(exception) std::terminate()
+    #define JSONCONS_RETHROW std::terminate()
+    #define JSONCONS_TRY if (true)
+    #define JSONCONS_CATCH(exception) if (false)
+#endif
+
 namespace jsoncons {
 
     // json_exception
