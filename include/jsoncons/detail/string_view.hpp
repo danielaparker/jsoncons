@@ -17,7 +17,6 @@
 #include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { 
 namespace detail {

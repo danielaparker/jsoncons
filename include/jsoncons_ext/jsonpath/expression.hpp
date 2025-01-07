@@ -8,7 +8,9 @@
 #define JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
+#include <memory>
 #include <set> // std::set
 #include <string> // std::basic_string
 #include <system_error>
@@ -18,6 +20,8 @@
 #include <utility> // std::move
 #include <vector> // std::vector
 
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

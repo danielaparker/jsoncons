@@ -13,7 +13,6 @@
 #include <utility> // std::swap
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons 
 { 

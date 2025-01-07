@@ -8,12 +8,14 @@
 #define JSONCONS_EXT_JSONPATH_JSONPATH_SELECTOR_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <system_error>
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>

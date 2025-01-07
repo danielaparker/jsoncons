@@ -14,7 +14,6 @@
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {

@@ -12,7 +12,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
