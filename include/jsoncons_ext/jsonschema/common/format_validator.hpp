@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstddef>
 #include <exception>
+#include <functional>
 #include <iostream>
 #include <set>
 #include <string>

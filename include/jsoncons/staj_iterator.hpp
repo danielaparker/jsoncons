@@ -7,13 +7,17 @@
 #ifndef JSONCONS_STAJ_ITERATOR_HPP
 #define JSONCONS_STAJ_ITERATOR_HPP
 
+#include <exception>
 #include <ios>
 #include <iterator> // std::input_iterator_tag
 #include <memory>
 #include <new> // placement new
 #include <string>
 #include <system_error>
+#include <type_traits>
+#include <utility>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_exception.hpp>

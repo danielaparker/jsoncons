@@ -8,9 +8,11 @@
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include <jsoncons/config/compiler_support.hpp>
 

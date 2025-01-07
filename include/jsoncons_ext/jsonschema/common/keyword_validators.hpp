@@ -15,9 +15,10 @@
 #include <string>
 #include <system_error>
 #include <unordered_set>
+#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/utility/uri.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_MSGPACK_MSGPACK_EVENT_READER_HPP
 
 #include <cstddef>
+#include <functional>
 #include <ios>
 #include <istream> // std::basic_istream
 #include <memory> // std::allocator
@@ -17,6 +18,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/staj_event_reader.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>

@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_CURSOR_HPP
 
 #include <cstddef>
+#include <functional>
 #include <ios>
 #include <istream> // std::basic_istream
 #include <memory> // std::allocator
@@ -18,9 +19,11 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
 #include <jsoncons/staj_cursor.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {
 

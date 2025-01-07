@@ -18,6 +18,7 @@
 #include <type_traits> // std::enable_if
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

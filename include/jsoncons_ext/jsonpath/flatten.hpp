@@ -9,10 +9,12 @@
 
 #include <cstddef>
 #include <memory>
+#include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 

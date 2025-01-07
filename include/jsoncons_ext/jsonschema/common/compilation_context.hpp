@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_COMPILATION_CONTEXT_HPP
 
 #include <random>
+#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>

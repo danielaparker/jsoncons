@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 

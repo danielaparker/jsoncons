@@ -20,7 +20,9 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
+
 #include <jsoncons_ext/csv/csv_options.hpp>
+#include <jsoncons_ext/csv/csv_error.hpp>
 
 namespace jsoncons { namespace csv {
 

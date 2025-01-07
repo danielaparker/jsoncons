@@ -7,6 +7,7 @@
 #ifndef JSONCONS_VALUE_CONVERTER_HPP
 #define JSONCONS_VALUE_CONVERTER_HPP
 
+#include <allocator>
 #include <string>
 #include <system_error> // std::error_code
 
@@ -15,6 +16,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp> // from_integer
 #include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/tag_type.hpp>
 

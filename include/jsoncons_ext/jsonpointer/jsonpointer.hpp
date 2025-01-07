@@ -16,7 +16,6 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 

@@ -13,6 +13,7 @@
 #include <set>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>

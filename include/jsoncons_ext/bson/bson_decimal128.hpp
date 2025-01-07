@@ -37,6 +37,8 @@
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace bson {
 

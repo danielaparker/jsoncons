@@ -10,6 +10,7 @@
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory> // std::allocator
 #include <sstream>
 #include <string>
@@ -24,6 +25,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/csv/csv_error.hpp>

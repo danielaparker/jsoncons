@@ -12,9 +12,12 @@
 #include <string>
 #include <system_error>
 
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 namespace jsoncons {
 

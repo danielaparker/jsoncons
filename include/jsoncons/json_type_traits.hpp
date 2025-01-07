@@ -26,7 +26,6 @@
 
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/tag_type.hpp>

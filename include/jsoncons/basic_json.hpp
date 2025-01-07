@@ -10,6 +10,7 @@
 #include <algorithm> // std::swap
 #include <cstring>
 #include <cstdint>
+#include <functional>
 #include <initializer_list> // std::initializer_list
 #include <istream> // std::basic_istream
 #include <limits> // std::numeric_limits
@@ -39,10 +40,12 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator

@@ -12,13 +12,16 @@
 #include <memory>
 #include <string>
 #include <system_error>
+#include <vector>
 #include <utility> // std::move
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/binary.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>

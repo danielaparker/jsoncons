@@ -21,9 +21,11 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
 
 namespace jsoncons { 

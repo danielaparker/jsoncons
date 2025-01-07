@@ -19,6 +19,7 @@
 #include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
