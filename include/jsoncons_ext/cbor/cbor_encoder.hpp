@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_CBOR_CBOR_ENCODER_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
@@ -19,7 +20,9 @@
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/binary.hpp>
+
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 

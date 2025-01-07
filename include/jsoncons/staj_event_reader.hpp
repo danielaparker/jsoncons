@@ -9,6 +9,7 @@
 
 #include <array> // std::array
 #include <cstddef>
+#include <cstdint>
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator
@@ -21,6 +22,7 @@
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/staj_event.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>

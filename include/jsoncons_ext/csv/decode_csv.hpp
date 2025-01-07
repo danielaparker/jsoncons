@@ -8,7 +8,6 @@
 #define JSONCONS_EXT_CSV_DECODE_CSV_HPP
 
 #include <jsoncons/allocator_set.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/csv/csv_cursor.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>

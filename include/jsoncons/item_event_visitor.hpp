@@ -8,9 +8,11 @@
 #define JSONCONS_ITEM_EVENT_VISITOR_HPP
 
 #include <cstddef>
+#include <cstdint>
 
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 

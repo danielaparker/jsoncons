@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_PARSER_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <functional> // std::function
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
@@ -23,6 +24,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \
         case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b: \

@@ -11,6 +11,7 @@
 #include <array>
 #include <bitset> // std::bitset
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
@@ -27,6 +28,7 @@
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>
 

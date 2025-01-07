@@ -9,8 +9,10 @@
 
 #include <algorithm> 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string> // std::string
+#include <utility>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>

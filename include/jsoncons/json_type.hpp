@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSON_TYPE_HPP
 #define JSONCONS_JSON_TYPE_HPP
 
+#include <cstdint>
 #include <ostream>
 
 #include <jsoncons/config/jsoncons_config.hpp>

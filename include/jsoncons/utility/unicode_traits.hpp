@@ -17,6 +17,7 @@
 #define JSONCONS_UTILITY_UNICODE_TRAITS_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iterator>
 #include <string>

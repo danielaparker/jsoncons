@@ -13,6 +13,8 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons_ext/jsonpath/expression.hpp>
 
 namespace jsoncons { 

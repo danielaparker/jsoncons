@@ -7,6 +7,7 @@
 #ifndef JSONCONS_UTILITY_HEAP_STRING_HPP
 #define JSONCONS_UTILITY_HEAP_STRING_HPP
 
+#include <cstdint>
 #include <cstring> // std::memcpy
 #include <memory> // std::allocator
 

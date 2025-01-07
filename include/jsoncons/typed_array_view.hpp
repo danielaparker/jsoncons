@@ -9,6 +9,7 @@
 
 #include <array> // std::array
 #include <cstddef>
+#include <cstdint>
 #include <functional> // std::function
 #include <ios>
 #include <system_error>

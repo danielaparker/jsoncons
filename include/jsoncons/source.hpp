@@ -7,6 +7,7 @@
 #ifndef JSONCONS_SOURCE_HPP
 #define JSONCONS_SOURCE_HPP
 
+#include <cstdint>
 #include <cstring> // std::memcpy
 #include <exception>
 #include <functional>

@@ -9,6 +9,7 @@
 
 #include <array> // std::array
 #include <cstddef>
+#include <cstdint>
 #include <cmath> // std::isfinite, std::isnan
 #include <limits> // std::numeric_limits
 #include <memory>
@@ -24,6 +25,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 
 namespace jsoncons { 

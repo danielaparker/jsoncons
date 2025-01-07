@@ -8,6 +8,7 @@
 #define JSONCONS_SINK_HPP
 
 #include <cmath>
+#include <cstdint>
 #include <cstring> // std::memcpy
 #include <memory> // std::addressof
 #include <ostream>

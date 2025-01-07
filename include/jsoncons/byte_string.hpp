@@ -8,6 +8,7 @@
 #define JSONCONS_BYTE_STRING_HPP
 
 #include <cmath>
+#include <cstdint>
 #include <cstring> // std::memcmp
 #include <initializer_list>
 #include <iomanip> // std::setw

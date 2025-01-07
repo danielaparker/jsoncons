@@ -8,6 +8,7 @@
 #define JSONCONS_DETAIL_WRITE_NUMBER_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <cmath>
 #include <limits> // std::numeric_limits
 #include <locale>

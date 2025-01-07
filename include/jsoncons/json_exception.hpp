@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <stdexcept>
 #include <string> // std::string
 #include <system_error> // std::error_code
 

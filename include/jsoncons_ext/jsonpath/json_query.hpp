@@ -9,7 +9,7 @@
 
 #include <type_traits>
 
-#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>

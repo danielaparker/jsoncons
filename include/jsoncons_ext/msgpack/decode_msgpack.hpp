@@ -12,7 +12,6 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>

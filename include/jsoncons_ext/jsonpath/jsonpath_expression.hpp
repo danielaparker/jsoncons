@@ -15,6 +15,7 @@
 #include <vector>
 
 #include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>

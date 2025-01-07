@@ -11,7 +11,6 @@
 #include <ostream> // std::basic_ostream
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 #include <jsoncons_ext/msgpack/msgpack_reader.hpp>

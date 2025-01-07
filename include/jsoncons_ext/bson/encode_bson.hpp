@@ -12,7 +12,6 @@
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>

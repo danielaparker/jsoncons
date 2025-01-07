@@ -8,12 +8,14 @@
 #define JSONCONS_JSON_DECODER_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <memory> // std::allocator
 #include <utility> // std::move
 #include <vector>
 
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
 
 namespace jsoncons {
 

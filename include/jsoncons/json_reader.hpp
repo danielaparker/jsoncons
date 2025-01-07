@@ -19,6 +19,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/source_adaptor.hpp>
+#include <jsoncons/tag_type.hpp>
 
 namespace jsoncons {
 

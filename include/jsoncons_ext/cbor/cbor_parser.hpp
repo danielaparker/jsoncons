@@ -9,6 +9,7 @@
 
 #include <bitset> // std::bitset
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility> // std::move
@@ -18,7 +19,9 @@
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/binary.hpp>
+
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>

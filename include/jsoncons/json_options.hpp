@@ -7,11 +7,11 @@
 #ifndef JSONCONS_JSON_OPTIONS_HPP
 #define JSONCONS_JSON_OPTIONS_HPP
 
+#include <cstdint>
 #include <cwchar>
 #include <functional>
 #include <string>
 
-#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/ser_context.hpp>
 

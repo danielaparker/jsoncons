@@ -10,6 +10,7 @@
 #include <array> // std::array
 #include <climits> // CHAR_BIT
 #include <cstddef>
+#include <cstdint>
 #include <cmath>
 #include <cstddef> // std::byte
 #include <iterator> // std::iterator_traits

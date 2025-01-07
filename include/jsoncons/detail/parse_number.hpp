@@ -9,6 +9,7 @@
 
 #include <cctype>
 #include <cstddef>
+#include <cstdint>
 #include <locale>
 #include <stdexcept>
 #include <string>

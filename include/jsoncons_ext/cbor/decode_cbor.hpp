@@ -15,7 +15,6 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>

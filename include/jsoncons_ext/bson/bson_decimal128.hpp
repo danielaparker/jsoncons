@@ -28,6 +28,7 @@
  */
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <ctype.h>
 #include <stdlib.h>

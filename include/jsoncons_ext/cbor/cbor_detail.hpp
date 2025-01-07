@@ -8,6 +8,7 @@
 #define JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
 
 #include <cstddef>
+#include <cstdint>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>

@@ -9,12 +9,13 @@
 
 #include <algorithm> // std::swap
 #include <cstring>
-#include <cstring> // std::memcpy
+#include <cstdint>
 #include <initializer_list> // std::initializer_list
 #include <istream> // std::basic_istream
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
 #include <ostream> 
+#include <stdexcept>
 #include <string>
 #include <type_traits> // std::enable_if
 #include <typeinfo>
@@ -36,6 +37,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

@@ -13,7 +13,6 @@
 
 #include <jsoncons/encode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
-#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

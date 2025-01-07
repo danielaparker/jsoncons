@@ -8,9 +8,11 @@
 #define JSONCONS_JSON_FILTER_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
 
 namespace jsoncons {
 

@@ -8,6 +8,7 @@
 #define JSONCONS_JSON_VISITOR_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <utility>
