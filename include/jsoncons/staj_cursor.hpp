@@ -12,13 +12,9 @@
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator
-#include <stdexcept>
-#include <string>
 #include <system_error>
-#include <type_traits> // std::enable_if
 
 #include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>

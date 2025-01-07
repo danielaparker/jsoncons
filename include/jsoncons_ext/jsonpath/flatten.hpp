@@ -9,7 +9,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
 
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/jsoncons_config.hpp>

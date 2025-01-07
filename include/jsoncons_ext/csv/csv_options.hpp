@@ -13,7 +13,6 @@
 #include <string>
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::pair
-#include <vector>
 
 #include <jsoncons/json_options.hpp>
 

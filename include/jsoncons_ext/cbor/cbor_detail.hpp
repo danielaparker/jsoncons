@@ -7,15 +7,9 @@
 #ifndef JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
 #define JSONCONS_EXT_CBOR_CBOR_DETAIL_HPP
 
-#include <iterator> // std::forward_iterator_tag
-#include <limits> // std::numeric_limits
-#include <memory>
-#include <string>
-#include <utility> // std::move
-#include <vector>
+#include <cstddef>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
 
 // 0x00..0x17 (0..23)

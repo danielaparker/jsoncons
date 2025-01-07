@@ -8,15 +8,11 @@
 #define JSONCONS_PRETTY_PRINT_HPP
 
 #include <cstring>
-#include <exception>
-#include <memory>
 #include <ostream>
-#include <string>
 #include <typeinfo>
 
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type_traits.hpp>
 

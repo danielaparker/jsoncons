@@ -19,6 +19,7 @@
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
 #define JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility> // std::move
@@ -14,11 +15,11 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/binary.hpp>
+
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons_ext/msgpack/msgpack_type.hpp>

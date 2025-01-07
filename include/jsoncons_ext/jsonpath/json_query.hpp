@@ -9,6 +9,8 @@
 
 #include <type_traits>
 
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>

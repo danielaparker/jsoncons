@@ -11,6 +11,7 @@
 
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 
 

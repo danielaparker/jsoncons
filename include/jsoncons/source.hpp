@@ -13,7 +13,6 @@
 #include <istream>
 #include <iterator>
 #include <memory> // std::addressof
-#include <stdexcept>
 #include <string>
 #include <type_traits> // std::enable_if
 #include <vector>

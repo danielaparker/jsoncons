@@ -7,7 +7,8 @@
 #ifndef JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 #define JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 
-#include <limits> // std::numeric_limits
+#include <cstddef>
+#include <exception>
 #include <set> // std::set
 #include <string> // std::basic_string
 #include <unordered_map> // std::unordered_map
@@ -17,6 +18,8 @@
 
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
 

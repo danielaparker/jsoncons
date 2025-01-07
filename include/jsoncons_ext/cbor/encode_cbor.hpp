@@ -8,15 +8,14 @@
 #define JSONCONS_EXT_CBOR_ENCODE_CBOR_HPP
 
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
+#include <ostream> // std::basic_ostream
 #include <type_traits> // std::enable_if
-#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/encode_traits.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 namespace jsoncons { 

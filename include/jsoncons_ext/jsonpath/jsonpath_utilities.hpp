@@ -7,14 +7,7 @@
 #ifndef JSONCONS_EXT_JSONPATH_UTILITIES_HPP
 #define JSONCONS_EXT_JSONPATH_UTILITIES_HPP
 
-#include <algorithm> // std::copy
-#include <iterator> // std::back_inserter
-#include <limits> // std::numeric_limits
-#include <memory>
-#include <string>
-#include <type_traits> // std::is_const
-#include <utility> // std::move
-#include <vector>
+#include <cstddef>
 
 namespace jsoncons { namespace jsonpath {
 

@@ -7,14 +7,11 @@
 #ifndef JSONCONS_JSON_DECODER_HPP
 #define JSONCONS_JSON_DECODER_HPP
 
-#include <iterator> // std::make_move_iterator
+#include <cstddef>
 #include <memory> // std::allocator
-#include <string>
-#include <type_traits> // std::true_type
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_visitor.hpp>
 

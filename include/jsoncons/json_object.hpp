@@ -10,7 +10,6 @@
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
 #include <cassert> // assert
 #include <cstring>
-#include <exception>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator

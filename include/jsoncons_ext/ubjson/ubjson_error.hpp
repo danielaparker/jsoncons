@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_UBJSON_UBJSON_ERROR_HPP
 #define JSONCONS_EXT_UBJSON_UBJSON_ERROR_HPP
 
+#include <string>
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>

@@ -8,7 +8,7 @@
 #define JSONCONS_DECODE_TRAITS_HPP
 
 #include <array>
-#include <memory>
+#include <cstddef>
 #include <string>
 #include <tuple>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type

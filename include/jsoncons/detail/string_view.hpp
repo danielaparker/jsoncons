@@ -9,14 +9,12 @@
 
 #include <algorithm> // std::find, std::min, std::reverse
 #include <cmath>
-#include <exception>
+#include <cstddef>
 #include <istream> // std::basic_istream
 #include <iterator>
-#include <memory>
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
 

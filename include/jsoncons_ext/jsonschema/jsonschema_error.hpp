@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
 #define JSONCONS_EXT_JSONSCHEMA_JSONSCHEMA_ERROR_HPP
 
+#include <string>
 #include <system_error>
 
 #include <jsoncons/json_exception.hpp>

@@ -8,10 +8,6 @@
 #define JSONCONS_EXT_MSGPACK_MSGPACK_OPTIONS_HPP
 
 #include <cwchar>
-#include <limits> // std::numeric_limits
-#include <string>
-
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons { namespace msgpack {
 

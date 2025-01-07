@@ -7,14 +7,6 @@
 #ifndef JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
 #define JSONCONS_EXT_MERGEPATCH_MERGEPATCH_HPP
 
-#include <algorithm> // std::min
-#include <memory>
-#include <string>
-#include <utility> // std::move
-#include <vector> 
-
-#include <jsoncons/json.hpp>
-
 namespace jsoncons { 
 namespace mergepatch {
 

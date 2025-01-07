@@ -7,8 +7,6 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_SCHEMA_202012_HPP
 #define JSONCONS_EXT_JSONSCHEMA_SCHEMA_202012_HPP
 
-#include <jsoncons/json.hpp>
-
 namespace jsoncons {
 namespace jsonschema {
 namespace draft202012 {

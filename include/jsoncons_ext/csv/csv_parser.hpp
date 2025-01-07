@@ -8,16 +8,15 @@
 #define JSONCONS_EXT_CSV_CSV_PARSER_HPP
 
 #include <cctype>
+#include <cstddef>
 #include <memory> // std::allocator
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <vector>
 
 #include <jsoncons/chunk_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>

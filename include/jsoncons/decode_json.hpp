@@ -9,8 +9,6 @@
 
 #include <iostream>
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <tuple>
 
 #include <jsoncons/allocator_set.hpp>

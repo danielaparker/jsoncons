@@ -9,11 +9,8 @@
 
 #include <cmath>
 #include <cstring> // std::memcpy
-#include <exception>
 #include <memory> // std::addressof
 #include <ostream>
-#include <stdexcept>
-#include <string>
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>

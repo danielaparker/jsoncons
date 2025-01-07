@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>

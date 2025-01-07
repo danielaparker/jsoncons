@@ -8,11 +8,10 @@
 #define JSONCONS_STAJ_EVENT_HPP
 
 #include <array> // std::array
+#include <cstddef>
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator
-#include <stdexcept>
-#include <string>
 #include <system_error>
 #include <type_traits> // std::enable_if
 
@@ -26,6 +25,8 @@
 #include <jsoncons/sink.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons/value_converter.hpp>
 
 namespace jsoncons {

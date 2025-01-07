@@ -8,8 +8,8 @@
 #define JSONCONS_UTILITY_URI_HPP
 
 #include <algorithm> 
+#include <cstddef>
 #include <iostream>
-#include <sstream> 
 #include <string> // std::string
 
 #include <jsoncons/config/jsoncons_config.hpp>

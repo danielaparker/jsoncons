@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_CBOR_CBOR_ENCODER_HPP
 #define JSONCONS_EXT_CBOR_CBOR_ENCODER_HPP
 
+#include <cstddef>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>

@@ -11,7 +11,6 @@
 #include <functional> // std::function
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
-#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <unordered_map>

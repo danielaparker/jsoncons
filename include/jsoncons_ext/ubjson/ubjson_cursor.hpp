@@ -7,13 +7,12 @@
 #ifndef JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
 #define JSONCONS_EXT_UBJSON_UBJSON_CURSOR_HPP
 
+#include <cstddef>
 #include <ios>
 #include <istream> // std::basic_istream
 #include <memory> // std::allocator
 #include <stdexcept>
-#include <string>
 #include <system_error>
-#include <vector>
 
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>

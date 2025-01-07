@@ -7,9 +7,6 @@
 #ifndef JSONCONS_EXT_MSGPACK_MSGPACK_TYPE_HPP
 #define JSONCONS_EXT_MSGPACK_MSGPACK_TYPE_HPP
 
-#include <memory>
-#include <string>
-
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace msgpack {

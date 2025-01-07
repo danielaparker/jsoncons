@@ -12,10 +12,8 @@
 #include <bitset> // std::bitset
 #include <chrono>
 #include <cstring>
-#include <exception>
 #include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <limits> // std::numeric_limits
 #include <map>
 #include <memory>
 #include <string>

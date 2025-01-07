@@ -9,12 +9,11 @@
 
 #include <iostream>
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <tuple>
 
 #include <jsoncons/encode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

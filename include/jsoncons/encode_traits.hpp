@@ -8,6 +8,7 @@
 #define JSONCONS_ENCODE_TRAITS_HPP
 
 #include <array>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -19,6 +20,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

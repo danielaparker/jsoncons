@@ -7,7 +7,10 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
+#include <cstddef>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>

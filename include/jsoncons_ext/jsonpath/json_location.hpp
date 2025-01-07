@@ -16,6 +16,8 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>

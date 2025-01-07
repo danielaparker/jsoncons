@@ -8,15 +8,12 @@
 #define JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
 
 #include <algorithm> // std::reverse
-#include <limits> // std::numeric_limits
-#include <memory>
+#include <cstddef>
 #include <regex>
-#include <string>
 #include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>

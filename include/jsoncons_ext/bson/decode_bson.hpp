@@ -8,14 +8,11 @@
 #define JSONCONS_EXT_BSON_DECODE_BSON_HPP
 
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <type_traits> // std::enable_if
-#include <vector>
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
+
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
 

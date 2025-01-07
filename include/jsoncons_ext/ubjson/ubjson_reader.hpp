@@ -7,12 +7,11 @@
 #ifndef JSONCONS_EXT_UBJSON_UBJSON_READER_HPP
 #define JSONCONS_EXT_UBJSON_UBJSON_READER_HPP
 
+#include <cstddef>
 #include <memory>
-#include <string>
 #include <utility> // std::move
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>

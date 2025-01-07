@@ -8,7 +8,8 @@
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_HPP
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>

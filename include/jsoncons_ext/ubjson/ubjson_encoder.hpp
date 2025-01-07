@@ -7,9 +7,9 @@
 #ifndef JSONCONS_EXT_UBJSON_UBJSON_ENCODER_HPP
 #define JSONCONS_EXT_UBJSON_UBJSON_ENCODER_HPP
 
+#include <cstddef>
 #include <limits> // std::numeric_limits
 #include <memory>
-#include <string>
 #include <utility> // std::move
 #include <vector>
 

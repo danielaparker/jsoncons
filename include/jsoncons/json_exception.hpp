@@ -7,7 +7,8 @@
 #ifndef JSON_EXCEPTION_HPP
 #define JSON_EXCEPTION_HPP
 
-#include <sstream> // std::ostringstream
+#include <cstddef>
+#include <exception>
 #include <string> // std::string
 #include <system_error> // std::error_code
 

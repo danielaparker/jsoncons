@@ -9,7 +9,6 @@
 
 #include <cmath>
 #include <cstring> // std::memcmp
-#include <exception>
 #include <initializer_list>
 #include <iomanip> // std::setw
 #include <iterator>
@@ -22,7 +21,6 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 

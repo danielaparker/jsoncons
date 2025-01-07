@@ -11,7 +11,6 @@
 #include <iterator> // std::input_iterator_tag
 #include <memory>
 #include <new> // placement new
-#include <stdexcept>
 #include <string>
 #include <system_error>
 

@@ -8,11 +8,8 @@
 #define JSONCONS_EXT_JSONPATH_JSONPATH_SELECTOR_HPP
 
 #include <cstddef>
-#include <limits> // std::numeric_limits
 #include <memory>
-#include <regex>
 #include <string>
-#include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>
 

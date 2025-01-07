@@ -7,6 +7,7 @@
 #ifndef JSONCONS_VALUE_CONVERTER_HPP
 #define JSONCONS_VALUE_CONVERTER_HPP
 
+#include <string>
 #include <system_error> // std::error_code
 
 #include <jsoncons/byte_string.hpp>

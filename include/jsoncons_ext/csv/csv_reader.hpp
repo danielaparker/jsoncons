@@ -7,14 +7,11 @@
 #ifndef JSONCONS_EXT_CSV_CSV_READER_HPP
 #define JSONCONS_EXT_CSV_CSV_READER_HPP
 
+#include <cstddef>
 #include <istream> // std::basic_istream
 #include <memory> // std::allocator
-#include <stdexcept>
-#include <string>
 #include <utility> // std::move
-#include <vector>
 
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_reader.hpp>

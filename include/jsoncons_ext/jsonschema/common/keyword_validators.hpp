@@ -9,13 +9,13 @@
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATORS_HPP
 
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 #include <set>
-#include <sstream>
+#include <string>
 #include <unordered_set>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/format_validator.hpp>

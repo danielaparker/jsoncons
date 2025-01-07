@@ -7,6 +7,7 @@
 #ifndef JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 #define JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 
+#include <cstddef>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
@@ -15,7 +16,6 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/utility/binary.hpp>

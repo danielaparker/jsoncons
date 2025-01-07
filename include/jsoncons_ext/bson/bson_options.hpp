@@ -8,10 +8,7 @@
 #define JSONCONS_EXT_BSON_BSON_OPTIONS_HPP
 
 #include <cwchar>
-#include <limits> // std::numeric_limits
-#include <string>
 
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {

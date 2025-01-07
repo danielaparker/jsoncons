@@ -9,6 +9,8 @@
 
 #include <algorithm> // std::stable_sort, std::reverse
 #include <cmath> // std::abs
+#include <cstddef>
+#include <exception>
 #include <functional> // 
 #include <limits> // std::numeric_limits
 #include <memory>
@@ -18,7 +20,6 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 
 namespace jsoncons { 

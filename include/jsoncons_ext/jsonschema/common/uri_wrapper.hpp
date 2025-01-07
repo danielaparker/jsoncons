@@ -7,8 +7,10 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_IDENTIFIER_HPP
 
+#include <cstddef>
+#include <string>
+
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>

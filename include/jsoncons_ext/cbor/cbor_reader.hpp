@@ -7,13 +7,11 @@
 #ifndef JSONCONS_EXT_CBOR_CBOR_READER_HPP
 #define JSONCONS_EXT_CBOR_CBOR_READER_HPP
 
+#include <cstddef>
 #include <memory>
-#include <string>
 #include <utility> // std::move
-#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>

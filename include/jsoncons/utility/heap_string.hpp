@@ -8,11 +8,7 @@
 #define JSONCONS_UTILITY_HEAP_STRING_HPP
 
 #include <cstring> // std::memcpy
-#include <exception>
 #include <memory> // std::allocator
-#include <ostream>
-#include <stdexcept>
-#include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
 

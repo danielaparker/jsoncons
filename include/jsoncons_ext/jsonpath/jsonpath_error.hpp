@@ -7,6 +7,8 @@
 #ifndef JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
 #define JSONCONS_EXT_JSONPATH_JSONPATH_ERROR_HPP
 
+#include <cstddef>
+#include <string>
 #include <system_error>
 
 #include <jsoncons/json_exception.hpp>

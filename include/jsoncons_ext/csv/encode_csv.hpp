@@ -7,6 +7,8 @@
 #ifndef JSONCONS_EXT_CSV_ENCODE_CSV_HPP
 #define JSONCONS_EXT_CSV_ENCODE_CSV_HPP
 
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>

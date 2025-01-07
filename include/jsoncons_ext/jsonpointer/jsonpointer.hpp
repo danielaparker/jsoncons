@@ -7,8 +7,8 @@
 #ifndef JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 #define JSONCONS_EXT_JSONPOINTER_JSONPOINTER_HPP
 
+#include <cstddef>
 #include <iostream>
-#include <iterator>
 #include <memory>
 #include <string>
 #include <system_error> // system_error
@@ -17,7 +17,8 @@
 #include <vector>
 
 #include <jsoncons/detail/write_number.hpp>
-#include <jsoncons/json.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
 namespace jsoncons { namespace jsonpointer {

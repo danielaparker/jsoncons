@@ -7,6 +7,11 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 #define JSONCONS_EXT_JSONSCHEMA_JSON_SCHEMA_FACTORY_HPP
 
+#include <string>
+#include <unordered_map>
+
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonschema/draft201909/schema_builder_201909.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_builder_202012.hpp>
 #include <jsoncons_ext/jsonschema/draft4/schema_builder_4.hpp>
