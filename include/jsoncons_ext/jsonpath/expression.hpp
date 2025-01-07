@@ -21,6 +21,7 @@
 #include <utility> // std::move
 #include <vector> // std::vector
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_type.hpp>

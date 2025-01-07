@@ -10,11 +10,13 @@
 #include <algorithm> // std::reverse
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <system_error>
 #include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/tag_type.hpp>

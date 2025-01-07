@@ -13,9 +13,13 @@
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/decode_traits.hpp>
 
 #include <jsoncons_ext/bson/bson_cursor.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
 
 namespace jsoncons { 

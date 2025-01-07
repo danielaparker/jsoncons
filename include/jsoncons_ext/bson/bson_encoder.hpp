@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
@@ -16,8 +17,10 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>

@@ -15,6 +15,8 @@
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>

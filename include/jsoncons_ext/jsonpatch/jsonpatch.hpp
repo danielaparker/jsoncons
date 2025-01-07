@@ -15,6 +15,8 @@
 #include <utility> // std::move
 #include <vector> 
 
+#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

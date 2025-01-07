@@ -13,6 +13,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
