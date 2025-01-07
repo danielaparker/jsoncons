@@ -232,7 +232,7 @@ private:
         } 
 
         uint8_t buf[sizeof(int32_t)]; 
-        size_t n = source_.read(buf, sizeof(int32_t));
+        std::size_t n = source_.read(buf, sizeof(int32_t));
         if (JSONCONS_UNLIKELY(n != sizeof(int32_t)))
         {
             ec = bson_errc::unexpected_eof;

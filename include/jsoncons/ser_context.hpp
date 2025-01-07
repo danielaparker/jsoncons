@@ -7,6 +7,8 @@
 #ifndef JSONCONS_SER_CONTEXT_HPP
 #define JSONCONS_SER_CONTEXT_HPP
 
+#include <cstddef>
+
 namespace jsoncons {
 
 class ser_context

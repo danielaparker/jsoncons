@@ -1001,7 +1001,7 @@ public:
     {
         basic_bigint<Allocator> v(*this);
 
-        size_t len = (v.length() * basic_type_bits / 3) + 2;
+        std::size_t len = (v.length() * basic_type_bits / 3) + 2;
         data.reserve(len);
 
         static uint64_t p10 = 1;

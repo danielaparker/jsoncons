@@ -1343,7 +1343,7 @@ namespace jsoncons { namespace jsonpointer {
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
                 auto s = *it;
-                size_t n{0};
+                std::size_t n{0};
                 auto r = jsoncons::detail::decimal_to_integer(s.data(), s.size(), n);
                 if (r.ec == jsoncons::detail::to_integer_errc() && (index++ == n))
                 {

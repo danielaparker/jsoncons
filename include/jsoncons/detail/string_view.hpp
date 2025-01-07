@@ -540,12 +540,12 @@ namespace std {
     template <typename CharT,typename Traits>
     struct hash<jsoncons::detail::basic_string_view<CharT, Traits>>
     {
-        size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept
+        std::size_t operator()(const jsoncons::detail::basic_string_view<CharT, Traits>& s) const noexcept
         {
             const int p = 53;
             const int m = 1000000009;
-            size_t hash_value = 0;
-            size_t p_pow = 1;
+            std::size_t hash_value = 0;
+            std::size_t p_pow = 1;
             for (CharT c : s) {
                 hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
                 p_pow = (p_pow * p) % m;

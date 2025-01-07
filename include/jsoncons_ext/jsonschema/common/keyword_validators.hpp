@@ -751,9 +751,9 @@ namespace jsonschema {
                 }
                 else
                 {
-                    size_t index = 0;
-                    size_t start = 0;
-                    size_t end = 0;
+                    std::size_t index = 0;
+                    std::size_t start = 0;
+                    std::size_t end = 0;
                     for (const auto& item : instance.array_range()) 
                     {
                         jsonpointer::json_pointer item_location = instance_location / index;
@@ -810,7 +810,7 @@ namespace jsonschema {
 
             if (schema_val_) 
             {
-                size_t index = 0;
+                std::size_t index = 0;
                 for (const auto& item : instance.array_range()) 
                 {
                     jsonpointer::json_pointer item_location = instance_location / index;
@@ -3368,8 +3368,8 @@ namespace jsonschema {
             collecting_error_listener local_reporter;
 
             std::size_t index = 0;
-            size_t start = 0;
-            size_t end = 0;
+            std::size_t start = 0;
+            std::size_t end = 0;
             for (const auto& item : instance.array_range()) 
             {
                 std::size_t errors = local_reporter.errors.size();
@@ -3642,12 +3642,12 @@ namespace jsonschema {
                 return walk_result::advance;
             }
         
-            size_t data_index = 0;
+            std::size_t data_index = 0;
         
             evaluation_context<Json> prefix_items_context(context, this->keyword_name());
 
-            size_t start = 0;
-            size_t end = 0;
+            std::size_t start = 0;
+            std::size_t end = 0;
             for (std::size_t schema_index=0; 
                   schema_index < prefix_item_validators_.size() && data_index < instance.size(); 
                   ++schema_index, ++data_index) 
@@ -3712,7 +3712,7 @@ namespace jsonschema {
                 return result;
             }
 
-            size_t data_index = 0;
+            std::size_t data_index = 0;
 
             evaluation_context<Json> prefix_items_context(context, this->keyword_name());
 
@@ -3922,8 +3922,8 @@ namespace jsonschema {
                 else
                 {
                     std::size_t index = 0;
-                    size_t start = 0;
-                    size_t end = 0;
+                    std::size_t start = 0;
+                    std::size_t end = 0;
                     for (const auto& item : instance.array_range())
                     {
                         // check if it is in "evaluated_items"

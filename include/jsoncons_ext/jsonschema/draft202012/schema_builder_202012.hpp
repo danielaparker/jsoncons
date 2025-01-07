@@ -482,7 +482,7 @@ namespace draft202012 {
 
             if (sch.type() == json_type::array_value) 
             {
-                size_t c = 0;
+                std::size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
                     std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
