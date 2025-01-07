@@ -16,10 +16,12 @@
 #include <string>
 #include <system_error>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>

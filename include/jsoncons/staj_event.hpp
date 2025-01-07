@@ -17,6 +17,7 @@
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>

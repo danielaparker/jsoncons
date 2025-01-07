@@ -9,8 +9,6 @@
 
 #include <cstdint>
 
-#include <jsoncons/config/jsoncons_config.hpp>
-
 namespace jsoncons { namespace bson {
 
     namespace bson_type

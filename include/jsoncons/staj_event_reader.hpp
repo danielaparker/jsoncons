@@ -15,6 +15,7 @@
 #include <memory> // std::allocator
 #include <system_error>
 
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_parser.hpp>

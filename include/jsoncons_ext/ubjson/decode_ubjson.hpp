@@ -14,7 +14,10 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/decode_traits.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 #include <jsoncons_ext/ubjson/ubjson_reader.hpp>

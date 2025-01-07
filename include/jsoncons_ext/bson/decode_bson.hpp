@@ -15,8 +15,10 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/decode_traits.hpp>
+#include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/bson/bson_cursor.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>

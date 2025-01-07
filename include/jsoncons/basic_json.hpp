@@ -41,6 +41,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/ser_context.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>

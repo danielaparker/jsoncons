@@ -14,7 +14,9 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/decode_traits.hpp>
+#include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
