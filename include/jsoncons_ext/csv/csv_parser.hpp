@@ -19,7 +19,6 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/chunk_reader.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
