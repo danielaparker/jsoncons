@@ -2178,55 +2178,21 @@ string_u1:
                     state_ = json_parse_state::string;
                     return;
                 }
-                case '\r':
-                {
-                    position_ += (input_ptr_ - sb + 1);
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
-                    {
-                        ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    push_state(state_);
-                    state_ = json_parse_state::cr;
-                    return;
-                }
                 case '\n':
-                {
-                    ++line_;
-                    ++position_;
-                    mark_position_ = position_;
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
-                    {
-                        ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    return;
-                }
+                case '\r':
                 case '\t':
                 {
                     position_ += (input_ptr_ - sb + 1);
-                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!more_)
+                    if (!err_handler_(json_errc::illegal_character_in_string, *this))
                     {
+                        more_ = false;
                         ec = json_errc::illegal_character_in_string;
-                        state_ = json_parse_state::string;
                         return;
                     }
-                    // recovery - keep
-                    string_buffer_.append(sb, input_ptr_ - sb + 1);
-                    ++input_ptr_;
-                    state_ = json_parse_state::string;
-                    return;
+                    // recovery - skip
+                    string_buffer_.append(sb,input_ptr_-sb);
+                    sb = input_ptr_ + 1;
+                    break;
                 }
                 case '\\': 
                 {

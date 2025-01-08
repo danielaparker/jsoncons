@@ -542,7 +542,7 @@ namespace jsoncons {
         {
             for (auto s = first; s != last; ++s)
             {
-                members_.emplace_back(key_type(s->first.c_str(), s->first.size(), get_allocator()), s->second);
+                members_.emplace_back(key_type((*s).first.c_str(), (*s).first.size(), get_allocator()), (*s).second);
             }
             std::stable_sort(members_.begin(),members_.end(),
                              [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
