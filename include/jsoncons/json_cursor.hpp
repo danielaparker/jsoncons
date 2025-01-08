@@ -337,7 +337,7 @@ public:
                     if (ec) {return;}
                     if (s.size() > 0)
                     {
-                        parser_.set_buffer(s.data(),s.size());
+                        parser_.update(s.data(),s.size());
                     }
                 }
                 if (!parser_.source_exhausted())
@@ -398,7 +398,7 @@ private:
             return;
         }
         std::size_t offset = (r.ptr - sv.data());
-        parser_.set_buffer(sv.data()+offset,sv.size()-offset);
+        parser_.update(sv.data()+offset,sv.size()-offset);
         bool is_done = parser_.done() || done_;
         if (!is_done)
         {
@@ -444,7 +444,7 @@ private:
                 if (ec) {return;}
                 if (s.size() > 0)
                 {
-                    parser_.set_buffer(s.data(),s.size());
+                    parser_.update(s.data(),s.size());
                     if (ec) {return;}
                 }
             }

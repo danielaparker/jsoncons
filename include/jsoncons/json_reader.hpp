@@ -313,6 +313,7 @@ namespace jsoncons {
                 }
             }
             
+            parser_.skip_whitespace();
             while (!source_.eof())
             {
                 parser_.skip_whitespace();
@@ -389,6 +390,7 @@ namespace jsoncons {
 
         bool eof() const
         {
+            std::cout << "parser no more source: " << parser_.source_exhausted() << ", source eof: " << source_.eof() << "\n";
             return parser_.source_exhausted() && source_.eof();
         }
 

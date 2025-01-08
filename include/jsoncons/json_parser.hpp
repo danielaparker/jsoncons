@@ -582,6 +582,9 @@ public:
                     more_ = false;
                     break;
                 case json_parse_state::start:
+                    more_ = false;
+                    ec = json_errc::unexpected_eof;
+                    break;                
                 case json_parse_state::done:
                     more_ = false;
                     break;
