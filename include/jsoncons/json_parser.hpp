@@ -59,14 +59,7 @@ enum class parse_state : uint8_t
     array, 
     string,
     member_name,
-    minus, 
-    zero,  
-    integer,
-    fraction1,
-    fraction2,
-    exp1,
-    exp2,
-    exp3,
+    number,
     n,
     nu,
     nul,
@@ -95,6 +88,18 @@ enum class parse_string_state : uint8_t
     escape_u6, 
     escape_u7, 
     escape_u8
+};
+
+enum class parse_number_state : uint8_t 
+{
+    minus, 
+    zero,  
+    integer,
+    fraction1,
+    fraction2,
+    exp1,
+    exp2,
+    exp3
 };
 
 template <typename CharT,typename TempAllocator  = std::allocator<char>>
@@ -135,7 +140,8 @@ private:
     const char_type* end_input_;
     const char_type* input_ptr_;
     parse_state state_;
-    parse_string_state string_state_;
+    parse_string_state string_state_ = parse_string_state{};
+    parse_number_state number_state_ = parse_number_state{};
     bool more_;
     bool done_;
 
@@ -183,7 +189,6 @@ public:
          end_input_(nullptr),
          input_ptr_(nullptr),
          state_(parse_state::start),
-         string_state_{},
          more_(true),
          done_(false),
          string_buffer_(temp_alloc),
@@ -579,15 +584,23 @@ public:
         {
             switch (state_)
             {
-                case parse_state::zero:  
-                case parse_state::integer:
-                    end_integer_value(visitor, ec);
-                    if (ec) return;
-                    break;
-                case parse_state::fraction2:
-                case parse_state::exp3:
-                    end_fraction_value(visitor, ec);
-                    if (ec) return;
+                case parse_state::number:  
+                    if (number_state_ == parse_number_state::zero || number_state_ == parse_number_state::integer)
+                    {
+                        end_integer_value(visitor, ec);
+                        if (ec) return;
+                    }
+                    else if (number_state_ == parse_number_state::fraction2 || number_state_ == parse_number_state::exp3)
+                    {
+                        end_fraction_value(visitor, ec);
+                        if (ec) return;
+                    }
+                    else
+                    {
+                        err_handler_(json_errc::unexpected_eof, *this);
+                        ec = json_errc::unexpected_eof;
+                        more_ = false;
+                    }
                     break;
                 case parse_state::accept:
                     visitor.flush();
@@ -701,14 +714,16 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::minus;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
                             case '0': 
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                state_ = parse_state::zero;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::zero;
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
@@ -721,7 +736,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::integer;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1113,7 +1129,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::minus;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1123,7 +1140,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::zero;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1133,7 +1151,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::integer;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1269,7 +1288,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::minus;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1279,7 +1299,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::zero;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1289,7 +1310,8 @@ public:
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
-                                state_ = parse_state::integer;
+                                state_ = parse_state::number;
+                                number_state_ = parse_number_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -1332,14 +1354,7 @@ public:
                     parse_string(visitor, ec);
                     if (ec) return;
                     break;
-                case parse_state::minus:
-                case parse_state::zero:  
-                case parse_state::integer: 
-                case parse_state::fraction1: 
-                case parse_state::fraction2: 
-                case parse_state::exp1: 
-                case parse_state::exp2:  
-                case parse_state::exp3: 
+                case parse_state::number:
                     parse_number(visitor, ec);  
                     if (ec) return;
                     break;
@@ -1725,23 +1740,23 @@ public:
     {
         const char_type* local_input_end = end_input_;
 
-        switch (state_)
+        switch (number_state_)
         {
-            case parse_state::minus:
+            case parse_number_state::minus:
                 goto minus_sign;
-            case parse_state::zero:
+            case parse_number_state::zero:
                 goto zero;
-            case parse_state::integer:
+            case parse_number_state::integer:
                 goto integer;
-            case parse_state::fraction1:
+            case parse_number_state::fraction1:
                 goto fraction1;
-            case parse_state::fraction2:
+            case parse_number_state::fraction2:
                 goto fraction2;
-            case parse_state::exp1:
+            case parse_number_state::exp1:
                 goto exp1;
-            case parse_state::exp2:
+            case parse_number_state::exp2:
                 goto exp2;
-            case parse_state::exp3:
+            case parse_number_state::exp3:
                 goto exp3;
             default:
                 JSONCONS_UNREACHABLE();               
@@ -1749,7 +1764,7 @@ public:
 minus_sign:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::minus;
+            number_state_ = parse_number_state::minus;
             return;
         }
         switch (*input_ptr_)
@@ -1773,7 +1788,7 @@ minus_sign:
 zero:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::zero;
+            number_state_ = parse_number_state::zero;
             return;
         }
         switch (*input_ptr_)
@@ -1835,19 +1850,19 @@ zero:
                 err_handler_(json_errc::leading_zero, *this);
                 ec = json_errc::leading_zero;
                 more_ = false;
-                state_ = parse_state::zero;
+                number_state_ = parse_number_state::zero;
                 return;
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = parse_state::zero;
+                number_state_ = parse_number_state::zero;
                 return;
         }
 integer:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::integer;
+            number_state_ = parse_number_state::integer;
             return;
         }
         switch (*input_ptr_)
@@ -1914,13 +1929,13 @@ integer:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = parse_state::integer;
+                number_state_ = parse_number_state::integer;
                 return;
         }
 fraction1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::fraction1;
+            number_state_ = parse_number_state::fraction1;
             return;
         }
         switch (*input_ptr_)
@@ -1934,13 +1949,13 @@ fraction1:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = parse_state::fraction1;
+                number_state_ = parse_number_state::fraction1;
                 return;
         }
 fraction2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::fraction2;
+            number_state_ = parse_number_state::fraction2;
             return;
         }
         switch (*input_ptr_)
@@ -2006,13 +2021,13 @@ fraction2:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = parse_state::fraction2;
+                number_state_ = parse_number_state::fraction2;
                 return;
         }
 exp1:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::exp1;
+            number_state_ = parse_number_state::exp1;
             return;
         }
         switch (*input_ptr_)
@@ -2035,13 +2050,13 @@ exp1:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
-                state_ = parse_state::exp1;
+                number_state_ = parse_number_state::exp1;
                 return;
         }
 exp2:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::exp2;
+            number_state_ = parse_number_state::exp2;
             return;
         }
         switch (*input_ptr_)
@@ -2055,14 +2070,14 @@ exp2:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
-                state_ = parse_state::exp2;
+                number_state_ = parse_number_state::exp2;
                 return;
         }
         
 exp3:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
-            state_ = parse_state::exp3;
+            number_state_ = parse_number_state::exp3;
             return;
         }
         switch (*input_ptr_)
@@ -2123,7 +2138,7 @@ exp3:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
                 more_ = false;
-                state_ = parse_state::exp3;
+                number_state_ = parse_number_state::exp3;
                 return;
         }
 
