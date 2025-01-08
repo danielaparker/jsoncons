@@ -384,7 +384,7 @@ namespace detail {
                             {
                                 json_decoder<Json> decoder(alloc_);
                                 basic_json_parser<char_type> parser;
-                                parser.set_buffer(buffer.data(),buffer.size());
+                                parser.update(buffer.data(),buffer.size());
                                 parser.parse_some(decoder, ec);
                                 if (ec)
                                 {
@@ -408,7 +408,7 @@ namespace detail {
                     {
                         json_decoder<Json> decoder(alloc_);
                         basic_json_parser<char_type> parser;
-                        parser.set_buffer(buffer.data(),buffer.size());
+                        parser.update(buffer.data(),buffer.size());
                         parser.parse_some(decoder, ec);
                         if (ec)
                         {
@@ -436,7 +436,7 @@ namespace detail {
                             {
                                 json_decoder<Json> decoder(alloc_);
                                 basic_json_parser<char_type> parser;
-                                parser.set_buffer(p_,end_input_ - p_);
+                                parser.update(p_,end_input_ - p_);
                                 parser.parse_some(decoder, ec);
                                 if (ec)
                                 {
