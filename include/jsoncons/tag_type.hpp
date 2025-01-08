@@ -7,6 +7,7 @@
 #ifndef JSONCONS_TAG_TYPE_HPP
 #define JSONCONS_TAG_TYPE_HPP
 
+#include <cstdint>
 #include <ostream>
 
 #include <jsoncons/config/jsoncons_config.hpp>

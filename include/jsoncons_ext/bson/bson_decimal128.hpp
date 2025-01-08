@@ -28,13 +28,17 @@
  */
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -578,18 +582,18 @@ namespace jsoncons { namespace bson {
         bool includes_sign = false; /* True if the input first contains a sign. */
         bool found_nonzero = false;
  
-        size_t significant_digits = 0; /* Total number of significant digits
+        std::size_t significant_digits = 0; /* Total number of significant digits
                                         * (no leading or trailing zero) */
-        size_t ndigits_read = 0;       /* Total number of significand digits read */
-        size_t ndigits = 0;        /* Total number of digits (no leading zeros) */
-        size_t radix_position = 0; /* The number of the digits after radix */
-        size_t first_nonzero = 0;  /* The index of the first non-zero in *str* */
+        std::size_t ndigits_read = 0;       /* Total number of significand digits read */
+        std::size_t ndigits = 0;        /* Total number of digits (no leading zeros) */
+        std::size_t radix_position = 0; /* The number of the digits after radix */
+        std::size_t first_nonzero = 0;  /* The index of the first non-zero in *str* */
  
         uint16_t digits[decimal128_limits::max_digits] = {0};
         uint16_t ndigits_stored = 0;      /* The number of digits in digits */
         uint16_t *digits_insert = digits; /* Insertion pointer for digits */
-        size_t first_digit = 0;           /* The index of the first non-zero digit */
-        size_t last_digit = 0;            /* The index of the last digit */
+        std::size_t first_digit = 0;           /* The index of the first non-zero digit */
+        std::size_t last_digit = 0;            /* The index of the last digit */
  
         int32_t exponent = 0;
         uint64_t significand_high = 0; /* The high 17 digits of the significand */
@@ -804,7 +808,7 @@ namespace jsoncons { namespace bson {
            significand_high = 0;
            significand_low = 0;
         } else if (last_digit - first_digit < 17) {
-           size_t d_idx = first_digit;
+           std::size_t d_idx = first_digit;
            significand_low = digits[d_idx++];
  
            for (; d_idx <= last_digit; d_idx++) {
@@ -813,7 +817,7 @@ namespace jsoncons { namespace bson {
               significand_high = 0;
            }
         } else {
-           size_t d_idx = first_digit;
+           std::size_t d_idx = first_digit;
            significand_high = digits[d_idx++];
  
            for (; d_idx <= last_digit - 17; d_idx++) {

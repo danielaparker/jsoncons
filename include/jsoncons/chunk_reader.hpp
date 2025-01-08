@@ -7,6 +7,7 @@
 #ifndef JSONCONS_CHUNK_READER_HPP
 #define JSONCONS_CHUNK_READER_HPP
 
+#include <cstddef>
 #include <functional>
 #include <system_error>
 

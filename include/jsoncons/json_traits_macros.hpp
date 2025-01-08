@@ -7,15 +7,10 @@
 #ifndef JSONCONS_JSON_TRAITS_MACROS_HPP
 #define JSONCONS_JSON_TRAITS_MACROS_HPP
 
-#include <algorithm> // std::swap
-#include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <limits> // std::numeric_limits
-#include <string>
-#include <type_traits> // std::enable_if
 #include <utility>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
-#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 

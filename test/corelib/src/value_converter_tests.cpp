@@ -1,10 +1,10 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/value_converter.hpp>
 #include <vector>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

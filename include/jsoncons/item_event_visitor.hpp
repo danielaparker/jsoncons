@@ -7,8 +7,22 @@
 #ifndef JSONCONS_ITEM_EVENT_VISITOR_HPP
 #define JSONCONS_ITEM_EVENT_VISITOR_HPP
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <vector>
+
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 
 

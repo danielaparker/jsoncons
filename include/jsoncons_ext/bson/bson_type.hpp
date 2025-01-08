@@ -7,10 +7,7 @@
 #ifndef JSONCONS_EXT_BSON_BSON_TYPE_HPP
 #define JSONCONS_EXT_BSON_BSON_TYPE_HPP
 
-#include <memory>
-#include <string>
-
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <cstdint>
 
 namespace jsoncons { namespace bson {
 

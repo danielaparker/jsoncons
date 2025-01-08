@@ -7,13 +7,13 @@
 #ifndef JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP
 #define JSONCONS_EXT_MSGPACK_MSGPACK_READER_HPP
 
+#include <cstddef>
 #include <memory>
-#include <string>
+#include <system_error>
 #include <utility> // std::move
-#include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>

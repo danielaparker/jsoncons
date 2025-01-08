@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
-#include <type_traits> // std::enable_if
+#include <string>
 
 #include <jsoncons/config/compiler_support.hpp>
 

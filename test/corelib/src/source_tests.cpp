@@ -3,12 +3,12 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <new>
+#include <catch/catch.hpp>
 
 TEST_CASE("basic_null_istream tests")
 {

@@ -2652,20 +2652,20 @@ namespace Catch {
     class Capturer {
         std::vector<MessageInfo> m_messages;
         IResultCapture& m_resultCapture = getResultCapture();
-        size_t m_captured = 0;
+        std::size_t m_captured = 0;
     public:
         Capturer( StringRef macroName, SourceLineInfo const& lineInfo, ResultWas::OfType resultType, StringRef names );
         ~Capturer();
 
-        void captureValue( size_t index, std::string const& value );
+        void captureValue( std::size_t index, std::string const& value );
 
         template<typename T>
-        void captureValues( size_t index, T const& value ) {
+        void captureValues( std::size_t index, T const& value ) {
             captureValue( index, Catch::Detail::stringify( value ) );
         }
 
         template<typename T, typename... Ts>
-        void captureValues( size_t index, T const& value, Ts const&... values ) {
+        void captureValues( std::size_t index, T const& value, Ts const&... values ) {
             captureValue( index, Catch::Detail::stringify(value) );
             captureValues( index+1, values... );
         }
@@ -3969,7 +3969,7 @@ namespace Generators {
             "FixedValuesGenerator does not support bools because of std::vector<bool>"
             "specialization, use SingleValue Generator instead.");
         std::vector<T> m_values;
-        size_t m_idx = 0;
+        std::size_t m_idx = 0;
     public:
         FixedValuesGenerator( std::initializer_list<T> values ) : m_values( values ) {}
 
@@ -4009,7 +4009,7 @@ namespace Generators {
     template<typename T>
     class Generators : public IGenerator<T> {
         std::vector<GeneratorWrapper<T>> m_generators;
-        size_t m_current = 0;
+        std::size_t m_current = 0;
 
         void populate(GeneratorWrapper<T>&& generator) {
             m_generators.emplace_back(std::move(generator));
@@ -4119,8 +4119,8 @@ namespace Generators {
     template <typename T>
     class TakeGenerator : public IGenerator<T> {
         GeneratorWrapper<T> m_generator;
-        size_t m_returned = 0;
-        size_t m_target;
+        std::size_t m_returned = 0;
+        std::size_t m_target;
     public:
         TakeGenerator(size_t target, GeneratorWrapper<T>&& generator):
             m_generator(std::move(generator)),
@@ -4203,9 +4203,9 @@ namespace Generators {
             "because of std::vector<bool> specialization");
         GeneratorWrapper<T> m_generator;
         mutable std::vector<T> m_returned;
-        size_t m_target_repeats;
-        size_t m_current_repeat = 0;
-        size_t m_repeat_index = 0;
+        std::size_t m_target_repeats;
+        std::size_t m_current_repeat = 0;
+        std::size_t m_repeat_index = 0;
     public:
         RepeatGenerator(size_t repeats, GeneratorWrapper<T>&& generator):
             m_generator(std::move(generator)),
@@ -4296,7 +4296,7 @@ namespace Generators {
     template <typename T>
     class ChunkGenerator final : public IGenerator<std::vector<T>> {
         std::vector<T> m_chunk;
-        size_t m_chunk_size;
+        std::size_t m_chunk_size;
         GeneratorWrapper<T> m_generator;
         bool m_used_up = false;
     public:
@@ -4715,7 +4715,7 @@ class IteratorGenerator final : public IGenerator<T> {
         "because of std::vector<bool> specialization");
 
     std::vector<T> m_elems;
-    size_t m_current = 0;
+    std::size_t m_current = 0;
 public:
     template <typename InputIterator, typename InputSentinel>
     IteratorGenerator(InputIterator first, InputSentinel last):m_elems(first, last) {
@@ -8490,23 +8490,23 @@ class Columns;
 
 class Column {
     std::vector<std::string> m_strings;
-    size_t m_width = CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH;
-    size_t m_indent = 0;
-    size_t m_initialIndent = std::string::npos;
+    std::size_t m_width = CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH;
+    std::size_t m_indent = 0;
+    std::size_t m_initialIndent = std::string::npos;
 
 public:
     class iterator {
         friend Column;
 
         Column const& m_column;
-        size_t m_stringIndex = 0;
-        size_t m_pos = 0;
+        std::size_t m_stringIndex = 0;
+        std::size_t m_pos = 0;
 
-        size_t m_len = 0;
-        size_t m_end = 0;
+        std::size_t m_len = 0;
+        std::size_t m_end = 0;
         bool m_suffix = false;
 
-        iterator(Column const& column, size_t stringIndex)
+        iterator(Column const& column, std::size_t stringIndex)
             : m_column(column),
             m_stringIndex(stringIndex) {}
 
@@ -8537,7 +8537,7 @@ public:
             if (m_end < m_pos + width) {
                 m_len = m_end - m_pos;
             } else {
-                size_t len = width;
+                std::size_t len = width;
                 while (len > 0 && !isBoundary(m_pos + len))
                     --len;
                 while (len > 0 && isWhitespace(line()[m_pos + len - 1]))
@@ -8552,7 +8552,7 @@ public:
             }
         }
 
-        auto indent() const -> size_t {
+        auto indent() const -> std::size_t {
             auto initial = m_pos == 0 && m_stringIndex == 0 ? m_column.m_initialIndent : std::string::npos;
             return initial == std::string::npos ? m_column.m_indent : initial;
         }
@@ -8632,7 +8632,7 @@ public:
         return *this;
     }
 
-    auto width() const -> size_t { return m_width; }
+    auto width() const -> std::size_t { return m_width; }
     auto begin() const -> iterator { return iterator(*this); }
     auto end() const -> iterator { return { *this, m_strings.size() }; }
 
@@ -8676,7 +8676,7 @@ public:
 
         std::vector<Column> const& m_columns;
         std::vector<Column::iterator> m_iterators;
-        size_t m_activeIterators;
+        std::size_t m_activeIterators;
 
         iterator(Columns const& columns, EndTag)
             : m_columns(columns.m_columns),
@@ -8883,7 +8883,7 @@ namespace detail {
                     } else {
                         if( next[1] != '-' && next.size() > 2 ) {
                             std::string opt = "- ";
-                            for( size_t i = 1; i < next.size(); ++i ) {
+                            for( std::size_t i = 1; i < next.size(); ++i ) {
                                 opt[1] = next[i];
                                 m_tokenBuffer.push_back( { TokenType::Option, opt } );
                             }
@@ -8908,7 +8908,7 @@ namespace detail {
             return !m_tokenBuffer.empty() || it != itEnd;
         }
 
-        auto count() const -> size_t { return m_tokenBuffer.size() + (itEnd - it); }
+        auto count() const -> std::size_t { return m_tokenBuffer.size() + (itEnd - it); }
 
         auto operator*() const -> Token {
             assert( !m_tokenBuffer.empty() );
@@ -9225,7 +9225,7 @@ namespace detail {
         virtual ~ParserBase() = default;
         virtual auto validate() const -> Result { return Result::ok(); }
         virtual auto parse( std::string const& exeName, TokenStream const &tokens) const -> InternalParseResult  = 0;
-        virtual auto cardinality() const -> size_t { return 1; }
+        virtual auto cardinality() const -> std::size_t { return 1; }
 
         auto parse( Args const &args ) const -> InternalParseResult {
             return parse( args.exeName(), TokenStream( args ) );
@@ -9285,7 +9285,7 @@ namespace detail {
             return m_optionality == Optionality::Optional;
         }
 
-        auto cardinality() const -> size_t override {
+        auto cardinality() const -> std::size_t override {
             if( m_ref->isContainer() )
                 return 0;
             else
@@ -9558,8 +9558,8 @@ namespace detail {
             }
 
             auto rows = getHelpColumns();
-            size_t consoleWidth = CATCH_CLARA_CONFIG_CONSOLE_WIDTH;
-            size_t optWidth = 0;
+            std::size_t consoleWidth = CATCH_CLARA_CONFIG_CONSOLE_WIDTH;
+            std::size_t optWidth = 0;
             for( auto const &cols : rows )
                 optWidth = (std::max)(optWidth, cols.left.size() + 2);
 
@@ -9599,7 +9599,7 @@ namespace detail {
 
             struct ParserInfo {
                 ParserBase const* parser = nullptr;
-                size_t count = 0;
+                std::size_t count = 0;
             };
             const size_t totalParsers = m_options.size() + m_args.size();
             assert( totalParsers < 512 );
@@ -9607,7 +9607,7 @@ namespace detail {
             ParserInfo parseInfos[512];
 
             {
-                size_t i = 0;
+                std::size_t i = 0;
                 for (auto const &opt : m_options) parseInfos[i++].parser = &opt;
                 for (auto const &arg : m_args) parseInfos[i++].parser = &arg;
             }
@@ -9618,7 +9618,7 @@ namespace detail {
             while( result.value().remainingTokens() ) {
                 bool tokenParsed = false;
 
-                for( size_t i = 0; i < totalParsers; ++i ) {
+                for( std::size_t i = 0; i < totalParsers; ++i ) {
                     auto&  parseInfo = parseInfos[i];
                     if( parseInfo.parser->cardinality() == 0 || parseInfo.count < parseInfo.parser->cardinality() ) {
                         result = parseInfo.parser->parse(exeName, result.value().remainingTokens());
@@ -10591,7 +10591,7 @@ namespace Catch {
             // In other words, it returns the Blue part of Bikeshed::Colour::Blue
             StringRef extractInstanceName(StringRef enumInstance) {
                 // Find last occurrence of ":"
-                size_t name_start = enumInstance.size();
+                std::size_t name_start = enumInstance.size();
                 while (name_start > 0 && enumInstance[name_start - 1] != ':') {
                     --name_start;
                 }
@@ -11309,7 +11309,7 @@ namespace Catch {
     }
 
     std::string TagInfo::all() const {
-        size_t size = 0;
+        std::size_t size = 0;
         for (auto const& spelling : spellings) {
             // Add 2 for the brackes
             size += spelling.size() + 2;
@@ -11864,7 +11864,7 @@ namespace Catch {
     }
 
     Capturer::Capturer( StringRef macroName, SourceLineInfo const& lineInfo, ResultWas::OfType resultType, StringRef names ) {
-        auto trimmed = [&] (size_t start, size_t end) {
+        auto trimmed = [&] (size_t start, std::size_t end) {
             while (names[start] == ',' || isspace(static_cast<unsigned char>(names[start]))) {
                 ++start;
             }
@@ -11883,7 +11883,7 @@ namespace Catch {
             CATCH_INTERNAL_ERROR("CAPTURE parsing encountered unmatched quote");
         };
 
-        size_t start = 0;
+        std::size_t start = 0;
         std::stack<char> openings;
         for (size_t pos = 0; pos < names.size(); ++pos) {
             char c = names[pos];
@@ -11923,12 +11923,12 @@ namespace Catch {
     Capturer::~Capturer() {
         if ( !uncaught_exceptions() ){
             assert( m_captured == m_messages.size() );
-            for( size_t i = 0; i < m_captured; ++i  )
+            for( std::size_t i = 0; i < m_captured; ++i  )
                 m_resultCapture.popScopedMessage( m_messages[i] );
         }
     }
 
-    void Capturer::captureValue( size_t index, std::string const& value ) {
+    void Capturer::captureValue( std::size_t index, std::string const& value ) {
         assert( index < m_messages.size() );
         m_messages[index].message += value;
         m_resultCapture.pushScopedMessage( m_messages[index] );
@@ -13851,9 +13851,9 @@ namespace Catch {
         const auto is_ws = [](char c) {
             return c == ' ' || c == '\t' || c == '\n' || c == '\r';
         };
-        size_t real_begin = 0;
+        std::size_t real_begin = 0;
         while (real_begin < ref.size() && is_ws(ref[real_begin])) { ++real_begin; }
-        size_t real_end = ref.size();
+        std::size_t real_end = ref.size();
         while (real_end > real_begin && is_ws(ref[real_end - 1])) { --real_end; }
 
         return ref.substr(real_begin, real_end - real_begin);
@@ -15443,7 +15443,7 @@ namespace Catch {
 
 namespace {
 
-    size_t trailingBytes(unsigned char c) {
+    std::size_t trailingBytes(unsigned char c) {
         if ((c & 0xE0) == 0xC0) {
             return 2;
         }

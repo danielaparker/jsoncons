@@ -10,10 +10,12 @@
 #include <cassert>
 #include <iostream>
 #include <set>
-#include <sstream>
+#include <string>
+#include <unordered_map>
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder.hpp>

@@ -9,12 +9,12 @@
 
 #include <array> // std::array
 #include <climits> // CHAR_BIT
+#include <cstddef>
+#include <cstdint>
 #include <cmath>
 #include <cstddef> // std::byte
-#include <exception>
 #include <iterator> // std::iterator_traits
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <type_traits> // std::enable_if, std::true_type
 #include <utility> // std::declval

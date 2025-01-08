@@ -7,16 +7,25 @@
 #ifndef JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 #define JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
 
-#include <limits> // std::numeric_limits
-#include <set> // std::set
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <functional>
+#include <memory>
 #include <string> // std::basic_string
+#include <system_error>
+#include <type_traits>
 #include <unordered_map> // std::unordered_map
-#include <unordered_set> // std::unordered_set
 #include <utility> // std::move
 #include <vector> // std::vector
 
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>
 

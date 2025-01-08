@@ -7,18 +7,26 @@
 #ifndef JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 #define JSONCONS_EXT_BSON_BSON_ENCODER_HPP
 
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/binary.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
+
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_oid.hpp>

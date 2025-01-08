@@ -7,7 +7,9 @@
 #ifndef JSONCONS_JSON_ERROR_HPP
 #define JSONCONS_JSON_ERROR_HPP
 
+#include <string>
 #include <system_error>
+#include <type_traits>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 

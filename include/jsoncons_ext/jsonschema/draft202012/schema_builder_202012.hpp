@@ -10,10 +10,12 @@
 #include <cassert>
 #include <iostream>
 #include <set>
-#include <sstream>
+#include <string>
+#include <unordered_map>
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/uri.hpp>
+
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
@@ -480,7 +482,7 @@ namespace draft202012 {
 
             if (sch.type() == json_type::array_value) 
             {
-                size_t c = 0;
+                std::size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
                     std::string sub_keys[] = {"prefixItems", std::to_string(c++)};

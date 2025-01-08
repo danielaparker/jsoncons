@@ -8,12 +8,15 @@
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_FORMAT_VALIDATOR_HPP
 
 #include <cassert>
+#include <cstddef>
+#include <exception>
+#include <functional>
 #include <iostream>
 #include <set>
-#include <sstream>
+#include <string>
+#include <system_error>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/validator.hpp>

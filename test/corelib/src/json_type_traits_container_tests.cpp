@@ -3,7 +3,6 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <catch/catch.hpp>
 #include <array>
 #include <cstdint>
 #include <ctime>
@@ -18,6 +17,7 @@
 #include <utility>
 #include <valarray>
 #include <vector>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

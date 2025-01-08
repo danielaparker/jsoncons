@@ -8,12 +8,14 @@
 #define JSONCONS_EXT_JSONPATCH_JSONPATCH_HPP
 
 #include <algorithm> // std::min
-#include <memory>
+#include <cstddef>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector> 
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

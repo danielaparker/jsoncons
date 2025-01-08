@@ -7,18 +7,24 @@
 #ifndef JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
 #define JSONCONS_EXT_MSGPACK_MSGPACK_PARSER_HPP
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/binary.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
+
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons_ext/msgpack/msgpack_type.hpp>

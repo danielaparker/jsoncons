@@ -9,13 +9,15 @@
 
 #include <iostream>
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <tuple>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/decode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
+#include <jsoncons/basic_json.hpp>
+#include <jsoncons/source.hpp>
 
 namespace jsoncons {
 

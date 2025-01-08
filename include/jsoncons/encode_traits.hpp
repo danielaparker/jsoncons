@@ -8,8 +8,11 @@
 #define JSONCONS_ENCODE_TRAITS_HPP
 
 #include <array>
+#include <cstddef>
 #include <memory>
+#include <utility>
 #include <string>
+#include <system_error>
 #include <tuple>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
@@ -19,6 +22,8 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

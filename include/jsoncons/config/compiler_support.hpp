@@ -8,12 +8,21 @@
 #define JSONCONS_CONFIG_COMPILER_SUPPORT_HPP
 
 #include <cmath>
-#include <exception>
-#include <ostream>
-#include <stdexcept>
-#include <string>
+#include <cstdint>
 #include <cstring> // std::memcpy
 #include <limits> // std::numeric_limits
+
+#if !defined(JSONCONS_NO_EXCEPTIONS)
+    #define JSONCONS_THROW(exception) throw exception
+    #define JSONCONS_RETHROW throw
+    #define JSONCONS_TRY try
+    #define JSONCONS_CATCH(exception) catch(exception)
+#else
+    #define JSONCONS_THROW(exception) std::terminate()
+    #define JSONCONS_RETHROW std::terminate()
+    #define JSONCONS_TRY if (true)
+    #define JSONCONS_CATCH(exception) if (false)
+#endif
 
 #if defined(__GNUC__)
 #   if defined(__GNUC_PATCHLEVEL__)
@@ -236,19 +245,6 @@
 # define JSONCONS_NO_EXCEPTIONS 1
 #endif
 #endif
-#endif
-
-// allow to disable exceptions
-#if !defined(JSONCONS_NO_EXCEPTIONS)
-    #define JSONCONS_THROW(exception) throw exception
-    #define JSONCONS_RETHROW throw
-    #define JSONCONS_TRY try
-    #define JSONCONS_CATCH(exception) catch(exception)
-#else
-    #define JSONCONS_THROW(exception) std::terminate()
-    #define JSONCONS_RETHROW std::terminate()
-    #define JSONCONS_TRY if (true)
-    #define JSONCONS_CATCH(exception) if (false)
 #endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
@@ -489,5 +485,6 @@ namespace binary {
 
 } // namespace binary
 } // namespace jsoncons
+// allow to disable exceptions
 
 #endif // JSONCONS_CONFIG_COMPILER_SUPPORT_HPP

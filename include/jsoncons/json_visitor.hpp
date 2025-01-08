@@ -7,17 +7,22 @@
 #ifndef JSONCONS_JSON_VISITOR_HPP
 #define JSONCONS_JSON_VISITOR_HPP
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string>
+#include <system_error>
 #include <utility>
 
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {
 

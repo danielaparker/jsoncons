@@ -7,7 +7,14 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_BUILDER_HPP
 
+#include <cstddef>
+#include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+
+#include <jsoncons/config/compiler_support.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
@@ -770,7 +777,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("allOf");
             std::vector<schema_validator_type> subschemas;
 
-            size_t c = 0;
+            std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "allOf", std::to_string(c++) };
@@ -785,7 +792,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("anyOf");
             std::vector<schema_validator_type> subschemas;
 
-            size_t c = 0;
+            std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "anyOf", std::to_string(c++) };
@@ -800,7 +807,7 @@ namespace jsonschema {
             uri schema_location{ context.make_schema_location("oneOf") };
             std::vector<schema_validator_type> subschemas;
 
-            size_t c = 0;
+            std::size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
                 std::string sub_keys[] = { "oneOf", std::to_string(c++) };
@@ -933,7 +940,7 @@ namespace jsonschema {
 
             if (sch.type() == json_type::array_value) 
             {
-                size_t c = 0;
+                std::size_t c = 0;
                 for (const auto& subsch : sch.array_range())
                 {
                     std::string sub_keys[] = {"items", std::to_string(c++)};

@@ -9,14 +9,16 @@
 
 #include <algorithm> // std::swap
 #include <cstring>
-#include <cstring> // std::memcpy
-#include <exception>
+#include <cstdint>
+#include <functional>
 #include <initializer_list> // std::initializer_list
 #include <istream> // std::basic_istream
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
 #include <ostream> 
+#include <stdexcept>
 #include <string>
+#include <system_error>
 #include <type_traits> // std::enable_if
 #include <typeinfo>
 #include <utility> // std::move
@@ -24,6 +26,7 @@
 
 #include <jsoncons/allocator_set.hpp>
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -37,8 +40,13 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/pretty_print.hpp>
+#include <jsoncons/ser_context.hpp>
+#include <jsoncons/source.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/utility/heap_string.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
 
 #if defined(JSONCONS_HAS_POLYMORPHIC_ALLOCATOR)
 #include <memory_resource> // std::poymorphic_allocator

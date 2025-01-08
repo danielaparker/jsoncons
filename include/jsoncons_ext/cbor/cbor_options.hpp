@@ -8,10 +8,7 @@
 #define JSONCONS_EXT_CBOR_CBOR_OPTIONS_HPP
 
 #include <cwchar>
-#include <limits> // std::numeric_limits
-#include <string>
 
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 
 namespace jsoncons { namespace cbor {

@@ -4,8 +4,9 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons/json.hpp>
+
 #include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons/json.hpp>
 #include <vector>
 #include <catch/catch.hpp>
 

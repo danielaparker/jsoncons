@@ -8,14 +8,15 @@
 #define JSONCONS_EXT_JSONPATH_PATH_NODE_HPP
 
 #include <algorithm> // std::reverse
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { 

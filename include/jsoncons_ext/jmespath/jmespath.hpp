@@ -9,16 +9,26 @@
 
 #include <algorithm> // std::stable_sort, std::reverse
 #include <cmath> // std::abs
+#include <cstddef>
+#include <exception>
 #include <functional> // 
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>
+#include <system_error>
 #include <type_traits> // std::is_const
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/unicode_traits.hpp>
+
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 
 namespace jsoncons { 

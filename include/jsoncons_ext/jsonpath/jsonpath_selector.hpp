@@ -7,17 +7,19 @@
 #ifndef JSONCONS_EXT_JSONPATH_JSONPATH_SELECTOR_HPP
 #define JSONCONS_EXT_JSONPATH_JSONPATH_SELECTOR_HPP
 
-#include <limits> // std::numeric_limits
+#include <cstddef>
+#include <cstdint>
 #include <memory>
-#include <regex>
 #include <string>
-#include <type_traits> // std::is_const
+#include <system_error>
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons_ext/jsonpath/expression.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {

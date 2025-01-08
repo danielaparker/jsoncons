@@ -4,14 +4,16 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSON_EXCEPTION_HPP
-#define JSON_EXCEPTION_HPP
+#ifndef JSONCONS_JSON_EXCEPTION_HPP
+#define JSONCONS_JSON_EXCEPTION_HPP
 
-#include <sstream> // std::ostringstream
+#include <cstddef>
+#include <exception>
+#include <stdexcept>
 #include <string> // std::string
 #include <system_error> // std::error_code
 
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/utility/unicode_traits.hpp> // unicode_traits::convert
 
@@ -218,4 +220,4 @@ namespace jsoncons {
 
 } // namespace jsoncons
 
-#endif // JSON_EXCEPTION_HPP
+#endif // JSONCONS_JSON_EXCEPTION_HPP

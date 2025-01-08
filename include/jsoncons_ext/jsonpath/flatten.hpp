@@ -7,18 +7,17 @@
 #ifndef JSONCONS_EXT_JSONPATH_FLATTEN_HPP
 #define JSONCONS_EXT_JSONPATH_FLATTEN_HPP
 
-#include <algorithm> // std::copy
-#include <iterator> // std::back_inserter
-#include <limits> // std::numeric_limits
+#include <cstddef>
 #include <memory>
 #include <string>
-#include <type_traits> // std::is_const
-#include <utility> // std::move
-#include <vector>
+
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/json_type.hpp>
+#include <jsoncons/tag_type.hpp>
 
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/json_location.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_utilities.hpp>
 
 namespace jsoncons { namespace jsonpath {

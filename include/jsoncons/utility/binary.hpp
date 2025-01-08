@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring> // std::memcpy
-#include <memory>
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/config/jsoncons_config.hpp>

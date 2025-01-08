@@ -1,9 +1,10 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <cassert>
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons/json.hpp>
+
+#include <cassert>
 
 // for brevity
 using jsoncons::json; 

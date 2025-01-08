@@ -8,16 +8,18 @@
 #define JSONCONS_EXT_CBOR_DECODE_CBOR_HPP
 
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <type_traits> // std::enable_if
 #include <vector>
 
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/decode_traits.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/basic_json.hpp>
+#include <jsoncons/source.hpp>
+
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 

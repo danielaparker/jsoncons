@@ -8,12 +8,10 @@
 #define JSONCONS_SINK_HPP
 
 #include <cmath>
+#include <cstdint>
 #include <cstring> // std::memcpy
-#include <exception>
 #include <memory> // std::addressof
 #include <ostream>
-#include <stdexcept>
-#include <string>
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>

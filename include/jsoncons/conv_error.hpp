@@ -7,8 +7,12 @@
 #ifndef JSONCONS_CONV_ERROR_HPP
 #define JSONCONS_CONV_ERROR_HPP
 
+#include <cstddef>
+#include <string>
 #include <system_error>
+#include <type_traits>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 

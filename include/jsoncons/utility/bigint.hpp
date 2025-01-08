@@ -13,7 +13,6 @@
 #include <cmath> // std::fmod
 #include <cstdint>
 #include <cstring> // std::memcpy
-#include <initializer_list> // std::initializer_list
 #include <iostream>
 #include <limits> // std::numeric_limits
 #include <memory> // std::allocator
@@ -21,6 +20,7 @@
 #include <type_traits> // std::enable_if
 #include <vector> // std::vector
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
@@ -1001,7 +1001,7 @@ public:
     {
         basic_bigint<Allocator> v(*this);
 
-        size_t len = (v.length() * basic_type_bits / 3) + 2;
+        std::size_t len = (v.length() * basic_type_bits / 3) + 2;
         data.reserve(len);
 
         static uint64_t p10 = 1;

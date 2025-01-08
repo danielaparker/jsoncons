@@ -3,12 +3,12 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <map>
+#include <catch/catch.hpp>
 
 namespace {
 

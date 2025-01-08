@@ -11,11 +11,11 @@
 #include <functional>
 #include <iostream>
 #include <set>
-#include <sstream>
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

@@ -7,13 +7,13 @@
 #ifndef JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
 #define JSONCONS_EXT_CSV_CSV_OPTIONS_HPP
 
+#include <cstdint>
 #include <cwchar>
 #include <limits> // std::numeric_limits
 #include <map>
 #include <string>
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::pair
-#include <vector>
 
 #include <jsoncons/json_options.hpp>
 

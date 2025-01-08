@@ -7,10 +7,11 @@
 #ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_VALIDATORS_HPP
 #define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_VALIDATORS_HPP
 
+#include <cstddef>
+#include <unordered_map>
 #include <unordered_set>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>

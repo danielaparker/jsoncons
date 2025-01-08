@@ -8,22 +8,22 @@
 #define JSONCONS_STAJ_EVENT_READER_HPP
 
 #include <array> // std::array
+#include <cstddef>
+#include <cstdint>
 #include <functional> // std::function
 #include <ios>
 #include <memory> // std::allocator
-#include <stdexcept>
-#include <string>
 #include <system_error>
-#include <type_traits> // std::enable_if
 
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/staj_event.hpp>
+#include <jsoncons/tag_type.hpp>
 #include <jsoncons/typed_array_view.hpp>
 #include <jsoncons/utility/bigint.hpp>
 #include <jsoncons/value_converter.hpp>

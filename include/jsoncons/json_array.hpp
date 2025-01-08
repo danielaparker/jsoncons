@@ -10,18 +10,15 @@
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
 #include <cassert> // assert
 #include <cstring>
-#include <exception>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
-#include <string>
 #include <type_traits> // std::enable_if
 #include <utility>
 #include <utility> // std::move
 #include <vector>
 
 #include <jsoncons/allocator_holder.hpp>
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_type.hpp>
 
 namespace jsoncons {

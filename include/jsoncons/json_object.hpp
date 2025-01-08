@@ -10,7 +10,6 @@
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
 #include <cassert> // assert
 #include <cstring>
-#include <exception>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
@@ -22,6 +21,7 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/allocator_holder.hpp>
 #include <jsoncons/json_array.hpp>
 #include <jsoncons/json_exception.hpp>

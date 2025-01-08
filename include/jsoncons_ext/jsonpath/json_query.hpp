@@ -7,8 +7,17 @@
 #ifndef JSONCONS_EXT_JSONPATH_JSON_QUERY_HPP
 #define JSONCONS_EXT_JSONPATH_JSON_QUERY_HPP
 
+#include <type_traits>
+
+#include <jsoncons/allocator_set.hpp>
+#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/tag_type.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+
+#include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {

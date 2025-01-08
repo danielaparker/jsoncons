@@ -8,15 +8,9 @@
 #define JSONCONS_TEXT_SOURCE_ADAPTOR_HPP
 
 #include <cstddef>
-#include <memory> // std::allocator_traits
-#include <stdexcept>
-#include <string>
 #include <system_error>
-#include <vector>
-#include <vector> // std::vector
 
 #include <jsoncons/json_error.hpp> // json_errc
-#include <jsoncons/json_exception.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/utility/unicode_traits.hpp>
 

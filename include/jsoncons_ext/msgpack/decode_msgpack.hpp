@@ -8,14 +8,16 @@
 #define JSONCONS_EXT_MSGPACK_DECODE_MSGPACK_HPP
 
 #include <istream> // std::basic_istream
-#include <memory>
-#include <string>
 #include <type_traits> // std::enable_if
-#include <vector>
 
 #include <jsoncons/allocator_set.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json.hpp>
+#include <jsoncons/basic_json.hpp>
+#include <jsoncons/conv_error.hpp>
+#include <jsoncons/decode_traits.hpp>
+#include <jsoncons/source.hpp>
+
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 #include <jsoncons_ext/msgpack/msgpack_reader.hpp>

@@ -8,21 +8,22 @@
 #define JSONCONS_BYTE_STRING_HPP
 
 #include <cmath>
+#include <cstdint>
 #include <cstring> // std::memcmp
-#include <exception>
 #include <initializer_list>
 #include <iomanip> // std::setw
 #include <iterator>
 #include <memory> // std::allocator
 #include <ostream>
 #include <sstream>
+#include <type_traits>
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
-#include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {
 

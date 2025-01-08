@@ -4,24 +4,26 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
-#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
+#ifndef JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
+#define JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP
 
 #include <algorithm> // std::reverse
-#include <limits> // std::numeric_limits
+#include <cstddef>
 #include <memory>
-#include <regex>
-#include <string>
+#include <system_error>
 #include <type_traits> // std::is_const
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/json.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/allocator_set.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/tag_type.hpp>
+
 #include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
+#include <jsoncons_ext/jsonpath/path_node.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
@@ -240,7 +242,7 @@ namespace jsonpath {
     {
         std::size_t count = 0;
 
-        auto expr = jsonpath::make_expression<json>(path_string);
+        auto expr = jsonpath::make_expression<Json>(path_string);
         std::vector<jsonpath::json_location> locations = expr.select_paths(root,
             jsonpath::result_options::nodups | jsonpath::result_options::sort_descending);
 
@@ -255,4 +257,4 @@ namespace jsonpath {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPR_HPP
+#endif // JSONCONS_EXT_JSONPATH_JSONPATH_EXPRESSION_HPP

@@ -7,17 +7,18 @@
 #ifndef JSONCONS_SOURCE_HPP
 #define JSONCONS_SOURCE_HPP
 
+#include <cstdint>
 #include <cstring> // std::memcpy
 #include <exception>
 #include <functional>
 #include <istream>
 #include <iterator>
 #include <memory> // std::addressof
-#include <stdexcept>
 #include <string>
 #include <type_traits> // std::enable_if
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/extension_traits.hpp>

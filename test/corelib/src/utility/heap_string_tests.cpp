@@ -1,15 +1,15 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
+#include <jsoncons/json.hpp>
+#include <jsoncons/utility/heap_string.hpp>
+
 #include <ctime>
 #include <sstream>
 #include <utility>
 #include <vector>
 
 #include <catch/catch.hpp>
-
-#include <jsoncons/json.hpp>
-#include <jsoncons/utility/heap_string.hpp>
 
 using namespace jsoncons;
 

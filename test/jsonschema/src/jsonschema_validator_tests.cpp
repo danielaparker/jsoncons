@@ -5,12 +5,13 @@
 // See https://github.com/danielaparker/jsoncons for latest version
 
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <jsoncons/json.hpp>
 #include <jsoncons/byte_string.hpp>
 
-#include <catch/catch.hpp>
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <catch/catch.hpp>
 
 using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;

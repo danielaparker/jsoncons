@@ -1,9 +1,9 @@
 // Copyright 2013-2024 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/detail/optional.hpp>
 #include <jsoncons/json.hpp>
+#include <catch/catch.hpp>
 
 using jsoncons::detail::optional;
 using jsoncons::json;

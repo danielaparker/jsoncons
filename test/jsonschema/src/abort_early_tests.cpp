@@ -4,8 +4,9 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <jsoncons/json.hpp>
+
 #include <catch/catch.hpp>
 #include <iostream>
 

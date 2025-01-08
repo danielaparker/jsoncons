@@ -27,13 +27,10 @@
  * limitations under the License.
  */
 
-#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
-#include <string>
-#include <system_error>
 #include <type_traits>
 
 #include <jsoncons/config/jsoncons_config.hpp>

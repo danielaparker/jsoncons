@@ -4,10 +4,13 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
+
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
+
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_encoder.hpp>
+
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>

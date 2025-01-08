@@ -7,11 +7,11 @@
 #include <utility>
 #include <vector>
 
-#include <catch/catch.hpp>
-
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
+
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

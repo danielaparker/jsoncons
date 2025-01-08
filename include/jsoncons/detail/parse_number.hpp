@@ -8,8 +8,8 @@
 #define JSONCONS_DETAIL_PARSE_NUMBER_HPP
 
 #include <cctype>
-#include <exception>
-#include <limits> // std::numeric_limits
+#include <cstddef>
+#include <cstdint>
 #include <locale>
 #include <stdexcept>
 #include <string>
@@ -17,8 +17,10 @@
 #include <type_traits> // std::enable_if
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { namespace detail {
 
