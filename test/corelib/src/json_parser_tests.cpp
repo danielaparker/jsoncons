@@ -230,52 +230,31 @@ TEST_CASE("test_parse_null")
 
     json j = decoder.get_result();
 }
-#if 0
-TEST_CASE("test_incremental_parsing")
+
+TEST_CASE("test incremental parsing")
 {
-    SECTION("Array of strings")
+    SECTION("array of bool")
     {
-        std::vector<std::string> chunks = {"[fal", "se, ", "t", "rue", ", null", ",", "1", "234", ",\"Hello ", "World\",", 
-            "0.", "1234", "]"};
-        std::size_t index = 0;
-
-        auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
-        {
-            if (index < chunks.size())
-            {
-                input.update(chunks[index].data(), chunks[index].size());
-                ++index;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        };
-
         jsoncons::json_decoder<json> decoder;
-        json_parser parser{read_chunk};
+        json_parser parser;
 
         parser.reset();
 
+        parser.update("[fal",4);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
+        parser.update("se]",3);
+        parser.parse_some(decoder);
+
         parser.finish_parse(decoder);
         CHECK(parser.done());
 
         json j = decoder.get_result();
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 6);
         CHECK_FALSE(j[0].as<bool>());
-        CHECK(j[1].as<bool>());
-        CHECK(j[2].is_null());
-        CHECK(j[3].as<int>() == 1234);
-        CHECK(j[4].as<std::string>() == "Hello World");
-        CHECK(j[5].as<double>() == 0.1234);
     }
 }
-#endif
 
 TEST_CASE("test_parser_reinitialization")
 {
