@@ -2458,7 +2458,7 @@ namespace jsonschema {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                     std::size_t errors = reporter.error_count();
-                    walk_result result = prop_(*it).second->validate(prop_context, prop.value(), prop_location, results, reporter, patch);
+                    walk_result result = (*prop_it).second->validate(prop_context, prop.value(), prop_location, results, reporter, patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -2525,7 +2525,7 @@ namespace jsonschema {
                 if (prop_it != properties_.end()) 
                 {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
-                    result = prop_(*it).second->walk(context, prop.value(), prop_location, reporter);
+                    result = (*prop_it).second->walk(context, prop.value(), prop_location, reporter);
                     allowed_properties.insert(prop.key());
                     if (result == walk_result::abort)
                     {

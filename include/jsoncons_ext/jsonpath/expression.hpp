@@ -1409,7 +1409,7 @@ namespace detail {
             value_type j(json_array_arg, semantic_tag::none, alloc_);
             while (rit != rend) 
             {
-                auto s = r(*it).str();
+                auto s = (*rit).str();
                 j.emplace_back(s.c_str(), semantic_tag::none);
                 ++rit;
             }

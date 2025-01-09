@@ -160,7 +160,7 @@ namespace jsonschema {
                     auto vocab_it = meta_sch.find("$vocabulary");
                     if (vocab_it != meta_sch.object_range().end())
                     {
-                        const auto& vocab = vocab_(*it).value();
+                        const auto& vocab = (*vocab_it).value();
                         if (vocab.is_object())
                         {
                             for (const auto& member : vocab.object_range())
@@ -172,7 +172,7 @@ namespace jsonschema {
                     auto schema_it = meta_sch.find("$schema");
                     if (schema_it != meta_sch.object_range().end())
                     {
-                        builder = get_builder(std::move(sch), schema_(*it).value().as_string_view(), options, schema_store_ptr, resolve_funcs, vocabulary);
+                        builder = get_builder(std::move(sch), (*schema_it).value().as_string_view(), options, schema_store_ptr, resolve_funcs, vocabulary);
                         found = true;
                     }
                 }

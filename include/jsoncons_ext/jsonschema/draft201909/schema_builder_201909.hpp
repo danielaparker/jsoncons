@@ -411,7 +411,7 @@ namespace draft201909 {
                     auto factory_it = validation_factory_map_.find(key_value.key());
                     if (factory_it != validation_factory_map_.end())
                     {
-                        auto validator = factory_(*it).second(context, key_value.value(), sch, anchor_dict);
+                        auto validator = (*factory_it).second(context, key_value.value(), sch, anchor_dict);
                         if (validator)
                         {   
                             validators.emplace_back(std::move(validator));
