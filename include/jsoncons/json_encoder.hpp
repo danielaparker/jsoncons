@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,7 +17,7 @@
 #include <utility> // std::move
 #include <vector>
 
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
