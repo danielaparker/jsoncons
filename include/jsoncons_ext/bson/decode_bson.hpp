@@ -17,7 +17,7 @@
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/decode_traits.hpp>
-#include <jsoncons/json_vistor.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
 
 #include <jsoncons_ext/bson/bson_cursor.hpp>
