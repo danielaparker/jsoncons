@@ -1,25 +1,27 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_ENCODER_HPP
-#define JSONCONS_CSV_CSV_ENCODER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_ENCODER_HPP
+#define JSONCONS_EXT_CSV_CSV_ENCODER_HPP
 
 #include <array> // std::array
-#include <string>
-#include <vector>
-#include <ostream>
-#include <utility> // std::move
-#include <unordered_map> // std::unordered_map
-#include <memory> // std::allocator
 #include <limits> // std::numeric_limits
+#include <memory> // std::allocator
+#include <ostream>
+#include <string>
+#include <unordered_map> // std::unordered_map
+#include <utility> // std::move
+#include <vector>
+
+#include <jsoncons/detail/write_number.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/detail/write_number.hpp>
-#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
 
