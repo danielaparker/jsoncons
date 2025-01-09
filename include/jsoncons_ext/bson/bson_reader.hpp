@@ -13,12 +13,10 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
-#include <jsoncons_ext/bson/bson_type.hpp>
 
 namespace jsoncons { namespace bson {
 

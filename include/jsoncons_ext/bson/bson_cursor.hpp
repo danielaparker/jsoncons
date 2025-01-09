@@ -9,11 +9,10 @@
 
 #include <cstddef>
 #include <functional>
-#include <ios>
 #include <memory> // std::allocator
 #include <system_error>
 
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>

@@ -9,19 +9,23 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <system_error>
+#include <type_traits>
 #include <vector>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
-#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_options.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
+#include <jsoncons/sink.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/write_number.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons { 

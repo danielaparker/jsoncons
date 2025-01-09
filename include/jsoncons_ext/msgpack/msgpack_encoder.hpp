@@ -9,14 +9,18 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <system_error>
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/utility/bigint.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>

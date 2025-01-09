@@ -8,7 +8,6 @@
 #define JSONCONS_DETAIL_OPTIONAL_HPP
 
 #include <memory>
-#include <new> // placement new
 #include <stdexcept>
 #include <type_traits>
 #include <utility> // std::swap

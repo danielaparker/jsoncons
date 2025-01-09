@@ -7,13 +7,13 @@
 #ifndef JSONCONS_DETAIL_SPAN_HPP
 #define JSONCONS_DETAIL_SPAN_HPP
 
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <limits>
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
-#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {

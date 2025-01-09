@@ -11,8 +11,6 @@
 #include <system_error>
 #include <type_traits>
 
-#include <jsoncons/config/jsoncons_config.hpp>
-
 namespace jsoncons { namespace bson {
 
 enum class bson_errc
@@ -104,4 +102,4 @@ namespace std {
     };
 } // namespace std
 
-#endif // JSONCONS_EXT_BSON_BSON_ENCODER_HPP
+#endif // JSONCONS_EXT_BSON_BSON_ERROR_HPP

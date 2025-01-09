@@ -15,9 +15,10 @@
 #include <utility> // std::move
 #include <vector>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
-#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/tag_type.hpp>

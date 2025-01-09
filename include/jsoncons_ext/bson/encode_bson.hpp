@@ -8,16 +8,20 @@
 #define JSONCONS_EXT_BSON_ENCODE_BSON_HPP
 
 #include <ostream> // std::basic_ostream
+#include <system_error> 
 #include <type_traits> // std::enable_if
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/encode_traits.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/sink.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 #include <jsoncons_ext/bson/bson_encoder.hpp>
-#include <jsoncons_ext/bson/bson_reader.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
 
 namespace jsoncons { 
 namespace bson {

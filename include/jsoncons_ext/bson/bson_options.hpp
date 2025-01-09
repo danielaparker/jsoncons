@@ -9,8 +9,6 @@
 
 #include <cwchar>
 
-#include <jsoncons_ext/bson/bson_type.hpp>
-
 namespace jsoncons { namespace bson {
 
 class bson_options;

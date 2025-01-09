@@ -9,17 +9,20 @@
 
 #include <cstddef>
 #include <functional>
-#include <ios>
 #include <memory> // std::allocator
 #include <system_error>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/staj_cursor.hpp>
+
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 
 namespace jsoncons { 
