@@ -13,7 +13,6 @@
 #include <system_error>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/item_event_visitor.hpp>
 #include <jsoncons/json_exception.hpp>

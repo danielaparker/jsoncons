@@ -7,6 +7,7 @@
 #ifndef JSONCONS_DETAIL_WRITE_NUMBER_HPP
 #define JSONCONS_DETAIL_WRITE_NUMBER_HPP
 
+#include <clocale>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>

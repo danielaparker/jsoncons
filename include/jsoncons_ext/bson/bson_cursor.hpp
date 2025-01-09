@@ -20,6 +20,8 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/staj_event.hpp>
 #include <jsoncons/staj_cursor.hpp>
+
+#include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 
 namespace jsoncons { 

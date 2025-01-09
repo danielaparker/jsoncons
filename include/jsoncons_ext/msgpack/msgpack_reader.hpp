@@ -13,11 +13,12 @@
 #include <utility> // std::move
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/item_event_visitor.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons_ext/msgpack/msgpack_error.hpp>
+
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
-#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 
 namespace jsoncons { namespace msgpack {
 
