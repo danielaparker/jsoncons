@@ -3,11 +3,11 @@
 
 - API Changes
 
-    - Reverted changes to `basic_json_parser` introduced in 1.0.0, cf Git issue #576
+    - Reverted changes to `basic_json_parser` API introduced in 1.0.0, cf Git issue #576
 
 - Fixed bugs:
 
-    - Git Issue #554: Make headers self-contained
+    - Git Issue #554: Made headers self-contained
 
 1.0.0
 -----
