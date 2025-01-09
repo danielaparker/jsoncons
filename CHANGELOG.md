@@ -1,4 +1,4 @@
-1.1.0 pending on master
+1.1.0 
 -----
 
 - API Changes
