@@ -1,7 +1,7 @@
 ### jsoncons::byte_string_view
 
 ```cpp
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 
 class byte_string_view;
 ```

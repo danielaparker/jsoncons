@@ -1,11 +1,11 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_CSV_CSV_READER_HPP
-#define JSONCONS_EXT_CSV_CSV_READER_HPP
+#ifndef JSONCONS_CSV_CSV_READER_HPP
+#define JSONCONS_CSV_CSV_READER_HPP
 
 #include <cstddef>
 #include <functional>
@@ -29,7 +29,7 @@
 namespace jsoncons { namespace csv {
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename Allocator=std::allocator<char>>
-    class basic_csv_reader final  : private chunk_reader<CharT>
+    class basic_csv_reader 
     {
         struct stack_item
         {
@@ -44,6 +44,9 @@ namespace jsoncons { namespace csv {
         using temp_allocator_type = Allocator;
         using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
 
+        basic_csv_reader(const basic_csv_reader&) = delete; 
+        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
+
         basic_default_json_visitor<CharT> default_visitor_;
         text_source_adaptor<Source> source_;
         basic_json_visitor<CharT>& visitor_;
@@ -56,9 +59,6 @@ namespace jsoncons { namespace csv {
         /*!
           \param is The input stream to read from
         */
-
-        basic_csv_reader(const basic_csv_reader&) = delete; 
-        basic_csv_reader(basic_csv_reader&&) = delete; 
 
         template <typename Sourceable>
         basic_csv_reader(Sourceable&& source,
@@ -108,15 +108,12 @@ namespace jsoncons { namespace csv {
                          const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
-             parser_(this, options, err_handler, alloc)
+             parser_(options, err_handler, alloc)
              
         {
         }
 
-        ~basic_csv_reader() = default;
-
-        basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
-        basic_csv_reader& operator = (basic_csv_reader&&) = delete; 
+        ~basic_csv_reader() noexcept = default;
 
         void read()
         {
@@ -130,21 +127,7 @@ namespace jsoncons { namespace csv {
 
         void read(std::error_code& ec)
         {
-            if (source_.is_error())
-            {
-                ec = csv_errc::source_error;
-                return;
-            }   
-            if (parser_.source_exhausted())
-            {
-                auto s = source_.read_buffer(ec);
-                if (ec) {return;}
-                if (s.size() > 0)
-                {
-                    parser_.set_buffer(s.data(),s.size());
-                }
-            }
-            parser_.parse_some(visitor_, ec);
+            read_internal(ec);
         }
 
         std::size_t line() const
@@ -164,19 +147,27 @@ namespace jsoncons { namespace csv {
 
     private:
 
-        bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
+        void read_internal(std::error_code& ec)
         {
-            //std::cout << "UPDATE BUFFER\n";
-            bool success = false;
-            auto s = source_.read_buffer(ec);
-            if (ec) {return false;}
-            if (s.size() > 0)
+            if (source_.is_error())
             {
-                parser_.set_buffer(s.data(),s.size());
-                success = true;
+                ec = csv_errc::source_error;
+                return;
+            }   
+            while (!parser_.stopped())
+            {
+                if (parser_.source_exhausted())
+                {
+                    auto s = source_.read_buffer(ec);
+                    if (ec) return;
+                    if (s.size() > 0)
+                    {
+                        parser_.update(s.data(),s.size());
+                    }
+                }
+                parser_.parse_some(visitor_, ec);
+                if (ec) return;
             }
-
-            return success;
         }
     };
 
@@ -185,7 +176,6 @@ namespace jsoncons { namespace csv {
     using csv_stream_reader = basic_csv_reader<char,stream_source<char>>;
     using wcsv_stream_reader = basic_csv_reader<wchar_t,stream_source<wchar_t>>;
 
-} // namespace csv
-} // namespace jsoncons
+}}
 
-#endif // JSONCONS_EXT_CSV_CSV_READER_HPP
+#endif

@@ -4,7 +4,6 @@
 #include <jsoncons/json.hpp>
 
 #include <sstream>
-#include <catch/catch.hpp>
 
 using namespace jsoncons;
 using namespace msgpack;

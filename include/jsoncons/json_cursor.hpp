@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,7 +14,7 @@
 #include <system_error>
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_exception.hpp>
@@ -337,7 +337,7 @@ public:
                     if (ec) {return;}
                     if (s.size() > 0)
                     {
-                        parser_.set_buffer(s.data(),s.size());
+                        parser_.update(s.data(),s.size());
                     }
                 }
                 if (!parser_.source_exhausted())
@@ -398,7 +398,7 @@ private:
             return;
         }
         std::size_t offset = (r.ptr - sv.data());
-        parser_.set_buffer(sv.data()+offset,sv.size()-offset);
+        parser_.update(sv.data()+offset,sv.size()-offset);
         bool is_done = parser_.done() || done_;
         if (!is_done)
         {
@@ -444,7 +444,7 @@ private:
                 if (ec) {return;}
                 if (s.size() > 0)
                 {
-                    parser_.set_buffer(s.data(),s.size());
+                    parser_.update(s.data(),s.size());
                     if (ec) {return;}
                 }
             }

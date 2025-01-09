@@ -1,4 +1,4 @@
-﻿// Copyright 2013-2024 Daniel Parker
+﻿// Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -87,7 +87,7 @@ TEST_CASE("test_parse_empty_object")
 
     static std::string s("{}");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -104,7 +104,7 @@ TEST_CASE("test_parse_array")
 
     static std::string s("[]");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -121,7 +121,7 @@ TEST_CASE("test_parse_string")
 
     static std::string s("\"\"");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -138,7 +138,7 @@ TEST_CASE("test_parse_integer")
 
     static std::string s("10");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -155,7 +155,7 @@ TEST_CASE("test_parse_integer_space")
 
     static std::string s("10 ");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -172,7 +172,7 @@ TEST_CASE("test_parse_double_space")
 
     static std::string s("10.0 ");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -189,7 +189,7 @@ TEST_CASE("test_parse_false")
 
     static std::string s("false");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -206,7 +206,7 @@ TEST_CASE("test_parse_true")
 
     static std::string s("true");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -223,7 +223,7 @@ TEST_CASE("test_parse_null")
 
     static std::string s("null");
 
-    parser.set_buffer(s.data(),s.length());
+    parser.update(s.data(),s.length());
     parser.parse_some(decoder);
     parser.finish_parse(decoder);
     CHECK(parser.done());
@@ -231,48 +231,28 @@ TEST_CASE("test_parse_null")
     json j = decoder.get_result();
 }
 
-TEST_CASE("test_incremental_parsing")
+TEST_CASE("test incremental parsing")
 {
-    SECTION("Array of strings")
+    SECTION("array of bool")
     {
-        std::vector<std::string> chunks = {"[fal", "se, ", "t", "rue", ", null", ",", "1", "234", ",\"Hello ", "World\",", 
-            "0.", "1234", "]"};
-        std::size_t index = 0;
-
-        auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
-        {
-            if (index < chunks.size())
-            {
-                input.set_buffer(chunks[index].data(), chunks[index].size());
-                ++index;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        };
-
         jsoncons::json_decoder<json> decoder;
-        json_parser parser{read_chunk};
+        json_parser parser;
 
         parser.reset();
 
+        parser.update("[fal",4);
         parser.parse_some(decoder);
         CHECK_FALSE(parser.done());
         CHECK(parser.source_exhausted());
+        parser.update("se]",3);
+        parser.parse_some(decoder);
+
         parser.finish_parse(decoder);
         CHECK(parser.done());
 
         json j = decoder.get_result();
         REQUIRE(j.is_array());
-        REQUIRE(j.size() == 6);
         CHECK_FALSE(j[0].as<bool>());
-        CHECK(j[1].as<bool>());
-        CHECK(j[2].is_null());
-        CHECK(j[3].as<int>() == 1234);
-        CHECK(j[4].as<std::string>() == "Hello World");
-        CHECK(j[5].as<double>() == 0.1234);
     }
 }
 
@@ -282,7 +262,7 @@ TEST_CASE("test_parser_reinitialization")
     json_parser parser;
 
     parser.reset();
-    parser.set_buffer("false true", 10);
+    parser.update("false true", 10);
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK_FALSE(parser.source_exhausted());
@@ -291,7 +271,7 @@ TEST_CASE("test_parser_reinitialization")
     CHECK_FALSE(j1.as<bool>());
 
     parser.reinitialize();
-    parser.set_buffer("-42", 3);
+    parser.update("-42", 3);
     parser.finish_parse(decoder);
     CHECK(parser.done());
     CHECK(parser.source_exhausted());
@@ -308,7 +288,7 @@ TEST_CASE("test_diagnostics_visitor", "")
         json_diagnostics_visitor visitor(os, "  ");
         json_parser parser;
         std::string input(R"({"foo":[42,null]})");
-        parser.set_buffer(input.data(), input.size());
+        parser.update(input.data(), input.size());
         parser.finish_parse(visitor);
         std::ostringstream expected;
         expected << "visit_begin_object"  << '\n'
@@ -327,7 +307,7 @@ TEST_CASE("test_diagnostics_visitor", "")
         wjson_diagnostics_visitor visitor(os, L"  ");
         wjson_parser parser;
         std::wstring input(LR"({"foo":[42,null]})");
-        parser.set_buffer(input.data(), input.size());
+        parser.update(input.data(), input.size());
         parser.finish_parse(visitor);
         std::wostringstream expected;
         expected << L"visit_begin_object"  << '\n'

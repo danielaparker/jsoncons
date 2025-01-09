@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -157,7 +157,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         if (level > 0)
                         {
                             for (auto it = column_types.rbegin();
-                                 it != column_types.rend() && level == it->level;
+                                 it != column_types.rend() && level == (*it).level;
                                  ++it)
                             {
                                 ++offset;
@@ -187,7 +187,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         auto it = type_dictionary.find(buffer);
                         if (it != type_dictionary.end())
                         {
-                            column_types.emplace_back(it->second,depth);
+                            column_types.emplace_back((*it).second,depth);
                             buffer.clear();
                         }
                         else
@@ -202,7 +202,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         auto it = type_dictionary.find(buffer);
                         if (it != type_dictionary.end())
                         {
-                            column_types.emplace_back(it->second,depth);
+                            column_types.emplace_back((*it).second,depth);
                             buffer.clear();
                         }
                         else
@@ -219,7 +219,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         auto it = type_dictionary.find(buffer);
                         if (it != type_dictionary.end())
                         {
-                            column_types.emplace_back(it->second,depth);
+                            column_types.emplace_back((*it).second,depth);
                             buffer.clear();
                         }
                         else
@@ -247,7 +247,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
         auto it = type_dictionary.find(buffer);
         if (it != type_dictionary.end())
         {
-            column_types.emplace_back(it->second,depth);
+            column_types.emplace_back((*it).second,depth);
             buffer.clear();
         }
         else

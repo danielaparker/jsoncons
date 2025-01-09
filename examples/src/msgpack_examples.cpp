@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons_ext/msgpack/msgpack.hpp>

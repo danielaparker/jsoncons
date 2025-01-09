@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,14 +8,20 @@
 #define JSONCONS_EXT_MSGPACK_ENCODE_MSGPACK_HPP
 
 #include <ostream> // std::basic_ostream
+#include <system_error> 
+#include <type_traits> 
 
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility/extension_traits.hpp>
+#include <jsoncons/allocator_set.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/encode_traits.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_visitor.hpp>
+#include <jsoncons/sink.hpp>
 
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
-#include <jsoncons_ext/msgpack/msgpack_reader.hpp>
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
 
 namespace jsoncons { 
 namespace msgpack {

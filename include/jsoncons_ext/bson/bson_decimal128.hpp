@@ -32,10 +32,13 @@
 #include <cstring>
 #include <ctype.h>
 #include <stdlib.h>
+#include <cstddef>
 #include <string.h>
 #include <string>
 #include <system_error>
+#include <type_traits>
 
+#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons/detail/write_number.hpp>

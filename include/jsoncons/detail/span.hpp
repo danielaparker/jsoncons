@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +7,13 @@
 #ifndef JSONCONS_DETAIL_SPAN_HPP
 #define JSONCONS_DETAIL_SPAN_HPP
 
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <limits>
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 
-#include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/utility/extension_traits.hpp>
 
 namespace jsoncons {

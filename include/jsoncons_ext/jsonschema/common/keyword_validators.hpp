@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // 
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@
 #include <vector>
 
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <jsoncons/conv_error.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/tag_type.hpp>
@@ -2458,7 +2458,7 @@ namespace jsonschema {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
                     std::size_t errors = reporter.error_count();
-                    walk_result result = prop_it->second->validate(prop_context, prop.value(), prop_location, results, reporter, patch);
+                    walk_result result = (*prop_it).second->validate(prop_context, prop.value(), prop_location, results, reporter, patch);
                     if (result == walk_result::abort)
                     {
                         return result;
@@ -2525,7 +2525,7 @@ namespace jsonschema {
                 if (prop_it != properties_.end()) 
                 {
                     jsonpointer::json_pointer prop_location = instance_location / prop.key();
-                    result = prop_it->second->walk(context, prop.value(), prop_location, reporter);
+                    result = (*prop_it).second->walk(context, prop.value(), prop_location, reporter);
                     allowed_properties.insert(prop.key());
                     if (result == walk_result::abort)
                     {

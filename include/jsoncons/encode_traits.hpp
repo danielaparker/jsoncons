@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -337,8 +337,8 @@ namespace jsoncons {
             if (ec) {return;}
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                encoder.key(it->first);
-                encode_traits<mapped_type,CharT>::encode(it->second, encoder, proto, ec);
+                encoder.key((*it).first);
+                encode_traits<mapped_type,CharT>::encode((*it).second, encoder, proto, ec);
                 if (ec) {return;}
             }
             encoder.end_object(ser_context(), ec);
@@ -368,9 +368,9 @@ namespace jsoncons {
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 std::basic_string<typename Json::char_type> s;
-                jsoncons::detail::from_integer(it->first,s);
+                jsoncons::detail::from_integer((*it).first,s);
                 encoder.key(s);
-                encode_traits<mapped_type,CharT>::encode(it->second, encoder, proto, ec);
+                encode_traits<mapped_type,CharT>::encode((*it).second, encoder, proto, ec);
                 if (ec) {return;}
             }
             encoder.end_object(ser_context(), ec);

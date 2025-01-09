@@ -243,6 +243,23 @@ private:
                     }
                     sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 }
+<<<<<<< HEAD
+=======
+                for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
+                {
+                    if (i > 0)
+                    {
+                        sink_.push_back(options_.field_delimiter());
+                    }
+                    auto it = buffered_line_.find(strings_buffer_[i]);
+                    if (it != buffered_line_.end())
+                    {
+                        sink_.append((*it).second.data(),(*it).second.length());
+                        (*it).second.clear();
+                    }
+                }
+                sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+>>>>>>> eee098be8f774f64527281d5beb9e90aa9b73e06
                 break;
             case stack_item_kind::column_mapping:
              {
@@ -431,11 +448,11 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_null_value(bo);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        (*it).second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    (*it).second.append(s);
                 }
                 break;
             }
@@ -505,7 +522,15 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_string_value(sv,bo);
                     bo.flush();
+<<<<<<< HEAD
                     cname_value_map_[stack_.back().pathname_] = s;
+=======
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        (*it).second.push_back(options_.subfield_delimiter());
+                    }
+                    (*it).second.append(s);
+>>>>>>> eee098be8f774f64527281d5beb9e90aa9b73e06
                 }
                 break;
             }
@@ -631,11 +656,11 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_double_value(val, context, bo, ec);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        (*it).second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    (*it).second.append(s);
                 }
                 break;
             }
@@ -708,11 +733,11 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_int64_value(val,bo);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        (*it).second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    (*it).second.append(s);
                 }
                 break;
             }
@@ -785,11 +810,11 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_uint64_value(val, bo);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        (*it).second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    (*it).second.append(s);
                 }
                 break;
             }
@@ -859,11 +884,11 @@ private:
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_bool_value(val,bo);
                     bo.flush();
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!(*it).second.empty() && options_.subfield_delimiter() != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        (*it).second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    (*it).second.append(s);
                 }
                 break;
             }

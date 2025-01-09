@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -886,7 +886,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     std::string input = "h1,h2\n"
                         "3,4\n"
                         "5,6\n";
-    parser.set_buffer(input.data(), input.size());
+    parser.update(input.data(), input.size());
     int count = 0;
     while (!parser.stopped() && count < 20)
     {
@@ -903,7 +903,7 @@ TEST_CASE("test_csv_parser_reinitialization")
     parser.reinitialize();
     input = "h7,h8\n"
             "9,10\n";
-    parser.set_buffer(input.data(), input.size());
+    parser.update(input.data(), input.size());
     count = 0;
     while (!parser.stopped() && count < 20)
     {

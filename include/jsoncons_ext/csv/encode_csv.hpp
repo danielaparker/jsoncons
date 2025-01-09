@@ -1,4 +1,4 @@
-/// Copyright 2013-2024 Daniel Parker
+/// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +7,18 @@
 #ifndef JSONCONS_EXT_CSV_ENCODE_CSV_HPP
 #define JSONCONS_EXT_CSV_ENCODE_CSV_HPP
 
-#include <jsoncons/config/compiler_support.hpp>
+#include <ostream>
 
+#include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/json_exception.hpp>
+
+#include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/encode_traits.hpp>
+#include <jsoncons/sink.hpp>
 
 namespace jsoncons { 
 namespace csv {

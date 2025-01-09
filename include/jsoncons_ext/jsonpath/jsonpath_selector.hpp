@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -262,7 +262,7 @@ namespace detail {
                 {
                     this->tail_select(context, root, 
                                         path_generator_type::generate(context, last, identifier_, options),
-                                        it->value(), receiver, options);
+                                        (*it).value(), receiver, options);
                 }
             }
             else if (current.is_array())
@@ -314,7 +314,7 @@ namespace detail {
                 {
                     return this->evaluate_tail(context, root, 
                                                path_generator_type::generate(context, last, identifier_, options),
-                                              it->value(), options, ec);
+                                              (*it).value(), options, ec);
                 }
                 return context.null_value();
             }

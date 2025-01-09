@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -3498,7 +3498,7 @@ namespace detail {
                 auto it = functions_.find(name);
                 if (it != functions_.end())
                 {
-                    return it->second;
+                    return (*it).second;
                 }
                 auto it2 = custom_functions_.find(name);
                 if (it2 == custom_functions_.end())
@@ -5080,7 +5080,7 @@ namespace detail {
         void unwind_rparen(std::error_code& ec)
         {
             auto it = operator_stack_.rbegin();
-            while (it != operator_stack_.rend() && !it->is_lparen())
+            while (it != operator_stack_.rend() && !(*it).is_lparen())
             {
                 output_stack_.emplace_back(std::move(*it));
                 ++it;
@@ -5103,7 +5103,7 @@ namespace detail {
                     unwind_rparen(ec);
                     std::vector<token> toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->type() != token_kind::begin_filter)
+                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_filter)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
@@ -5138,15 +5138,15 @@ namespace detail {
                     unwind_rparen(ec);
                     std::vector<std::vector<token>> vals;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->type() != token_kind::begin_multi_select_list)
+                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_list)
                     {
                         std::vector<token> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                        } while (it != output_stack_.rend() && it->type() != token_kind::begin_multi_select_list && it->type() != token_kind::separator);
-                        if (it->type() == token_kind::separator)
+                        } while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_list && (*it).type() != token_kind::separator);
+                        if ((*it).type() == token_kind::separator)
                         {
                             ++it;
                         }
@@ -5182,18 +5182,18 @@ namespace detail {
                     unwind_rparen(ec);
                     std::vector<key_tokens> key_toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->type() != token_kind::begin_multi_select_hash)
+                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_hash)
                     {
                         std::vector<token> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                        } while (it != output_stack_.rend() && it->type() != token_kind::key);
-                        JSONCONS_ASSERT(it->is_key());
-                        auto key = std::move(it->key_);
+                        } while (it != output_stack_.rend() && (*it).type() != token_kind::key);
+                        JSONCONS_ASSERT((*it).is_key());
+                        auto key = std::move((*it).key_);
                         ++it;
-                        if (it->type() == token_kind::separator)
+                        if ((*it).type() == token_kind::separator)
                         {
                             ++it;
                         }
@@ -5229,7 +5229,7 @@ namespace detail {
                 {
                     std::vector<token> toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->type() != token_kind::begin_expression_type)
+                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_expression_type)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
@@ -5280,9 +5280,9 @@ namespace detail {
                         std::vector<token> toks;
                         auto it = output_stack_.rbegin();
                         std::size_t arg_count = 0;
-                        while (it != output_stack_.rend() && it->type() != token_kind::function)
+                        while (it != output_stack_.rend() && (*it).type() != token_kind::function)
                         {
-                            if (it->type() == token_kind::argument)
+                            if ((*it).type() == token_kind::argument)
                             {
                                 ++arg_count;
                             }
@@ -5294,7 +5294,7 @@ namespace detail {
                             ec = jmespath_errc::unbalanced_parentheses;
                             return;
                         }
-                        if (it->arity() && arg_count != *(it->arity()))
+                        if ((*it).arity() && arg_count != *((*it).arity()))
                         {
                             ec = jmespath_errc::invalid_arity;
                             return;
@@ -5354,9 +5354,9 @@ namespace detail {
                     else
                     {
                         auto it = operator_stack_.rbegin();
-                        while (it != operator_stack_.rend() && it->is_operator()
-                               && (tok.precedence_level() > it->precedence_level()
-                             || (tok.precedence_level() == it->precedence_level() && tok.is_right_associative())))
+                        while (it != operator_stack_.rend() && (*it).is_operator()
+                               && (tok.precedence_level() > (*it).precedence_level()
+                             || (tok.precedence_level() == (*it).precedence_level() && tok.is_right_associative())))
                         {
                             output_stack_.emplace_back(std::move(*it));
                             ++it;

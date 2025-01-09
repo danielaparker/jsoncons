@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -37,6 +37,11 @@ namespace jsoncons {
     private:
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& other_visitor_;
+        //std::function<bool(json_errc,const ser_context&)> err_handler_;
+
+        // noncopyable and nonmoveable
+        json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+        json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
 
     public:
         json_utf8_to_other_visitor_adaptor()
@@ -44,17 +49,12 @@ namespace jsoncons {
         {
         }
 
-        // noncopyable and nonmoveable
-        json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
-        json_utf8_to_other_visitor_adaptor(json_utf8_to_other_visitor_adaptor<CharT>&&) = delete;
-
-        json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor)
-            : other_visitor_(other_visitor)
+        json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor/*,
+                                              std::function<bool(json_errc,const ser_context&)> err_handler*/)
+            : other_visitor_(other_visitor)/*,
+              err_handler_(err_handler)*/
         {
         }
-
-        json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
-        json_utf8_to_other_visitor_adaptor<CharT>& operator=(json_utf8_to_other_visitor_adaptor<CharT>&&) = delete;
 
     private:
 
@@ -154,7 +154,7 @@ namespace jsoncons {
     };
 
     template <typename CharT,typename Source=jsoncons::stream_source<CharT>,typename TempAllocator =std::allocator<char>>
-    class basic_json_reader final : private chunk_reader<CharT> 
+    class basic_json_reader 
     {
     public:
         using char_type = CharT;
@@ -169,19 +169,18 @@ namespace jsoncons {
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,TempAllocator> parser_;
-        bool eof_;
-
-    public:
 
         // Noncopyable and nonmoveable
         basic_json_reader(const basic_json_reader&) = delete;
-        basic_json_reader(basic_json_reader&&) = delete;
+        basic_json_reader& operator=(const basic_json_reader&) = delete;
 
+    public:
         template <typename Sourceable>
         explicit basic_json_reader(Sourceable&& source, const TempAllocator& temp_alloc = TempAllocator())
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
+                                default_json_parsing(),
                                 temp_alloc)
         {
         }
@@ -193,36 +192,12 @@ namespace jsoncons {
             : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
+                                options.err_handler(),
                                 temp_alloc)
         {
         }
 
         template <typename Sourceable>
-        basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor, 
-                          const TempAllocator& temp_alloc = TempAllocator())
-            : basic_json_reader(std::forward<Sourceable>(source),
-                                visitor,
-                                basic_json_decode_options<CharT>(),
-                                temp_alloc)
-        {
-        }
-
-        template <typename Sourceable>
-        basic_json_reader(Sourceable&& source, 
-                          basic_json_visitor<CharT>& visitor,
-                          const basic_json_decode_options<CharT>& options, 
-                          const TempAllocator& temp_alloc = TempAllocator())
-            : source_(std::forward<Sourceable>(source)),
-              visitor_(visitor),
-              parser_(this, options, options.err_handler(), temp_alloc),
-              eof_(false)
-        {
-        }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-        template <typename Sourceable>
-        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const TempAllocator& temp_alloc = TempAllocator())
@@ -235,7 +210,6 @@ namespace jsoncons {
         }
 
         template <typename Sourceable>
-        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
         basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -249,7 +223,31 @@ namespace jsoncons {
         }
 
         template <typename Sourceable>
-        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
+        basic_json_reader(Sourceable&& source, 
+                          basic_json_visitor<CharT>& visitor, 
+                          const TempAllocator& temp_alloc = TempAllocator())
+            : basic_json_reader(std::forward<Sourceable>(source),
+                                visitor,
+                                basic_json_decode_options<CharT>(),
+                                default_json_parsing(),
+                                temp_alloc)
+        {
+        }
+
+        template <typename Sourceable>
+        basic_json_reader(Sourceable&& source, 
+                          basic_json_visitor<CharT>& visitor,
+                          const basic_json_decode_options<CharT>& options, 
+                          const TempAllocator& temp_alloc = TempAllocator())
+            : basic_json_reader(std::forward<Sourceable>(source),
+                                visitor,
+                                options,
+                                options.err_handler(),
+                                temp_alloc)
+        {
+        }
+
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
@@ -262,8 +260,7 @@ namespace jsoncons {
         {
         }
 
-        template <typename Sourceable> 
-        JSONCONS_DEPRECATED_MSG("Instead, set err_handler in options")
+        template <typename Sourceable>
         basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
@@ -271,13 +268,9 @@ namespace jsoncons {
                           const TempAllocator& temp_alloc = TempAllocator())
            : source_(std::forward<Sourceable>(source)),
              visitor_(visitor),
-             parser_(this, options, err_handler, temp_alloc),
-             eof_(false)
+             parser_(options,err_handler,temp_alloc)
         {
         }
-#endif
-        basic_json_reader& operator=(const basic_json_reader&) = delete;
-        basic_json_reader& operator=(basic_json_reader&&) = delete;
 
         void read_next()
         {
@@ -297,21 +290,52 @@ namespace jsoncons {
                 return;
             }        
             parser_.reset();
-            auto s = source_.read_buffer(ec);
-            if (ec) {return;}
-            if (s.size() > 0)
+            while (!parser_.stopped())
             {
-                parser_.set_buffer(s.data(),s.size());
-            }
-            parser_.parse_some(visitor_, ec);
-            if (ec) {return;}
-            if (!parser_.enter() && !parser_.accept())
-            {
-                ec = json_errc::unexpected_eof;
-                return;
+                if (parser_.source_exhausted())
+                {
+                    auto s = source_.read_buffer(ec);
+                    if (ec) return;
+                    if (s.size() > 0)
+                    {
+                        parser_.update(s.data(),s.size());
+                    }
+                }
+                bool eof = parser_.source_exhausted();
+                parser_.parse_some(visitor_, ec);
+                if (ec) return;
+                if (eof)
+                {
+                    if (parser_.enter())
+                    {
+                        break;
+                    }
+                    else if (!parser_.accept())
+                    {
+                        ec = json_errc::unexpected_eof;
+                        return;
+                    }
+                }
             }
             
-            parser_.skip_space(ec);
+            parser_.skip_whitespace();
+            while (!source_.eof())
+            {
+                parser_.skip_whitespace();
+                if (parser_.source_exhausted())
+                {
+                    auto s = source_.read_buffer(ec);
+                    if (ec) return;
+                    if (s.size() > 0)
+                    {
+                        parser_.update(s.data(),s.size());
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         void check_done()
@@ -341,7 +365,32 @@ namespace jsoncons {
                 ec = json_errc::source_error;
                 return;
             }   
-            parser_.check_done(ec);
+            if (source_.eof())
+            {
+                parser_.check_done(ec);
+                if (ec) return;
+            }
+            else
+            {
+                do
+                {
+                    if (parser_.source_exhausted())
+                    {
+                        auto s = source_.read_buffer(ec);
+                        if (ec) return;
+                        if (s.size() > 0)
+                        {
+                            parser_.update(s.data(),s.size());
+                        }
+                    }
+                    if (!parser_.source_exhausted())
+                    {
+                        parser_.check_done(ec);
+                        if (ec) return;
+                    }
+                }
+                while (!eof());
+            }
         }
 
         bool eof() const
@@ -363,26 +412,6 @@ namespace jsoncons {
                 check_done(ec);
             }
         }
-    private:
-        
-        bool read_chunk(basic_parser_input<char_type>&, std::error_code& ec) final
-        {
-            //std::cout << "UPDATE BUFFER\n";
-            bool success = false;
-            auto s = source_.read_buffer(ec);
-            if (ec) {return false;}
-            if (s.size() > 0)
-            {
-                parser_.set_buffer(s.data(),s.size());
-                success = true;
-            }
-            else
-            {
-                eof_ = true;
-            }
-
-            return success;
-        }
     };
 
     using json_string_reader = basic_json_reader<char,string_source<char>>;
@@ -390,7 +419,7 @@ namespace jsoncons {
     using json_stream_reader = basic_json_reader<char,stream_source<char>>;
     using wjson_stream_reader = basic_json_reader<wchar_t,stream_source<wchar_t>>;
 
-} // namespace jsoncons
+}
 
-#endif // JSONCONS_JSON_READER_HPP
+#endif
 

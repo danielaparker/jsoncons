@@ -1,7 +1,7 @@
 ### jsoncons::byte_string
 
 ```cpp
-#include <jsoncons/byte_string.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 
 typedef basic_byte_string<Allocator = std::allocator<uint8_t>> byte_string;
 ```

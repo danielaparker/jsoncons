@@ -46,15 +46,6 @@ temp_allocator_type        |TempAllocator
         std::function<bool(json_errc,const ser_context&)> err_handler,                         (4)   (deprecated since 0.171.0) 
         const TempAllocator& temp_alloc = TempAllocator());                       
 
-    basic_json_parser(
-        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> read_chunk, 
-        const TempAllocator& temp_alloc = TempAllocator());                                    (5)   (since 1.0.0)
-
-    basic_json_parser(
-        std::function<bool(basic_parser_input<CharT>& input, std::error_code& ec)> read_chunk, 
-        const basic_json_decode_options<CharT>& options,
-        const TempAllocator& temp_alloc = TempAllocator());                                    (6)   (since 1.0.0)
-
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
 and a default [err_handler](err_handler.md).
@@ -71,11 +62,8 @@ and a specified [err_handler](err_handler.md).
 #### Member functions
 
     void update(const string_view_type& sv)              
-    void update(const CharT* data, std::size_t length)             (deprecated in 1.0.0)
+    void update(const CharT* data, std::size_t length)             (until 1.0.0, since 1.1.0)
 Update the parser with a chunk of JSON
-
-    void set_buffer(const CharT* data, std::size_t length) final   (since 1.0.0)
-Initializes the buffer to parse from with a chunk of JSON text
 
     bool done() const
 Returns `true` when the parser has consumed a complete JSON text, `false` otherwise
@@ -190,7 +178,7 @@ B: inf
 C: -inf
 ```
 
-#### Incremental parsing (until 1.0.0)
+#### Incremental parsing (until 1.0.0, since 1.1.0)
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -252,62 +240,3 @@ Output:
 (7) [false,90]
 ```
 
-#### Incremental parsing (since 1.0.0)
-
-```cpp
-#include <jsoncons/json.hpp>
-#include <iostream>
-
-int main()
-{
-    std::vector<std::string> chunks = {"[fal", "se,", "9", "0]"};
-    std::size_t index = 0;
-
-    auto read_chunk = [&](jsoncons::parser_input& input, std::error_code& /*ec*/) -> bool
-    {
-        if (index < chunks.size())
-        {
-            input.set_buffer(chunks[index].data(), chunks[index].size());
-            ++index;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    };
-
-    jsoncons::json_decoder<jsoncons::json> decoder;
-    jsoncons::json_parser parser{read_chunk};
-
-    parser.reset();
-    try
-    {
-        parser.parse_some(decoder);
-        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-        parser.finish_parse(decoder);
-        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-        parser.check_done();
-        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
-
-        jsoncons::json j = decoder.get_result();
-        std::cout << "(4) " << j << "\n\n";
-    }
-    catch (const jsoncons::ser_error& e)
-    {
-        std::cout << e.what() << '\n';
-    }
-}
-```
-
-Output:
-
-```
-(1) done: false, source_exhausted: true
-
-(2) done: true, source_exhausted: true
-
-(3) done: true, source_exhausted: true
-
-(4) [false,90]
-```

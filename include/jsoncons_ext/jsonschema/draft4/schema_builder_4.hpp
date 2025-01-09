@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -154,7 +154,7 @@ namespace draft4 {
                         }
 
                         Json default_value{ jsoncons::null_type() };
-                        uri relative(it->value().template as<std::string>()); 
+                        uri relative((*it).value().template as<std::string>()); 
                         auto id = context.get_base_uri().resolve(relative);
                         validators.push_back(this->get_or_create_reference(sch, uri_wrapper{id}));
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
@@ -198,7 +198,7 @@ namespace draft4 {
             auto it = sch.find("definitions");
             if (it != sch.object_range().end()) 
             {
-                for (const auto& def : it->value().object_range())
+                for (const auto& def : (*it).value().object_range())
                 {
                     std::string sub_keys[] = { "definitions", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
@@ -208,7 +208,7 @@ namespace draft4 {
             it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
-                default_value = it->value();
+                default_value = (*it).value();
             }
 
             for (const auto& key_value : sch.object_range())
@@ -216,7 +216,7 @@ namespace draft4 {
                 auto factory_it = keyword_factory_map_.find(key_value.key());
                 if (factory_it != keyword_factory_map_.end())
                 {
-                    auto validator = factory_it->second(context, key_value.value(), sch, anchor_dict);
+                    auto validator = (*factory_it).second(context, key_value.value(), sch, anchor_dict);
                     if (validator)
                     {   
                         validators.emplace_back(std::move(validator));
@@ -228,7 +228,7 @@ namespace draft4 {
             it = sch.find("properties");
             if (it != sch.object_range().end()) 
             {
-                properties = this->make_properties_validator(context, it->value(), sch, anchor_dict);
+                properties = this->make_properties_validator(context, (*it).value(), sch, anchor_dict);
             }
             std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
 
@@ -236,14 +236,14 @@ namespace draft4 {
             it = sch.find("patternProperties");
             if (it != sch.object_range().end())
             {
-                pattern_properties = make_pattern_properties_validator(context, it->value(), sch, anchor_dict);
+                pattern_properties = make_pattern_properties_validator(context, (*it).value(), sch, anchor_dict);
             }
     #endif
 
             it = sch.find("additionalProperties");
             if (it != sch.object_range().end()) 
             {
-                validators.emplace_back(this->make_additional_properties_validator(context, it->value(), sch,
+                validators.emplace_back(this->make_additional_properties_validator(context, (*it).value(), sch,
                     std::move(properties), std::move(pattern_properties), anchor_dict));
             }
             else
@@ -264,14 +264,14 @@ namespace draft4 {
             if (it != sch.object_range().end()) 
             {
 
-                if (it->value().type() == json_type::array_value) 
+                if ((*it).value().type() == json_type::array_value) 
                 {
-                    validators.emplace_back(this->make_prefix_items_validator_07(context, it->value(), sch, anchor_dict));
+                    validators.emplace_back(this->make_prefix_items_validator_07(context, (*it).value(), sch, anchor_dict));
                 } 
-                else if (it->value().type() == json_type::object_value ||
-                           it->value().type() == json_type::bool_value)
+                else if ((*it).value().type() == json_type::object_value ||
+                           (*it).value().type() == json_type::bool_value)
                 {
-                    validators.emplace_back(this->make_items_validator("items", context, it->value(), sch, anchor_dict));
+                    validators.emplace_back(this->make_items_validator("items", context, (*it).value(), sch, anchor_dict));
                 }
             }
             return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), 
@@ -316,7 +316,7 @@ namespace draft4 {
                 auto it = parent.find("exclusiveMaximum");
                 if (it != parent.object_range().end())
                 {
-                    is_exclusive = it->value().as_bool();
+                    is_exclusive = (*it).value().as_bool();
                 }
             }
             if (is_exclusive)
@@ -346,7 +346,7 @@ namespace draft4 {
                 auto it = parent.find("exclusiveMinimum");
                 if (it != parent.object_range().end())
                 {
-                    is_exclusive = it->value().as_bool();
+                    is_exclusive = (*it).value().as_bool();
                 }
             }
             if (is_exclusive)
@@ -389,7 +389,7 @@ namespace draft4 {
                 auto it = sch.find("id"); // If id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    uri relative(it->value().template as<std::string>()); 
+                    uri relative((*it).value().template as<std::string>()); 
                     auto resolved = parent.get_base_uri().resolve(relative);
                     id = resolved;
                     uri_wrapper new_uri{ resolved };
