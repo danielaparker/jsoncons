@@ -72,9 +72,9 @@ namespace jsonschema {
         {
             for (auto it = uris_.rbegin(); it != uris_.rend(); ++it)
             {
-                if (!it->has_plain_name_fragment())
+                if (!(*it).has_plain_name_fragment())
                 {
-                    return it->append(keyword).uri();
+                    return (*it).append(keyword).uri();
                 }
             }
             return uri{"#"};

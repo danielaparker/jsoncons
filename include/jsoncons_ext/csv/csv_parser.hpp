@@ -1640,7 +1640,7 @@ private:
         auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ buffer_ });
         if (it != string_double_map_.end())
         {
-            more_ = visitor_->double_value(it->second, semantic_tag::none, *this, ec);
+            more_ = visitor_->double_value((*it).second, semantic_tag::none, *this, ec);
         }
         else if (column_index_ < column_types_.size() + offset_)
         {

@@ -100,22 +100,22 @@ namespace draft201909 {
             if (!vocabulary.empty())
             {
                 auto it = vocabulary.find(applicator_id());
-                if (it == vocabulary.end() || !(it->second))
+                if (it == vocabulary.end() || !((*it).second))
                 {
                     include_applicator_ = false;
                 }
                 it = vocabulary.find(unevaluated_id());
-                if (it == vocabulary.end() || !(it->second))
+                if (it == vocabulary.end() || !((*it).second))
                 {
                     include_unevaluated_ = false;
                 }
                 it = vocabulary.find(validation_id());
-                if (it == vocabulary.end() || !(it->second))
+                if (it == vocabulary.end() || !((*it).second))
                 {
                     include_validation_ = false;
                 }
                 it = vocabulary.find(format_annotation_id());
-                if (it == vocabulary.end() || !(it->second))
+                if (it == vocabulary.end() || !((*it).second))
                 {
                     include_format_ = false;
                 }
@@ -256,7 +256,7 @@ namespace draft201909 {
                 auto it = sch.find("definitions");
                 if (it != sch.object_range().end()) 
                 {
-                    for (const auto& def : it->value().object_range())
+                    for (const auto& def : (*it).value().object_range())
                     {
                         std::string sub_keys[] = { "definitions", def.key() };
                         defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
@@ -267,7 +267,7 @@ namespace draft201909 {
             auto it = sch.find("$defs");
             if (it != sch.object_range().end()) 
             {
-                for (const auto& def : it->value().object_range())
+                for (const auto& def : (*it).value().object_range())
                 {
                     std::string sub_keys[] = { "$defs", def.key() };
                     defs.emplace(def.key(), make_schema_validator(context, def.value(), sub_keys, anchor_dict));
@@ -278,20 +278,20 @@ namespace draft201909 {
             it = sch.find("$recursiveAnchor"); 
             if (it != sch.object_range().end()) 
             {
-                recursive_anchor = it->value().template as<bool>();
+                recursive_anchor = (*it).value().template as<bool>();
             }
 
             it = sch.find("default");
             if (it != sch.object_range().end()) 
             {
-                default_value = it->value();
+                default_value = (*it).value();
                 known_keywords.insert("default");
             }
 
             it = sch.find("$ref");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri relative{it->value().template as<std::string>()}; 
+                uri relative{(*it).value().template as<std::string>()}; 
                 auto resolved = context.get_base_uri().resolve(relative);
                 validators.push_back(this->get_or_create_reference(sch, uri_wrapper{resolved}));
             }
@@ -299,7 +299,7 @@ namespace draft201909 {
             it = sch.find("$recursiveRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
-                uri relative(it->value().template as<std::string>());
+                uri relative((*it).value().template as<std::string>());
                 auto ref = context.get_base_uri().resolve(relative);
                 auto orig = jsoncons::make_unique<recursive_ref_validator_type>(sch, ref.base()); 
                 this->unresolved_refs_.emplace_back(ref, orig.get());
@@ -311,13 +311,13 @@ namespace draft201909 {
                 it = sch.find("propertyNames");
                 if (it != sch.object_range().end()) 
                 {
-                    validators.emplace_back(this->make_property_names_validator(context, it->value(), sch, anchor_dict));
+                    validators.emplace_back(this->make_property_names_validator(context, (*it).value(), sch, anchor_dict));
                 }
 
                 it = sch.find("dependentSchemas");
                 if (it != sch.object_range().end()) 
                 {
-                    validators.emplace_back(this->make_dependent_schemas_validator(context, it->value(), sch, anchor_dict));
+                    validators.emplace_back(this->make_dependent_schemas_validator(context, (*it).value(), sch, anchor_dict));
                 }
                 
                 schema_validator_type if_validator;
@@ -328,21 +328,21 @@ namespace draft201909 {
                 if (it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "if" };
-                    if_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    if_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
     
                 it = sch.find("then");
                 if (it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "then" };
-                    then_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    then_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
     
                 it = sch.find("else");
                 if (it != sch.object_range().end()) 
                 {
                     std::string sub_keys[] = { "else" };
-                    else_validator = make_schema_validator(context, it->value(), sub_keys, anchor_dict);
+                    else_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
                 }
                 if (if_validator || then_validator || else_validator)
                 {
@@ -357,7 +357,7 @@ namespace draft201909 {
                 it = sch.find("properties");
                 if (it != sch.object_range().end()) 
                 {
-                    properties = this->make_properties_validator(context, it->value(), sch, anchor_dict);
+                    properties = this->make_properties_validator(context, (*it).value(), sch, anchor_dict);
                 }
                 std::unique_ptr<pattern_properties_validator<Json>> pattern_properties;
     
@@ -365,14 +365,14 @@ namespace draft201909 {
                 it = sch.find("patternProperties");
                 if (it != sch.object_range().end())
                 {
-                    pattern_properties = make_pattern_properties_validator(context, it->value(), sch, anchor_dict);
+                    pattern_properties = make_pattern_properties_validator(context, (*it).value(), sch, anchor_dict);
                 }
         #endif
     
                 it = sch.find("additionalProperties");
                 if (it != sch.object_range().end()) 
                 {
-                    validators.emplace_back(this->make_additional_properties_validator(context, it->value(), sch,
+                    validators.emplace_back(this->make_additional_properties_validator(context, (*it).value(), sch,
                         std::move(properties), std::move(pattern_properties), anchor_dict));
                 }
                 else
@@ -393,14 +393,14 @@ namespace draft201909 {
                 if (it != sch.object_range().end()) 
                 {
     
-                    if (it->value().type() == json_type::array_value) 
+                    if ((*it).value().type() == json_type::array_value) 
                     {
-                        validators.emplace_back(this->make_prefix_items_validator_07(context, it->value(), sch, anchor_dict));
+                        validators.emplace_back(this->make_prefix_items_validator_07(context, (*it).value(), sch, anchor_dict));
                     } 
-                    else if (it->value().type() == json_type::object_value ||
-                               it->value().type() == json_type::bool_value)
+                    else if ((*it).value().type() == json_type::object_value ||
+                               (*it).value().type() == json_type::bool_value)
                     {
-                        validators.emplace_back(this->make_items_validator("items", context, it->value(), sch, anchor_dict));
+                        validators.emplace_back(this->make_items_validator("items", context, (*it).value(), sch, anchor_dict));
                     }
                 }
             }
@@ -411,7 +411,7 @@ namespace draft201909 {
                     auto factory_it = validation_factory_map_.find(key_value.key());
                     if (factory_it != validation_factory_map_.end())
                     {
-                        auto validator = factory_it->second(context, key_value.value(), sch, anchor_dict);
+                        auto validator = factory_(*it).second(context, key_value.value(), sch, anchor_dict);
                         if (validator)
                         {   
                             validators.emplace_back(std::move(validator));
@@ -427,7 +427,7 @@ namespace draft201909 {
                     it = sch.find("format");
                     if (it != sch.object_range().end()) 
                     {
-                        validators.emplace_back(this->make_format_validator(context, it->value(), sch));
+                        validators.emplace_back(this->make_format_validator(context, (*it).value(), sch));
                     }
                 }
             }
@@ -436,12 +436,12 @@ namespace draft201909 {
                 it = sch.find("unevaluatedProperties");
                 if (it != sch.object_range().end()) 
                 {
-                    unevaluated_properties_val = this->make_unevaluated_properties_validator(context, it->value(), sch, anchor_dict);
+                    unevaluated_properties_val = this->make_unevaluated_properties_validator(context, (*it).value(), sch, anchor_dict);
                 }
                 it = sch.find("unevaluatedItems");
                 if (it != sch.object_range().end()) 
                 {
-                    unevaluated_items_val = this->make_unevaluated_items_validator(context, it->value(), sch, anchor_dict);
+                    unevaluated_items_val = this->make_unevaluated_items_validator(context, (*it).value(), sch, anchor_dict);
                 }
             }
             
@@ -502,7 +502,7 @@ namespace draft201909 {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
                 if (it != sch.object_range().end()) 
                 {
-                    uri relative(it->value().template as<std::string>()); 
+                    uri relative((*it).value().template as<std::string>()); 
                     if (relative.has_fragment())
                     {
                         JSONCONS_THROW(schema_error("Draft 2019-09 does not allow $id with fragment"));
@@ -520,7 +520,7 @@ namespace draft201909 {
                 it = sch.find("$anchor"); 
                 if (it != sch.object_range().end()) 
                 {
-                    auto anchor = it->value().template as<std::string>();
+                    auto anchor = (*it).value().template as<std::string>();
                     if (!this->validate_anchor(anchor))
                     {
                         JSONCONS_THROW(schema_error("Invalid $anchor " + anchor));

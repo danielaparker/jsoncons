@@ -178,11 +178,11 @@ namespace jsonschema {
                 {
                     JSONCONS_THROW(schema_error("Undefined reference " + ref.first.string()));
                 }
-                if (it->second == nullptr)
+                if ((*it).second == nullptr)
                 {
                     JSONCONS_THROW(schema_error("Null referred schema " + ref.first.string()));
                 }
-                ref.second->set_referred_schema(it->second);
+                ref.second->set_referred_schema((*it).second);
             }
         }
 
@@ -231,7 +231,7 @@ namespace jsonschema {
             auto it = this->schema_store_ptr_->find(identifier.uri());
             if (it != this->schema_store_ptr_->end())
             {
-                return jsoncons::make_unique<ref_validator_type>(schema, identifier.uri(), it->second);
+                return jsoncons::make_unique<ref_validator_type>(schema, identifier.uri(), (*it).second);
             }
 
             // referencing an unknown keyword, turn it into schema
@@ -310,7 +310,7 @@ namespace jsonschema {
                     auto it = std::move(sch).find("$schema");
                     if (it != std::move(sch).object_range().end())
                     {
-                        if (it->value().as_string_view() == schema())
+                        if ((*it).value().as_string_view() == schema())
                         {
                             return make_schema_validator(context, std::move(sch), keys, anchor_dict);
                         }
@@ -587,13 +587,13 @@ namespace jsonschema {
             auto it = parent.find("contentEncoding");
             if (it != parent.object_range().end())
             {
-                if (!it->value().is_string())
+                if (!(*it).value().is_string())
                 {
                     const std::string message("contentEncoding must be a string");
                     JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
                 }
 
-                content_encoding = it->value().as_string();
+                content_encoding = (*it).value().as_string();
             }
             
             auto value = sch.template as<std::string>();
@@ -736,7 +736,7 @@ namespace jsonschema {
             if (it != parent.object_range().end()) 
             {
                 uri path = context.make_schema_location("maxContains");
-                auto value = it->value().template as<std::size_t>();
+                auto value = (*it).value().template as<std::size_t>();
                 max_contains = jsoncons::make_unique<max_contains_keyword<Json>>(parent, path, value);
             }
             else
@@ -750,7 +750,7 @@ namespace jsonschema {
             if (it != parent.object_range().end()) 
             {
                 uri path = context.make_schema_location("minContains");
-                auto value = it->value().template as<std::size_t>();
+                auto value = (*it).value().template as<std::size_t>();
                 min_contains = jsoncons::make_unique<min_contains_keyword<Json>>(parent, path, value);
             }
             else
@@ -954,7 +954,7 @@ namespace jsonschema {
                     uri items_location{context.make_schema_location("additionalItems")};
                     std::string sub_keys[] = {"additionalItems"};
                     items_val = jsoncons::make_unique<items_keyword<Json>>("additionalItems", parent, items_location,
-                        this->make_cross_draft_schema_validator(context, it->value(), sub_keys, anchor_dict));
+                        this->make_cross_draft_schema_validator(context, (*it).value(), sub_keys, anchor_dict));
                 }
             }
 

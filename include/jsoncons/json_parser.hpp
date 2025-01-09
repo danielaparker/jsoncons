@@ -2689,7 +2689,7 @@ private:
             auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
             if (it != string_double_map_.end())
             {
-                more_ = visitor.double_value(it->second, semantic_tag::none, *this, ec);
+                more_ = visitor.double_value((*it).second, semantic_tag::none, *this, ec);
             }
             else
             {
@@ -2703,7 +2703,7 @@ private:
             auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
             if (it != string_double_map_.end())
             {
-                more_ = visitor.double_value(it->second, semantic_tag::none, *this, ec);
+                more_ = visitor.double_value((*it).second, semantic_tag::none, *this, ec);
             }
             else
             {

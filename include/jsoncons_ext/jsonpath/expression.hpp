@@ -1409,7 +1409,7 @@ namespace detail {
             value_type j(json_array_arg, semantic_tag::none, alloc_);
             while (rit != rend) 
             {
-                auto s = rit->str();
+                auto s = r(*it).str();
                 j.emplace_back(s.c_str(), semantic_tag::none);
                 ++rit;
             }
@@ -2517,7 +2517,7 @@ namespace detail {
                 }
                 return it2->second.get();
             }
-            return it->second.get();
+            return (*it).second.get();
         }
 
         const unary_operator<Json>* get_unary_not() const
@@ -3221,7 +3221,7 @@ namespace detail {
                         for (auto&& node : receiver.nodes)
                         {
                             auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
-                            if (it != index.end() && it->path() == node.path()) 
+                            if (it != index.end() && (*it).path() == node.path()) 
                             {
                                 temp2.emplace_back(std::move(node));
                                 index.erase(it);

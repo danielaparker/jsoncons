@@ -770,7 +770,7 @@ namespace jsonpath {
                     {
                         if (i < last)
                         {
-                            p_current = std::addressof(it->value());
+                            p_current = std::addressof((*it).value());
                         }
                         else
                         {
@@ -828,7 +828,7 @@ namespace jsonpath {
                     auto it = p_current->find(element.name());
                     if (it != p_current->object_range().end())
                     {
-                        p_current = std::addressof(it->value());
+                        p_current = std::addressof((*it).value());
                         if (i == last)
                         {
                             found = true;
@@ -907,7 +907,7 @@ namespace jsonpath {
                 auto it = p_current->find(element.name());
                 if (it != p_current->object_range().end())
                 {
-                    p_current = std::addressof(it->value());
+                    p_current = std::addressof((*it).value());
                     if (i == last)
                     {
                         *p_current = std::move(value);

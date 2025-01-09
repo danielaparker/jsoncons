@@ -696,7 +696,7 @@ namespace jsoncons \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            return it->first; \
+            return (*it).first; \
         } \
         static Json to_json(enum_type class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -717,7 +717,7 @@ namespace jsoncons \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            return Json(it->second,alloc); \
+            return Json((*it).second,alloc); \
         } \
     }; \
 } \
@@ -797,7 +797,7 @@ namespace jsoncons \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            return it->first; \
+            return (*it).first; \
         } \
         static Json to_json(enum_type class_instance, allocator_type alloc=allocator_type()) \
         { \
@@ -818,7 +818,7 @@ namespace jsoncons \
                     JSONCONS_THROW(conv_error(conv_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
-            return Json(it->second,alloc); \
+            return Json((*it).second,alloc); \
         } \
     }; \
     template <> struct is_json_type_traits_declared<EnumType> : public std::true_type {}; \

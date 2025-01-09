@@ -8870,7 +8870,7 @@ namespace detail {
             m_tokenBuffer.resize( 0 );
 
             // Skip any empty strings
-            while( it != itEnd && it->empty() )
+            while( it != itEnd && (*it).empty() )
                 ++it;
 
             if( it != itEnd ) {
@@ -12535,7 +12535,7 @@ namespace Catch {
         auto it =  m_factories.find( name );
         if( it == m_factories.end() )
             return nullptr;
-        return it->second->create( ReporterConfig( config ) );
+        return (*it).second->create( ReporterConfig( config ) );
     }
 
     void ReporterRegistry::registerReporter( std::string const& name, IReporterFactoryPtr const& factory ) {
@@ -13977,7 +13977,7 @@ namespace Catch {
     TagAlias const* TagAliasRegistry::find( std::string const& alias ) const {
         auto it = m_registry.find( alias );
         if( it != m_registry.end() )
-            return &(it->second);
+            return &((*it).second);
         else
             return nullptr;
     }
@@ -16646,7 +16646,7 @@ void ConsoleReporter::printTestCaseAndSectionHeader() {
             it = m_sectionStack.begin() + 1, // Skip first section (test case)
             itEnd = m_sectionStack.end();
         for (; it != itEnd; ++it)
-            printHeaderString(it->name, 2);
+            printHeaderString((*it).name, 2);
     }
 
     SourceLineInfo lineInfo = m_sectionStack.back().lineInfo;
@@ -16838,7 +16838,7 @@ namespace Catch {
                                    end(tags),
                                    [] (std::string const& tag) {return tag.front() == '#'; });
             if (it != tags.end())
-                return it->substr(1);
+                return (*it).substr(1);
             return std::string();
         }
 

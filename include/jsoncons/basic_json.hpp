@@ -2594,7 +2594,7 @@ namespace jsoncons {
                     }
                     else
                     {
-                        return it->value();
+                        return (*it).value();
                     }
                     break;
                 }
@@ -2622,7 +2622,7 @@ namespace jsoncons {
                     }
                     else
                     {
-                        return it->value();
+                        return (*it).value();
                     }
                     break;
                 }
@@ -2954,7 +2954,7 @@ namespace jsoncons {
                         return 0;
                     }
                     std::size_t count = 0;
-                    while (it != cast<object_storage>().value().end()&& it->key() == key)
+                    while (it != cast<object_storage>().value().end()&& (*it).key() == key)
                     {
                         ++count;
                         ++it;
@@ -3595,7 +3595,7 @@ namespace jsoncons {
                     {
                         JSONCONS_THROW(key_not_found(key.data(),key.length()));
                     }
-                    return it->value();
+                    return (*it).value();
                 }
                 case json_storage_kind::json_reference:
                     return cast<json_reference_storage>().value().at(key);
@@ -3617,7 +3617,7 @@ namespace jsoncons {
                     {
                         JSONCONS_THROW(key_not_found(key.data(),key.length()));
                     }
-                    return it->value();
+                    return (*it).value();
                 }
                 case json_storage_kind::json_const_reference:
                     return cast<json_const_reference_storage>().value().at(key);
@@ -3714,7 +3714,7 @@ namespace jsoncons {
                     auto it = cast<object_storage>().value().find(key);
                     if (it != cast<object_storage>().value().end())
                     {
-                        return it->value();
+                        return (*it).value();
                     }
                     else
                     {
@@ -3747,7 +3747,7 @@ namespace jsoncons {
                     auto it = cast<object_storage>().value().find(key);
                     if (it != cast<object_storage>().value().end())
                     {
-                        return it->value().template as<T>();
+                        return (*it).value().template as<T>();
                     }
                     else
                     {
@@ -4473,8 +4473,8 @@ namespace jsoncons {
                     const object& o = cast<object_storage>().value();
                     for (auto it = o.begin(); more && it != o.end(); ++it)
                     {
-                        visitor.key(string_view_type((it->key()).data(),it->key().length()), context, ec);
-                        it->value().dump_noflush(visitor, ec);
+                        visitor.key(string_view_type(((*it).key()).data(),(*it).key().length()), context, ec);
+                        (*it).value().dump_noflush(visitor, ec);
                     }
                     if (more)
                     {
@@ -4488,7 +4488,7 @@ namespace jsoncons {
                     const array& o = cast<array_storage>().value();
                     for (const_array_iterator it = o.begin(); more && it != o.end(); ++it)
                     {
-                        it->dump_noflush(visitor, ec);
+                        (*it).dump_noflush(visitor, ec);
                     }
                     if (more)
                     {

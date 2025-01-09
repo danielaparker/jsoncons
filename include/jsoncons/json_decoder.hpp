@@ -197,7 +197,7 @@ private:
             auto last = first + size;
             for (auto it = first; it != last; ++it)
             {
-                container.push_back(std::move(it->value));
+                container.push_back(std::move((*it).value));
             }
             item_stack_.erase(first, item_stack_.end());
         }

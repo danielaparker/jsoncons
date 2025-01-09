@@ -260,7 +260,7 @@ namespace jsonpath {
                 {
                     return nullptr;
                 }
-                current = std::addressof(it->value());
+                current = std::addressof((*it).value());
             }
         }
         return current;

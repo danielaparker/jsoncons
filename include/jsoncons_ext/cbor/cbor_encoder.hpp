@@ -387,7 +387,7 @@ private:
             else
             {
                 write_tag(25);
-                write_uint64_value(it->second);
+                write_uint64_value((*it).second);
             }
         }
         else
@@ -929,7 +929,7 @@ private:
             else
             {
                 write_tag(25);
-                write_uint64_value(it->second);
+                write_uint64_value((*it).second);
             }
         }
         else
@@ -959,7 +959,7 @@ private:
             else
             {
                 write_tag(25);
-                write_uint64_value(it->second);
+                write_uint64_value((*it).second);
             }
         }
         else

@@ -2145,7 +2145,7 @@ namespace detail {
         void unwind_rparen(std::error_code& ec)
         {
             auto it = operator_stack_.rbegin();
-            while (it != operator_stack_.rend() && !it->is_lparen())
+            while (it != operator_stack_.rend() && !(*it).is_lparen())
             {
                 output_stack_.emplace_back(std::move(*it));
                 ++it;
@@ -2183,7 +2183,7 @@ namespace detail {
                     }
                     std::vector<token_type> toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::begin_filter)
+                    while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::begin_filter)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
@@ -2233,7 +2233,7 @@ namespace detail {
                     }
                     std::vector<token_type> toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::begin_expression)
+                    while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::begin_expression)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
@@ -2272,7 +2272,7 @@ namespace detail {
                     }
                     std::vector<token_type> toks;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::begin_expression)
+                    while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::begin_expression)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
@@ -2310,18 +2310,18 @@ namespace detail {
                 {
                     std::vector<selector_type*> expressions;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::begin_union)
+                    while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::begin_union)
                     {
-                        if (it->token_kind() == jsonpath_token_kind::selector)
+                        if ((*it).token_kind() == jsonpath_token_kind::selector)
                         {
-                            expressions.emplace_back(std::move(it->selector_));
+                            expressions.emplace_back(std::move((*it).selector_));
                         }
                         do
                         {
                             ++it;
                         } 
-                        while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::begin_union && it->token_kind() != jsonpath_token_kind::separator);
-                        if (it->token_kind() == jsonpath_token_kind::separator)
+                        while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::begin_union && (*it).token_kind() != jsonpath_token_kind::separator);
+                        if ((*it).token_kind() == jsonpath_token_kind::separator)
                         {
                             ++it;
                         }
@@ -2364,9 +2364,9 @@ namespace detail {
                     std::vector<token_type> toks;
                     auto it = output_stack_.rbegin();
                     std::size_t arg_count = 0;
-                    while (it != output_stack_.rend() && it->token_kind() != jsonpath_token_kind::function)
+                    while (it != output_stack_.rend() && (*it).token_kind() != jsonpath_token_kind::function)
                     {
-                        if (it->token_kind() == jsonpath_token_kind::argument)
+                        if ((*it).token_kind() == jsonpath_token_kind::argument)
                         {
                             ++arg_count;
                         }
@@ -2379,7 +2379,7 @@ namespace detail {
                         return;
                     }
                     std::reverse(toks.begin(), toks.end());
-                    if (it->arity() && arg_count != *(it->arity()))
+                    if ((*it).arity() && arg_count != *((*it).arity()))
                     {
                         ec = jsonpath_errc::invalid_arity;
                         return;
@@ -2434,9 +2434,9 @@ namespace detail {
                     else
                     {
                         auto it = operator_stack_.rbegin();
-                        while (it != operator_stack_.rend() && it->is_operator()
-                               && (tok.precedence_level() > it->precedence_level()
-                             || (tok.precedence_level() == it->precedence_level() && tok.is_right_associative())))
+                        while (it != operator_stack_.rend() && (*it).is_operator()
+                               && (tok.precedence_level() > (*it).precedence_level()
+                             || (tok.precedence_level() == (*it).precedence_level() && tok.is_right_associative())))
                         {
                             output_stack_.emplace_back(std::move(*it));
                             ++it;
