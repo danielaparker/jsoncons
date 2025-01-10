@@ -270,20 +270,21 @@ public:
     using char_type = CharT;
     using string_type = std::basic_string<CharT>;
 private:
-    char_type field_delimiter_;
-    char_type quote_char_;
-    char_type quote_escape_char_;
-    char_type subfield_delimiter_;
+    bool is_flat_{true};
+    char_type field_delimiter_{','};
+    char_type quote_char_{'\"'};
+    char_type quote_escape_char_{'\"'};
+    char_type subfield_delimiter_{char_type{}};
 
-    bool enable_nan_to_num_:1;
-    bool enable_inf_to_num_:1;
-    bool enable_neginf_to_num_:1;
-    bool enable_nan_to_str_:1;
-    bool enable_inf_to_str_:1;
-    bool enable_neginf_to_str_:1;
-    bool enable_str_to_nan_:1;
-    bool enable_str_to_inf_:1;
-    bool enable_str_to_neginf_:1;
+    bool enable_nan_to_num_:1{false};
+    bool enable_inf_to_num_:1{false};
+    bool enable_neginf_to_num_:1{false};
+    bool enable_nan_to_str_:1{false};
+    bool enable_inf_to_str_:1{false};
+    bool enable_neginf_to_str_:1{false};
+    bool enable_str_to_nan_:1{false};
+    bool enable_str_to_inf_:1{false};
+    bool enable_str_to_neginf_:1{false};
 
     string_type nan_to_num_;
     string_type inf_to_num_;
@@ -295,19 +296,6 @@ private:
 
 protected:
     basic_csv_options_common()
-      : field_delimiter_(','),
-        quote_char_('\"'),
-        quote_escape_char_('\"'),
-        subfield_delimiter_(char_type()),
-        enable_nan_to_num_(false),
-        enable_inf_to_num_(false),
-        enable_neginf_to_num_(false),
-        enable_nan_to_str_(false),
-        enable_inf_to_str_(false),
-        enable_neginf_to_str_(false),
-        enable_str_to_nan_(false),
-        enable_str_to_inf_(false),
-        enable_str_to_neginf_(false)
     {
     }
 
@@ -317,6 +305,11 @@ protected:
 
     virtual ~basic_csv_options_common() = default;
 public:
+
+    bool is_flat() const 
+    {
+        return is_flat_;
+    }
 
     char_type field_delimiter() const 
     {
@@ -682,6 +675,7 @@ public:
     using basic_csv_decode_options<CharT>::nan_to_num;
     using basic_csv_decode_options<CharT>::inf_to_num;
     using basic_csv_decode_options<CharT>::neginf_to_num;
+    using basic_csv_decode_options<CharT>::is_flat;
     using basic_csv_decode_options<CharT>::field_delimiter;
     using basic_csv_decode_options<CharT>::subfield_delimiter;
     using basic_csv_decode_options<CharT>::quote_char;
@@ -815,6 +809,12 @@ public:
     basic_csv_options& column_defaults(const string_type& value)
     {
         this->column_defaults_ = value;
+        return *this;
+    }
+
+    basic_csv_options& is_flat(bool value)
+    {
+        this->is_flat_ = value;
         return *this;
     }
 
