@@ -396,9 +396,10 @@ private:
         {
             case stack_item_kind::flat_object:
             {
-                stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-                stack_.back().pathname_.push_back('/');
-                stack_.back().pathname_.append(std::string(name));
+                //stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+                //stack_.back().pathname_.push_back('/');
+                //stack_.back().pathname_.append(std::string(name));
+                stack_.back().pathname_ = std::string(name);
                 break;
             }
             case stack_item_kind::object:

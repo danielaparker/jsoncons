@@ -9,11 +9,12 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv")
 {
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
 true,1971-01-01T04:14:00,1.0,Chicago Reader
-#true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
+true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
 )";
         
         std::string jtext = R"(
@@ -57,9 +58,9 @@ true,1971-01-01T04:14:00,1.0,Chicago Reader
         
         std::cout << buf << "\n";
         
-        //CHECK(expected == buf);
+        CHECK(expected == buf);
     }
-#if 0
+#endif
     SECTION("array of arrays to csv")
     {
         std::string expected = R"(/0,/1,/2,/3,/3/0,/3/0/0,/3/0/1
@@ -106,8 +107,7 @@ Chicago Sun-Times,1.27,1948-01-01T14:57:13,true,14:57:13,1948-01-01,63
         j.dump(encoder);
         
         CHECK(expected == buf);
-    }
-#endif    
+    }    
 }
 
 TEST_CASE("test json to non-flat csv")
