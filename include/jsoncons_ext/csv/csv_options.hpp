@@ -275,16 +275,16 @@ private:
     char_type quote_escape_char_{'\"'};
     char_type subfield_delimiter_{char_type{}};
 
-    bool flat_:1{true};
-    bool enable_nan_to_num_:1{false};
-    bool enable_inf_to_num_:1{false};
-    bool enable_neginf_to_num_:1{false};
-    bool enable_nan_to_str_:1{false};
-    bool enable_inf_to_str_:1{false};
-    bool enable_neginf_to_str_:1{false};
-    bool enable_str_to_nan_:1{false};
-    bool enable_str_to_inf_:1{false};
-    bool enable_str_to_neginf_:1{false};
+    bool flat_:1;
+    bool enable_nan_to_num_:1;
+    bool enable_inf_to_num_:1;
+    bool enable_neginf_to_num_:1;
+    bool enable_nan_to_str_:1;
+    bool enable_inf_to_str_:1;
+    bool enable_neginf_to_str_:1;
+    bool enable_str_to_nan_:1;
+    bool enable_str_to_inf_:1;
+    bool enable_str_to_neginf_:1;
 
     string_type nan_to_num_;
     string_type inf_to_num_;
@@ -296,6 +296,16 @@ private:
 
 protected:
     basic_csv_options_common()
+      : flat_{true},                  
+        enable_nan_to_num_{false},    
+        enable_inf_to_num_{false},    
+        enable_neginf_to_num_{false}, 
+        enable_nan_to_str_{false},    
+        enable_inf_to_str_{false},    
+        enable_neginf_to_str_{false}, 
+        enable_str_to_nan_{false},    
+        enable_str_to_inf_{false},    
+        enable_str_to_neginf_{false}
     {
     }
 
