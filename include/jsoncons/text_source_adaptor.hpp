@@ -81,7 +81,6 @@ namespace jsoncons {
     {
     public:
         using value_type = typename Source::value_type;
-        using value_type = typename Source::value_type;
         using source_type = Source;
     private:
         source_type source_;
