@@ -778,11 +778,11 @@ namespace detail {
         }
 
         void select(eval_context<Json,JsonReference>& context,
-                    reference root,
-                    const path_node_type& last, 
-                    reference current,
-                    node_receiver_type& receiver,
-                    result_options options) const override
+            reference root,
+            const path_node_type& last, 
+            reference current,
+            node_receiver_type& receiver,
+            result_options options) const override
         {
             if (current.is_array())
             {
@@ -806,11 +806,11 @@ namespace detail {
         }
 
         reference evaluate(eval_context<Json,JsonReference>& context,
-                           reference root,
-                           const path_node_type& last, 
-                           reference current, 
-                           result_options options,
-                           std::error_code&) const override
+            reference root,
+            const path_node_type& last, 
+            reference current, 
+            result_options options,
+            std::error_code&) const override
         {
             auto jptr = context.create_json(json_array_arg, semantic_tag::none, context.get_allocator());
             json_array_receiver<Json,JsonReference> receiver(jptr);

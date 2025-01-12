@@ -1940,13 +1940,14 @@ namespace detail {
                 return value_type::null();
             }
 
-            auto arg0= args[0].value();
+            auto arg0 = args[0].value();
             //std::cout << "length function arg: " << arg0 << "\n";
 
             switch (arg0.type())
             {
                 case json_type::object_value:
                 case json_type::array_value:
+                    std::cout << "LENGTH ARG: " << arg0 << "\n";
                     return value_type(arg0.size(), semantic_tag::none);
                 case json_type::string_value:
                 {
@@ -3368,7 +3369,7 @@ namespace detail {
                             stack.emplace_back(std::addressof(root));
                             break;
                         case jsonpath_token_kind::current_node:
-                            //std::cout << "current: " << current << "\n";
+                            std::cout << "CURRENT NODE: " << current << "\n";
                             stack.emplace_back(std::addressof(current));
                             break;
                         case jsonpath_token_kind::argument:
@@ -3426,6 +3427,7 @@ namespace detail {
                             //std::cout << "selector item: " << *ptr << "\n";
 
                             reference val = tok.selector_->evaluate(context, root, path_node_type{}, item.value(), options, ec);
+                            std::cout << "SELECTOR RESULT: " << val << "\n";
 
                             stack.pop_back();
                             stack.emplace_back(stack_item_type(std::addressof(val)));
