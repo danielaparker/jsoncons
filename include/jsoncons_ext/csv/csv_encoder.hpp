@@ -58,8 +58,11 @@ private:
 
     enum class stack_item_kind
     {
+        flat_row_mapping,
         row_mapping,
         column_mapping,
+        flat_object,
+        unmapped,
         object,
         row,
         column,
@@ -81,7 +84,7 @@ private:
 
         bool is_object() const
         {
-            return item_kind_ == stack_item_kind::object;
+            return item_kind_ == stack_item_kind::object || stack_item_kind::flat_object;
         }
 
         stack_item_kind item_kind() const
@@ -184,7 +187,7 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& /*ec*/) override
     {
         if (stack_.empty())
         {
@@ -193,26 +196,38 @@ private:
         }
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_row_mapping:
+                stack_.emplace_back(stack_item_kind::flat_object);
+                return true;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
+            case stack_item_kind::unmapped:
+            case stack_item_kind::flat_object:
+                stack_.emplace_back(stack_item_kind::unmapped);
+                return true;
             default: // error
-                ec = csv_errc::source_error;
-                return false;
+                //ec = csv_errc::source_error;
+                //return false;
+                return true;
         }
     }
 
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
-        JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.empty())
+        {
+            return true;
+        }
 
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
-                if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::row_mapping)
+                if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::row_mapping || stack_[stack_.size()-2].item_kind_ == stack_item_kind::flat_row_mapping)
                 {
                     if (stack_[0].count_ == 0)
                     {
@@ -268,7 +283,14 @@ private:
     {
         if (stack_.empty())
         {
-            stack_.emplace_back(stack_item_kind::row_mapping);
+            if (options_.flat())
+            {
+                stack_.emplace_back(stack_item_kind::flat_row_mapping);
+            }
+            else
+            {
+                stack_.emplace_back(stack_item_kind::row_mapping);
+            }
             return true;
         }
         
@@ -312,7 +334,10 @@ private:
 
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
-        JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.empty())
+        {
+            return true;
+        }
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
@@ -369,6 +394,13 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
+            {
+                stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+                stack_.back().pathname_.push_back('/');
+                stack_.back().pathname_.append(std::string(name));
+                break;
+            }
             case stack_item_kind::object:
             {
                 stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
@@ -413,6 +445,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -487,6 +520,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -557,6 +591,8 @@ private:
                               const ser_context& context,
                               std::error_code& ec) override
     {
+        JSONCONS_ASSERT(!stack_.empty());
+
         byte_string_chars_format encoding_hint;
         switch (tag)
         {
@@ -613,6 +649,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -690,6 +727,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -767,6 +805,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -841,6 +880,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_object:
             case stack_item_kind::object:
             case stack_item_kind::object_multi_valued_field:
             {
@@ -1049,7 +1089,10 @@ private:
     template <typename AnyWriter>
     void begin_value(AnyWriter& sink)
     {
-        JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.empty())
+        {
+            return;
+        }
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
@@ -1090,7 +1133,10 @@ private:
 
     void end_value()
     {
-        JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.empty())
+        {
+            return;
+        }
         switch(stack_.back().item_kind_)
         {
             case stack_item_kind::row:

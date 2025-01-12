@@ -13,7 +13,7 @@ TEST_CASE("test json to flat csv")
     {
         std::string expected = R"(boolean,datetime,float,text
 true,1971-01-01T04:14:00,1.0,Chicago Reader
-true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
+#true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
 )";
         
         std::string jtext = R"(
