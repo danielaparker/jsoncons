@@ -62,6 +62,7 @@ private:
         row_mapping,
         column_mapping,
         flat_object,
+        flat_row,
         unmapped,
         object,
         row,
@@ -296,12 +297,15 @@ private:
         
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_row_mapping:
+                stack_.emplace_back(stack_item_kind::flat_row);
+                break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::row);
-                return true;
+                break;
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object_multi_valued_field);
-                return true;
+                break;
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
                 row_counts_.push_back(1);
@@ -309,7 +313,7 @@ private:
                 {
                     column_names_.emplace_back();
                 }
-                return true;
+                break;
             case stack_item_kind::column:
             {
                 if (column_names_.size() <= row_counts_.back())
@@ -319,17 +323,25 @@ private:
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 begin_value(bo);
                 stack_.emplace_back(stack_item_kind::column_multi_valued_field);
-                return true;
+                break;
             }
             case stack_item_kind::row:
                 begin_value(sink_);
                 //stack_.emplace_back(stack_item_kind::row_multi_valued_field);
                 stack_.emplace_back(stack_item_kind::row);
-                return true;
+                break;
+            case stack_item_kind::flat_row:
+                begin_value(sink_);
+                stack_.emplace_back(stack_item_kind::unmapped);
+                break;
+            case stack_item_kind::unmapped:
+                stack_.emplace_back(stack_item_kind::unmapped);
+                break;
             default: // error
                 ec = csv_errc::source_error;
                 return false;
         }
+        return true;
     }
 
     bool visit_end_array(const ser_context&, std::error_code&) override
@@ -338,8 +350,42 @@ private:
         {
             return true;
         }
+        
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_row:
+                if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::flat_row_mapping)
+                {
+                    if (stack_[0].count_ == 0 && !options_.column_names().empty())
+                    {
+                        for (std::size_t i = 0; i < column_names_.size(); ++i)
+                        {
+                            if (i > 0)
+                            {
+                                sink_.push_back(options_.field_delimiter());
+                            }
+                            sink_.append(column_names_[i].data(), column_names_[i].length());
+                        }
+                        sink_.append(options_.line_delimiter().data(), 
+                            options_.line_delimiter().length());
+                    }
+
+                    for (std::size_t i = 0; i < column_names_.size(); ++i)
+                    {
+                        if (i > 0)
+                        {
+                            sink_.push_back(options_.field_delimiter());
+                        }
+                        auto it = cname_value_map_.find(column_names_[i]);
+                        if (it != cname_value_map_.end())
+                        {
+                            sink_.append(it->second.data(),it->second.length());
+                            it->second.clear();
+                        }
+                    }
+                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                }
+                break;
             case stack_item_kind::row:
                 if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::row_mapping)
                 {
@@ -357,7 +403,6 @@ private:
                             options_.line_delimiter().length());
                     }
                     
-                    //std::cout << "visit_end_array: write row column_names: " << column_names_.size() << "\n";
                     for (std::size_t i = 0; i < column_names_.size(); ++i)
                     {
                         if (i > 0)
@@ -473,6 +518,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -544,6 +590,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -677,6 +724,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -755,6 +803,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -833,6 +882,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -908,6 +958,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 append_array_path_component();
@@ -1096,6 +1147,7 @@ private:
         }
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
                 break;
             case stack_item_kind::column:
@@ -1140,6 +1192,7 @@ private:
         }
         switch(stack_.back().item_kind_)
         {
+            case stack_item_kind::flat_row:
             case stack_item_kind::row:
             {
                 ++stack_.back().count_;
