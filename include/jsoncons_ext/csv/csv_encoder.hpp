@@ -68,7 +68,7 @@ private:
         row,
         column,
         object_multivalued_field,
-        row_multivalued_field,
+        multivalued_field,
         column_multivalued_field
     };
 
@@ -190,7 +190,7 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& /*ec*/) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -201,13 +201,13 @@ private:
         {
             case stack_item_kind::flat_row_mapping:
                 stack_.emplace_back(stack_item_kind::flat_object);
-                return true;
+                break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object);
-                return true;
+                break;
             case stack_item_kind::flat_object:
                 if (options_.subfield_delimiter() == char_type())
                 {
@@ -215,21 +215,23 @@ private:
                 }
                 else
                 {
+                    stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+                    std::cout << "begin_object pathname: " << stack_.back().pathname_ << "\n";                   
                     value_buffer_.clear();
-                    stack_.emplace_back(stack_item_kind::row_multivalued_field);
+                    stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
-                return true;
+                break;
             case stack_item_kind::unmapped:
                 stack_.emplace_back(stack_item_kind::unmapped);
-                return true;
+                break;
             default: // error
-                //ec = csv_errc::source_error;
-                //return false;
-                return true;
+                ec = csv_errc::source_error;
+                return false;
         }
+        return true;
     }
 
-    bool visit_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -246,6 +248,7 @@ private:
                     {
                         for (std::size_t i = 0; i < column_names_.size(); ++i)
                         {
+                            std::cout << "column-" << i << " name: " << column_names_[i] << "\n";
                             if (i > 0)
                             {
                                 sink_.push_back(options_.field_delimiter());
@@ -281,8 +284,11 @@ private:
                  }
                  break;
              }
-            default:
+            case stack_item_kind::unmapped:
                 break;
+            default:
+                ec = csv_errc::source_error;
+                return false;
         }
         stack_.pop_back();
         if (!stack_.empty())
@@ -349,10 +355,26 @@ private:
                 {
                     append_array_path_component();
                     value_buffer_.clear();
-                    stack_.emplace_back(stack_item_kind::row_multivalued_field);
+                    stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
                 break;
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::flat_object:
+                if (options_.subfield_delimiter() == char_type())
+                {
+                    stack_.emplace_back(stack_item_kind::unmapped);
+                }
+                else
+                {
+                    std::cout << "flat_object->row " << stack_.back().pathname_ << "\n";
+                    if (options_.column_names().empty())
+                    {
+                        column_names_.emplace_back(stack_.back().pathname_);
+                    }
+                    value_buffer_.clear();
+                    stack_.emplace_back(stack_item_kind::multivalued_field);
+                }
+                break;
+            case stack_item_kind::multivalued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             case stack_item_kind::unmapped:
@@ -365,7 +387,7 @@ private:
         return true;
     }
 
-    bool visit_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -374,6 +396,9 @@ private:
         
         switch (stack_.back().item_kind_)
         {
+            case stack_item_kind::row_mapping:
+            case stack_item_kind::flat_row_mapping:
+                break;
             case stack_item_kind::flat_row:
                 if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::flat_row_mapping)
                 {
@@ -407,7 +432,7 @@ private:
                     sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 }
                 break;
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 auto it = cname_value_map_.find(stack_[stack_.size()-2].pathname_);
                 if (it != cname_value_map_.end())
@@ -452,8 +477,11 @@ private:
             case stack_item_kind::column:
                 ++column_index_;
                 break;
-            default:
+            case stack_item_kind::unmapped:
                 break;
+            default:
+                ec = csv_errc::source_error;
+                return false;
         }
         stack_.pop_back();
 
@@ -567,7 +595,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -646,7 +674,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -787,7 +815,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -873,7 +901,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -959,7 +987,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1042,7 +1070,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1244,7 +1272,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::multivalued_field:
             case stack_item_kind::column_multivalued_field:
                 break;
             default:

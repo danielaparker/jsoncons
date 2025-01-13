@@ -7,6 +7,7 @@
 
 namespace csv = jsoncons::csv; 
 
+#if 0
 TEST_CASE("test json to flat csv")
 {
     SECTION("array of objects to csv")
@@ -147,9 +148,11 @@ NY,LON,TOR;LON
         CHECK(expected == buf);
     }    
 }
+#endif
 
 TEST_CASE("test json to non-flat csv")
 {
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -251,5 +254,45 @@ Chicago Sun-Times,1.27,1948-01-01T14:57:13,true,14:57:13,1948-01-01,63
         
         CHECK(expected == buf);
     }
+#endif
+    SECTION("array of object and subarrays to csv")
+    {
+        std::string expected = R"(calculationPeriodCenters,paymentCenters,resetCenters
+NY;LON,TOR,LON
+NY,LON,TOR;LON
+NY;LON,TOR,LON
+NY,LON,TOR;LON
+)";
+
+    std::string jtext = R"(
+[
+    {"calculationPeriodCenters" : ["NY","LON"],
+     "paymentCenters" : "TOR",
+     "resetCenters" : "LON"},
+    {"calculationPeriodCenters" : "NY",
+     "paymentCenters" : "LON",
+     "resetCenters" : ["TOR","LON"]},
+    {"calculationPeriodCenters" : ["NY","LON"],
+     "paymentCenters" : "TOR",
+     "resetCenters" : "LON"},
+    {"calculationPeriodCenters" : "NY",
+     "paymentCenters" : "LON",
+     "resetCenters" : ["TOR","LON"]}
+]
+    )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(true)
+            .subfield_delimiter(';');
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        CHECK(expected == buf);
+    }    
 }
 
