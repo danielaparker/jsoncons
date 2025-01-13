@@ -67,9 +67,9 @@ private:
         object,
         row,
         column,
-        object_multi_valued_field,
-        row_multi_valued_field,
-        column_multi_valued_field
+        object_multivalued_field,
+        row_multivalued_field,
+        column_multivalued_field
     };
 
     struct stack_item
@@ -216,7 +216,7 @@ private:
                 else
                 {
                     value_buffer_.clear();
-                    stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                    stack_.emplace_back(stack_item_kind::row_multivalued_field);
                 }
                 return true;
             case stack_item_kind::unmapped:
@@ -316,7 +316,7 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 break;
             case stack_item_kind::object:
-                stack_.emplace_back(stack_item_kind::object_multi_valued_field);
+                stack_.emplace_back(stack_item_kind::object_multivalued_field);
                 break;
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
@@ -334,7 +334,7 @@ private:
                 }                
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 begin_value(bo);
-                stack_.emplace_back(stack_item_kind::column_multi_valued_field);
+                stack_.emplace_back(stack_item_kind::column_multivalued_field);
                 break;
             }
             case stack_item_kind::row:
@@ -349,10 +349,10 @@ private:
                 {
                     append_array_path_component();
                     value_buffer_.clear();
-                    stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                    stack_.emplace_back(stack_item_kind::row_multivalued_field);
                 }
                 break;
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             case stack_item_kind::unmapped:
@@ -407,7 +407,7 @@ private:
                     sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 }
                 break;
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 auto it = cname_value_map_.find(stack_[stack_.size()-2].pathname_);
                 if (it != cname_value_map_.end())
@@ -523,7 +523,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -567,7 +567,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -587,7 +587,7 @@ private:
                 write_null_value(bo);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_null_value(bo);
@@ -606,7 +606,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -646,7 +646,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -666,7 +666,7 @@ private:
                 write_string_value(sv,bo);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_string_value(sv,bo);
@@ -743,7 +743,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -787,7 +787,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -807,7 +807,7 @@ private:
                 write_double_value(val, context, bo, ec);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_double_value(val, context, bo, ec);
@@ -829,7 +829,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -873,7 +873,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -893,7 +893,7 @@ private:
                 write_int64_value(val, bo);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_int64_value(val, bo);
@@ -915,7 +915,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -959,7 +959,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -979,7 +979,7 @@ private:
                 write_uint64_value(val, bo);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_uint64_value(val, bo);
@@ -998,7 +998,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multi_valued_field:
+            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -1042,7 +1042,7 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1062,7 +1062,7 @@ private:
                 write_bool_value(val, bo);
                 break;
             }
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
                 write_bool_value(val, bo);
@@ -1244,8 +1244,8 @@ private:
                 }
                 break;
             }
-            case stack_item_kind::row_multi_valued_field:
-            case stack_item_kind::column_multi_valued_field:
+            case stack_item_kind::row_multivalued_field:
+            case stack_item_kind::column_multivalued_field:
                 break;
             default:
                 break;
