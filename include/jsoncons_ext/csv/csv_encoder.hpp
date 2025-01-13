@@ -327,11 +327,20 @@ private:
             }
             case stack_item_kind::row:
                 begin_value(sink_);
-                //stack_.emplace_back(stack_item_kind::row_multi_valued_field);
                 stack_.emplace_back(stack_item_kind::row);
                 break;
             case stack_item_kind::flat_row:
                 begin_value(sink_);
+                if (options_.subfield_delimiter() == char_type())
+                {
+                    stack_.emplace_back(stack_item_kind::unmapped);
+                }
+                else
+                {
+                    stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                }
+                break;
+            case stack_item_kind::row_multi_valued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             case stack_item_kind::unmapped:
@@ -1174,7 +1183,7 @@ private:
             }
             case stack_item_kind::row_multi_valued_field:
             case stack_item_kind::column_multi_valued_field:
-                if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
+                if (stack_.back().count_ > 0)
                 {
                     sink.push_back(options_.subfield_delimiter());
                 }
