@@ -208,8 +208,18 @@ private:
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
-            case stack_item_kind::unmapped:
             case stack_item_kind::flat_object:
+                if (options_.subfield_delimiter() == char_type())
+                {
+                    stack_.emplace_back(stack_item_kind::unmapped);
+                }
+                else
+                {
+                    value_buffer_.clear();
+                    stack_.emplace_back(stack_item_kind::row_multi_valued_field);
+                }
+                return true;
+            case stack_item_kind::unmapped:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 return true;
             default: // error
@@ -328,12 +338,9 @@ private:
                 break;
             }
             case stack_item_kind::row:
-                //append_array_path_component();
-                begin_value(sink_);
                 stack_.emplace_back(stack_item_kind::row);
                 break;
             case stack_item_kind::flat_row:
-                begin_value(sink_);
                 if (options_.subfield_delimiter() == char_type())
                 {
                     stack_.emplace_back(stack_item_kind::unmapped);
