@@ -216,7 +216,6 @@ private:
                 else
                 {
                     stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-                    std::cout << "begin_object pathname: " << stack_.back().pathname_ << "\n";                   
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
@@ -248,7 +247,6 @@ private:
                     {
                         for (std::size_t i = 0; i < column_names_.size(); ++i)
                         {
-                            std::cout << "column-" << i << " name: " << column_names_[i] << "\n";
                             if (i > 0)
                             {
                                 sink_.push_back(options_.field_delimiter());
@@ -365,11 +363,11 @@ private:
                 }
                 else
                 {
-                    std::cout << "flat_object->row " << stack_.back().pathname_ << "\n";
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
                     }
+                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
@@ -636,6 +634,7 @@ private:
             case stack_item_kind::object:
             case stack_item_kind::object_multivalued_field:
             {
+                //stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
                 if (stack_[0].count_ == 0)
                 {
                     if (options_.column_names().empty())
