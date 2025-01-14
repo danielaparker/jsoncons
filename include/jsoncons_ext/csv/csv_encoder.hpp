@@ -257,7 +257,6 @@ private:
                         sink_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
                     }
-                    std::cout << "num column_names_: " << column_names_.size() << "\n";
                     for (std::size_t i = 0; i < column_names_.size(); ++i)
                     {
                         if (i > 0)
@@ -644,7 +643,6 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        std::cout << "Number of columns: " << column_names_.size() << "\n";
                     }
                     cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
