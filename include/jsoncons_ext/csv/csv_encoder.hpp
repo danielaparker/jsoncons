@@ -67,7 +67,6 @@ private:
         object,
         row,
         column,
-        object_multivalued_field,
         multivalued_field,
         column_multivalued_field
     };
@@ -220,10 +219,13 @@ private:
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
                 break;
+            case stack_item_kind::column_multivalued_field:
+                break;
             case stack_item_kind::unmapped:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             default: // error
+                std::cout << "visit_begin_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -282,9 +284,12 @@ private:
                  }
                  break;
              }
+            case stack_item_kind::column_multivalued_field:
+                break;
             case stack_item_kind::unmapped:
                 break;
             default:
+                std::cout << "visit_end_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -320,7 +325,7 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 break;
             case stack_item_kind::object:
-                stack_.emplace_back(stack_item_kind::object_multivalued_field);
+                stack_.emplace_back(stack_item_kind::object);
                 break;
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
@@ -378,10 +383,13 @@ private:
             case stack_item_kind::multivalued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
+            case stack_item_kind::column_multivalued_field:
+                break;
             case stack_item_kind::unmapped:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             default: // error
+                std::cout << "visit_begin_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -478,9 +486,12 @@ private:
             case stack_item_kind::column:
                 ++column_index_;
                 break;
+            case stack_item_kind::column_multivalued_field:
+                break;
             case stack_item_kind::unmapped:
                 break;
             default:
+                std::cout << "visit_end_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -552,7 +563,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -635,7 +645,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 //stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
                 if (stack_[0].count_ == 0)
@@ -773,7 +782,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -859,7 +867,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -945,7 +952,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -1028,7 +1034,6 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-            case stack_item_kind::object_multivalued_field:
             {
                 if (stack_[0].count_ == 0)
                 {
@@ -1275,7 +1280,12 @@ private:
                 break;
             }
             case stack_item_kind::multivalued_field:
+                break;
             case stack_item_kind::column_multivalued_field:
+                if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
+                {
+                    sink.push_back(options_.subfield_delimiter());
+                }
                 break;
             default:
                 break;
