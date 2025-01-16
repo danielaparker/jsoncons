@@ -470,8 +470,8 @@ private:
     bool unquoted_empty_value_is_null_:1;
     bool infer_types_:1;
     bool lossless_number_:1;
-    char_type comment_starter_;
-    csv_mapping_kind mapping_;
+    char_type comment_starter_{'\0'};
+    csv_mapping_kind mapping_{};
     std::size_t header_lines_{0};
     std::size_t max_lines_{(std::numeric_limits<std::size_t>::max)()};
     string_type column_types_;
@@ -487,9 +487,7 @@ public:
           trim_trailing_inside_quotes_(false),
           unquoted_empty_value_is_null_(false),
           infer_types_(true),
-          lossless_number_(false),
-          comment_starter_('\0'),
-          mapping_()
+          lossless_number_(false)
     {}
 
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;
@@ -619,15 +617,12 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 private:
-    quote_style_kind quote_style_;
-    float_chars_format float_format_;
-    int8_t precision_;
+    quote_style_kind quote_style_{quote_style_kind::minimal};
+    float_chars_format float_format_{float_chars_format::general};
+    int8_t precision_{0};
     string_type line_delimiter_;
 public:
     basic_csv_encode_options()
-      : quote_style_(quote_style_kind::minimal),
-        float_format_(float_chars_format::general),
-        precision_(0)
     {
         line_delimiter_.push_back('\n');
     }

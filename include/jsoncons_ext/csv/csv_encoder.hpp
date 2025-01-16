@@ -103,7 +103,7 @@ private:
     std::vector<string_type,string_allocator_type> column_names_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
 
-    std::size_t column_index_;
+    std::size_t column_index_{0};
     std::vector<std::size_t> row_counts_;
     string_type buffer_;
     string_type value_buffer_;
@@ -112,8 +112,7 @@ private:
     basic_csv_encoder(const basic_csv_encoder&) = delete;
     basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
 public:
-    basic_csv_encoder(Sink&& sink, 
-                      const Allocator& alloc = Allocator())
+    basic_csv_encoder(Sink&& sink, const Allocator& alloc = Allocator())
        : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>(), alloc)
     {
     }
@@ -124,9 +123,7 @@ public:
       : sink_(std::forward<Sink>(sink)),
         options_(options),
         alloc_(alloc),
-        stack_(),
         fp_(options.float_format(), options.precision()),
-        column_index_(0),
         buffer_(alloc),
         value_buffer_(alloc)
     {
