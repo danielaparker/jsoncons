@@ -102,6 +102,7 @@ private:
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_name_map_;
 
     std::size_t column_index_{0};
     std::vector<std::size_t> row_counts_;
@@ -118,8 +119,8 @@ public:
     }
 
     basic_csv_encoder(Sink&& sink,
-                      const basic_csv_encode_options<CharT>& options, 
-                      const Allocator& alloc = Allocator())
+        const basic_csv_encode_options<CharT>& options, 
+        const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
         options_(options),
         alloc_(alloc),
@@ -370,6 +371,7 @@ private:
                         if (options_.column_names().empty())
                         {
                             column_names_.emplace_back(stack_.back().pathname_);
+                            column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                         }
                         cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                     }
@@ -550,6 +552,7 @@ private:
         if (stack_[0].count_ == 0 && options_.column_names().empty())
         {
             column_names_.emplace_back(stack_.back().pathname_);
+            column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
         }
     }
 
@@ -568,6 +571,7 @@ private:
                         column_names_.emplace_back(stack_.back().pathname_);
                     }
                     cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                 }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
@@ -649,6 +653,7 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
+                        column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                     }
                     cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
