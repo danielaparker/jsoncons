@@ -76,6 +76,7 @@ private:
         stack_item_kind item_kind_;
         std::size_t count_;
         std::string pathname_;
+        std::string pointer_;
 
         stack_item(stack_item_kind item_kind) noexcept
            : item_kind_(item_kind), pathname_{}, count_(0)
@@ -101,6 +102,7 @@ private:
     jsoncons::detail::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
+    std::vector<string_type,string_allocator_type> column_pointers_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_name_map_;
 
@@ -213,6 +215,7 @@ private:
                 else
                 {
                     stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+                    stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
@@ -251,8 +254,7 @@ private:
                             {
                                 sink_.push_back(options_.field_delimiter());
                             }
-                            sink_.append(column_names_[i].data(),
-                                          column_names_[i].length());
+                            sink_.append(column_names_[i].data(), column_names_[i].length());
                         }
                         sink_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
@@ -371,6 +373,7 @@ private:
                         if (options_.column_names().empty())
                         {
                             column_names_.emplace_back(stack_.back().pathname_);
+                            column_pointers_.emplace_back(stack_.back().pathname_);
                             column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                         }
                         cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
@@ -510,9 +513,9 @@ private:
         {
             case stack_item_kind::flat_object:
             {
-                //stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-                //stack_.back().pathname_.push_back('/');
-                //stack_.back().pathname_.append(std::string(name));
+                stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
+                stack_.back().pointer_.push_back('/');
+                stack_.back().pointer_.append(std::string(name));
                 stack_.back().pathname_ = std::string(name);
                 break;
             }
@@ -521,6 +524,9 @@ private:
                 stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
                 stack_.back().pathname_.push_back('/');
                 stack_.back().pathname_.append(std::string(name));
+                stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
+                stack_.back().pointer_.push_back('/');
+                stack_.back().pointer_.append(std::string(name));
                 break;
             }
             case stack_item_kind::column_mapping:
@@ -544,11 +550,15 @@ private:
     
     void append_array_path_component()
     {
-        stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-        stack_.back().pathname_.push_back('/');
         buffer_.clear();
         jsoncons::detail::from_integer(stack_.back().count_, buffer_);
+
+        stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+        stack_.back().pathname_.push_back('/');
         stack_.back().pathname_.append(buffer_);
+        stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
+        stack_.back().pointer_.push_back('/');
+        stack_.back().pointer_.append(buffer_);
         if (stack_[0].count_ == 0 && options_.column_names().empty())
         {
             column_names_.emplace_back(stack_.back().pathname_);
