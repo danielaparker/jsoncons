@@ -365,15 +365,10 @@ private:
                     append_array_path_component();
                     if (stack_[0].count_ == 0)
                     {
-                        //if (options_.column_names().empty())
-                        //{
-                        //    column_pointers_.emplace_back(stack_.back().pointer_);
-                        //}
                         column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                     }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
-                    stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
                 }
                 break;
             case stack_item_kind::flat_object:
