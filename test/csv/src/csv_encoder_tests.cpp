@@ -252,8 +252,8 @@ NY,LON,TOR;LON
         csv::csv_string_encoder encoder(buf, options);
         j.dump(encoder);
 
-        std::cout << buf << "\n"; 
-        //CHECK(expected == buf);
+        //std::cout << buf << "\n"; 
+        CHECK(expected == buf);
     }
         
 }
