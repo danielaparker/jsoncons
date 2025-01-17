@@ -75,12 +75,12 @@ private:
     struct stack_item
     {
         stack_item_kind item_kind_;
-        std::size_t count_;
+        std::size_t count_{0};
         std::string pathname_;
         std::string pointer_;
 
         stack_item(stack_item_kind item_kind) noexcept
-           : item_kind_(item_kind), pathname_{}, count_(0)
+           : item_kind_(item_kind)
         {
         }
 
@@ -104,7 +104,7 @@ private:
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_pointers_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> cname_value_map_;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_name_map_;
 
     std::size_t column_index_{0};
@@ -149,7 +149,7 @@ public:
     {
         stack_.clear();
         column_names_.clear();
-        cname_value_map_.clear();
+        column_pointer_value_map_.clear();
         column_index_ = 0;
         row_counts_.clear();
     }
@@ -271,8 +271,8 @@ private:
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = cname_value_map_.find(column_pointers_[i]);
-                        if (it != cname_value_map_.end())
+                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
+                        if (it != column_pointer_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -379,10 +379,9 @@ private:
                         if (options_.column_names().empty())
                         {
                             column_names_.emplace_back(stack_.back().pathname_);
-                            column_pointers_.emplace_back(stack_.back().pathname_);
-                            column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
+                            column_pointers_.emplace_back(stack_.back().pointer_);
                         }
-                        cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                        column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                     }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -433,14 +432,14 @@ private:
                             options_.line_delimiter().length());
                     }
 
-                    for (std::size_t i = 0; i < column_names_.size(); ++i)
+                    for (std::size_t i = 0; i < column_pointers_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = cname_value_map_.find(column_names_[i]);
-                        if (it != cname_value_map_.end())
+                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
+                        if (it != column_pointer_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -451,8 +450,8 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                auto it = cname_value_map_.find(stack_[stack_.size()-2].pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_[stack_.size()-2].pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     it->second.append(value_buffer_.data(),value_buffer_.length());
                 }
@@ -475,14 +474,14 @@ private:
                             options_.line_delimiter().length());
                     }
                     
-                    for (std::size_t i = 0; i < column_names_.size(); ++i)
+                    for (std::size_t i = 0; i < column_pointers_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = cname_value_map_.find(column_names_[i]);
-                        if (it != cname_value_map_.end())
+                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
+                        if (it != column_pointer_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -522,24 +521,20 @@ private:
                 stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
                 stack_.back().pointer_.push_back('/');
                 stack_.back().pointer_.append(std::string(name));
-                stack_.back().pathname_ = std::string(name);
                 if (options_.column_names().empty())
                 {
-                    column_pointer_name_map_.emplace(stack_.back().pathname_, name);
+                    column_pointer_name_map_.emplace(stack_.back().pointer_, name);
                 }
                 break;
             }
             case stack_item_kind::object:
             {
-                stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-                stack_.back().pathname_.push_back('/');
-                stack_.back().pathname_.append(std::string(name));
                 stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
                 stack_.back().pointer_.push_back('/');
                 stack_.back().pointer_.append(std::string(name));
                 if (options_.column_names().empty())
                 {
-                    column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
+                    column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
                 }
                 break;
             }
@@ -567,17 +562,17 @@ private:
         buffer_.clear();
         jsoncons::detail::from_integer(stack_.back().count_, buffer_);
 
-        stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-        stack_.back().pathname_.push_back('/');
-        stack_.back().pathname_.append(buffer_);
+        //stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
+        //stack_.back().pathname_.push_back('/');
+        //stack_.back().pathname_.append(buffer_);
         stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
         stack_.back().pointer_.push_back('/');
         stack_.back().pointer_.append(buffer_);
         if (stack_[0].count_ == 0 && options_.column_names().empty())
         {
-            column_names_.emplace_back(stack_.back().pathname_);
-            column_pointers_.emplace_back(stack_.back().pathname_);
-            column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
+            column_names_.emplace_back(stack_.back().pointer_);
+            column_pointers_.emplace_back(stack_.back().pointer_);
+            column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
         }
     }
 
@@ -594,12 +589,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -619,10 +614,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -678,18 +673,18 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
                     write_string_value(sv,bo);
                     bo.flush();
-                    cname_value_map_[stack_.back().pathname_] = s;
+                    column_pointer_value_map_[stack_.back().pointer_] = s;
                 }
                 break;
             }
@@ -699,10 +694,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -815,12 +810,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -840,10 +835,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -901,12 +896,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -926,10 +921,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -987,12 +982,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -1012,10 +1007,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -1070,12 +1065,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pathname_);
+                        column_pointers_.emplace_back(stack_.back().pointer_);
                     }
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
@@ -1095,10 +1090,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
+                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
                 }
-                auto it = cname_value_map_.find(stack_.back().pathname_);
-                if (it != cname_value_map_.end())
+                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
+                if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_sink<std::basic_string<CharT>> bo(s);
