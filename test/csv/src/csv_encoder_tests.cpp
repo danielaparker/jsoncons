@@ -1,4 +1,4 @@
-// Copyright 2013-2024 Daniel Parker
+// Copyright 2013-2025 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -9,7 +9,6 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv")
 {
-//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -60,6 +59,8 @@ true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
         
         CHECK(expected == buf);
     }
+
+#if 0
 
     SECTION("array of objects with some missing members to csv")
     {
@@ -226,7 +227,7 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-//#endif   
+#endif   
     /*SECTION("array of subarrays to csv")
     {
         const std::string jtext = R"(
@@ -253,7 +254,7 @@ NY,LON,TOR;LON
 
 TEST_CASE("test json to non-flat csv")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -444,6 +445,6 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-//#endif
+#endif
 }
 

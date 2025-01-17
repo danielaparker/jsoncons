@@ -518,6 +518,10 @@ private:
                 stack_.back().pointer_.push_back('/');
                 stack_.back().pointer_.append(std::string(name));
                 stack_.back().pathname_ = std::string(name);
+                if (options_.column_names().empty())
+                {
+                    column_pointer_name_map_.emplace(stack_.back().pathname_, name);
+                }
                 break;
             }
             case stack_item_kind::object:
@@ -528,6 +532,10 @@ private:
                 stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
                 stack_.back().pointer_.push_back('/');
                 stack_.back().pointer_.append(std::string(name));
+                if (options_.column_names().empty())
+                {
+                    column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
+                }
                 break;
             }
             case stack_item_kind::column_mapping:
@@ -582,7 +590,6 @@ private:
                         column_names_.emplace_back(stack_.back().pathname_);
                     }
                     cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
-                    column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                 }
                 auto it = cname_value_map_.find(stack_.back().pathname_);
                 if (it != cname_value_map_.end())
@@ -664,7 +671,6 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointer_name_map_.emplace(stack_.back().pathname_, stack_.back().pathname_);
                     }
                     cname_value_map_[stack_.back().pathname_] = std::basic_string<CharT>();
                 }
