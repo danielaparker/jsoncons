@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -197,7 +197,9 @@ NY,LON,TOR;LON
         j.dump(encoder);
 
         CHECK(expected == buf);
-    }    
+    }
+//#endif    
+#if 0        
     SECTION("object of arrays and subarrays to csv")
     {
         std::string expected = R"(a,b,c

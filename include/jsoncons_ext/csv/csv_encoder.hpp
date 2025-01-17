@@ -573,7 +573,10 @@ private:
         {
             column_names_.emplace_back(stack_.back().pointer_);
             column_pointers_.emplace_back(stack_.back().pointer_);
-            column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
+            if (stack_.back().item_kind_ == stack_item_kind::row)
+            {
+                column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
+            }
         }
     }
 
