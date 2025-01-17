@@ -61,12 +61,12 @@ private:
     {
         flat_row_mapping,
         row_mapping,
-        column_mapping,
         flat_object,
         flat_row,
         unmapped,
         object,
         row,
+        column_mapping,
         column,
         multivalued_field,
         column_multivalued_field
@@ -336,18 +336,18 @@ private:
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
                 row_counts_.push_back(1);
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
                 break;
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }                
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 begin_value(bo);
                 stack_.emplace_back(stack_item_kind::column_multivalued_field);
                 break;
@@ -544,14 +544,14 @@ private:
             }
             case stack_item_kind::column_mapping:
             {
-                if (column_names_.empty())
+                if (column_pointers_.empty())
                 {
-                    column_names_.emplace_back(name);
+                    column_pointers_.emplace_back(name);
                 }
                 else
                 {
-                    column_names_[0].push_back(options_.field_delimiter());
-                    column_names_[0].append(string_type(name));
+                    column_pointers_[0].push_back(options_.field_delimiter());
+                    column_pointers_[0].append(string_type(name));
                 }
                 break;
             }
@@ -643,17 +643,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_null_value(bo);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_null_value(bo);
                 break;
             }
@@ -722,17 +722,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_string_value(sv,bo);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_string_value(sv,bo);
                 break;
             }
@@ -863,17 +863,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_double_value(val, context, bo, ec);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_double_value(val, context, bo, ec);
                 break;
             }
@@ -949,17 +949,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_int64_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_int64_value(val, bo);
                 break;
             }
@@ -1035,17 +1035,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
@@ -1118,17 +1118,17 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_names_.size() <= row_counts_.back())
+                if (column_pointers_.size() <= row_counts_.back())
                 {
-                    column_names_.emplace_back();
+                    column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_bool_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_names_[row_counts_.back()]);
+                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
                 write_bool_value(val, bo);
                 break;
             }
