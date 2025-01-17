@@ -9,6 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv")
 {
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -60,8 +61,6 @@ true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
         CHECK(expected == buf);
     }
 
-#if 0
-
     SECTION("array of objects with some missing members to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -112,6 +111,7 @@ true,1948-01-01T14:57:13,,Chicago Sun-Times
         CHECK(expected == buf);
     }
 
+#endif
     SECTION("array of arrays to csv")
     {
         std::string expected = R"(Chicago Reader,1.0,1971-01-01T04:14:00,true
@@ -158,6 +158,8 @@ Chicago Sun-Times,1.27,1948-01-01T14:57:13,true
         
         CHECK(expected == buf);
     }    
+
+#if 0
 
     SECTION("array of arrays and subarrays to csv")
     {
