@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -198,7 +198,7 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }
-#endif    
+
     SECTION("object of arrays and subarrays to csv")
     {
         std::string expected = R"(a,b,c
@@ -228,9 +228,13 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-/*   
+//#endif    
+   
     SECTION("array of subarrays to csv")
     {
+        std::string expected = R"(1;2;3,4;5;6
+7;8;9,10;11;12
+)";
         const std::string jtext = R"(
 [
    [[1,2,3],[4,5,6]],
@@ -251,12 +255,12 @@ NY,LON,TOR;LON
         std::cout << buf << "\n"; 
         //CHECK(expected == buf);
     }
-*/        
+        
 }
 
 TEST_CASE("test json to non-flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -447,6 +451,6 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
 }
 
