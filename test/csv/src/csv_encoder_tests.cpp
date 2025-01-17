@@ -111,7 +111,6 @@ true,1948-01-01T14:57:13,,Chicago Sun-Times
         CHECK(expected == buf);
     }
 
-#endif
     SECTION("array of arrays to csv")
     {
         std::string expected = R"(Chicago Reader,1.0,1971-01-01T04:14:00,true
@@ -159,7 +158,6 @@ Chicago Sun-Times,1.27,1948-01-01T14:57:13,true
         CHECK(expected == buf);
     }    
 
-#if 0
 
     SECTION("array of arrays and subarrays to csv")
     {
@@ -229,8 +227,8 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-#endif   
-    /*SECTION("array of subarrays to csv")
+   
+    SECTION("array of subarrays to csv")
     {
         const std::string jtext = R"(
 [
@@ -251,12 +249,13 @@ NY,LON,TOR;LON
 
         std::cout << buf << "\n"; 
         //CHECK(expected == buf);
-    }*/    
+    }    
+#endif
 }
 
 TEST_CASE("test json to non-flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -447,6 +446,6 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
 }
 
