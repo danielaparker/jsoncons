@@ -602,13 +602,11 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_null_value(s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    write_null_value(it->second);
                 }
                 break;
             }
@@ -623,9 +621,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_null_value(s);
-                    it->second.append(s);
+                    write_null_value(it->second);
                 }
                 break;
             }
@@ -693,9 +689,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_string_value(sv, s);
-                    it->second.append(s);
+                    write_string_value(sv, it->second);
                 }
                 break;
             }
@@ -806,13 +800,11 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_double_value(val, context, s, ec);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    write_double_value(val, context, it->second, ec);
                 }
                 break;
             }
@@ -827,9 +819,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_double_value(val, context, s, ec);
-                    it->second.append(s);
+                    write_double_value(val, context, it->second, ec);
                 }
                 break;
             }
@@ -885,13 +875,11 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_int64_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    write_int64_value(val, it->second);
                 }
                 break;
             }
@@ -906,9 +894,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_int64_value(val, s);
-                    it->second.append(s);
+                    write_int64_value(val, it->second);
                 }
                 break;
             }
@@ -964,13 +950,11 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_uint64_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    write_uint64_value(val, it->second);
                 }
                 break;
             }
@@ -985,9 +969,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_uint64_value(val, s);
-                    it->second.append(s);
+                    write_uint64_value(val, it->second);
                 }
                 break;
             }
@@ -1040,13 +1022,11 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_bool_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
                     }
-                    it->second.append(s);
+                    write_bool_value(val, it->second);
                 }
                 break;
             }
@@ -1061,9 +1041,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    write_bool_value(val, s);
-                    it->second.append(s);
+                    write_bool_value(val, it->second);
                 }
                 break;
             }
