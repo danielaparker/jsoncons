@@ -162,11 +162,10 @@ public:
 
 private:
 
-    template <typename AnyWriter>
     void escape_string(const CharT* s,
                        std::size_t length,
                        CharT quote_char, CharT quote_escape_char,
-                       AnyWriter& sink)
+                       string_type& sink)
     {
         const CharT* begin = s;
         const CharT* end = s + length;
@@ -347,8 +346,7 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }                
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                begin_value(bo);
+                begin_value(column_pointers_[row_counts_.back()]);
                 stack_.emplace_back(stack_item_kind::column_multivalued_field);
                 break;
             }
@@ -605,9 +603,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_null_value(bo);
-                    bo.flush();
+                    write_null_value(s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
@@ -628,9 +624,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_null_value(bo);
-                    bo.flush();
+                    write_null_value(s);
                     it->second.append(s);
                 }
                 break;
@@ -641,8 +635,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_null_value(bo);
+                write_null_value(value_buffer_);
                 break;
             }
             case stack_item_kind::column:
@@ -651,14 +644,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_null_value(bo);
+                write_null_value(column_pointers_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_null_value(bo);
+                write_null_value(column_pointers_[row_counts_.back()]);
                 break;
             }
             default:
@@ -687,11 +678,7 @@ private:
                 auto it = column_pointer_value_map_.find(stack_.back().pointer_);
                 if (it != column_pointer_value_map_.end())
                 {
-                    std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_string_value(sv,bo);
-                    bo.flush();
-                    column_pointer_value_map_[stack_.back().pointer_] = s;
+                    write_string_value(sv, column_pointer_value_map_[stack_.back().pointer_]);
                 }
                 break;
             }
@@ -707,9 +694,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_string_value(sv,bo);
-                    bo.flush();
+                    write_string_value(sv, s);
                     it->second.append(s);
                 }
                 break;
@@ -720,8 +705,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_string_value(sv, bo);
+                write_string_value(sv, value_buffer_);
                 break;
             }
             case stack_item_kind::column:
@@ -730,14 +714,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_string_value(sv,bo);
+                write_string_value(sv, column_pointers_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_string_value(sv,bo);
+                write_string_value(sv, column_pointers_[row_counts_.back()]);
                 break;
             }
             default:
@@ -825,9 +807,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_double_value(val, context, bo, ec);
-                    bo.flush();
+                    write_double_value(val, context, s, ec);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
@@ -848,9 +828,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_double_value(val, context, bo, ec);
-                    bo.flush();
+                    write_double_value(val, context, s, ec);
                     it->second.append(s);
                 }
                 break;
@@ -861,8 +839,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_double_value(val, context, bo, ec);
+                write_double_value(val, context, value_buffer_, ec);
                 break;
             }
             case stack_item_kind::column:
@@ -871,14 +848,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_double_value(val, context, bo, ec);
+                write_double_value(val, context, column_pointers_[row_counts_.back()], ec);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_double_value(val, context, bo, ec);
+                write_double_value(val, context, column_pointers_[row_counts_.back()], ec);
                 break;
             }
             default:
@@ -911,9 +886,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_int64_value(val,bo);
-                    bo.flush();
+                    write_int64_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
@@ -934,9 +907,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_int64_value(val,bo);
-                    bo.flush();
+                    write_int64_value(val, s);
                     it->second.append(s);
                 }
                 break;
@@ -947,8 +918,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_int64_value(val, bo);
+                write_int64_value(val, value_buffer_);
                 break;
             }
             case stack_item_kind::column:
@@ -957,14 +927,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_int64_value(val, bo);
+                write_int64_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_int64_value(val, bo);
+                write_int64_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             default:
@@ -997,9 +965,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_uint64_value(val, bo);
-                    bo.flush();
+                    write_uint64_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
@@ -1020,9 +986,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_uint64_value(val, bo);
-                    bo.flush();
+                    write_uint64_value(val, s);
                     it->second.append(s);
                 }
                 break;
@@ -1033,8 +997,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_uint64_value(val, bo);
+                write_uint64_value(val, value_buffer_);
                 break;
             }
             case stack_item_kind::column:
@@ -1043,14 +1006,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_uint64_value(val, bo);
+                write_uint64_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_uint64_value(val, bo);
+                write_uint64_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             default:
@@ -1080,9 +1041,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_bool_value(val,bo);
-                    bo.flush();
+                    write_bool_value(val, s);
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
                         it->second.push_back(options_.subfield_delimiter());
@@ -1103,9 +1062,7 @@ private:
                 if (it != column_pointer_value_map_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::string_sink<std::basic_string<CharT>> bo(s);
-                    write_bool_value(val,bo);
-                    bo.flush();
+                    write_bool_value(val, s);
                     it->second.append(s);
                 }
                 break;
@@ -1116,8 +1073,7 @@ private:
                 {
                     value_buffer_.push_back(options_.subfield_delimiter());
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(value_buffer_);
-                write_bool_value(val, bo);
+                write_bool_value(val, value_buffer_);
                 break;
             }
             case stack_item_kind::column:
@@ -1126,14 +1082,12 @@ private:
                 {
                     column_pointers_.emplace_back();
                 }
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_bool_value(val, bo);
+                write_bool_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                jsoncons::string_sink<std::basic_string<CharT>> bo(column_pointers_[row_counts_.back()]);
-                write_bool_value(val, bo);
+                write_bool_value(val, column_pointers_[row_counts_.back()]);
                 break;
             }
             default:
@@ -1142,8 +1096,7 @@ private:
         return true;
     }
 
-    template <typename AnyWriter>
-    bool do_string_value(const CharT* s, std::size_t length, AnyWriter& sink)
+    bool do_string_value(const CharT* s, std::size_t length, string_type& str)
     {
         bool quote = false;
         if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
@@ -1151,29 +1104,27 @@ private:
             (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
         {
             quote = true;
-            sink.push_back(options_.quote_char());
+            str.push_back(options_.quote_char());
         }
-        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), sink);
+        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), str);
         if (quote)
         {
-            sink.push_back(options_.quote_char());
+            str.push_back(options_.quote_char());
         }
 
         return true;
     }
 
-    template <typename AnyWriter>
-    void write_string_value(const string_view_type& value, AnyWriter& sink)
+    void write_string_value(const string_view_type& value, string_type& str)
     {
-        begin_value(sink);
-        do_string_value(value.data(),value.length(),sink);
+        begin_value(str);
+        do_string_value(value.data(),value.length(), str);
         end_value();
     }
 
-    template <typename AnyWriter>
-    void write_double_value(double val, const ser_context& context, AnyWriter& sink, std::error_code& ec)
+    void write_double_value(double val, const ser_context& context, string_type& str, std::error_code& ec)
     {
-        begin_value(sink);
+        begin_value(str);
 
         if (!std::isfinite(val))
         {
@@ -1181,7 +1132,7 @@ private:
             {
                 if (options_.enable_nan_to_num())
                 {
-                    sink.append(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    str.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                 }
                 else if (options_.enable_nan_to_str())
                 {
@@ -1189,14 +1140,14 @@ private:
                 }
                 else
                 {
-                    sink.append(null_constant().data(), null_constant().size());
+                    str.append(null_constant().data(), null_constant().size());
                 }
             }
             else if (val == std::numeric_limits<double>::infinity())
             {
                 if (options_.enable_inf_to_num())
                 {
-                    sink.append(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    str.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                 }
                 else if (options_.enable_inf_to_str())
                 {
@@ -1204,14 +1155,14 @@ private:
                 }
                 else
                 {
-                    sink.append(null_constant().data(), null_constant().size());
+                    str.append(null_constant().data(), null_constant().size());
                 }
             }
             else
             {
                 if (options_.enable_neginf_to_num())
                 {
-                    sink.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    str.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                 }
                 else if (options_.enable_neginf_to_str())
                 {
@@ -1219,67 +1170,62 @@ private:
                 }
                 else
                 {
-                    sink.append(null_constant().data(), null_constant().size());
+                    str.append(null_constant().data(), null_constant().size());
                 }
             }
         }
         else
         {
-            fp_(val, sink);
+            fp_(val, str);
         }
 
         end_value();
 
     }
 
-    template <typename AnyWriter>
-    void write_int64_value(int64_t val, AnyWriter& sink)
+    void write_int64_value(int64_t val, string_type& str)
     {
-        begin_value(sink);
+        begin_value(str);
 
-        jsoncons::detail::from_integer(val,sink);
+        jsoncons::detail::from_integer(val,str);
 
         end_value();
     }
 
-    template <typename AnyWriter>
-    void write_uint64_value(uint64_t val, AnyWriter& sink)
+    void write_uint64_value(uint64_t val, string_type& str)
     {
-        begin_value(sink);
+        begin_value(str);
 
-        jsoncons::detail::from_integer(val,sink);
+        jsoncons::detail::from_integer(val,str);
 
         end_value();
     }
 
-    template <typename AnyWriter>
-    void write_bool_value(bool val, AnyWriter& sink) 
+    void write_bool_value(bool val, string_type& str) 
     {
-        begin_value(sink);
+        begin_value(str);
 
         if (val)
         {
-            sink.append(true_constant().data(), true_constant().size());
+            str.append(true_constant().data(), true_constant().size());
         }
         else
         {
-            sink.append(false_constant().data(), false_constant().size());
+            str.append(false_constant().data(), false_constant().size());
         }
 
         end_value();
     }
  
-    template <typename AnyWriter>
-    bool write_null_value(AnyWriter& sink) 
+    bool write_null_value(string_type& str) 
     {
-        begin_value(sink);
-        sink.append(null_constant().data(), null_constant().size());
+        begin_value(str);
+        str.append(null_constant().data(), null_constant().size());
         end_value();
         return true;
     }
 
-    template <typename AnyWriter>
-    void begin_value(AnyWriter& sink)
+    void begin_value(string_type& str)
     {
         if (stack_.empty())
         {
@@ -1298,7 +1244,7 @@ private:
                     {
                         if (row_counts_[i] <= row_counts_.back())
                         {
-                            sink.push_back(options_.field_delimiter());
+                            str.push_back(options_.field_delimiter());
                         }
                         else
                         {
@@ -1308,7 +1254,7 @@ private:
                 }
                 if (column_index_ > 0)
                 {
-                    sink.push_back(options_.field_delimiter());
+                    str.push_back(options_.field_delimiter());
                 }
                 break;
             }
@@ -1317,7 +1263,7 @@ private:
             case stack_item_kind::column_multivalued_field:
                 if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
                 {
-                    sink.push_back(options_.subfield_delimiter());
+                    str.push_back(options_.subfield_delimiter());
                 }
                 break;
             default:
