@@ -131,7 +131,18 @@ public:
         buffer_(alloc),
         value_buffer_(alloc)
     {
-        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
+        if (!options.column_mapping().empty())
+        {
+            for (const auto& item : options.column_mapping())
+            {
+                column_paths_.emplace_back(item.first);
+                column_path_name_map_.emplace(item.first, item.second);
+            }
+        }
+        else
+        {
+            jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
+        }
     }
 
     ~basic_csv_encoder() noexcept
@@ -378,11 +389,11 @@ private:
                 {
                     if (stack_[0].count_ == 0)
                     {
-                        if (options_.column_names().empty())
+                        if (options_.column_mapping().empty())
                         {
                             column_paths_.emplace_back(stack_.back().column_path_);
+                            column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                         }
-                        column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                     }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -468,13 +479,19 @@ private:
                 {
                     if (stack_[0].count_ == 0)
                     {
-                        for (std::size_t i = 0; i < column_names_.size(); ++i)
+                        std::size_t col = 0;
+                        for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            if (i > 0)
+                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            if (it != column_path_name_map_.end())
                             {
-                                sink_.push_back(options_.field_delimiter());
+                                if (col > 0)
+                                {
+                                    sink_.push_back(options_.field_delimiter());
+                                }
+                                sink_.append(it->second.data(), it->second.length());
+                                ++col;
                             }
-                            sink_.append(column_names_[i].data(), column_names_[i].length());
                         }
                         sink_.append(options_.line_delimiter().data(), 
                             options_.line_delimiter().length());
@@ -571,13 +588,15 @@ private:
         stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
         stack_.back().column_path_.push_back('/');
         stack_.back().column_path_.append(buffer_);
-        if (stack_[0].count_ == 0 && options_.column_names().empty())
+        if (stack_[0].count_ == 0)
         {
-            column_names_.emplace_back(stack_.back().column_path_);
-            column_paths_.emplace_back(stack_.back().column_path_);
-            if (stack_.back().item_kind_ == stack_item_kind::row)
+            if (options_.column_mapping().empty())
             {
-                column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
+                column_paths_.emplace_back(stack_.back().column_path_);
+                if (stack_.back().item_kind_ == stack_item_kind::row)
+                {
+                    column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
+                }
             }
         }
     }
@@ -592,9 +611,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pathname_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -664,9 +682,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().column_path_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -790,9 +807,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pathname_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -865,9 +881,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pathname_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -940,9 +955,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pathname_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -1012,9 +1026,8 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_names().empty())
+                    if (options_.column_mapping().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pathname_);
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
