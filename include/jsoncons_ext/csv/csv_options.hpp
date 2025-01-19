@@ -812,7 +812,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& column_mapping(const std::vector<std::string,std::string>& value)
+    basic_csv_options& column_mapping(const std::vector<std::pair<std::string,std::string>>& value)
     {
         this->column_mapping_ = value;
         return *this;
