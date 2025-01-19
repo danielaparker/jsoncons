@@ -77,7 +77,7 @@ private:
         stack_item_kind item_kind_;
         std::size_t count_{0};
         std::string pathname_;
-        std::string pointer_;
+        std::string column_path_;
 
         stack_item(stack_item_kind item_kind) noexcept
            : item_kind_(item_kind)
@@ -103,9 +103,9 @@ private:
     jsoncons::detail::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<string_type,string_allocator_type> column_pointers_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_value_map_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_pointer_name_map_;
+    std::vector<string_type,string_allocator_type> column_paths_;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
 
     std::size_t column_index_{0};
     std::vector<std::size_t> row_counts_;
@@ -149,7 +149,7 @@ public:
     {
         stack_.clear();
         column_names_.clear();
-        column_pointer_value_map_.clear();
+        column_path_value_map_.clear();
         column_index_ = 0;
         row_counts_.clear();
     }
@@ -215,7 +215,7 @@ private:
                 else
                 {
                     stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
-                    stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
+                    stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
@@ -249,10 +249,10 @@ private:
                     if (stack_[0].count_ == 0)
                     {
                         std::size_t col = 0;
-                        for (std::size_t i = 0; i < column_pointers_.size(); ++i)
+                        for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_pointer_name_map_.find(column_pointers_[i]);
-                            if (it != column_pointer_name_map_.end())
+                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
                                 {
@@ -264,14 +264,14 @@ private:
                         }
                         sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                     }
-                    for (std::size_t i = 0; i < column_pointers_.size(); ++i)
+                    for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
-                        if (it != column_pointer_value_map_.end())
+                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -282,7 +282,7 @@ private:
                 break;
             case stack_item_kind::column_mapping:
              {
-                 for (const auto& item : column_pointers_)
+                 for (const auto& item : column_paths_)
                  {
                      sink_.append(item.data(), item.size());
                      sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
@@ -335,18 +335,18 @@ private:
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
                 row_counts_.push_back(1);
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
                 break;
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }                
-                begin_value(column_pointers_[row_counts_.back()]);
+                begin_value(column_paths_[row_counts_.back()]);
                 stack_.emplace_back(stack_item_kind::column_multivalued_field);
                 break;
             }
@@ -363,7 +363,7 @@ private:
                     append_array_path_component();
                     if (stack_[0].count_ == 0)
                     {
-                        column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                        column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                     }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -380,9 +380,9 @@ private:
                     {
                         if (options_.column_names().empty())
                         {
-                            column_pointers_.emplace_back(stack_.back().pointer_);
+                            column_paths_.emplace_back(stack_.back().column_path_);
                         }
-                        column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                        column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                     }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -419,13 +419,13 @@ private:
             case stack_item_kind::flat_row:
                 if (stack_[stack_.size()-2].item_kind_ == stack_item_kind::flat_row_mapping)
                 {
-                    if (stack_[0].count_ == 0 && !column_pointer_name_map_.empty())
+                    if (stack_[0].count_ == 0 && !column_path_name_map_.empty())
                     {
                         std::size_t col = 0;
-                        for (std::size_t i = 0; i < column_pointers_.size(); ++i)
+                        for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_pointer_name_map_.find(column_pointers_[i]);
-                            if (it != column_pointer_name_map_.end())
+                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
                                 {
@@ -438,14 +438,14 @@ private:
                         sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                     }
 
-                    for (std::size_t i = 0; i < column_pointers_.size(); ++i)
+                    for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
-                        if (it != column_pointer_value_map_.end())
+                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -456,8 +456,8 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                auto it = column_pointer_value_map_.find(stack_[stack_.size()-2].pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_[stack_.size()-2].column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     it->second.append(value_buffer_.data(),value_buffer_.length());
                 }
@@ -480,14 +480,14 @@ private:
                             options_.line_delimiter().length());
                     }
                     
-                    for (std::size_t i = 0; i < column_pointers_.size(); ++i)
+                    for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             sink_.push_back(options_.field_delimiter());
                         }
-                        auto it = column_pointer_value_map_.find(column_pointers_[i]);
-                        if (it != column_pointer_value_map_.end())
+                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(),it->second.length());
                             it->second.clear();
@@ -524,36 +524,36 @@ private:
         {
             case stack_item_kind::flat_object:
             {
-                stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
-                stack_.back().pointer_.push_back('/');
-                stack_.back().pointer_.append(std::string(name));
+                stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
+                stack_.back().column_path_.push_back('/');
+                stack_.back().column_path_.append(std::string(name));
                 if (options_.column_names().empty())
                 {
-                    column_pointer_name_map_.emplace(stack_.back().pointer_, name);
+                    column_path_name_map_.emplace(stack_.back().column_path_, name);
                 }
                 break;
             }
             case stack_item_kind::object:
             {
-                stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
-                stack_.back().pointer_.push_back('/');
-                stack_.back().pointer_.append(std::string(name));
+                stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
+                stack_.back().column_path_.push_back('/');
+                stack_.back().column_path_.append(std::string(name));
                 if (options_.column_names().empty())
                 {
-                    column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
+                    column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
                 }
                 break;
             }
             case stack_item_kind::column_mapping:
             {
-                if (column_pointers_.empty())
+                if (column_paths_.empty())
                 {
-                    column_pointers_.emplace_back(name);
+                    column_paths_.emplace_back(name);
                 }
                 else
                 {
-                    column_pointers_[0].push_back(options_.field_delimiter());
-                    column_pointers_[0].append(string_type(name));
+                    column_paths_[0].push_back(options_.field_delimiter());
+                    column_paths_[0].append(string_type(name));
                 }
                 break;
             }
@@ -568,16 +568,16 @@ private:
         buffer_.clear();
         jsoncons::detail::from_integer(stack_.back().count_, buffer_);
 
-        stack_.back().pointer_ = stack_[stack_.size()-2].pointer_;
-        stack_.back().pointer_.push_back('/');
-        stack_.back().pointer_.append(buffer_);
+        stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
+        stack_.back().column_path_.push_back('/');
+        stack_.back().column_path_.append(buffer_);
         if (stack_[0].count_ == 0 && options_.column_names().empty())
         {
-            column_names_.emplace_back(stack_.back().pointer_);
-            column_pointers_.emplace_back(stack_.back().pointer_);
+            column_names_.emplace_back(stack_.back().column_path_);
+            column_paths_.emplace_back(stack_.back().column_path_);
             if (stack_.back().item_kind_ == stack_item_kind::row)
             {
-                column_pointer_name_map_.emplace(stack_.back().pointer_, stack_.back().pointer_);
+                column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
             }
         }
     }
@@ -595,12 +595,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -616,10 +616,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_null_value(it->second);
                 }
@@ -636,16 +636,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_null_value(column_pointers_[row_counts_.back()]);
+                write_null_value(column_paths_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_null_value(column_pointers_[row_counts_.back()]);
+                write_null_value(column_paths_[row_counts_.back()]);
                 break;
             }
             default:
@@ -666,15 +666,15 @@ private:
                 {
                     if (options_.column_names().empty())
                     {
-                        column_names_.emplace_back(stack_.back().pointer_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_names_.emplace_back(stack_.back().column_path_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
-                    write_string_value(sv, column_pointer_value_map_[stack_.back().pointer_]);
+                    write_string_value(sv, column_path_value_map_[stack_.back().column_path_]);
                 }
                 break;
             }
@@ -684,10 +684,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_string_value(sv, it->second);
                 }
@@ -704,16 +704,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_string_value(sv, column_pointers_[row_counts_.back()]);
+                write_string_value(sv, column_paths_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_string_value(sv, column_pointers_[row_counts_.back()]);
+                write_string_value(sv, column_paths_[row_counts_.back()]);
                 break;
             }
             default:
@@ -793,12 +793,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -814,10 +814,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_double_value(val, context, it->second, ec);
                 }
@@ -834,16 +834,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_double_value(val, context, column_pointers_[row_counts_.back()], ec);
+                write_double_value(val, context, column_paths_[row_counts_.back()], ec);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_double_value(val, context, column_pointers_[row_counts_.back()], ec);
+                write_double_value(val, context, column_paths_[row_counts_.back()], ec);
                 break;
             }
             default:
@@ -868,12 +868,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -889,10 +889,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_int64_value(val, it->second);
                 }
@@ -909,16 +909,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_int64_value(val, column_pointers_[row_counts_.back()]);
+                write_int64_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_int64_value(val, column_pointers_[row_counts_.back()]);
+                write_int64_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             default:
@@ -943,12 +943,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -964,10 +964,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_uint64_value(val, it->second);
                 }
@@ -984,16 +984,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_uint64_value(val, column_pointers_[row_counts_.back()]);
+                write_uint64_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_uint64_value(val, column_pointers_[row_counts_.back()]);
+                write_uint64_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             default:
@@ -1015,12 +1015,12 @@ private:
                     if (options_.column_names().empty())
                     {
                         column_names_.emplace_back(stack_.back().pathname_);
-                        column_pointers_.emplace_back(stack_.back().pointer_);
+                        column_paths_.emplace_back(stack_.back().column_path_);
                     }
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -1036,10 +1036,10 @@ private:
                 append_array_path_component();
                 if (stack_[0].count_ == 0)
                 {
-                    column_pointer_value_map_[stack_.back().pointer_] = std::basic_string<CharT>();
+                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                auto it = column_pointer_value_map_.find(stack_.back().pointer_);
-                if (it != column_pointer_value_map_.end())
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
+                if (it != column_path_value_map_.end())
                 {
                     write_bool_value(val, it->second);
                 }
@@ -1056,16 +1056,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_pointers_.size() <= row_counts_.back())
+                if (column_paths_.size() <= row_counts_.back())
                 {
-                    column_pointers_.emplace_back();
+                    column_paths_.emplace_back();
                 }
-                write_bool_value(val, column_pointers_[row_counts_.back()]);
+                write_bool_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_bool_value(val, column_pointers_[row_counts_.back()]);
+                write_bool_value(val, column_paths_[row_counts_.back()]);
                 break;
             }
             default:

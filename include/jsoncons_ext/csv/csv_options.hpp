@@ -293,6 +293,7 @@ private:
     string_type inf_to_str_;
     string_type neginf_to_str_;
     string_type column_names_;
+    std::vector<std::pair<std::string,std::string>> column_mapping_; 
 
 protected:
     basic_csv_options_common()
@@ -341,9 +342,14 @@ public:
         return quote_escape_char_;
     }
 
-    string_type column_names() const 
+    const string_type& column_names() const 
     {
         return column_names_;
+    }
+
+    const std::vector<std::pair<std::string,std::string>>& column_mapping() const 
+    {
+        return column_mapping_;
     }
 
     bool enable_nan_to_num() const
@@ -686,6 +692,7 @@ public:
     using basic_csv_decode_options<CharT>::quote_char;
     using basic_csv_decode_options<CharT>::quote_escape_char;
     using basic_csv_decode_options<CharT>::column_names;
+    using basic_csv_decode_options<CharT>::column_mapping;
     using basic_csv_decode_options<CharT>::header_lines; 
     using basic_csv_decode_options<CharT>::assume_header; 
     using basic_csv_decode_options<CharT>::ignore_empty_values; 
@@ -802,6 +809,12 @@ public:
     basic_csv_options& column_names(const string_type& value)
     {
         this->column_names_ = value;
+        return *this;
+    }
+
+    basic_csv_options& column_mapping(const std::vector<std::string,std::string>& value)
+    {
+        this->column_mapping_ = value;
         return *this;
     }
 
