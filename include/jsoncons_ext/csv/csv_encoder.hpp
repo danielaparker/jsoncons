@@ -104,6 +104,7 @@ private:
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_paths_;
+    std::vector<string_type,string_allocator_type> column_rows_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
 
@@ -343,24 +344,6 @@ private:
             case stack_item_kind::object:
                 stack_.emplace_back(stack_item_kind::object);
                 break;
-            case stack_item_kind::column_mapping:
-                stack_.emplace_back(stack_item_kind::column);
-                row_counts_.push_back(1);
-                if (column_paths_.size() <= row_counts_.back())
-                {
-                    column_paths_.emplace_back();
-                }
-                break;
-            case stack_item_kind::column:
-            {
-                if (column_paths_.size() <= row_counts_.back())
-                {
-                    column_paths_.emplace_back();
-                }                
-                begin_value(column_paths_[row_counts_.back()]);
-                stack_.emplace_back(stack_item_kind::column_multivalued_field);
-                break;
-            }
             case stack_item_kind::row:
                 stack_.emplace_back(stack_item_kind::row);
                 break;
@@ -402,6 +385,24 @@ private:
             case stack_item_kind::multivalued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
+            case stack_item_kind::column_mapping:
+                stack_.emplace_back(stack_item_kind::column);
+                row_counts_.push_back(1);
+                if (column_rows_.size() <= row_counts_.back())
+                {
+                    column_rows_.emplace_back();
+                }
+                break;
+            case stack_item_kind::column:
+            {
+                if (column_rows_.size() <= row_counts_.back())
+                {
+                    column_rows_.emplace_back();
+                }                
+                begin_value(column_rows_[row_counts_.back()]);
+                stack_.emplace_back(stack_item_kind::column_multivalued_field);
+                break;
+            }
             case stack_item_kind::column_multivalued_field:
                 break;
             case stack_item_kind::unmapped:
@@ -654,16 +655,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_null_value(column_paths_[row_counts_.back()]);
+                write_null_value(column_rows_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_null_value(column_paths_[row_counts_.back()]);
+                write_null_value(column_rows_[row_counts_.back()]);
                 break;
             }
             default:
@@ -721,16 +722,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_string_value(sv, column_paths_[row_counts_.back()]);
+                write_string_value(sv, column_rows_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_string_value(sv, column_paths_[row_counts_.back()]);
+                write_string_value(sv, column_rows_[row_counts_.back()]);
                 break;
             }
             default:
@@ -850,16 +851,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_double_value(val, context, column_paths_[row_counts_.back()], ec);
+                write_double_value(val, context, column_rows_[row_counts_.back()], ec);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_double_value(val, context, column_paths_[row_counts_.back()], ec);
+                write_double_value(val, context, column_rows_[row_counts_.back()], ec);
                 break;
             }
             default:
@@ -924,16 +925,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_int64_value(val, column_paths_[row_counts_.back()]);
+                write_int64_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_int64_value(val, column_paths_[row_counts_.back()]);
+                write_int64_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             default:
@@ -998,16 +999,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_uint64_value(val, column_paths_[row_counts_.back()]);
+                write_uint64_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_uint64_value(val, column_paths_[row_counts_.back()]);
+                write_uint64_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             default:
@@ -1069,16 +1070,16 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_paths_.size() <= row_counts_.back())
+                if (column_rows_.size() <= row_counts_.back())
                 {
-                    column_paths_.emplace_back();
+                    column_rows_.emplace_back();
                 }
-                write_bool_value(val, column_paths_[row_counts_.back()]);
+                write_bool_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
             {
-                write_bool_value(val, column_paths_[row_counts_.back()]);
+                write_bool_value(val, column_rows_[row_counts_.back()]);
                 break;
             }
             default:
