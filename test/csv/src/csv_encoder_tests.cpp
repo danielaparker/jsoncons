@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv with column mappings")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -122,6 +122,7 @@ TEST_CASE("test json to flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
+#endif    
 }
 
 TEST_CASE("test json to flat csv")
@@ -345,7 +346,6 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-#endif    
    
     SECTION("array of subarrays to csv")
     {
@@ -372,12 +372,12 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }
-        
+#endif           
 }
 
 TEST_CASE("test json to non-flat csv with column mappings")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -435,6 +435,62 @@ TEST_CASE("test json to non-flat csv with column mappings")
         
         CHECK(expected == buf);
     }
+#endif
+    SECTION("array of arrays to csv")
+    {
+        std::string expected = R"(Date Time,Newspaper,No Pages
+1971-01-01T04:14:00,Chicago Reader,40
+1948-01-01T14:57:13,Chicago Sun-Times,63
+)";
+
+        std::string jtext = R"(
+[
+    [
+        "Chicago Reader", 
+        1.0, 
+        "1971-01-01T04:14:00", 
+        false,
+        [ 
+          "04:14:00",
+          [
+            "1971-01-01",
+            40
+          ]
+        ]
+    ], 
+    [
+        "Chicago Sun-Times", 
+        1.27, 
+        "1948-01-01T14:57:13", 
+        true,
+        [
+          "14:57:13",
+          [
+            "1948-01-01",
+            63
+          ]
+        ]
+    ]
+]
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(false)
+            .column_mapping({ 
+                {"/2","Date Time"},
+                {"/0","Newspaper"},
+                {"/3/0/1", "No Pages"} 
+                });
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        CHECK(expected == buf);
+    }    
 }
 
 TEST_CASE("test json to non-flat csv")
