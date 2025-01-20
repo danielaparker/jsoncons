@@ -316,6 +316,33 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }
+   
+    SECTION("array of subarrays to csv")
+    {
+        std::string expected = R"(1;2;3,4;5;6
+7;8;9,10;11;12
+)";
+        const std::string jtext = R"(
+[
+   [[1,2,3],[4,5,6]],
+   [[7,8,9],[10,11,12]]   
+]
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .subfield_delimiter(';');
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        //std::cout << buf << "\n"; 
+        CHECK(expected == buf);
+    }
+#endif           
 
     SECTION("object of arrays and subarrays to csv")
     {
@@ -346,33 +373,6 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-   
-    SECTION("array of subarrays to csv")
-    {
-        std::string expected = R"(1;2;3,4;5;6
-7;8;9,10;11;12
-)";
-        const std::string jtext = R"(
-[
-   [[1,2,3],[4,5,6]],
-   [[7,8,9],[10,11,12]]   
-]
-        )";
-
-        auto j = jsoncons::json::parse(jtext);
-        //std::cout << pretty_print(j) << "\n";
-
-        auto options = csv::csv_options{}
-            .subfield_delimiter(';');
-
-        std::string buf;
-        csv::csv_string_encoder encoder(buf, options);
-        j.dump(encoder);
-
-        //std::cout << buf << "\n"; 
-        CHECK(expected == buf);
-    }
-#endif           
 }
 
 TEST_CASE("test json to non-flat csv with column mappings")
@@ -435,7 +435,6 @@ TEST_CASE("test json to non-flat csv with column mappings")
         
         CHECK(expected == buf);
     }
-#endif
     SECTION("array of arrays to csv")
     {
         std::string expected = R"(Date Time,Newspaper,No Pages
@@ -491,6 +490,7 @@ TEST_CASE("test json to non-flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
+#endif
 }
 
 TEST_CASE("test json to non-flat csv")

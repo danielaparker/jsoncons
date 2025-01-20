@@ -140,7 +140,7 @@ public:
                 column_path_name_map_.emplace(item.first, item.second);
             }
         }
-        else
+        else if (!options.column_names().empty())
         {
             jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
         }
@@ -294,7 +294,18 @@ private:
                 break;
             case stack_item_kind::column_mapping:
              {
+                 bool first = true;
                  for (const auto& item : column_paths_)
+                 {
+                     if (!first)
+                     {
+                         sink_.push_back(options_.field_delimiter());
+                         first = false;
+                     }
+                     sink_.append(item.data(), item.size());
+                 }
+                 //sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                 for (const auto& item : column_rows_)
                  {
                      sink_.append(item.data(), item.size());
                      sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
