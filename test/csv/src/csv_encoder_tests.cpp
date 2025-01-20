@@ -67,6 +67,61 @@ TEST_CASE("test json to flat csv with column mappings")
         
         CHECK(expected == buf);
     }
+
+    SECTION("array of arrays to csv")
+    {
+        std::string expected = R"(Date Time,Newspaper
+1971-01-01T04:14:00,Chicago Reader
+1948-01-01T14:57:13,Chicago Sun-Times
+)";
+
+        std::string jtext = R"(
+[
+    [
+        "Chicago Reader", 
+        1.0, 
+        "1971-01-01T04:14:00", 
+        true,
+        [ 
+          "04:14:00",
+          [
+            "1971-01-01",
+            40
+          ]
+        ]
+    ], 
+    [
+        "Chicago Sun-Times", 
+        1.27, 
+        "1948-01-01T14:57:13", 
+        true,
+        [
+          "14:57:13",
+          [
+            "1948-01-01",
+            63
+          ]
+        ]
+    ]
+]
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(true)
+            .column_mapping({ 
+                {"/2","Date Time"},
+                {"/0","Newspaper"} 
+                });
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        CHECK(expected == buf);
+    }    
 }
 
 TEST_CASE("test json to flat csv")
