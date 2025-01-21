@@ -99,6 +99,7 @@ private:
 
     Sink sink_;
     const basic_csv_encode_options<CharT> options_;
+    bool has_column_mapping_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -129,6 +130,7 @@ public:
         const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
         options_(options),
+        has_column_mapping_(!options.column_mapping().empty()),
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
         buffer_(alloc),
@@ -432,7 +434,7 @@ private:
                 {
                     if (stack_[0].count_ == 0)
                     {
-                        if (options_.column_mapping().empty())
+                        if (!has_column_mapping_)
                         {
                             column_paths_.emplace_back(stack_.back().column_path_);
                             column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
@@ -645,7 +647,7 @@ private:
         stack_.back().column_path_.append(buffer_);
         if (stack_[0].count_ == 0)
         {
-            if (options_.column_mapping().empty())
+            if (!has_column_mapping_)
             {
                 column_paths_.emplace_back(stack_.back().column_path_);
                 if (stack_.back().item_kind_ == stack_item_kind::row)
@@ -666,7 +668,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
@@ -730,7 +732,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
@@ -848,7 +850,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
@@ -915,7 +917,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
@@ -982,7 +984,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }
@@ -1046,7 +1048,7 @@ private:
             {
                 if (stack_[0].count_ == 0)
                 {
-                    if (options_.column_mapping().empty())
+                    if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
                     }

@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv with column mappings")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -122,12 +122,12 @@ TEST_CASE("test json to flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-#endif    
+//#endif    
 }
 
 TEST_CASE("test json to flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -342,7 +342,7 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }
-#endif           
+//#endif           
 
     SECTION("object of arrays and subarrays to csv")
     {
@@ -377,7 +377,7 @@ NY,LON,TOR;LON
 
 TEST_CASE("test json to non-flat csv with column mappings")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -490,12 +490,12 @@ TEST_CASE("test json to non-flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
 }
 
 TEST_CASE("test json to non-flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -686,6 +686,6 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
 }
 
