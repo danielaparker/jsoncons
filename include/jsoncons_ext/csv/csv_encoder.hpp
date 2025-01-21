@@ -98,15 +98,27 @@ private:
     };
 
     Sink sink_;
-    const basic_csv_encode_options<CharT> options_;
     bool flat_;
     bool has_column_mapping_;
+    bool has_column_names_;
     char_type field_delimiter_;
     char_type subfield_delimiter_;
     string_type line_delimiter_;
     quote_style_kind quote_style_;
     char_type quote_char_;
     char_type quote_escape_char_;
+    bool enable_nan_to_num_;
+    string_type nan_to_num_;
+    bool enable_nan_to_str_;
+    string_type nan_to_str_;
+    bool enable_inf_to_num_;
+    string_type inf_to_num_;
+    bool enable_inf_to_str_;
+    string_type inf_to_str_;
+    bool enable_neginf_to_num_;
+    string_type neginf_to_num_;
+    bool enable_neginf_to_str_;
+    string_type neginf_to_str_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -136,15 +148,27 @@ public:
         const basic_csv_encode_options<CharT>& options, 
         const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
-        options_(options),
         flat_(options.flat()),
         has_column_mapping_(!options.column_mapping().empty()),
+        has_column_names_(!options.column_names().empty()),
         field_delimiter_(options.field_delimiter()),
         subfield_delimiter_(options.subfield_delimiter()),
         line_delimiter_(options.line_delimiter()),
         quote_style_(options.quote_style()),
         quote_char_(options.quote_char()),
         quote_escape_char_(options.quote_escape_char()),
+        enable_nan_to_num_(options.enable_nan_to_num()),
+        nan_to_num_(options.nan_to_num()),
+        enable_nan_to_str_(options.enable_nan_to_str()),
+        nan_to_str_(options.nan_to_str()),
+        enable_inf_to_num_(options.enable_inf_to_num()),
+        inf_to_num_(options.inf_to_num()),
+        enable_inf_to_str_(options.enable_inf_to_str()),
+        inf_to_str_(options.inf_to_str()),
+        enable_neginf_to_num_(options.enable_neginf_to_num()),
+        neginf_to_num_(options.neginf_to_num()),
+        enable_neginf_to_str_(options.enable_neginf_to_str()),
+        neginf_to_str_(options.neginf_to_str()),
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
         buffer_(alloc),
@@ -614,7 +638,7 @@ private:
                 stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                 stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
-                if (options_.column_names().empty())
+                if (!has_column_names_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, name);
                 }
@@ -625,7 +649,7 @@ private:
                 stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                 stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
-                if (options_.column_names().empty())
+                if (!has_column_names_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
                 }
@@ -1147,13 +1171,13 @@ private:
         {
             if ((std::isnan)(val))
             {
-                if (options_.enable_nan_to_num())
+                if (enable_nan_to_num_)
                 {
-                    str.append(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    str.append(nan_to_num_.data(), nan_to_num_.length());
                 }
-                else if (options_.enable_nan_to_str())
+                else if (enable_nan_to_str_)
                 {
-                    visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    visit_string(nan_to_str_, semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1162,13 +1186,13 @@ private:
             }
             else if (val == std::numeric_limits<double>::infinity())
             {
-                if (options_.enable_inf_to_num())
+                if (enable_inf_to_num_)
                 {
-                    str.append(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    str.append(inf_to_num_.data(), inf_to_num_.length());
                 }
-                else if (options_.enable_inf_to_str())
+                else if (enable_inf_to_str_)
                 {
-                    visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(inf_to_str_, semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1177,13 +1201,13 @@ private:
             }
             else
             {
-                if (options_.enable_neginf_to_num())
+                if (enable_neginf_to_num_)
                 {
-                    str.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    str.append(neginf_to_num_.data(), neginf_to_num_.length());
                 }
-                else if (options_.enable_neginf_to_str())
+                else if (enable_neginf_to_str_)
                 {
-                    visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(neginf_to_str_, semantic_tag::none, context, ec);
                 }
                 else
                 {
