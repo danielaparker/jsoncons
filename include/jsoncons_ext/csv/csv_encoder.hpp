@@ -99,7 +99,11 @@ private:
 
     Sink sink_;
     const basic_csv_encode_options<CharT> options_;
+    bool flat_;
     bool has_column_mapping_;
+    char_type field_delimiter_;
+    char_type subfield_delimiter_;
+    string_type line_delimiter_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -130,7 +134,11 @@ public:
         const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
         options_(options),
+        flat_(options.flat()),
         has_column_mapping_(!options.column_mapping().empty()),
+        field_delimiter_(options.field_delimiter()),
+        subfield_delimiter_(options.subfield_delimiter()),
+        line_delimiter_(options.line_delimiter()),
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
         buffer_(alloc),
@@ -225,7 +233,7 @@ private:
                 stack_.emplace_back(stack_item_kind::object);
                 break;
             case stack_item_kind::flat_object:
-                if (options_.subfield_delimiter() == char_type())
+                if (subfield_delimiter_ == char_type())
                 {
                     stack_.emplace_back(stack_item_kind::unmapped);
                 }
@@ -273,19 +281,19 @@ private:
                             {
                                 if (col > 0)
                                 {
-                                    sink_.push_back(options_.field_delimiter());
+                                    sink_.push_back(field_delimiter_);
                                 }
                                 sink_.append(it->second.data(), it->second.length());
                                 ++col;
                             }
                         }
-                        sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                        sink_.append(line_delimiter_.data(), line_delimiter_.length());
                     }
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
-                            sink_.push_back(options_.field_delimiter());
+                            sink_.push_back(field_delimiter_);
                         }
                         auto it = column_path_value_map_.find(column_paths_[i]);
                         if (it != column_path_value_map_.end())
@@ -294,7 +302,7 @@ private:
                             it->second.clear();
                         }
                     }
-                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                    sink_.append(line_delimiter_.data(), line_delimiter_.length());
                 }
                 break;
             case stack_item_kind::column_mapping:
@@ -304,12 +312,12 @@ private:
                  {
                      if (!first)
                      {
-                         sink_.push_back(options_.field_delimiter());
+                         sink_.push_back(field_delimiter_);
                          first = false;
                      }
                      sink_.append(item.data(), item.size());
                  }
-                 sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                 sink_.append(line_delimiter_.data(), line_delimiter_.length());
                  
                  std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
                  for (const auto& item : column_path_column_map_)
@@ -341,11 +349,11 @@ private:
                              {
                                  for (std::size_t i = 0; i < missing_cols; ++i)
                                  {
-                                     sink_.push_back(options_.field_delimiter());
+                                     sink_.push_back(field_delimiter_);
                                  }
                                  if (!first)
                                  {
-                                     sink_.push_back(options_.field_delimiter());
+                                     sink_.push_back(field_delimiter_);
                                  }
                                  else
                                  {
@@ -357,7 +365,7 @@ private:
                          }
                          if (!done)
                          {
-                             sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                             sink_.append(line_delimiter_.data(), line_delimiter_.length());
                          }
                      }
                  }
@@ -384,7 +392,7 @@ private:
     {
         if (stack_.empty())
         {
-            if (options_.flat())
+            if (flat_)
             {
                 stack_.emplace_back(stack_item_kind::flat_row_mapping);
             }
@@ -410,7 +418,7 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 break;
             case stack_item_kind::flat_row:
-                if (options_.subfield_delimiter() == char_type())
+                if (subfield_delimiter_ == char_type())
                 {
                     stack_.emplace_back(stack_item_kind::unmapped);
                 }
@@ -426,7 +434,7 @@ private:
                 }
                 break;
             case stack_item_kind::flat_object:
-                if (options_.subfield_delimiter() == char_type())
+                if (subfield_delimiter_ == char_type())
                 {
                     stack_.emplace_back(stack_item_kind::unmapped);
                 }
@@ -495,20 +503,20 @@ private:
                             {
                                 if (col > 0)
                                 {
-                                    sink_.push_back(options_.field_delimiter());
+                                    sink_.push_back(field_delimiter_);
                                 }
                                 sink_.append(it->second.data(), it->second.length());
                                 ++col;
                             }
                         }
-                        sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                        sink_.append(line_delimiter_.data(), line_delimiter_.length());
                     }
 
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
-                            sink_.push_back(options_.field_delimiter());
+                            sink_.push_back(field_delimiter_);
                         }
                         auto it = column_path_value_map_.find(column_paths_[i]);
                         if (it != column_path_value_map_.end())
@@ -517,7 +525,7 @@ private:
                             it->second.clear();
                         }
                     }
-                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                    sink_.append(line_delimiter_.data(), line_delimiter_.length());
                 }
                 break;
             case stack_item_kind::multivalued_field:
@@ -542,21 +550,21 @@ private:
                             {
                                 if (col > 0)
                                 {
-                                    sink_.push_back(options_.field_delimiter());
+                                    sink_.push_back(field_delimiter_);
                                 }
                                 sink_.append(it->second.data(), it->second.length());
                                 ++col;
                             }
                         }
-                        sink_.append(options_.line_delimiter().data(), 
-                            options_.line_delimiter().length());
+                        sink_.append(line_delimiter_.data(), 
+                            line_delimiter_.length());
                     }
                     
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
                         if (i > 0)
                         {
-                            sink_.push_back(options_.field_delimiter());
+                            sink_.push_back(field_delimiter_);
                         }
                         auto it = column_path_value_map_.find(column_paths_[i]);
                         if (it != column_path_value_map_.end())
@@ -565,7 +573,7 @@ private:
                             it->second.clear();
                         }
                     }
-                    sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                    sink_.append(line_delimiter_.data(), line_delimiter_.length());
                 }
                 break;
             case stack_item_kind::column:
@@ -625,7 +633,7 @@ private:
                 }
                 else
                 {
-                    column_paths_[0].push_back(options_.field_delimiter());
+                    column_paths_[0].push_back(field_delimiter_);
                     column_paths_[0].append(string_type(name));
                 }
                 column_it_ = column_path_column_map_.emplace(string_type(name), column_type{}).first;
@@ -677,9 +685,9 @@ private:
                 auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!it->second.empty() && subfield_delimiter_ != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        it->second.push_back(subfield_delimiter_);
                     }
                     write_null_value(it->second);
                 }
@@ -705,7 +713,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_null_value(value_buffer_);
                 break;
@@ -765,7 +773,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_string_value(sv, value_buffer_);
                 break;
@@ -859,9 +867,9 @@ private:
                 auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!it->second.empty() && subfield_delimiter_ != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        it->second.push_back(subfield_delimiter_);
                     }
                     write_double_value(val, context, it->second, ec);
                 }
@@ -887,7 +895,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_double_value(val, context, value_buffer_, ec);
                 break;
@@ -926,9 +934,9 @@ private:
                 auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!it->second.empty() && subfield_delimiter_ != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        it->second.push_back(subfield_delimiter_);
                     }
                     write_int64_value(val, it->second);
                 }
@@ -954,7 +962,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_int64_value(val, value_buffer_);
                 break;
@@ -993,9 +1001,9 @@ private:
                 auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!it->second.empty() && subfield_delimiter_ != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        it->second.push_back(subfield_delimiter_);
                     }
                     write_uint64_value(val, it->second);
                 }
@@ -1021,7 +1029,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_uint64_value(val, value_buffer_);
                 break;
@@ -1057,9 +1065,9 @@ private:
                 auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
-                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    if (!it->second.empty() && subfield_delimiter_ != char_type())
                     {
-                        it->second.push_back(options_.subfield_delimiter());
+                        it->second.push_back(subfield_delimiter_);
                     }
                     write_bool_value(val, it->second);
                 }
@@ -1085,7 +1093,7 @@ private:
             {
                 if (!value_buffer_.empty())
                 {
-                    value_buffer_.push_back(options_.subfield_delimiter());
+                    value_buffer_.push_back(subfield_delimiter_);
                 }
                 write_bool_value(val, value_buffer_);
                 break;
@@ -1107,7 +1115,7 @@ private:
         bool quote = false;
         if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
             (options_.quote_style() == quote_style_kind::minimal &&
-            (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
+            (std::char_traits<CharT>::find(s, length, field_delimiter_) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
         {
             quote = true;
             str.push_back(options_.quote_char());
