@@ -78,7 +78,6 @@ private:
     {
         stack_item_kind item_kind_;
         std::size_t count_{0};
-        std::string pathname_;
         std::string column_path_;
 
         stack_item(stack_item_kind item_kind) noexcept
@@ -176,7 +175,7 @@ public:
         column_path_column_map_(alloc),
         column_it_(column_path_column_map_.end())
     {
-        if (!options.column_mapping().empty())
+        if (has_column_mapping_)
         {
             for (const auto& item : options.column_mapping())
             {
@@ -184,7 +183,7 @@ public:
                 column_path_name_map_.emplace(item.first, item.second);
             }
         }
-        else if (!options.column_names().empty())
+        else if (has_column_names_)
         {
             jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
         }
@@ -269,7 +268,6 @@ private:
                 }
                 else
                 {
-                    stack_.back().pathname_ = stack_[stack_.size()-2].pathname_;
                     stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -290,10 +288,7 @@ private:
 
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
-        if (stack_.empty())
-        {
-            return true;
-        }
+        JSONCONS_ASSERT(!stack_.empty());
 
         switch (stack_.back().item_kind_)
         {
@@ -336,71 +331,78 @@ private:
                 }
                 break;
             case stack_item_kind::column_mapping:
-             {
-                 bool first = true;
-                 for (const auto& item : column_paths_)
-                 {
-                     if (!first)
-                     {
-                         sink_.push_back(field_delimiter_);
-                         first = false;
-                     }
-                     sink_.append(item.data(), item.size());
-                 }
-                 sink_.append(line_delimiter_.data(), line_delimiter_.length());
-                 
-                 std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
-                 for (const auto& item : column_path_column_map_)
-                 {
-                     columns.emplace_back(item.second.cbegin(), item.second.cend());
-                 }
+            {
+                // Write header
+                {
+                    bool first = true;
+                    for (std::size_t i = 0; i < column_paths_.size(); ++i)
+                    {
+                        auto it = column_path_name_map_.find(column_paths_[i]);
+                        if (it != column_path_name_map_.end())
+                        {
+                            if (!first)
+                            {
+                                sink_.push_back(field_delimiter_);
+                            }
+                            sink_.append(it->second.data(), it->second.length());
+                            first = false;
+                        }
+                    }
+                    sink_.append(line_delimiter_.data(), line_delimiter_.length());
+                }
 
-                 if (!columns.empty())
-                 {
-                     const std::size_t no_cols = columns.size();
-                     bool done = false;
-                     while (!done)
-                     {
-                         std::size_t missing_cols = 0;
-                             
-                         first = true;
-                         for (auto& item : columns)
-                         {
-                             if (item.first == item.second)
-                             {
-                                 ++missing_cols;
-                                 if (missing_cols == no_cols)
-                                 {
-                                     done = true;
-                                     break;
-                                 }
-                             }
-                             else
-                             {
-                                 for (std::size_t i = 0; i < missing_cols; ++i)
-                                 {
-                                     sink_.push_back(field_delimiter_);
-                                 }
-                                 if (!first)
-                                 {
-                                     sink_.push_back(field_delimiter_);
-                                 }
-                                 else
-                                 {
-                                     first = false;
-                                 }
-                                 sink_.append((*(item.first)).data(), (*(item.first)).size());
-                                 ++item.first;
-                             }
-                         }
-                         if (!done)
-                         {
-                             sink_.append(line_delimiter_.data(), line_delimiter_.length());
-                         }
-                     }
-                 }
-                 break;
-             }
+                std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
+                for (const auto& item : column_path_column_map_)
+                {
+                    columns.emplace_back(item.second.cbegin(), item.second.cend());
+                }
+
+                if (!columns.empty())
+                {
+                    const std::size_t no_cols = columns.size();
+                    bool done = false;
+                    while (!done)
+                    {
+                        std::size_t missing_cols = 0;
+                            
+                        bool first = true;
+                        for (auto& item : columns)
+                        {
+                            if (item.first == item.second)
+                            {
+                                ++missing_cols;
+                                if (missing_cols == no_cols)
+                                {
+                                    done = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                for (std::size_t i = 0; i < missing_cols; ++i)
+                                {
+                                    sink_.push_back(field_delimiter_);
+                                }
+                                if (!first)
+                                {
+                                    sink_.push_back(field_delimiter_);
+                                }
+                                else
+                                {
+                                    first = false;
+                                }
+                                sink_.append((*(item.first)).data(), (*(item.first)).size());
+                                ++item.first;
+                            }
+                        }
+                        if (!done)
+                        {
+                            sink_.append(line_delimiter_.data(), line_delimiter_.length());
+                        }
+                    }
+                }
+                break;
+            }
             case stack_item_kind::column_multivalued_field:
                 break;
             case stack_item_kind::unmapped:
@@ -510,10 +512,7 @@ private:
 
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
-        if (stack_.empty())
-        {
-            return true;
-        }
+        JSONCONS_ASSERT(!stack_.empty());
         
         switch (stack_.back().item_kind_)
         {
@@ -657,16 +656,14 @@ private:
             }
             case stack_item_kind::column_mapping:
             {
-                if (column_paths_.empty())
+                stack_.back().column_path_.push_back('/');
+                stack_.back().column_path_.append(std::string(name));
+                if (!has_column_names_)
                 {
-                    column_paths_.emplace_back(name);
+                    column_path_name_map_.emplace(stack_.back().column_path_, name);
                 }
-                else
-                {
-                    column_paths_[0].push_back(field_delimiter_);
-                    column_paths_[0].append(string_type(name));
-                }
-                column_it_ = column_path_column_map_.emplace(string_type(name), column_type{}).first;
+                column_paths_.emplace_back(stack_.back().column_path_);
+                column_it_ = column_path_column_map_.emplace(stack_.back().column_path_, column_type{}).first;
                 break;
             }
             default:
