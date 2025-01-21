@@ -352,9 +352,13 @@ private:
                 }
 
                 std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
-                for (const auto& item : column_path_column_map_)
+                for (const auto& item : column_paths_)
                 {
-                    columns.emplace_back(item.second.cbegin(), item.second.cend());
+                    auto it = column_path_column_map_.find(item);
+                    if (it != column_path_column_map_.end())
+                    {
+                        columns.emplace_back((*it).second.cbegin(), (*it).second.cend());
+                    }
                 }
 
                 if (!columns.empty())
@@ -637,7 +641,7 @@ private:
                 stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                 stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
-                if (!has_column_names_)
+                if (!has_column_mapping_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, name);
                 }
@@ -648,7 +652,7 @@ private:
                 stack_.back().column_path_ = stack_[stack_.size()-2].column_path_;
                 stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
-                if (!has_column_names_)
+                if (!has_column_mapping_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
                 }
@@ -656,13 +660,14 @@ private:
             }
             case stack_item_kind::column_mapping:
             {
+                stack_.back().column_path_.erase();
                 stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
-                if (!has_column_names_)
+                if (!has_column_mapping_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, name);
+                    column_paths_.emplace_back(stack_.back().column_path_);
                 }
-                column_paths_.emplace_back(stack_.back().column_path_);
                 column_it_ = column_path_column_map_.emplace(stack_.back().column_path_, column_type{}).first;
                 break;
             }

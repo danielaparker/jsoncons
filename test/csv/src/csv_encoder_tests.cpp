@@ -373,6 +373,39 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
+
+    SECTION("object of arrays and subarrays to csv with column mapping")
+    {
+        std::string expected = R"(B,A
+7;8;9,1;true;null
+10;11;12,-4;5.5;6
+)";
+
+        const std::string jtext = R"(
+{
+   "a" : [[1,true,null],[-4,5.5,"6"]],
+   "b" : [[7,8,9],[10,11,12]],
+   "c" : [15,16,17]       
+}
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .subfield_delimiter(';')
+            .column_mapping({ 
+                {"/b","B"},
+                {"/a","A"} 
+                });
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        //std::cout << buf << "\n"; 
+        CHECK(expected == buf);
+    }    
 }
 
 TEST_CASE("test json to non-flat csv with column mappings")
