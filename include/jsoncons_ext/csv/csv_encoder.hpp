@@ -104,6 +104,9 @@ private:
     char_type field_delimiter_;
     char_type subfield_delimiter_;
     string_type line_delimiter_;
+    quote_style_kind quote_style_;
+    char_type quote_char_;
+    char_type quote_escape_char_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -139,6 +142,9 @@ public:
         field_delimiter_(options.field_delimiter()),
         subfield_delimiter_(options.subfield_delimiter()),
         line_delimiter_(options.line_delimiter()),
+        quote_style_(options.quote_style()),
+        quote_char_(options.quote_char()),
+        quote_escape_char_(options.quote_escape_char()),
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
         buffer_(alloc),
@@ -1113,17 +1119,17 @@ private:
     bool do_string_value(const CharT* s, std::size_t length, string_type& str)
     {
         bool quote = false;
-        if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
-            (options_.quote_style() == quote_style_kind::minimal &&
-            (std::char_traits<CharT>::find(s, length, field_delimiter_) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
+        if (quote_style_ == quote_style_kind::all || quote_style_ == quote_style_kind::nonnumeric ||
+            (quote_style_ == quote_style_kind::minimal &&
+            (std::char_traits<CharT>::find(s, length, field_delimiter_) != nullptr || std::char_traits<CharT>::find(s, length, quote_char_) != nullptr)))
         {
             quote = true;
-            str.push_back(options_.quote_char());
+            str.push_back(quote_char_);
         }
-        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), str);
+        escape_string(s, length, quote_char_, quote_escape_char_, str);
         if (quote)
         {
-            str.push_back(options_.quote_char());
+            str.push_back(quote_char_);
         }
 
         return true;
