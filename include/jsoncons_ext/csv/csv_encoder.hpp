@@ -39,7 +39,9 @@ public:
     using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
     using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
     using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
-
+    using string_vector_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type, std::vector<string_type, string_allocator_type>>>;
+    using column_type = std::vector<string_type, string_allocator_type>;
+    using column_path_column_map_type = std::unordered_map<string_type, column_type, std::hash<string_type>,std::equal_to<string_type>,string_vector_allocator_type>;
 private:
     static jsoncons::basic_string_view<CharT> null_constant()
     {
@@ -104,14 +106,14 @@ private:
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_paths_;
-    std::vector<string_type,string_allocator_type> column_rows_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
+    column_path_column_map_type column_path_column_map_;
 
     std::size_t column_index_{0};
-    std::vector<std::size_t> row_counts_;
     string_type buffer_;
     string_type value_buffer_;
+    column_path_column_map_type::iterator column_it_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -130,7 +132,9 @@ public:
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
         buffer_(alloc),
-        value_buffer_(alloc)
+        value_buffer_(alloc),
+        column_path_column_map_(alloc),
+        column_it_(column_path_column_map_.end())
     {
         if (!options.column_mapping().empty())
         {
@@ -163,7 +167,6 @@ public:
         column_names_.clear();
         column_path_value_map_.clear();
         column_index_ = 0;
-        row_counts_.clear();
     }
 
     void reset(Sink&& sink)
@@ -238,7 +241,7 @@ private:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             default: // error
-                std::cout << "visit_begin_object " << (int)stack_.back().item_kind_ << "\n"; 
+                //std::cout << "visit_begin_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -304,11 +307,57 @@ private:
                      }
                      sink_.append(item.data(), item.size());
                  }
-                 //sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
-                 for (const auto& item : column_rows_)
+                 sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                 
+                 std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
+                 for (const auto& item : column_path_column_map_)
                  {
-                     sink_.append(item.data(), item.size());
-                     sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                     columns.emplace_back(item.second.cbegin(), item.second.cend());
+                 }
+
+                 if (!columns.empty())
+                 {
+                     const std::size_t no_cols = columns.size();
+                     bool done = false;
+                     while (!done)
+                     {
+                         std::size_t missing_cols = 0;
+                             
+                         first = true;
+                         for (auto& item : columns)
+                         {
+                             if (item.first == item.second)
+                             {
+                                 ++missing_cols;
+                                 if (missing_cols == no_cols)
+                                 {
+                                     done = true;
+                                     break;
+                                 }
+                             }
+                             else
+                             {
+                                 for (std::size_t i = 0; i < missing_cols; ++i)
+                                 {
+                                     sink_.push_back(options_.field_delimiter());
+                                 }
+                                 if (!first)
+                                 {
+                                     sink_.push_back(options_.field_delimiter());
+                                 }
+                                 else
+                                 {
+                                     first = false;
+                                 }
+                                 sink_.append((*(item.first)).data(), (*(item.first)).size());
+                                 ++item.first;
+                             }
+                         }
+                         if (!done)
+                         {
+                             sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                         }
+                     }
                  }
                  break;
              }
@@ -317,14 +366,14 @@ private:
             case stack_item_kind::unmapped:
                 break;
             default:
-                std::cout << "visit_end_object " << (int)stack_.back().item_kind_ << "\n"; 
+                //std::cout << "visit_end_object " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
         stack_.pop_back();
         if (!stack_.empty())
         {
-            end_value();
+            ++stack_.back().count_;
         }
         return true;
     }
@@ -398,29 +447,21 @@ private:
                 break;
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
-                row_counts_.push_back(1);
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
                 break;
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }                
-                begin_value(column_rows_[row_counts_.back()]);
+                value_buffer_.clear();
                 stack_.emplace_back(stack_item_kind::column_multivalued_field);
                 break;
             }
             case stack_item_kind::column_multivalued_field:
+                stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             case stack_item_kind::unmapped:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             default: // error
-                std::cout << "visit_begin_array " << (int)stack_.back().item_kind_ << "\n"; 
+                //std::cout << "visit_begin_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -529,11 +570,12 @@ private:
                 ++column_index_;
                 break;
             case stack_item_kind::column_multivalued_field:
+                column_it_->second.emplace_back(value_buffer_.data(),value_buffer_.length());
                 break;
             case stack_item_kind::unmapped:
                 break;
             default:
-                std::cout << "visit_end_array " << (int)stack_.back().item_kind_ << "\n"; 
+                //std::cout << "visit_end_array " << (int)stack_.back().item_kind_ << "\n"; 
                 ec = csv_errc::source_error;
                 return false;
         }
@@ -541,7 +583,7 @@ private:
 
         if (!stack_.empty())
         {
-            end_value();
+            ++stack_.back().count_;
         }
         return true;
     }
@@ -584,6 +626,7 @@ private:
                     column_paths_[0].push_back(options_.field_delimiter());
                     column_paths_[0].append(string_type(name));
                 }
+                column_it_ = column_path_column_map_.emplace(string_type(name), column_type{}).first;
                 break;
             }
             default:
@@ -655,6 +698,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
@@ -666,16 +710,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_null_value(column_rows_[row_counts_.back()]);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_null_value(column_rows_[row_counts_.back()]);
+                (*column_it_).second.emplace_back();
+                write_null_value((*column_it_).second.back());
                 break;
             }
             default:
@@ -722,6 +758,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
@@ -733,16 +770,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_string_value(sv, column_rows_[row_counts_.back()]);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_string_value(sv, column_rows_[row_counts_.back()]);
+                (*column_it_).second.emplace_back();
+                write_string_value(sv, (*column_it_).second.back());
                 break;
             }
             default:
@@ -852,6 +881,7 @@ private:
                 break;
             }
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -862,16 +892,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_double_value(val, context, column_rows_[row_counts_.back()], ec);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_double_value(val, context, column_rows_[row_counts_.back()], ec);
+                (*column_it_).second.emplace_back();
+                write_double_value(val, context, (*column_it_).second.back(), ec);
                 break;
             }
             default:
@@ -925,6 +947,7 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
             {
                 if (!value_buffer_.empty())
@@ -936,16 +959,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_int64_value(val, column_rows_[row_counts_.back()]);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_int64_value(val, column_rows_[row_counts_.back()]);
+                (*column_it_).second.emplace_back();
+                write_int64_value(val, (*column_it_).second.back());
                 break;
             }
             default:
@@ -1000,6 +1015,7 @@ private:
                 break;
             }
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1010,16 +1026,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_uint64_value(val, column_rows_[row_counts_.back()]);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_uint64_value(val, column_rows_[row_counts_.back()]);
+                (*column_it_).second.emplace_back();
+                write_uint64_value(val, (*column_it_).second.back());
                 break;
             }
             default:
@@ -1071,6 +1079,7 @@ private:
                 break;
             }
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::column_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1081,16 +1090,8 @@ private:
             }
             case stack_item_kind::column:
             {
-                if (column_rows_.size() <= row_counts_.back())
-                {
-                    column_rows_.emplace_back();
-                }
-                write_bool_value(val, column_rows_[row_counts_.back()]);
-                break;
-            }
-            case stack_item_kind::column_multivalued_field:
-            {
-                write_bool_value(val, column_rows_[row_counts_.back()]);
+                (*column_it_).second.emplace_back();
+                write_bool_value(val, (*column_it_).second.back());
                 break;
             }
             default:
@@ -1120,15 +1121,12 @@ private:
 
     void write_string_value(const string_view_type& value, string_type& str)
     {
-        begin_value(str);
         do_string_value(value.data(),value.length(), str);
-        end_value();
+        ++stack_.back().count_;
     }
 
     void write_double_value(double val, const ser_context& context, string_type& str, std::error_code& ec)
     {
-        begin_value(str);
-
         if (!std::isfinite(val))
         {
             if ((std::isnan)(val))
@@ -1182,32 +1180,26 @@ private:
             fp_(val, str);
         }
 
-        end_value();
+        ++stack_.back().count_;
 
     }
 
     void write_int64_value(int64_t val, string_type& str)
     {
-        begin_value(str);
-
         jsoncons::detail::from_integer(val,str);
 
-        end_value();
+        ++stack_.back().count_;
     }
 
     void write_uint64_value(uint64_t val, string_type& str)
     {
-        begin_value(str);
-
         jsoncons::detail::from_integer(val,str);
 
-        end_value();
+        ++stack_.back().count_;
     }
 
     void write_bool_value(bool val, string_type& str) 
     {
-        begin_value(str);
-
         if (val)
         {
             str.append(true_constant().data(), true_constant().size());
@@ -1217,86 +1209,14 @@ private:
             str.append(false_constant().data(), false_constant().size());
         }
 
-        end_value();
+        ++stack_.back().count_;
     }
  
     bool write_null_value(string_type& str) 
     {
-        begin_value(str);
         str.append(null_constant().data(), null_constant().size());
-        end_value();
+        ++stack_.back().count_;
         return true;
-    }
-
-    void begin_value(string_type& str)
-    {
-        if (stack_.empty())
-        {
-            return;
-        }
-        switch (stack_.back().item_kind_)
-        {
-            case stack_item_kind::flat_row:
-            case stack_item_kind::row:
-                break;
-            case stack_item_kind::column:
-            {
-                if (row_counts_.size() >= 3)
-                {
-                    for (std::size_t i = row_counts_.size()-2; i-- > 0;)
-                    {
-                        if (row_counts_[i] <= row_counts_.back())
-                        {
-                            str.push_back(options_.field_delimiter());
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (column_index_ > 0)
-                {
-                    str.push_back(options_.field_delimiter());
-                }
-                break;
-            }
-            case stack_item_kind::multivalued_field:
-                break;
-            case stack_item_kind::column_multivalued_field:
-                if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
-                {
-                    str.push_back(options_.subfield_delimiter());
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    void end_value()
-    {
-        if (stack_.empty())
-        {
-            return;
-        }
-        switch(stack_.back().item_kind_)
-        {
-            case stack_item_kind::flat_row:
-            case stack_item_kind::row:
-            {
-                ++stack_.back().count_;
-                break;
-            }
-            case stack_item_kind::column:
-            {
-                ++row_counts_.back();
-                break;
-            }
-            default:
-                ++stack_.back().count_;
-                break;
-        }
     }
 };
 
