@@ -203,7 +203,14 @@ public:
     void reset()
     {
         stack_.clear();
-        column_names_.clear();
+        if (!has_column_names_)
+        {
+            column_names_.clear();
+        }
+        if (!has_column_mapping_)
+        {
+            column_path_name_map_.clear();
+        }
         column_path_value_map_.clear();
         column_index_ = 0;
     }
