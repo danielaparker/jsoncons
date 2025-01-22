@@ -183,18 +183,9 @@ public:
                 column_path_name_map_.emplace(item.first, item.second);
             }
         }
-        else if (has_column_names_)
+        if (has_column_names_)
         {
             jsoncons::csv::detail::parse_column_names(options.column_names(), column_names_);
-            for (const auto& item : column_names_)
-            {
-                string_type str{alloc_};
-                str.push_back('/');
-                str.append(item.data(), item.size());
-                column_paths_.emplace_back(str);
-                column_path_name_map_.emplace(std::move(str), item);
-            }
-            has_column_mapping_ = true;
         }
     }
 
@@ -258,6 +249,23 @@ private:
         {
             stack_.emplace_back(stack_item_kind::column_mapping);
             return true;
+        }
+        
+        // legacy        
+        if (has_column_names_ && stack_.back().count_ == 0)
+        {
+            if (stack_.back().item_kind_ == stack_item_kind::flat_row_mapping || stack_.back().item_kind_ == stack_item_kind::row_mapping)
+            {
+                for (const auto& item : column_names_)
+                {
+                    string_type str{alloc_};
+                    str.push_back('/');
+                    str.append(item.data(), item.size());
+                    column_paths_.emplace_back(str);
+                    column_path_name_map_.emplace(std::move(str), item);
+                }
+                has_column_mapping_ = true;
+            }
         }
         switch (stack_.back().item_kind_)
         {
