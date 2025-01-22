@@ -126,7 +126,6 @@ private:
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_paths_;
     std::vector<string_type,string_allocator_type> column_path_values_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
     column_path_column_map_type column_path_column_map_;
 
@@ -205,16 +204,11 @@ public:
     void reset()
     {
         stack_.clear();
-        if (!has_column_names_)
-        {
-            column_names_.clear();
-        }
         if (!has_column_mapping_)
         {
             column_paths_.clear();
-            column_path_name_map_.clear();
+            column_path_values_.clear();
         }
-        column_path_value_map_.clear();
         column_index_ = 0;
     }
 
@@ -351,11 +345,13 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
-                        if (it != column_path_value_map_.end())
+                        auto it = std::find(column_paths_.begin(), column_paths_.end(), column_paths_[i]);
+                        if (it != column_paths_.end())
                         {
-                            sink_.append(it->second.data(),it->second.length());
-                            it->second.clear();
+                            JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                            auto& value = column_path_values_[it - column_paths_.begin()];
+                            sink_.append(value.data(), value.length());
+                            value.clear();
                         }
                     }
                     sink_.append(line_delimiter_.data(), line_delimiter_.length());
@@ -579,11 +575,13 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
-                        if (it != column_path_value_map_.end())
+                        auto it = std::find(column_paths_.begin(), column_paths_.end(), column_paths_[i]);
+                        if (it != column_paths_.end())
                         {
-                            sink_.append(it->second.data(),it->second.length());
-                            it->second.clear();
+                            JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                            auto& value = column_path_values_[it - column_paths_.begin()];
+                            sink_.append(value.data(), value.length());
+                            value.clear();
                         }
                     }
                     sink_.append(line_delimiter_.data(), line_delimiter_.length());
@@ -591,13 +589,12 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                /*auto it1 = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
-                if (it1 != column_paths_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_[stack_.size() - 2].column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_values_[it1-column_paths_.begin()] = value_buffer_;
-                }*/
-
-                column_path_value_map_[stack_[stack_.size()-2].column_path_] = value_buffer_;
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    column_path_values_[it - column_paths_.begin()] = value_buffer_;
+                }
                 break;
             }
             case stack_item_kind::row:
@@ -629,11 +626,13 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
-                        if (it != column_path_value_map_.end())
+                        auto it = std::find(column_paths_.begin(), column_paths_.end(), column_paths_[i]);
+                        if (it != column_paths_.end())
                         {
-                            sink_.append(it->second.data(),it->second.length());
-                            it->second.clear();
+                            JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                            auto& value = column_path_values_[it - column_paths_.begin()];
+                            sink_.append(value.data(), value.length());
+                            value.clear();
                         }
                     }
                     sink_.append(line_delimiter_.data(), line_delimiter_.length());
@@ -744,12 +743,12 @@ private:
                         column_paths_.emplace_back(stack_.back().column_path_);
                         column_path_values_.resize(column_paths_.size());
                     }
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_null_value(column_path_value_map_[stack_.back().column_path_]);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_null_value(column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -757,14 +756,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_null_value(it->second);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_null_value(column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -807,11 +803,12 @@ private:
                         column_path_values_.resize(column_paths_.size());
                     }
                 }
-                
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_string_value(sv, column_path_value_map_[stack_.back().column_path_]);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_string_value(sv, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -819,14 +816,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_string_value(sv, it->second);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_string_value(sv, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -926,12 +920,12 @@ private:
                         column_paths_.emplace_back(stack_.back().column_path_);
                         column_path_values_.resize(column_paths_.size());
                     }
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_double_value(val, context, column_path_value_map_[stack_.back().column_path_], ec);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_double_value(val, context, column_path_values_[it - column_paths_.begin()], ec);
                 }
                 break;
             }
@@ -939,14 +933,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_double_value(val, context, it->second, ec);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_double_value(val, context, column_path_values_[it - column_paths_.begin()], ec);
                 }
                 break;
             }
@@ -991,12 +982,12 @@ private:
                         column_paths_.emplace_back(stack_.back().column_path_);
                         column_path_values_.resize(column_paths_.size());
                     }
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_int64_value(val, column_path_value_map_[stack_.back().column_path_]);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_int64_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -1004,14 +995,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_int64_value(val, it->second);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_int64_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -1056,12 +1044,12 @@ private:
                         column_paths_.emplace_back(stack_.back().column_path_);
                         column_path_values_.resize(column_paths_.size());
                     }
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_uint64_value(val, column_path_value_map_[stack_.back().column_path_]);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_uint64_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -1069,14 +1057,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_uint64_value(val, it->second);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_uint64_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -1118,12 +1103,12 @@ private:
                         column_paths_.emplace_back(stack_.back().column_path_);
                         column_path_values_.resize(column_paths_.size());
                     }
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
-                if (column_path_name_map_.find(stack_.back().column_path_) != column_path_name_map_.end())
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    write_bool_value(val, column_path_value_map_[stack_.back().column_path_]);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_bool_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
@@ -1131,14 +1116,11 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                if (stack_[0].count_ == 0)
+                auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it != column_paths_.end())
                 {
-                    column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                }
-                auto it = column_path_value_map_.find(stack_.back().column_path_);
-                if (it != column_path_value_map_.end())
-                {
-                    write_bool_value(val, it->second);
+                    JSONCONS_ASSERT(column_paths_.size() == column_path_values_.size());
+                    write_bool_value(val, column_path_values_[it - column_paths_.begin()]);
                 }
                 break;
             }
