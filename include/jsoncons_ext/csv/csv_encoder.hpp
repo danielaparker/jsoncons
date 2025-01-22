@@ -125,6 +125,7 @@ private:
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<string_type,string_allocator_type> column_paths_;
+    std::vector<string_type,string_allocator_type> column_path_values_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
     column_path_column_map_type column_path_column_map_;
@@ -509,9 +510,15 @@ private:
                         if (!has_column_mapping_)
                         {
                             column_paths_.emplace_back(stack_.back().column_path_);
-                            column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                         }
                     }
+                    auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                    if (it != column_paths_.end())
+                    {
+                        column_path_values_.resize(column_paths_.size());
+                        column_path_values_[it-column_paths_.begin()] = std::basic_string<CharT>();
+                    }
+                    
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
@@ -591,6 +598,7 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
+                column_path_value_map_[stack_[stack_.size()-2].column_path_] = std::basic_string<CharT>();
                 auto it = column_path_value_map_.find(stack_[stack_.size()-2].column_path_);
                 if (it != column_path_value_map_.end())
                 {
