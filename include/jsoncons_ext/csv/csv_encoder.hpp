@@ -512,12 +512,6 @@ private:
                             column_paths_.emplace_back(stack_.back().column_path_);
                         }
                     }
-                    auto it = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
-                    if (it != column_paths_.end())
-                    {
-                        column_path_values_.resize(column_paths_.size());
-                        column_path_values_[it-column_paths_.begin()] = std::basic_string<CharT>();
-                    }
                     
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
@@ -598,12 +592,14 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                column_path_value_map_[stack_[stack_.size()-2].column_path_] = std::basic_string<CharT>();
-                auto it = column_path_value_map_.find(stack_[stack_.size()-2].column_path_);
-                if (it != column_path_value_map_.end())
+                auto it1 = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                if (it1 != column_paths_.end())
                 {
-                    it->second.append(value_buffer_.data(),value_buffer_.length());
+                    column_path_values_.resize(column_paths_.size());
+                    column_path_values_[it1-column_paths_.begin()] = value_buffer_;
                 }
+
+                column_path_value_map_[stack_[stack_.size()-2].column_path_] = value_buffer_;
                 break;
             }
             case stack_item_kind::row:
