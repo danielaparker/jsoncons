@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv with column mappings")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -122,12 +122,12 @@ TEST_CASE("test json to flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-#endif    
+//#endif    
 }
 
 TEST_CASE("test json to flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -342,7 +342,6 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }
-#endif           
 
     SECTION("object of arrays and subarrays to csv")
     {
@@ -406,11 +405,12 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
+//#endif           
 }
 
 TEST_CASE("test json to non-flat csv with column mappings")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -523,12 +523,12 @@ TEST_CASE("test json to non-flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
 }
 
 TEST_CASE("test json to non-flat csv")
 {
-#if 0
+//#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -719,6 +719,91 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-#endif
+//#endif
+}
+
+
+TEST_CASE("test json to flat csv with column names")
+{
+    SECTION("array of objects to csv")
+    {
+        std::string expected = R"(boolean,datetime,float,text
+true,1971-01-01T04:14:00,1.0,Chicago Reader
+true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
+)";
+
+        std::string jtext = R"(
+[
+    {
+        "text": "Chicago Reader", 
+        "float": 1.0, 
+        "datetime": "1971-01-01T04:14:00", 
+        "boolean": true
+    }, 
+    {
+        "text": "Chicago Sun-Times", 
+        "float": 1.27, 
+        "datetime": "1948-01-01T14:57:13", 
+        "boolean": true
+    }
+]
+        )";
+
+        
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(true)
+            .column_names("boolean,datetime,float,text");
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+        
+        //std::cout << buf << "\n";
+        
+        CHECK(expected == buf);
+    }
+
+    SECTION("array of objects to csv with missing name")
+    {
+        std::string expected = R"(boolean,datetime,float,text
+true,,1.0,Chicago Reader
+true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
+)";
+
+        std::string jtext = R"(
+[
+    {
+        "text": "Chicago Reader", 
+        "float": 1.0, 
+        "boolean": true
+    }, 
+    {
+        "text": "Chicago Sun-Times", 
+        "float": 1.27, 
+        "datetime": "1948-01-01T14:57:13", 
+        "boolean": true
+    }
+]
+        )";
+
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(true)
+            .column_names("boolean,datetime,float,text");
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        //std::cout << buf << "\n";
+
+        CHECK(expected == buf);
+    }
 }
 
