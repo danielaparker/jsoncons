@@ -280,7 +280,6 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::flat_row_mapping:
-                column_index_ = 0;
                 stack_.emplace_back(stack_item_kind::flat_object);
                 break;
             case stack_item_kind::row_mapping:
@@ -492,10 +491,6 @@ private:
                 else
                 {
                     append_array_path_component();
-                    if (stack_[0].count_ == 0)
-                    {
-                        column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
-                    }
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
                 }
