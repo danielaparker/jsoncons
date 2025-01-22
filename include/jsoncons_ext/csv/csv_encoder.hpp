@@ -183,6 +183,7 @@ public:
                 column_paths_.emplace_back(item.first);
                 column_path_name_map_.emplace(item.first, item.second);
             }
+            column_path_values_.resize(column_paths_.size());
         }
         if (has_column_names_)
         {
@@ -213,7 +214,6 @@ public:
             column_paths_.clear();
             column_path_name_map_.clear();
         }
-        column_path_values_.clear();
         column_path_value_map_.clear();
         column_index_ = 0;
     }
@@ -272,6 +272,7 @@ private:
                     str.push_back('/');
                     str.append(item.data(), item.size());
                     column_paths_.emplace_back(str);
+                    column_path_values_.resize(column_paths_.size());
                     column_path_name_map_.emplace(std::move(str), item);
                 }
                 has_column_mapping_ = true;
@@ -507,6 +508,7 @@ private:
                         if (!has_column_mapping_)
                         {
                             column_paths_.emplace_back(stack_.back().column_path_);
+                            column_path_values_.resize(column_paths_.size());
                         }
                     }
                     
@@ -589,12 +591,11 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                auto it1 = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
+                /*auto it1 = std::find(column_paths_.begin(), column_paths_.end(), stack_.back().column_path_);
                 if (it1 != column_paths_.end())
                 {
-                    column_path_values_.resize(column_paths_.size());
                     column_path_values_[it1-column_paths_.begin()] = value_buffer_;
-                }
+                }*/
 
                 column_path_value_map_[stack_[stack_.size()-2].column_path_] = value_buffer_;
                 break;
@@ -719,6 +720,7 @@ private:
             if (!has_column_mapping_)
             {
                 column_paths_.emplace_back(stack_.back().column_path_);
+                column_path_values_.resize(column_paths_.size());
                 if (stack_.back().item_kind_ == stack_item_kind::row)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
@@ -740,6 +742,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
@@ -801,6 +804,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                 }
                 
@@ -920,6 +924,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
@@ -984,6 +989,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
@@ -1048,6 +1054,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
@@ -1109,6 +1116,7 @@ private:
                     if (!has_column_mapping_)
                     {
                         column_paths_.emplace_back(stack_.back().column_path_);
+                        column_path_values_.resize(column_paths_.size());
                     }
                     column_path_value_map_[stack_.back().column_path_] = std::basic_string<CharT>();
                 }
