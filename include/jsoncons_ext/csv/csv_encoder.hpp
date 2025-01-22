@@ -316,10 +316,11 @@ private:
                 {
                     if (stack_[0].count_ == 0)
                     {
-                        if (has_column_names_)
+                        bool first = true;
+                        for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            bool first = true;
-                            for (const auto& item : column_names_)
+                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            if (it != column_path_name_map_.end())
                             {
                                 if (!first)
                                 {
@@ -329,31 +330,10 @@ private:
                                 {
                                     first = false;
                                 }
-                                sink_.append(item.data(), item.length());
+                                sink_.append(it->second.data(), it->second.length());
                             }
-                            sink_.append(line_delimiter_.data(), line_delimiter_.length());
                         }
-                        else
-                        {
-                            bool first = true;
-                            for (std::size_t i = 0; i < column_paths_.size(); ++i)
-                            {
-                                auto it = column_path_name_map_.find(column_paths_[i]);
-                                if (it != column_path_name_map_.end())
-                                {
-                                    if (!first)
-                                    {
-                                        sink_.push_back(field_delimiter_);
-                                    }
-                                    else
-                                    {
-                                        first = false;
-                                    }
-                                    sink_.append(it->second.data(), it->second.length());
-                                }
-                            }
-                            sink_.append(line_delimiter_.data(), line_delimiter_.length());
-                        }
+                        sink_.append(line_delimiter_.data(), line_delimiter_.length());
                     }
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
