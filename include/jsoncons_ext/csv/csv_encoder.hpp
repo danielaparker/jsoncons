@@ -210,8 +210,10 @@ public:
         }
         if (!has_column_mapping_)
         {
+            column_paths_.clear();
             column_path_name_map_.clear();
         }
+        column_path_values_.clear();
         column_path_value_map_.clear();
         column_index_ = 0;
     }
@@ -787,6 +789,7 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
@@ -847,6 +850,7 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
@@ -965,6 +969,7 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
@@ -1028,6 +1033,7 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
@@ -1091,6 +1097,7 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
@@ -1151,11 +1158,15 @@ private:
             default:
                 break;
         }
+        ++stack_.back().count_;
         return true;
     }
 
-    bool do_string_value(const CharT* s, std::size_t length, string_type& str)
+    void write_string_value(const string_view_type& value, string_type& str)
     {
+        const char* s = value.data();
+        const std::size_t length = value.length();
+        
         bool quote = false;
         if (quote_style_ == quote_style_kind::all || quote_style_ == quote_style_kind::nonnumeric ||
             (quote_style_ == quote_style_kind::minimal &&
@@ -1169,14 +1180,6 @@ private:
         {
             str.push_back(quote_char_);
         }
-
-        return true;
-    }
-
-    void write_string_value(const string_view_type& value, string_type& str)
-    {
-        do_string_value(value.data(),value.length(), str);
-        ++stack_.back().count_;
     }
 
     void write_double_value(double val, const ser_context& context, string_type& str, std::error_code& ec)
@@ -1233,23 +1236,16 @@ private:
         {
             fp_(val, str);
         }
-
-        ++stack_.back().count_;
-
     }
 
     void write_int64_value(int64_t val, string_type& str)
     {
         jsoncons::detail::from_integer(val,str);
-
-        ++stack_.back().count_;
     }
 
     void write_uint64_value(uint64_t val, string_type& str)
     {
         jsoncons::detail::from_integer(val,str);
-
-        ++stack_.back().count_;
     }
 
     void write_bool_value(bool val, string_type& str) 
@@ -1262,15 +1258,11 @@ private:
         {
             str.append(false_constant().data(), false_constant().size());
         }
-
-        ++stack_.back().count_;
     }
  
-    bool write_null_value(string_type& str) 
+    void write_null_value(string_type& str) 
     {
         str.append(null_constant().data(), null_constant().size());
-        ++stack_.back().count_;
-        return true;
     }
 };
 
