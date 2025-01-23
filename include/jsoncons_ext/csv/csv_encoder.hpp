@@ -23,6 +23,7 @@
 #include <jsoncons/sink.hpp>
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -33,11 +34,12 @@ public:
     using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
     using sink_type = Sink;
-
     using allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
     using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
+    using json_pointer_type = jsonpointer::basic_json_pointer<char_type>;
     using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
+    using json_pointer_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_pointer_type>;
     using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
     using string_vector_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type, std::vector<string_type, string_allocator_type>>>;
     using column_type = std::vector<string_type, string_allocator_type>;
@@ -124,7 +126,7 @@ private:
     jsoncons::detail::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<string_type,string_allocator_type> column_paths_;
+    std::vector<json_pointer_type,json_pointer_allocator_type> column_paths_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     column_path_column_map_type column_path_column_map_;
@@ -340,7 +342,7 @@ private:
                         bool first = true;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            auto it = column_path_name_map_.find(column_paths_[i].string());
                             if (it != column_path_name_map_.end())
                             {
                                 if (!first)
@@ -362,7 +364,7 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        auto it = column_path_value_map_.find(column_paths_[i].string());
                         if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(), it->second.length());
@@ -379,7 +381,7 @@ private:
                     bool first = true;
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
-                        auto it = column_path_name_map_.find(column_paths_[i]);
+                        auto it = column_path_name_map_.find(column_paths_[i].string());
                         if (it != column_path_name_map_.end())
                         {
                             if (!first)
@@ -396,7 +398,7 @@ private:
                 std::vector<std::pair<typename column_type::const_iterator,typename column_type::const_iterator>> columns;
                 for (const auto& item : column_paths_)
                 {
-                    auto it = column_path_column_map_.find(item);
+                    auto it = column_path_column_map_.find(item.string());
                     if (it != column_path_column_map_.end())
                     {
                         columns.emplace_back((*it).second.cbegin(), (*it).second.cend());
@@ -601,7 +603,7 @@ private:
                         std::size_t col = 0;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            auto it = column_path_name_map_.find(column_paths_[i].string());
                             if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
@@ -621,7 +623,7 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        auto it = column_path_value_map_.find(column_paths_[i].string());
                         if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(), it->second.length());
@@ -648,7 +650,7 @@ private:
                         std::size_t col = 0;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i]);
+                            auto it = column_path_name_map_.find(column_paths_[i].string());
                             if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
@@ -669,7 +671,7 @@ private:
                         {
                             sink_.push_back(field_delimiter_);
                         }
-                        auto it = column_path_value_map_.find(column_paths_[i]);
+                        auto it = column_path_value_map_.find(column_paths_[i].string());
                         if (it != column_path_value_map_.end())
                         {
                             sink_.append(it->second.data(), it->second.length());
