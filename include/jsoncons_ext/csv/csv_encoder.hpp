@@ -463,6 +463,27 @@ private:
             }
             return true;
         }
+        // legacy        
+        if (has_column_names_ && stack_.back().count_ == 0)
+        {
+            if (stack_.back().item_kind_ == stack_item_kind::flat_row_mapping || stack_.back().item_kind_ == stack_item_kind::row_mapping)
+            {
+                std::size_t index = 0;
+                for (const auto& item : column_names_)
+                {
+                    string_type str{alloc_};
+                    str.push_back('/');
+                    buffer_.clear();
+                    jsoncons::detail::from_integer(index, buffer_);
+                    str.append(buffer_.data(), buffer_.size());
+                    column_paths_.emplace_back(str);
+                    column_path_value_map_.emplace(str, string_type{alloc_});
+                    column_path_name_map_.emplace(std::move(str), item);
+                    ++index;
+                }
+                has_column_mapping_ = true;
+            }
+        }
         
         switch (stack_.back().item_kind_)
         {

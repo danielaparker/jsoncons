@@ -9,7 +9,7 @@ namespace csv = jsoncons::csv;
 
 TEST_CASE("test json to flat csv with column mappings")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -122,12 +122,12 @@ TEST_CASE("test json to flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-//#endif    
+#endif    
 }
 
 TEST_CASE("test json to flat csv")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -405,12 +405,12 @@ NY,LON,TOR;LON
         //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
-//#endif           
+#endif           
 }
 
 TEST_CASE("test json to non-flat csv with column mappings")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(Number,Date Time
@@ -523,12 +523,12 @@ TEST_CASE("test json to non-flat csv with column mappings")
 
         CHECK(expected == buf);
     }    
-//#endif
+#endif
 }
 
 TEST_CASE("test json to non-flat csv")
 {
-//#if 0
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(/boolean,/datetime,/float,/nested/nested/date,/nested/nested/integer,/nested/time,/text
@@ -719,12 +719,13 @@ NY,LON,TOR;LON
 
         CHECK(expected == buf);
     }    
-//#endif
+#endif
 }
 
 
 TEST_CASE("test json to flat csv with column names")
 {
+#if 0
     SECTION("array of objects to csv")
     {
         std::string expected = R"(boolean,datetime,float,text
@@ -805,5 +806,56 @@ true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
 
         CHECK(expected == buf);
     }
+#endif
+    SECTION("array of arrays to csv with column_names")
+    {
+        std::string expected = R"(text,float
+Chicago Reader,1.0
+Chicago Sun-Times,1.27
+)";
+
+        std::string jtext = R"(
+[
+    [
+        "Chicago Reader", 
+        1.0, 
+        "1971-01-01T04:14:00", 
+        true,
+        [ 
+          "04:14:00",
+          [
+            "1971-01-01",
+            40
+          ]
+        ]
+    ], 
+    [
+        "Chicago Sun-Times", 
+        1.27, 
+        "1948-01-01T14:57:13", 
+        true,
+        [
+          "14:57:13",
+          [
+            "1948-01-01",
+            63
+          ]
+        ]
+    ]
+]
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .flat(true)
+            .column_names("text,float");
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+        CHECK(expected == buf);
+    }    
 }
 
