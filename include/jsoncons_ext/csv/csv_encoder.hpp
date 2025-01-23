@@ -132,7 +132,7 @@ private:
     std::size_t column_index_{0};
     string_type buffer_;
     string_type value_buffer_;
-    column_path_column_map_type::iterator column_it_;
+    typename column_path_column_map_type::iterator column_it_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
