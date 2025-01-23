@@ -170,9 +170,13 @@ public:
         neginf_to_str_(options.neginf_to_str()),
         alloc_(alloc),
         fp_(options.float_format(), options.precision()),
+        column_names_(alloc),
+        column_paths_(alloc),
+        column_path_name_map_(alloc),
+        column_path_value_map_(alloc),
+        column_path_column_map_(alloc),
         buffer_(alloc),
         value_buffer_(alloc),
-        column_path_column_map_(alloc),
         column_it_(column_path_column_map_.end())
     {
         if (has_column_mapping_)
