@@ -252,6 +252,19 @@ private:
         if (stack_.empty())
         {
             stack_.emplace_back(stack_item_kind::column_mapping);
+            if (has_column_names_)
+            {
+                for (const auto& item : column_names_)
+                {
+                    string_type str{alloc_};
+                    str.push_back('/');
+                    str.append(item.data(), item.size());
+                    column_paths_.emplace_back(str);
+                    column_path_value_map_.emplace(str, string_type{alloc_});
+                    column_path_name_map_.emplace(std::move(str), item);
+                }
+                has_column_mapping_ = true;
+            }
             return true;
         }
         
@@ -393,24 +406,34 @@ private:
                     while (!done)
                     {
                         std::size_t missing_cols = 0;
-                            
+                        std::size_t new_missing_cols = 0;
                         bool first = true;
-                        for (auto& item : columns)
+                        for (std::size_t i = 0; i < no_cols; ++i)
                         {
+                            auto& item = columns[i];
                             if (item.first == item.second)
-                            {
+                            {                               
                                 ++missing_cols;
+                                ++new_missing_cols;
                                 if (missing_cols == no_cols)
                                 {
                                     done = true;
-                                    break;
+                                }
+                                else if (i == (no_cols-1))
+                                {
+                                    while (new_missing_cols > 0)
+                                    {
+                                        sink_.push_back(field_delimiter_);
+                                        --new_missing_cols;
+                                    }
                                 }
                             }
                             else
                             {
-                                for (std::size_t i = 0; i < missing_cols; ++i)
+                                while (new_missing_cols > 0)
                                 {
                                     sink_.push_back(field_delimiter_);
+                                    --new_missing_cols;
                                 }
                                 if (!first)
                                 {

@@ -806,7 +806,6 @@ true,1948-01-01T14:57:13,1.27,Chicago Sun-Times
 
         CHECK(expected == buf);
     }
-#endif
     SECTION("array of arrays to csv with column_names")
     {
         std::string expected = R"(text,float
@@ -855,6 +854,38 @@ Chicago Sun-Times,1.27
         std::string buf;
         csv::csv_string_encoder encoder(buf, options);
         j.dump(encoder);
+        CHECK(expected == buf);
+    }    
+#endif
+
+    SECTION("object of arrays and subarrays to csv with column_names")
+    {
+        std::string expected = R"(b,c,a
+7;8;9,15,1;true;null
+10;11;12,16,-4;5.5;6
+,17,
+)";
+
+        const std::string jtext = R"(
+{
+   "a" : [[1,true,null],[-4,5.5,"6"]],
+   "b" : [[7,8,9],[10,11,12]],
+   "c" : [15,16,17]       
+}
+        )";
+
+        auto j = jsoncons::json::parse(jtext);
+        //std::cout << pretty_print(j) << "\n";
+
+        auto options = csv::csv_options{}
+            .subfield_delimiter(';')
+            .column_names("b,c,a");
+
+        std::string buf;
+        csv::csv_string_encoder encoder(buf, options);
+        j.dump(encoder);
+
+        //std::cout << buf << "\n"; 
         CHECK(expected == buf);
     }    
 }
