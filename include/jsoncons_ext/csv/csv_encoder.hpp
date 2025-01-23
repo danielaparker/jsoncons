@@ -37,10 +37,11 @@ public:
     using allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
     using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
-    using json_pointer_type = jsonpointer::basic_json_pointer<char_type>;
+    using jpointer_type = jsonpointer::basic_json_pointer<char_type>;
     using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
-    using json_pointer_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_pointer_type>;
+    using jpointer_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<jpointer_type>;
     using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
+    using jpointer_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const jpointer_type,string_type>>;
     using string_vector_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type, std::vector<string_type, string_allocator_type>>>;
     using column_type = std::vector<string_type, string_allocator_type>;
     using column_path_column_map_type = std::unordered_map<string_type, column_type, std::hash<string_type>,std::equal_to<string_type>,string_vector_allocator_type>;
@@ -126,8 +127,8 @@ private:
     jsoncons::detail::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<json_pointer_type,json_pointer_allocator_type> column_paths_;
-    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_name_map_;
+    std::vector<jpointer_type,jpointer_allocator_type> column_paths_;
+    std::unordered_map<jpointer_type,string_type, std::hash<jpointer_type>,std::equal_to<jpointer_type>,jpointer_string_allocator_type> column_path_name_map_;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> column_path_value_map_;
     column_path_column_map_type column_path_column_map_;
 
@@ -342,7 +343,7 @@ private:
                         bool first = true;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i].string());
+                            auto it = column_path_name_map_.find(column_paths_[i]);
                             if (it != column_path_name_map_.end())
                             {
                                 if (!first)
@@ -381,7 +382,7 @@ private:
                     bool first = true;
                     for (std::size_t i = 0; i < column_paths_.size(); ++i)
                     {
-                        auto it = column_path_name_map_.find(column_paths_[i].string());
+                        auto it = column_path_name_map_.find(column_paths_[i]);
                         if (it != column_path_name_map_.end())
                         {
                             if (!first)
@@ -603,7 +604,7 @@ private:
                         std::size_t col = 0;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i].string());
+                            auto it = column_path_name_map_.find(column_paths_[i]);
                             if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
@@ -650,7 +651,7 @@ private:
                         std::size_t col = 0;
                         for (std::size_t i = 0; i < column_paths_.size(); ++i)
                         {
-                            auto it = column_path_name_map_.find(column_paths_[i].string());
+                            auto it = column_path_name_map_.find(column_paths_[i]);
                             if (it != column_path_name_map_.end())
                             {
                                 if (col > 0)
