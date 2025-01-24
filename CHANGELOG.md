@@ -1,3 +1,16 @@
+1.2.0 (pending on master)
+-----
+
+- Fixed bugs:
+
+    - Git Issue #453: jsonpath length function incorrect with recursive select argument
+
+- Implemented new features:
+
+    - Git issue #556: Support nested json to csv
+
+    - Git issue #585: Add `raw_tag()` accessor to `basic_cbor_cursor`
+
 1.1.0 
 -----
 
