@@ -34,7 +34,6 @@ minor modifications.
 #ifndef JSONCONS_DETAIL_GRISU3_HPP
 #define JSONCONS_DETAIL_GRISU3_HPP 
 
-#pragma once
 #include <cassert>
 #include <cinttypes>
 #include <cmath>

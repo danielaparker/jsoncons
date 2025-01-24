@@ -1443,4 +1443,26 @@ namespace jsoncons { namespace jsonpointer {
 } // namespace jsonpointer
 } // namespace jsoncons
 
+namespace std {
+    template <typename CharT>
+    struct hash<jsoncons::jsonpointer::basic_json_pointer<CharT>>
+    {
+        std::size_t operator()(const jsoncons::jsonpointer::basic_json_pointer<CharT>& ptr) const noexcept
+        {
+            constexpr std::uint64_t prime{0x100000001B3};
+            std::uint64_t result{0xcbf29ce484222325};
+             
+            for (const auto& str : ptr)
+            {
+                for (std::size_t i = 0; i < str.length(); ++i)
+                {
+                    result = (result * prime) ^ str[i];
+                }
+            }
+            return result;
+        }
+    };   
+    
+} // namespace std
+
 #endif
