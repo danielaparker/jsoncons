@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
-#define JSONCONS_EXT_JSONSCHEMA_COMMON_EVALUATION_CONTEXT_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_EVAL_CONTEXT_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_EVAL_CONTEXT_HPP
 
 #include <cstddef>
 #include <string>
@@ -63,31 +63,31 @@ namespace jsonschema {
     }
 
     template <typename Json>
-    class evaluation_context
+    class eval_context
     {
     private:
         std::vector<const schema_validator<Json>*> dynamic_scope_;
         jsonpointer::json_pointer eval_path_;
         evaluation_flags flags_;
     public:
-        evaluation_context()
+        eval_context()
             : flags_{}
         {
         }
 
-        evaluation_context(const evaluation_context& other)
+        eval_context(const eval_context& other)
             : dynamic_scope_ { other.dynamic_scope_}, eval_path_{other.eval_path_},
               flags_(other.flags_)
         {
         }
 
-        evaluation_context(evaluation_context&& other) noexcept
+        eval_context(eval_context&& other) noexcept
             : dynamic_scope_{std::move(other.dynamic_scope_)},eval_path_{std::move(other.eval_path_)},
               flags_(other.flags_)
         {
         }
 
-        evaluation_context(const evaluation_context& parent, const schema_validator<Json> *validator)
+        eval_context(const eval_context& parent, const schema_validator<Json> *validator)
             : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
               flags_(parent.flags_)
         {
@@ -97,7 +97,7 @@ namespace jsonschema {
             }
         }
 
-        evaluation_context(const evaluation_context& parent, const schema_validator<Json> *validator,
+        eval_context(const eval_context& parent, const schema_validator<Json> *validator,
             evaluation_flags flags)
             : dynamic_scope_ { parent.dynamic_scope_ }, eval_path_{ parent.eval_path_ },
               flags_(flags)
@@ -108,27 +108,27 @@ namespace jsonschema {
             }
         }
 
-        evaluation_context(const evaluation_context& parent, const std::string& name)
+        eval_context(const eval_context& parent, const std::string& name)
             : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
               flags_(parent.flags_)
               
         {
         }
 
-        evaluation_context(const evaluation_context& parent, const std::string& name,
+        eval_context(const eval_context& parent, const std::string& name,
             evaluation_flags flags)
             : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / name),
               flags_(flags)
         {
         }
 
-        evaluation_context(const evaluation_context& parent, std::size_t index)
+        eval_context(const eval_context& parent, std::size_t index)
             : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index),
               flags_(parent.flags_)
         {
         }
 
-        evaluation_context(const evaluation_context& parent, std::size_t index,
+        eval_context(const eval_context& parent, std::size_t index,
             evaluation_flags flags)
             : dynamic_scope_{parent.dynamic_scope_}, eval_path_(parent.eval_path() / index),
               flags_(flags)

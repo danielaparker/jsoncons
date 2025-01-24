@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
-#define JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
+#ifndef JSONCONS_EXT_JSONPATH_TOKEN_EVALUATOR_HPP
+#define JSONCONS_EXT_JSONPATH_TOKEN_EVALUATOR_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -1947,7 +1947,7 @@ namespace detail {
             {
                 case json_type::object_value:
                 case json_type::array_value:
-                    std::cout << "LENGTH ARG: " << arg0 << "\n";
+                    //std::cout << "LENGTH ARG: " << arg0 << "\n";
                     return value_type(arg0.size(), semantic_tag::none);
                 case json_type::string_value:
                 {
@@ -3269,7 +3269,7 @@ namespace detail {
     };
 
     template <typename Json,typename JsonReference>
-    class expression : public expression_base<Json,JsonReference>
+    class token_evaluator : public expression_base<Json,JsonReference>
     {
     public:
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
@@ -3293,22 +3293,22 @@ namespace detail {
         std::vector<token_type> token_list_;
     public:
 
-        expression()
+        token_evaluator()
         {
         }
 
-        expression(const expression& expr) = delete;
-        expression(expression&& expr) = default;
+        token_evaluator(const token_evaluator& expr) = delete;
+        token_evaluator(token_evaluator&& expr) = default;
 
-        expression(std::vector<token_type>&& token_stack)
+        token_evaluator(std::vector<token_type>&& token_stack)
             : token_list_(std::move(token_stack))
         {
         }
 
-        expression& operator=(const expression& expr) = delete;
-        expression& operator=(expression&& expr) = default;
+        token_evaluator& operator=(const token_evaluator& expr) = delete;
+        token_evaluator& operator=(token_evaluator&& expr) = default;
         
-        ~expression() = default;
+        ~token_evaluator() = default;
 
         value_type evaluate(eval_context<Json,reference>& context, 
             reference root,
@@ -3369,7 +3369,6 @@ namespace detail {
                             stack.emplace_back(std::addressof(root));
                             break;
                         case jsonpath_token_kind::current_node:
-                            std::cout << "CURRENT NODE: " << current << "\n";
                             stack.emplace_back(std::addressof(current));
                             break;
                         case jsonpath_token_kind::argument:
@@ -3427,7 +3426,6 @@ namespace detail {
                             //std::cout << "selector item: " << *ptr << "\n";
 
                             reference val = tok.selector_->evaluate(context, root, path_node_type{}, item.value(), options, ec);
-                            std::cout << "SELECTOR RESULT: " << val << "\n";
 
                             stack.pop_back();
                             stack.emplace_back(stack_item_type(std::addressof(val)));
@@ -3454,7 +3452,7 @@ namespace detail {
                 s.append("\n");
                 s.append(std::size_t(level)*2, ' ');
             }
-            s.append("expression ");
+            s.append("token_evaluator ");
             for (const auto& item : token_list_)
             {
                 s.append(item.to_string(level+1));
@@ -3470,4 +3468,4 @@ namespace detail {
 } // namespace jsonpath
 } // namespace jsoncons
 
-#endif // JSONCONS_EXT_JSONPATH_EXPRESSION_HPP
+#endif // JSONCONS_EXT_JSONPATH_TOKEN_EVALUATOR_HPP

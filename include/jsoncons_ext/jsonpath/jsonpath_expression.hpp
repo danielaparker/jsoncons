@@ -20,7 +20,7 @@
 #include <jsoncons/utility/extension_traits.hpp>
 #include <jsoncons/tag_type.hpp>
 
-#include <jsoncons_ext/jsonpath/expression.hpp>
+#include <jsoncons_ext/jsonpath/token_evaluator.hpp>
 #include <jsoncons_ext/jsonpath/json_location.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_parser.hpp>
 #include <jsoncons_ext/jsonpath/path_node.hpp>

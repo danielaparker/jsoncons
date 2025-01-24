@@ -13,7 +13,7 @@
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>
-#include <jsoncons_ext/jsonschema/common/evaluation_context.hpp>
+#include <jsoncons_ext/jsonschema/common/eval_context.hpp>
 #include <jsoncons_ext/jsonschema/common/keyword_validators.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 
@@ -83,7 +83,7 @@ namespace jsonschema {
             return schema_val_->always_succeeds();
         }
 
-        walk_result walk(const evaluation_context<Json>& context, 
+        walk_result walk(const eval_context<Json>& context, 
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
         {
@@ -91,7 +91,7 @@ namespace jsonschema {
         }
         
     private:
-        walk_result do_validate(const evaluation_context<Json>& context, 
+        walk_result do_validate(const eval_context<Json>& context, 
             const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results,
@@ -102,7 +102,7 @@ namespace jsonschema {
             return schema_val_->validate(context, instance, instance_location, results, reporter, patch);
         }
 
-        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_walk(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
         {
             JSONCONS_ASSERT(schema_val_ != nullptr);
@@ -177,7 +177,7 @@ namespace jsonschema {
 
     private:
 
-        walk_result do_validate(const evaluation_context<Json>& context, const Json&, 
+        walk_result do_validate(const eval_context<Json>& context, const Json&, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& /*results*/, 
             error_reporter& reporter, 
@@ -194,7 +194,7 @@ namespace jsonschema {
             return walk_result::advance;
         }
 
-        walk_result do_walk(const evaluation_context<Json>& /*context*/, const Json& /*instance*/,
+        walk_result do_walk(const eval_context<Json>& /*context*/, const Json& /*instance*/,
             const jsonpointer::json_pointer& /*instance_location*/, const walk_reporter_type& /*reporter*/) const final 
         {
             return walk_result::advance;
@@ -351,7 +351,7 @@ namespace jsonschema {
             }
         }
 
-        walk_result do_validate(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location,
             evaluation_results& results, 
             error_reporter& reporter, 
@@ -377,7 +377,7 @@ namespace jsonschema {
                 flags |= evaluation_flags::require_evaluated_items;
             }
 
-            evaluation_context<Json> this_context{context, this, flags};
+            eval_context<Json> this_context{context, this, flags};
             
             //std::cout << "validators:\n";
             for (auto& val : validators_)
@@ -429,10 +429,10 @@ namespace jsonschema {
             return walk_result::advance;
         }
 
-        walk_result do_walk(const evaluation_context<Json>& context, const Json& instance, 
+        walk_result do_walk(const eval_context<Json>& context, const Json& instance, 
             const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final 
         {           
-            evaluation_context<Json> this_context{context, this};
+            eval_context<Json> this_context{context, this};
             for (auto& val : validators_)
             {               
                 //std::cout << "    " << val->keyword_name() << "\n";
