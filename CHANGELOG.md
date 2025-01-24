@@ -3,7 +3,7 @@
 
 - Fixed bugs:
 
-    - Git Issue #453: jsonpath length function incorrect with recursive select argument
+    - Git Issue #453: jsonpath length function with recursive select argument gives wrong result
 
 - Implemented new features:
 
