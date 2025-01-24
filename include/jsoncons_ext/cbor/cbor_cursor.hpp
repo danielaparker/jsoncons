@@ -158,6 +158,11 @@ public:
     {
         return parser_.done();
     }
+    
+    bool raw_tag() const
+    {
+        return parser_.raw_tag();
+    }
 
     bool is_typed_array() const
     {
