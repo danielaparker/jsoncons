@@ -227,11 +227,16 @@ json_stream_reader reader(is,decoder);
 while (!reader.eof())
 {
     reader.read_next();
-    if (!reader.eof())
-    {
-        json j = decoder.get_result();
-        std::cout << j << '\n';
-    }
+
+    // until 1.0.0
+    //if (!reader.eof())
+    //{
+    //    json j = decoder.get_result();
+    //    std::cout << j << '\n';
+    //}
+    // since 1.0.0
+    json j = decoder.get_result();
+    std::cout << j << '\n';
 }
 ```
 Output:

@@ -85,11 +85,16 @@ void read_mulitple_json_objects()
     while (!reader.eof())
     {
         reader.read_next();
-        if (!reader.eof())
-        {
-            json j = decoder.get_result();
-            std::cout << j << '\n';
-        }
+        
+        // until 1.0.0
+        //if (!reader.eof())
+        //{
+        //    json j = decoder.get_result();
+        //    std::cout << j << '\n';
+        //}       
+        // since 1.0.0
+        json j = decoder.get_result();
+        std::cout << j << '\n';
     }
 }
 
@@ -165,7 +170,7 @@ int main()
     std::cout << "\njson_reader examples\n\n";
 
     //read_mulitple_json_objects();
-    read_with_stateful_allocator();
+    //read_with_stateful_allocator();
     //custom_iterator_source();
-    //read_json_lines();
+    read_json_lines();
 }

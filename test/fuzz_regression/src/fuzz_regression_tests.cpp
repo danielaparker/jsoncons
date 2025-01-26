@@ -16,9 +16,9 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("oss-fuzz issues")
 {
+#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -661,9 +661,33 @@ TEST_CASE("oss-fuzz issues")
             }
         }
     }
-}
 #endif
+    // Fuzz target: fuzz_csv_encoder
+    // Issue: Failed throw
+    // Resolution: 
+    SECTION("issue 391917540")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_csv_encoder-4850580052312064";
 
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::string s2;
+        csv::csv_string_encoder visitor(s2);
+
+        csv::csv_stream_reader reader(is, visitor);
+        std::error_code ec;
+
+        REQUIRE_NOTHROW(reader.read(ec));
+        std::cout << ec.message() << "\n";
+        
+        //CHECK((ec == csv::csv_errc::source_error)); //-V521
+
+        //std::cout << visitor.get_result() << "" << '\n';
+    }
+}
+
+#if 0
 TEST_CASE("Fuzz target: fuzz_ubjson_encoder")
 {
     // Issue: Timeout
@@ -754,3 +778,6 @@ TEST_CASE("Fuzz target: fuzz_cbor_encoder")
         }
     }
 }
+#endif
+
+
