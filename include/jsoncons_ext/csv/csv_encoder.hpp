@@ -64,15 +64,18 @@ private:
     enum class stack_item_kind
     {
         flat_row_mapping,
+        stream_flat_row_mapping,
         row_mapping,
         flat_object,
         flat_row,
+        stream_flat_row,
         unmapped,
         object,
         row,
         column_mapping,
         column,
         multivalued_field,
+        stream_multivalued_field,
         column_multivalued_field
     };
     
@@ -309,6 +312,9 @@ private:
             case stack_item_kind::flat_row_mapping:
                 stack_.emplace_back(stack_item_kind::flat_object);
                 break;
+            case stack_item_kind::stream_flat_row_mapping:
+                stack_.emplace_back(stack_item_kind::flat_object);
+                break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
@@ -348,7 +354,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-                if (parent(stack_).item_kind_ == stack_item_kind::row_mapping || parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping)
+                if (parent(stack_).item_kind_ == stack_item_kind::row_mapping || parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping || parent(stack_).item_kind_ == stack_item_kind::stream_flat_row_mapping)
                 {
                     if (stack_[0].count_ == 0)
                     {
@@ -497,7 +503,14 @@ private:
         {
             if (flat_)
             {
-                stack_.emplace_back(stack_item_kind::flat_row_mapping);
+                if (has_column_mapping_ || has_column_names_)
+                {
+                    stack_.emplace_back(stack_item_kind::flat_row_mapping);
+                }
+                else
+                {
+                    stack_.emplace_back(stack_item_kind::stream_flat_row_mapping);
+                }
             }
             else
             {
@@ -537,6 +550,9 @@ private:
             case stack_item_kind::flat_row_mapping:
                 stack_.emplace_back(stack_item_kind::flat_row);
                 break;
+            case stack_item_kind::stream_flat_row_mapping:
+                stack_.emplace_back(stack_item_kind::stream_flat_row);
+                break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::row);
                 break;
@@ -556,6 +572,17 @@ private:
                     append_array_path_component();
                     value_buffer_.clear();
                     stack_.emplace_back(stack_item_kind::multivalued_field);
+                }
+                break;
+            case stack_item_kind::stream_flat_row:
+                if (subfield_delimiter_ == char_type())
+                {
+                    stack_.emplace_back(stack_item_kind::unmapped);
+                }
+                else
+                {
+                    value_buffer_.clear();
+                    stack_.emplace_back(stack_item_kind::stream_multivalued_field);
                 }
                 break;
             case stack_item_kind::flat_object:
@@ -579,6 +606,7 @@ private:
                 }
                 break;
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
                 stack_.emplace_back(stack_item_kind::unmapped);
                 break;
             case stack_item_kind::column_mapping:
@@ -612,6 +640,7 @@ private:
         {
             case stack_item_kind::row_mapping:
             case stack_item_kind::flat_row_mapping:
+            case stack_item_kind::stream_flat_row_mapping:
                 break;
             case stack_item_kind::flat_row:
                 if (parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping)
@@ -651,13 +680,28 @@ private:
                     sink_.append(line_delimiter_.data(), line_delimiter_.length());
                 }
                 break;
+            case stack_item_kind::stream_flat_row:
+                if (parent(stack_).item_kind_ == stack_item_kind::stream_flat_row_mapping)
+                {
+                    sink_.append(line_delimiter_.data(), line_delimiter_.length());
+                }
+                break;
             case stack_item_kind::multivalued_field:
             {
-                auto it = column_path_value_map_.find(stack_[stack_.size() - 2].column_path_);
+                auto it = column_path_value_map_.find(parent(stack_).column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     it->second = value_buffer_;
                 }
+                break;
+            }
+            case stack_item_kind::stream_multivalued_field:
+            {
+                if (parent(stack_).count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                sink_.append(value_buffer_.data(), value_buffer_.size());
                 break;
             }
             case stack_item_kind::row:
@@ -819,8 +863,20 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_null_value(value_buffer_);
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -877,8 +933,20 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_string_value(sv, value_buffer_);
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -992,8 +1060,24 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_double_value(val, context, value_buffer_, ec);
+                if (ec)
+                {
+                    return false;
+                }
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::multivalued_field:
             case stack_item_kind::column_multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1052,8 +1136,20 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_int64_value(val, value_buffer_);
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::column_multivalued_field:
             case stack_item_kind::multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1112,8 +1208,20 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_uint64_value(val, value_buffer_);
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::multivalued_field:
             case stack_item_kind::column_multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
@@ -1169,8 +1277,20 @@ private:
                 }
                 break;
             }
+            case stack_item_kind::stream_flat_row:
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    sink_.push_back(field_delimiter_);
+                }
+                value_buffer_.clear();
+                write_bool_value(val, value_buffer_);
+                sink_.append(value_buffer_.data(), value_buffer_.size());
+                break;
+            }
             case stack_item_kind::multivalued_field:
             case stack_item_kind::column_multivalued_field:
+            case stack_item_kind::stream_multivalued_field:
             {
                 if (!value_buffer_.empty())
                 {
