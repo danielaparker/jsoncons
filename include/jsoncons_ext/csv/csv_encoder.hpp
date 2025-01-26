@@ -90,11 +90,6 @@ private:
         {
         }
 
-        bool is_object() const
-        {
-            return item_kind_ == stack_item_kind::object || stack_item_kind::flat_object;
-        }
-
         stack_item_kind item_kind() const
         {
             return item_kind_;

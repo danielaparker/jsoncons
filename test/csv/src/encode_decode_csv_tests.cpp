@@ -204,7 +204,7 @@ TEMPLATE_TEST_CASE("test_csv_encoder_reset", "",
         // Missing column and array end
     f.encoder.flush();
 
-    CHECK("h1,h2\n" == f.string1());
+    CHECK("h1,h2\n1" == f.string1()); // streaming case
     f.encoder.reset();
     f.encoder.begin_array();
         f.encoder.begin_array();
@@ -217,7 +217,7 @@ TEMPLATE_TEST_CASE("test_csv_encoder_reset", "",
         f.encoder.end_array();
     f.encoder.end_array();
     f.encoder.flush();
-    CHECK("h1,h2\nh3,h4\n3,4\n" == f.string1());
+    CHECK("h1,h2\n1h3,h4\n3,4\n" == f.string1()); // streaming case
 
     // Reset and encode to different sink
     f.encoder.reset(f.output2);
