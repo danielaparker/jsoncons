@@ -22,7 +22,8 @@ namespace jsoncons { namespace csv {
         syntax_error,
         invalid_parse_state,
         invalid_escaped_char,
-        unexpected_char_between_fields
+        unexpected_char_between_fields,
+        max_nesting_depth_exceeded
     };
 
 class csv_error_category_impl
@@ -51,6 +52,8 @@ public:
                 return "Invalid character following quote escape character";
             case csv_errc::unexpected_char_between_fields:
                 return "Unexpected character between fields";
+            case csv_errc::max_nesting_depth_exceeded:
+                return "Data item nesting exceeds limit in options";
             default:
                 return "Unknown CSV parser error";
         }

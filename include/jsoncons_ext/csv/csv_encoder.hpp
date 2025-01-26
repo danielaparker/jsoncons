@@ -106,6 +106,7 @@ private:
 
     Sink sink_;
     bool flat_;
+    std::size_t max_nesting_depth_;
     bool has_column_mapping_;
     bool has_column_names_;
     char_type field_delimiter_;
@@ -156,6 +157,7 @@ public:
         const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
         flat_(options.flat()),
+        max_nesting_depth_(options.max_nesting_depth()),
         has_column_mapping_(!options.column_mapping().empty()),
         has_column_names_(!options.column_names().empty()),
         field_delimiter_(options.field_delimiter()),
@@ -279,6 +281,11 @@ private:
             }
             return true;
         }
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
+        {
+            ec = csv_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         
         // legacy        
         if (has_column_names_ && stack_.back().count_ == 0)
@@ -497,6 +504,11 @@ private:
                 stack_.emplace_back(stack_item_kind::row_mapping);
             }
             return true;
+        }
+        if (JSONCONS_UNLIKELY(stack_.size() >= max_nesting_depth_))
+        {
+            ec = csv_errc::max_nesting_depth_exceeded;
+            return false;
         }
         // legacy        
         if (has_column_names_ && stack_.back().count_ == 0)
