@@ -37,6 +37,31 @@ namespace jsoncons { namespace jsonpointer {
 
     } // namespace detail
 
+    template <typename CharT,typename Allocator=std::allocator<CharT>>
+    std::basic_string<CharT,std::char_traits<CharT>,Allocator> escape(const jsoncons::basic_string_view<CharT>& s, const Allocator& = Allocator())
+    {
+        std::basic_string<CharT,std::char_traits<CharT>,Allocator> result;
+
+        for (auto c : s)
+        {
+            if (c == '~')
+            {
+                result.push_back('~');
+                result.push_back('0');
+            }
+            else if (c == '/')
+            {
+                result.push_back('~');
+                result.push_back('1');
+            }
+            else
+            {
+                result.push_back(c);
+            }
+        }
+        return result;
+    }
+
     template <typename CharT>
     std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
     {
@@ -1170,31 +1195,6 @@ namespace jsoncons { namespace jsonpointer {
                 result.push_back(c);
             }
         }
-    }
-
-    template <typename CharT>
-    std::basic_string<CharT> escape(const jsoncons::basic_string_view<CharT>& s)
-    {
-        std::basic_string<CharT> result;
-
-        for (auto c : s)
-        {
-            if (c == '~')
-            {
-                result.push_back('~');
-                result.push_back('0');
-            }
-            else if (c == '/')
-            {
-                result.push_back('~');
-                result.push_back('1');
-            }
-            else
-            {
-                result.push_back(c);
-            }
-        }
-        return result;
     }
 
     // flatten
