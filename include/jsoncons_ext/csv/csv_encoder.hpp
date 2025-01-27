@@ -37,9 +37,7 @@ public:
     using allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
     using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
-    using jpointer_type = jsonpointer::basic_json_pointer<char_type>;
     using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
-    using jpointer_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<jpointer_type>;
     using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
     using string_vector_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type, std::vector<string_type, string_allocator_type>>>;
     using column_type = std::vector<string_type, string_allocator_type>;
@@ -82,7 +80,7 @@ private:
     {
         stack_item_kind item_kind_;
         std::size_t count_{0};
-        jpointer_type column_path_;
+        string_type column_path_;
 
         stack_item(stack_item_kind item_kind) noexcept
            : item_kind_(item_kind)
@@ -265,9 +263,9 @@ private:
             {
                 for (const auto& item : column_names_)
                 {
-                    jpointer_type col_path;
-                    col_path.append(item);
-                    string_type str = col_path.string();
+                    string_type str{alloc_};
+                    str.push_back('/');
+                    str.append(jsonpointer::escape_string(item));
                     column_paths_.emplace_back(str);
                     column_path_value_map_.emplace(str, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(str), item);
@@ -289,9 +287,9 @@ private:
             {
                 for (const auto& item : column_names_)
                 {
-                    jpointer_type col_path;
-                    col_path.append(item);
-                    string_type str = col_path.string();
+                    string_type str{alloc_};
+                    str.push_back('/');
+                    str.append(jsonpointer::escape_string(item));
                     column_paths_.emplace_back(str);
                     column_path_value_map_.emplace(str, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(str), item);
@@ -580,7 +578,7 @@ private:
                     {
                         if (!has_column_mapping_)
                         {
-                            string_type str = stack_.back().column_path_.string();
+                            string_type str = stack_.back().column_path_;
                             column_paths_.emplace_back(str);
                             column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                         }
@@ -672,7 +670,7 @@ private:
                 break;
             case stack_item_kind::multivalued_field:
             {
-                auto it = column_path_value_map_.find(parent(stack_).column_path_.string());
+                auto it = column_path_value_map_.find(parent(stack_).column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     it->second = value_buffer_;
@@ -757,35 +755,38 @@ private:
             case stack_item_kind::flat_object:
             {
                 stack_.back().column_path_ = parent(stack_).column_path_;
-                stack_.back().column_path_.append(std::string(name));
+                stack_.back().column_path_.push_back('/');
+                stack_.back().column_path_.append(jsonpointer::escape_string(std::string(name)));
                 if (!has_column_mapping_)
                 {
-                    column_path_name_map_.emplace(stack_.back().column_path_.string(), name);
+                    column_path_name_map_.emplace(stack_.back().column_path_, name);
                 }
                 break;
             }
             case stack_item_kind::object:
             {
                 stack_.back().column_path_ = parent(stack_).column_path_;
-                stack_.back().column_path_.append(std::string(name));
+                stack_.back().column_path_.push_back('/');
+                stack_.back().column_path_.append(jsonpointer::escape_string(std::string(name)));
                 if (!has_column_mapping_)
                 {
-                    column_path_name_map_.emplace(stack_.back().column_path_.string(), stack_.back().column_path_.string());
+                    column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);
                 }
                 break;
             }
             case stack_item_kind::column_mapping:
             {
                 stack_.back().column_path_.clear();
+                stack_.back().column_path_.push_back('/');
                 stack_.back().column_path_.append(std::string(name));
                 if (!has_column_mapping_)
                 {
                     
-                    string_type str = stack_.back().column_path_.string();
+                    string_type str = stack_.back().column_path_;
                     column_paths_.emplace_back(str);
                     column_path_name_map_.emplace(std::move(str), name);
                 }
-                column_it_ = column_path_column_map_.emplace(stack_.back().column_path_.string(), column_type{alloc_}).first;
+                column_it_ = column_path_column_map_.emplace(stack_.back().column_path_, column_type{alloc_}).first;
                 break;
             }
             default:
@@ -797,15 +798,16 @@ private:
     void append_array_path_component()
     {
         stack_.back().column_path_ = parent(stack_).column_path_;
-        stack_.back().column_path_.append(stack_.back().count_);
+        stack_.back().column_path_.push_back('/');
+        jsoncons::detail::from_integer(stack_.back().count_, stack_.back().column_path_);
         if (stack_[0].count_ == 0)
         {
             if (!has_column_mapping_)
             {
-                string_type str = stack_.back().column_path_.string();
+                string_type str = stack_.back().column_path_;
                 if (stack_.back().item_kind_ == stack_item_kind::row)
                 {
-                    column_path_name_map_.emplace(str, stack_.back().column_path_.string());
+                    column_path_name_map_.emplace(str, stack_.back().column_path_);
                 }
                 column_paths_.emplace_back(str);
                 column_path_value_map_.emplace(std::move(str), string_type{alloc_});
@@ -825,12 +827,12 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_null_value(it->second);
@@ -841,7 +843,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_null_value(it->second);
@@ -895,13 +897,13 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
 
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_string_value(sv, it->second);
@@ -912,7 +914,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_string_value(sv, it->second);
@@ -1024,12 +1026,12 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_double_value(val, context, it->second, ec);
@@ -1040,7 +1042,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_double_value(val, context, it->second, ec);
@@ -1101,12 +1103,12 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_int64_value(val, it->second);
@@ -1117,7 +1119,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_int64_value(val, it->second);
@@ -1174,12 +1176,12 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_uint64_value(val, it->second);
@@ -1190,7 +1192,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_uint64_value(val, it->second);
@@ -1244,12 +1246,12 @@ private:
                 {
                     if (!has_column_mapping_)
                     {
-                        string_type str = stack_.back().column_path_.string();
+                        string_type str = stack_.back().column_path_;
                         column_paths_.emplace_back(str);
                         column_path_value_map_.emplace(std::move(str), string_type{alloc_});
                     }
                 }
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_bool_value(val, it->second);
@@ -1260,7 +1262,7 @@ private:
             case stack_item_kind::row:
             {
                 append_array_path_component();
-                auto it = column_path_value_map_.find(stack_.back().column_path_.string());
+                auto it = column_path_value_map_.find(stack_.back().column_path_);
                 if (it != column_path_value_map_.end())
                 {
                     write_bool_value(val, it->second);
