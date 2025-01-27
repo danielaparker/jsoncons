@@ -166,6 +166,86 @@ public:
         reset();
     }
 
+    void begin_object_with_tag(uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        begin_object();
+    }
+
+    void begin_object_with_tag(std::size_t length, uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        begin_object(length);
+    }
+
+    void begin_array_with_tag(uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        begin_array();
+    }
+
+    void begin_array_with_tag(std::size_t length, uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        begin_array(length);
+    }
+
+    void null_value_with_tag(uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        sink_.push_back(0xf6);
+        end_value();
+    }  
+
+    void bool_value_with_tag(bool value, uint64_t raw_tag)
+    {
+        write_tag(raw_tag);
+        if (value)
+        {
+            sink_.push_back(0xf5);
+        }
+        else
+        {
+            sink_.push_back(0xf4);
+        }
+
+        end_value();
+    }  
+
+    void string_value_with_tag(const string_view_type& value, uint64_t raw_tag) 
+    {
+        write_tag(raw_tag);
+        write_string(value);
+        end_value();
+    }
+
+    void byte_string_value_with_tag(const byte_string_view& value, uint64_t raw_tag) 
+    {
+        write_tag(raw_tag);
+        write_byte_string(value);
+        end_value();
+    }
+
+    void double_value_with_tag(double value, uint64_t raw_tag) 
+    {
+        write_tag(raw_tag);
+        double_value(value);
+    }
+    
+    void uint64_value_with_tag(uint64_t value, uint64_t raw_tag) 
+    {
+        write_tag(raw_tag);
+        write_uint64_value(value);
+        end_value();
+    }
+
+    void int64_value_with_tag(int64_t value, uint64_t raw_tag) 
+    {
+        write_tag(raw_tag);
+        write_int64_value(value);
+        end_value();
+    }
+
 private:
     // Implementing methods
 
@@ -924,7 +1004,7 @@ private:
             if (it == bytestringref_map_.end())
             {
                 bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
-                write_byte_string_value(bs);
+                write_byte_string(bs);
             }
             else
             {
@@ -934,7 +1014,7 @@ private:
         }
         else
         {
-            write_byte_string_value(b);
+            write_byte_string(b);
         }
 
         end_value();
@@ -954,7 +1034,7 @@ private:
             {
                 bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
                 write_tag(ext_tag);
-                write_byte_string_value(bs);
+                write_byte_string(bs);
             }
             else
             {
@@ -965,14 +1045,14 @@ private:
         else
         {
             write_tag(ext_tag);
-            write_byte_string_value(b);
+            write_byte_string(b);
         }
 
         end_value();
         return true;
     }
 
-    void write_byte_string_value(const byte_string_view& b) 
+    void write_byte_string(const byte_string_view& b) 
     {
         if (b.size() <= 0x17)
         {
@@ -1079,78 +1159,7 @@ private:
             default:
                 break;
         }
-        if (value >= 0)
-        {
-            if (value <= 0x17)
-            {
-                binary::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint8_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x18), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint16_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x19), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint16_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<uint32_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x1a), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint32_t>(value), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (value <= (std::numeric_limits<int64_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x1b), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<int64_t>(value), 
-                                  std::back_inserter(sink_));
-            }
-        } else
-        {
-            const auto posnum = -1 - value;
-            if (value >= -24)
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x20 + posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint8_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x38), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint8_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint16_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x39), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint16_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<uint32_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x3a), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<uint32_t>(posnum), 
-                                  std::back_inserter(sink_));
-            } 
-            else if (posnum <= (std::numeric_limits<int64_t>::max)())
-            {
-                binary::native_to_big(static_cast<uint8_t>(0x3b), 
-                                  std::back_inserter(sink_));
-                binary::native_to_big(static_cast<int64_t>(posnum), 
-                                  std::back_inserter(sink_));
-            }
-        }
+        write_int64_value(value);
         end_value();
         return true;
     }
@@ -1239,6 +1248,82 @@ private:
         }
     }
 
+    void write_int64_value(int64_t value) 
+    {
+        if (value >= 0)
+        {
+            if (value <= 0x17)
+            {
+                binary::native_to_big(static_cast<uint8_t>(value), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (value <= (std::numeric_limits<uint8_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x18), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint8_t>(value), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (value <= (std::numeric_limits<uint16_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x19), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint16_t>(value), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (value <= (std::numeric_limits<uint32_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x1a), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(value), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (value <= (std::numeric_limits<int64_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x1b), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int64_t>(value), 
+                                  std::back_inserter(sink_));
+            }
+        } else
+        {
+            const auto posnum = -1 - value;
+            if (value >= -24)
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x20 + posnum), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (posnum <= (std::numeric_limits<uint8_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x38), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint8_t>(posnum), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (posnum <= (std::numeric_limits<uint16_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x39), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint16_t>(posnum), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (posnum <= (std::numeric_limits<uint32_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x3a), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(posnum), 
+                                  std::back_inserter(sink_));
+            } 
+            else if (posnum <= (std::numeric_limits<int64_t>::max)())
+            {
+                binary::native_to_big(static_cast<uint8_t>(0x3b), 
+                                  std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int64_t>(posnum), 
+                                  std::back_inserter(sink_));
+            }
+        }
+    }
+
     bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (value)
@@ -1270,7 +1355,7 @@ private:
                     write_tag(0x40);
                     break;
             }
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1300,7 +1385,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1330,7 +1415,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1360,7 +1445,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1388,7 +1473,7 @@ private:
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1418,7 +1503,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int16_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1448,7 +1533,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int32_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1478,7 +1563,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int64_t));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1508,7 +1593,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             std::memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1538,7 +1623,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(float));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(float));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         else
@@ -1568,7 +1653,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));
             std::memcpy(v.data(), data.data(), data.size()*sizeof(double));
-            write_byte_string_value(byte_string_view(v));
+            write_byte_string(byte_string_view(v));
             return true;
         }
         
