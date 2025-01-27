@@ -14,41 +14,41 @@ template<
 
 Specifies options for reading and writing CSV data. 
 
-Option|Reading|Writing
-------|-------|----------
-flat (since 1.2.0)|&nbsp;|Indicates whether the encoder should process JSON as "flat" (without navigating through nested structures).
-max_nesting_depth (since 1.2.0)|&nbsp;|Maximum nesting depth allowed in the input when encoding nested JSON to CSV 
-column_mapping (since 1.2.0)|&nbsp;|Maps column paths identified by JSONPointers to plain names.
+Option|Reading|Writing|Default
+------|-------|-------|-------
+flat (since 1.2.0)|&nbsp;|Indicates whether the encoder should process JSON as "flat" (without navigating through nested structures)|`true`
+max_nesting_depth (since 1.2.0)|&nbsp;|Maximum nesting depth allowed in the input when encoding nested JSON to CSV|**1024**
+column_mapping (since 1.2.0)|&nbsp;|Maps column paths identified by JSONPointers to plain names|No column mappings
 nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
 inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
 neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON
 nan_to_num| |Sets a number replacement for `NaN` when writing JSON
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
-line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row. Default is `\n`.
-field_delimiter|A character that indicates the end of a field. Default is `,`.|Character to separate values.
-subfield_delimiter|A character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Character to write between items in an array value.
-quote_char|A character to quote fields. Default is the double quote character `"`|A character to quote fields.
-quote_escape_char|A character to escape quote characters occuring inside quoted fields. The default is the double quote character (i.e. the quote character is doubled).|Character to escape quote characters occurring inside quoted fields. 
-quote_style| |Indicates what [quote_style](quote_style_kind.md) to use when quoting fields. Default is minimal.
+line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row.|**\n**
+field_delimiter|A character that indicates the end of a field.|Character to separate values.|**,**
+subfield_delimiter|A character that indicates the end of a single value in a multi-valued field.|Character to write between items in an array value.|No multivalued fields
+quote_char|A character to quote fields.|A character to quote fields.|**"**
+quote_escape_char|A character to escape quote characters occuring inside quoted fields. |Character to escape quote characters occurring inside quoted fields.|double quote character (quote character is doubled) 
+quote_style| |Indicates what [quote_style](quote_style_kind.md) to use when quoting fields. |**minimal**
 column_names|Use these column names when reading the file.|Write these column names to the header line.
 header_lines|Number of header lines in the CSV text. Defaults to 1 if assume_header is true, otherwise 0|
-assume_header|Assume first row in file is header, use field names to construct objects. Default is `false`.|
-skip_header|Skip the first (header) line of input. Default is `false`.|
-ignore_empty_values|Do not read CSV fields that have empty values. Default is `false`.|
-ignore_empty_lines|If set to true, all lines in the file that are empty (apart from record delimiter characters) are ignored. To ignore lines with only spaces or tabs, set trim to true. Default is `true`.|
-trim_leading|Trim leading whitespace. Default is `false`.|
-trim_trailing|Trim trailing whitespace. Default is `false`.|
-trim|Trim both leading and trailing whitespace. Default is `false`.|
-trim_leading_inside_quotes|Trim leading whitespace inside quote characters. Default is `false`.|
-trim_trailing_inside_quotes|Trim trailing whitespace inside quote characters. Default is `false`.|
-trim_inside_quotes|Trim both leading and trailing whitespace inside quote characters. Default is `false`.|
-unquoted_empty_value_is_null|Replace empty field with json null value. Default is `false`.|
-infer_types|Infer null, true, false, integers and floating point values in the CSV source. Default is `true`.|
-lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Default is `false`.|
-comment_starter|Character to comment out a line, must be at column 1. Default is no comments.|
+assume_header|Assume first row in file is header, use field names to construct objects.|**false**
+skip_header|Skip the first (header) line of input. |**false**
+ignore_empty_values|Do not read CSV fields that have empty values. |**false**
+ignore_empty_lines|If set to true, all lines in the file that are empty (apart from record delimiter characters) are ignored. To ignore lines with only spaces or tabs, set trim to true. |**true**
+trim_leading|Trim leading whitespace. |**false**
+trim_trailing|Trim trailing whitespace. |**false**
+trim|Trim both leading and trailing whitespace. |**false**
+trim_leading_inside_quotes|Trim leading whitespace inside quote characters.|**false**
+trim_trailing_inside_quotes|Trim trailing whitespace inside quote characters.|**false**
+trim_inside_quotes|Trim both leading and trailing whitespace inside quote characters.|**false**
+unquoted_empty_value_is_null|Replace empty field with json null value. |**false**
+infer_types|Infer null, true, false, integers and floating point values in the CSV source.|**true**
+lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.|**false**
+comment_starter|Character to comment out a line, must be at column 1|None
 mapping_kind|Indicates what [mapping kind](csv_mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `csv_mapping_kind::n_objects`, otherwise `csv_mapping_kind::n_rows`.|
-max_lines|Maximum number of lines to read. Default is unlimited.|
+max_lines|Maximum number of lines to read. |Unlimited
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
 float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
@@ -78,6 +78,12 @@ Copy constructor.
 Move constructor. 
 
 #### Modifiers
+
+    basic_csv_options& flat(bool value);
+    
+    basic_csv_options& max_nesting_depth(std::size_t value);
+
+    basic_csv_options& column_mapping(const std::vector<std::pair<std::string,std::string>>& value);
 
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
 Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also

@@ -93,6 +93,8 @@ private:
         }
     };
 
+    using stack_item_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item>;
+
     static const stack_item& parent(const std::vector<stack_item>& stack)
     {
         JSONCONS_ASSERT(stack.size() >= 2);
@@ -124,7 +126,7 @@ private:
     string_type neginf_to_str_;
     allocator_type alloc_;
 
-    std::vector<stack_item> stack_;
+    std::vector<stack_item, stack_item_allocator_type> stack_;
     jsoncons::detail::write_double fp_;
 
     std::vector<string_type,string_allocator_type> column_names_;
@@ -173,6 +175,7 @@ public:
         enable_neginf_to_str_(options.enable_neginf_to_str()),
         neginf_to_str_(options.neginf_to_str()),
         alloc_(alloc),
+        stack_(alloc),
         fp_(options.float_format(), options.precision()),
         column_names_(alloc),
         column_paths_(alloc),
