@@ -11,6 +11,8 @@
 
     - Git issue #585: Add `raw_tag()` accessor to `basic_cbor_cursor`
 
+    - Add `max_nesting_depth` option to `basic_csv_options`
+
 1.1.0 
 -----
 
