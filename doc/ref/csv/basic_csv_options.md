@@ -17,7 +17,7 @@ Specifies options for reading and writing CSV data.
 Option|Reading|Writing
 ------|-------|----------
 flat (since 1.2.0)|&nbsp;|Indicates whether the encoder should process JSON as "flat" (without navigating through nested structures).
-max_nesting_depth (since 1.2.0)|&npsp;|Maximum nesting depth allowed in the input when encoding nested JSON to CSV 
+max_nesting_depth (since 1.2.0)|&nbsp;|Maximum nesting depth allowed in the input when encoding nested JSON to CSV 
 column_mapping (since 1.2.0)|&nbsp;|Maps column paths identified by JSONPointers to plain names.
 nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
 inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
