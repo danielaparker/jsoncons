@@ -267,12 +267,11 @@ private:
             {
                 for (const auto& item : column_names_)
                 {
-                    string_type str{alloc_};
-                    str.push_back('/');
-                    str.append(item.data(), item.size());
-                    column_paths_.emplace_back(str);
-                    column_path_value_map_.emplace(str, string_type{alloc_});
-                    column_path_name_map_.emplace(std::move(str), item);
+                    jpointer_type col_path;
+                    col_path.append(item);
+                    column_paths_.emplace_back(col_path);
+                    column_path_value_map_.emplace(col_path, string_type{alloc_});
+                    column_path_name_map_.emplace(std::move(col_path), item);
                 }
                 has_column_mapping_ = true;
             }
@@ -291,12 +290,11 @@ private:
             {
                 for (const auto& item : column_names_)
                 {
-                    string_type str{alloc_};
-                    str.push_back('/');
-                    str.append(item.data(), item.size());
-                    column_paths_.emplace_back(str);
-                    column_path_value_map_.emplace(str, string_type{alloc_});
-                    column_path_name_map_.emplace(std::move(str), item);
+                    jpointer_type col_path;
+                    col_path.append(item);
+                    column_paths_.emplace_back(col_path);
+                    column_path_value_map_.emplace(col_path, string_type{alloc_});
+                    column_path_name_map_.emplace(std::move(col_path), item);
                 }
                 has_column_mapping_ = true;
             }
@@ -515,14 +513,13 @@ private:
                 std::size_t index = 0;
                 for (const auto& item : column_names_)
                 {
-                    string_type str{alloc_};
-                    str.push_back('/');
+                    jpointer_type col_path;
                     buffer_.clear();
                     jsoncons::detail::from_integer(index, buffer_);
-                    str.append(buffer_.data(), buffer_.size());
-                    column_paths_.emplace_back(str);
-                    column_path_value_map_.emplace(str, string_type{alloc_});
-                    column_path_name_map_.emplace(std::move(str), item);
+                    col_path.append(buffer_);
+                    column_paths_.emplace_back(col_path);
+                    column_path_value_map_.emplace(col_path, string_type{alloc_});
+                    column_path_name_map_.emplace(std::move(col_path), item);
                     ++index;
                 }
                 has_column_mapping_ = true;
