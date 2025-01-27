@@ -136,7 +136,6 @@ private:
     column_path_column_map_type column_path_column_map_;
 
     std::size_t column_index_{0};
-    string_type buffer_;
     string_type value_buffer_;
     typename column_path_column_map_type::iterator column_it_;
 
@@ -182,7 +181,6 @@ public:
         column_path_name_map_(alloc),
         column_path_value_map_(alloc),
         column_path_column_map_(alloc),
-        buffer_(alloc),
         value_buffer_(alloc),
         column_it_(column_path_column_map_.end())
     {
@@ -514,9 +512,7 @@ private:
                 for (const auto& item : column_names_)
                 {
                     jpointer_type col_path;
-                    buffer_.clear();
-                    jsoncons::detail::from_integer(index, buffer_);
-                    col_path.append(buffer_);
+                    col_path.append(index);
                     column_paths_.emplace_back(col_path);
                     column_path_value_map_.emplace(col_path, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(col_path), item);
@@ -794,11 +790,8 @@ private:
     
     void append_array_path_component()
     {
-        buffer_.clear();
-        jsoncons::detail::from_integer(stack_.back().count_, buffer_);
-
         stack_.back().column_path_ = parent(stack_).column_path_;
-        stack_.back().column_path_.append(buffer_);
+        stack_.back().column_path_.append(stack_.back().count_);
         if (stack_[0].count_ == 0)
         {
             if (!has_column_mapping_)
