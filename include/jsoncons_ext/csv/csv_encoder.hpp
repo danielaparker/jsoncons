@@ -64,7 +64,6 @@ private:
     enum class stack_item_kind
     {
         flat_row_mapping,
-        stream_flat_row_mapping,
         row_mapping,
         flat_object,
         flat_row,
@@ -307,9 +306,6 @@ private:
             case stack_item_kind::flat_row_mapping:
                 stack_.emplace_back(stack_item_kind::flat_object);
                 break;
-            case stack_item_kind::stream_flat_row_mapping:
-                stack_.emplace_back(stack_item_kind::flat_object);
-                break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::object);
                 return true;
@@ -349,7 +345,7 @@ private:
         {
             case stack_item_kind::flat_object:
             case stack_item_kind::object:
-                if (parent(stack_).item_kind_ == stack_item_kind::row_mapping || parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping || parent(stack_).item_kind_ == stack_item_kind::stream_flat_row_mapping)
+                if (parent(stack_).item_kind_ == stack_item_kind::row_mapping || parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping)
                 {
                     if (stack_[0].count_ == 0)
                     {
@@ -498,14 +494,7 @@ private:
         {
             if (flat_)
             {
-                if (has_column_mapping_ || has_column_names_)
-                {
-                    stack_.emplace_back(stack_item_kind::flat_row_mapping);
-                }
-                else
-                {
-                    stack_.emplace_back(stack_item_kind::stream_flat_row_mapping);
-                }
+                stack_.emplace_back(stack_item_kind::flat_row_mapping);
             }
             else
             {
@@ -543,10 +532,14 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::flat_row_mapping:
-                stack_.emplace_back(stack_item_kind::flat_row);
-                break;
-            case stack_item_kind::stream_flat_row_mapping:
-                stack_.emplace_back(stack_item_kind::stream_flat_row);
+                if (has_column_mapping_)
+                {
+                    stack_.emplace_back(stack_item_kind::flat_row);
+                }
+                else
+                {
+                    stack_.emplace_back(stack_item_kind::stream_flat_row);
+                }
                 break;
             case stack_item_kind::row_mapping:
                 stack_.emplace_back(stack_item_kind::row);
@@ -635,7 +628,6 @@ private:
         {
             case stack_item_kind::row_mapping:
             case stack_item_kind::flat_row_mapping:
-            case stack_item_kind::stream_flat_row_mapping:
                 break;
             case stack_item_kind::flat_row:
                 if (parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping)
@@ -676,7 +668,7 @@ private:
                 }
                 break;
             case stack_item_kind::stream_flat_row:
-                if (parent(stack_).item_kind_ == stack_item_kind::stream_flat_row_mapping)
+                if (parent(stack_).item_kind_ == stack_item_kind::flat_row_mapping)
                 {
                     sink_.append(line_delimiter_.data(), line_delimiter_.length());
                 }
