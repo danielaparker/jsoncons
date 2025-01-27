@@ -265,7 +265,7 @@ private:
                 {
                     string_type str{alloc_};
                     str.push_back('/');
-                    str.append(jsonpointer::escape(jsoncons::string_view(item), char_allocator_type(alloc_)));
+                    str.append(jsonpointer::escape<char_type,char_allocator_type>(item, alloc_));
                     column_paths_.emplace_back(str);
                     column_path_value_map_.emplace(str, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(str), item);
@@ -289,7 +289,7 @@ private:
                 {
                     string_type str{alloc_};
                     str.push_back('/');
-                    str.append(jsonpointer::escape(jsoncons::string_view(item), char_allocator_type(alloc_)));
+                    str.append(jsonpointer::escape<char_type,char_allocator_type>(item, alloc_));
                     column_paths_.emplace_back(str);
                     column_path_value_map_.emplace(str, string_type{alloc_});
                     column_path_name_map_.emplace(std::move(str), item);
@@ -756,7 +756,7 @@ private:
             {
                 stack_.back().column_path_ = parent(stack_).column_path_;
                 stack_.back().column_path_.push_back('/');
-                stack_.back().column_path_.append(jsonpointer::escape(name, char_allocator_type(alloc_)));
+                stack_.back().column_path_.append(jsonpointer::escape<char_type,char_allocator_type>(name, alloc_));
                 if (!has_column_mapping_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, name);
@@ -767,7 +767,7 @@ private:
             {
                 stack_.back().column_path_ = parent(stack_).column_path_;
                 stack_.back().column_path_.push_back('/');
-                stack_.back().column_path_.append(jsonpointer::escape(name, char_allocator_type(alloc_)));
+                stack_.back().column_path_.append(jsonpointer::escape<char_type,char_allocator_type>(name, alloc_));
                 if (!has_column_mapping_)
                 {
                     column_path_name_map_.emplace(stack_.back().column_path_, stack_.back().column_path_);

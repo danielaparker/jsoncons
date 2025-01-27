@@ -38,18 +38,18 @@ namespace jsoncons { namespace jsonpointer {
     } // namespace detail
 
     template <typename CharT,typename Allocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,Allocator> escape(const jsoncons::basic_string_view<CharT>& s, const Allocator& = Allocator())
+    std::basic_string<CharT,std::char_traits<CharT>,Allocator> escape(jsoncons::basic_string_view<CharT> s, const Allocator& = Allocator())
     {
         std::basic_string<CharT,std::char_traits<CharT>,Allocator> result;
 
         for (auto c : s)
         {
-            if (c == '~')
+            if (JSONCONS_UNLIKELY(c == '~'))
             {
                 result.push_back('~');
                 result.push_back('0');
             }
-            else if (c == '/')
+            else if (JSONCONS_UNLIKELY(c == '/'))
             {
                 result.push_back('~');
                 result.push_back('1');
