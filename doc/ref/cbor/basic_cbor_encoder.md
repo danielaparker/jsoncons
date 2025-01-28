@@ -204,12 +204,12 @@ Reset encoder to write a new value to a new sink
                            const ser_context& context=ser_context()); (12) (until 0.152.0)
 
     template <typename Source>
-    bool byte_string_value(const Source& souce, 
+    bool ByteStringViewLike(const Source& souce, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); (12) (since 0.152.0)
 
     template <typename Source>
-    bool byte_string_value(const Source& souce, 
+    bool ByteStringViewLike(const Source& souce, 
                            uint64_t ext_tag, 
                            const ser_context& context=ser_context()); (13) (since 0.152.0)
 

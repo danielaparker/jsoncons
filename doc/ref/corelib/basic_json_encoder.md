@@ -102,13 +102,13 @@ Reset encoder to write a new value to a new sink
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); (12) (until 0.152.0)
 
-    template <typename Source>
-    bool byte_string_value(const Source& souce, 
+    template <typename ByteStringViewLike>
+    bool byte_string_value(const ByteStringViewLike& souce, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); (12) (since 0.152.0)
 
-    template <typename Source>
-    bool byte_string_value(const Source& souce, 
+    template <typename ByteStringViewLike>
+    bool byte_string_value(const ByteStringViewLike& souce, 
                            uint64_t ext_tag, 
                            const ser_context& context=ser_context()); (13) (since 0.152.0)
 
@@ -175,14 +175,14 @@ Reset encoder to write a new value to a new sink
                            const ser_context& context,
                            std::error_code& ec); (28) (until 0.152.0)
 
-    template <typename Source>   
-    bool byte_string_value(const Source& source, 
+    template <typename ByteStringViewLike>   
+    bool byte_string_value(const ByteStringViewLike& source, 
                            semantic_tag tag, 
                            const ser_context& context,
                            std::error_code& ec); (28) (since 0.152.0)
 
-    template <typename Source>   
-    bool byte_string_value(const Source& source, 
+    template <typename ByteStringViewLike>   
+    bool byte_string_value(const ByteStringViewLike& source, 
                            uint64_t ext_tag, 
                            const ser_context& context,
                            std::error_code& ec); (29) (since 0.152.0)
@@ -284,13 +284,13 @@ Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (12) Writes a byte string value `source` with a generic tag.
-Type `Source` must be a container that has member functions `data()` and `size()`, 
+Type `ByteStringViewLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (13) Writes a byte string value `source` with a format specific tag, `ext_tag`.
-Type `Source` must be a container that has member functions `data()` and `size()`, 
+Type `ByteStringViewLike` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
