@@ -562,7 +562,7 @@ TEST_CASE("test cbor encode with raw tags")
         CHECK(cursor.current().get<uint64_t>() == 1);
         cursor.next();
         CHECK(cursor.raw_tag() == 0xC4);
-        CHECK(cursor.current().get<uint64_t>() == -10);
+        CHECK(cursor.current().get<int64_t>() == -10);
         cursor.next();
         CHECK(cursor.raw_tag() == 0xC5);
         CHECK(cursor.current().get<double>() == Approx(10.5).epsilon(0.00001));
