@@ -537,12 +537,13 @@ TEST_CASE("test cbor encode with raw tags")
     {
         std::vector<uint8_t> data;
         cbor::cbor_bytes_encoder encoder(data);
-        encoder.begin_array_with_tag(6,0xB1);
+        encoder.begin_array_with_tag(7,0xB1);
         encoder.write_null_with_tag(0xC1);
         encoder.write_bool_with_tag(false, 0xC2);
         encoder.write_uint64_with_tag(1, 0xC3);
         encoder.write_int64_with_tag(-10, 0xC4);
         encoder.write_double_with_tag(10.5, 0xC5);
+        encoder.write_byte_string_with_tag(std::vector<uint8_t>{0x01,0x02,0x03}, 0xC6);
         encoder.begin_object_with_tag(0, 0xD1);
         encoder.end_object();
         encoder.end_array();
@@ -566,6 +567,9 @@ TEST_CASE("test cbor encode with raw tags")
         cursor.next();
         CHECK(cursor.raw_tag() == 0xC5);
         CHECK(cursor.current().get<double>() == Approx(10.5).epsilon(0.00001));
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC6);
+        CHECK(cursor.current().get<std::vector<uint8_t>>() == std::vector<uint8_t>{0x01,0x02,0x03});
         cursor.next();
         CHECK(cursor.raw_tag() == 0xD1);
         CHECK(cursor.current().event_type() == jsoncons::staj_event_type::begin_object);

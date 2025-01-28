@@ -219,10 +219,12 @@ public:
         end_value();
     }
 
-    void write_byte_string_with_tag(const byte_string_view& value, uint64_t raw_tag) 
+    template <typename ByteStringViewLike>
+    void write_byte_string_with_tag(const ByteStringViewLike& value, uint64_t raw_tag,
+        typename std::enable_if<extension_traits::is_byte_sequence<ByteStringViewLike>::value,int>::type = 0) 
     {
         write_tag(raw_tag);
-        write_byte_string(value);
+        write_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(value.data()),value.size()));
         end_value();
     }
 
