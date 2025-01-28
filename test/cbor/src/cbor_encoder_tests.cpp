@@ -531,3 +531,43 @@ TEMPLATE_TEST_CASE("test_cbor_encoder_reset", "",
 }
 
 
+TEST_CASE("test cbor encode with raw tags")
+{
+    SECTION("test 1")
+    {
+        std::vector<uint8_t> data;
+        cbor::cbor_bytes_encoder encoder(data);
+        encoder.begin_array_with_tag(6,0xB1);
+        encoder.write_null_with_tag(0xC1);
+        encoder.write_bool_with_tag(false, 0xC2);
+        encoder.write_uint64_with_tag(1, 0xC3);
+        encoder.write_int64_with_tag(-10, 0xC4);
+        encoder.write_double_with_tag(10.5, 0xC5);
+        encoder.begin_object_with_tag(0, 0xD1);
+        encoder.end_object();
+        encoder.end_array();
+        encoder.flush();
+        
+        cbor::cbor_bytes_cursor cursor(data);
+        CHECK(cursor.raw_tag() == 0xB1);
+        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC1);
+        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::null_value);
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC2);
+        CHECK(cursor.current().get<bool>() == false);
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC3);
+        CHECK(cursor.current().get<uint64_t>() == 1);
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC4);
+        CHECK(cursor.current().get<uint64_t>() == -10);
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xC5);
+        CHECK(cursor.current().get<double>() == Approx(10.5).epsilon(0.00001));
+        cursor.next();
+        CHECK(cursor.raw_tag() == 0xD1);
+        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::begin_object);
+    }
+}

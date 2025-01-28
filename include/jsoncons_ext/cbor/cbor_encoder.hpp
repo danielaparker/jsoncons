@@ -190,14 +190,14 @@ public:
         begin_array(length);
     }
 
-    void null_value_with_tag(uint64_t raw_tag)
+    void write_null_with_tag(uint64_t raw_tag)
     {
         write_tag(raw_tag);
         sink_.push_back(0xf6);
         end_value();
     }  
 
-    void bool_value_with_tag(bool value, uint64_t raw_tag)
+    void write_bool_with_tag(bool value, uint64_t raw_tag)
     {
         write_tag(raw_tag);
         if (value)
@@ -212,34 +212,34 @@ public:
         end_value();
     }  
 
-    void string_value_with_tag(const string_view_type& value, uint64_t raw_tag) 
+    void write_string_with_tag(const string_view_type& value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_string(value);
         end_value();
     }
 
-    void byte_string_value_with_tag(const byte_string_view& value, uint64_t raw_tag) 
+    void write_byte_string_with_tag(const byte_string_view& value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_byte_string(value);
         end_value();
     }
 
-    void double_value_with_tag(double value, uint64_t raw_tag) 
+    void write_double_with_tag(double value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         double_value(value);
     }
     
-    void uint64_value_with_tag(uint64_t value, uint64_t raw_tag) 
+    void write_uint64_with_tag(uint64_t value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_uint64_value(value);
         end_value();
     }
 
-    void int64_value_with_tag(int64_t value, uint64_t raw_tag) 
+    void write_int64_with_tag(int64_t value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_int64_value(value);

@@ -159,7 +159,7 @@ public:
         return parser_.done();
     }
     
-    bool raw_tag() const
+    uint64_t raw_tag() const
     {
         return parser_.raw_tag();
     }
