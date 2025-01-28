@@ -538,12 +538,12 @@ TEST_CASE("test cbor encode with raw tags")
         std::vector<uint8_t> data;
         cbor::cbor_bytes_encoder encoder(data);
         encoder.begin_array_with_tag(7,0xB1);
-        encoder.write_null_with_tag(0xC1);
-        encoder.write_bool_with_tag(false, 0xC2);
-        encoder.write_uint64_with_tag(1, 0xC3);
-        encoder.write_int64_with_tag(-10, 0xC4);
-        encoder.write_double_with_tag(10.5, 0xC5);
-        encoder.write_byte_string_with_tag(std::vector<uint8_t>{0x01,0x02,0x03}, 0xC6);
+        encoder.null_value_with_tag(0xC1);
+        encoder.bool_value_with_tag(false, 0xC2);
+        encoder.uint64_value_with_tag(1, 0xC3);
+        encoder.int64_value_with_tag(-10, 0xC4);
+        encoder.double_value_with_tag(10.5, 0xC5);
+        encoder.byte_string_value_with_tag(std::vector<uint8_t>{0x01,0x02,0x03}, 0xC6);
         encoder.begin_object_with_tag(0, 0xD1);
         encoder.end_object();
         encoder.end_array();

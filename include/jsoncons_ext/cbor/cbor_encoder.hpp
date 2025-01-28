@@ -190,14 +190,14 @@ public:
         begin_array(length);
     }
 
-    void write_null_with_tag(uint64_t raw_tag)
+    void null_value_with_tag(uint64_t raw_tag)
     {
         write_tag(raw_tag);
         sink_.push_back(0xf6);
         end_value();
     }  
 
-    void write_bool_with_tag(bool value, uint64_t raw_tag)
+    void bool_value_with_tag(bool value, uint64_t raw_tag)
     {
         write_tag(raw_tag);
         if (value)
@@ -212,7 +212,7 @@ public:
         end_value();
     }  
 
-    void write_string_with_tag(const string_view_type& value, uint64_t raw_tag) 
+    void string_value_with_tag(const string_view_type& value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_string(value);
@@ -220,7 +220,7 @@ public:
     }
 
     template <typename ByteStringViewLike>
-    void write_byte_string_with_tag(const ByteStringViewLike& value, uint64_t raw_tag,
+    void byte_string_value_with_tag(const ByteStringViewLike& value, uint64_t raw_tag,
         typename std::enable_if<extension_traits::is_byte_sequence<ByteStringViewLike>::value,int>::type = 0) 
     {
         write_tag(raw_tag);
@@ -228,20 +228,20 @@ public:
         end_value();
     }
 
-    void write_double_with_tag(double value, uint64_t raw_tag) 
+    void double_value_with_tag(double value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         double_value(value);
     }
     
-    void write_uint64_with_tag(uint64_t value, uint64_t raw_tag) 
+    void uint64_value_with_tag(uint64_t value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_uint64_value(value);
         end_value();
     }
 
-    void write_int64_with_tag(int64_t value, uint64_t raw_tag) 
+    void int64_value_with_tag(int64_t value, uint64_t raw_tag) 
     {
         write_tag(raw_tag);
         write_int64_value(value);

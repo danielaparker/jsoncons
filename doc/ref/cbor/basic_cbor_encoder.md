@@ -44,6 +44,32 @@ Reset encoder to write another value to the same sink
     void reset(Sink&& sink)
 Reset encoder to write a new value to a new sink
 
+    void begin_object_with_tag(uint64_t raw_tag);                          // (since 1.2.0)
+
+    void begin_object_with_tag(std::size_t length, uint64_t raw_tag);      // (since 1.2.0)
+
+    void begin_array_with_tag(uint64_t raw_tag);                           // (since 1.2.0)
+
+    void begin_array_with_tag(std::size_t length, uint64_t raw_tag);       // (since 1.2.0)
+
+    void null_value_with_tag(uint64_t raw_tag);                            // (since 1.2.0)
+
+    void bool_value_with_tag(bool value, uint64_t raw_tag);                // (since 1.2.0)
+
+    void string_value_with_tag(const string_view_type& value, 
+        uint64_t raw_tag);                                                 // (since 1.2.0) 
+
+    template <typename ByteStringViewLike>
+    void byte_string_value_with_tag(const ByteStringViewLike& value, 
+        uint64_t raw_tag);                                                 // (since 1.2.0) 
+
+    void double_value_with_tag(double value, uint64_t raw_tag);            // (since 1.2.0) 
+    
+    void uint64_value_with_tag(uint64_t value, uint64_t raw_tag);          // (since 1.2.0) 
+
+    void int64_value_with_tag(int64_t value, uint64_t raw_tag);            // (since 1.2.0) 
+
+
 #### Inherited from [jsoncons::basic_json_visitor](../basic_json_visitor.md)
 
     void flush();                                                  (1)
@@ -297,6 +323,16 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 ### Examples
 
+
+[Encode to CBOR buffer](#eg1)  
+[Encode to CBOR stream](#eg2)  
+[Encode with raw CBOR tags (since 1.2.0)](#eg3)  
+[Encode Typed Array tags - array of half precision floating-point](#eg4)  
+[Encode Typed Array tags - multi-dimensional column major tag](#eg5)  
+
+ <div id="eg1"/>
+
+
 #### Encode to CBOR buffer
 
 ```cpp
@@ -342,6 +378,8 @@ Output:
 9f,63,63,61,74,44,70,75,72,72,d6,44,68,69,73,73,c1,1a,55,4b,bf,d3,ff
 ```
 
+ <div id="eg2"/>
+
 #### Encode to CBOR stream
 
 ```cpp
@@ -385,6 +423,36 @@ Output:
 ```
 83,c3,49,01,00,00,00,00,00,00,00,00,c4,82,21,c2,49,01,00,00,00,00,00,00,00,00,c1,1a,55,4b,bf,d3
 ```
+
+ <div id="eg3"/>
+
+#### Encode with raw CBOR tags (since 1.2.0)
+
+```cpp
+#include <cassert>
+#include <iostream>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+namespace cbor = jsoncons::cbor;
+
+int main()
+{
+    std::vector<uint8_t> data;
+    cbor::cbor_bytes_encoder encoder(data);
+    encoder.begin_array(1);
+    encoder.uint64_value_with_tag(10, 0xC1);
+    encoder.end_array();
+    encoder.flush();
+
+    cbor::cbor_bytes_cursor cursor(data);
+    assert(cursor.current().event_type() == jsoncons::staj_event_type::begin_array);
+    cursor.next();
+    assert(cursor.raw_tag() == 0xC1);
+    assert(cursor.current().get<uint64_t>() == 10);
+}
+```
+
+ <div id="eg4"/>
 
 #### Encode Typed Array tags - array of half precision floating-point
 
@@ -440,6 +508,8 @@ true 3555 0.333252
     0.333251953125
 ]
 ```
+
+ <div id="eg5"/>
 
 #### Encode Typed Array tags - multi-dimensional column major tag 
 

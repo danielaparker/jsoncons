@@ -67,6 +67,9 @@ as `basic_cbor_cursor` holds a pointer to but does not own this object.
 
 #### Member functions
 
+    uint64_t raw_tag() const;      // (since 1.2.0)
+Returns the CBOR tag associated with the current value
+
     bool done() const override;
 Checks if there are no more events.
 
