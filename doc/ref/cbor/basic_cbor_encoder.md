@@ -59,8 +59,8 @@ Reset encoder to write a new value to a new sink
     void string_value_with_tag(const string_view_type& value, 
         uint64_t raw_tag);                                                 // (since 1.2.0) 
 
-    template <typename ByteStringViewLike>
-    void byte_string_value_with_tag(const ByteStringViewLike& value, 
+    template <typename ByteStringLike>
+    void byte_string_value_with_tag(const ByteStringLike& value, 
         uint64_t raw_tag);                                                 // (since 1.2.0) 
 
     void double_value_with_tag(double value, uint64_t raw_tag);            // (since 1.2.0) 
@@ -110,13 +110,13 @@ Reset encoder to write a new value to a new sink
         semantic_tag tag=semantic_tag::none, 
         const ser_context& context=ser_context());                 (12) (until 0.152.0)
 
-    template <typename ByteStringViewLike>
-    bool byte_string_value(const ByteStringViewLike & souce, 
+    template <typename ByteStringLike>
+    bool byte_string_value(const ByteStringLike & souce, 
         semantic_tag tag=semantic_tag::none, 
         const ser_context& context=ser_context());                 (12) (since 0.152.0)
 
-    template <typename ByteStringViewLike>
-    bool byte_string_value(const ByteStringViewLike & souce, 
+    template <typename ByteStringLike>
+    bool byte_string_value(const ByteStringLike & souce, 
         uint64_t ext_tag, 
         const ser_context& context=ser_context());                 (13) (since 0.152.0)
 
@@ -323,7 +323,6 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 ### Examples
 
-
 [Encode to CBOR buffer](#eg1)  
 [Encode to CBOR stream](#eg2)  
 [Encode with raw CBOR tags (since 1.2.0)](#eg3)  
@@ -331,7 +330,6 @@ Throws a [ser_error](ser_error.md) on parse errors.
 [Encode Typed Array tags - multi-dimensional column major tag](#eg5)  
 
  <div id="eg1"/>
-
 
 #### Encode to CBOR buffer
 

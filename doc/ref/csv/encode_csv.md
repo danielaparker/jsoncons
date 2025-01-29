@@ -40,7 +40,13 @@ Functions (3)-(4) are identical to (1)-(2) except an [allocator_set](../allocato
 
 ### Examples
 
-#### Encode a json array of objects (n_objects format)
+[Encode a JSON array of "flat" objects (n_objects format)](#eg1)  
+[Encode a JSON array of "flat" arrays (n_rows format)](#eg2)  
+[Encode a JSON object of name-array members (m_columns format)](#eg3)  
+[Encode nested JSON to CSV (since 1.2.0)](#eg4)  
+[Encode nested JSON to CSV with column mapping (since 1.2.0)](#eg5)  
+
+ <div id="eg1"/>
 
 ```cpp
 #include <cassert>
@@ -112,6 +118,8 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 "John Smith",false,null,"22313-1450",0.15,300.7
 ```
 
+ <div id="eg2"/>
+
 #### Encode a json array of arrays (n_rows format)
 
 ```cpp
@@ -159,6 +167,8 @@ Output:
 "John Smith",false,null,"22313-1450",0.15,300.7
 ```
 
+ <div id="eg3"/>
+
 #### Encode a json object of name-array members (m_columns format)
 
 ```cpp
@@ -204,6 +214,135 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 "Jane Doe",false,"416-272-2561","55416",0.15,480.7
 "Joe Bloggs",false,"4162722561","55416",0.15,300.7
 "John Smith",false,null,"22313-1450",0.15,300.7
+```
+
+ <div id="eg4"/>
+
+#### Encode nested JSON to CSV (since 1.2.0)
+
+```cpp
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+
+namespace csv = jsoncons::csv;
+
+int main()
+{
+    std::string jtext = R"(
+[
+    {
+        "text": "Chicago Reader", 
+        "float": 1.0, 
+        "datetime": "1971-01-01T04:14:00", 
+        "boolean": true,
+        "nested": {
+          "time": "04:14:00",
+          "nested": {
+            "date": "1971-01-01",
+            "integer": 40
+          }
+        }
+    }, 
+    {
+        "text": "Chicago Sun-Times", 
+        "float": 1.27, 
+        "datetime": "1948-01-01T14:57:13", 
+        "boolean": true,
+        "nested": {
+          "time": "14:57:13",
+          "nested": {
+            "date": "1948-01-01",
+            "integer": 63
+          }
+        }
+    }
+]
+        )";
+
+    auto j = jsoncons::ojson::parse(jtext);
+
+    auto options = csv::csv_options{}
+        .flat(false);
+
+    std::string buf;
+    csv::encode_csv(j, buf, options);
+    std::cout << buf << "\n";
+}
+```
+Output:
+```
+/text,/float,/datetime,/boolean,/nested/time,/nested/nested/date,/nested/nested/integer
+Chicago Reader,1.0,1971-01-01T04:14:00,true,04:14:00,1971-01-01,40
+Chicago Sun-Times,1.27,1948-01-01T14:57:13,true,14:57:13,1948-01-01,63
+```
+
+ <div id="eg5"/>
+
+#### Encode nested JSON to CSV with column mapping (since 1.2.0)
+
+```cpp
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+
+namespace csv = jsoncons::csv;
+
+int main()
+{
+    std::string jtext = R"(
+[
+    {
+        "text": "Chicago Reader", 
+        "float": 1.0, 
+        "datetime": "1971-01-01T04:14:00", 
+        "boolean": true,
+        "nested": {
+          "time": "04:14:00",
+          "nested": {
+            "date": "1971-01-01",
+            "integer": 40
+          }
+        }
+    }, 
+    {
+        "text": "Chicago Sun-Times", 
+        "float": 1.27, 
+        "datetime": "1948-01-01T14:57:13", 
+        "boolean": true,
+        "nested": {
+          "time": "14:57:13",
+          "nested": {
+            "date": "1948-01-01",
+            "integer": 63
+          }
+        }
+    }
+]
+        )";
+
+    auto j = jsoncons::ojson::parse(jtext);
+
+    auto options = csv::csv_options{}
+        .flat(false)
+        .column_mapping({
+            {"/datetime","Timestamp"},
+            {"/text", "Newspaper"},
+            {"/nested/nested/integer","Count"}
+        });
+
+    std::string buf;
+    csv::encode_csv(j, buf, options);
+    std::cout << buf << "\n";
+}
+```
+Output:
+```
+Timestamp,Newspaper,Count
+1971-01-01T04:14:00,Chicago Reader,40
+1948-01-01T14:57:13,Chicago Sun-Times,63
 ```
 
 

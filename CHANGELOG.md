@@ -7,11 +7,11 @@
 
 - Implemented new features:
 
-    - Git issue #556: Support nested json to csv
+    - Git issue #556: Support nested JSON to CSV. Add `flat`, `column_mapping`, and `max_nesting_depth` options to `basic_csv_options`
 
-    - Git issue #585: Add `raw_tag()` accessor to `basic_cbor_cursor`
-
-    - Add `max_nesting_depth` option to `basic_csv_options`
+    - Git issue #585: Add `raw_tag()` accessor to `basic_cbor_cursor`. Add functions `begin_object_with_tag`,
+    `begin_array_with_tag`, `uint64_value_with_tag` etc. to `basic_cbor_encoder` to support encoding values with
+    raw CBOR tags.
 
 1.1.0 
 -----
