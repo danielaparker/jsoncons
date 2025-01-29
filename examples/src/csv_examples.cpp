@@ -146,7 +146,7 @@ void csv_source_to_json_value()
 
 void csv_source_to_cpp_object()
 {
-    const std::string jtext = R"(Date,1Y,2Y,3Y,5Y
+    const std::string data = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 2017-01-08,0.0063,0.0076,0.0084,0.0112
@@ -158,7 +158,7 @@ void csv_source_to_cpp_object()
 
     using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
-    table_type table = csv::decode_csv<table_type>(jtext,ioptions);
+    table_type table = csv::decode_csv<table_type>(data,ioptions);
 
     std::cout << "(1)\n";
     for (const auto& row : table)

@@ -581,6 +581,22 @@ void duration_example2()
     std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n";
 }
 
+void encode_with_raw_cbor_tags()   // (since 1.2.0)
+{
+    std::vector<uint8_t> data;
+    cbor::cbor_bytes_encoder encoder(data);
+    encoder.begin_array(1);
+    encoder.uint64_value_with_tag(10, 0xC1);
+    encoder.end_array();
+    encoder.flush();
+
+    cbor::cbor_bytes_cursor cursor(data);
+    assert(cursor.current().event_type() == jsoncons::staj_event_type::begin_array);
+    cursor.next();
+    assert(cursor.raw_tag() == 0xC1);
+    assert(cursor.current().get<uint64_t>() == 10);
+}
+
 int main()
 {
     std::cout << "\ncbor examples\n\n";
@@ -610,5 +626,7 @@ int main()
     ext_type_example();
     duration_example1();
     duration_example2();
+    
+    encode_with_raw_cbor_tags();
 }
 
