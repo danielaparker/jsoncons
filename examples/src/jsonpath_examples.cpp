@@ -86,7 +86,7 @@ void json_query_examples()
     jsoncons::json result16 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price) == 8)]");
     std::cout << "(16)\n" << pretty_print(result16) << "\n";
 
-    jsoncons::json result17 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price*100) == 894)]");
+    jsoncons::json result17 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price*100) == 895)]");
     std::cout << "(17) " << result17 << "\n";
 
     jsoncons::json result18 = jsonpath::json_query(booklist,"floor($.store.book[0].price*100)");
