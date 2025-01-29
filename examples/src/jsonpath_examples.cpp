@@ -17,85 +17,80 @@ template <typename T>
 using MyScopedAllocator = std::scoped_allocator_adaptor<free_list_allocator<T>>;
 
 // for brevity
-using jsoncons::json; 
 namespace jsonpath = jsoncons::jsonpath;
 namespace jsonpointer = jsoncons::jsonpointer;
 
 void json_query_examples() 
 {
     std::ifstream is("./input/store.json");
-    json booklist = json::parse(is);
+    auto booklist = jsoncons::json::parse(is);
 
     // The authors of books that are cheaper than $10
-    json result1 = jsonpath::json_query(booklist, "$.store.book[?(@.price < 10)].author");
+    jsoncons::json result1 = jsonpath::json_query(booklist, "$.store.book[?(@.price < 10)].author");
     std::cout << "(1) " << result1 << "\n";
 
     // The number of books
-    json result2 = jsonpath::json_query(booklist, "length($..book)");
+    jsoncons::json result2 = jsonpath::json_query(booklist, "length($..book)");
     std::cout << "(2) " << result2 << "\n";
 
     // The third book
-    json result3 = jsonpath::json_query(booklist, "$..book[2]");
+    jsoncons::json result3 = jsonpath::json_query(booklist, "$..book[2]");
     std::cout << "(3)\n" << pretty_print(result3) << "\n";
 
     // All books whose author's name starts with Evelyn
-    json result4 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    jsoncons::json result4 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
     std::cout << "(4)\n" << pretty_print(result4) << "\n";
 
     // The titles of all books that have isbn number
-    json result5 = jsonpath::json_query(booklist, "$..book[?(@.isbn)].title");
+    jsoncons::json result5 = jsonpath::json_query(booklist, "$..book[?(@.isbn)].title");
     std::cout << "(5) " << result5 << "\n";
 
     // All authors and titles of books
-    json result6 = jsonpath::json_query(booklist, "$['store']['book']..['author','title']");
+    jsoncons::json result6 = jsonpath::json_query(booklist, "$['store']['book']..['author','title']");
     std::cout << "(6)\n" << pretty_print(result6) << "\n";
 
     // Union of two ranges of book titles
-    json result7 = jsonpath::json_query(booklist, "$..book[1:2,2:4].title");
-    std::cout << "(7)\n" << pretty_print(result7) << "\n";
+    jsoncons::json result7 = jsonpath::json_query(booklist, "$..book[1:2,2:4].title");
+    std::cout << "(7) " << result7 << "\n";
 
     // Union of a subset of book titles identified by index
-    json result8 = jsonpath::json_query(booklist, "$.store[@.book[0].title,@.book[1].title,@.book[3].title]");
-    std::cout << "(8)\n" << pretty_print(result8) << "\n";
+    jsoncons::json result8 = jsonpath::json_query(booklist, "$.store[@.book[0].title,@.book[1].title,@.book[3].title]");
+    std::cout << "(8) " << result8 << "\n";
 
     // Union of third book title and all book titles with price > 10
-    json result9 = jsonpath::json_query(booklist, "$.store[@.book[3].title,@.book[?(@.price > 10)].title]");
-    std::cout << "(9)\n" << pretty_print(result9) << "\n";
+    jsoncons::json result9 = jsonpath::json_query(booklist, "$.store[@.book[3].title,@.book[?(@.price > 10)].title]");
+    std::cout << "(9) " << result9 << "\n";
 
     // Intersection of book titles with category fiction and price < 15
-    json result10 = jsonpath::json_query(booklist, "$.store.book[?(@.category == 'fiction' && @.price < 15)].title");
-    std::cout << "(10)\n" << pretty_print(result10) << "\n";
+    jsoncons::json result10 = jsonpath::json_query(booklist, "$.store.book[?(@.category == 'fiction' && @.price < 15)].title");
+    std::cout << "(10) " << result10 << "\n";
 
     // Normalized path expressions
-    json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
-    std::cout << "(11)\n" << pretty_print(result11) << "\n";
+    jsoncons::json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
+    std::cout << "(11) " << result11 << "\n";
 
     // All titles whose author's second name is 'Waugh'
-    json result12 = jsonpath::json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
-    std::cout << "(12)\n" << result12 << "\n";
+    jsoncons::json result12 = jsonpath::json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+    std::cout << "(12) " << result12 << "\n";
 
     // All keys in the second book
-    json result13 = jsonpath::json_query(booklist,"keys($.store.book[1])");
-    std::cout << "(13)\n" << result13 << "\n";
+    jsoncons::json result13 = jsonpath::json_query(booklist,"keys($.store.book[1])");
+    std::cout << "(13) " << result13 << "\n";
 
-    // 
-    json result14 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price) == 9)]");
-    std::cout << "(14)\n" << result14 << "\n";
+    jsoncons::json result14 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price) == 9)]");
+    std::cout << "(14)\n" << pretty_print(result14) << "\n";
 
-    // 
-    json result15 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price*100) == 895)]");
+    jsoncons::json result15 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price*100) == 895)]");
     std::cout << "(15)\n" << result15 << "\n";
 
-    // 
-    json result16 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price) == 8)]");
-    std::cout << "(16)\n" << result16 << "\n";
+    jsoncons::json result16 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price) == 8)]");
+    std::cout << "(16)\n" << pretty_print(result16) << "\n";
 
-    // 
-    json result17 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price*100) == 895)]");
-    std::cout << "(17)\n" << result17 << "\n";
+    jsoncons::json result17 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price*100) == 894)]");
+    std::cout << "(17) " << result17 << "\n";
 
-    json result18 = jsonpath::json_query(booklist,"floor($.store.book[0].price*100)");
-    std::cout << "(18)\n" << result18.to_string() << "\n";
+    jsoncons::json result18 = jsonpath::json_query(booklist,"floor($.store.book[0].price*100)");
+    std::cout << "(18) " << result18 << "\n";
 }
 
 void function_tokenize_example() 
@@ -120,12 +115,12 @@ void function_tokenize_example()
 }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
     // All titles whose author's last name is 'Murakami'
     std::string expr = R"($.books[?(tokenize(@.author,'\\s+')[-1] == 'Murakami')].title)";
 
-    json result = jsonpath::json_query(j, expr);
+    jsoncons::json result = jsonpath::json_query(j, expr);
     std::cout << pretty_print(result) << "\n\n";
 }
 
@@ -159,12 +154,12 @@ void function_sum_example()
 }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
     // All titles whose price is greater than the average price
     std::string expr = R"($.books[?(@.price > sum($.books[*].price)/length($.books[*].price))].title)";
 
-    json result = jsonpath::json_query(j, expr);
+    jsoncons::json result = jsonpath::json_query(j, expr);
     std::cout << result << "\n\n";
 }
 
@@ -197,12 +192,12 @@ void function_avg_example()
 }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
     // All titles whose price is greater than the average price
     std::string expr = R"($.books[?(@.price > avg($.books[*].price))].title)";
 
-    json result = jsonpath::json_query(j, expr);
+    jsoncons::json result = jsonpath::json_query(j, expr);
     std::cout << result << "\n\n";
 }
 
@@ -219,13 +214,13 @@ void function_floor_example()
     ]        
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
-    json result1 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 895)]");
+    jsoncons::json result1 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 895)]");
     std::cout << "(1) " << result1 << "\n\n";
-    json result2 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 894)]");
+    jsoncons::json result2 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 894)]");
     std::cout << "(2) " << result2 << "\n\n";
-    json result3 = jsonpath::json_query(j, "$[?(floor(@.number*100) == -895)]");
+    jsoncons::json result3 = jsonpath::json_query(j, "$[?(floor(@.number*100) == -895)]");
     std::cout << "(3) " << result3 << "\n\n";
 }
 
@@ -249,11 +244,11 @@ void function_ceil_example()
     }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
-    json result1 = jsonpath::json_query(j, "$.books[?(ceil(@.price) == 23.0)]");
+    jsoncons::json result1 = jsonpath::json_query(j, "$.books[?(ceil(@.price) == 23.0)]");
     std::cout << "(1) " << result1 << "\n\n";
-    json result2 = jsonpath::json_query(j, "$.books[?(ceil(@.price*100) == 2358.0)]");
+    jsoncons::json result2 = jsonpath::json_query(j, "$.books[?(ceil(@.price*100) == 2358.0)]");
     std::cout << "(2) " << result2 << "\n\n";
 }
 
@@ -286,12 +281,12 @@ void function_keys_example()
 }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
     // All books that don't have a price
     std::string expr = "$.books[?(!contains(keys(@),'price'))]";
 
-    json result = jsonpath::json_query(j, expr);
+    jsoncons::json result = jsonpath::json_query(j, expr);
     std::cout << result << "\n\n";
 }
 
@@ -324,19 +319,19 @@ void function_length_example()
 }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
-    json result1 = jsonpath::json_query(j, "length($.books[*])");
+    jsoncons::json result1 = jsonpath::json_query(j, "length($.books[*])");
     std::cout << "(1) " << result1 << "\n\n";
 
-    json result2 = jsonpath::json_query(j, "length($.books[*].price)");
+    jsoncons::json result2 = jsonpath::json_query(j, "length($.books[*].price)");
     std::cout << "(2) "  << result2 << "\n\n";
 }
 
 void json_replace_example1()
 { 
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
     jsonpath::json_replace(data,"$.books[?(@.title == 'A Wild Sheep Chase')].price",20.0);
     std::cout << pretty_print(data) << "\n\n";
@@ -344,10 +339,10 @@ void json_replace_example1()
 
 void json_replace_example2()
 {
-    json j;
+    jsoncons::json j;
     try
     {
-        j = json::parse(R"(
+        j = jsoncons::json::parse(R"(
 {"store":
 {"book": [
 {"category": "reference",
@@ -376,9 +371,9 @@ void json_replace_example2()
 void json_replace_example3()
 {
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
-    auto f = [](const std::string& /*location*/, json& price) 
+    auto f = [](const std::string& /*location*/, jsoncons::json& price) 
     {
         price = std::round(price.as<double>() - 1.0);
     };
@@ -391,9 +386,9 @@ void json_replace_example3()
 void json_replace_example4()
 {
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
-    auto f = [](const std::string& /*location*/, json& book) 
+    auto f = [](const std::string& /*location*/, jsoncons::json& book) 
     {
         if (book.at("category") == "memoir" && !book.contains("price"))
         {
@@ -407,7 +402,7 @@ void json_replace_example4()
 
 void jsonpath_complex_examples()
 {
-    const json j = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
     [
       {
         "root": {
@@ -491,21 +486,21 @@ void jsonpath_complex_examples()
     )");
 
     // Find all arrays of elements where length(@.result) is 4
-    json result1 = jsonpath::json_query(j,"$..[?(length(@.result) == 4)].result");
+    jsoncons::json result1 = jsonpath::json_query(j,"$..[?(length(@.result) == 4)].result");
     std::cout << "(1) " << result1 << "\n";
 
     // Find array of elements that has id 10 and length(@.result) is 4
-    json result2 = jsonpath::json_query(j,"$..[?(@.id == 10)]..[?(length(@.result) == 4)].result");
+    jsoncons::json result2 = jsonpath::json_query(j,"$..[?(@.id == 10)]..[?(length(@.result) == 4)].result");
     std::cout << "(2) " << result2 << "\n";
 
     // Find all arrays of elements where length(@.result) is 4 and that have value 3 
-    json result3 = jsonpath::json_query(j,"$..[?(length(@.result) == 4 && (@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3))].result");
+    jsoncons::json result3 = jsonpath::json_query(j,"$..[?(length(@.result) == 4 && (@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3))].result");
     std::cout << "(3) " << result3 << "\n";
 }
 
 void jsonpath_union()
 {
-    const json root = json::parse(R"(
+    auto root = jsoncons::json::parse(R"(
 {
   "firstName": "John",
   "lastName" : "doe",
@@ -528,14 +523,14 @@ void jsonpath_union()
 }    )");
 
     std::string path = "$..[@.firstName,@.address.city]";
-    json result = jsonpath::json_query(root,path);
+    jsoncons::json result = jsonpath::json_query(root,path);
 
     std::cout << result << "\n";
 }
 
 void flatten_and_unflatten()
 {
-    json input = json::parse(R"(
+    auto input = jsoncons::json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -555,18 +550,18 @@ void flatten_and_unflatten()
     }
     )");
 
-    json result = jsonpath::flatten(input);
+    jsoncons::json result = jsonpath::flatten(input);
 
     std::cout << pretty_print(result) << "\n";
 
-    json original = jsonpath::unflatten(result);
+    jsoncons::json original = jsonpath::unflatten(result);
     assert(original == input);
 }
 
 void more_json_query_examples()
 {
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
     auto result1 = jsonpath::json_query(data, "$.books[1,1,3].title");
     std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
@@ -586,43 +581,43 @@ void more_json_query_examples()
 
 void make_expression_examples()
 {
-    auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
+    auto expr = jsonpath::make_expression<jsoncons::json>("$.books[1,1,3].title");
 
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
-    json result1 = expr.evaluate(data);
+    jsoncons::json result1 = expr.evaluate(data);
     std::cout << "(1) " << pretty_print(result1) << "\n\n";
 
-    json result2 = expr.evaluate(data, jsonpath::result_options::path);
+    jsoncons::json result2 = expr.evaluate(data, jsonpath::result_options::path);
     std::cout << "(2) " << pretty_print(result2) << "\n\n";
 
-    json result3 = expr.evaluate(data, jsonpath::result_options::nodups);
+    jsoncons::json result3 = expr.evaluate(data, jsonpath::result_options::nodups);
     std::cout << "(3) " << pretty_print(result3) << "\n\n";
 
-    json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::nodups);
+    jsoncons::json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::nodups);
     std::cout << "(4) " << pretty_print(result4) << "\n\n";
 }
 
 void more_make_expression_example()
 {
-    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+    auto expr = jsonpath::make_expression<jsoncons::json>("$.books[?(@.price > avg($.books[*].price))].title");
 
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
-    json result = expr.evaluate(data);
+    jsoncons::json result = expr.evaluate(data);
     std::cout << pretty_print(result) << "\n\n";
 }
 
 void make_expression_with_callback_example()
 {
-    auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
+    auto expr = jsonpath::make_expression<jsoncons::json>("$.books[?(@.price >= 22.0)]");
 
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
 
-    auto callback = [](const std::string& path, const json& val)
+    auto callback = [](const std::string& path, const jsoncons::json& val)
     {
         std::cout << path << ": " << val << "\n";
     };
@@ -632,10 +627,10 @@ void make_expression_with_callback_example()
 void json_query_with_callback_example()
 {
     std::ifstream is("./input/books.json");
-    json data = json::parse(is);
+    auto data =jsoncons::json::parse(is);
     std::string path = "$.books[?(@.price >= 22.0)]";
 
-    auto callback = [](const std::string& path, const json& val)
+    auto callback = [](const std::string& path, const jsoncons::json& val)
     {
         std::cout << path << ": " << val << "\n";
     };
@@ -645,7 +640,7 @@ void json_query_with_callback_example()
 void json_query_with_options_example()
 {
     std::string s = "[1,2,3,4,5]";
-    json data = json::parse(s);
+    auto data =jsoncons::json::parse(s);
     std::string path = "$[4,1,1]";
 
     auto result1 = jsonpath::json_query(data, path);
@@ -700,13 +695,13 @@ void search_for_and_replace_a_value()
       }
     )";
 
-    json j = json::parse(data);
+    auto j = jsoncons::json::parse(data);
 
     // Change the price of "Moby Dick" from $8.99 to $10
     jsonpath::json_replace(j,"$.books[?(@.isbn == '0553213113')].price",10.0);
 
     // Increase the price of "Sayings of the Century" by $1
-    auto f = [](const std::string& /*location*/, json& value) 
+    auto f = [](const std::string& /*location*/, jsoncons::json& value) 
     {
         value = value.as<double>() + 1.0;
     };
@@ -718,7 +713,7 @@ void search_for_and_replace_a_value()
 void union_example() 
 {
     std::ifstream is("./input/store.json");
-    json store = json::parse(is);
+    jsoncons::json store = jsoncons::json::parse(is);
 
     std::string path = "$.store.book[0:2,-1,?(@.author=='Herman Melville')].title";
     auto result1 = jsonpath::json_query(store, path);
@@ -752,7 +747,7 @@ void parent_operator_example()
 ]
     )";
 
-    json store = json::parse(doc);
+    jsoncons::json store = jsoncons::json::parse(doc);
 
     std::string path = "$[*].reviews[?(@.rating == 5)]^^";
     auto result = jsonpath::json_query(store, path);
@@ -786,25 +781,25 @@ public:
 
 void custom_functions1()
 {
-    my_custom_functions<json> funcs;
+    my_custom_functions<jsoncons::json> funcs;
 
-    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+    jsoncons::json root = jsoncons::json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
     std::cout << pretty_print(root) << "\n\n";
 
-    auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
-    json result = expr.evaluate(root);
+    auto expr = jsonpath::make_expression<jsoncons::json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
+    jsoncons::json result = expr.evaluate(root);
 
     std::cout << pretty_print(result) << "\n\n";
 }
 
 void custom_functions2()
 {
-    my_custom_functions<json> funcs;
+    my_custom_functions<jsoncons::json> funcs;
 
-    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+    auto root = jsoncons::json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
     std::cout << pretty_print(root) << "\n\n";
 
-    json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
+    jsoncons::json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
 
     std::cout << pretty_print(result) << "\n\n";
 }
@@ -869,6 +864,7 @@ void make_expression_with_stateful_allocator()
 int main()
 {
     std::cout << "\njsonpath examples\n\n";
+    json_query_examples();
 
     jsonpath_complex_examples();
     jsonpath_union();
@@ -893,7 +889,6 @@ int main()
     custom_functions1();
     custom_functions2();
 
-    json_query_examples();
     function_floor_example();
     function_ceil_example();
 
@@ -902,6 +897,6 @@ int main()
 
     make_expression_with_stateful_allocator();
     
-    std::cout << "\n";
+    std::cout << "\n";   
 }
 
