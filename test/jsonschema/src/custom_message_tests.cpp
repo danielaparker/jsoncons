@@ -22,28 +22,31 @@ TEST_CASE("jsonschema custom message tests")
 {
     std::string schema_str = R"(
 {
-  "type": "object",
-  "properties": {
-    "foo": {
-      "type": "array",
-      "maxItems": 3,
-      "items" : {
-        "type" : "number"
-      }/*,
-      "message" : {
-        "maxItems" : "Custom Message: Maximum 3 numbers can be given in 'foo'",
-        "type" : "Custom Message: Only numbers are supported in 'foo'"
-      }*/
-    },
-    "bar": {
-      "type": "string"
-    }
-  }
+ "type": "object",
+ "properties": {
+   "foo": {
+     "type": "array",
+     "maxItems": 3,
+     "items" : {
+       "type" : "number"
+     },
+     "message" : {
+       "maxItems" : "Custom Message: Maximum 3 numbers can be given in 'foo'",
+       "type" : "Custom Message: Only numbers are supported in 'foo'"
+     }
+   },
+   "bar": {
+     "type": "string"
+   }
+ },
+ "message": {
+   "type" : "Custom Message: Invalid type provided"
+ }
 }
     )";
     
     auto options = jsonschema::evaluation_options{}
-        .error_message_keyword("message");
+        .custom_message_keyword("message");
 
     auto schema = jsoncons::json::parse(schema_str);    
     auto compiled = jsonschema::make_json_schema<json>(schema, options); 
@@ -52,9 +55,9 @@ TEST_CASE("jsonschema custom message tests")
     {
         std::string data_str = R"(
 {
-  "foo": [],
-  "bar": "Bar 1"
-}
+    "foo": [1, 2, 3],
+    "bar": 123
+}        
         )";
 
         try
@@ -63,13 +66,9 @@ TEST_CASE("jsonschema custom message tests")
             json data = json::parse(data_str);
 
             std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& /*msg*/) -> jsonschema::walk_result
+            auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
             {
-                //std::cout << "  Failed: " << "eval_path: " << msg.eval_path().string() << ", schema_location: " << msg.schema_location().string() << ", " << msg.instance_location().string() << ": " << msg.message() << "\n";
-                //for (const auto& err : msg.nested_errors())
-                //{
-                    //std::cout << "  Nested error: " << err.instance_location().string() << ": " << err.message() << "\n";
-                //}
+                std::cout << msg.message() << "\n";
                 ++error_count;
                 return jsonschema::walk_result::advance;
             };
