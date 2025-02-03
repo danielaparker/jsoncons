@@ -226,6 +226,11 @@ namespace jsonschema {
         {
             return do_walk(context, instance, instance_location, reporter);
         }
+        
+        virtual bool always_fails() const = 0;
+
+        virtual bool always_succeeds() const = 0;
+
 
     private:
         virtual walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
@@ -241,19 +246,6 @@ namespace jsonschema {
     template <typename Json>
     class keyword_validator : public validator_base<Json> 
     {
-    public:
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-
-        virtual const std::string& keyword_name() const = 0;
-
-        virtual bool always_fails() const = 0;
-
-        virtual bool always_succeeds() const = 0;
-    };
-
-    template <typename Json>
-    class keyword_validator_base : public keyword_validator<Json>
-    {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         std::string keyword_name_;
@@ -262,17 +254,17 @@ namespace jsonschema {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        keyword_validator_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
+        keyword_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location)
             : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
         {
         }
 
-        keyword_validator_base(const keyword_validator_base&) = delete;
-        keyword_validator_base(keyword_validator_base&&) = default;
-        keyword_validator_base& operator=(const keyword_validator_base&) = delete;
-        keyword_validator_base& operator=(keyword_validator_base&&) = default;
+        keyword_validator(const keyword_validator&) = delete;
+        keyword_validator(keyword_validator&&) = default;
+        keyword_validator& operator=(const keyword_validator&) = delete;
+        keyword_validator& operator=(keyword_validator&&) = default;
 
-        const std::string& keyword_name() const final
+        const std::string& keyword_name() const
         {
             return keyword_name_;
         }
@@ -325,7 +317,7 @@ namespace jsonschema {
     };
 
     template <typename Json>
-    class ref_validator : public keyword_validator_base<Json>, public virtual ref<Json>
+    class ref_validator : public keyword_validator<Json>, public virtual ref<Json>
     {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
@@ -335,19 +327,19 @@ namespace jsonschema {
 
     public:
         ref_validator(const Json& schema, const ref_validator& other)
-            : keyword_validator_base<Json>(other.keyword_name(), schema, other.schema_location()),
+            : keyword_validator<Json>(other.keyword_name(), schema, other.schema_location()),
                   referred_schema_{other.referred_schema_}
         {
         }
         
         ref_validator(const Json& schema, const uri& schema_location) 
-            : keyword_validator_base<Json>("$ref", schema, schema_location), referred_schema_{nullptr}
+            : keyword_validator<Json>("$ref", schema, schema_location), referred_schema_{nullptr}
         {
             //std::cout << "ref_validator: " << this->schema_location().string() << "\n";
         }
 
         ref_validator(const Json& schema, const uri& schema_location, const schema_validator<Json>* referred_schema)
-            : keyword_validator_base<Json>("$ref", schema, schema_location), referred_schema_(referred_schema)
+            : keyword_validator<Json>("$ref", schema, schema_location), referred_schema_(referred_schema)
         {
             //std::cout << "ref_validator2: " << this->schema_location().string() << "\n";
         }
@@ -450,10 +442,6 @@ namespace jsonschema {
         schema_validator()
         {}
 
-        virtual bool always_fails() const = 0;
-
-        virtual bool always_succeeds() const = 0;
-        
         virtual jsoncons::optional<Json> get_default_value() const = 0;
 
         virtual bool recursive_anchor() const = 0;
