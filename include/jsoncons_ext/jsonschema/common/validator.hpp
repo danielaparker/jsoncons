@@ -246,15 +246,9 @@ namespace jsonschema {
 
         virtual const std::string& keyword_name() const = 0;
 
-        virtual bool always_fails() const 
-        {
-            return false;
-        }          
+        virtual bool always_fails() const = 0;
 
-        virtual bool always_succeeds() const
-        {
-            return false;
-        }
+        virtual bool always_succeeds() const = 0;
     };
 
     template <typename Json>
@@ -317,6 +311,17 @@ namespace jsonschema {
                 message,
                 details);
         }
+        
+        bool always_fails() const override
+        {
+            return false;
+        }          
+
+        bool always_succeeds() const override
+        {
+            return false;
+        }
+
     };
 
     template <typename Json>
