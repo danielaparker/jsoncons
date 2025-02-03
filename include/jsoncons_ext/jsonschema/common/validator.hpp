@@ -234,8 +234,21 @@ namespace jsonschema {
             Json& patch) const = 0;
    };
 
+    class validation_message_factory
+    {
+    public:
+        virtual validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message) const = 0;
+
+        virtual validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message,
+            const std::vector<validation_message>& details) const = 0;
+    };
+    
     template <typename Json>
-    class keyword_base 
+    class keyword_base : public validation_message_factory
     {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
@@ -279,7 +292,7 @@ namespace jsonschema {
 
         validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
-            const std::string& message) const
+            const std::string& message) const override
         {
             return validation_message(keyword_name_, 
                 eval_path,
@@ -291,7 +304,7 @@ namespace jsonschema {
         validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message,
-            const std::vector<validation_message>& details) const
+            const std::vector<validation_message>& details) const override
         {
             return validation_message(keyword_name_, 
                 eval_path,

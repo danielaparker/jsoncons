@@ -607,59 +607,59 @@ namespace jsonschema {
 
             std::string format = sch.template as<std::string>();
 
-            format_checker format_check;
+            validate_format validate;
             if (format == "date-time")
             {
-                format_check = rfc3339_date_time_check;
+                validate = rfc3339_date_time_check;
             }
             else if (format == "date") 
             {
-                format_check = rfc3339_date_check;
+                validate = rfc3339_date_check;
             } 
             else if (format == "time") 
             {
-                format_check = rfc3339_time_check;
+                validate = rfc3339_time_check;
             } 
             else if (format == "email") 
             {
-                format_check = email_check;
+                validate = email_check;
             } 
             else if (format == "hostname") 
             {
-                format_check = hostname_check;
+                validate = hostname_check;
             } 
             else if (format == "ipv4") 
             {
-                format_check = ipv4_check;
+                validate = ipv4_check;
             } 
             else if (format == "ipv6") 
             {
-                format_check = ipv6_check;
+                validate = ipv6_check;
             } 
             else if (format == "regex") 
             {
-                format_check = regex_check;
+                validate = regex_check;
             } 
             else if (format == "json-pointer") 
             {
-                format_check = jsonpointer_check;
+                validate = jsonpointer_check;
             } 
             else if (format == "uri") 
             {
-                format_check = uri_check;
+                validate = uri_check;
             } 
             else if (format == "uri-reference") 
             {
-                format_check = uri_reference_check;
+                validate = uri_reference_check;
             } 
             else
             {
                 // Not supported - ignore
-                format_check = nullptr;
+                validate = nullptr;
             }       
 
             return jsoncons::make_unique<format_validator<Json>>(parent, schema_location, 
-                format_check);
+                validate);
         }
 
         virtual std::unique_ptr<pattern_validator<Json>> make_pattern_validator(const compilation_context& context, 

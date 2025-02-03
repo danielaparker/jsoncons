@@ -5,7 +5,7 @@
 // See https://github.com/danielaparker/jsoncons for latest version
 
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/format.hpp>
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/utility/byte_string.hpp>

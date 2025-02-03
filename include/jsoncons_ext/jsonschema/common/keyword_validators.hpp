@@ -28,7 +28,7 @@
 #include <jsoncons/utility/uri.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/format_validator.hpp>
+#include <jsoncons_ext/jsonschema/common/format.hpp>
 #include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 #include <jsoncons_ext/jsonschema/common/validator.hpp>
 
@@ -392,11 +392,11 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
-        format_checker format_check_;
+        validate_format validate_;
 
     public:
-        format_validator(const Json& schema, const uri& schema_location, const format_checker& format_check)
-            : keyword_validator<Json>("format", schema, schema_location), format_check_(format_check)
+        format_validator(const Json& schema, const uri& schema_location, const validate_format& format_check)
+            : keyword_validator<Json>("format", schema, schema_location), validate_(format_check)
         {
 
         }
@@ -414,12 +414,12 @@ namespace jsonschema {
                 return walk_result::advance;
             }
 
-            if (format_check_ != nullptr) 
+            if (validate_ != nullptr) 
             {
                 eval_context<Json> this_context(context, this->keyword_name());
                 auto s = instance.template as<std::string>();
 
-                walk_result result = format_check_(this_context.eval_path(), this->schema_location(), instance_location, s, reporter);
+                walk_result result = validate_(*this, this_context.eval_path(), instance_location, s, reporter);
                 if (result == walk_result::abort)
                 {
                     return result;
