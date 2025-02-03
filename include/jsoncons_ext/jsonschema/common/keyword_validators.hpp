@@ -92,9 +92,8 @@ namespace jsonschema {
             eval_context<Json> this_context(context, this->keyword_name());
             if (schema_ptr == nullptr)
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(), 
+                walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(),
-                    this->schema_location(), 
                     instance_location, 
                     "Unresolved schema reference " + this->schema_location().string()));
                 return result;
@@ -280,9 +279,8 @@ namespace jsonschema {
                 auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
                 if (retval.ec != jsoncons::conv_errc::success)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         "Content is not a base64 string"));
                     if (result == walk_result::abort)
@@ -293,9 +291,8 @@ namespace jsonschema {
             }
             else if (!content_encoding_.empty())
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(),
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "unable to check for contentEncoding '" + content_encoding_ + "'"));
                 if (result == walk_result::abort)
@@ -367,9 +364,8 @@ namespace jsonschema {
 
                 if (ec)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         std::string("Content is not JSON: ") + ec.message()));
                     if (result == walk_result::abort)
@@ -482,9 +478,8 @@ namespace jsonschema {
                 message.append("' does not match pattern '");
                 message.append(pattern_string_);
                 message.append("'.");
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(),
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     std::move(message)));
                 if (result == walk_result::abort)
@@ -569,11 +564,10 @@ namespace jsonschema {
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length > max_length_)
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
-                        instance_location, 
-                        std::string("Number of characters must be at most ") + std::to_string(max_length_)));
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::string("Number of characters must be at most ") + std::to_string(max_length_)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -623,11 +617,10 @@ namespace jsonschema {
             {
                 std::string message("Maximum number of items is " + std::to_string(max_items_));
                 message.append(" but found " + std::to_string(instance.size()));
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(),
-                        instance_location, 
-                        std::move(message)));
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::move(message)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -677,11 +670,10 @@ namespace jsonschema {
             {
                 std::string message("Minimum number of items is " + std::to_string(min_items_));
                 message.append(" but found " + std::to_string(instance.size()));
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(),
-                        instance_location, 
-                        std::move(message)));
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::move(message)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -735,10 +727,9 @@ namespace jsonschema {
                 if (schema_val_->always_fails())
                 {
                     jsonpointer::json_pointer item_location = instance_location / 0;
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
-                        item_location,
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
+                        item_location, 
                         "Item at index '0' but the schema does not allow any items."));
                     return result;
                 }
@@ -860,9 +851,8 @@ namespace jsonschema {
 
             if (are_unique_ && !array_has_unique_items(instance))
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "Array items are not unique"));
                 if (result == walk_result::abort)
@@ -930,9 +920,8 @@ namespace jsonschema {
             std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
             if (length < min_length_) 
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     std::string("Number of characters must be at least ") + std::to_string(min_length_)));
                 if (result == walk_result::abort)
@@ -999,9 +988,8 @@ namespace jsonschema {
 
             if (local_reporter.errors.empty())
             {
-                result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "Instance must not be valid against schema"));
                 if (result == walk_result::abort)
@@ -1081,9 +1069,8 @@ namespace jsonschema {
             }
             else 
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "Must be valid against at least one schema, but found no matching schemas", 
                     local_reporter.errors));
@@ -1196,9 +1183,8 @@ namespace jsonschema {
                         message.append(std::to_string(i));
                     }
                 }
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     message, 
                     local_reporter.errors));
@@ -1305,9 +1291,8 @@ namespace jsonschema {
             }
             else 
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "Must be valid against all schemas, but found unmatched schemas", 
                     local_reporter.errors));
@@ -1374,10 +1359,9 @@ namespace jsonschema {
             {
                 if (instance.template as<int64_t>() > value_.template as<int64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
-                        instance_location, 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
                     {
@@ -1389,9 +1373,8 @@ namespace jsonschema {
             {
                 if (instance.template as<uint64_t>() > value_.template as<uint64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1408,9 +1391,8 @@ namespace jsonschema {
                 bigint n2 = bigint::from_string(s2.data(), s2.length());
                 if (n1 > n2)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1423,9 +1405,8 @@ namespace jsonschema {
             {
                 if (instance.template as<double>() > value_.template as<double>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1474,9 +1455,8 @@ namespace jsonschema {
             {
                 if (instance.template as<int64_t>() >= value_.template as<int64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1489,9 +1469,8 @@ namespace jsonschema {
             {
                 if (instance.template as<uint64_t>() >= value_.template as<uint64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1508,9 +1487,8 @@ namespace jsonschema {
                 bigint n2 = bigint::from_string(s2.data(), s2.length());
                 if (n1 >= n2)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1523,9 +1501,8 @@ namespace jsonschema {
             {
                 if (instance.template as<double>() >= value_.template as<double>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1574,9 +1551,8 @@ namespace jsonschema {
             {
                 if (instance.template as<int64_t>() < value_.template as<int64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1589,9 +1565,8 @@ namespace jsonschema {
             {
                 if (instance.template as<uint64_t>() < value_.template as<uint64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1608,9 +1583,8 @@ namespace jsonschema {
                 bigint n2 = bigint::from_string(s2.data(), s2.length());
                 if (n1 < n2)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1623,9 +1597,8 @@ namespace jsonschema {
             {
                 if (instance.template as<double>() < value_.template as<double>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1674,9 +1647,8 @@ namespace jsonschema {
             {
                 if (instance.template as<int64_t>() <= value_.template as<int64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1689,9 +1661,8 @@ namespace jsonschema {
             {
                 if (instance.template as<uint64_t>() <= value_.template as<uint64_t>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1708,9 +1679,8 @@ namespace jsonschema {
                 bigint n2 = bigint::from_string(s2.data(), s2.length());
                 if (n1 <= n2)
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1723,9 +1693,8 @@ namespace jsonschema {
             {
                 if (instance.template as<double>() <= value_.template as<double>())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         message_ + instance.template as<std::string>()));
                     if (result == walk_result::abort)
@@ -1777,9 +1746,8 @@ namespace jsonschema {
             {
                 if (!is_multiple_of(value, static_cast<double>(value_)))
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(),
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
                         instance_location, 
                         instance.template as<std::string>() + " is not a multiple of " + std::to_string(value_)));
                     if (result == walk_result::abort)
@@ -1844,11 +1812,10 @@ namespace jsonschema {
             {
                 if(instance.find(key) == instance.object_range().end())
                 {
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
-                                                     this_context.eval_path(),
-                                                     this->schema_location(),
-                                                     instance_location,
-                                                     "Required property '" + key + "' not found."));
+                    walk_result result = reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
+                        instance_location, 
+                        "Required property '" + key + "' not found."));
                     if(result == walk_result::abort)
                     {
                         return result;
@@ -1900,9 +1867,8 @@ namespace jsonschema {
 
                 std::string message("Maximum number of properties is " + std::to_string(max_properties_));
                 message.append(" but found " + std::to_string(instance.size()));
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     std::move(message)));
                 if (result == walk_result::abort)
@@ -1953,11 +1919,10 @@ namespace jsonschema {
 
                 std::string message("Minimum number of properties is " + std::to_string(min_properties_));
                 message.append(" but found " + std::to_string(instance.size()));
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(),
-                        this->schema_location(),
-                        instance_location,
-                        std::move(message)));
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::move(message)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -2134,9 +2099,8 @@ namespace jsonschema {
 
             if (!in_range)
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "'" + instance.template as<std::string>() + "' is not a valid enum value."));
                 if (result == walk_result::abort)
@@ -2182,9 +2146,8 @@ namespace jsonschema {
             {
                 eval_context<Json> this_context(context, this->keyword_name());
 
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     "Instance is not const"));
                 if (result == walk_result::abort)
@@ -2346,9 +2309,8 @@ namespace jsonschema {
                 message.append(", found ");
                 message.append(to_schema_type(instance.type()));
 
-                return reporter.error(validation_message(this->keyword_name(),
-                    this_context.eval_path(), 
-                    this->schema_location(), 
+                return reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
                     instance_location, 
                     message));
             }
@@ -2763,10 +2725,9 @@ namespace jsonschema {
                         auto prop_it = allowed_properties.find(prop.key());
                         if (prop_it == allowed_properties.end()) 
                         {
-                            walk_result result = reporter.error(validation_message(this->keyword_name(),
-                                prop_context.eval_path(), 
-                                additional_properties_->schema_location(), 
-                                prop_location,
+                            walk_result result = reporter.error(this->make_validation_message(
+                                prop_context.eval_path(),
+                                prop_location, 
                                 "Additional property '" + prop.key() + "' not allowed by schema."));
                             if (result == walk_result::abort)
                             {
@@ -2810,9 +2771,8 @@ namespace jsonschema {
                             }
                             if (!local_reporter.errors.empty())
                             {
-                                result = reporter.error(validation_message(this->keyword_name(),
-                                    this_context.eval_path(), 
-                                    additional_properties_->schema_location(),
+                                result = reporter.error(this->make_validation_message(
+                                    this_context.eval_path(),
                                     instance_location, 
                                     "Additional property '" + prop.key() + "' found but was invalid."));
                                 if (result == walk_result::abort)
@@ -3092,10 +3052,9 @@ namespace jsonschema {
                 if (schema_val_->always_fails())
                 {
                     jsonpointer::json_pointer item_location = instance_location / 0;
-                    return reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(), 
-                        item_location,
+                    return reporter.error(this->make_validation_message(
+                        this_context.eval_path(),
+                        instance_location, 
                         "Instance has properties but the schema does not allow any property names."));
                 }
                 else if (schema_val_->always_succeeds())

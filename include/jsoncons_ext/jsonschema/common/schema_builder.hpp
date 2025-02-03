@@ -1008,7 +1008,7 @@ namespace jsonschema {
             std::string sub_keys[] = {"additionalProperties"};
             additional_properties = this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
-            return jsoncons::make_unique<additional_properties_validator<Json>>(parent, std::move(schema_location),
+            return jsoncons::make_unique<additional_properties_validator<Json>>(parent, additional_properties->schema_location(),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
         }

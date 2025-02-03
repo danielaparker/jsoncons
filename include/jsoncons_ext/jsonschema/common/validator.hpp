@@ -18,6 +18,7 @@
 #include <jsoncons_ext/jsonschema/common/eval_context.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 #include <jsoncons_ext/jsonschema/validation_message.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -291,6 +292,30 @@ namespace jsonschema {
         const uri& schema_location() const final
         {
             return schema_location_;
+        }
+
+        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message) const
+        {
+            return validation_message(keyword_name_, 
+                eval_path,
+                schema_location_, 
+                instance_location, 
+                message);
+        }
+
+        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message,
+            const std::vector<validation_message>& details) const
+        {
+            return validation_message(keyword_name_, 
+                eval_path,
+                schema_location_, 
+                instance_location, 
+                message,
+                details);
         }
     };
 
