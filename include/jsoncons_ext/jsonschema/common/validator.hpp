@@ -237,6 +237,8 @@ namespace jsonschema {
     class validation_message_factory
     {
     public:
+        virtual ~validation_message_factory() = default;
+        
         virtual validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message) const = 0;
