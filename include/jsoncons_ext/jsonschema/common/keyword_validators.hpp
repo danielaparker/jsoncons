@@ -3207,11 +3207,11 @@ namespace jsonschema {
             {
                 std::string message("A schema can match a contains constraint at most " + std::to_string(max_value_) + " times");
                 message.append(" but it matched " + std::to_string(count) + " times.");
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(),
-                        instance_location, 
-                        std::move(message)));
+                
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::move(message)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -3253,11 +3253,10 @@ namespace jsonschema {
             {
                 std::string message("A schema must match a contains constraint at least " + std::to_string(min_value_) + " times");
                 message.append(" but it matched " + std::to_string(count) + " times.");
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
-                        this_context.eval_path(), 
-                        this->schema_location(),
-                        instance_location, 
-                        std::move(message)));
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::move(message)));
                 if (result == walk_result::abort)
                 {
                     return result;
@@ -3386,9 +3385,8 @@ namespace jsonschema {
             }
             else if (contains_count == 0)
             {
-                walk_result result = reporter.error(validation_message(this->keyword_name(),
+                walk_result result = reporter.error(this->make_validation_message(
                     this_context.eval_path(), 
-                    this->schema_location(), 
                     instance_location, 
                     "Expected at least one array item to match 'contains' schema.",
                     local_reporter.errors));
@@ -3481,9 +3479,8 @@ namespace jsonschema {
                 if (items_val_->always_fails())
                 {
                     jsonpointer::json_pointer item_location = instance_location / data_index;
-                    walk_result result = reporter.error(validation_message(this->keyword_name(),
+                    walk_result result = reporter.error(this->make_validation_message(
                         items_context.eval_path(), 
-                        this->schema_location(), 
                         item_location,
                         "Extra item at index '" + std::to_string(data_index) + "' but the schema does not allow extra items."));
                     if (result == walk_result::abort)
@@ -3748,9 +3745,8 @@ namespace jsonschema {
                             eval_context<Json> prop_context{this_context, prop.key(), evaluation_flags{}};
                             jsonpointer::json_pointer prop_location = instance_location / prop.key();
 
-                            walk_result result = reporter.error(validation_message(this->keyword_name(),
+                            walk_result result = reporter.error(this->make_validation_message(
                                 prop_context.eval_path(), 
-                                this->schema_location(), 
                                 prop_location,
                                 "Unevaluated property '" + prop.key() + "' but the schema does not allow unevaluated properties."));
                             if (result == walk_result::abort)
@@ -3858,9 +3854,8 @@ namespace jsonschema {
                             eval_context<Json> item_context{this_context, index, evaluation_flags{}};
                             jsonpointer::json_pointer item_location = instance_location / index;
                             //std::cout << "Not in evaluated properties: " << item.key() << "\n";
-                            walk_result result = reporter.error(validation_message(this->keyword_name(),
+                            walk_result result = reporter.error(this->make_validation_message(
                                 item_context.eval_path(), 
-                                this->schema_location(), 
                                 item_location,
                                 "Unevaluated item at index '" + std::to_string(index) + "' but the schema does not allow unevaluated items."));
                             if (result == walk_result::abort)

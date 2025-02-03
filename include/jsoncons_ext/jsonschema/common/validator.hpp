@@ -244,6 +244,74 @@ namespace jsonschema {
    };
 
     template <typename Json>
+    class keyword_base 
+    {
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
+
+        std::string keyword_name_;
+        const Json* schema_ptr_;
+        uri schema_location_;
+    public:
+
+        keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
+            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
+        {
+        }
+
+        virtual ~keyword_base() = default;
+
+        keyword_base(const keyword_base&) = delete;
+        keyword_base(keyword_base&&) = default;
+        keyword_base& operator=(const keyword_base&) = delete;
+        keyword_base& operator=(keyword_base&&) = default;
+
+        const std::string& keyword_name() const 
+        {
+            return keyword_name_;
+        }
+
+        const Json& schema() const
+        {
+            return *schema_ptr_;
+        }
+
+        const uri& schema_location() const 
+        {
+            return schema_location_;
+        }
+
+        walk_result walk(const eval_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
+
+        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message) const
+        {
+            return validation_message(keyword_name_, 
+                eval_path,
+                schema_location_, 
+                instance_location, 
+                message);
+        }
+
+        validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
+            const jsonpointer::json_pointer& instance_location,
+            const std::string& message,
+            const std::vector<validation_message>& details) const
+        {
+            return validation_message(keyword_name_, 
+                eval_path,
+                schema_location_, 
+                instance_location, 
+                message,
+                details);
+        }
+    };
+
+    template <typename Json>
     class keyword_validator : public validator_base<Json> 
     {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
@@ -384,50 +452,6 @@ namespace jsonschema {
             }
             eval_context<Json> this_context(context, this->keyword_name());
             return referred_schema_->walk(this_context, instance, instance_location, reporter);           
-        }
-    };
-
-    template <typename Json>
-    class keyword_base 
-    {
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
-
-        std::string keyword_name_;
-        const Json* schema_ptr_;
-        uri schema_location_;
-    public:
-
-        keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
-            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
-        {
-        }
-
-        virtual ~keyword_base() = default;
-
-        keyword_base(const keyword_base&) = delete;
-        keyword_base(keyword_base&&) = default;
-        keyword_base& operator=(const keyword_base&) = delete;
-        keyword_base& operator=(keyword_base&&) = default;
-
-        const std::string& keyword_name() const 
-        {
-            return keyword_name_;
-        }
-
-        const Json& schema() const
-        {
-            return *schema_ptr_;
-        }
-
-        const uri& schema_location() const 
-        {
-            return schema_location_;
-        }
-
-        walk_result walk(const eval_context<Json>& /*context*/, const Json& instance,
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const
-        {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
