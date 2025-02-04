@@ -554,10 +554,13 @@ namespace jsonschema {
                 default:
                     break;
             }
+            
+            auto it = context.custom_messages().find("type");
+            std::string custom_message = it == context.custom_messages().end() ? std::string{} : it->second;
 
             return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), 
-                std::move(expected_types)
-         );
+                std::move(expected_types), custom_message
+                );
         }
 
         virtual std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const compilation_context& context, 

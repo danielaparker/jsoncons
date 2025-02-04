@@ -24,20 +24,25 @@ namespace jsonschema {
         uri_wrapper base_uri_;
         std::vector<uri_wrapper> uris_;
         jsoncons::optional<uri> id_;
+        std::unordered_map<std::string,std::string> custom_messages_;
     public:
 
         compilation_context()
         {
         }
 
-        explicit compilation_context(const uri_wrapper& retrieval_uri)
+        explicit compilation_context(const uri_wrapper& retrieval_uri,
+            const std::unordered_map<std::string,std::string>& custom_messages = std::unordered_map<std::string,std::string>{})
             : base_uri_(retrieval_uri), 
-              uris_(std::vector<uri_wrapper>{{retrieval_uri}})
+              uris_(std::vector<uri_wrapper>{{retrieval_uri}}),
+              custom_messages_{custom_messages}
         {
         }
 
-        explicit compilation_context(const std::vector<uri_wrapper>& uris)
-            : uris_(uris)
+        explicit compilation_context(const std::vector<uri_wrapper>& uris,
+            const std::unordered_map<std::string,std::string>& custom_messages = std::unordered_map<std::string,std::string>{})
+            : uris_(uris),
+              custom_messages_{custom_messages}
         {
             if (uris_.empty())
             {
@@ -46,14 +51,22 @@ namespace jsonschema {
             base_uri_ = uris_.back();
         }
 
-        explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id)
-            : uris_(uris), id_(id)
+        explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id,
+            const std::unordered_map<std::string,std::string>& custom_messages = std::unordered_map<std::string,std::string>{})
+            : uris_(uris), 
+              id_(id),
+              custom_messages_{custom_messages}
         {
             if (uris_.empty())
             {
                 uris_.push_back(uri_wrapper{"#"});
             }
             base_uri_ = uris_.back();
+        }
+        
+        const std::unordered_map<std::string,std::string>& custom_messages() const
+        {
+            return custom_messages_;
         }
 
         const std::vector<uri_wrapper>& uris() const {return uris_;}
