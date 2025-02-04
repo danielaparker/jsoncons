@@ -261,7 +261,7 @@ namespace jsonschema {
     public:
 
         keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location,
-            const std::string& custom_message = std::string{})
+            const std::string& custom_message)
             : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), 
               schema_location_(schema_location), custom_message_(custom_message)
         {
@@ -335,7 +335,7 @@ namespace jsonschema {
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
         keyword_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location,
-            const std::string& custom_message = std::string{})
+            const std::string& custom_message)
             : keyword_base<Json>(keyword_name, schema, schema_location, custom_message)
         {
         }
@@ -377,14 +377,15 @@ namespace jsonschema {
         {
         }
         
-        ref_validator(const Json& schema, const uri& schema_location) 
-            : keyword_validator<Json>("$ref", schema, schema_location), referred_schema_{nullptr}
+        ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message = std::string{}) 
+            : keyword_validator<Json>("$ref", schema, schema_location, custom_message), referred_schema_{nullptr}
         {
             //std::cout << "ref_validator: " << this->schema_location().string() << "\n";
         }
 
-        ref_validator(const Json& schema, const uri& schema_location, const schema_validator<Json>* referred_schema)
-            : keyword_validator<Json>("$ref", schema, schema_location), referred_schema_(referred_schema)
+        ref_validator(const Json& schema, const uri& schema_location, const schema_validator<Json>* referred_schema, 
+            const std::string& custom_message = std::string{})
+            : keyword_validator<Json>("$ref", schema, schema_location, custom_message), referred_schema_(referred_schema)
         {
             //std::cout << "ref_validator2: " << this->schema_location().string() << "\n";
         }
