@@ -257,10 +257,13 @@ namespace jsonschema {
         std::string keyword_name_;
         const Json* schema_ptr_;
         uri schema_location_;
+        std::string custom_message_;
     public:
 
-        keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location)
-            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), schema_location_(schema_location)
+        keyword_base(const std::string& keyword_name, const Json& schema, const uri& schema_location,
+            const std::string& custom_message = std::string{})
+            : keyword_name_(keyword_name), schema_ptr_(std::addressof(schema)), 
+              schema_location_(schema_location), custom_message_(custom_message)
         {
         }
 
@@ -300,7 +303,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location_, 
                 instance_location, 
-                message);
+                custom_message_.empty() ? message : custom_message_);
         }
 
         validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
@@ -312,7 +315,7 @@ namespace jsonschema {
                 eval_path,
                 schema_location_, 
                 instance_location, 
-                message,
+                custom_message_.empty() ? message : custom_message_,
                 details);
         }
 
