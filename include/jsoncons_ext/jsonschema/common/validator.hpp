@@ -334,8 +334,9 @@ namespace jsonschema {
     public:
         using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
 
-        keyword_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location)
-            : keyword_base<Json>(keyword_name, schema, schema_location)
+        keyword_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location,
+            const std::string& custom_message = std::string{})
+            : keyword_base<Json>(keyword_name, schema, schema_location, custom_message)
         {
         }
 

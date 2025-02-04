@@ -2207,8 +2207,8 @@ namespace jsonschema {
         type_validator& operator=(type_validator&&) = default;
 
         type_validator(const Json& schema, const uri& schema_location,
-            std::vector<json_schema_type>&& expected_types)
-            : keyword_validator<Json>("type", schema, std::move(schema_location)),
+            std::vector<json_schema_type>&& expected_types, const std::string& custom_message = std::string{})
+            : keyword_validator<Json>("type", schema, std::move(schema_location), custom_message),
               expected_types_(std::move(expected_types))
         {
         }
