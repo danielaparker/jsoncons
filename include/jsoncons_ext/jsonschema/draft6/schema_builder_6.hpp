@@ -295,7 +295,10 @@ namespace draft6 {
         std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
         {
+            std::string keyword = "patternProperties";
             uri schema_location = context.get_base_uri();
+            std::string custom_message = context.get_custom_message(keyword);
+
             std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
             
             for (const auto& prop : sch.object_range())
@@ -307,6 +310,7 @@ namespace draft6 {
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>(parent, std::move(schema_location),
+                custom_message,
                 std::move(pattern_properties));
         }
 #endif

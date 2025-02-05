@@ -646,7 +646,8 @@ namespace jsonschema {
 
         std::size_t min_items_;
     public:
-        min_items_validator(const Json& schema, const uri& schema_location, std::size_t min_items, const std::string& custom_message = std::string{})
+        min_items_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, 
+            std::size_t min_items)
             : keyword_validator<Json>("minItems", schema, schema_location, custom_message), min_items_(min_items)
         {
         }
@@ -1843,7 +1844,8 @@ namespace jsonschema {
 
         std::size_t max_properties_;
     public:
-        max_properties_validator(const Json& schema, const uri& schema_location, std::size_t max_properties, const std::string& custom_message = std::string{})
+        max_properties_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, 
+            std::size_t max_properties)
             : keyword_validator<Json>("maxProperties", schema, schema_location, custom_message), max_properties_(max_properties)
         {
         }
@@ -1896,7 +1898,7 @@ namespace jsonschema {
 
         std::size_t min_properties_;
     public:
-        min_properties_validator(const Json& schema, const uri& schema_location, std::size_t min_properties, const std::string& custom_message = std::string{})
+        min_properties_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, std::size_t min_properties)
             : keyword_validator<Json>("minProperties", schema, schema_location, custom_message), min_properties_(min_properties)
         {
         }
@@ -2380,10 +2382,8 @@ namespace jsonschema {
         properties_validator(properties_validator&&) = default;
         properties_validator& operator=(properties_validator&&) = default;
 
-        properties_validator(const Json& schema, const uri& schema_location,
-            std::map<std::string, schema_validator_type>&& properties,
-            const std::string& custom_message = std::string{}
-        )
+        properties_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            std::map<std::string, schema_validator_type>&& properties)
             : keyword_validator<Json>("properties", schema, std::move(schema_location), custom_message),
               properties_(std::move(properties))
         {
@@ -2539,10 +2539,8 @@ namespace jsonschema {
         std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties_;
 
     public:
-        pattern_properties_validator(const Json& schema, const uri& schema_location,
-            std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties,
-            const std::string& custom_message = std::string{}
-        )
+        pattern_properties_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            std::vector<std::pair<std::regex, schema_validator_type>>&& pattern_properties)
             : keyword_validator<Json>("patternProperties", schema, std::move(schema_location), custom_message),
               pattern_properties_(std::move(pattern_properties))
         {
@@ -2670,11 +2668,12 @@ namespace jsonschema {
         schema_validator_type additional_properties_;
 
     public:
-        additional_properties_validator(const Json& schema, const uri& schema_location,
+        additional_properties_validator(const Json& schema, 
+            const uri& schema_location,
+            const std::string& custom_message,
             std::unique_ptr<properties_validator<Json>>&& properties,
             std::unique_ptr<pattern_properties_validator<Json>>&& pattern_properties,
-            schema_validator_type&& additional_properties,
-            const std::string& custom_message = std::string{}
+            schema_validator_type&& additional_properties
         )
             : keyword_validator<Json>("additionalProperties", schema, std::move(schema_location),
                 custom_message), 
@@ -3716,9 +3715,10 @@ namespace jsonschema {
         schema_validator_type schema_val_;
 
     public:
-        unevaluated_properties_validator(const Json& schema, const uri& schema_location,
-            schema_validator_type&& schema_val,
-            const std::string& custom_message = std::string{})
+        unevaluated_properties_validator(const Json& schema, 
+            const uri& schema_location,
+            const std::string& custom_message,
+            schema_validator_type&& schema_val)
             : keyword_validator<Json>("unevaluatedProperties", schema, std::move(schema_location),
                 custom_message), 
               schema_val_(std::move(schema_val))
