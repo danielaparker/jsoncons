@@ -535,8 +535,6 @@ namespace draft202012 {
         compilation_context make_compilation_context(const compilation_context& parent, 
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
-            std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
-            
             // Exclude uri's that are not plain name identifiers
             std::vector<uri_wrapper> new_uris;
             for (const auto& uri : parent.uris())
@@ -611,6 +609,8 @@ namespace draft202012 {
                         new_uris.emplace_back(std::move(identifier)); 
                     }
                 }
+
+                std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
                 if (!this->options().custom_message_keyword().empty())
                 {
                     it = sch.find(this->options().custom_message_keyword()); 
@@ -621,7 +621,7 @@ namespace draft202012 {
                         {
                             for (const auto& item : messages.object_range())
                             {
-                                custom_messages.insert_or_assign(item.key(), item.value().template as<std::string>());
+                                custom_messages[item.key()] =  item.value().template as<std::string>();
                             }
                         }
                     }
@@ -633,6 +633,23 @@ namespace draft202012 {
             //{
             //    std::cout << "    " << uri.string() << "\n";
             //}
+
+            std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
+            if (!this->options().custom_message_keyword().empty())
+            {
+                auto it = sch.find(this->options().custom_message_keyword()); 
+                if (it != sch.object_range().end()) 
+                {
+                    const auto& messages = it->value();
+                    if (messages.is_object())
+                    {
+                        for (const auto& item : messages.object_range())
+                        {
+                            custom_messages[item.key()] =  item.value().template as<std::string>();
+                        }
+                    }
+                }
+            }
 
             return compilation_context(new_uris, id, custom_messages);
         }

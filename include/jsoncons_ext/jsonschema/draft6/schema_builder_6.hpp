@@ -366,7 +366,24 @@ namespace draft6 {
                 std::cout << "    " << uri.string() << "\n";
             }
 */
-            return compilation_context(new_uris, id);
+            std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
+            if (!this->options().custom_message_keyword().empty())
+            {
+                auto it = sch.find(this->options().custom_message_keyword()); 
+                if (it != sch.object_range().end()) 
+                {
+                    const auto& messages = it->value();
+                    if (messages.is_object())
+                    {
+                        for (const auto& item : messages.object_range())
+                        {
+                            custom_messages[item.key()] =  item.value().template as<std::string>();
+                        }
+                    }
+                }
+            }
+
+            return compilation_context(new_uris, id, custom_messages);
         }
     private:
         static const std::unordered_set<std::string>& known_keywords()
