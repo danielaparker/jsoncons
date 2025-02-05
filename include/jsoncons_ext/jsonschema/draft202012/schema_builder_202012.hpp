@@ -302,7 +302,8 @@ namespace draft202012 {
                 std::string value = (*it).value().template as<std::string>();
                 uri relative(value); 
                 auto ref = context.get_base_uri().resolve(relative)                   ;
-                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(sch, ref.base(), uri_wrapper{ref});
+                auto orig = jsoncons::make_unique<dynamic_ref_validator_type>(sch, ref.base(), 
+                    context.get_custom_message("$dynamicRef"), uri_wrapper{ref});
                 this->unresolved_refs_.emplace_back(ref, orig.get());
                 validators.push_back(std::move(orig));
             }

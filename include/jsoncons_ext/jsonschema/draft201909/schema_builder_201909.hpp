@@ -299,9 +299,10 @@ namespace draft201909 {
             it = sch.find("$recursiveRef");
             if (it != sch.object_range().end()) // this schema has a reference
             {
+                std::string custom_message = context.get_custom_message("$recursiveRef");
                 uri relative((*it).value().template as<std::string>());
                 auto ref = context.get_base_uri().resolve(relative);
-                auto orig = jsoncons::make_unique<recursive_ref_validator_type>(sch, ref.base()); 
+                auto orig = jsoncons::make_unique<recursive_ref_validator_type>(sch, ref.base(), custom_message); 
                 this->unresolved_refs_.emplace_back(ref, orig.get());
                 validators.push_back(std::move(orig));
             }

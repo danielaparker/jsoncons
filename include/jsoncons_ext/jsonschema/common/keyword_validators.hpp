@@ -49,7 +49,7 @@ namespace jsonschema {
         const schema_validator<Json> *tentative_target_; 
 
     public:
-        recursive_ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message = std::string{}) 
+        recursive_ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message) 
             : keyword_validator<Json>("$recursiveRef", schema, schema_location, custom_message),
               tentative_target_(nullptr)
         {}
@@ -146,7 +146,7 @@ namespace jsonschema {
         const schema_validator<Json>* tentative_target_;
 
     public:
-        dynamic_ref_validator(const Json& schema, const uri& schema_location, const uri_wrapper& value, const std::string& custom_message = std::string{}) 
+        dynamic_ref_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const uri_wrapper& value) 
             : keyword_validator<Json>("$dynamicRef", schema, schema_location, custom_message), value_(value),
             tentative_target_(nullptr)
         {
@@ -251,7 +251,7 @@ namespace jsonschema {
         std::string content_encoding_;
 
     public:
-        content_encoding_validator(const Json& schema, const uri& schema_location, const std::string& content_encoding, const std::string& custom_message = std::string{})
+        content_encoding_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const std::string& content_encoding)
             : keyword_validator<Json>("contentEncoding", schema, schema_location, custom_message), 
               content_encoding_(content_encoding)
         {
@@ -322,8 +322,9 @@ namespace jsonschema {
         std::string content_encoding_;
 
     public:
-        content_media_type_validator(const Json& schema, const uri& schema_location, const std::string& content_media_type,
-            const std::string& content_encoding, const std::string& custom_message = std::string{})
+        content_media_type_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, 
+            const std::string& content_media_type,
+            const std::string& content_encoding)
             : keyword_validator<Json>("contentMediaType", schema, schema_location, custom_message), 
               content_media_type_(content_media_type), content_encoding_(content_encoding)
         {
@@ -395,10 +396,9 @@ namespace jsonschema {
         validate_format validate_;
 
     public:
-        format_validator(const Json& schema, const uri& schema_location, const validate_format& format_check, const std::string& custom_message = std::string{})
-            : keyword_validator<Json>("format", schema, schema_location, custom_message), validate_(format_check)
+        format_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const validate_format& validate)
+            : keyword_validator<Json>("format", schema, schema_location, custom_message), validate_(validate)
         {
-
         }
 
     private:

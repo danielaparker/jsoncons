@@ -568,20 +568,23 @@ namespace jsonschema {
         virtual std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const compilation_context& context, 
             const Json& sch, const Json& parent)
         {
-            uri schema_location = context.make_schema_location("contentEncoding");
+            std::string keyword = "contentEncoding";
+            uri schema_location = context.make_schema_location(keyword);
             if (!sch.is_string())
             {
                 const std::string message("contentEncoding must be a string");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_encoding_validator<Json>>(parent, schema_location, value);
+            return jsoncons::make_unique<content_encoding_validator<Json>>(parent, schema_location, 
+                context.get_custom_message(keyword), value);
         }
 
         virtual std::unique_ptr<content_media_type_validator<Json>> make_content_media_type_validator(const compilation_context& context, 
             const Json& sch, const Json& parent)
         {
-            uri schema_location = context.make_schema_location("contentMediaType");
+            std::string keyword = "contentMediaType";
+            uri schema_location = context.make_schema_location(keyword);
             if (!sch.is_string())
             {
                 const std::string message("contentMediaType must be a string");
@@ -602,7 +605,8 @@ namespace jsonschema {
             }
             
             auto value = sch.template as<std::string>();
-            return jsoncons::make_unique<content_media_type_validator<Json>>(parent, schema_location, value, content_encoding);
+            return jsoncons::make_unique<content_media_type_validator<Json>>(parent, schema_location, 
+                context.get_custom_message(keyword), value, content_encoding);
         }
 
         virtual std::unique_ptr<format_validator<Json>> make_format_validator(const compilation_context& context, 
@@ -612,49 +616,61 @@ namespace jsonschema {
 
             std::string format = sch.template as<std::string>();
 
+            std::string message_key;
             validate_format validate;
             if (format == "date-time")
             {
+                message_key = "format.date-time";
                 validate = rfc3339_date_time_check;
             }
             else if (format == "date") 
             {
+                message_key = "format.date";
                 validate = rfc3339_date_check;
             } 
             else if (format == "time") 
             {
+                message_key = "format.time";
                 validate = rfc3339_time_check;
             } 
             else if (format == "email") 
             {
+                message_key = "format.email";
                 validate = email_check;
             } 
             else if (format == "hostname") 
             {
+                message_key = "format.hostname";
                 validate = hostname_check;
             } 
             else if (format == "ipv4") 
             {
+                message_key = "format.ipv4";
                 validate = ipv4_check;
             } 
             else if (format == "ipv6") 
             {
+                message_key = "format.ipv6";
                 validate = ipv6_check;
             } 
             else if (format == "regex") 
             {
+                message_key = "format.regex";
                 validate = regex_check;
             } 
             else if (format == "json-pointer") 
             {
+                message_key = "format.json-pointer";
                 validate = jsonpointer_check;
             } 
             else if (format == "uri") 
             {
+                message_key = "format.uri";
                 validate = uri_check;
             } 
             else if (format == "uri-reference") 
             {
+                message_key = "format.uri-reference";
                 validate = uri_reference_check;
             } 
             else
@@ -663,7 +679,7 @@ namespace jsonschema {
                 validate = nullptr;
             }       
 
-            return jsoncons::make_unique<format_validator<Json>>(parent, schema_location, 
+            return jsoncons::make_unique<format_validator<Json>>(parent, schema_location, context.get_custom_message(message_key), 
                 validate);
         }
 

@@ -52,7 +52,7 @@ namespace jsonschema {
         }
 
         explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id,
-            const std::unordered_map<std::string,std::string>& custom_messages = std::unordered_map<std::string,std::string>{})
+            const std::unordered_map<std::string,std::string>& custom_messages)
             : uris_(uris), 
               id_(id),
               custom_messages_{custom_messages}
