@@ -538,7 +538,7 @@ namespace jsonschema {
 
         std::size_t max_length_{0};
     public:
-        max_length_validator(const Json& schema, const uri& schema_location, std::size_t max_length, const std::string& custom_message = std::string{})
+        max_length_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, std::size_t max_length)
             : keyword_validator<Json>("maxLength", schema, schema_location, custom_message), max_length_(max_length)
         {
         }
@@ -573,6 +573,60 @@ namespace jsonschema {
                     return result;
                 }
             }          
+            return walk_result::advance;
+        }
+
+        walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance,
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
+        {
+            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
+        }
+    };
+
+    // minLength
+
+    template <typename Json>
+    class min_length_validator : public keyword_validator<Json>
+    {
+        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
+
+        std::size_t min_length_;
+
+    public:
+        min_length_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, std::size_t min_length)
+            : keyword_validator<Json>("minLength", schema, schema_location, custom_message), min_length_(min_length)
+        {
+        }
+
+    private:
+
+        walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location,
+            evaluation_results& /*results*/, 
+            error_reporter& reporter,
+            Json& /*patch*/) const final
+        {
+            if (!instance.is_string())
+            {
+                return walk_result::advance;
+            }
+
+            eval_context<Json> this_context(context, this->keyword_name());
+
+            auto sv = instance.as_string_view();
+            std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
+            if (length < min_length_) 
+            {
+                walk_result result = reporter.error(this->make_validation_message(
+                    this_context.eval_path(),
+                    instance_location, 
+                    std::string("Number of characters must be at least ") + std::to_string(min_length_)));
+                if (result == walk_result::abort)
+                {
+                    return result;
+                }
+            }
             return walk_result::advance;
         }
 
@@ -702,7 +756,8 @@ namespace jsonschema {
         schema_validator_type schema_val_;
     public:
         items_validator(const std::string& keyword_name, const Json& schema, const uri& schema_location, 
-            schema_validator_type&& schema_val, const std::string& custom_message = std::string{})
+            const std::string& custom_message, 
+            schema_validator_type&& schema_val)
             : keyword_validator<Json>(keyword_name, schema, schema_location, custom_message), 
               schema_val_(std::move(schema_val))
         {
@@ -830,7 +885,7 @@ namespace jsonschema {
 
         bool are_unique_;
     public:
-        unique_items_validator(const Json& schema, const uri& schema_location, bool are_unique, const std::string& custom_message = std::string{})
+        unique_items_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, bool are_unique)
             : keyword_validator<Json>("uniqueItems", schema, schema_location, custom_message), are_unique_(are_unique)
         {
         }
@@ -886,60 +941,6 @@ namespace jsonschema {
         }
     };
 
-    // minLength
-
-    template <typename Json>
-    class min_length_validator : public keyword_validator<Json>
-    {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
-
-        std::size_t min_length_;
-
-    public:
-        min_length_validator(const Json& schema, const uri& schema_location, std::size_t min_length, const std::string& custom_message = std::string{})
-            : keyword_validator<Json>("minLength", schema, schema_location, custom_message), min_length_(min_length)
-        {
-        }
-
-    private:
-
-        walk_result do_validate(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location,
-            evaluation_results& /*results*/, 
-            error_reporter& reporter,
-            Json& /*patch*/) const final
-        {
-            if (!instance.is_string())
-            {
-                return walk_result::advance;
-            }
-
-            eval_context<Json> this_context(context, this->keyword_name());
-
-            auto sv = instance.as_string_view();
-            std::size_t length = unicode_traits::count_codepoints(sv.data(), sv.size());
-            if (length < min_length_) 
-            {
-                walk_result result = reporter.error(this->make_validation_message(
-                    this_context.eval_path(),
-                    instance_location, 
-                    std::string("Number of characters must be at least ") + std::to_string(min_length_)));
-                if (result == walk_result::abort)
-                {
-                    return result;
-                }
-            }
-            return walk_result::advance;
-        }
-
-        walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance,
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const final
-        {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
-        }
-    };
-
     // not
 
     template <typename Json>
@@ -952,8 +953,8 @@ namespace jsonschema {
         schema_validator_type schema_val_;
 
     public:
-        not_validator(const Json& schema, const uri& schema_location,
-            schema_validator_type&& schema_val, const std::string& custom_message = std::string{})
+        not_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            schema_validator_type&& schema_val)
             : keyword_validator<Json>("not", schema, schema_location, custom_message), 
               schema_val_(std::move(schema_val))
         {
@@ -1022,8 +1023,8 @@ namespace jsonschema {
         std::vector<schema_validator_type> validators_;
 
     public:
-        any_of_validator(const Json& schema, const uri& schema_location,
-             std::vector<schema_validator_type>&& validators, const std::string& custom_message = std::string{})
+        any_of_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+             std::vector<schema_validator_type>&& validators)
             : keyword_validator<Json>("anyOf", schema, schema_location, custom_message),
               validators_(std::move(validators))
         {
@@ -1118,8 +1119,8 @@ namespace jsonschema {
         std::vector<schema_validator_type> validators_;
 
     public:
-        one_of_validator(const Json& schema, const uri& schema_location,
-             std::vector<schema_validator_type>&& validators, const std::string& custom_message = std::string{})
+        one_of_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+             std::vector<schema_validator_type>&& validators)
             : keyword_validator<Json>("oneOf", schema, schema_location, custom_message),
               validators_(std::move(validators))
         {
@@ -1233,8 +1234,8 @@ namespace jsonschema {
         std::vector<schema_validator_type> validators_;
 
     public:
-        all_of_validator(const Json& schema, const uri& schema_location,
-             std::vector<schema_validator_type>&& validators, const std::string& custom_message = std::string{})
+        all_of_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+             std::vector<schema_validator_type>&& validators)
             : keyword_validator<Json>("allOf", schema, schema_location, custom_message),
               validators_(std::move(validators))
         {
@@ -1340,7 +1341,7 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        maximum_validator(const Json& schema, const uri& schema_location, const Json& value, const std::string& custom_message = std::string{})
+        maximum_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const Json& value)
             : keyword_validator<Json>("maximum", schema, schema_location, custom_message), value_(value),
               message_{"Maximum value is " + value.template as<std::string>() + " but found"}
         {
@@ -1436,7 +1437,7 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        exclusive_maximum_validator(const Json& schema, const uri& schema_location, const Json& value, const std::string& custom_message = std::string{})
+        exclusive_maximum_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const Json& value)
             : keyword_validator<Json>("exclusiveMaximum", schema, schema_location, custom_message), value_(value),
               message_{"Exclusive maximum value is " + value.template as<std::string>() + " but found "}
         {
@@ -1532,7 +1533,7 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        minimum_validator(const Json& schema, const uri& schema_location, const Json& value, const std::string& custom_message = std::string{})
+        minimum_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const Json& value)
             : keyword_validator<Json>("minimum", schema, schema_location, custom_message), value_(value),
               message_{"Minimum value is " + value.template as<std::string>() + " but found "}
         {
@@ -1628,7 +1629,7 @@ namespace jsonschema {
         std::string message_;
 
     public:
-        exclusive_minimum_validator(const Json& schema, const uri& schema_location, const Json& value, const std::string& custom_message = std::string{})
+        exclusive_minimum_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, const Json& value)
             : keyword_validator<Json>("exclusiveMinimum", schema, schema_location, custom_message), value_(value),
               message_{"Exclusive minimum value is " + value.template as<std::string>() + " but found "}
         {
@@ -1723,7 +1724,7 @@ namespace jsonschema {
         double value_;
 
     public:
-        multiple_of_validator(const Json& schema, const uri& schema_location, double value, const std::string& custom_message = std::string{})
+        multiple_of_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, double value)
             : keyword_validator<Json>("multipleOf", schema, schema_location, custom_message), value_(value)
         {
         }
@@ -1783,8 +1784,8 @@ namespace jsonschema {
         std::vector<std::string> items_;
 
     public:
-        required_validator(const Json& schema, const uri& schema_location,
-            const std::vector<std::string>& items, const std::string& custom_message = std::string{})
+        required_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            const std::vector<std::string>& items)
             : keyword_validator<Json>("required", schema, schema_location, custom_message), items_(items)
         {
         }
@@ -1954,10 +1955,10 @@ namespace jsonschema {
 
     public:
         conditional_validator(const Json& schema, const uri& schema_location,
+            const std::string& custom_message,
             schema_validator_type&& if_val,
             schema_validator_type&& then_val,
-            schema_validator_type&& else_val,
-            const std::string& custom_message = std::string{}
+            schema_validator_type&& else_val
         ) : keyword_validator<Json>("", schema, std::move(schema_location), custom_message), 
               if_val_(std::move(if_val)), 
               then_val_(std::move(then_val)), 

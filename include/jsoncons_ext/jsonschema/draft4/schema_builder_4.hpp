@@ -325,11 +325,13 @@ namespace draft4 {
             }
             if (is_exclusive)
             {
-                return jsoncons::make_unique<exclusive_maximum_validator<Json>>(parent, schema_location, sch);
+                return jsoncons::make_unique<exclusive_maximum_validator<Json>>(parent, schema_location, 
+                    context.get_custom_message("maximum"), sch);
             }
             else
             {
-                return jsoncons::make_unique<maximum_validator<Json>>(parent, schema_location, sch);
+                return jsoncons::make_unique<maximum_validator<Json>>(parent, schema_location,
+                    context.get_custom_message("maximum"), sch);
             }
         }
 
@@ -355,11 +357,13 @@ namespace draft4 {
             }
             if (is_exclusive)
             {
-                return jsoncons::make_unique<exclusive_minimum_validator<Json>>(parent, schema_location, sch);
+                return jsoncons::make_unique<exclusive_minimum_validator<Json>>(parent, schema_location,
+                    context.get_custom_message("minimum"), sch);
             }
             else
             {
-                return jsoncons::make_unique<minimum_validator<Json>>(parent, schema_location, sch);
+                return jsoncons::make_unique<minimum_validator<Json>>(parent, schema_location,
+                    context.get_custom_message("minimum"), sch);
             }
         }
 

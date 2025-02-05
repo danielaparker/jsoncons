@@ -264,7 +264,7 @@ namespace draft7 {
             if (if_validator || then_validator || else_validator)
             {
                 validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
-                    sch, context.get_base_uri(),
+                    sch, context.get_base_uri(), context.get_custom_message("conditional"),
                     std::move(if_validator), std::move(then_validator), std::move(else_validator)));
             }
             
