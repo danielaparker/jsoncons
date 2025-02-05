@@ -32,7 +32,7 @@ TEST_CASE("jsonschema custom message tests")
      },
      "errorMessage" : {
        "maxItems" : "At most 3 numbers are allowed in 'foo'",
-       "type" : "Only numbers are supported in 'foo'"
+       "type" : "Only numbers are allowed in 'foo'"
      }
    },
    "bar": {
@@ -94,7 +94,7 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
 
         REQUIRE(messages.size() == 1);
-        CHECK("Only numbers are supported in 'foo'" == messages[0]);
+        CHECK("Only numbers are allowed in 'foo'" == messages[0]);
     }
 
     SECTION("test 3")
@@ -118,7 +118,7 @@ TEST_CASE("jsonschema custom message tests")
         
         REQUIRE(messages.size() == 2);
         CHECK("Type is invalid" == messages[0]);
-        CHECK("Only numbers are supported in 'foo'" == messages[1]);
+        CHECK("Only numbers are allowed in 'foo'" == messages[1]);
     }
 
     SECTION("test 4")
@@ -142,7 +142,7 @@ TEST_CASE("jsonschema custom message tests")
 
         REQUIRE(messages.size() == 3);
         CHECK("Type is invalid" == messages[0]);
-        CHECK("Only numbers are supported in 'foo'" == messages[1]);
+        CHECK("Only numbers are allowed in 'foo'" == messages[1]);
         CHECK("At most 3 numbers are allowed in 'foo'" == messages[2]);
     }
 }

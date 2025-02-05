@@ -342,7 +342,6 @@ namespace jsonschema {
         {
             std::string keyword = "properties";
             uri schema_location = context.get_base_uri();
-            std::string custom_message = context.get_custom_message(keyword);
 
             std::map<std::string, schema_validator_type> properties;
 
@@ -354,7 +353,7 @@ namespace jsonschema {
             }
 
             return jsoncons::make_unique<properties_validator<Json>>(parent, std::move(schema_location),
-                custom_message, std::move(properties));
+                context.get_custom_message(keyword), std::move(properties));
         }
 
         virtual std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, 
@@ -489,7 +488,6 @@ namespace jsonschema {
         {
             std::string keyword = "type";
             uri schema_location = context.get_base_uri();
-            std::string custom_message = context.get_custom_message(keyword);
             
             std::vector<json_schema_type> expected_types;
 
@@ -569,7 +567,7 @@ namespace jsonschema {
                     break;
             }
             
-            return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), custom_message, 
+            return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), context.get_custom_message(keyword), 
                 std::move(expected_types));
         }
 
@@ -706,7 +704,6 @@ namespace jsonschema {
         {
             std::string keyword = "maxItems";
             uri schema_location = context.make_schema_location(keyword);
-            std::string custom_message = context.get_custom_message(keyword);
 
             if (!sch.is_number())
             {
@@ -714,7 +711,7 @@ namespace jsonschema {
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, custom_message, value);
+            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
         }
 
         virtual std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context& context, 
@@ -722,7 +719,6 @@ namespace jsonschema {
         {
             std::string keyword = "minItems";
             uri schema_location = context.make_schema_location(keyword);
-            std::string custom_message = context.get_custom_message(keyword);
 
             if (!sch.is_number())
             {
@@ -730,7 +726,7 @@ namespace jsonschema {
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_items_validator<Json>>(parent, schema_location, custom_message, value);
+            return jsoncons::make_unique<min_items_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
         }
 
         virtual std::unique_ptr<max_properties_validator<Json>> make_max_properties_validator(const compilation_context& context, 
@@ -738,14 +734,13 @@ namespace jsonschema {
         {
             std::string keyword = "maxProperties";
             uri schema_location = context.make_schema_location(keyword);
-            std::string custom_message = context.get_custom_message(keyword);
             if (!sch.is_number())
             {
                 const std::string message("maxProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_properties_validator<Json>>(parent, schema_location, custom_message, value);
+            return jsoncons::make_unique<max_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
         }
 
         virtual std::unique_ptr<min_properties_validator<Json>> make_min_properties_validator(const compilation_context& context, 
@@ -753,14 +748,13 @@ namespace jsonschema {
         {
             std::string keyword = "minProperties";
             uri schema_location = context.make_schema_location(keyword);
-            std::string custom_message = context.get_custom_message(keyword);
             if (!sch.is_number())
             {
                 const std::string message("minProperties must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<min_properties_validator<Json>>(parent, schema_location, custom_message, value);
+            return jsoncons::make_unique<min_properties_validator<Json>>(parent, schema_location, context.get_custom_message(keyword), value);
         }
 
         virtual std::unique_ptr<contains_validator<Json>> make_contains_validator(const compilation_context& context,
@@ -1025,12 +1019,11 @@ namespace jsonschema {
         {
             std::string keyword = "unevaluatedProperties";
             uri schema_location = context.get_base_uri();
-            std::string custom_message = context.get_custom_message(keyword);
 
             std::string sub_keys[] = {keyword};
 
             return jsoncons::make_unique<unevaluated_properties_validator<Json>>(parent, std::move(schema_location),
-                custom_message,
+                context.get_custom_message(keyword),
                 make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict));
         }
 
@@ -1052,7 +1045,6 @@ namespace jsonschema {
         {
             std::string keyword = "additionalProperties";
             uri schema_location = context.get_base_uri();
-            std::string custom_message = context.get_custom_message(keyword);
 
             std::vector<keyword_validator_type> validators;
             schema_validator_type additional_properties;
@@ -1061,7 +1053,7 @@ namespace jsonschema {
             additional_properties = this->make_cross_draft_schema_validator(context, sch, sub_keys, anchor_dict);
 
             return jsoncons::make_unique<additional_properties_validator<Json>>(parent, additional_properties->schema_location(),
-                custom_message,
+                context.get_custom_message(keyword),
                 std::move(properties), std::move(pattern_properties),
                 std::move(additional_properties));
         }
