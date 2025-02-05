@@ -558,9 +558,8 @@ namespace jsonschema {
             auto it = context.custom_messages().find("type");
             std::string custom_message = it == context.custom_messages().end() ? std::string{} : it->second;
 
-            return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), 
-                std::move(expected_types), custom_message
-                );
+            return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), custom_message, 
+                std::move(expected_types));
         }
 
         virtual std::unique_ptr<content_encoding_validator<Json>> make_content_encoding_validator(const compilation_context& context, 
@@ -679,13 +678,16 @@ namespace jsonschema {
             const Json& sch, const Json& parent)
         {
             uri schema_location = context.make_schema_location("maxItems");
+            auto it = context.custom_messages().find("maxItems");
+            std::string custom_message = it == context.custom_messages().end() ? std::string{} : it->second;
+
             if (!sch.is_number())
             {
                 const std::string message("maxItems must be a number value");
                 JSONCONS_THROW(schema_error(schema_location.string() + ": " + message));
             }
             auto value = sch.template as<std::size_t>();
-            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, value);
+            return jsoncons::make_unique<max_items_validator<Json>>(parent, schema_location, custom_message, value);
         }
 
         virtual std::unique_ptr<min_items_validator<Json>> make_min_items_validator(const compilation_context& context, 

@@ -593,7 +593,7 @@ namespace jsonschema {
 
         std::size_t max_items_;
     public:
-        max_items_validator(const Json& schema, const uri& schema_location, std::size_t max_items, const std::string& custom_message = std::string{})
+        max_items_validator(const Json& schema, const uri& schema_location, const std::string& custom_message, std::size_t max_items)
             : keyword_validator<Json>("maxItems", schema, schema_location, custom_message), max_items_(max_items)
         {
         }
@@ -2207,8 +2207,8 @@ namespace jsonschema {
         type_validator(type_validator&&) = default;
         type_validator& operator=(type_validator&&) = default;
 
-        type_validator(const Json& schema, const uri& schema_location,
-            std::vector<json_schema_type>&& expected_types, const std::string& custom_message = std::string{})
+        type_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            std::vector<json_schema_type>&& expected_types)
             : keyword_validator<Json>("type", schema, std::move(schema_location), custom_message),
               expected_types_(std::move(expected_types))
         {

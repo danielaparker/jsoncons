@@ -60,27 +60,90 @@ TEST_CASE("jsonschema custom message tests")
 }        
         )";
 
-        try
-        {
-            // Data
-            json data = json::parse(data_str);
+        json data = json::parse(data_str);
 
-            std::size_t error_count = 0;
-            auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
-            {
-                std::cout << msg.message() << "\n";
-                ++error_count;
-                return jsonschema::walk_result::advance;
-            };
-            compiled.validate(data, reporter);
-            CHECK(error_count > 0);
-            //std::cout << "error_count: " << error_count << "\n";
-        }
-        catch (const std::exception& e)
+        std::vector<std::string> messages;
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
         {
-            std::cout << e.what() << "\n";
-        }
+            messages.push_back(msg.message());
+            return jsonschema::walk_result::advance;
+        };
+        compiled.validate(data, reporter);
 
+        REQUIRE(messages.size() == 1);
+        CHECK("Custom Message: Invalid type provided" == messages[0]);
+    }
+
+    SECTION("test 2")
+    {
+        std::string data_str = R"(
+{
+    "foo": [1, 2, "text"],
+    "bar": "Bar 1"
+}        
+        )";
+
+        json data = json::parse(data_str);
+
+        std::vector<std::string> messages;
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        {
+            messages.push_back(msg.message());
+            return jsonschema::walk_result::advance;
+        };
+        compiled.validate(data, reporter);
+
+        REQUIRE(messages.size() == 1);
+        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[0]);
+    }
+
+    SECTION("test 3")
+    {
+        std::string data_str = R"(
+{
+    "foo": [1, 2, "text"],
+    "bar": 123
+}        
+        )";
+
+        json data = json::parse(data_str);
+
+        std::vector<std::string> messages;
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        {
+            messages.push_back(msg.message());
+            return jsonschema::walk_result::advance;
+        };
+        compiled.validate(data, reporter);
+        
+        REQUIRE(messages.size() == 2);
+        CHECK("Custom Message: Invalid type provided" == messages[0]);
+        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[1]);
+    }
+
+    SECTION("test 4")
+    {
+        std::string data_str = R"(
+{
+            "foo": [1, 2, "text", 3],
+            "bar": 123
+}        
+        )";
+
+        json data = json::parse(data_str);
+
+        std::vector<std::string> messages;
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        {
+            messages.push_back(msg.message());
+            return jsonschema::walk_result::advance;
+        };
+        compiled.validate(data, reporter);
+
+        REQUIRE(messages.size() == 3);
+        CHECK("Custom Message: Invalid type provided" == messages[0]);
+        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[1]);
+        CHECK("Custom Message: Maximum 3 numbers can be given in 'foo'" == messages[2]);
     }
 }
 
