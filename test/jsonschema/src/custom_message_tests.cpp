@@ -30,23 +30,23 @@ TEST_CASE("jsonschema custom message tests")
      "items" : {
        "type" : "number"
      },
-     "message" : {
-       "maxItems" : "Custom Message: Maximum 3 numbers can be given in 'foo'",
-       "type" : "Custom Message: Only numbers are supported in 'foo'"
+     "errorMessage" : {
+       "maxItems" : "At most 3 numbers are allowed in 'foo'",
+       "type" : "Only numbers are supported in 'foo'"
      }
    },
    "bar": {
      "type": "string"
    }
  },
- "message": {
-   "type" : "Custom Message: Invalid type provided"
+ "errorMessage": {
+   "type" : "Type is invalid"
  }
 }
     )";
     
     auto options = jsonschema::evaluation_options{}
-        .custom_message_keyword("message");
+        .custom_message_keyword("errorMessage");
 
     auto schema = jsoncons::json::parse(schema_str);    
     auto compiled = jsonschema::make_json_schema<json>(schema, options); 
@@ -71,7 +71,7 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
 
         REQUIRE(messages.size() == 1);
-        CHECK("Custom Message: Invalid type provided" == messages[0]);
+        CHECK("Type is invalid" == messages[0]);
     }
 
     SECTION("test 2")
@@ -94,7 +94,7 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
 
         REQUIRE(messages.size() == 1);
-        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[0]);
+        CHECK("Only numbers are supported in 'foo'" == messages[0]);
     }
 
     SECTION("test 3")
@@ -117,8 +117,8 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
         
         REQUIRE(messages.size() == 2);
-        CHECK("Custom Message: Invalid type provided" == messages[0]);
-        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[1]);
+        CHECK("Type is invalid" == messages[0]);
+        CHECK("Only numbers are supported in 'foo'" == messages[1]);
     }
 
     SECTION("test 4")
@@ -141,9 +141,56 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
 
         REQUIRE(messages.size() == 3);
-        CHECK("Custom Message: Invalid type provided" == messages[0]);
-        CHECK("Custom Message: Only numbers are supported in 'foo'" == messages[1]);
-        CHECK("Custom Message: Maximum 3 numbers can be given in 'foo'" == messages[2]);
+        CHECK("Type is invalid" == messages[0]);
+        CHECK("Only numbers are supported in 'foo'" == messages[1]);
+        CHECK("At most 3 numbers are allowed in 'foo'" == messages[2]);
+    }
+}
+
+TEST_CASE("jsonschema custom message with format keyword")
+{
+    std::string schema_str = R"(
+{
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "errorMessage": {
+        "format.date": "Date format must be yyyy-mm-dd"
+      }
+    }
+  }
+}
+    )";
+    
+    auto options = jsonschema::evaluation_options{}
+        .custom_message_keyword("errorMessage")
+        .require_format_validation(true);
+
+    auto schema = jsoncons::json::parse(schema_str);    
+    auto compiled = jsonschema::make_json_schema<json>(schema, options); 
+    
+    SECTION("test 1")
+    {
+        std::string data_str = R"(
+{
+    "date": "05-13-1955"
+}        
+        )";
+
+        json data = json::parse(data_str);
+
+        std::vector<std::string> messages;
+        auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
+        {
+            messages.push_back(msg.message());
+            return jsonschema::walk_result::advance;
+        };
+        compiled.validate(data, reporter);
+
+        REQUIRE(messages.size() == 1);
+        CHECK("Date format must be yyyy-mm-dd" == messages[0]);
     }
 }
 
