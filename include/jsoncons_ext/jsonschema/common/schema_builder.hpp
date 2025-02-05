@@ -689,7 +689,7 @@ namespace jsonschema {
             uri schema_location = context.make_schema_location("pattern");
             auto pattern_string = sch.template as<std::string>();
             auto regex = std::regex(pattern_string, std::regex::ECMAScript);
-            return jsoncons::make_unique<pattern_validator<Json>>(parent, schema_location, 
+            return jsoncons::make_unique<pattern_validator<Json>>(parent, schema_location, context.get_custom_message("pattern"), 
                 pattern_string, regex);
         }
 

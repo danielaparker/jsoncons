@@ -448,8 +448,8 @@ namespace jsonschema {
         std::regex regex_;
 
     public:
-        pattern_validator(const Json& schema, const uri& schema_location,
-            const std::string& pattern_string, const std::regex& regex, const std::string& custom_message = std::string{})
+        pattern_validator(const Json& schema, const uri& schema_location, const std::string& custom_message,
+            const std::string& pattern_string, const std::regex& regex)
             : keyword_validator<Json>("pattern", schema, schema_location, custom_message), 
               pattern_string_(pattern_string), regex_(regex)
         {
@@ -504,7 +504,7 @@ namespace jsonschema {
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
     public:
-        pattern_validator(const Json& schema, const uri& schema_location, const std::string& custom_message = std::string{})
+        pattern_validator(const Json& schema, const uri& schema_location, const std::string& custom_message)
             : keyword_validator<Json>("pattern", schema, schema_location, custom_message)
         {
         }
