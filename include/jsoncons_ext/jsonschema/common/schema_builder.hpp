@@ -555,8 +555,7 @@ namespace jsonschema {
                     break;
             }
             
-            auto it = context.custom_messages().find("type");
-            std::string custom_message = it == context.custom_messages().end() ? std::string{} : it->second;
+            std::string custom_message = context.get_custom_message("type");
 
             return jsoncons::make_unique<type_validator<Json>>(parent, std::move(schema_location), custom_message, 
                 std::move(expected_types));
@@ -678,8 +677,7 @@ namespace jsonschema {
             const Json& sch, const Json& parent)
         {
             uri schema_location = context.make_schema_location("maxItems");
-            auto it = context.custom_messages().find("maxItems");
-            std::string custom_message = it == context.custom_messages().end() ? std::string{} : it->second;
+            std::string custom_message = context.get_custom_message("maxItems");
 
             if (!sch.is_number())
             {

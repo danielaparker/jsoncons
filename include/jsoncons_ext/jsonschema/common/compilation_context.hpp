@@ -64,6 +64,12 @@ namespace jsonschema {
             base_uri_ = uris_.back();
         }
         
+        std::string get_custom_message(const std::string& message_key) const
+        {
+            auto it = custom_messages_.find(message_key);
+            return it == custom_messages_.end() ? std::string{} : it->second;
+        }
+        
         const std::unordered_map<std::string,std::string>& custom_messages() const
         {
             return custom_messages_;
