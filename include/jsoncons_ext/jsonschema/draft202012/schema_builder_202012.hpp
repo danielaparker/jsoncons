@@ -498,11 +498,13 @@ namespace draft202012 {
                     std::string sub_keys[] = { "additionalItems" };
 
                     items_val = jsoncons::make_unique<items_keyword<Json>>("items", parent, items_location,
+                        context.get_custom_message("items"),
                         this->make_cross_draft_schema_validator(context, (*it).value(), sub_keys, anchor_dict));
                 }
             }
 
             return jsoncons::make_unique<prefix_items_validator<Json>>("prefixItems", parent, schema_location,  
+                context.get_custom_message("prefixItems"),
                 std::move(prefix_item_validators), std::move(items_val));
         }
 
