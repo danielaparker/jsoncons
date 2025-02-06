@@ -155,11 +155,16 @@ TEST_CASE("jsonschema custom message with format keyword")
   "properties": {
     "date": {
       "type": "string",
-      "format": "date",
-      "errorMessage": {
-        "format.date": "Date format must be yyyy-mm-dd"
-      }
+      "format": "date"
+    },
+    "date-time": {
+      "type": "string",
+      "format": "date-time",
+      "errorMessage": "Date-time format must be YYYY-MM-DDThh:mmTZD"
     }
+  },
+  "errorMessage": {
+    "format.date": "Date format must be YYYY-MM-DD"
   }
 }
     )";
@@ -175,8 +180,9 @@ TEST_CASE("jsonschema custom message with format keyword")
     {
         std::string data_str = R"(
 {
-    "date": "05-13-1955"
-}        
+    "date": "05-13-1955",
+    "date-time": "1955-05-13"
+}
         )";
 
         json data = json::parse(data_str);
@@ -189,8 +195,9 @@ TEST_CASE("jsonschema custom message with format keyword")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 1);
-        CHECK("Date format must be yyyy-mm-dd" == messages[0]);
+        REQUIRE(messages.size() == 2);
+        CHECK("Date format must be YYYY-MM-DD" == messages[0]);
+        CHECK("Date-time format must be YYYY-MM-DDThh:mmTZD" == messages[1]);
     }
 }
 

@@ -25,6 +25,7 @@ namespace jsonschema {
         std::vector<uri_wrapper> uris_;
         jsoncons::optional<uri> id_;
         std::unordered_map<std::string,std::string> custom_messages_;
+        std::string custom_message_;
     public:
 
         compilation_context()
@@ -52,10 +53,11 @@ namespace jsonschema {
         }
 
         explicit compilation_context(const std::vector<uri_wrapper>& uris, const jsoncons::optional<uri>& id,
-            const std::unordered_map<std::string,std::string>& custom_messages)
+            const std::unordered_map<std::string,std::string>& custom_messages, const std::string& custom_message)
             : uris_(uris), 
               id_(id),
-              custom_messages_{custom_messages}
+              custom_messages_{custom_messages},
+              custom_message_(custom_message)
         {
             if (uris_.empty())
             {
@@ -66,6 +68,10 @@ namespace jsonschema {
         
         std::string get_custom_message(const std::string& message_key) const
         {
+            if (!custom_message_.empty())
+            {
+                return custom_message_;
+            }
             auto it = custom_messages_.find(message_key);
             return it == custom_messages_.end() ? std::string{} : it->second;
         }

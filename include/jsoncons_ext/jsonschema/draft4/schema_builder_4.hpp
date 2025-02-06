@@ -393,6 +393,7 @@ namespace draft4 {
             }
             jsoncons::optional<uri> id;
             std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
+            std::string custom_message;
             if (sch.is_object())
             {
                 auto it = sch.find("id"); // If id is found, this schema can be referenced by the id
@@ -415,13 +416,17 @@ namespace draft4 {
                     it = sch.find("errorMessage"); 
                     if (it != sch.object_range().end()) 
                     {
-                        const auto& messages = it->value();
-                        if (messages.is_object())
+                        const auto& value = it->value();
+                        if (value.is_object())
                         {
-                            for (const auto& item : messages.object_range())
+                            for (const auto& item : value.object_range())
                             {
                                 custom_messages[item.key()] =  item.value().template as<std::string>();
                             }
+                        }
+                        else if (value.is_string())
+                        {
+                            custom_message = value.template as<std::string>();
                         }
                     }
                 }
@@ -435,7 +440,7 @@ namespace draft4 {
             }
 */
 
-            return compilation_context(new_uris, id, custom_messages);
+            return compilation_context(new_uris, id, custom_messages, custom_message);
         }
     private:
         static const std::unordered_set<std::string>& known_keywords()
