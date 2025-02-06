@@ -14,7 +14,6 @@
 #include <regex>
 #include <catch/catch.hpp>
 
-using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch;
 
@@ -22,45 +21,52 @@ TEST_CASE("jsonschema custom message tests")
 {
     std::string schema_str = R"(
 {
- "type": "object",
- "properties": {
-   "foo": {
-     "type": "array",
-     "maxItems": 3,
-     "items" : {
-       "type" : "number"
-     },
-     "errorMessage" : {
-       "maxItems" : "At most 3 numbers are allowed in 'foo'",
-       "type" : "Only numbers are allowed in 'foo'"
-     }
-   },
-   "bar": {
-     "type": "string"
-   }
- },
- "errorMessage": {
-   "type" : "Type is invalid"
- }
+    "type": "object",
+    "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "foo": {
+            "type": "array",
+            "maxItems": 3,
+            "items" : {
+                "type" : "number"
+            },
+            "errorMessage" : {
+                "maxItems" : "At most 3 numbers are allowed in 'foo'",
+                "type" : "Only numbers are allowed in 'foo'"
+            }
+        },
+        "bar": {
+            "type": "string",
+            "errorMessage" : "Type of `bar` must be string"    
+        }
+    },
+    "errorMessage": {
+        "format.date": "Date format must be YYYY-MM-DD"
+    }
 }
     )";
     
     auto options = jsonschema::evaluation_options{}
-        .enable_custom_error_message(true);
+        .enable_custom_error_message(true)
+        .require_format_validation(true);
 
     auto schema = jsoncons::json::parse(schema_str);    
-    auto compiled = jsonschema::make_json_schema<json>(schema, options); 
+    auto compiled = jsonschema::make_json_schema<jsoncons::json>(schema, options); 
     
     SECTION("test 1")
     {
         std::string data_str = R"(
 {
-    "foo": [1, 2, 3],
-    "bar": 123
+    "foo": [1, 2, "three"],
+    "bar": 123,        
+    "date": "05-13-1955"
 }        
         )";
 
-        json data = json::parse(data_str);
+        auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
         auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
@@ -70,8 +76,10 @@ TEST_CASE("jsonschema custom message tests")
         };
         compiled.validate(data, reporter);
 
-        REQUIRE(messages.size() == 1);
-        CHECK("Type is invalid" == messages[0]);
+        REQUIRE(messages.size() == 3);
+        CHECK("Type of `bar` must be string" == messages[0]);
+        CHECK("Date format must be YYYY-MM-DD" == messages[1]);
+        CHECK("Only numbers are allowed in 'foo'" == messages[2]);
     }
 
     SECTION("test 2")
@@ -83,7 +91,7 @@ TEST_CASE("jsonschema custom message tests")
 }        
         )";
 
-        json data = json::parse(data_str);
+        auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
         auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
@@ -106,7 +114,7 @@ TEST_CASE("jsonschema custom message tests")
 }        
         )";
 
-        json data = json::parse(data_str);
+        auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
         auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
@@ -117,7 +125,7 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
         
         REQUIRE(messages.size() == 2);
-        CHECK("Type is invalid" == messages[0]);
+        CHECK("Type of `bar` must be string" == messages[0]);
         CHECK("Only numbers are allowed in 'foo'" == messages[1]);
     }
 
@@ -130,7 +138,7 @@ TEST_CASE("jsonschema custom message tests")
 }        
         )";
 
-        json data = json::parse(data_str);
+        auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
         auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
@@ -141,7 +149,7 @@ TEST_CASE("jsonschema custom message tests")
         compiled.validate(data, reporter);
 
         REQUIRE(messages.size() == 3);
-        CHECK("Type is invalid" == messages[0]);
+        CHECK("Type of `bar` must be string" == messages[0]);
         CHECK("Only numbers are allowed in 'foo'" == messages[1]);
         CHECK("At most 3 numbers are allowed in 'foo'" == messages[2]);
     }
@@ -174,7 +182,7 @@ TEST_CASE("jsonschema custom message with format keyword")
         .require_format_validation(true);
 
     auto schema = jsoncons::json::parse(schema_str);    
-    auto compiled = jsonschema::make_json_schema<json>(schema, options); 
+    auto compiled = jsonschema::make_json_schema<jsoncons::json>(schema, options); 
     
     SECTION("test 1")
     {
@@ -185,7 +193,7 @@ TEST_CASE("jsonschema custom message with format keyword")
 }
         )";
 
-        json data = json::parse(data_str);
+        auto data = jsoncons::json::parse(data_str);
 
         std::vector<std::string> messages;
         auto reporter = [&](const jsonschema::validation_message& msg) -> jsonschema::walk_result
