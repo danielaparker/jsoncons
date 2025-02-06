@@ -47,7 +47,7 @@ namespace jsonschema {
         bool require_format_validation_{false};
         bool compatibility_mode_{false};
         std::string default_base_uri_;
-        std::string custom_message_keyword_;
+        bool enable_custom_error_message_{false};
     public:
         evaluation_options()
             : default_version_{schema_version::draft202012()}, 
@@ -99,13 +99,13 @@ namespace jsonschema {
             return *this;
         }
 
-        const std::string& custom_message_keyword() const
+        bool enable_custom_error_message() const
         {
-            return custom_message_keyword_;
+            return enable_custom_error_message_;
         }
-        evaluation_options& custom_message_keyword(const std::string& version) 
+        evaluation_options& enable_custom_error_message(bool value) 
         {
-            custom_message_keyword_ = version;
+            enable_custom_error_message_ = value;
             return *this;
         }
 
@@ -115,7 +115,7 @@ namespace jsonschema {
                 && lhs.require_format_validation_ == rhs.require_format_validation_
                 && lhs.compatibility_mode_ == rhs.compatibility_mode_
                 && lhs.default_base_uri_ == rhs.default_base_uri_
-                && lhs.custom_message_keyword_ == rhs.custom_message_keyword_;
+                && lhs.enable_custom_error_message_ == rhs.enable_custom_error_message_;
         }
     };
 

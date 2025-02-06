@@ -373,6 +373,7 @@ namespace draft7 {
                 }
             }
             jsoncons::optional<uri> id;
+            std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
             if (sch.is_object())
             {
                 auto it = sch.find("$id"); // If $id is found, this schema can be referenced by the id
@@ -390,6 +391,21 @@ namespace draft7 {
                         new_uris.emplace_back(new_uri); 
                     }
                 }
+                if (this->options().enable_custom_error_message())
+                {
+                    it = sch.find("errorMessage"); 
+                    if (it != sch.object_range().end()) 
+                    {
+                        const auto& messages = it->value();
+                        if (messages.is_object())
+                        {
+                            for (const auto& item : messages.object_range())
+                            {
+                                custom_messages[item.key()] =  item.value().template as<std::string>();
+                            }
+                        }
+                    }
+                }
             }
 
 /*
@@ -399,22 +415,6 @@ namespace draft7 {
                 std::cout << "    " << uri.string() << "\n";
             }
 */
-            std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
-            if (!this->options().custom_message_keyword().empty())
-            {
-                auto it = sch.find(this->options().custom_message_keyword()); 
-                if (it != sch.object_range().end()) 
-                {
-                    const auto& messages = it->value();
-                    if (messages.is_object())
-                    {
-                        for (const auto& item : messages.object_range())
-                        {
-                            custom_messages[item.key()] =  item.value().template as<std::string>();
-                        }
-                    }
-                }
-            }
 
             return compilation_context(new_uris, id, custom_messages);
         }

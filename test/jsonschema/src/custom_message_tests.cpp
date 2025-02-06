@@ -46,7 +46,7 @@ TEST_CASE("jsonschema custom message tests")
     )";
     
     auto options = jsonschema::evaluation_options{}
-        .custom_message_keyword("errorMessage");
+        .enable_custom_error_message(true);
 
     auto schema = jsoncons::json::parse(schema_str);    
     auto compiled = jsonschema::make_json_schema<json>(schema, options); 
@@ -165,7 +165,7 @@ TEST_CASE("jsonschema custom message with format keyword")
     )";
     
     auto options = jsonschema::evaluation_options{}
-        .custom_message_keyword("errorMessage")
+        .enable_custom_error_message(true)
         .require_format_validation(true);
 
     auto schema = jsoncons::json::parse(schema_str);    
