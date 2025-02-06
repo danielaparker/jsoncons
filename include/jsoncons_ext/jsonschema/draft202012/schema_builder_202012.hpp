@@ -614,9 +614,9 @@ namespace draft202012 {
                 }
 
                 std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
-                if (!this->options().custom_message_keyword().empty())
+                if ("errorMessage")
                 {
-                    it = sch.find(this->options().custom_message_keyword()); 
+                    it = sch.find("errorMessage"); 
                     if (it != sch.object_range().end()) 
                     {
                         const auto& messages = it->value();
@@ -638,9 +638,9 @@ namespace draft202012 {
             //}
 
             std::unordered_map<std::string,std::string> custom_messages{parent.custom_messages()};
-            if (!this->options().custom_message_keyword().empty())
+            if ("errorMessage")
             {
-                auto it = sch.find(this->options().custom_message_keyword()); 
+                auto it = sch.find("errorMessage"); 
                 if (it != sch.object_range().end()) 
                 {
                     const auto& messages = it->value();
