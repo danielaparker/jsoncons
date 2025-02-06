@@ -13,6 +13,9 @@
     `begin_array_with_tag`, `uint64_value_with_tag` etc. to `basic_cbor_encoder` to support encoding values with
     raw CBOR tags.
 
+    - Git issue #574: Support custom JSON Schema error messages with `errorMessage` keyword. Add 
+    `enable_custom_error_message` option to `evaluation_options`.
+
 1.1.0 
 -----
 
