@@ -50,6 +50,7 @@ For earlier releases, please refer to [jsonschema (until 0.174.0)](https://githu
 #### Keywords
 
 The jsoncons implementation passes all required tests in the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite/) for the keywords below.
+You can check the [Bowtie project](https://github.com/bowtie-json-schema/bowtie) to see how jsoncons [compares with other implementations](https://bowtie.report/).
 
 | Keyword                    | Draft 4   | Draft 6   | Draft 7   | Draft 2019-09 | Draft 2020-12 |
 |:--------------------------:|:---------:|:---------:|:---------:|:---------:|:---------:|
@@ -138,8 +139,8 @@ missing key/value pairs.
 
 ### Custom error messages (since 1.2.0)
 
-jsoncons optionally allows schema authors to provide custom error messages via an `errorMessage` keyword. 
-See [custom error messages](./custom-error-messages.md) for how to enable this feature.
+jsoncons supports custom error messages via an opt-in `errorMessage` keyword.
+To enable this feature, refer to [custom error messages](./custom-error-messages.md).
   
 ### Examples
 
