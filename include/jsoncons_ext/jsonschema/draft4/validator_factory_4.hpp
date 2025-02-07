@@ -19,7 +19,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/draft4/schema_draft4.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 
@@ -48,10 +48,10 @@ namespace draft4 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        validator_factory_4(Json&& sch, const validator_factory_factory_type& builder_factory, 
+        validator_factory_4(Json&& sch, const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : validator_factory<Json>(schema_version::draft4(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
+            : validator_factory<Json>(schema_version::draft4(), std::move(sch), factory_factory, options, schema_store_ptr, resolve_funcs)
         {
             init();
         }

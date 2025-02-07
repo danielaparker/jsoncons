@@ -19,7 +19,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 
@@ -89,12 +89,12 @@ namespace draft201909 {
         bool include_format_;
 
     public:
-        validator_factory_201909(Json&& sch, const validator_factory_factory_type& builder_factory, 
+        validator_factory_201909(Json&& sch, const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
             : validator_factory<Json>(schema_version::draft201909(), 
-                std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
+                std::move(sch), factory_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
             if (!vocabulary.empty())

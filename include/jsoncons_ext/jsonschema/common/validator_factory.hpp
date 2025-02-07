@@ -17,7 +17,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/evaluation_options.hpp>
 
 namespace jsoncons {
@@ -43,7 +43,7 @@ namespace jsonschema {
     private:
         std::string spec_version_;
         std::unique_ptr<Json> root_schema_;
-        validator_factory_factory_type builder_factory_;
+        validator_factory_factory_type factory_factory_;
         evaluation_options options_;
         schema_store_type* schema_store_ptr_;
         std::vector<resolve_uri_type<Json>> resolve_funcs_;
@@ -59,21 +59,21 @@ namespace jsonschema {
 
     public:
 
-        validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& builder_factory,
+        validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs)
-            : spec_version_(version), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), factory_factory_(factory_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
             root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
         }
 
-        validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& builder_factory,
+        validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary)
-            : spec_version_(version), builder_factory_(builder_factory), options_(std::move(options)),
+            : spec_version_(version), factory_factory_(factory_factory), options_(std::move(options)),
               schema_store_ptr_(schema_store_ptr), resolve_funcs_(resolve_funcs), vocabulary_(vocabulary)
         {
             JSONCONS_ASSERT(schema_store_ptr != nullptr);
@@ -316,7 +316,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto validator_factory = builder_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
+                            auto validator_factory = factory_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
                             validator_factory->build_schema(context.get_base_uri().string());
                             schema_val = validator_factory->get_schema_validator();
                         }

@@ -13,7 +13,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 
 namespace jsoncons {
