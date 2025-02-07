@@ -25,8 +25,7 @@ namespace jsonschema {
     {
     public:
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
 
     public:
         schema_validator()
@@ -41,31 +40,19 @@ namespace jsonschema {
         virtual const schema_validator<Json>* get_schema_for_dynamic_anchor(const std::string& anchor) const = 0;
 
         virtual const jsoncons::optional<jsoncons::uri>& dynamic_anchor() const = 0;
-
-        walk_result walk(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
-        {
-            return do_walk(context, instance, instance_location, reporter);
-        }
-
-    private:
-
-        virtual walk_result do_walk(const eval_context<Json>& /*context*/, const Json& /*instance*/, 
-            const jsonpointer::json_pointer& /*instance_location*/, const walk_reporter_type& /*reporter*/) const = 0;
     };
 
     template <typename Json>
     class document_schema_validator : public schema_validator<Json>
     {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = std::unique_ptr<schema_validator<Json>>;
+        using schema_validator_ptr_type = std::unique_ptr<schema_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         std::unique_ptr<Json> root_schema_;
-        schema_validator_type schema_val_;
-        std::vector<schema_validator_type> schemas_;
+        schema_validator_ptr_type schema_val_;
+        std::vector<schema_validator_ptr_type> schemas_;
     public:
-        document_schema_validator(std::unique_ptr<Json>&& root_schema, schema_validator_type&& schema_val, std::vector<schema_validator_type>&& schemas)
+        document_schema_validator(std::unique_ptr<Json>&& root_schema, schema_validator_ptr_type&& schema_val, std::vector<schema_validator_ptr_type>&& schemas)
             : root_schema_(std::move(root_schema)), schema_val_(std::move(schema_val)), schemas_(std::move(schemas))
         {
             if (schema_val_ == nullptr)
@@ -148,8 +135,7 @@ namespace jsonschema {
     class boolean_schema_validator : public schema_validator<Json>
     {
     public:
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri schema_location_;
@@ -239,17 +225,17 @@ namespace jsonschema {
     class object_schema_validator : public schema_validator<Json>
     {
     public:
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
-        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
+        using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
         using anchor_schema_map_type = std::unordered_map<std::string,std::unique_ptr<ref_validator<Json>>>;
         using walk_reporter_type = typename json_schema_traits<Json>::walk_reporter_type;
 
         uri schema_location_;
         jsoncons::optional<jsoncons::uri> id_;
-        std::vector<keyword_validator_type> validators_; 
+        std::vector<keyword_validator_ptr_type> validators_; 
         std::unique_ptr<unevaluated_properties_validator<Json>> unevaluated_properties_val_;
         std::unique_ptr<unevaluated_items_validator<Json>> unevaluated_items_val_;
-        std::map<std::string,schema_validator_type> defs_;
+        std::map<std::string,schema_validator_ptr_type> defs_;
         Json default_value_;
         bool recursive_anchor_;
         jsoncons::optional<jsoncons::uri> dynamic_anchor_;
@@ -264,8 +250,8 @@ namespace jsonschema {
         object_schema_validator& operator=(object_schema_validator&&) = default;
         object_schema_validator(const uri& schema_location,
             const jsoncons::optional<jsoncons::uri>& id,
-            std::vector<keyword_validator_type>&& validators, 
-            std::map<std::string,schema_validator_type>&& defs,
+            std::vector<keyword_validator_ptr_type>&& validators, 
+            std::map<std::string,schema_validator_ptr_type>&& defs,
             Json&& default_value)
             : schema_location_(schema_location),
               id_(id),
@@ -279,10 +265,10 @@ namespace jsonschema {
         }
         object_schema_validator(const uri& schema_location, 
             const jsoncons::optional<jsoncons::uri>& id,
-            std::vector<keyword_validator_type>&& validators,
+            std::vector<keyword_validator_ptr_type>&& validators,
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
-            std::map<std::string,schema_validator_type>&& defs,
+            std::map<std::string,schema_validator_ptr_type>&& defs,
             Json&& default_value, bool recursive_anchor)
             : schema_location_(schema_location),
               id_(id),
@@ -298,10 +284,10 @@ namespace jsonschema {
         }
         object_schema_validator(const uri& schema_location, 
             const jsoncons::optional<jsoncons::uri>& id,
-            std::vector<keyword_validator_type>&& validators, 
+            std::vector<keyword_validator_ptr_type>&& validators, 
             std::unique_ptr<unevaluated_properties_validator<Json>>&& unevaluated_properties_val, 
             std::unique_ptr<unevaluated_items_validator<Json>>&& unevaluated_items_val, 
-            std::map<std::string,schema_validator_type>&& defs,
+            std::map<std::string,schema_validator_ptr_type>&& defs,
             Json&& default_value,
             jsoncons::optional<jsoncons::uri>&& dynamic_anchor,
             anchor_schema_map_type&& anchor_dict)

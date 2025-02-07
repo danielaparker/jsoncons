@@ -37,12 +37,12 @@ namespace draft7 {
     public:
         using schema_store_type = typename validator_factory<Json>::schema_store_type;
         using validator_factory_factory_type = typename validator_factory<Json>::validator_factory_factory_type;
-        using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
-        using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
+        using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
+        using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
     private:
 
-        using keyword_factory_type = std::function<keyword_validator_type(const compilation_context& context, 
+        using keyword_factory_type = std::function<keyword_validator_ptr_type(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type&)>;
 
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
@@ -128,13 +128,13 @@ namespace draft7 {
                 [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_required_validator(context, sch, parent);});
         }
 
-        schema_validator_type make_schema_validator( 
+        schema_validator_ptr_type make_schema_validator( 
             const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys, 
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
 
-            schema_validator_type schema_validator_ptr;
+            schema_validator_ptr_type schema_validator_ptr;
 
             switch (sch.type())
             {
@@ -153,8 +153,8 @@ namespace draft7 {
                     auto it = sch.find("$ref");
                     if (it != sch.object_range().end()) // this schema is a reference
                     {
-                        std::vector<keyword_validator_type> validators;
-                        std::map<std::string,schema_validator_type> defs;
+                        std::vector<keyword_validator_ptr_type> validators;
+                        std::map<std::string,schema_validator_ptr_type> defs;
 
                         auto it2 = sch.find("definitions");
                         if (it2 != sch.object_range().end()) 
@@ -200,13 +200,13 @@ namespace draft7 {
             return schema_validator_ptr;
         }
 
-        schema_validator_type make_object_schema_validator(const compilation_context& context, 
+        schema_validator_ptr_type make_object_schema_validator(const compilation_context& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
             Json default_value{ jsoncons::null_type() };
-            std::vector<keyword_validator_type> validators;
-            std::map<std::string,schema_validator_type> defs;
+            std::vector<keyword_validator_ptr_type> validators;
+            std::map<std::string,schema_validator_ptr_type> defs;
 
             auto it = sch.find("definitions");
             if (it != sch.object_range().end()) 
@@ -237,9 +237,9 @@ namespace draft7 {
                 }
             }
 
-            schema_validator_type if_validator;
-            schema_validator_type then_validator;
-            schema_validator_type else_validator;
+            schema_validator_ptr_type if_validator;
+            schema_validator_ptr_type then_validator;
+            schema_validator_ptr_type else_validator;
 
             it = sch.find("if");
             if (it != sch.object_range().end()) 
@@ -331,7 +331,7 @@ namespace draft7 {
             uri schema_location = context.get_base_uri();
             std::string custom_message = context.get_custom_message(keyword);
 
-            std::vector<std::pair<std::regex, schema_validator_type>> pattern_properties;
+            std::vector<std::pair<std::regex, schema_validator_ptr_type>> pattern_properties;
             
             for (const auto& prop : sch.object_range())
             {

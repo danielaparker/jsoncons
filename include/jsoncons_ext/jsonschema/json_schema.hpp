@@ -107,7 +107,7 @@ namespace jsonschema {
     template <typename Json>
     class json_schema
     {
-        using keyword_validator_type = std::unique_ptr<keyword_validator<Json>>;
+        using keyword_validator_ptr_type = std::unique_ptr<keyword_validator<Json>>;
         using document_schema_validator_type = std::unique_ptr<document_schema_validator<Json>>;
 
         document_schema_validator_type root_;
