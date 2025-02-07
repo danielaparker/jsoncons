@@ -209,6 +209,12 @@ namespace jsonschema {
         {
             return do_validate(context, instance, instance_location, results, reporter, patch);
         }
+
+        walk_result walk(const eval_context<Json>& context, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
+        {
+            return do_walk(context, instance, instance_location, reporter);
+        }
         
         virtual bool always_fails() const = 0;
 
@@ -221,6 +227,9 @@ namespace jsonschema {
             evaluation_results& results, 
             error_reporter& reporter, 
             Json& patch) const = 0;
+
+        virtual walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance, 
+            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const = 0;
    };
 
     class validation_message_factory

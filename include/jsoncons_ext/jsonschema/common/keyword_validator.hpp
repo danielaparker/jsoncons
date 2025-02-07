@@ -90,12 +90,6 @@ namespace jsonschema {
             return schema_location_;
         }
 
-        walk_result walk(const eval_context<Json>& context, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const 
-        {
-            return do_walk(context, instance, instance_location, reporter);
-        }
-
         validation_message make_validation_message(const jsonpointer::json_pointer& eval_path,
             const jsonpointer::json_pointer& instance_location,
             const std::string& message) const override
@@ -118,14 +112,6 @@ namespace jsonschema {
                 instance_location, 
                 custom_message_.empty() ? message : custom_message_,
                 details);
-        }
-
-    private:
-
-        virtual walk_result do_walk(const eval_context<Json>& /*context*/, const Json& instance, 
-            const jsonpointer::json_pointer& instance_location, const walk_reporter_type& reporter) const
-        {
-            return reporter(this->keyword_name(), this->schema(), this->schema_location(), instance, instance_location);
         }
     };
 
