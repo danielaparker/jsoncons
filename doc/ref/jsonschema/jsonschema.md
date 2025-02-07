@@ -138,8 +138,8 @@ missing key/value pairs.
 
 ### Custom error messages (since 1.2.0)
 
-jsoncons supports an `errorMessage` keyword that allows schema authors to provide
-custom error messages. See [custom error message](./custom-error-message) for how to enable this feature.
+jsoncons optionally allows schema authors to provide custom error messages via an `errorMessage` keyword. 
+See [custom error message](./custom-error-message.md) for how to enable this feature.
   
 ### Examples
 
