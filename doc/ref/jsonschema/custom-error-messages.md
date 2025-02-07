@@ -1,13 +1,12 @@
 ### Custom Error Messages (since 1.2.0)
 
-jsoncons supports an `errorMessage` keyword that allows schema authors to provide
-custom error messages. To enable this feature, you need to provide an `expression_options`
-argument with `enable_custom_error_message` set to `true` when calling `make_json_schema`. 
+jsoncons optionally allows schema authors to provide custom error messages via an `errorMessage` keyword. 
+To enable this feature, you need to provide an `expression_options` argument with `enable_custom_error_message` set to `true` when preparing a JSON Schema document with `make_json_schema`. 
 
 The `errorMessage` keyword can be set to either
 
-- An object that maps message keys to custom messages, or
-- A string that represents a custom message. 
+- A string that represents a custom message, or
+- An object that maps message keys to custom messages
  
 An example of an object that maps message keys to custom messages is
 
@@ -18,10 +17,11 @@ An example of an object that maps message keys to custom messages is
   "format.date": "Date format must be YYYY-MM-DD"
 }
 ```
-Message keys are JSON Schema keywords, except for `format`,
-where they have the form 
+Maps are visible in the lexical scope of a schema. Message keys are JSON Schema keywords, except for `format`, where they have the form 
 
     format.<format value> 
+
+This implementation of key-message maps draws on the experience of [networknt json-schema-validator](https://github.com/networknt/json-schema-validator/blob/master/doc/cust-msg.md). We do not currently support parameterized messages.
 
 ### Example
 

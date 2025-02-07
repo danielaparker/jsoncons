@@ -135,6 +135,11 @@ for specifying a default value, but doesn't prescribe how implementations should
 Some implementations ignore the default keyword, others support updating the input JSON to fill in a default value 
 for a missing key/value pair. This implementation outputs a JSONPatch document that may be further applied to the input JSON to add the
 missing key/value pairs.
+
+### Custom error messages (since 1.2.0)
+
+jsoncons supports an `errorMessage` keyword that allows schema authors to provide
+custom error messages. See [custom error message](./custom-error-message) for how to enable this feature.
   
 ### Examples
 
