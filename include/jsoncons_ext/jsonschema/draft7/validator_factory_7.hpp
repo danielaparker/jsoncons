@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT6_SCHEMA_BUILDER_6_HPP
-#define JSONCONS_EXT_JSONSCHEMA_DRAFT6_SCHEMA_BUILDER_6_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT7_VALIDATOR_FACTORY_7_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT7_VALIDATOR_FACTORY_7_HPP
 
 #include <cassert>
 #include <iostream>
@@ -18,9 +18,9 @@
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
-#include <jsoncons_ext/jsonschema/draft6/schema_draft6.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_draft7.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
 
 #if defined(JSONCONS_HAS_STD_REGEX)
@@ -29,14 +29,14 @@
 
 namespace jsoncons {
 namespace jsonschema {
-namespace draft6 {
+namespace draft7 {
 
     template <typename Json>
-    class schema_builder_6 : public schema_builder<Json> 
+    class validator_factory_7 : public validator_factory<Json> 
     {
     public:
-        using schema_store_type = typename schema_builder<Json>::schema_store_type;
-        using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
+        using schema_store_type = typename validator_factory<Json>::schema_store_type;
+        using validator_factory_factory_type = typename validator_factory<Json>::validator_factory_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
@@ -48,25 +48,28 @@ namespace draft6 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_6(Json&& sch, const schema_builder_factory_type& builder_factory, 
+        validator_factory_7(Json&& sch, const validator_factory_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : schema_builder<Json>(schema_version::draft6(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
+            : validator_factory<Json>(schema_version::draft7(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
         {
             init();
         }
 
-        schema_builder_6(const schema_builder_6&) = delete;
-        schema_builder_6& operator=(const schema_builder_6&) = delete;
-        schema_builder_6(schema_builder_6&&) = default;
-        schema_builder_6& operator=(schema_builder_6&&) = default;
+        validator_factory_7(const validator_factory_7&) = delete;
+        validator_factory_7& operator=(const validator_factory_7&) = delete;
+        validator_factory_7(validator_factory_7&&) = default;
+        validator_factory_7& operator=(validator_factory_7&&) = default;
 
         void init()
         {
             keyword_factory_map_.emplace("type", 
                 [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_type_validator(context, sch, parent);});
             keyword_factory_map_.emplace("contentEncoding", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_encoding_validator(context, sch, parent);});
+                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&)
+            {
+                return this->make_content_encoding_validator(context, sch, parent);}
+            );
             keyword_factory_map_.emplace("contentMediaType", 
                 [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch, parent);});
             if (this->options().require_format_validation())
@@ -130,7 +133,6 @@ namespace draft6 {
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
-            //std::cout << "make_schema_validator " << context.get_base_uri().string() << ", " << new_context.get_base_uri().string() << "\n\n";
 
             schema_validator_type schema_validator_ptr;
 
@@ -166,7 +168,7 @@ namespace draft6 {
 
                         Json default_value{ jsoncons::null_type() };
                         uri relative((*it).value().template as<std::string>()); 
-                        auto id = context.get_base_uri().resolve(relative)                   ;
+                        auto id = context.get_base_uri().resolve(relative);
                         validators.push_back(this->get_or_create_reference(sch, uri_wrapper{id}));
                         schema_validator_ptr = jsoncons::make_unique<object_schema_validator<Json>>(
                             new_context.get_base_uri(), context.id(),
@@ -234,6 +236,37 @@ namespace draft6 {
                     }
                 }
             }
+
+            schema_validator_type if_validator;
+            schema_validator_type then_validator;
+            schema_validator_type else_validator;
+
+            it = sch.find("if");
+            if (it != sch.object_range().end()) 
+            {
+                std::string sub_keys[] = { "if" };
+                if_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
+            }
+
+            it = sch.find("then");
+            if (it != sch.object_range().end()) 
+            {
+                std::string sub_keys[] = { "then" };
+                then_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
+            }
+
+            it = sch.find("else");
+            if (it != sch.object_range().end()) 
+            {
+                std::string sub_keys[] = { "else" };
+                else_validator = make_schema_validator(context, (*it).value(), sub_keys, anchor_dict);
+            }
+            if (if_validator || then_validator || else_validator)
+            {
+                validators.emplace_back(jsoncons::make_unique<conditional_validator<Json>>(
+                    sch, context.get_base_uri(), context.get_custom_message("conditional"),
+                    std::move(if_validator), std::move(then_validator), std::move(else_validator)));
+            }
             
             std::unique_ptr<properties_validator<Json>> properties;
             it = sch.find("properties");
@@ -285,8 +318,7 @@ namespace draft6 {
                     validators.emplace_back(this->make_items_validator("items", context, (*it).value(), sch, anchor_dict));
                 }
             }
-            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), 
-                std::move(id),
+            return jsoncons::make_unique<object_schema_validator<Json>>(context.get_base_uri(), std::move(id),
                 std::move(validators), std::move(defs), std::move(default_value));
         }
 
@@ -303,10 +335,11 @@ namespace draft6 {
             
             for (const auto& prop : sch.object_range())
             {
+                std::string sub_keys[] = {"patternProperties", prop.key()};
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
-                        make_schema_validator(context, prop.value(), {}, anchor_dict)));
+                        make_schema_validator(context, prop.value(), sub_keys, anchor_dict)));
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>(parent, std::move(schema_location),
@@ -350,16 +383,15 @@ namespace draft6 {
                     uri relative((*it).value().template as<std::string>()); 
                     auto resolved = parent.get_base_uri().resolve(relative);
                     id = resolved;
-                    uri_wrapper new_uri{resolved};
-
                     //std::cout << "$id: " << id << ", " << new_uri.string() << "\n";
                     // Add it to the list if it is not already there
+                    
+                    uri_wrapper new_uri{resolved};
                     if (std::find(new_uris.begin(), new_uris.end(), new_uri) == new_uris.end())
                     {
                         new_uris.emplace_back(new_uri); 
                     }
                 }
-
                 if (this->options().enable_custom_error_message())
                 {
                     it = sch.find("errorMessage"); 
@@ -411,6 +443,9 @@ namespace draft6 {
                 "enum",                
                 "exclusiveMaximum",
                 "exclusiveMinimum",
+                "if",
+                "then",
+                "else",        
                 "items",               
                 "maximum",             
                 "maxItems",            
@@ -437,7 +472,7 @@ namespace draft6 {
         }
     };
 
-} // namespace draft6
+} // namespace draft7
 } // namespace jsonschema
 } // namespace jsoncons
 

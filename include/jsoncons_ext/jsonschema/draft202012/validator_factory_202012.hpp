@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT202012_SCHEMA_BUILDER_202012_HPP
-#define JSONCONS_EXT_JSONSCHEMA_DRAFT202012_SCHEMA_BUILDER_202012_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT202012_VALIDATOR_FACTORY_202012_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT202012_VALIDATOR_FACTORY_202012_HPP
 
 #include <cassert>
 #include <iostream>
@@ -18,7 +18,7 @@
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_draft202012.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
@@ -32,11 +32,11 @@ namespace jsonschema {
 namespace draft202012 {
 
     template <typename Json>
-    class schema_builder_202012 : public schema_builder<Json> 
+    class validator_factory_202012 : public validator_factory<Json> 
     {
     public:
-        using schema_store_type = typename schema_builder<Json>::schema_store_type;
-        using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
+        using schema_store_type = typename validator_factory<Json>::schema_store_type;
+        using validator_factory_factory_type = typename validator_factory<Json>::validator_factory_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using dynamic_ref_validator_type = dynamic_ref_validator<Json>;
@@ -89,11 +89,11 @@ namespace draft202012 {
         bool include_format_;
 
     public:
-        schema_builder_202012(Json&& sch, const schema_builder_factory_type& builder_factory, 
+        validator_factory_202012(Json&& sch, const validator_factory_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
-            : schema_builder<Json>(schema_version::draft202012(), std::move(sch),
+            : validator_factory<Json>(schema_version::draft202012(), std::move(sch),
                 builder_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
@@ -123,10 +123,10 @@ namespace draft202012 {
             init();
         }
 
-        schema_builder_202012(const schema_builder_202012&) = delete;
-        schema_builder_202012& operator=(const schema_builder_202012&) = delete;
-        schema_builder_202012(schema_builder_202012&&) = default;
-        schema_builder_202012& operator=(schema_builder_202012&&) = default;
+        validator_factory_202012(const validator_factory_202012&) = delete;
+        validator_factory_202012& operator=(const validator_factory_202012&) = delete;
+        validator_factory_202012(validator_factory_202012&&) = default;
+        validator_factory_202012& operator=(validator_factory_202012&&) = default;
 
         void init()
         {

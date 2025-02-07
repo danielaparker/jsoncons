@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
-#define JSONCONS_EXT_JSONSCHEMA_DRAFT201909_SCHEMA_BUILDER_201909_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT201909_VALIDATOR_FACTORY_201909_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT201909_VALIDATOR_FACTORY_201909_HPP
 
 #include <cassert>
 #include <iostream>
@@ -18,7 +18,7 @@
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/draft201909/schema_draft201909.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
@@ -32,11 +32,11 @@ namespace jsonschema {
 namespace draft201909 {
 
     template <typename Json>
-    class schema_builder_201909 : public schema_builder<Json> 
+    class validator_factory_201909 : public validator_factory<Json> 
     {
     public:
-        using schema_store_type = typename schema_builder<Json>::schema_store_type;
-        using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
+        using schema_store_type = typename validator_factory<Json>::schema_store_type;
+        using validator_factory_factory_type = typename validator_factory<Json>::validator_factory_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using recursive_ref_validator_type = recursive_ref_validator<Json>;
@@ -89,11 +89,11 @@ namespace draft201909 {
         bool include_format_;
 
     public:
-        schema_builder_201909(Json&& sch, const schema_builder_factory_type& builder_factory, 
+        validator_factory_201909(Json&& sch, const validator_factory_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) noexcept
-            : schema_builder<Json>(schema_version::draft201909(), 
+            : validator_factory<Json>(schema_version::draft201909(), 
                 std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {
@@ -123,10 +123,10 @@ namespace draft201909 {
             init();
         }
 
-        schema_builder_201909(const schema_builder_201909&) = delete;
-        schema_builder_201909& operator=(const schema_builder_201909&) = delete;
-        schema_builder_201909(schema_builder_201909&&) = default;
-        schema_builder_201909& operator=(schema_builder_201909&&) = default;
+        validator_factory_201909(const validator_factory_201909&) = delete;
+        validator_factory_201909& operator=(const validator_factory_201909&) = delete;
+        validator_factory_201909(validator_factory_201909&&) = default;
+        validator_factory_201909& operator=(validator_factory_201909&&) = default;
 
         void init()
         {

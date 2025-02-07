@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
-#define JSONCONS_EXT_JSONSCHEMA_DRAFT4_SCHEMA_BUILDER_4_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_DRAFT4_VALIDATOR_FACTORY_4_HPP
+#define JSONCONS_EXT_JSONSCHEMA_DRAFT4_VALIDATOR_FACTORY_4_HPP
 
 #include <cassert>
 #include <iostream>
@@ -18,7 +18,7 @@
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/schema_builder.hpp>
+#include <jsoncons_ext/jsonschema/common/validator_factory.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validators.hpp>
 #include <jsoncons_ext/jsonschema/draft4/schema_draft4.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
@@ -32,11 +32,11 @@ namespace jsonschema {
 namespace draft4 {
 
     template <typename Json>
-    class schema_builder_4 : public schema_builder<Json> 
+    class validator_factory_4 : public validator_factory<Json> 
     {
     public:
-        using schema_store_type = typename schema_builder<Json>::schema_store_type;
-        using schema_builder_factory_type = typename schema_builder<Json>::schema_builder_factory_type;
+        using schema_store_type = typename validator_factory<Json>::schema_store_type;
+        using validator_factory_factory_type = typename validator_factory<Json>::validator_factory_factory_type;
         using keyword_validator_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_type = typename std::unique_ptr<schema_validator<Json>>;
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
@@ -48,18 +48,18 @@ namespace draft4 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        schema_builder_4(Json&& sch, const schema_builder_factory_type& builder_factory, 
+        validator_factory_4(Json&& sch, const validator_factory_factory_type& builder_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
-            : schema_builder<Json>(schema_version::draft4(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
+            : validator_factory<Json>(schema_version::draft4(), std::move(sch), builder_factory, options, schema_store_ptr, resolve_funcs)
         {
             init();
         }
 
-        schema_builder_4(const schema_builder_4&) = delete;
-        schema_builder_4& operator=(const schema_builder_4&) = delete;
-        schema_builder_4(schema_builder_4&&) = default;
-        schema_builder_4& operator=(schema_builder_4&&) = default;
+        validator_factory_4(const validator_factory_4&) = delete;
+        validator_factory_4& operator=(const validator_factory_4&) = delete;
+        validator_factory_4(validator_factory_4&&) = default;
+        validator_factory_4& operator=(validator_factory_4&&) = default;
 
         void init()
         {
