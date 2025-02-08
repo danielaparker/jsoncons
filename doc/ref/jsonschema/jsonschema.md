@@ -136,7 +136,8 @@ It needs to know the dialect of a schema resource in order to know how to proces
 it uses that. Otherwise, it falls back on a default version you can provide through [evaluation_options](./evaluation_options.md), e.g.
 
 ```cpp
-auto options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7());
+auto options = jsonschema::evaluation_options{}
+    .default_version(jsonschema::schema_version::draft7());
 auto compiled = jsonschema::make_json_schema(schema, options);
 ```
 

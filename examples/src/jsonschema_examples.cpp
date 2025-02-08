@@ -438,8 +438,9 @@ void draft_07_example()
 )");
 
     // Need to supply default version because schema does not have $schema keyword  
-    jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema,
-        jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7()));
+    auto options = jsonschema::evaluation_options{}
+        .default_version(jsonschema::schema_version::draft7());
+    auto compiled = jsonschema::make_json_schema(schema, options);
 
     json data = json::parse(R"([ null, 2, 3, "foo" ])");
 
