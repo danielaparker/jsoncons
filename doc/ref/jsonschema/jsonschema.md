@@ -456,7 +456,6 @@ int main()
                 std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
                 std::string pathname = root_dir + uri.path();
-
                 std::fstream is(pathname.c_str());
                 if (!is)
                 {
