@@ -129,6 +129,20 @@ Any other format type is ignored.
 Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
 by setting the evaluation option `require_format_validation` to `true` 
 
+### Schema dialect
+
+jsoncons supports Drafts 4, 6, 7, 2019-9 and 2020-12 of the [JSON Schema Specification](https://json-schema.org/specification).
+It needs to know the dialect of a schema resource in order to know how to process it. If a schema contains a **$schema** dialect identifier,
+it uses that. Otherwise, it falls back on a default version you can provide through [evaluation_options](./evaluation_options.md), e.g.
+
+```cpp
+auto options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7());
+
+auto compiled = jsonschema::make_json_schema(schema, options);
+```
+
+If no default is provided, the latest supported version is assumed.
+
 ### URI resolution
 
 jsoncons requires a user supplied URI resolver to resolve a URI reference to a schema resoure.
