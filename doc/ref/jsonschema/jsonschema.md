@@ -144,7 +144,7 @@ Here is an example of a URI resolver that resolves a URI to a physical pathname,
 std::string root_dir = "./input/jsonschema";
 auto resolver = [&](const jsoncons::uri& uri) -> json
     {
-        std::string pathname = root_dir + std::string(uri.path());
+        std::string pathname = root_dir + uri.path();
 
         std::fstream is(pathname.c_str());
         if (!is)
@@ -455,7 +455,7 @@ int main()
                 std::cout << "Requested URI: " << uri.string() << "\n";
                 std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
 
-                std::string pathname = root_dir + std::string(uri.path());
+                std::string pathname = root_dir + uri.path();
 
                 std::fstream is(pathname.c_str());
                 if (!is)
