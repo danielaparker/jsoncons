@@ -137,7 +137,6 @@ it uses that. Otherwise, it falls back on a default version you can provide thro
 
 ```cpp
 auto options = jsonschema::evaluation_options{}.default_version(jsonschema::schema_version::draft7());
-
 auto compiled = jsonschema::make_json_schema(schema, options);
 ```
 
