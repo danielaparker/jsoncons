@@ -128,6 +128,32 @@ Any other format type is ignored.
 
 Since Draft 2019-09, format is no longer an assertion by default. It can be configured to be an assertion 
 by setting the evaluation option `require_format_validation` to `true` 
+
+### URI resolution
+
+A URI resolver is a function object with the signature of `resolver` being equivalent to 
+<pre>
+    Json fun(const <a href="../corelib/utility/uri.md">jsoncons::uri</a>& uri);</pre>
+
+If unable to resolve the resource, it should return <code>Json::null()</code>.
+
+Here is an example of a URI resolver that resolves a URI to a physical pathname, 
+
+```cpp
+std::string root_dir = "./input/jsonschema";
+auto resolver = [&](const jsoncons::uri& uri) -> json
+    {
+        std::string pathname = root_dir + std::string(uri.path());
+
+        std::fstream is(pathname.c_str());
+        if (!is)
+        {
+            return json::null();
+        }
+
+        return json::parse(is);
+    };
+```
   
 ### Default values
   
@@ -398,29 +424,8 @@ second schema defined in an external file, `name-defs.json`,
 }
 ```
 
-jsoncons allows you to write a resolver function object to handle the URI
-of the external file and translate it into a physical pathname.
-
-```cpp
-auto resolver = [](const jsoncons::uri& uri) -> json
-    {
-        std::cout << "Requested URI: " << uri.string() << "\n";
-        std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
-
-        std::string pathname = "./input/jsonschema" + std::string(uri.path());
-
-        std::fstream is(pathname.c_str());
-        if (!is)
-        {
-            return json::null();
-        }
-
-        return json::parse(is);
-    };
-```
-
-When building the main schema, the schema builder needs to resolve the URI 'https://www.example.com/name-defs.json#/$defs/orNull'. 
-The user does not need to supply that specific subschema, it is enough to supply the schema document '/name-defs.json'. 
+When building the main schema, the schema builder needs to resolve the URI 'https://www.example.com/name-defs.json#/$defs/orNull'
+via a URI resolver. The resolver does not need to supply that specific subschema, it is enough to supply the schema document '/name-defs.json'. 
 The schema builder than processes that schema document and makes multiple entries into an internal validator registry, 
 including an entry for 'https://www.example.com/name-defs.json#/$defs/orNull'.
 
@@ -443,15 +448,22 @@ int main()
         // Throws schema_error if JSON Schema compilation fails
         jsonschema::json_schema<json> compiled = jsonschema::make_json_schema(schema, resolver);
 
-        auto reporter = [](const jsonschema::validation_message& msg) -> jsonschema::walk_result
-        {
-            std::cout << msg.instance_location().string() << ": " << msg.message() << "\n";
-            for (const auto& detail : msg.details())
+        std::string root_dir = "./input/jsonschema";
+        auto resolver = [&](const jsoncons::uri& uri) -> json
             {
-                std::cout << "    "  << detail.message() << "\n";
-            }
-            return jsonschema::walk_result::advance;
-        };
+                std::cout << "Requested URI: " << uri.string() << "\n";
+                std::cout << "base: " << uri.base().string() << ", path: " << uri.path() << "\n\n";
+
+                std::string pathname = root_dir + std::string(uri.path());
+
+                std::fstream is(pathname.c_str());
+                if (!is)
+                {
+                    return json::null();
+                }
+
+                return json::parse(is);
+            };
 
         // Will call the message handler function object for each schema violation
         compiled.validate(data, reporter);
