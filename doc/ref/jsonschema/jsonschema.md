@@ -131,6 +131,7 @@ by setting the evaluation option `require_format_validation` to `true`
 
 ### URI resolution
 
+jsoncons requires a user supplied URI resolver to resolve a URI reference to a schema resoure.
 A URI resolver is a function object with the signature of `resolver` being equivalent to 
 <pre>
     Json fun(const <a href="../corelib/utility/uri.md">jsoncons::uri</a>& uri);</pre>
