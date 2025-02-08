@@ -1,4 +1,4 @@
-1.2.0 (pending on master)
+1.2.0 
 -----
 
 - Fixed bugs:
