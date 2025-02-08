@@ -46,6 +46,10 @@ Get or set a default base URI. In the case that a schema does not have
 an `$id` with an absolute URI, the default base URI will be used to resolve
 relative references. It defaults to 'https://jsoncons.com'.
 
+    bool enable_custom_error_message() const;
+    evaluation_options& enable_custom_error_message(bool value); 
+Determines whether custom error messages in a schema are supported. The default is `false`. 
+
 #### Non-member functions
 
     bool operator==(const evaluation_options& lhs, const evaluation_options& rhs);
