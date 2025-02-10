@@ -4019,6 +4019,7 @@ namespace detail {
                             default:
                             {
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                std::cout << "MESSAGE: " << ec.message() << "\n";
                                 if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 

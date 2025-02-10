@@ -1,0 +1,30 @@
+// Copyright 2013-2025 Daniel Parker
+// Distributed under Boost license
+
+#if defined(_MSC_VER)
+#include "windows.h" // test no inadvertant macro expansions
+#endif
+
+#include <jsoncons_ext/jmespath/jmespath.hpp>
+#include <jsoncons/json.hpp>
+
+#include <iostream>
+#include <catch/catch.hpp>
+
+namespace jmespath = jsoncons::jmespath;
+
+TEST_CASE("jmespath let tests")
+{
+    SECTION("Test 1")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": "bar"})");
+        auto expected = jsoncons::json::parse(R"("bar")");
+
+        std::string query = R"(let $foo = foo in $foo)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        /*jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);*/
+    }    
+}
+
