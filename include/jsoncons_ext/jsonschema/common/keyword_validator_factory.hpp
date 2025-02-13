@@ -53,7 +53,7 @@ namespace jsonschema {
         
         // Owns external schemas
         std::vector<schema_validator_ptr_type> schema_validators_;
-    public:
+    protected:
         std::vector<std::pair<jsoncons::uri, ref_type*>> unresolved_refs_; 
         std::map<jsoncons::uri, Json> unknown_keywords_;
 
@@ -336,6 +336,10 @@ namespace jsonschema {
             }
             return schema_val;
         }
+        
+        // keyword validator factories
+        
+        // No dependence on data members
 
         std::unique_ptr<properties_validator<Json>> make_properties_validator(const compilation_context& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
