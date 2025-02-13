@@ -356,6 +356,31 @@ namespace jsonschema {
                 context.get_custom_message(keyword), std::move(properties));
         }
 
+#if defined(JSONCONS_HAS_STD_REGEX)
+                
+        std::unique_ptr<pattern_properties_validator<Json>> make_pattern_properties_validator( const compilation_context& context, 
+            const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
+        {
+            std::string keyword = "patternProperties";
+            uri schema_location = context.get_base_uri();
+            std::string custom_message = context.get_custom_message(keyword);
+
+            std::vector<std::pair<std::regex, schema_validator_ptr_type>> pattern_properties;
+            
+            for (const auto& prop : sch.object_range())
+            {
+                pattern_properties.emplace_back(
+                    std::make_pair(
+                        std::regex(prop.key(), std::regex::ECMAScript),
+                        make_schema_validator(context, prop.value(), {}, anchor_dict)));
+            }
+
+            return jsoncons::make_unique<pattern_properties_validator<Json>>(parent, std::move(schema_location),
+                custom_message,
+                std::move(pattern_properties));
+        }
+#endif       
+
         virtual std::unique_ptr<max_length_validator<Json>> make_max_length_validator(const compilation_context& context, 
             const Json& sch, const Json& parent)
         {
