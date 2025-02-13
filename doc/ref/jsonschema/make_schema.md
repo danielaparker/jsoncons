@@ -12,13 +12,13 @@ template <typename Json>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
     const std::string& retrieval_uri);                               (2) (since 0.173.0)
 
-template <typename Json,class URIResolver>
+template <typename Json,class SchemaResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema,
-    const std::string& retrieval_uri, const URIResolver& resolver);    (3) (since 0.173.0)
+    const std::string& retrieval_uri, const SchemaResolver& resolver);    (3) (since 0.173.0)
 
-template <typename Json,class URIResolver>
+template <typename Json,class SchemaResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, 
-    const URIResolver& resolver);                                      (4)
+    const SchemaResolver& resolver);                                      (4)
 ```
 
 Returns a `shared_ptr` to a `json_schema<Json>`.
