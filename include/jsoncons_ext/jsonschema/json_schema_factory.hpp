@@ -12,11 +12,11 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 
-#include <jsoncons_ext/jsonschema/draft201909/validator_factory_201909.hpp>
-#include <jsoncons_ext/jsonschema/draft202012/validator_factory_202012.hpp>
-#include <jsoncons_ext/jsonschema/draft4/validator_factory_4.hpp>
-#include <jsoncons_ext/jsonschema/draft6/validator_factory_6.hpp>
-#include <jsoncons_ext/jsonschema/draft7/validator_factory_7.hpp>
+#include <jsoncons_ext/jsonschema/draft201909/schema_validator_factory_201909.hpp>
+#include <jsoncons_ext/jsonschema/draft202012/schema_validator_factory_202012.hpp>
+#include <jsoncons_ext/jsonschema/draft4/schema_validator_factory_4.hpp>
+#include <jsoncons_ext/jsonschema/draft6/schema_validator_factory_6.hpp>
+#include <jsoncons_ext/jsonschema/draft7/schema_validator_factory_7.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
