@@ -145,14 +145,14 @@ If no default is provided, the latest supported version is assumed.
 
 ### URI resolution
 
-jsoncons requires a user supplied URI resolver to resolve a URI reference to a schema resoure.
-A URI resolver is a function object with the signature of `resolver` being equivalent to 
+jsoncons requires a user supplied schema resolver  to resolve a URI reference to a schema resoure.
+A schema resolver  is a function object with the signature of `resolver` being equivalent to 
 <pre>
     Json fun(const <a href="../corelib/utility/uri.md">jsoncons::uri</a>& uri);</pre>
 
 If unable to resolve the resource, it should return <code>Json::null()</code>.
 
-Here is an example of a URI resolver that resolves a URI to a physical pathname, 
+Here is an example of a schema resolver  that resolves a URI to a physical pathname, 
 
 ```cpp
 std::string root_dir = "./input/jsonschema";

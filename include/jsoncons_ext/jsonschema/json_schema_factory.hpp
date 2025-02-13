@@ -211,9 +211,9 @@ namespace jsonschema {
         }
     }
 
-    template <typename Json,typename URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
-    make_json_schema(Json sch, const std::string& retrieval_uri, const URIResolver& resolver, 
+    template <typename Json,typename SchemaResolver>
+    typename std::enable_if<extension_traits::is_unary_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    make_json_schema(Json sch, const std::string& retrieval_uri, const SchemaResolver& resolver, 
         evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
@@ -244,9 +244,9 @@ namespace jsonschema {
         return json_schema<Json>(validator_factory->get_schema_validator());
     }
 
-    template <typename Json,typename URIResolver>
-    typename std::enable_if<extension_traits::is_unary_function_object_exact<URIResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
-    make_json_schema(Json sch, const URIResolver& resolver, 
+    template <typename Json,typename SchemaResolver>
+    typename std::enable_if<extension_traits::is_unary_function_object_exact<SchemaResolver,Json,jsoncons::uri>::value,json_schema<Json>>::type
+    make_json_schema(Json sch, const SchemaResolver& resolver, 
         evaluation_options options = evaluation_options{})
     {
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
