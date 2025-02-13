@@ -729,7 +729,7 @@ namespace jmespath {
 
 namespace detail {
      
-    enum class path_state 
+    enum class expr_state 
     {
         start,
         lhs_expression,
@@ -781,7 +781,9 @@ namespace detail {
         cmp_gt_or_gte,
         cmp_ne,
         expect_pipe_or_or,
-        expect_and
+        expect_and,
+        let_expression,
+        variable_ref
     };
 
     template <typename Json>
@@ -3653,7 +3655,7 @@ namespace detail {
         const char_type* p_;
 
         static_resources resources_;
-        std::vector<path_state> state_stack_;
+        std::vector<expr_state> state_stack_;
 
         std::vector<token> output_stack_;
         std::vector<token> operator_stack_;
@@ -3683,7 +3685,7 @@ namespace detail {
         {
             push_token(current_node_arg, ec);
             if (ec) {return jmespath_expression();}
-            state_stack_.emplace_back(path_state::start);
+            state_stack_.emplace_back(expr_state::start);
 
             string_type buffer;
             uint32_t cp = 0;
@@ -3699,13 +3701,13 @@ namespace detail {
             {
                 switch (state_stack_.back())
                 {
-                    case path_state::start: 
+                    case expr_state::start: 
                     {
-                        state_stack_.back() = path_state::rhs_expression;
-                        state_stack_.emplace_back(path_state::lhs_expression);
+                        state_stack_.back() = expr_state::rhs_expression;
+                        state_stack_.emplace_back(expr_state::lhs_expression);
                         break;
                     }
-                    case path_state::rhs_expression:
+                    case expr_state::rhs_expression:
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -3714,33 +3716,33 @@ namespace detail {
                             case '.': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(path_state::sub_expression);
+                                state_stack_.emplace_back(expr_state::sub_expression);
                                 break;
                             case '|':
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_pipe_or_or);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::expect_pipe_or_or);
                                 break;
                             case '&':
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_and);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::expect_and);
                                 break;
                             case '<':
                             case '>':
                             case '=':
                             {
-                                state_stack_.emplace_back(path_state::comparator_expression);
+                                state_stack_.emplace_back(expr_state::comparator_expression);
                                 break;
                             }
                             case '!':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::cmp_ne);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::cmp_ne);
                                 break;
                             }
                             case ')':
@@ -3749,7 +3751,7 @@ namespace detail {
                                 break;
                             }
                             case '[':
-                                state_stack_.emplace_back(path_state::bracket_specifier);
+                                state_stack_.emplace_back(expr_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3766,7 +3768,7 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case path_state::comparator_expression:
+                    case expr_state::comparator_expression:
                         switch(*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -3775,21 +3777,21 @@ namespace detail {
                             case '<':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::lhs_expression;
-                                state_stack_.emplace_back(path_state::cmp_lt_or_lte);
+                                state_stack_.back() = expr_state::lhs_expression;
+                                state_stack_.emplace_back(expr_state::cmp_lt_or_lte);
                                 break;
                             case '>':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::lhs_expression;
-                                state_stack_.emplace_back(path_state::cmp_gt_or_gte);
+                                state_stack_.back() = expr_state::lhs_expression;
+                                state_stack_.emplace_back(expr_state::cmp_gt_or_gte);
                                 break;
                             case '=':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::lhs_expression;
-                                state_stack_.emplace_back(path_state::cmp_eq);
+                                state_stack_.back() = expr_state::lhs_expression;
+                                state_stack_.emplace_back(expr_state::cmp_eq);
                                 break;
                             }
                             default:
@@ -3805,7 +3807,7 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case path_state::lhs_expression: 
+                    case expr_state::lhs_expression: 
                     {
                         switch (*p_)
                         {
@@ -3813,25 +3815,25 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::val_expr;
-                                state_stack_.emplace_back(path_state::quoted_string);
+                                state_stack_.back() = expr_state::val_expr;
+                                state_stack_.emplace_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = path_state::raw_string;
+                                state_stack_.back() = expr_state::raw_string;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '`':
-                                state_stack_.back() = path_state::literal;
+                                state_stack_.back() = expr_state::literal;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::multi_select_hash;
+                                state_stack_.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3848,9 +3850,9 @@ namespace detail {
                                 ++column_;
                                 push_token(lparen_arg, ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expect_rparen;
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::expect_rparen;
+                                state_stack_.emplace_back(expr_state::rhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                             }
                             case '!':
@@ -3869,15 +3871,15 @@ namespace detail {
                                 state_stack_.pop_back();
                                 break;
                             case '[': 
-                                state_stack_.back() = path_state::bracket_specifier_or_multi_select_list;
+                                state_stack_.back() = expr_state::bracket_specifier_or_multi_select_list;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = path_state::identifier_or_function_expr;
-                                    state_stack_.emplace_back(path_state::unquoted_string);
+                                    state_stack_.back() = expr_state::identifier_or_function_expr;
+                                    state_stack_.emplace_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3891,7 +3893,7 @@ namespace detail {
                         };
                         break;
                     }
-                    case path_state::sub_expression: 
+                    case expr_state::sub_expression: 
                     {
                         switch (*p_)
                         {
@@ -3899,15 +3901,15 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::val_expr;
-                                state_stack_.emplace_back(path_state::quoted_string);
+                                state_stack_.back() = expr_state::val_expr;
+                                state_stack_.emplace_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::multi_select_hash;
+                                state_stack_.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3919,15 +3921,15 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '[': 
-                                state_stack_.back() = path_state::expect_multi_select_list;
+                                state_stack_.back() = expr_state::expect_multi_select_list;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = path_state::identifier_or_function_expr;
-                                    state_stack_.emplace_back(path_state::unquoted_string);
+                                    state_stack_.back() = expr_state::identifier_or_function_expr;
+                                    state_stack_.emplace_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3941,19 +3943,19 @@ namespace detail {
                         };
                         break;
                     }
-                    case path_state::key_expr:
+                    case expr_state::key_expr:
                         push_token(token(key_arg, buffer), ec);
                         if (ec) {return jmespath_expression();}
                         buffer.clear(); 
                         state_stack_.pop_back(); 
                         break;
-                    case path_state::val_expr:
+                    case expr_state::val_expr:
                         push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         buffer.clear();
                         state_stack_.pop_back(); 
                         break;
-                    case path_state::expression_or_expression_type:
+                    case expr_state::expression_or_expression_type:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -3962,20 +3964,40 @@ namespace detail {
                             case '&':
                                 push_token(token(begin_expression_type_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expression_type;
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::expression_type;
+                                state_stack_.emplace_back(expr_state::rhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.back() = path_state::argument;
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::argument;
+                                state_stack_.emplace_back(expr_state::rhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
-                    case path_state::identifier_or_function_expr:
+                    case expr_state::let_expression:
+                    {
+                        std::cout << "let expression " << *p_ << "\n";
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':
+                                advance_past_space_character();
+                                break;
+                            case '$':
+                                std::cout << "variable_ref";
+                                state_stack_.push_back(expr_state::variable_ref);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jmespath_errc::syntax_error;
+                                return jmespath_expression();
+                        }
+                        break;
+                    }
+                    case expr_state::identifier_or_function_expr:
                         switch(*p_)
                         {
                             case '(':
@@ -3988,7 +4010,7 @@ namespace detail {
                                 buffer.clear();
                                 push_token(token(f), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::function_expression;
+                                state_stack_.back() = expr_state::function_expression;
                                 // check no-args function
                                 bool is_no_args_func = true;
                                 bool isEnd = false;
@@ -4010,7 +4032,7 @@ namespace detail {
                                 }
                                 if (!is_no_args_func)
                                 {
-                                    state_stack_.emplace_back(path_state::expression_or_expression_type);
+                                    state_stack_.emplace_back(expr_state::expression_or_expression_type);
                                 }
                                 ++p_;
                                 ++column_;
@@ -4018,17 +4040,26 @@ namespace detail {
                             }
                             default:
                             {
-                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                std::cout << "MESSAGE: " << ec.message() << "\n";
-                                if (ec) {return jmespath_expression();}
-                                buffer.clear();
-                                state_stack_.pop_back(); 
+                                if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
+                                {
+                                    std::cout << "let\n";
+                                    state_stack_.back() = expr_state::let_expression;
+                                    //++p_;
+                                    //++column_;
+                                }
+                                else
+                                {
+                                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                    if (ec) {return jmespath_expression();}
+                                    buffer.clear();
+                                    state_stack_.pop_back(); 
+                                }
                                 break;
                             }
                         }
                         break;
 
-                    case path_state::function_expression:
+                    case expr_state::function_expression:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -4037,7 +4068,7 @@ namespace detail {
                             case ',':
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.emplace_back(path_state::expression_or_expression_type);
+                                state_stack_.emplace_back(expr_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4055,20 +4086,20 @@ namespace detail {
                         }
                         break;
 
-                    case path_state::argument:
+                    case expr_state::argument:
                         push_token(argument_arg, ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back();
                         break;
 
-                    case path_state::expression_type:
+                    case expr_state::expression_type:
                         push_token(end_expression_type_arg, ec);
                         push_token(argument_arg, ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back();
                         break;
 
-                    case path_state::quoted_string: 
+                    case expr_state::quoted_string: 
                         switch (*p_)
                         {
                             case '\"':
@@ -4077,7 +4108,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '\\':
-                                state_stack_.emplace_back(path_state::quoted_string_escape_char);
+                                state_stack_.emplace_back(expr_state::quoted_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4089,7 +4120,7 @@ namespace detail {
                         };
                         break;
 
-                    case path_state::unquoted_string: 
+                    case expr_state::unquoted_string: 
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -4110,7 +4141,7 @@ namespace detail {
                                 break;
                         };
                         break;
-                    case path_state::raw_string_escape_char:
+                    case expr_state::raw_string_escape_char:
                         switch (*p_)
                         {
                             case '\'':
@@ -4128,7 +4159,7 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case path_state::quoted_string_escape_char:
+                    case expr_state::quoted_string_escape_char:
                         switch (*p_)
                         {
                             case '\"':
@@ -4182,14 +4213,14 @@ namespace detail {
                             case 'u':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::escape_u1;
+                                state_stack_.back() = expr_state::escape_u1;
                                 break;
                             default:
                                 ec = jmespath_errc::illegal_escaped_character;
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::escape_u1:
+                    case expr_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
@@ -4197,9 +4228,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u2;
+                        state_stack_.back() = expr_state::escape_u2;
                         break;
-                    case path_state::escape_u2:
+                    case expr_state::escape_u2:
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
@@ -4207,9 +4238,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u3;
+                        state_stack_.back() = expr_state::escape_u3;
                         break;
-                    case path_state::escape_u3:
+                    case expr_state::escape_u3:
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
@@ -4217,9 +4248,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u4;
+                        state_stack_.back() = expr_state::escape_u4;
                         break;
-                    case path_state::escape_u4:
+                    case expr_state::escape_u4:
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
@@ -4229,7 +4260,7 @@ namespace detail {
                         {
                             ++p_;
                             ++column_;
-                            state_stack_.back() = path_state::escape_expect_surrogate_pair1;
+                            state_stack_.back() = expr_state::escape_expect_surrogate_pair1;
                         }
                         else
                         {
@@ -4239,33 +4270,33 @@ namespace detail {
                             state_stack_.pop_back();
                         }
                         break;
-                    case path_state::escape_expect_surrogate_pair1:
+                    case expr_state::escape_expect_surrogate_pair1:
                         switch (*p_)
                         {
                             case '\\': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::escape_expect_surrogate_pair2;
+                                state_stack_.back() = expr_state::escape_expect_surrogate_pair2;
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::escape_expect_surrogate_pair2:
+                    case expr_state::escape_expect_surrogate_pair2:
                         switch (*p_)
                         {
                             case 'u': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::escape_u5;
+                                state_stack_.back() = expr_state::escape_u5;
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::escape_u5:
+                    case expr_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
@@ -4273,9 +4304,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u6;
+                        state_stack_.back() = expr_state::escape_u6;
                         break;
-                    case path_state::escape_u6:
+                    case expr_state::escape_u6:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
@@ -4283,9 +4314,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u7;
+                        state_stack_.back() = expr_state::escape_u7;
                         break;
-                    case path_state::escape_u7:
+                    case expr_state::escape_u7:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
@@ -4293,9 +4324,9 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = path_state::escape_u8;
+                        state_stack_.back() = expr_state::escape_u8;
                         break;
-                    case path_state::escape_u8:
+                    case expr_state::escape_u8:
                     {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
@@ -4309,7 +4340,7 @@ namespace detail {
                         ++column_;
                         break;
                     }
-                    case path_state::raw_string: 
+                    case expr_state::raw_string: 
                         switch (*p_)
                         {
                             case '\'':
@@ -4323,7 +4354,7 @@ namespace detail {
                                 break;
                             }
                             case '\\':
-                                state_stack_.emplace_back(path_state::raw_string_escape_char);
+                                state_stack_.emplace_back(expr_state::raw_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4334,7 +4365,7 @@ namespace detail {
                                 break;
                         };
                         break;
-                    case path_state::literal: 
+                    case expr_state::literal: 
                         switch (*p_)
                         {
                             case '`':
@@ -4384,21 +4415,21 @@ namespace detail {
                                 break;
                         };
                         break;
-                    case path_state::number:
+                    case expr_state::number:
                         switch(*p_)
                         {
                             case '-':
                                 buffer.push_back(*p_);
-                                state_stack_.back() = path_state::digit;
+                                state_stack_.back() = expr_state::digit;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.back() = path_state::digit;
+                                state_stack_.back() = expr_state::digit;
                                 break;
                         }
                         break;
-                    case path_state::digit:
+                    case expr_state::digit:
                         switch(*p_)
                         {
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -4412,13 +4443,13 @@ namespace detail {
                         }
                         break;
 
-                    case path_state::bracket_specifier:
+                    case expr_state::bracket_specifier:
                         switch(*p_)
                         {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expect_rbracket;
+                                state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4432,29 +4463,29 @@ namespace detail {
                             case '?':
                                 push_token(token(begin_filter_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::filter;
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::filter;
+                                state_stack_.emplace_back(expr_state::rhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ':': // slice_expression
-                                state_stack_.back() = path_state::rhs_slice_expression_stop ;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.back() = expr_state::rhs_slice_expression_stop ;
+                                state_stack_.emplace_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
                             // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::index_or_slice_expression;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.back() = expr_state::index_or_slice_expression;
+                                state_stack_.emplace_back(expr_state::number);
                                 break;
                             default:
                                 ec = jmespath_errc::expected_index_expression;
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::bracket_specifier_or_multi_select_list:
+                    case expr_state::bracket_specifier_or_multi_select_list:
                         switch(*p_)
                         {
                             case '*':
@@ -4465,32 +4496,32 @@ namespace detail {
                                 }
                                 if (*(p_+1) == ']')
                                 {
-                                    state_stack_.back() = path_state::bracket_specifier;
+                                    state_stack_.back() = expr_state::bracket_specifier;
                                 }
                                 else
                                 {
                                     push_token(token(begin_multi_select_list_arg), ec);
                                     if (ec) {return jmespath_expression();}
-                                    state_stack_.back() = path_state::multi_select_list;
-                                    state_stack_.emplace_back(path_state::lhs_expression);                                
+                                    state_stack_.back() = expr_state::multi_select_list;
+                                    state_stack_.emplace_back(expr_state::lhs_expression);                                
                                 }
                                 break;
                             case ']': // []
                             case '?':
                             case ':': // slice_expression
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::bracket_specifier;
+                                state_stack_.back() = expr_state::bracket_specifier;
                                 break;
                             default:
                                 push_token(token(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::multi_select_list;
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::multi_select_list;
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
 
-                    case path_state::expect_multi_select_list:
+                    case expr_state::expect_multi_select_list:
                         switch(*p_)
                         {
                             case ']':
@@ -4502,20 +4533,20 @@ namespace detail {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expect_rbracket;
+                                state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::multi_select_list;
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::multi_select_list;
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
 
-                    case path_state::multi_select_hash:
+                    case expr_state::multi_select_hash:
                         switch(*p_)
                         {
                             case '*':
@@ -4525,12 +4556,12 @@ namespace detail {
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 break;
                             default:
-                                state_stack_.back() = path_state::key_val_expr;
+                                state_stack_.back() = expr_state::key_val_expr;
                                 break;
                         }
                         break;
 
-                    case path_state::index_or_slice_expression:
+                    case expr_state::index_or_slice_expression:
                         switch(*p_)
                         {
                             case ']':
@@ -4573,8 +4604,8 @@ namespace detail {
                                     slic.start_ = val;
                                     buffer.clear();
                                 }
-                                state_stack_.back() = path_state::rhs_slice_expression_stop;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.back() = expr_state::rhs_slice_expression_stop;
+                                state_stack_.emplace_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4584,7 +4615,7 @@ namespace detail {
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::rhs_slice_expression_stop :
+                    case expr_state::rhs_slice_expression_stop :
                     {
                         if (!buffer.empty())
                         {
@@ -4609,8 +4640,8 @@ namespace detail {
                                 ++column_;
                                 break;
                             case ':':
-                                state_stack_.back() = path_state::rhs_slice_expression_step;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.back() = expr_state::rhs_slice_expression_step;
+                                state_stack_.emplace_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4620,7 +4651,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::rhs_slice_expression_step:
+                    case expr_state::rhs_slice_expression_step:
                     {
                         if (!buffer.empty())
                         {
@@ -4656,7 +4687,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_rbracket:
+                    case expr_state::expect_rbracket:
                     {
                         switch(*p_)
                         {
@@ -4671,7 +4702,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_rparen:
+                    case expr_state::expect_rparen:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -4682,14 +4713,14 @@ namespace detail {
                                 ++column_;
                                 push_token(rparen_arg, ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::rhs_expression;
+                                state_stack_.back() = expr_state::rhs_expression;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rparen;
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::key_val_expr: 
+                    case expr_state::key_val_expr: 
                     {
                         switch (*p_)
                         {
@@ -4697,24 +4728,24 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::expect_colon;
-                                state_stack_.emplace_back(path_state::key_expr);
-                                state_stack_.emplace_back(path_state::quoted_string);
+                                state_stack_.back() = expr_state::expect_colon;
+                                state_stack_.emplace_back(expr_state::key_expr);
+                                state_stack_.emplace_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = path_state::expect_colon;
-                                state_stack_.emplace_back(path_state::raw_string);
+                                state_stack_.back() = expr_state::expect_colon;
+                                state_stack_.emplace_back(expr_state::raw_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = path_state::expect_colon;
-                                    state_stack_.emplace_back(path_state::key_expr);
-                                    state_stack_.emplace_back(path_state::unquoted_string);
+                                    state_stack_.back() = expr_state::expect_colon;
+                                    state_stack_.emplace_back(expr_state::key_expr);
+                                    state_stack_.emplace_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -4728,7 +4759,7 @@ namespace detail {
                         };
                         break;
                     }
-                    case path_state::cmp_lt_or_lte:
+                    case expr_state::cmp_lt_or_lte:
                     {
                         switch(*p_)
                         {
@@ -4749,7 +4780,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::cmp_gt_or_gte:
+                    case expr_state::cmp_gt_or_gte:
                     {
                         switch(*p_)
                         {
@@ -4770,7 +4801,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::cmp_eq:
+                    case expr_state::cmp_eq:
                     {
                         switch(*p_)
                         {
@@ -4788,7 +4819,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::cmp_ne:
+                    case expr_state::cmp_ne:
                     {
                         switch(*p_)
                         {
@@ -4806,7 +4837,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_dot:
+                    case expr_state::expect_dot:
                     {
                         switch(*p_)
                         {
@@ -4824,7 +4855,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_pipe_or_or:
+                    case expr_state::expect_pipe_or_or:
                     {
                         switch(*p_)
                         {
@@ -4844,7 +4875,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_and:
+                    case expr_state::expect_and:
                     {
                         switch(*p_)
                         {
@@ -4862,7 +4893,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::multi_select_list:
+                    case expr_state::multi_select_list:
                     {
                         switch(*p_)
                         {
@@ -4872,15 +4903,15 @@ namespace detail {
                             case ',':
                                 push_token(token(separator_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[':
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::sub_expression);
+                                state_stack_.emplace_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4888,8 +4919,8 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_pipe_or_or);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::expect_pipe_or_or);
                                 break;
                             }
                             case ']':
@@ -4908,7 +4939,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::filter:
+                    case expr_state::filter:
                     {
                         switch(*p_)
                         {
@@ -4930,7 +4961,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_rbrace:
+                    case expr_state::expect_rbrace:
                     {
                         switch(*p_)
                         {
@@ -4940,16 +4971,16 @@ namespace detail {
                             case ',':
                                 push_token(token(separator_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::key_val_expr; 
+                                state_stack_.back() = expr_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[':
                             case '{':
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::sub_expression);
+                                state_stack_.emplace_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4968,7 +4999,7 @@ namespace detail {
                         }
                         break;
                     }
-                    case path_state::expect_colon:
+                    case expr_state::expect_colon:
                     {
                         switch(*p_)
                         {
@@ -4976,8 +5007,8 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ':':
-                                state_stack_.back() = path_state::expect_rbrace;
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.back() = expr_state::expect_rbrace;
+                                state_stack_.emplace_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5000,7 +5031,7 @@ namespace detail {
             {
                 switch (state_stack_.back())
                 {
-                    case path_state::rhs_expression:
+                    case expr_state::rhs_expression:
                         if (state_stack_.size() > 1)
                         {
                             state_stack_.pop_back();
@@ -5011,17 +5042,17 @@ namespace detail {
                             return jmespath_expression();
                         }
                         break;
-                    case path_state::val_expr:
+                    case expr_state::val_expr:
                         push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back(); 
                         break;
-                    case path_state::identifier_or_function_expr:
+                    case expr_state::identifier_or_function_expr:
                         push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back(); 
                         break;
-                    case path_state::unquoted_string: 
+                    case expr_state::unquoted_string: 
                         state_stack_.pop_back(); 
                         break;
                     default:
@@ -5031,7 +5062,7 @@ namespace detail {
                 }
             }
 
-            if (!(state_stack_.size() == 1 && state_stack_.back() == path_state::rhs_expression))
+            if (!(state_stack_.size() == 1 && state_stack_.back() == expr_state::rhs_expression))
             {
                 ec = jmespath_errc::unexpected_end_of_input;
                 return jmespath_expression();
