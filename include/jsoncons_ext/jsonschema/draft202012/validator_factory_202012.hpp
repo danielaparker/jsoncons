@@ -396,7 +396,7 @@ namespace draft202012 {
 
                     if ((*it).value().type() == json_type::array_value) 
                     {
-                        validators.emplace_back(make_prefix_items_validator(context, (*it).value(), sch, local_anchor_dict));
+                        validators.emplace_back(this->make_prefix_items_validator(context, (*it).value(), sch, local_anchor_dict));
                     } 
                 }
                 else
@@ -471,41 +471,6 @@ namespace draft202012 {
                 std::move(id),
                 std::move(validators), std::move(unevaluated_properties_val), std::move(unevaluated_items_val), 
                 std::move(defs), std::move(default_value), std::move(dynamic_anchor), std::move(anchor_schema_map));
-        }
-
-        std::unique_ptr<prefix_items_validator<Json>> make_prefix_items_validator(const compilation_context& context, 
-            const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
-        {
-            std::vector<schema_validator_ptr_type> prefix_item_validators;
-            std::unique_ptr<items_keyword<Json>> items_val;
-
-            uri schema_location{context.make_schema_location("prefixItems")};
-
-            if (sch.type() == json_type::array_value) 
-            {
-                std::size_t c = 0;
-                for (const auto& subsch : sch.array_range())
-                {
-                    std::string sub_keys[] = {"prefixItems", std::to_string(c++)};
-
-                    prefix_item_validators.emplace_back(this->make_cross_draft_schema_validator(context, subsch, sub_keys, anchor_dict));
-                }
-
-                auto it = parent.find("items");
-                if (it != parent.object_range().end()) 
-                {
-                    uri items_location{context.make_schema_location("items")};
-                    std::string sub_keys[] = { "additionalItems" };
-
-                    items_val = jsoncons::make_unique<items_keyword<Json>>("items", parent, items_location,
-                        context.get_custom_message("items"),
-                        this->make_cross_draft_schema_validator(context, (*it).value(), sub_keys, anchor_dict));
-                }
-            }
-
-            return jsoncons::make_unique<prefix_items_validator<Json>>("prefixItems", parent, schema_location,  
-                context.get_custom_message("prefixItems"),
-                std::move(prefix_item_validators), std::move(items_val));
         }
 
 #if defined(JSONCONS_HAS_STD_REGEX)
