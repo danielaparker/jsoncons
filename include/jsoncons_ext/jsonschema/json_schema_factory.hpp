@@ -31,12 +31,12 @@ namespace jsonschema {
         {
         }
             
-        std::unique_ptr<validator_factory<Json>> operator()(Json sch, 
+        std::unique_ptr<keyword_validator_factory<Json>> operator()(Json sch, 
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) const
         {
-            std::unique_ptr<validator_factory<Json>> factory;
+            std::unique_ptr<keyword_validator_factory<Json>> factory;
 
             if (sch.is_object())
             {
@@ -67,7 +67,7 @@ namespace jsonschema {
             return factory;
         }
 
-        std::unique_ptr<validator_factory<Json>> get_default_schema_factory(Json&& sch,
+        std::unique_ptr<keyword_validator_factory<Json>> get_default_schema_factory(Json&& sch,
             const evaluation_options& options, 
             schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
@@ -104,12 +104,12 @@ namespace jsonschema {
             }
         }
         
-        std::unique_ptr<validator_factory<Json>> get_factory(Json&& sch, const jsoncons::string_view& schema_id,
+        std::unique_ptr<keyword_validator_factory<Json>> get_factory(Json&& sch, const jsoncons::string_view& schema_id,
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) const
         {
-            std::unique_ptr<validator_factory<Json>> factory;
+            std::unique_ptr<keyword_validator_factory<Json>> factory;
 
             if (schema_id == schema_version::draft202012())
             {
@@ -143,11 +143,11 @@ namespace jsonschema {
             return factory;
         }
         
-        std::unique_ptr<validator_factory<Json>> get_factory_from_meta_schema(Json&& sch, const jsoncons::string_view& schema_id,
+        std::unique_ptr<keyword_validator_factory<Json>> get_factory_from_meta_schema(Json&& sch, const jsoncons::string_view& schema_id,
             const evaluation_options& options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) const
         {
-            std::unique_ptr<validator_factory<Json>> factory;
+            std::unique_ptr<keyword_validator_factory<Json>> factory;
 
             bool found = false;
             jsoncons::uri uri{ std::string(schema_id) };
@@ -222,10 +222,10 @@ namespace jsonschema {
         
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>, resolver}};
-        auto validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto keyword_validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
 
-        validator_factory->build_schema(retrieval_uri);
-        return json_schema<Json>(validator_factory->get_schema_validator());
+        keyword_validator_factory->build_schema(retrieval_uri);
+        return json_schema<Json>(keyword_validator_factory->get_schema_validator());
     }
 
     template <typename Json>
@@ -238,10 +238,10 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>}};
-        auto validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto keyword_validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
 
-        validator_factory->build_schema(retrieval_uri);
-        return json_schema<Json>(validator_factory->get_schema_validator());
+        keyword_validator_factory->build_schema(retrieval_uri);
+        return json_schema<Json>(keyword_validator_factory->get_schema_validator());
     }
 
     template <typename Json,typename SchemaResolver>
@@ -255,10 +255,10 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>, resolver}};
-        auto validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto keyword_validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
 
-        validator_factory->build_schema();
-        return json_schema<Json>(validator_factory->get_schema_validator());
+        keyword_validator_factory->build_schema();
+        return json_schema<Json>(keyword_validator_factory->get_schema_validator());
     }
 
     template <typename Json>
@@ -271,10 +271,10 @@ namespace jsonschema {
 
         std::unordered_map<std::string,bool> vocabulary{};
         std::vector<resolve_uri_type<Json>> resolve_funcs = {{meta_resolver<Json>}};
-        auto validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
+        auto keyword_validator_factory = factory_factory(std::move(sch), options, &schema_store, resolve_funcs, vocabulary);
 
-        validator_factory->build_schema();
-        return json_schema<Json>(validator_factory->get_schema_validator());
+        keyword_validator_factory->build_schema();
+        return json_schema<Json>(keyword_validator_factory->get_schema_validator());
     }
 
 } // namespace jsonschema
