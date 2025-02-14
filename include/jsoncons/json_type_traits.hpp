@@ -1296,6 +1296,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_type_traits<Json, basic_bigint<Allocator>>
     {
     public:
+        using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
 
         static bool is(const Json& j) noexcept
@@ -1335,6 +1336,13 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
         }
         
         static Json to_json(const basic_bigint<Allocator>& val)
+        {
+            std::basic_string<char_type> s;
+            val.write_string(s);
+            return Json(s,semantic_tag::bigint);
+        }
+
+        static Json to_json(const basic_bigint<Allocator>& val, const allocator_type&)
         {
             std::basic_string<char_type> s;
             val.write_string(s);
