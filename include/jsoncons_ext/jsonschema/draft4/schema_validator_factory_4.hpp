@@ -32,7 +32,7 @@ namespace jsonschema {
 namespace draft4 {
 
     template <typename Json>
-    class validator_factory_4 : public keyword_validator_factory<Json> 
+    class schema_validator_factory_4 : public keyword_validator_factory<Json> 
     {
     public:
         using schema_store_type = typename keyword_validator_factory<Json>::schema_store_type;
@@ -48,7 +48,7 @@ namespace draft4 {
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
 
     public:
-        validator_factory_4(Json&& sch, const validator_factory_factory_type& factory_factory, 
+        schema_validator_factory_4(Json&& sch, const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs) 
             : keyword_validator_factory<Json>(schema_version::draft4(), std::move(sch), factory_factory, options, schema_store_ptr, resolve_funcs)
@@ -56,10 +56,10 @@ namespace draft4 {
             init();
         }
 
-        validator_factory_4(const validator_factory_4&) = delete;
-        validator_factory_4& operator=(const validator_factory_4&) = delete;
-        validator_factory_4(validator_factory_4&&) = default;
-        validator_factory_4& operator=(validator_factory_4&&) = default;
+        schema_validator_factory_4(const schema_validator_factory_4&) = delete;
+        schema_validator_factory_4& operator=(const schema_validator_factory_4&) = delete;
+        schema_validator_factory_4(schema_validator_factory_4&&) = default;
+        schema_validator_factory_4& operator=(schema_validator_factory_4&&) = default;
 
         void init()
         {

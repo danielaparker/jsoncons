@@ -32,7 +32,7 @@ namespace jsonschema {
 namespace draft202012 {
 
     template <typename Json>
-    class validator_factory_202012 : public keyword_validator_factory<Json> 
+    class schema_validator_factory_202012 : public keyword_validator_factory<Json> 
     {
     public:
         using schema_store_type = typename keyword_validator_factory<Json>::schema_store_type;
@@ -89,7 +89,7 @@ namespace draft202012 {
         bool include_format_;
 
     public:
-        validator_factory_202012(Json&& sch, const validator_factory_factory_type& factory_factory, 
+        schema_validator_factory_202012(Json&& sch, const validator_factory_factory_type& factory_factory, 
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
@@ -123,10 +123,10 @@ namespace draft202012 {
             init();
         }
 
-        validator_factory_202012(const validator_factory_202012&) = delete;
-        validator_factory_202012& operator=(const validator_factory_202012&) = delete;
-        validator_factory_202012(validator_factory_202012&&) = default;
-        validator_factory_202012& operator=(validator_factory_202012&&) = default;
+        schema_validator_factory_202012(const schema_validator_factory_202012&) = delete;
+        schema_validator_factory_202012& operator=(const schema_validator_factory_202012&) = delete;
+        schema_validator_factory_202012(schema_validator_factory_202012&&) = default;
+        schema_validator_factory_202012& operator=(schema_validator_factory_202012&&) = default;
 
         void init()
         {

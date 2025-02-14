@@ -75,27 +75,27 @@ namespace jsonschema {
         {
             if (options.default_version() == schema_version::draft202012())
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft202012::validator_factory_202012<Json>>(std::move(sch), *this, 
+                return jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_validator_factory_202012<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs, vocabulary);
             }
             else if (options.default_version() == schema_version::draft201909())
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft201909::validator_factory_201909<Json>>(std::move(sch), *this, 
+                return jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_validator_factory_201909<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs, vocabulary);
             }
             else if (options.default_version() == schema_version::draft7())
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft7::validator_factory_7<Json>>(std::move(sch), *this, 
+                return jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_7<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else if (options.default_version() == schema_version::draft6())
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft6::validator_factory_6<Json>>(std::move(sch), *this, 
+                return jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_validator_factory_6<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else if (options.default_version() == schema_version::draft4())
             {
-                return jsoncons::make_unique<jsoncons::jsonschema::draft4::validator_factory_4<Json>>(std::move(sch), *this, 
+                return jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_validator_factory_4<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else
@@ -113,27 +113,27 @@ namespace jsonschema {
 
             if (schema_id == schema_version::draft202012())
             {
-                factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::validator_factory_202012<Json>>(std::move(sch), *this, 
+                factory = jsoncons::make_unique<jsoncons::jsonschema::draft202012::schema_validator_factory_202012<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs, vocabulary);
             }
             else if (schema_id == schema_version::draft201909())
             {
-                factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::validator_factory_201909<Json>>(std::move(sch), *this, 
+                factory = jsoncons::make_unique<jsoncons::jsonschema::draft201909::schema_validator_factory_201909<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs, vocabulary);
             }
             else if (schema_id == schema_version::draft7())
             {
-                factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::validator_factory_7<Json>>(std::move(sch), *this, 
+                factory = jsoncons::make_unique<jsoncons::jsonschema::draft7::schema_validator_factory_7<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else if (schema_id == schema_version::draft6())
             {
-                factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::validator_factory_6<Json>>(std::move(sch), *this, 
+                factory = jsoncons::make_unique<jsoncons::jsonschema::draft6::schema_validator_factory_6<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else if (schema_id == schema_version::draft4())
             {
-                factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::validator_factory_4<Json>>(std::move(sch), *this, 
+                factory = jsoncons::make_unique<jsoncons::jsonschema::draft4::schema_validator_factory_4<Json>>(std::move(sch), *this, 
                     options, schema_store_ptr, resolve_funcs);
             }
             else
