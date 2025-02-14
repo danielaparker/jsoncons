@@ -1185,7 +1185,9 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
                                                     !std::is_polymorphic<ValueType>::value
     >::type>
     {
-        static bool is(const Json& j) noexcept 
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
         {
             return j.is_null() || j.template is<ValueType>();
         }
@@ -1195,11 +1197,12 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_null() ? std::shared_ptr<ValueType>(nullptr) : std::make_shared<ValueType>(j.template as<ValueType>());
         }
 
-        static Json to_json(const std::shared_ptr<ValueType>& ptr) 
+        static Json to_json(const std::shared_ptr<ValueType>& ptr, 
+            const allocator_type& alloc = allocator_type())
         {
             if (ptr.get() != nullptr) 
             {
-                Json j(*ptr);
+                Json j(*ptr, alloc);
                 return j;
             }
             else 
@@ -1215,7 +1218,9 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
                                                     !std::is_polymorphic<ValueType>::value
     >::type>
     {
-        static bool is(const Json& j) noexcept 
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
         {
             return j.is_null() || j.template is<ValueType>();
         }
@@ -1225,11 +1230,12 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_null() ? std::unique_ptr<ValueType>(nullptr) : jsoncons::make_unique<ValueType>(j.template as<ValueType>());
         }
 
-        static Json to_json(const std::unique_ptr<ValueType>& ptr) 
+        static Json to_json(const std::unique_ptr<ValueType>& ptr,
+            const allocator_type& alloc = allocator_type())
         {
             if (ptr.get() != nullptr) 
             {
-                Json j(*ptr);
+                Json j(*ptr, alloc);
                 return j;
             }
             else 
@@ -1243,6 +1249,7 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
     struct json_type_traits<Json, jsoncons::optional<T>,
                             typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<T>>::value>::type>
     {
+        using allocator_type = typename Json::allocator_type;
     public:
         static bool is(const Json& j) noexcept
         {
@@ -1254,9 +1261,10 @@ has_can_convert = extension_traits::is_detected<traits_can_convert_t, Json, T>;
             return j.is_null() ? jsoncons::optional<T>() : jsoncons::optional<T>(j.template as<T>());
         }
         
-        static Json to_json(const jsoncons::optional<T>& val)
+        static Json to_json(const jsoncons::optional<T>& val, 
+            const allocator_type& alloc = allocator_type())
         {
-            return val.has_value() ? Json(*val) : Json::null();
+            return val.has_value() ? Json(*val, alloc) : Json::null();
         }
     };
 
