@@ -42,7 +42,7 @@ namespace draft6 {
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
     private:
 
-        using keyword_factory_type = std::function<keyword_validator_ptr_type(const compilation_context& context, 
+        using keyword_factory_type = std::function<keyword_validator_ptr_type(const compilation_context<Json>& context, 
             const Json& sch, const Json& parent, anchor_uri_map_type&)>;
 
         std::unordered_map<std::string,keyword_factory_type> keyword_factory_map_;
@@ -64,69 +64,69 @@ namespace draft6 {
         void init()
         {
             keyword_factory_map_.emplace("type", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_type_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_type_validator(context, sch, parent);});
             keyword_factory_map_.emplace("contentEncoding", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_encoding_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_encoding_validator(context, sch, parent);});
             keyword_factory_map_.emplace("contentMediaType", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_content_media_type_validator(context, sch, parent);});
             if (this->options().require_format_validation())
             {
                 keyword_factory_map_.emplace("format", 
-                    [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_format_validator(context, sch, parent);});
+                    [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_format_validator(context, sch, parent);});
             }
 #if defined(JSONCONS_HAS_STD_REGEX)
             keyword_factory_map_.emplace("pattern", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_pattern_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_pattern_validator(context, sch, parent);});
 #endif
             keyword_factory_map_.emplace("maxItems", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_items_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_items_validator(context, sch, parent);});
             keyword_factory_map_.emplace("minItems", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_items_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_items_validator(context, sch, parent);});
             keyword_factory_map_.emplace("maxProperties", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_properties_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_properties_validator(context, sch, parent);});
             keyword_factory_map_.emplace("minProperties", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_properties_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_properties_validator(context, sch, parent);});
             keyword_factory_map_.emplace("contains", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict)
                         {return this->make_contains_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("uniqueItems", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_unique_items_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_unique_items_validator(context, sch, parent);});
             keyword_factory_map_.emplace("maxLength", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_length_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_max_length_validator(context, sch, parent);});
             keyword_factory_map_.emplace("minLength", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_length_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_min_length_validator(context, sch, parent);});
             keyword_factory_map_.emplace("not", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_not_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_not_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("maximum", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_maximum_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_maximum_validator(context, sch, parent);});
             keyword_factory_map_.emplace("exclusiveMaximum", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_exclusive_maximum_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_exclusive_maximum_validator(context, sch, parent);});
             keyword_factory_map_.emplace("minimum", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_minimum_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_minimum_validator(context, sch, parent);});
             keyword_factory_map_.emplace("exclusiveMinimum", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_exclusive_minimum_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_exclusive_minimum_validator(context, sch, parent);});
             keyword_factory_map_.emplace("multipleOf", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_multiple_of_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_multiple_of_validator(context, sch, parent);});
             keyword_factory_map_.emplace("const", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_const_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_const_validator(context, sch, parent);});
             keyword_factory_map_.emplace("enum", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_enum_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_enum_validator(context, sch, parent);});
             keyword_factory_map_.emplace("allOf", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_all_of_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_all_of_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("anyOf", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_any_of_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_any_of_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("oneOf", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_one_of_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_one_of_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("dependencies", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_dependencies_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("propertyNames", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_property_names_validator(context, sch, parent, anchor_dict);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type& anchor_dict){return this->make_property_names_validator(context, sch, parent, anchor_dict);});
             keyword_factory_map_.emplace("required", 
-                [&](const compilation_context& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_required_validator(context, sch, parent);});
+                [&](const compilation_context<Json>& context, const Json& sch, const Json& parent, anchor_uri_map_type&){return this->make_required_validator(context, sch, parent);});
         }
 
         schema_validator_ptr_type make_schema_validator( 
-            const compilation_context& context, const Json& sch, jsoncons::span<const std::string> keys, 
+            const compilation_context<Json>& context, const Json& sch, jsoncons::span<const std::string> keys, 
             anchor_uri_map_type& anchor_dict) override
         {
             auto new_context = make_compilation_context(context, sch, keys);
@@ -198,7 +198,7 @@ namespace draft6 {
             return schema_validator_ptr;
         }
 
-        schema_validator_ptr_type make_object_schema_validator(const compilation_context& context, 
+        schema_validator_ptr_type make_object_schema_validator(const compilation_context<Json>& context, 
             const Json& sch, anchor_uri_map_type& anchor_dict)
         {
             jsoncons::optional<jsoncons::uri> id = context.id();
@@ -292,7 +292,7 @@ namespace draft6 {
        
     private:
 
-        compilation_context make_compilation_context(const compilation_context& parent, 
+        compilation_context<Json> make_compilation_context(const compilation_context<Json>& parent, 
             const Json& sch, jsoncons::span<const std::string> keys) const override
         {
             // Exclude uri's that are not plain name identifiers
@@ -364,7 +364,7 @@ namespace draft6 {
             }
 */
 
-            return compilation_context(new_uris, id, custom_messages, custom_message);
+            return compilation_context<Json>(new_uris, id, custom_messages, custom_message);
         }
     private:
         static const std::unordered_set<std::string>& known_keywords()

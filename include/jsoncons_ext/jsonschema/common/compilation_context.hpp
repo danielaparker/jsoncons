@@ -9,28 +9,34 @@
 
 #include <random>
 #include <vector>
+#include <unordered_map>
 
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/utility/uri.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/uri_wrapper.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
 
+    template <typename Json>
+    class keyword_validator_factory;
+
+    template <typename Json>
     class compilation_context
     {
+        using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
+        using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
+
+        keyword_validator_factory<Json>* factory_{nullptr};
         uri_wrapper base_uri_;
         std::vector<uri_wrapper> uris_;
         jsoncons::optional<uri> id_;
         std::unordered_map<std::string,std::string> custom_messages_;
         std::string custom_message_;
     public:
-
-        compilation_context()
-        {
-        }
 
         explicit compilation_context(const uri_wrapper& retrieval_uri,
             const std::unordered_map<std::string,std::string>& custom_messages = std::unordered_map<std::string,std::string>{})
@@ -64,6 +70,12 @@ namespace jsonschema {
                 uris_.push_back(uri_wrapper{"#"});
             }
             base_uri_ = uris_.back();
+        }
+              
+        schema_validator_ptr_type make_cross_draft_schema_validator(
+            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
+        {
+            return factory_->make_cross_draft_schema_validator(*this, keys, anchor_dict);
         }
         
         std::string get_custom_message(const std::string& message_key) const
