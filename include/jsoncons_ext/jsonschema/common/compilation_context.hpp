@@ -22,15 +22,11 @@ namespace jsoncons {
 namespace jsonschema {
 
     template <typename Json>
-    class schema_validator_factory_base;
-
-    template <typename Json>
     class compilation_context
     {
         using anchor_uri_map_type = std::unordered_map<std::string,uri_wrapper>;
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
 
-        schema_validator_factory_base<Json>* factory_{nullptr};
         uri_wrapper base_uri_;
         std::vector<uri_wrapper> uris_;
         jsoncons::optional<uri> id_;
@@ -70,12 +66,6 @@ namespace jsonschema {
                 uris_.push_back(uri_wrapper{"#"});
             }
             base_uri_ = uris_.back();
-        }
-              
-        schema_validator_ptr_type make_cross_draft_schema_validator(
-            const Json& sch, jsoncons::span<const std::string> keys, anchor_uri_map_type& anchor_dict)
-        {
-            return factory_->make_cross_draft_schema_validator(*this, keys, anchor_dict);
         }
         
         std::string get_custom_message(const std::string& message_key) const

@@ -19,6 +19,7 @@
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/evaluation_options.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator_factory_base.hpp>
 
 namespace jsoncons {
 namespace jsonschema {
@@ -89,7 +90,8 @@ namespace jsonschema {
                 pattern_properties.emplace_back(
                     std::make_pair(
                         std::regex(prop.key(), std::regex::ECMAScript),
-                        factory_->make_schema_validator(context, prop.value(), {}, anchor_dict)));
+                        factory_->make_cross_draft_schema_validator(context, prop.value(), {}, anchor_dict)));
+                
             }
 
             return jsoncons::make_unique<pattern_properties_validator<Json>>(parent, std::move(schema_location),
