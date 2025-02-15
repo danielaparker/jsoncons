@@ -18,7 +18,7 @@
 
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/common/compilation_context.hpp>
-#include <jsoncons_ext/jsonschema/common/keyword_validator_factory.hpp>
+#include <jsoncons_ext/jsonschema/common/schema_validator_factory_base.hpp>
 #include <jsoncons_ext/jsonschema/common/schema_validator.hpp>
 #include <jsoncons_ext/jsonschema/draft202012/schema_draft202012.hpp>
 #include <jsoncons_ext/jsonschema/json_schema.hpp>
@@ -32,11 +32,11 @@ namespace jsonschema {
 namespace draft202012 {
 
     template <typename Json>
-    class schema_validator_factory_202012 : public keyword_validator_factory<Json> 
+    class schema_validator_factory_202012 : public schema_validator_factory_base<Json> 
     {
     public:
-        using schema_store_type = typename keyword_validator_factory<Json>::schema_store_type;
-        using validator_factory_factory_type = typename keyword_validator_factory<Json>::validator_factory_factory_type;
+        using schema_store_type = typename schema_validator_factory_base<Json>::schema_store_type;
+        using validator_factory_factory_type = typename schema_validator_factory_base<Json>::validator_factory_factory_type;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
         using schema_validator_ptr_type = typename std::unique_ptr<schema_validator<Json>>;
         using dynamic_ref_validator_type = dynamic_ref_validator<Json>;
@@ -93,7 +93,7 @@ namespace draft202012 {
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary) 
-            : keyword_validator_factory<Json>(schema_version::draft202012(), std::move(sch),
+            : schema_validator_factory_base<Json>(schema_version::draft202012(), std::move(sch),
                 factory_factory, options, schema_store_ptr, resolve_funcs, vocabulary),
                 include_applicator_(true), include_unevaluated_(true), include_validation_(true), include_format_(true)
         {

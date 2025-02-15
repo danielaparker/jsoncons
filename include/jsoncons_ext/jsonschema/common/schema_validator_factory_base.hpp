@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATOR_FACTORY_HPP
-#define JSONCONS_EXT_JSONSCHEMA_COMMON_KEYWORD_VALIDATOR_FACTORY_HPP
+#ifndef JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_VALIDATOR_FACTORY_BASE_HPP
+#define JSONCONS_EXT_JSONSCHEMA_COMMON_SCHEMA_VALIDATOR_FACTORY_BASE_HPP
 
 #include <cstddef>
 #include <functional>
@@ -27,11 +27,11 @@ namespace jsonschema {
     using resolve_uri_type = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <typename Json>
-    class keyword_validator_factory
+    class schema_validator_factory_base
     {
     public:
         using schema_store_type = std::map<jsoncons::uri, schema_validator<Json>*>;
-        using validator_factory_factory_type = std::function<std::unique_ptr<keyword_validator_factory<Json>>(const Json&,
+        using validator_factory_factory_type = std::function<std::unique_ptr<schema_validator_factory_base<Json>>(const Json&,
             const evaluation_options&,schema_store_type*,const std::vector<resolve_uri_type<Json>>&,
             const std::unordered_map<std::string,bool>&)>;
         using keyword_validator_ptr_type = typename std::unique_ptr<keyword_validator<Json>>;
@@ -59,7 +59,7 @@ namespace jsonschema {
 
     public:
 
-        keyword_validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
+        schema_validator_factory_base(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs)
             : spec_version_(version), factory_factory_(factory_factory), options_(std::move(options)),
@@ -69,7 +69,7 @@ namespace jsonschema {
             root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
         }
 
-        keyword_validator_factory(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
+        schema_validator_factory_base(const std::string& version, Json&& root_schema, const validator_factory_factory_type& factory_factory,
             evaluation_options options, schema_store_type* schema_store_ptr,
             const std::vector<resolve_uri_type<Json>>& resolve_funcs,
             const std::unordered_map<std::string,bool>& vocabulary)
@@ -80,7 +80,7 @@ namespace jsonschema {
             root_schema_ = jsoncons::make_unique<Json>(std::move(root_schema));
         }
 
-        virtual ~keyword_validator_factory() = default;
+        virtual ~schema_validator_factory_base() = default;
 
         const std::unordered_map<std::string,bool>& vocabulary() const {return vocabulary_;}
         
@@ -316,9 +316,9 @@ namespace jsonschema {
                         }
                         else
                         {
-                            auto keyword_validator_factory = factory_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
-                            keyword_validator_factory->build_schema(context.get_base_uri().string());
-                            schema_val = keyword_validator_factory->get_schema_validator();
+                            auto schema_validator_factory_base = factory_factory_(std::move(sch), options_, schema_store_ptr_, resolve_funcs_, vocabulary_);
+                            schema_validator_factory_base->build_schema(context.get_base_uri().string());
+                            schema_val = schema_validator_factory_base->get_schema_validator();
                         }
                     }
                     else
