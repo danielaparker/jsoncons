@@ -86,7 +86,7 @@ namespace jsoncons {
         }
 
         template <typename... Args>
-        key_value(key_type&& name,  Args&& ... args) noexcept
+        key_value(key_type&& name,  Args&& ... args) 
             : key_(std::move(name)), value_(std::forward<Args>(args)...)
         {
         }
