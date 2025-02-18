@@ -528,6 +528,77 @@ namespace jmespath {
         }
     };
 
+namespace detail {
+
+    template <typename Json>
+    class unary_operator
+    {
+        using reference = typename Json::const_reference;
+
+        std::size_t precedence_level_;
+        bool is_right_associative_;
+
+    protected:
+        virtual ~unary_operator() = default; 
+    public:
+        unary_operator(operator_kind oper)
+            : precedence_level_(operator_table::precedence_level(oper)), 
+              is_right_associative_(operator_table::is_right_associative(oper))
+        {
+        }
+
+        std::size_t precedence_level() const 
+        {
+            return precedence_level_;
+        }
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
+
+        virtual reference evaluate(reference val, eval_context<Json>&, std::error_code& ec) const = 0;
+    };
+
+    template <typename Json>
+    class binary_operator
+    {
+        using reference = typename Json::const_reference;
+
+        std::size_t precedence_level_;
+        bool is_right_associative_;
+    protected:
+        virtual ~binary_operator() = default; 
+    public:
+        binary_operator(operator_kind oper)
+            : precedence_level_(operator_table::precedence_level(oper)), 
+              is_right_associative_(operator_table::is_right_associative(oper))
+        {
+        }
+
+
+        std::size_t precedence_level() const 
+        {
+            return precedence_level_;
+        }
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
+
+        virtual reference evaluate(reference lhs, reference rhs, eval_context<Json>&, std::error_code& ec) const = 0;
+
+        virtual std::string to_string(std::size_t indent = 0) const
+        {
+            std::string s;
+            for (std::size_t i = 0; i <= indent; ++i)
+            {
+                s.push_back(' ');
+            }
+            s.append("to_string not implemented\n");
+            return s;
+        }
+    };
+
     enum class token_kind 
     {
         current_node,
@@ -727,7 +798,378 @@ namespace jmespath {
         }
     };
 
-namespace detail {
+    template <typename Json>
+    class token
+    {
+    public:
+        using char_type = typename Json::char_type;
+        using char_traits_type = typename Json::char_traits_type;
+        using string_type = std::basic_string<char_type,char_traits_type>;
+
+        token_kind type_;
+
+        union
+        {
+            std::unique_ptr<expr_base_impl<Json>> expression_;
+            const unary_operator<Json>* unary_operator_;
+            const binary_operator<Json>* binary_operator_;
+            const function_base<Json>* function_;
+            Json value_;
+            string_type key_;
+        };
+    public:
+
+        token(current_node_arg_t) noexcept
+            : type_(token_kind::current_node)
+        {
+        }
+
+        token(end_function_arg_t) noexcept
+            : type_(token_kind::end_function)
+        {
+        }
+
+        token(separator_arg_t) noexcept
+            : type_(token_kind::separator)
+        {
+        }
+
+        token(lparen_arg_t) noexcept
+            : type_(token_kind::lparen)
+        {
+        }
+
+        token(rparen_arg_t) noexcept
+            : type_(token_kind::rparen)
+        {
+        }
+
+        token(end_of_expression_arg_t) noexcept
+            : type_(token_kind::end_of_expression)
+        {
+        }
+
+        token(begin_multi_select_hash_arg_t) noexcept
+            : type_(token_kind::begin_multi_select_hash)
+        {
+        }
+
+        token(end_multi_select_hash_arg_t) noexcept
+            : type_(token_kind::end_multi_select_hash)
+        {
+        }
+
+        token(begin_multi_select_list_arg_t) noexcept
+            : type_(token_kind::begin_multi_select_list)
+        {
+        }
+
+        token(end_multi_select_list_arg_t) noexcept
+            : type_(token_kind::end_multi_select_list)
+        {
+        }
+
+        token(begin_filter_arg_t) noexcept
+            : type_(token_kind::begin_filter)
+        {
+        }
+
+        token(end_filter_arg_t) noexcept
+            : type_(token_kind::end_filter)
+        {
+        }
+
+        token(pipe_arg_t) noexcept
+            : type_(token_kind::pipe)
+        {
+        }
+
+        token(key_arg_t, const string_type& key)
+            : type_(token_kind::key)
+        {
+            new (&key_) string_type(key);
+        }
+
+        token(std::unique_ptr<expr_base<Json>>&& expression)
+            : type_(token_kind::expression)
+        {
+            new (&expression_) std::unique_ptr<expr_base<Json>>(std::move(expression));
+        }
+
+        token(const unary_operator<Json>* expression) noexcept
+            : type_(token_kind::unary_operator),
+              unary_operator_(expression)
+        {
+        }
+
+        token(const binary_operator<Json>* expression) noexcept
+            : type_(token_kind::binary_operator),
+              binary_operator_(expression)
+        {
+        }
+
+        token(const function_base<Json>* function) noexcept
+            : type_(token_kind::function),
+              function_(function)
+        {
+        }
+
+        token(argument_arg_t) noexcept
+            : type_(token_kind::argument)
+        {
+        }
+
+        token(begin_expression_type_arg_t) noexcept
+            : type_(token_kind::begin_expression_type)
+        {
+        }
+
+        token(end_expression_type_arg_t) noexcept
+            : type_(token_kind::end_expression_type)
+        {
+        }
+
+        token(literal_arg_t, Json&& value) noexcept
+            : type_(token_kind::literal), value_(std::move(value))
+        {
+        }
+
+        token(token&& other) noexcept
+        {
+            construct(std::move(other));
+        }
+
+        token& operator=(token&& other) noexcept
+        {
+            if (&other != this)
+            {
+                if (type_ == other.type_)
+                {
+                    switch (type_)
+                    {
+                        case token_kind::expression:
+                            expression_ = std::move(other.expression_);
+                            break;
+                        case token_kind::key:
+                            key_ = std::move(other.key_);
+                            break;
+                        case token_kind::unary_operator:
+                            unary_operator_ = other.unary_operator_;
+                            break;
+                        case token_kind::binary_operator:
+                            binary_operator_ = other.binary_operator_;
+                            break;
+                        case token_kind::function:
+                            function_ = other.function_;
+                            break;
+                        case token_kind::literal:
+                            value_ = std::move(other.value_);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    destroy();
+                    construct(std::move(other));
+                }
+            }
+            return *this;
+        }
+
+        ~token() noexcept
+        {
+            destroy();
+        }
+
+        token_kind type() const
+        {
+            return type_;
+        }
+
+        bool is_lparen() const
+        {
+            return type_ == token_kind::lparen; 
+        }
+
+        bool is_lbrace() const
+        {
+            return type_ == token_kind::begin_multi_select_hash; 
+        }
+
+        bool is_key() const
+        {
+            return type_ == token_kind::key; 
+        }
+
+        bool is_rparen() const
+        {
+            return type_ == token_kind::rparen; 
+        }
+
+        bool is_current_node() const
+        {
+            return type_ == token_kind::current_node; 
+        }
+
+        bool is_projection() const
+        {
+            return type_ == token_kind::expression && expression_->is_projection(); 
+        }
+
+        bool is_expression() const
+        {
+            return type_ == token_kind::expression; 
+        }
+
+        bool is_operator() const
+        {
+            return type_ == token_kind::unary_operator || 
+                   type_ == token_kind::binary_operator; 
+        }
+
+        std::size_t precedence_level() const
+        {
+            switch(type_)
+            {
+                case token_kind::unary_operator:
+                    return unary_operator_->precedence_level();
+                case token_kind::binary_operator:
+                    return binary_operator_->precedence_level();
+                case token_kind::expression:
+                    return expression_->precedence_level();
+                default:
+                    return 0;
+            }
+        }
+
+        jsoncons::optional<std::size_t> arity() const
+        {
+            return type_ == token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
+        }
+
+        bool is_right_associative() const
+        {
+            switch(type_)
+            {
+                case token_kind::unary_operator:
+                    return unary_operator_->is_right_associative();
+                case token_kind::binary_operator:
+                    return binary_operator_->is_right_associative();
+                case token_kind::expression:
+                    return expression_->is_right_associative();
+                default:
+                    return false;
+            }
+        }
+
+        void construct(token<Json>&& other)
+        {
+            type_ = other.type_;
+            switch (type_)
+            {
+                case token_kind::expression:
+                    new (&expression_) std::unique_ptr<expr_base<Json>>(std::move(other.expression_));
+                    break;
+                case token_kind::key:
+                    new (&key_) string_type(std::move(other.key_));
+                    break;
+                case token_kind::unary_operator:
+                    unary_operator_ = other.unary_operator_;
+                    break;
+                case token_kind::binary_operator:
+                    binary_operator_ = other.binary_operator_;
+                    break;
+                case token_kind::function:
+                    function_ = other.function_;
+                    break;
+                case token_kind::literal:
+                    new (&value_) Json(std::move(other.value_));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void destroy() noexcept 
+        {
+            switch(type_)
+            {
+                case token_kind::expression:
+                    expression_.~unique_ptr();
+                    break;
+                case token_kind::key:
+                    key_.~basic_string();
+                    break;
+                case token_kind::literal:
+                    value_.~Json();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        std::string to_string(std::size_t indent = 0) const
+        {
+            switch(type_)
+            {
+                case token_kind::expression:
+                    return expression_->to_string(indent);
+                    break;
+                case token_kind::unary_operator:
+                    return std::string("unary_operator");
+                    break;
+                case token_kind::binary_operator:
+                    return binary_operator_->to_string(indent);
+                    break;
+                case token_kind::current_node:
+                    return std::string("current_node");
+                    break;
+                case token_kind::end_function:
+                    return std::string("end_function");
+                    break;
+                case token_kind::separator:
+                    return std::string("separator");
+                    break;
+                case token_kind::literal:
+                    return std::string("literal");
+                    break;
+                case token_kind::key:
+                    return std::string("key") + key_;
+                    break;
+                case token_kind::begin_multi_select_hash:
+                    return std::string("begin_multi_select_hash");
+                    break;
+                case token_kind::begin_multi_select_list:
+                    return std::string("begin_multi_select_list");
+                    break;
+                case token_kind::begin_filter:
+                    return std::string("begin_filter");
+                    break;
+                case token_kind::pipe:
+                    return std::string("pipe");
+                    break;
+                case token_kind::lparen:
+                    return std::string("lparen");
+                    break;
+                case token_kind::function:
+                    return function_->to_string();
+                case token_kind::argument:
+                    return std::string("argument");
+                    break;
+                case token_kind::begin_expression_type:
+                    return std::string("begin_expression_type");
+                    break;
+                case token_kind::end_expression_type:
+                    return std::string("end_expression_type");
+                    break;
+                default:
+                    return std::string("default");
+                    break;
+            }
+        }
+    };
      
     enum class expr_state 
     {
@@ -817,79 +1259,16 @@ namespace detail {
             return !is_false(ref);
         }
 
-        class unary_operator
-        {
-            std::size_t precedence_level_;
-            bool is_right_associative_;
-
-        protected:
-            virtual ~unary_operator() = default; 
-        public:
-            unary_operator(operator_kind oper)
-                : precedence_level_(operator_table::precedence_level(oper)), 
-                  is_right_associative_(operator_table::is_right_associative(oper))
-            {
-            }
-
-            std::size_t precedence_level() const 
-            {
-                return precedence_level_;
-            }
-            bool is_right_associative() const
-            {
-                return is_right_associative_;
-            }
-
-            virtual reference evaluate(reference val, eval_context<Json>&, std::error_code& ec) const = 0;
-        };
-
-        class not_expression final : public unary_operator
+        class not_expression final : public unary_operator<Json>
         {
         public:
             not_expression()
-                : unary_operator(operator_kind::not_op)
+                : unary_operator<Json>(operator_kind::not_op)
             {}
 
             reference evaluate(reference val, eval_context<Json>& context, std::error_code&) const override
             {
                 return is_false(val) ? context.true_value() : context.false_value();
-            }
-        };
-
-        class binary_operator
-        {
-            std::size_t precedence_level_;
-            bool is_right_associative_;
-        protected:
-            virtual ~binary_operator() = default; 
-        public:
-            binary_operator(operator_kind oper)
-                : precedence_level_(operator_table::precedence_level(oper)), 
-                  is_right_associative_(operator_table::is_right_associative(oper))
-            {
-            }
-
-
-            std::size_t precedence_level() const 
-            {
-                return precedence_level_;
-            }
-            bool is_right_associative() const
-            {
-                return is_right_associative_;
-            }
-
-            virtual reference evaluate(reference lhs, reference rhs, eval_context<Json>&, std::error_code& ec) const = 0;
-
-            virtual std::string to_string(std::size_t indent = 0) const
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("to_string not implemented\n");
-                return s;
             }
         };
 
@@ -2096,377 +2475,7 @@ namespace detail {
             }
         };
 
-        // token
-
-        class token
-        {
-        public:
-            token_kind type_;
-
-            union
-            {
-                std::unique_ptr<expression_type> expression_;
-                const unary_operator* unary_operator_;
-                const binary_operator* binary_operator_;
-                const function_type* function_;
-                Json value_;
-                string_type key_;
-            };
-        public:
-
-            token(current_node_arg_t) noexcept
-                : type_(token_kind::current_node)
-            {
-            }
-
-            token(end_function_arg_t) noexcept
-                : type_(token_kind::end_function)
-            {
-            }
-
-            token(separator_arg_t) noexcept
-                : type_(token_kind::separator)
-            {
-            }
-
-            token(lparen_arg_t) noexcept
-                : type_(token_kind::lparen)
-            {
-            }
-
-            token(rparen_arg_t) noexcept
-                : type_(token_kind::rparen)
-            {
-            }
-
-            token(end_of_expression_arg_t) noexcept
-                : type_(token_kind::end_of_expression)
-            {
-            }
-
-            token(begin_multi_select_hash_arg_t) noexcept
-                : type_(token_kind::begin_multi_select_hash)
-            {
-            }
-
-            token(end_multi_select_hash_arg_t) noexcept
-                : type_(token_kind::end_multi_select_hash)
-            {
-            }
-
-            token(begin_multi_select_list_arg_t) noexcept
-                : type_(token_kind::begin_multi_select_list)
-            {
-            }
-
-            token(end_multi_select_list_arg_t) noexcept
-                : type_(token_kind::end_multi_select_list)
-            {
-            }
-
-            token(begin_filter_arg_t) noexcept
-                : type_(token_kind::begin_filter)
-            {
-            }
-
-            token(end_filter_arg_t) noexcept
-                : type_(token_kind::end_filter)
-            {
-            }
-
-            token(pipe_arg_t) noexcept
-                : type_(token_kind::pipe)
-            {
-            }
-
-            token(key_arg_t, const string_type& key)
-                : type_(token_kind::key)
-            {
-                new (&key_) string_type(key);
-            }
-
-            token(std::unique_ptr<expression_type>&& expression)
-                : type_(token_kind::expression)
-            {
-                new (&expression_) std::unique_ptr<expression_type>(std::move(expression));
-            }
-
-            token(const unary_operator* expression) noexcept
-                : type_(token_kind::unary_operator),
-                  unary_operator_(expression)
-            {
-            }
-
-            token(const binary_operator* expression) noexcept
-                : type_(token_kind::binary_operator),
-                  binary_operator_(expression)
-            {
-            }
-
-            token(const function_type* function) noexcept
-                : type_(token_kind::function),
-                  function_(function)
-            {
-            }
-
-            token(argument_arg_t) noexcept
-                : type_(token_kind::argument)
-            {
-            }
-
-            token(begin_expression_type_arg_t) noexcept
-                : type_(token_kind::begin_expression_type)
-            {
-            }
-
-            token(end_expression_type_arg_t) noexcept
-                : type_(token_kind::end_expression_type)
-            {
-            }
-
-            token(literal_arg_t, Json&& value) noexcept
-                : type_(token_kind::literal), value_(std::move(value))
-            {
-            }
-
-            token(token&& other) noexcept
-            {
-                construct(std::move(other));
-            }
-
-            token& operator=(token&& other) noexcept
-            {
-                if (&other != this)
-                {
-                    if (type_ == other.type_)
-                    {
-                        switch (type_)
-                        {
-                            case token_kind::expression:
-                                expression_ = std::move(other.expression_);
-                                break;
-                            case token_kind::key:
-                                key_ = std::move(other.key_);
-                                break;
-                            case token_kind::unary_operator:
-                                unary_operator_ = other.unary_operator_;
-                                break;
-                            case token_kind::binary_operator:
-                                binary_operator_ = other.binary_operator_;
-                                break;
-                            case token_kind::function:
-                                function_ = other.function_;
-                                break;
-                            case token_kind::literal:
-                                value_ = std::move(other.value_);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        destroy();
-                        construct(std::move(other));
-                    }
-                }
-                return *this;
-            }
-
-            ~token() noexcept
-            {
-                destroy();
-            }
-
-            token_kind type() const
-            {
-                return type_;
-            }
-
-            bool is_lparen() const
-            {
-                return type_ == token_kind::lparen; 
-            }
-
-            bool is_lbrace() const
-            {
-                return type_ == token_kind::begin_multi_select_hash; 
-            }
-
-            bool is_key() const
-            {
-                return type_ == token_kind::key; 
-            }
-
-            bool is_rparen() const
-            {
-                return type_ == token_kind::rparen; 
-            }
-
-            bool is_current_node() const
-            {
-                return type_ == token_kind::current_node; 
-            }
-
-            bool is_projection() const
-            {
-                return type_ == token_kind::expression && expression_->is_projection(); 
-            }
-
-            bool is_expression() const
-            {
-                return type_ == token_kind::expression; 
-            }
-
-            bool is_operator() const
-            {
-                return type_ == token_kind::unary_operator || 
-                       type_ == token_kind::binary_operator; 
-            }
-
-            std::size_t precedence_level() const
-            {
-                switch(type_)
-                {
-                    case token_kind::unary_operator:
-                        return unary_operator_->precedence_level();
-                    case token_kind::binary_operator:
-                        return binary_operator_->precedence_level();
-                    case token_kind::expression:
-                        return expression_->precedence_level();
-                    default:
-                        return 0;
-                }
-            }
-
-            jsoncons::optional<std::size_t> arity() const
-            {
-                return type_ == token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
-            }
-
-            bool is_right_associative() const
-            {
-                switch(type_)
-                {
-                    case token_kind::unary_operator:
-                        return unary_operator_->is_right_associative();
-                    case token_kind::binary_operator:
-                        return binary_operator_->is_right_associative();
-                    case token_kind::expression:
-                        return expression_->is_right_associative();
-                    default:
-                        return false;
-                }
-            }
-
-            void construct(token&& other)
-            {
-                type_ = other.type_;
-                switch (type_)
-                {
-                    case token_kind::expression:
-                        new (&expression_) std::unique_ptr<expression_type>(std::move(other.expression_));
-                        break;
-                    case token_kind::key:
-                        new (&key_) string_type(std::move(other.key_));
-                        break;
-                    case token_kind::unary_operator:
-                        unary_operator_ = other.unary_operator_;
-                        break;
-                    case token_kind::binary_operator:
-                        binary_operator_ = other.binary_operator_;
-                        break;
-                    case token_kind::function:
-                        function_ = other.function_;
-                        break;
-                    case token_kind::literal:
-                        new (&value_) Json(std::move(other.value_));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void destroy() noexcept 
-            {
-                switch(type_)
-                {
-                    case token_kind::expression:
-                        expression_.~unique_ptr();
-                        break;
-                    case token_kind::key:
-                        key_.~basic_string();
-                        break;
-                    case token_kind::literal:
-                        value_.~Json();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            std::string to_string(std::size_t indent = 0) const
-            {
-                switch(type_)
-                {
-                    case token_kind::expression:
-                        return expression_->to_string(indent);
-                        break;
-                    case token_kind::unary_operator:
-                        return std::string("unary_operator");
-                        break;
-                    case token_kind::binary_operator:
-                        return binary_operator_->to_string(indent);
-                        break;
-                    case token_kind::current_node:
-                        return std::string("current_node");
-                        break;
-                    case token_kind::end_function:
-                        return std::string("end_function");
-                        break;
-                    case token_kind::separator:
-                        return std::string("separator");
-                        break;
-                    case token_kind::literal:
-                        return std::string("literal");
-                        break;
-                    case token_kind::key:
-                        return std::string("key") + key_;
-                        break;
-                    case token_kind::begin_multi_select_hash:
-                        return std::string("begin_multi_select_hash");
-                        break;
-                    case token_kind::begin_multi_select_list:
-                        return std::string("begin_multi_select_list");
-                        break;
-                    case token_kind::begin_filter:
-                        return std::string("begin_filter");
-                        break;
-                    case token_kind::pipe:
-                        return std::string("pipe");
-                        break;
-                    case token_kind::lparen:
-                        return std::string("lparen");
-                        break;
-                    case token_kind::function:
-                        return function_->to_string();
-                    case token_kind::argument:
-                        return std::string("argument");
-                        break;
-                    case token_kind::begin_expression_type:
-                        return std::string("begin_expression_type");
-                        break;
-                    case token_kind::end_expression_type:
-                        return std::string("end_expression_type");
-                        break;
-                    default:
-                        return std::string("default");
-                        break;
-                }
-            }
-        };
-
-        static pointer evaluate_tokens(reference doc, const std::vector<token>& output_stack, eval_context<Json>& context, std::error_code& ec)
+        static pointer evaluate_tokens(reference doc, const std::vector<token<Json>>& output_stack, eval_context<Json>& context, std::error_code& ec)
         {
             pointer root_ptr = std::addressof(doc);
             std::vector<parameter_type> stack;
@@ -2580,11 +2589,11 @@ namespace detail {
 
         // Implementations
 
-        class or_operator final : public binary_operator
+        class or_operator final : public binary_operator<Json>
         {
         public:
             or_operator()
-                : binary_operator(operator_kind::or_op)
+                : binary_operator<Json>(operator_kind::or_op)
             {
             }
 
@@ -2616,11 +2625,11 @@ namespace detail {
             }
         };
 
-        class and_operator final : public binary_operator
+        class and_operator final : public binary_operator<Json>
         {
         public:
             and_operator()
-                : binary_operator(operator_kind::and_op)
+                : binary_operator<Json>(operator_kind::and_op)
             {
             }
 
@@ -2648,11 +2657,11 @@ namespace detail {
             }
         };
 
-        class eq_operator final : public binary_operator
+        class eq_operator final : public binary_operator<Json>
         {
         public:
             eq_operator()
-                : binary_operator(operator_kind::eq_op)
+                : binary_operator<Json>(operator_kind::eq_op)
             {
             }
 
@@ -2673,11 +2682,11 @@ namespace detail {
             }
         };
 
-        class ne_operator final : public binary_operator
+        class ne_operator final : public binary_operator<Json>
         {
         public:
             ne_operator()
-                : binary_operator(operator_kind::ne_op)
+                : binary_operator<Json>(operator_kind::ne_op)
             {
             }
 
@@ -2698,11 +2707,11 @@ namespace detail {
             }
         };
 
-        class lt_operator final : public binary_operator
+        class lt_operator final : public binary_operator<Json>
         {
         public:
             lt_operator()
-                : binary_operator(operator_kind::lt_op)
+                : binary_operator<Json>(operator_kind::lt_op)
             {
             }
 
@@ -2727,11 +2736,11 @@ namespace detail {
             }
         };
 
-        class lte_operator final : public binary_operator
+        class lte_operator final : public binary_operator<Json>
         {
         public:
             lte_operator()
-                : binary_operator(operator_kind::lte_op)
+                : binary_operator<Json>(operator_kind::lte_op)
             {
             }
 
@@ -2756,11 +2765,11 @@ namespace detail {
             }
         };
 
-        class gt_operator final : public binary_operator
+        class gt_operator final : public binary_operator<Json>
         {
         public:
             gt_operator()
-                : binary_operator(operator_kind::gt_op)
+                : binary_operator<Json>(operator_kind::gt_op)
             {
             }
 
@@ -2785,11 +2794,11 @@ namespace detail {
             }
         };
 
-        class gte_operator final : public binary_operator
+        class gte_operator final : public binary_operator<Json>
         {
         public:
             gte_operator()
-                : binary_operator(operator_kind::gte_op)
+                : binary_operator<Json>(operator_kind::gte_op)
             {
             }
 
@@ -3154,9 +3163,9 @@ namespace detail {
 
         class filter_expression final : public projection_base
         {
-            std::vector<token> token_list_;
+            std::vector<token<Json>> token_list_;
         public:
-            filter_expression(std::vector<token>&& token_list)
+            filter_expression(std::vector<token<Json>>&& token_list)
                 : projection_base(operator_kind::projection_op), token_list_(std::move(token_list))
             {
             }
@@ -3269,9 +3278,9 @@ namespace detail {
 
         class multi_select_list final : public basic_expression
         {
-            std::vector<std::vector<token>> token_lists_;
+            std::vector<std::vector<token<Json>>> token_lists_;
         public:
-            multi_select_list(std::vector<std::vector<token>>&& token_lists)
+            multi_select_list(std::vector<std::vector<token<Json>>>&& token_lists)
                 : token_lists_(std::move(token_lists))
             {
             }
@@ -3317,9 +3326,9 @@ namespace detail {
         struct key_tokens
         {
             string_type key;
-            std::vector<token> tokens;
+            std::vector<token<Json>> tokens;
 
-            key_tokens(string_type&& Key, std::vector<token>&& Tokens) noexcept
+            key_tokens(string_type&& Key, std::vector<token<Json>>&& Tokens) noexcept
                 : key(std::move(Key)), tokens(std::move(Tokens))
             {
             }
@@ -3366,9 +3375,9 @@ namespace detail {
         class function_expression final : public basic_expression
         {
         public:
-            std::vector<token> toks_;
+            std::vector<token<Json>> toks_;
 
-            function_expression(std::vector<token>&& toks)
+            function_expression(std::vector<token<Json>>&& toks)
                 : toks_(std::move(toks))
             {
             }
@@ -3419,7 +3428,7 @@ namespace detail {
             };
 
             std::vector<std::unique_ptr<Json>> temp_storage_;
-            std::unordered_map<string_type,std::unique_ptr<function_type>,MyHash> custom_functions_;
+            std::unordered_map<string_type,std::unique_ptr<function_base<Json>>,MyHash> custom_functions_;
             
         public:
 
@@ -3439,7 +3448,7 @@ namespace detail {
                 }
             }
 
-            const function_type* get_function(const string_type& name, std::error_code& ec) const
+            const function_base<Json>* get_function(const string_type& name, std::error_code& ec) const
             {
                 static abs_function abs_func;
                 static avg_function avg_func;
@@ -3468,7 +3477,7 @@ namespace detail {
                 static to_string_function to_string_func;
                 static not_null_function not_null_func;
 
-                using function_dictionary = std::unordered_map<string_type,const function_type*>;
+                using function_dictionary = std::unordered_map<string_type,const function_base<Json>*>;
                 static const function_dictionary functions_ =
                 {
                     {string_type{'a','b','s'}, &abs_func},
@@ -3513,58 +3522,58 @@ namespace detail {
                 return it2->second.get();
             }
 
-            const unary_operator* get_not_operator() const
+            const unary_operator<Json>* get_not_operator() const
             {
                 static const not_expression not_oper;
 
                 return &not_oper;
             }
 
-            const binary_operator* get_or_operator() const
+            const binary_operator<Json>* get_or_operator() const
             {
                 static const or_operator or_oper;
 
                 return &or_oper;
             }
 
-            const binary_operator* get_and_operator() const
+            const binary_operator<Json>* get_and_operator() const
             {
                 static const and_operator and_oper;
 
                 return &and_oper;
             }
 
-            const binary_operator* get_eq_operator() const
+            const binary_operator<Json>* get_eq_operator() const
             {
                 static const eq_operator eq_oper;
                 return &eq_oper;
             }
 
-            const binary_operator* get_ne_operator() const
+            const binary_operator<Json>* get_ne_operator() const
             {
                 static const ne_operator ne_oper;
                 return &ne_oper;
             }
 
-            const binary_operator* get_lt_operator() const
+            const binary_operator<Json>* get_lt_operator() const
             {
                 static const lt_operator lt_oper;
                 return &lt_oper;
             }
 
-            const binary_operator* get_lte_operator() const
+            const binary_operator<Json>* get_lte_operator() const
             {
                 static const lte_operator lte_oper;
                 return &lte_oper;
             }
 
-            const binary_operator* get_gt_operator() const
+            const binary_operator<Json>* get_gt_operator() const
             {
                 static const gt_operator gt_oper;
                 return &gt_oper;
             }
 
-            const binary_operator* get_gte_operator() const
+            const binary_operator<Json>* get_gte_operator() const
             {
                 static const gte_operator gte_oper;
                 return &gte_oper;
@@ -3575,7 +3584,7 @@ namespace detail {
         {
         public:
             static_resources resources_;
-            std::vector<token> output_stack_;
+            std::vector<token<Json>> output_stack_;
         public:
             jmespath_expression(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
                 : resources_{funcs}
@@ -3592,7 +3601,7 @@ namespace detail {
             }
 
             jmespath_expression(static_resources&& resources,
-                                std::vector<token>&& output_stack)
+                                std::vector<token<Json>>&& output_stack)
                 : resources_(std::move(resources)), output_stack_(std::move(output_stack))
             {
             }
@@ -3634,21 +3643,6 @@ namespace detail {
                 }
                 return result;
             }
-
-            static jmespath_expression compile(const string_view_type& expr,
-                std::error_code& ec)
-            {
-                jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
-                return evaluator.compile(expr.data(), expr.size(), ec);
-            }
-
-            static jmespath_expression compile(const string_view_type& expr,
-                const jsoncons::jmespath::custom_functions<Json>& funcs,
-                std::error_code& ec)
-            {
-                jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{funcs};
-                return evaluator.compile(expr.data(), expr.size(), ec);
-            }
         };
     public:
         std::size_t line_{1};
@@ -3660,8 +3654,8 @@ namespace detail {
         static_resources resources_;
         std::vector<expr_state> state_stack_;
 
-        std::vector<token> output_stack_;
-        std::vector<token> operator_stack_;
+        std::vector<token<Json>> output_stack_;
+        std::vector<token<Json>> operator_stack_;
 
     public:
         jmespath_evaluator(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
@@ -3766,9 +3760,9 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    done = true;
-                                    //ec = jmespath_errc::syntax_error;
-                                    //return jmespath_expression();
+                                    //done = true;
+                                    ec = jmespath_errc::syntax_error;
+                                    return jmespath_expression();
                                 }
                                 break;
                         }
@@ -3843,7 +3837,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '*': // wildcard
-                                push_token(token(jsoncons::make_unique<object_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -3864,14 +3858,14 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token(resources_.get_not_operator()), ec);
+                                push_token(token<Json>(resources_.get_not_operator()), ec);
                                 if (ec) {return jmespath_expression();}
                                 break;
                             }
                             case '@':
                                 ++p_;
                                 ++column_;
-                                push_token(token(jsoncons::make_unique<current_node>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<current_node>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 break;
@@ -3919,7 +3913,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '*':
-                                push_token(token(jsoncons::make_unique<object_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -3949,13 +3943,13 @@ namespace detail {
                         break;
                     }
                     case expr_state::key_expr:
-                        push_token(token(key_arg, buffer), ec);
+                        push_token(token<Json>(key_arg, buffer), ec);
                         if (ec) {return jmespath_expression();}
                         buffer.clear(); 
                         state_stack_.pop_back(); 
                         break;
                     case expr_state::val_expr:
-                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         buffer.clear();
                         state_stack_.pop_back(); 
@@ -3967,7 +3961,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '&':
-                                push_token(token(begin_expression_type_arg), ec);
+                                push_token(token<Json>(begin_expression_type_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::expression_type;
                                 state_stack_.push_back(expr_state::rhs_expression);
@@ -4068,7 +4062,7 @@ namespace detail {
                                     return jmespath_expression();
                                 }
                                 buffer.clear();
-                                push_token(token(f), ec);
+                                push_token(token<Json>(f), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::function_expression;
                                 // check no-args function
@@ -4110,7 +4104,7 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                     if (ec) {return jmespath_expression();}
                                     buffer.clear();
                                     state_stack_.pop_back(); 
@@ -4127,7 +4121,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
@@ -4135,7 +4129,7 @@ namespace detail {
                                 break;
                             case ')':
                             {
-                                push_token(token(end_function_arg), ec);
+                                push_token(token<Json>(end_function_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -4406,7 +4400,7 @@ namespace detail {
                         {
                             case '\'':
                             {
-                                push_token(token(literal_arg, Json(buffer)), ec);
+                                push_token(token<Json>(literal_arg, Json(buffer)), ec);
                                 if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // raw_string
@@ -4442,7 +4436,7 @@ namespace detail {
                                 }
                                 auto j = decoder.get_result();
 
-                                push_token(token(literal_arg, std::move(j)), ec);
+                                push_token(token<Json>(literal_arg, std::move(j)), ec);
                                 if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // json_value
@@ -4508,21 +4502,21 @@ namespace detail {
                         switch(*p_)
                         {
                             case '*':
-                                push_token(token(jsoncons::make_unique<list_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': // []
-                                push_token(token(jsoncons::make_unique<flatten_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
                             case '?':
-                                push_token(token(begin_filter_arg), ec);
+                                push_token(token<Json>(begin_filter_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::filter;
                                 state_stack_.push_back(expr_state::rhs_expression);
@@ -4561,7 +4555,7 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    push_token(token(begin_multi_select_list_arg), ec);
+                                    push_token(token<Json>(begin_multi_select_list_arg), ec);
                                     if (ec) {return jmespath_expression();}
                                     state_stack_.back() = expr_state::multi_select_list;
                                     state_stack_.push_back(expr_state::lhs_expression);                                
@@ -4574,7 +4568,7 @@ namespace detail {
                                 state_stack_.back() = expr_state::bracket_specifier;
                                 break;
                             default:
-                                push_token(token(begin_multi_select_list_arg), ec);
+                                push_token(token<Json>(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::multi_select_list;
                                 state_stack_.push_back(expr_state::lhs_expression);
@@ -4592,14 +4586,14 @@ namespace detail {
                                 ec = jmespath_errc::expected_multi_select_list;
                                 return jmespath_expression();
                             case '*':
-                                push_token(token(jsoncons::make_unique<list_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(begin_multi_select_list_arg), ec);
+                                push_token(token<Json>(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::multi_select_list;
                                 state_stack_.push_back(expr_state::lhs_expression);
@@ -4629,7 +4623,7 @@ namespace detail {
                             {
                                 if (buffer.empty())
                                 {
-                                    push_token(token(jsoncons::make_unique<flatten_projection>()), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
                                     if (ec) {return jmespath_expression();}
                                 }
                                 else
@@ -4641,7 +4635,7 @@ namespace detail {
                                         ec = jmespath_errc::invalid_number;
                                         return jmespath_expression();
                                     }
-                                    push_token(token(jsoncons::make_unique<index_selector>(val)), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<index_selector>(val)), ec);
                                     if (ec) {return jmespath_expression();}
 
                                     buffer.clear();
@@ -4693,7 +4687,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
                                 if (ec) {return jmespath_expression();}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
@@ -4734,7 +4728,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
                                 if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 slic = slice{};
@@ -4825,16 +4819,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(resources_.get_lte_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_lte_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(resources_.get_lt_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_lt_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 break;
@@ -4846,16 +4840,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(resources_.get_gte_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_gte_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(resources_.get_gt_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_gt_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 break;
@@ -4867,8 +4861,8 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(resources_.get_eq_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_eq_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -4885,8 +4879,8 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(resources_.get_ne_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_ne_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -4921,15 +4915,15 @@ namespace detail {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token(resources_.get_or_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_or_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(pipe_arg), ec);
+                                push_token(token<Json>(pipe_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 break;
@@ -4941,8 +4935,8 @@ namespace detail {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token(resources_.get_and_operator()), ec);
-                                push_token(token(current_node_arg), ec);
+                                push_token(token<Json>(resources_.get_and_operator()), ec);
+                                push_token(token<Json>(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
@@ -4962,7 +4956,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(separator_arg), ec);
+                                push_token(token<Json>(separator_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
@@ -4986,7 +4980,7 @@ namespace detail {
                             }
                             case ']':
                             {
-                                push_token(token(end_multi_select_list_arg), ec);
+                                push_token(token<Json>(end_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
 
@@ -5009,7 +5003,7 @@ namespace detail {
                                 break;
                             case ']':
                             {
-                                push_token(token(end_filter_arg), ec);
+                                push_token(token<Json>(end_filter_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -5030,7 +5024,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(separator_arg), ec);
+                                push_token(token<Json>(separator_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::key_val_expr; 
                                 ++p_;
@@ -5104,12 +5098,12 @@ namespace detail {
                         }
                         break;
                     case expr_state::val_expr:
-                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back(); 
                         break;
                     case expr_state::identifier_or_function_expr:
-                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                         if (ec) {return jmespath_expression();}
                         state_stack_.pop_back(); 
                         break;
@@ -5187,14 +5181,14 @@ namespace detail {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void push_token(token&& tok, std::error_code& ec)
+        void push_token(token<Json>&& tok, std::error_code& ec)
         {
             switch (tok.type())
             {
                 case token_kind::end_filter:
                 {
                     unwind_rparen(ec);
-                    std::vector<token> toks;
+                    std::vector<token<Json>> toks;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && (*it).type() != token_kind::begin_filter)
                     {
@@ -5222,18 +5216,18 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.push_back(token(jsoncons::make_unique<filter_expression>(std::move(toks))));
+                        output_stack_.push_back(token<Json>(jsoncons::make_unique<filter_expression>(std::move(toks))));
                     }
                     break;
                 }
                 case token_kind::end_multi_select_list:
                 {
                     unwind_rparen(ec);
-                    std::vector<std::vector<token>> vals;
+                    std::vector<std::vector<token<Json>>> vals;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_list)
                     {
-                        std::vector<token> toks;
+                        std::vector<token<Json>> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
@@ -5266,7 +5260,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.push_back(token(jsoncons::make_unique<multi_select_list>(std::move(vals))));
+                        output_stack_.push_back(token<Json>(jsoncons::make_unique<multi_select_list>(std::move(vals))));
                     }
                     break;
                 }
@@ -5277,7 +5271,7 @@ namespace detail {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_hash)
                     {
-                        std::vector<token> toks;
+                        std::vector<token<Json>> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
@@ -5314,13 +5308,13 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.push_back(token(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
+                        output_stack_.push_back(token<Json>(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
                     }
                     break;
                 }
                 case token_kind::end_expression_type:
                 {
-                    std::vector<token> toks;
+                    std::vector<token<Json>> toks;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && (*it).type() != token_kind::begin_expression_type)
                     {
@@ -5337,7 +5331,7 @@ namespace detail {
                     }
                     std::reverse(toks.begin(), toks.end());
                     output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                    output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                     break;
                 }
                 case token_kind::literal:
@@ -5370,7 +5364,7 @@ namespace detail {
                 case token_kind::end_function:
                     {
                         unwind_rparen(ec);
-                        std::vector<token> toks;
+                        std::vector<token<Json>> toks;
                         auto it = output_stack_.rbegin();
                         std::size_t arg_count = 0;
                         while (it != output_stack_.rend() && (*it).type() != token_kind::function)
@@ -5397,7 +5391,7 @@ namespace detail {
                             toks.emplace_back(std::move(*it));
                             ++it;
                             output_stack_.erase(it.base(), output_stack_.end());
-                            output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                             break;
                         }
                         if (toks.back().type() != token_kind::literal)
@@ -5417,7 +5411,7 @@ namespace detail {
                         }
                         else
                         {
-                            output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                         }
                         break;
                     }
@@ -5464,24 +5458,24 @@ namespace detail {
                 {
                     unwind_rparen(ec);
                     output_stack_.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token(lparen_arg));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 }
                 case token_kind::begin_filter:
                     output_stack_.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token(lparen_arg));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_list:
                     output_stack_.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token(lparen_arg));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_hash:
                     output_stack_.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token(lparen_arg));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::function:
                     output_stack_.push_back(std::move(tok));
-                    operator_stack_.emplace_back(token(lparen_arg));
+                    operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::current_node:
                     output_stack_.push_back(std::move(tok));
