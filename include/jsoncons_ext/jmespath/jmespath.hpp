@@ -3630,19 +3630,6 @@ namespace detail {
                 eval_context<Json> dynamic_storage;
                 return deep_copy(*evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
             }
-
-            static jmespath_expression compile(const string_view_type& expr,
-                const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
-            {
-                jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{funcs};
-                std::error_code ec;
-                jmespath_expression result = evaluator.compile(expr.data(), expr.size(), ec);
-                if (ec)
-                {
-                    JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
-                }
-                return result;
-            }
         };
     public:
         std::size_t line_{1};
@@ -5561,14 +5548,24 @@ namespace detail {
     jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
     {
-        return jmespath_expression<Json>::compile(expr, funcs);
+        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{ funcs };
+        std::error_code ec;
+        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
+        }
+        return result;
     }
 
     template <typename Json>
     jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         std::error_code& ec)
     {
-        return jmespath_expression<Json>::compile(expr, ec);
+        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
+        std::error_code ec;
+        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
+        return result;
     }
 
     template <typename Json>
@@ -5576,7 +5573,10 @@ namespace detail {
         const jsoncons::jmespath::custom_functions<Json>& funcs,
         std::error_code& ec)
     {
-        return jmespath_expression<Json>::compile(expr, funcs, ec);
+        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{ funcs };
+        std::error_code ec;
+        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
+        return result;
     }
 
 } // namespace jmespath
