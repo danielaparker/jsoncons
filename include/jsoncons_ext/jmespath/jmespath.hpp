@@ -5563,7 +5563,6 @@ namespace detail {
         std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
-        std::error_code ec;
         jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
         return result;
     }
@@ -5574,7 +5573,6 @@ namespace detail {
         std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{ funcs };
-        std::error_code ec;
         jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
         return result;
     }
