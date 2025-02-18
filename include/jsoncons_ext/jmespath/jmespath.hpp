@@ -783,7 +783,9 @@ namespace detail {
         expect_pipe_or_or,
         expect_and,
         let_expression,
-        variable_ref
+        variable_ref,
+        expect_assign,
+        expect_in
     };
 
     template <typename Json>
@@ -3571,6 +3573,7 @@ namespace detail {
 
         class jmespath_expression
         {
+        public:
             static_resources resources_;
             std::vector<token> output_stack_;
         public:
@@ -3647,7 +3650,7 @@ namespace detail {
                 return evaluator.compile(expr.data(), expr.size(), ec);
             }
         };
-    private:
+    public:
         std::size_t line_{1};
         std::size_t column_{1};
         const char_type* begin_input_;
@@ -3680,12 +3683,12 @@ namespace detail {
             return column_;
         }
 
-        jmespath_expression compile(const char_type* path, std::size_t length,
+        jmespath_expression compile(const char_type* path, std::size_t length, 
             std::error_code& ec)
         {
             push_token(current_node_arg, ec);
             if (ec) {return jmespath_expression();}
-            state_stack_.emplace_back(expr_state::start);
+            state_stack_.push_back(expr_state::start);
 
             string_type buffer;
             uint32_t cp = 0;
@@ -3697,14 +3700,15 @@ namespace detail {
 
             slice slic{};
 
-            while (p_ < end_input_)
+            bool done = false;
+            while (p_ < end_input_ && !done)
             {
                 switch (state_stack_.back())
                 {
                     case expr_state::start: 
                     {
                         state_stack_.back() = expr_state::rhs_expression;
-                        state_stack_.emplace_back(expr_state::lhs_expression);
+                        state_stack_.push_back(expr_state::lhs_expression);
                         break;
                     }
                     case expr_state::rhs_expression:
@@ -3716,33 +3720,33 @@ namespace detail {
                             case '.': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(expr_state::sub_expression);
+                                state_stack_.push_back(expr_state::sub_expression);
                                 break;
                             case '|':
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
-                                state_stack_.emplace_back(expr_state::expect_pipe_or_or);
+                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::expect_pipe_or_or);
                                 break;
                             case '&':
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
-                                state_stack_.emplace_back(expr_state::expect_and);
+                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::expect_and);
                                 break;
                             case '<':
                             case '>':
                             case '=':
                             {
-                                state_stack_.emplace_back(expr_state::comparator_expression);
+                                state_stack_.push_back(expr_state::comparator_expression);
                                 break;
                             }
                             case '!':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
-                                state_stack_.emplace_back(expr_state::cmp_ne);
+                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::cmp_ne);
                                 break;
                             }
                             case ')':
@@ -3751,19 +3755,20 @@ namespace detail {
                                 break;
                             }
                             case '[':
-                                state_stack_.emplace_back(expr_state::bracket_specifier);
+                                state_stack_.push_back(expr_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                if (state_stack_.size() > 1)
+                                if (state_stack_.size() > 1) 
                                 {
                                     state_stack_.pop_back();
                                 }
                                 else
                                 {
-                                    ec = jmespath_errc::syntax_error;
-                                    return jmespath_expression();
+                                    done = true;
+                                    //ec = jmespath_errc::syntax_error;
+                                    //return jmespath_expression();
                                 }
                                 break;
                         }
@@ -3778,20 +3783,20 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.emplace_back(expr_state::cmp_lt_or_lte);
+                                state_stack_.push_back(expr_state::cmp_lt_or_lte);
                                 break;
                             case '>':
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.emplace_back(expr_state::cmp_gt_or_gte);
+                                state_stack_.push_back(expr_state::cmp_gt_or_gte);
                                 break;
                             case '=':
                             {
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.emplace_back(expr_state::cmp_eq);
+                                state_stack_.push_back(expr_state::cmp_eq);
                                 break;
                             }
                             default:
@@ -3816,7 +3821,7 @@ namespace detail {
                                 break;
                             case '\"':
                                 state_stack_.back() = expr_state::val_expr;
-                                state_stack_.emplace_back(expr_state::quoted_string);
+                                state_stack_.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3851,8 +3856,8 @@ namespace detail {
                                 push_token(lparen_arg, ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::expect_rparen;
-                                state_stack_.emplace_back(expr_state::rhs_expression);
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::rhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                             }
                             case '!':
@@ -3879,7 +3884,7 @@ namespace detail {
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
                                     state_stack_.back() = expr_state::identifier_or_function_expr;
-                                    state_stack_.emplace_back(expr_state::unquoted_string);
+                                    state_stack_.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3902,7 +3907,7 @@ namespace detail {
                                 break;
                             case '\"':
                                 state_stack_.back() = expr_state::val_expr;
-                                state_stack_.emplace_back(expr_state::quoted_string);
+                                state_stack_.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3929,7 +3934,7 @@ namespace detail {
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
                                     state_stack_.back() = expr_state::identifier_or_function_expr;
-                                    state_stack_.emplace_back(expr_state::unquoted_string);
+                                    state_stack_.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3965,17 +3970,69 @@ namespace detail {
                                 push_token(token(begin_expression_type_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::expression_type;
-                                state_stack_.emplace_back(expr_state::rhs_expression);
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::rhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 state_stack_.back() = expr_state::argument;
-                                state_stack_.emplace_back(expr_state::rhs_expression);
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::rhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                         }
+                        break;
+                    case expr_state::expect_in:
+                        advance_past_space_character();
+                        if (!(*p_ == 'i' && (p_+1) < end_input_ && *(p_+1) == 'n'))
+                        {
+                            ec = jmespath_errc::syntax_error;
+                            return jmespath_expression();
+                        }
+                        p_ += 2;
+                        column_ += 2;
+                        std::cout << "Got in\n";
+                        state_stack_.pop_back();
+                        break;
+                    case expr_state::expect_assign:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '=':
+                            {
+                                std::cout << "expect_assign\n";
+                                ++p_;
+                                ++column_;
+                                std::cout << "before compile\n";
+                                jmespath_evaluator evaluator{};
+                                auto expr = evaluator.compile(p_, (end_input_-p_), ec);
+                                std::cout << "after compile\n";
+                                if (ec)
+                                {
+                                    std::cout << "expr error " << ec.message() << ", " << *p_ << "\n";
+                                    return jmespath_expression();
+                                }
+                                p_ = evaluator.p_;
+                                std::cout << "buffer: " << buffer << ", num tokens: " << expr.output_stack_.size() << "\n";
+                                buffer.clear();
+                                state_stack_.back() = expr_state::expect_in;
+                                break;
+                            }
+                            default:
+                            {
+                                std::cout << *p_ << "\n";
+                                ec = jmespath_errc::syntax_error;
+                                return jmespath_expression();
+                            }
+                        }
+                        break;
+                    case expr_state::variable_ref:
+                        std::cout << buffer << "\n";
+                        //++p_;
+                        //++column_;
+                        state_stack_.back() = expr_state::expect_assign;
                         break;
                     case expr_state::let_expression:
                     {
@@ -3986,14 +4043,17 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '$':
-                                std::cout << "variable_ref";
+                                std::cout << "variable_ref\n";
                                 state_stack_.push_back(expr_state::variable_ref);
+                                state_stack_.push_back(expr_state::unquoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
+                            {
                                 ec = jmespath_errc::syntax_error;
                                 return jmespath_expression();
+                            }
                         }
                         break;
                     }
@@ -4032,7 +4092,7 @@ namespace detail {
                                 }
                                 if (!is_no_args_func)
                                 {
-                                    state_stack_.emplace_back(expr_state::expression_or_expression_type);
+                                    state_stack_.push_back(expr_state::expression_or_expression_type);
                                 }
                                 ++p_;
                                 ++column_;
@@ -4044,6 +4104,7 @@ namespace detail {
                                 {
                                     std::cout << "let\n";
                                     state_stack_.back() = expr_state::let_expression;
+                                    buffer.clear();
                                     //++p_;
                                     //++column_;
                                 }
@@ -4068,7 +4129,7 @@ namespace detail {
                             case ',':
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.emplace_back(expr_state::expression_or_expression_type);
+                                state_stack_.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4108,7 +4169,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '\\':
-                                state_stack_.emplace_back(expr_state::quoted_string_escape_char);
+                                state_stack_.push_back(expr_state::quoted_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4354,7 +4415,7 @@ namespace detail {
                                 break;
                             }
                             case '\\':
-                                state_stack_.emplace_back(expr_state::raw_string_escape_char);
+                                state_stack_.push_back(expr_state::raw_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4464,21 +4525,21 @@ namespace detail {
                                 push_token(token(begin_filter_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::filter;
-                                state_stack_.emplace_back(expr_state::rhs_expression);
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::rhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ':': // slice_expression
                                 state_stack_.back() = expr_state::rhs_slice_expression_stop ;
-                                state_stack_.emplace_back(expr_state::number);
+                                state_stack_.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
                             // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 state_stack_.back() = expr_state::index_or_slice_expression;
-                                state_stack_.emplace_back(expr_state::number);
+                                state_stack_.push_back(expr_state::number);
                                 break;
                             default:
                                 ec = jmespath_errc::expected_index_expression;
@@ -4503,7 +4564,7 @@ namespace detail {
                                     push_token(token(begin_multi_select_list_arg), ec);
                                     if (ec) {return jmespath_expression();}
                                     state_stack_.back() = expr_state::multi_select_list;
-                                    state_stack_.emplace_back(expr_state::lhs_expression);                                
+                                    state_stack_.push_back(expr_state::lhs_expression);                                
                                 }
                                 break;
                             case ']': // []
@@ -4516,7 +4577,7 @@ namespace detail {
                                 push_token(token(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::multi_select_list;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -4541,7 +4602,7 @@ namespace detail {
                                 push_token(token(begin_multi_select_list_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = expr_state::multi_select_list;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -4605,7 +4666,7 @@ namespace detail {
                                     buffer.clear();
                                 }
                                 state_stack_.back() = expr_state::rhs_slice_expression_stop;
-                                state_stack_.emplace_back(expr_state::number);
+                                state_stack_.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4641,7 +4702,7 @@ namespace detail {
                                 break;
                             case ':':
                                 state_stack_.back() = expr_state::rhs_slice_expression_step;
-                                state_stack_.emplace_back(expr_state::number);
+                                state_stack_.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4729,14 +4790,14 @@ namespace detail {
                                 break;
                             case '\"':
                                 state_stack_.back() = expr_state::expect_colon;
-                                state_stack_.emplace_back(expr_state::key_expr);
-                                state_stack_.emplace_back(expr_state::quoted_string);
+                                state_stack_.push_back(expr_state::key_expr);
+                                state_stack_.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\'':
                                 state_stack_.back() = expr_state::expect_colon;
-                                state_stack_.emplace_back(expr_state::raw_string);
+                                state_stack_.push_back(expr_state::raw_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4744,8 +4805,8 @@ namespace detail {
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
                                     state_stack_.back() = expr_state::expect_colon;
-                                    state_stack_.emplace_back(expr_state::key_expr);
-                                    state_stack_.emplace_back(expr_state::unquoted_string);
+                                    state_stack_.push_back(expr_state::key_expr);
+                                    state_stack_.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -4903,15 +4964,15 @@ namespace detail {
                             case ',':
                                 push_token(token(separator_arg), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[':
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.emplace_back(expr_state::sub_expression);
+                                state_stack_.push_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4919,8 +4980,8 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
-                                state_stack_.emplace_back(expr_state::expect_pipe_or_or);
+                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::expect_pipe_or_or);
                                 break;
                             }
                             case ']':
@@ -4977,10 +5038,10 @@ namespace detail {
                                 break;
                             case '[':
                             case '{':
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.emplace_back(expr_state::sub_expression);
+                                state_stack_.push_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5008,7 +5069,7 @@ namespace detail {
                                 break;
                             case ':':
                                 state_stack_.back() = expr_state::expect_rbrace;
-                                state_stack_.emplace_back(expr_state::lhs_expression);
+                                state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5114,7 +5175,7 @@ namespace detail {
             auto it = operator_stack_.rbegin();
             while (it != operator_stack_.rend() && !(*it).is_lparen())
             {
-                output_stack_.emplace_back(std::move(*it));
+                output_stack_.push_back(std::move(*it));
                 ++it;
             }
             if (it == operator_stack_.rend())
@@ -5161,7 +5222,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.emplace_back(token(jsoncons::make_unique<filter_expression>(std::move(toks))));
+                        output_stack_.push_back(token(jsoncons::make_unique<filter_expression>(std::move(toks))));
                     }
                     break;
                 }
@@ -5205,7 +5266,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.emplace_back(token(jsoncons::make_unique<multi_select_list>(std::move(vals))));
+                        output_stack_.push_back(token(jsoncons::make_unique<multi_select_list>(std::move(vals))));
                     }
                     break;
                 }
@@ -5253,7 +5314,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.emplace_back(token(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
+                        output_stack_.push_back(token(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
                     }
                     break;
                 }
@@ -5276,7 +5337,7 @@ namespace detail {
                     }
                     std::reverse(toks.begin(), toks.end());
                     output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                    output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
                     break;
                 }
                 case token_kind::literal:
@@ -5286,7 +5347,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.emplace_back(std::move(tok));
+                        output_stack_.push_back(std::move(tok));
                     }
                     break;
                 case token_kind::expression:
@@ -5298,7 +5359,7 @@ namespace detail {
                     }
                     else
                     {
-                        output_stack_.emplace_back(std::move(tok));
+                        output_stack_.push_back(std::move(tok));
                     }
                     break;
                 case token_kind::rparen:
@@ -5336,7 +5397,7 @@ namespace detail {
                             toks.emplace_back(std::move(*it));
                             ++it;
                             output_stack_.erase(it.base(), output_stack_.end());
-                            output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
                             break;
                         }
                         if (toks.back().type() != token_kind::literal)
@@ -5356,7 +5417,7 @@ namespace detail {
                         }
                         else
                         {
-                            output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack_.push_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
                         }
                         break;
                     }
@@ -5365,7 +5426,7 @@ namespace detail {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend())
                         {
-                            output_stack_.emplace_back(std::move(*it));
+                            output_stack_.push_back(std::move(*it));
                             ++it;
                         }
                         operator_stack_.clear();
@@ -5390,7 +5451,7 @@ namespace detail {
                                && (tok.precedence_level() > (*it).precedence_level()
                              || (tok.precedence_level() == (*it).precedence_level() && tok.is_right_associative())))
                         {
-                            output_stack_.emplace_back(std::move(*it));
+                            output_stack_.push_back(std::move(*it));
                             ++it;
                         }
 
@@ -5402,34 +5463,34 @@ namespace detail {
                 case token_kind::separator:
                 {
                     unwind_rparen(ec);
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 }
                 case token_kind::begin_filter:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_list:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_hash:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_kind::function:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_kind::current_node:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     break;
                 case token_kind::key:
                 case token_kind::pipe:
                 case token_kind::argument:
                 case token_kind::begin_expression_type:
-                    output_stack_.emplace_back(std::move(tok));
+                    output_stack_.push_back(std::move(tok));
                     break;
                 case token_kind::lparen:
                     operator_stack_.emplace_back(std::move(tok));
