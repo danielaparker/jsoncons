@@ -78,7 +78,7 @@ public:
                 }
 
                 Json result{jsoncons::json_array_arg};
-                int count = countValue.template as<int>();
+                std::size_t count = countValue.template as<std::size_t>();
                 for (size_t i = 0; i < count; i++)
                 {
                     current_index = i;
@@ -123,7 +123,7 @@ public:
                     return context.null_value();
                 }
 
-                if (arg0.is<int64_t>() && arg1.is<int64_t>())
+                if (arg0.template is<int64_t>() && arg1.template is<int64_t>())
                 {
                     int64_t v = arg0.template as<int64_t>() + arg1.template as<int64_t>();
                     return Json(v);
