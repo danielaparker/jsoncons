@@ -3636,10 +3636,6 @@ namespace detail {
         const char_type* begin_input_{nullptr};
         const char_type* end_input_{nullptr};
         const char_type* p_{nullptr};
-
-        std::vector<expr_state> state_stack_;
-
-        std::vector<token<Json>> output_stack_;
         std::vector<token<Json>> operator_stack_;
 
     public:
@@ -3668,9 +3664,12 @@ namespace detail {
         std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
             bool is_let_expression, std::error_code& ec)
         {
-            push_token(current_node_arg, ec);
+            std::vector<expr_state> state_stack;
+            std::vector<token<Json>> output_stack;
+
+            push_token(current_node_arg, output_stack, ec);
             if (ec) {return std::vector<token<Json>>{};}
-            state_stack_.push_back(expr_state::start);
+            state_stack.push_back(expr_state::start);
 
             string_type buffer;
             uint32_t cp = 0;
@@ -3685,12 +3684,12 @@ namespace detail {
             bool done = false;
             while (p_ < end_input_ && !done)
             {
-                switch (state_stack_.back())
+                switch (state_stack.back())
                 {
                     case expr_state::start: 
                     {
-                        state_stack_.back() = expr_state::rhs_expression;
-                        state_stack_.push_back(expr_state::lhs_expression);
+                        state_stack.back() = expr_state::rhs_expression;
+                        state_stack.push_back(expr_state::lhs_expression);
                         break;
                     }
                     case expr_state::rhs_expression:
@@ -3702,49 +3701,49 @@ namespace detail {
                             case '.': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.push_back(expr_state::sub_expression);
+                                state_stack.push_back(expr_state::sub_expression);
                                 break;
                             case '|':
                                 ++p_;
                                 ++column_;
-                                state_stack_.push_back(expr_state::lhs_expression);
-                                state_stack_.push_back(expr_state::expect_pipe_or_or);
+                                state_stack.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::expect_pipe_or_or);
                                 break;
                             case '&':
                                 ++p_;
                                 ++column_;
-                                state_stack_.push_back(expr_state::lhs_expression);
-                                state_stack_.push_back(expr_state::expect_and);
+                                state_stack.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::expect_and);
                                 break;
                             case '<':
                             case '>':
                             case '=':
                             {
-                                state_stack_.push_back(expr_state::comparator_expression);
+                                state_stack.push_back(expr_state::comparator_expression);
                                 break;
                             }
                             case '!':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.push_back(expr_state::lhs_expression);
-                                state_stack_.push_back(expr_state::cmp_ne);
+                                state_stack.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::cmp_ne);
                                 break;
                             }
                             case ')':
                             {
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             }
                             case '[':
-                                state_stack_.push_back(expr_state::bracket_specifier);
+                                state_stack.push_back(expr_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                if (state_stack_.size() > 1) 
+                                if (state_stack.size() > 1) 
                                 {
-                                    state_stack_.pop_back();
+                                    state_stack.pop_back();
                                 }
                                 else
                                 {
@@ -3770,27 +3769,27 @@ namespace detail {
                             case '<':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.push_back(expr_state::cmp_lt_or_lte);
+                                state_stack.back() = expr_state::lhs_expression;
+                                state_stack.push_back(expr_state::cmp_lt_or_lte);
                                 break;
                             case '>':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.push_back(expr_state::cmp_gt_or_gte);
+                                state_stack.back() = expr_state::lhs_expression;
+                                state_stack.push_back(expr_state::cmp_gt_or_gte);
                                 break;
                             case '=':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::lhs_expression;
-                                state_stack_.push_back(expr_state::cmp_eq);
+                                state_stack.back() = expr_state::lhs_expression;
+                                state_stack.push_back(expr_state::cmp_eq);
                                 break;
                             }
                             default:
-                                if (state_stack_.size() > 1)
+                                if (state_stack.size() > 1)
                                 {
-                                    state_stack_.pop_back();
+                                    state_stack.pop_back();
                                 }
                                 else
                                 {
@@ -3808,32 +3807,32 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = expr_state::val_expr;
-                                state_stack_.push_back(expr_state::quoted_string);
+                                state_stack.back() = expr_state::val_expr;
+                                state_stack.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = expr_state::raw_string;
+                                state_stack.back() = expr_state::raw_string;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '`':
-                                state_stack_.back() = expr_state::literal;
+                                state_stack.back() = expr_state::literal;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '{':
-                                push_token(begin_multi_select_hash_arg, ec);
+                                push_token(begin_multi_select_hash_arg, output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::multi_select_hash;
+                                state_stack.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*': // wildcard
-                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3841,38 +3840,38 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(lparen_arg, ec);
+                                push_token(lparen_arg, output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::expect_rparen;
-                                state_stack_.push_back(expr_state::rhs_expression);
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::expect_rparen;
+                                state_stack.push_back(expr_state::rhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                             }
                             case '!':
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token<Json>(resources.get_not_operator()), ec);
+                                push_token(token<Json>(resources.get_not_operator()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 break;
                             }
                             case '@':
                                 ++p_;
                                 ++column_;
-                                push_token(token<Json>(jsoncons::make_unique<current_node>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<current_node>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case '[': 
-                                state_stack_.back() = expr_state::bracket_specifier_or_multi_select_list;
+                                state_stack.back() = expr_state::bracket_specifier_or_multi_select_list;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = expr_state::identifier_or_function_expr;
-                                    state_stack_.push_back(expr_state::unquoted_string);
+                                    state_stack.back() = expr_state::identifier_or_function_expr;
+                                    state_stack.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3894,35 +3893,35 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = expr_state::val_expr;
-                                state_stack_.push_back(expr_state::quoted_string);
+                                state_stack.back() = expr_state::val_expr;
+                                state_stack.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '{':
-                                push_token(begin_multi_select_hash_arg, ec);
+                                push_token(begin_multi_select_hash_arg, output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::multi_select_hash;
+                                state_stack.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
-                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<object_projection>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[': 
-                                state_stack_.back() = expr_state::expect_multi_select_list;
+                                state_stack.back() = expr_state::expect_multi_select_list;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = expr_state::identifier_or_function_expr;
-                                    state_stack_.push_back(expr_state::unquoted_string);
+                                    state_stack.back() = expr_state::identifier_or_function_expr;
+                                    state_stack.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -3937,16 +3936,16 @@ namespace detail {
                         break;
                     }
                     case expr_state::key_expr:
-                        push_token(token<Json>(key_arg, buffer), ec);
+                        push_token(token<Json>(key_arg, buffer), output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
                         buffer.clear(); 
-                        state_stack_.pop_back(); 
+                        state_stack.pop_back(); 
                         break;
                     case expr_state::val_expr:
-                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
                         buffer.clear();
-                        state_stack_.pop_back(); 
+                        state_stack.pop_back(); 
                         break;
                     case expr_state::expression_or_expression_type:
                         switch (*p_)
@@ -3955,18 +3954,18 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '&':
-                                push_token(token<Json>(begin_expression_type_arg), ec);
+                                push_token(token<Json>(begin_expression_type_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::expression_type;
-                                state_stack_.push_back(expr_state::rhs_expression);
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::expression_type;
+                                state_stack.push_back(expr_state::rhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.back() = expr_state::argument;
-                                state_stack_.push_back(expr_state::rhs_expression);
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::argument;
+                                state_stack.push_back(expr_state::rhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -3980,7 +3979,7 @@ namespace detail {
                         p_ += 2;
                         column_ += 2;
                         std::cout << "Got in\n";
-                        state_stack_.pop_back();
+                        state_stack.pop_back();
                         break;
                     case expr_state::expect_assign:
                         switch (*p_)
@@ -4005,7 +4004,7 @@ namespace detail {
                                 p_ = evaluator.p_;
                                 std::cout << "buffer: " << buffer << ", num tokens: " << output_stk.size() << "\n";
                                 buffer.clear();
-                                state_stack_.back() = expr_state::expect_in;
+                                state_stack.back() = expr_state::expect_in;
                                 break;
                             }
                             default:
@@ -4018,7 +4017,7 @@ namespace detail {
                         break;
                     case expr_state::variable_ref:
                         std::cout << buffer << "\n";
-                        state_stack_.back() = expr_state::expect_assign;
+                        state_stack.back() = expr_state::expect_assign;
                         break;
                     case expr_state::let_expression:
                     {
@@ -4030,8 +4029,8 @@ namespace detail {
                                 break;
                             case '$':
                                 std::cout << "variable_ref\n";
-                                state_stack_.push_back(expr_state::variable_ref);
-                                state_stack_.push_back(expr_state::unquoted_string);
+                                state_stack.push_back(expr_state::variable_ref);
+                                state_stack.push_back(expr_state::unquoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4054,9 +4053,9 @@ namespace detail {
                                     return std::vector<token<Json>>{};
                                 }
                                 buffer.clear();
-                                push_token(token<Json>(f), ec);
+                                push_token(token<Json>(f), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::function_expression;
+                                state_stack.back() = expr_state::function_expression;
                                 // check no-args function
                                 bool is_no_args_func = true;
                                 bool isEnd = false;
@@ -4078,7 +4077,7 @@ namespace detail {
                                 }
                                 if (!is_no_args_func)
                                 {
-                                    state_stack_.push_back(expr_state::expression_or_expression_type);
+                                    state_stack.push_back(expr_state::expression_or_expression_type);
                                 }
                                 ++p_;
                                 ++column_;
@@ -4089,17 +4088,17 @@ namespace detail {
                                 if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
                                     std::cout << "let\n";
-                                    state_stack_.back() = expr_state::let_expression;
+                                    state_stack.back() = expr_state::let_expression;
                                     buffer.clear();
                                     //++p_;
                                     //++column_;
                                 }
                                 else
                                 {
-                                    push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), output_stack, ec);
                                     if (ec) {return std::vector<token<Json>>{};}
                                     buffer.clear();
-                                    state_stack_.pop_back(); 
+                                    state_stack.pop_back(); 
                                 }
                                 break;
                             }
@@ -4113,17 +4112,17 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.push_back(expr_state::expression_or_expression_type);
+                                state_stack.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ')':
                             {
-                                push_token(token<Json>(end_function_arg), ec);
+                                push_token(token<Json>(end_function_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4134,28 +4133,28 @@ namespace detail {
                         break;
 
                     case expr_state::argument:
-                        push_token(argument_arg, ec);
+                        push_token(argument_arg, output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
-                        state_stack_.pop_back();
+                        state_stack.pop_back();
                         break;
 
                     case expr_state::expression_type:
-                        push_token(end_expression_type_arg, ec);
-                        push_token(argument_arg, ec);
+                        push_token(end_expression_type_arg, output_stack, ec);
+                        push_token(argument_arg, output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
-                        state_stack_.pop_back();
+                        state_stack.pop_back();
                         break;
 
                     case expr_state::quoted_string: 
                         switch (*p_)
                         {
                             case '\"':
-                                state_stack_.pop_back(); // quoted_string
+                                state_stack.pop_back(); // quoted_string
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\\':
-                                state_stack_.push_back(expr_state::quoted_string_escape_char);
+                                state_stack.push_back(expr_state::quoted_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4171,7 +4170,7 @@ namespace detail {
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
-                                state_stack_.pop_back(); // unquoted_string
+                                state_stack.pop_back(); // unquoted_string
                                 advance_past_space_character();
                                 break;
                             default:
@@ -4183,7 +4182,7 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    state_stack_.pop_back(); // unquoted_string
+                                    state_stack.pop_back(); // unquoted_string
                                 }
                                 break;
                         };
@@ -4193,14 +4192,14 @@ namespace detail {
                         {
                             case '\'':
                                 buffer.push_back(*p_);
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 buffer.push_back('\\');
                                 buffer.push_back(*p_);
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4213,54 +4212,54 @@ namespace detail {
                                 buffer.push_back('\"');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case '\\': 
                                 buffer.push_back('\\');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case '/':
                                 buffer.push_back('/');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 'b':
                                 buffer.push_back('\b');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 'f':
                                 buffer.push_back('\f');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 'n':
                                 buffer.push_back('\n');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 'r':
                                 buffer.push_back('\r');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 't':
                                 buffer.push_back('\t');
                                 ++p_;
                                 ++column_;
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                             case 'u':
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::escape_u1;
+                                state_stack.back() = expr_state::escape_u1;
                                 break;
                             default:
                                 ec = jmespath_errc::illegal_escaped_character;
@@ -4275,7 +4274,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u2;
+                        state_stack.back() = expr_state::escape_u2;
                         break;
                     case expr_state::escape_u2:
                         cp = append_to_codepoint(cp, *p_, ec);
@@ -4285,7 +4284,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u3;
+                        state_stack.back() = expr_state::escape_u3;
                         break;
                     case expr_state::escape_u3:
                         cp = append_to_codepoint(cp, *p_, ec);
@@ -4295,7 +4294,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u4;
+                        state_stack.back() = expr_state::escape_u4;
                         break;
                     case expr_state::escape_u4:
                         cp = append_to_codepoint(cp, *p_, ec);
@@ -4307,14 +4306,14 @@ namespace detail {
                         {
                             ++p_;
                             ++column_;
-                            state_stack_.back() = expr_state::escape_expect_surrogate_pair1;
+                            state_stack.back() = expr_state::escape_expect_surrogate_pair1;
                         }
                         else
                         {
                             unicode_traits::convert(&cp, 1, buffer);
                             ++p_;
                             ++column_;
-                            state_stack_.pop_back();
+                            state_stack.pop_back();
                         }
                         break;
                     case expr_state::escape_expect_surrogate_pair1:
@@ -4323,7 +4322,7 @@ namespace detail {
                             case '\\': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::escape_expect_surrogate_pair2;
+                                state_stack.back() = expr_state::escape_expect_surrogate_pair2;
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
@@ -4336,7 +4335,7 @@ namespace detail {
                             case 'u': 
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = expr_state::escape_u5;
+                                state_stack.back() = expr_state::escape_u5;
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
@@ -4351,7 +4350,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u6;
+                        state_stack.back() = expr_state::escape_u6;
                         break;
                     case expr_state::escape_u6:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
@@ -4361,7 +4360,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u7;
+                        state_stack.back() = expr_state::escape_u7;
                         break;
                     case expr_state::escape_u7:
                         cp2 = append_to_codepoint(cp2, *p_, ec);
@@ -4371,7 +4370,7 @@ namespace detail {
                         }
                         ++p_;
                         ++column_;
-                        state_stack_.back() = expr_state::escape_u8;
+                        state_stack.back() = expr_state::escape_u8;
                         break;
                     case expr_state::escape_u8:
                     {
@@ -4382,7 +4381,7 @@ namespace detail {
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
                         unicode_traits::convert(&codepoint, 1, buffer);
-                        state_stack_.pop_back();
+                        state_stack.pop_back();
                         ++p_;
                         ++column_;
                         break;
@@ -4392,16 +4391,16 @@ namespace detail {
                         {
                             case '\'':
                             {
-                                push_token(token<Json>(literal_arg, Json(buffer)), ec);
+                                push_token(token<Json>(literal_arg, Json(buffer)), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
-                                state_stack_.pop_back(); // raw_string
+                                state_stack.pop_back(); // raw_string
                                 ++p_;
                                 ++column_;
                                 break;
                             }
                             case '\\':
-                                state_stack_.push_back(expr_state::raw_string_escape_char);
+                                state_stack.push_back(expr_state::raw_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4428,10 +4427,10 @@ namespace detail {
                                 }
                                 auto j = decoder.get_result();
 
-                                push_token(token<Json>(literal_arg, std::move(j)), ec);
+                                push_token(token<Json>(literal_arg, std::move(j)), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
-                                state_stack_.pop_back(); // json_value
+                                state_stack.pop_back(); // json_value
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4467,12 +4466,12 @@ namespace detail {
                         {
                             case '-':
                                 buffer.push_back(*p_);
-                                state_stack_.back() = expr_state::digit;
+                                state_stack.back() = expr_state::digit;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.back() = expr_state::digit;
+                                state_stack.back() = expr_state::digit;
                                 break;
                         }
                         break;
@@ -4485,7 +4484,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.pop_back(); // digit
+                                state_stack.pop_back(); // digit
                                 break;
                         }
                         break;
@@ -4494,38 +4493,38 @@ namespace detail {
                         switch(*p_)
                         {
                             case '*':
-                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::expect_rbracket;
+                                state_stack.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': // []
-                                push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); // bracket_specifier
+                                state_stack.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
                             case '?':
-                                push_token(token<Json>(begin_filter_arg), ec);
+                                push_token(token<Json>(begin_filter_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::filter;
-                                state_stack_.push_back(expr_state::rhs_expression);
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::filter;
+                                state_stack.push_back(expr_state::rhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ':': // slice_expression
-                                state_stack_.back() = expr_state::rhs_slice_expression_stop ;
-                                state_stack_.push_back(expr_state::number);
+                                state_stack.back() = expr_state::rhs_slice_expression_stop ;
+                                state_stack.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
                             // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = expr_state::index_or_slice_expression;
-                                state_stack_.push_back(expr_state::number);
+                                state_stack.back() = expr_state::index_or_slice_expression;
+                                state_stack.push_back(expr_state::number);
                                 break;
                             default:
                                 ec = jmespath_errc::expected_index_expression;
@@ -4543,27 +4542,27 @@ namespace detail {
                                 }
                                 if (*(p_+1) == ']')
                                 {
-                                    state_stack_.back() = expr_state::bracket_specifier;
+                                    state_stack.back() = expr_state::bracket_specifier;
                                 }
                                 else
                                 {
-                                    push_token(token<Json>(begin_multi_select_list_arg), ec);
+                                    push_token(token<Json>(begin_multi_select_list_arg), output_stack, ec);
                                     if (ec) {return std::vector<token<Json>>{};}
-                                    state_stack_.back() = expr_state::multi_select_list;
-                                    state_stack_.push_back(expr_state::lhs_expression);                                
+                                    state_stack.back() = expr_state::multi_select_list;
+                                    state_stack.push_back(expr_state::lhs_expression);                                
                                 }
                                 break;
                             case ']': // []
                             case '?':
                             case ':': // slice_expression
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = expr_state::bracket_specifier;
+                                state_stack.back() = expr_state::bracket_specifier;
                                 break;
                             default:
-                                push_token(token<Json>(begin_multi_select_list_arg), ec);
+                                push_token(token<Json>(begin_multi_select_list_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::multi_select_list;
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::multi_select_list;
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -4578,17 +4577,17 @@ namespace detail {
                                 ec = jmespath_errc::expected_multi_select_list;
                                 return std::vector<token<Json>>{};
                             case '*':
-                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
+                                push_token(token<Json>(jsoncons::make_unique<list_projection>()), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::expect_rbracket;
+                                state_stack.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(begin_multi_select_list_arg), ec);
+                                push_token(token<Json>(begin_multi_select_list_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::multi_select_list;
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::multi_select_list;
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -4603,7 +4602,7 @@ namespace detail {
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 break;
                             default:
-                                state_stack_.back() = expr_state::key_val_expr;
+                                state_stack.back() = expr_state::key_val_expr;
                                 break;
                         }
                         break;
@@ -4615,7 +4614,7 @@ namespace detail {
                             {
                                 if (buffer.empty())
                                 {
-                                    push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), output_stack, ec);
                                     if (ec) {return std::vector<token<Json>>{};}
                                 }
                                 else
@@ -4627,12 +4626,12 @@ namespace detail {
                                         ec = jmespath_errc::invalid_number;
                                         return std::vector<token<Json>>{};
                                     }
-                                    push_token(token<Json>(jsoncons::make_unique<index_selector>(val)), ec);
+                                    push_token(token<Json>(jsoncons::make_unique<index_selector>(val)), output_stack, ec);
                                     if (ec) {return std::vector<token<Json>>{};}
 
                                     buffer.clear();
                                 }
-                                state_stack_.pop_back(); // bracket_specifier
+                                state_stack.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4651,8 +4650,8 @@ namespace detail {
                                     slic.start_ = val;
                                     buffer.clear();
                                 }
-                                state_stack_.back() = expr_state::rhs_slice_expression_stop;
-                                state_stack_.push_back(expr_state::number);
+                                state_stack.back() = expr_state::rhs_slice_expression_stop;
+                                state_stack.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4679,16 +4678,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 slic = slice{};
-                                state_stack_.pop_back(); // bracket_specifier2
+                                state_stack.pop_back(); // bracket_specifier2
                                 ++p_;
                                 ++column_;
                                 break;
                             case ':':
-                                state_stack_.back() = expr_state::rhs_slice_expression_step;
-                                state_stack_.push_back(expr_state::number);
+                                state_stack.back() = expr_state::rhs_slice_expression_step;
+                                state_stack.push_back(expr_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4720,11 +4719,11 @@ namespace detail {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
                                 slic = slice{};
-                                state_stack_.pop_back(); // rhs_slice_expression_step
+                                state_stack.pop_back(); // rhs_slice_expression_step
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4739,7 +4738,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case ']':
-                                state_stack_.pop_back(); // expect_rbracket
+                                state_stack.pop_back(); // expect_rbracket
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4758,9 +4757,9 @@ namespace detail {
                             case ')':
                                 ++p_;
                                 ++column_;
-                                push_token(rparen_arg, ec);
+                                push_token(rparen_arg, output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::rhs_expression;
+                                state_stack.back() = expr_state::rhs_expression;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rparen;
@@ -4775,24 +4774,24 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '\"':
-                                state_stack_.back() = expr_state::expect_colon;
-                                state_stack_.push_back(expr_state::key_expr);
-                                state_stack_.push_back(expr_state::quoted_string);
+                                state_stack.back() = expr_state::expect_colon;
+                                state_stack.push_back(expr_state::key_expr);
+                                state_stack.push_back(expr_state::quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = expr_state::expect_colon;
-                                state_stack_.push_back(expr_state::raw_string);
+                                state_stack.back() = expr_state::expect_colon;
+                                state_stack.push_back(expr_state::raw_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
-                                    state_stack_.back() = expr_state::expect_colon;
-                                    state_stack_.push_back(expr_state::key_expr);
-                                    state_stack_.push_back(expr_state::unquoted_string);
+                                    state_stack.back() = expr_state::expect_colon;
+                                    state_stack.push_back(expr_state::key_expr);
+                                    state_stack.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
                                     ++p_;
                                     ++column_;
@@ -4811,18 +4810,18 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_lte_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_lte_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources.get_lt_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_lt_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 break;
                         }
                         break;
@@ -4832,18 +4831,18 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_gte_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_gte_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources.get_gt_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_gt_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 break;
                         }
                         break;
@@ -4853,10 +4852,10 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_eq_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_eq_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4871,10 +4870,10 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources.get_ne_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_ne_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4892,7 +4891,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '.':
-                                state_stack_.pop_back(); // expect_dot
+                                state_stack.pop_back(); // expect_dot
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4907,17 +4906,17 @@ namespace detail {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token<Json>(resources.get_or_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_or_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(pipe_arg), ec);
+                                push_token(token<Json>(pipe_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); 
+                                state_stack.pop_back(); 
                                 break;
                         }
                         break;
@@ -4927,10 +4926,10 @@ namespace detail {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token<Json>(resources.get_and_operator()), ec);
-                                push_token(token<Json>(current_node_arg), ec);
+                                push_token(token<Json>(resources.get_and_operator()), output_stack, ec);
+                                push_token(token<Json>(current_node_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back(); // expect_and
+                                state_stack.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4948,17 +4947,17 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token<Json>(separator_arg), ec);
+                                push_token(token<Json>(separator_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[':
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.push_back(expr_state::sub_expression);
+                                state_stack.push_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4966,15 +4965,15 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.push_back(expr_state::lhs_expression);
-                                state_stack_.push_back(expr_state::expect_pipe_or_or);
+                                state_stack.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::expect_pipe_or_or);
                                 break;
                             }
                             case ']':
                             {
-                                push_token(token<Json>(end_multi_select_list_arg), ec);
+                                push_token(token<Json>(end_multi_select_list_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
 
                                 ++p_;
                                 ++column_;
@@ -4995,9 +4994,9 @@ namespace detail {
                                 break;
                             case ']':
                             {
-                                push_token(token<Json>(end_filter_arg), ec);
+                                push_token(token<Json>(end_filter_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.pop_back();
+                                state_stack.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5016,25 +5015,25 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token<Json>(separator_arg), ec);
+                                push_token(token<Json>(separator_arg), output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
-                                state_stack_.back() = expr_state::key_val_expr; 
+                                state_stack.back() = expr_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
                                 break;
                             case '[':
                             case '{':
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.push_back(expr_state::sub_expression);
+                                state_stack.push_back(expr_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '}':
                             {
-                                state_stack_.pop_back();
-                                push_token(end_multi_select_hash_arg, ec);
+                                state_stack.pop_back();
+                                push_token(end_multi_select_hash_arg, output_stack, ec);
                                 if (ec) {return std::vector<token<Json>>{};}
                                 ++p_;
                                 ++column_;
@@ -5054,8 +5053,8 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ':':
-                                state_stack_.back() = expr_state::expect_rbrace;
-                                state_stack_.push_back(expr_state::lhs_expression);
+                                state_stack.back() = expr_state::expect_rbrace;
+                                state_stack.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5069,19 +5068,19 @@ namespace detail {
                 
             }
 
-            if (state_stack_.empty())
+            if (state_stack.empty())
             {
                 ec = jmespath_errc::syntax_error;
                 return std::vector<token<Json>>{};
             }
-            while (state_stack_.size() > 1)
+            while (state_stack.size() > 1)
             {
-                switch (state_stack_.back())
+                switch (state_stack.back())
                 {
                     case expr_state::rhs_expression:
-                        if (state_stack_.size() > 1)
+                        if (state_stack.size() > 1)
                         {
-                            state_stack_.pop_back();
+                            state_stack.pop_back();
                         }
                         else
                         {
@@ -5090,17 +5089,17 @@ namespace detail {
                         }
                         break;
                     case expr_state::val_expr:
-                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
-                        state_stack_.pop_back(); 
+                        state_stack.pop_back(); 
                         break;
                     case expr_state::identifier_or_function_expr:
-                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}
-                        state_stack_.pop_back(); 
+                        state_stack.pop_back(); 
                         break;
                     case expr_state::unquoted_string: 
-                        state_stack_.pop_back(); 
+                        state_stack.pop_back(); 
                         break;
                     default:
                         ec = jmespath_errc::syntax_error;
@@ -5109,23 +5108,23 @@ namespace detail {
                 }
             }
 
-            if (!(state_stack_.size() == 1 && state_stack_.back() == expr_state::rhs_expression))
+            if (!(state_stack.size() == 1 && state_stack.back() == expr_state::rhs_expression))
             {
                 ec = jmespath_errc::unexpected_end_of_input;
                 return std::vector<token<Json>>{};
             }
 
-            state_stack_.pop_back();
+            state_stack.pop_back();
 
-            push_token(end_of_expression_arg, ec);
+            push_token(end_of_expression_arg, output_stack, ec);
             if (ec) {return std::vector<token<Json>>{};}
 
-            //for (auto& t : output_stack_)
+            //for (auto& t : output_stack)
             //{
             //    std::cout << t.to_string() << '\n';
             //}
 
-            return std::move(output_stack_);
+            return std::move(output_stack);
         }
 
         void advance_past_space_character()
@@ -5156,12 +5155,12 @@ namespace detail {
             }
         }
 
-        void unwind_rparen(std::error_code& ec)
+        void unwind_rparen(std::vector<token<Json>>& output_stack, std::error_code& ec)
         {
             auto it = operator_stack_.rbegin();
             while (it != operator_stack_.rend() && !(*it).is_lparen())
             {
-                output_stack_.push_back(std::move(*it));
+                output_stack.push_back(std::move(*it));
                 ++it;
             }
             if (it == operator_stack_.rend())
@@ -5173,21 +5172,21 @@ namespace detail {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void push_token(token<Json>&& tok, std::error_code& ec)
+        void push_token(token<Json>&& tok, std::vector<token<Json>>& output_stack, std::error_code& ec)
         {
             switch (tok.type())
             {
                 case token_kind::end_filter:
                 {
-                    unwind_rparen(ec);
+                    unwind_rparen(output_stack, ec);
                     std::vector<token<Json>> toks;
-                    auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_filter)
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && (*it).type() != token_kind::begin_filter)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
                     }
-                    if (it == output_stack_.rend())
+                    if (it == output_stack.rend())
                     {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
@@ -5198,33 +5197,33 @@ namespace detail {
                     }
                     std::reverse(toks.begin(), toks.end());
                     ++it;
-                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack.erase(it.base(),output_stack.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack.empty() && output_stack.back().is_projection() && 
+                        (tok.precedence_level() < output_stack.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
                     {
-                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<filter_expression>(std::move(toks)));
+                        output_stack.back().expression_->add_expression(jsoncons::make_unique<filter_expression>(std::move(toks)));
                     }
                     else
                     {
-                        output_stack_.push_back(token<Json>(jsoncons::make_unique<filter_expression>(std::move(toks))));
+                        output_stack.push_back(token<Json>(jsoncons::make_unique<filter_expression>(std::move(toks))));
                     }
                     break;
                 }
                 case token_kind::end_multi_select_list:
                 {
-                    unwind_rparen(ec);
+                    unwind_rparen(output_stack, ec);
                     std::vector<std::vector<token<Json>>> vals;
-                    auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_list)
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && (*it).type() != token_kind::begin_multi_select_list)
                     {
                         std::vector<token<Json>> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                        } while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_list && (*it).type() != token_kind::separator);
+                        } while (it != output_stack.rend() && (*it).type() != token_kind::begin_multi_select_list && (*it).type() != token_kind::separator);
                         if ((*it).type() == token_kind::separator)
                         {
                             ++it;
@@ -5236,39 +5235,39 @@ namespace detail {
                         std::reverse(toks.begin(), toks.end());
                         vals.emplace_back(std::move(toks));
                     }
-                    if (it == output_stack_.rend())
+                    if (it == output_stack.rend())
                     {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
                     }
                     ++it;
-                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack.erase(it.base(),output_stack.end());
                     std::reverse(vals.begin(), vals.end());
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack.empty() && output_stack.back().is_projection() && 
+                        (tok.precedence_level() < output_stack.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
                     {
-                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_list>(std::move(vals)));
+                        output_stack.back().expression_->add_expression(jsoncons::make_unique<multi_select_list>(std::move(vals)));
                     }
                     else
                     {
-                        output_stack_.push_back(token<Json>(jsoncons::make_unique<multi_select_list>(std::move(vals))));
+                        output_stack.push_back(token<Json>(jsoncons::make_unique<multi_select_list>(std::move(vals))));
                     }
                     break;
                 }
                 case token_kind::end_multi_select_hash:
                 {
-                    unwind_rparen(ec);
+                    unwind_rparen(output_stack, ec);
                     std::vector<key_tokens> key_toks;
-                    auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_multi_select_hash)
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && (*it).type() != token_kind::begin_multi_select_hash)
                     {
                         std::vector<token<Json>> toks;
                         do
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                        } while (it != output_stack_.rend() && (*it).type() != token_kind::key);
+                        } while (it != output_stack.rend() && (*it).type() != token_kind::key);
                         JSONCONS_ASSERT((*it).is_key());
                         auto key = std::move((*it).key_);
                         ++it;
@@ -5283,37 +5282,37 @@ namespace detail {
                         std::reverse(toks.begin(), toks.end());
                         key_toks.emplace_back(std::move(key), std::move(toks));
                     }
-                    if (it == output_stack_.rend())
+                    if (it == output_stack.rend())
                     {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
                     }
                     std::reverse(key_toks.begin(), key_toks.end());
                     ++it;
-                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack.erase(it.base(),output_stack.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack.empty() && output_stack.back().is_projection() && 
+                        (tok.precedence_level() < output_stack.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
                     {
-                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_hash>(std::move(key_toks)));
+                        output_stack.back().expression_->add_expression(jsoncons::make_unique<multi_select_hash>(std::move(key_toks)));
                     }
                     else
                     {
-                        output_stack_.push_back(token<Json>(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
+                        output_stack.push_back(token<Json>(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
                     }
                     break;
                 }
                 case token_kind::end_expression_type:
                 {
                     std::vector<token<Json>> toks;
-                    auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && (*it).type() != token_kind::begin_expression_type)
+                    auto it = output_stack.rbegin();
+                    while (it != output_stack.rend() && (*it).type() != token_kind::begin_expression_type)
                     {
                         toks.emplace_back(std::move(*it));
                         ++it;
                     }
-                    if (it == output_stack_.rend())
+                    if (it == output_stack.rend())
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
                     }
@@ -5322,44 +5321,44 @@ namespace detail {
                         toks.emplace_back(current_node_arg);
                     }
                     std::reverse(toks.begin(), toks.end());
-                    output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
+                    output_stack.erase(it.base(),output_stack.end());
+                    output_stack.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                     break;
                 }
                 case token_kind::literal:
-                    if (!output_stack_.empty() && output_stack_.back().type() == token_kind::current_node)
+                    if (!output_stack.empty() && output_stack.back().type() == token_kind::current_node)
                     {
-                        output_stack_.back() = std::move(tok);
+                        output_stack.back() = std::move(tok);
                     }
                     else
                     {
-                        output_stack_.push_back(std::move(tok));
+                        output_stack.push_back(std::move(tok));
                     }
                     break;
                 case token_kind::expression:
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack.empty() && output_stack.back().is_projection() && 
+                        (tok.precedence_level() < output_stack.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
                     {
-                        output_stack_.back().expression_->add_expression(std::move(tok.expression_));
+                        output_stack.back().expression_->add_expression(std::move(tok.expression_));
                     }
                     else
                     {
-                        output_stack_.push_back(std::move(tok));
+                        output_stack.push_back(std::move(tok));
                     }
                     break;
                 case token_kind::rparen:
                     {
-                        unwind_rparen(ec);
+                        unwind_rparen(output_stack, ec);
                         break;
                     }
                 case token_kind::end_function:
                     {
-                        unwind_rparen(ec);
+                        unwind_rparen(output_stack, ec);
                         std::vector<token<Json>> toks;
-                        auto it = output_stack_.rbegin();
+                        auto it = output_stack.rbegin();
                         std::size_t arg_count = 0;
-                        while (it != output_stack_.rend() && (*it).type() != token_kind::function)
+                        while (it != output_stack.rend() && (*it).type() != token_kind::function)
                         {
                             if ((*it).type() == token_kind::argument)
                             {
@@ -5368,7 +5367,7 @@ namespace detail {
                             toks.emplace_back(std::move(*it));
                             ++it;
                         }
-                        if (it == output_stack_.rend())
+                        if (it == output_stack.rend())
                         {
                             ec = jmespath_errc::unbalanced_parentheses;
                             return;
@@ -5382,8 +5381,8 @@ namespace detail {
                         {
                             toks.emplace_back(std::move(*it));
                             ++it;
-                            output_stack_.erase(it.base(), output_stack_.end());
-                            output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack.erase(it.base(), output_stack.end());
+                            output_stack.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                             break;
                         }
                         if (toks.back().type() != token_kind::literal)
@@ -5393,17 +5392,17 @@ namespace detail {
                         std::reverse(toks.begin(), toks.end());
                         toks.push_back(std::move(*it));
                         ++it;
-                        output_stack_.erase(it.base(),output_stack_.end());
+                        output_stack.erase(it.base(),output_stack.end());
 
-                        if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                            (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                            (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                        if (!output_stack.empty() && output_stack.back().is_projection() && 
+                            (tok.precedence_level() < output_stack.back().precedence_level() ||
+                            (tok.precedence_level() == output_stack.back().precedence_level() && tok.is_right_associative())))
                         {
-                            output_stack_.back().expression_->add_expression(jsoncons::make_unique<function_expression>(std::move(toks)));
+                            output_stack.back().expression_->add_expression(jsoncons::make_unique<function_expression>(std::move(toks)));
                         }
                         else
                         {
-                            output_stack_.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
+                            output_stack.push_back(token<Json>(jsoncons::make_unique<function_expression>(std::move(toks))));
                         }
                         break;
                     }
@@ -5412,7 +5411,7 @@ namespace detail {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend())
                         {
-                            output_stack_.push_back(std::move(*it));
+                            output_stack.push_back(std::move(*it));
                             ++it;
                         }
                         operator_stack_.clear();
@@ -5437,7 +5436,7 @@ namespace detail {
                                && (tok.precedence_level() > (*it).precedence_level()
                              || (tok.precedence_level() == (*it).precedence_level() && tok.is_right_associative())))
                         {
-                            output_stack_.push_back(std::move(*it));
+                            output_stack.push_back(std::move(*it));
                             ++it;
                         }
 
@@ -5448,35 +5447,35 @@ namespace detail {
                 }
                 case token_kind::separator:
                 {
-                    unwind_rparen(ec);
-                    output_stack_.push_back(std::move(tok));
+                    unwind_rparen(output_stack, ec);
+                    output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 }
                 case token_kind::begin_filter:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_list:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::begin_multi_select_hash:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::function:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     operator_stack_.emplace_back(token<Json>(lparen_arg));
                     break;
                 case token_kind::current_node:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::key:
                 case token_kind::pipe:
                 case token_kind::argument:
                 case token_kind::begin_expression_type:
-                    output_stack_.push_back(std::move(tok));
+                    output_stack.push_back(std::move(tok));
                     break;
                 case token_kind::lparen:
                     operator_stack_.emplace_back(std::move(tok));
