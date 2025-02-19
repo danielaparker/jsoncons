@@ -3588,10 +3588,7 @@ namespace detail {
             static_resources resources_;
             std::vector<token<Json>> output_stack_;
         public:
-            jmespath_expression(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
-                : resources_{funcs}
-            {
-            }
+            jmespath_expression() = default;
 
             jmespath_expression(const jmespath_expression& expr) = delete;
             jmespath_expression& operator=(const jmespath_expression& expr) = delete;
@@ -3603,7 +3600,7 @@ namespace detail {
             }
 
             jmespath_expression(static_resources&& resources,
-                                std::vector<token<Json>>&& output_stack)
+                std::vector<token<Json>>&& output_stack)
                 : resources_(std::move(resources)), output_stack_(std::move(output_stack))
             {
             }
@@ -3636,21 +3633,17 @@ namespace detail {
     public:
         std::size_t line_{1};
         std::size_t column_{1};
-        const char_type* begin_input_;
-        const char_type* end_input_;
-        const char_type* p_;
+        const char_type* begin_input_{nullptr};
+        const char_type* end_input_{nullptr};
+        const char_type* p_{nullptr};
 
-        static_resources resources_;
         std::vector<expr_state> state_stack_;
 
         std::vector<token<Json>> output_stack_;
         std::vector<token<Json>> operator_stack_;
 
     public:
-        jmespath_evaluator(const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
-            : begin_input_(nullptr), end_input_(nullptr),
-              p_(nullptr),
-              resources_{funcs}
+        jmespath_evaluator()
         {
         }
         
@@ -3666,11 +3659,17 @@ namespace detail {
             return column_;
         }
 
-        jmespath_expression compile(const char_type* path, std::size_t length, 
+        std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources,
             std::error_code& ec)
         {
+            return compile(path, length, resources, false, ec);
+        }
+
+        std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
+            bool is_let_expression, std::error_code& ec)
+        {
             push_token(current_node_arg, ec);
-            if (ec) {return jmespath_expression();}
+            if (ec) {return std::vector<token<Json>>{};}
             state_stack_.push_back(expr_state::start);
 
             string_type buffer;
@@ -3749,9 +3748,15 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    //done = true;
-                                    ec = jmespath_errc::syntax_error;
-                                    return jmespath_expression();
+                                    if (is_let_expression && (*p_ == ',' || (*p_ == 'i' && (end_input_-p_) >= 2 && *(p_+1) == 'n')))
+                                    {
+                                        done = true;
+                                    }
+                                    else
+                                    {
+                                        ec = jmespath_errc::syntax_error;
+                                        return std::vector<token<Json>>{};
+                                    }
                                 }
                                 break;
                         }
@@ -3790,7 +3795,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jmespath_errc::syntax_error;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 break;
                         }
@@ -3820,14 +3825,14 @@ namespace detail {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*': // wildcard
                                 push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -3837,7 +3842,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(lparen_arg, ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::expect_rparen;
                                 state_stack_.push_back(expr_state::rhs_expression);
                                 state_stack_.push_back(expr_state::lhs_expression);
@@ -3847,15 +3852,15 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token<Json>(resources_.get_not_operator()), ec);
-                                if (ec) {return jmespath_expression();}
+                                push_token(token<Json>(resources.get_not_operator()), ec);
+                                if (ec) {return std::vector<token<Json>>{};}
                                 break;
                             }
                             case '@':
                                 ++p_;
                                 ++column_;
                                 push_token(token<Json>(jsoncons::make_unique<current_node>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 break;
                             case '[': 
@@ -3875,7 +3880,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jmespath_errc::expected_identifier;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 break;
                         };
@@ -3896,14 +3901,14 @@ namespace detail {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 push_token(token<Json>(jsoncons::make_unique<object_projection>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -3925,7 +3930,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jmespath_errc::expected_identifier;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 break;
                         };
@@ -3933,13 +3938,13 @@ namespace detail {
                     }
                     case expr_state::key_expr:
                         push_token(token<Json>(key_arg, buffer), ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         buffer.clear(); 
                         state_stack_.pop_back(); 
                         break;
                     case expr_state::val_expr:
                         push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         buffer.clear();
                         state_stack_.pop_back(); 
                         break;
@@ -3951,7 +3956,7 @@ namespace detail {
                                 break;
                             case '&':
                                 push_token(token<Json>(begin_expression_type_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::expression_type;
                                 state_stack_.push_back(expr_state::rhs_expression);
                                 state_stack_.push_back(expr_state::lhs_expression);
@@ -3970,7 +3975,7 @@ namespace detail {
                         if (!(*p_ == 'i' && (p_+1) < end_input_ && *(p_+1) == 'n'))
                         {
                             ec = jmespath_errc::syntax_error;
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         p_ += 2;
                         column_ += 2;
@@ -3990,15 +3995,15 @@ namespace detail {
                                 ++column_;
                                 std::cout << "before compile\n";
                                 jmespath_evaluator evaluator{};
-                                auto expr = evaluator.compile(p_, (end_input_-p_), ec);
+                                auto output_stk = evaluator.compile(p_, (end_input_-p_), resources, true, ec);
                                 std::cout << "after compile\n";
                                 if (ec)
                                 {
-                                    std::cout << "expr error " << ec.message() << ", " << *p_ << "\n";
-                                    return jmespath_expression();
+                                    std::cout << "COMPILE ERROR " << ec.message() << ", " << *p_ << "\n";
+                                    return std::vector<token<Json>>{};
                                 }
                                 p_ = evaluator.p_;
-                                std::cout << "buffer: " << buffer << ", num tokens: " << expr.output_stack_.size() << "\n";
+                                std::cout << "buffer: " << buffer << ", num tokens: " << output_stk.size() << "\n";
                                 buffer.clear();
                                 state_stack_.back() = expr_state::expect_in;
                                 break;
@@ -4007,14 +4012,12 @@ namespace detail {
                             {
                                 std::cout << *p_ << "\n";
                                 ec = jmespath_errc::syntax_error;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             }
                         }
                         break;
                     case expr_state::variable_ref:
                         std::cout << buffer << "\n";
-                        //++p_;
-                        //++column_;
                         state_stack_.back() = expr_state::expect_assign;
                         break;
                     case expr_state::let_expression:
@@ -4035,7 +4038,7 @@ namespace detail {
                             default:
                             {
                                 ec = jmespath_errc::syntax_error;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             }
                         }
                         break;
@@ -4045,14 +4048,14 @@ namespace detail {
                         {
                             case '(':
                             {
-                                auto f = resources_.get_function(buffer, ec);
+                                auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 buffer.clear();
                                 push_token(token<Json>(f), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::function_expression;
                                 // check no-args function
                                 bool is_no_args_func = true;
@@ -4094,7 +4097,7 @@ namespace detail {
                                 else
                                 {
                                     push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                    if (ec) {return jmespath_expression();}
+                                    if (ec) {return std::vector<token<Json>>{};}
                                     buffer.clear();
                                     state_stack_.pop_back(); 
                                 }
@@ -4111,7 +4114,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.push_back(expr_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
@@ -4119,7 +4122,7 @@ namespace detail {
                             case ')':
                             {
                                 push_token(token<Json>(end_function_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -4132,14 +4135,14 @@ namespace detail {
 
                     case expr_state::argument:
                         push_token(argument_arg, ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         state_stack_.pop_back();
                         break;
 
                     case expr_state::expression_type:
                         push_token(end_expression_type_arg, ec);
                         push_token(argument_arg, ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         state_stack_.pop_back();
                         break;
 
@@ -4261,14 +4264,14 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::illegal_escaped_character;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4278,7 +4281,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4288,7 +4291,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4298,7 +4301,7 @@ namespace detail {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         if (unicode_traits::is_high_surrogate(cp))
                         {
@@ -4324,7 +4327,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::escape_expect_surrogate_pair2:
@@ -4337,14 +4340,14 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4354,7 +4357,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4364,7 +4367,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         ++p_;
                         ++column_;
@@ -4375,7 +4378,7 @@ namespace detail {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
                         unicode_traits::convert(&codepoint, 1, buffer);
@@ -4390,7 +4393,7 @@ namespace detail {
                             case '\'':
                             {
                                 push_token(token<Json>(literal_arg, Json(buffer)), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
                                 state_stack_.pop_back(); // raw_string
                                 ++p_;
@@ -4421,12 +4424,12 @@ namespace detail {
                                 if (parse_ec)
                                 {
                                     ec = jmespath_errc::invalid_literal;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 auto j = decoder.get_result();
 
                                 push_token(token<Json>(literal_arg, std::move(j)), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
                                 state_stack_.pop_back(); // json_value
                                 ++p_;
@@ -4447,7 +4450,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jmespath_errc::unexpected_end_of_input;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 ++p_;
                                 ++column_;
@@ -4492,21 +4495,21 @@ namespace detail {
                         {
                             case '*':
                                 push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': // []
                                 push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
                             case '?':
                                 push_token(token<Json>(begin_filter_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::filter;
                                 state_stack_.push_back(expr_state::rhs_expression);
                                 state_stack_.push_back(expr_state::lhs_expression);
@@ -4526,7 +4529,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_index_expression;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::bracket_specifier_or_multi_select_list:
@@ -4536,7 +4539,7 @@ namespace detail {
                                 if (p_+1 >= end_input_)
                                 {
                                     ec = jmespath_errc::unexpected_end_of_input;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 if (*(p_+1) == ']')
                                 {
@@ -4545,7 +4548,7 @@ namespace detail {
                                 else
                                 {
                                     push_token(token<Json>(begin_multi_select_list_arg), ec);
-                                    if (ec) {return jmespath_expression();}
+                                    if (ec) {return std::vector<token<Json>>{};}
                                     state_stack_.back() = expr_state::multi_select_list;
                                     state_stack_.push_back(expr_state::lhs_expression);                                
                                 }
@@ -4558,7 +4561,7 @@ namespace detail {
                                 break;
                             default:
                                 push_token(token<Json>(begin_multi_select_list_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::multi_select_list;
                                 state_stack_.push_back(expr_state::lhs_expression);
                                 break;
@@ -4573,17 +4576,17 @@ namespace detail {
                             case ':':
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 ec = jmespath_errc::expected_multi_select_list;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             case '*':
                                 push_token(token<Json>(jsoncons::make_unique<list_projection>()), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token<Json>(begin_multi_select_list_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::multi_select_list;
                                 state_stack_.push_back(expr_state::lhs_expression);
                                 break;
@@ -4613,7 +4616,7 @@ namespace detail {
                                 if (buffer.empty())
                                 {
                                     push_token(token<Json>(jsoncons::make_unique<flatten_projection>()), ec);
-                                    if (ec) {return jmespath_expression();}
+                                    if (ec) {return std::vector<token<Json>>{};}
                                 }
                                 else
                                 {
@@ -4622,10 +4625,10 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
-                                        return jmespath_expression();
+                                        return std::vector<token<Json>>{};
                                     }
                                     push_token(token<Json>(jsoncons::make_unique<index_selector>(val)), ec);
-                                    if (ec) {return jmespath_expression();}
+                                    if (ec) {return std::vector<token<Json>>{};}
 
                                     buffer.clear();
                                 }
@@ -4643,7 +4646,7 @@ namespace detail {
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
-                                        return jmespath_expression();
+                                        return std::vector<token<Json>>{};
                                     }
                                     slic.start_ = val;
                                     buffer.clear();
@@ -4656,7 +4659,7 @@ namespace detail {
                             }
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::rhs_slice_expression_stop :
@@ -4668,7 +4671,7 @@ namespace detail {
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             }
                             slic.stop_ = jsoncons::optional<int64_t>(val);
                             buffer.clear();
@@ -4677,7 +4680,7 @@ namespace detail {
                         {
                             case ']':
                                 push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -4691,7 +4694,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4704,12 +4707,12 @@ namespace detail {
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             }
                             if (val == 0)
                             {
                                 ec = jmespath_errc::step_cannot_be_zero;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                             }
                             slic.step_ = val;
                             buffer.clear();
@@ -4718,7 +4721,7 @@ namespace detail {
                         {
                             case ']':
                                 push_token(token<Json>(jsoncons::make_unique<slice_projection>(slic)), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // rhs_slice_expression_step
@@ -4727,7 +4730,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4742,7 +4745,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4756,12 +4759,12 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 push_token(rparen_arg, ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::rhs_expression;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rparen;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::key_val_expr: 
@@ -4797,7 +4800,7 @@ namespace detail {
                                 else
                                 {
                                     ec = jmespath_errc::expected_key;
-                                    return jmespath_expression();
+                                    return std::vector<token<Json>>{};
                                 }
                                 break;
                         };
@@ -4808,17 +4811,17 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources_.get_lte_operator()), ec);
+                                push_token(token<Json>(resources.get_lte_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources_.get_lt_operator()), ec);
+                                push_token(token<Json>(resources.get_lt_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -4829,17 +4832,17 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources_.get_gte_operator()), ec);
+                                push_token(token<Json>(resources.get_gte_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token<Json>(resources_.get_gt_operator()), ec);
+                                push_token(token<Json>(resources.get_gt_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -4850,16 +4853,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources_.get_eq_operator()), ec);
+                                push_token(token<Json>(resources.get_eq_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4868,16 +4871,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token<Json>(resources_.get_ne_operator()), ec);
+                                push_token(token<Json>(resources.get_ne_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4895,7 +4898,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_dot;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4904,16 +4907,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token<Json>(resources_.get_or_operator()), ec);
+                                push_token(token<Json>(resources.get_or_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token<Json>(pipe_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -4924,16 +4927,16 @@ namespace detail {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token<Json>(resources_.get_and_operator()), ec);
+                                push_token(token<Json>(resources.get_and_operator()), ec);
                                 push_token(token<Json>(current_node_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 ec = jmespath_errc::expected_and;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4946,7 +4949,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(token<Json>(separator_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.push_back(expr_state::lhs_expression);
                                 ++p_;
                                 ++column_;
@@ -4970,7 +4973,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(token<Json>(end_multi_select_list_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
 
                                 ++p_;
@@ -4979,7 +4982,7 @@ namespace detail {
                             }
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -4993,7 +4996,7 @@ namespace detail {
                             case ']':
                             {
                                 push_token(token<Json>(end_filter_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -5001,7 +5004,7 @@ namespace detail {
                             }
                             default:
                                 ec = jmespath_errc::expected_rbracket;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -5014,7 +5017,7 @@ namespace detail {
                                 break;
                             case ',':
                                 push_token(token<Json>(separator_arg), ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 state_stack_.back() = expr_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
@@ -5032,14 +5035,14 @@ namespace detail {
                             {
                                 state_stack_.pop_back();
                                 push_token(end_multi_select_hash_arg, ec);
-                                if (ec) {return jmespath_expression();}
+                                if (ec) {return std::vector<token<Json>>{};}
                                 ++p_;
                                 ++column_;
                                 break;
                             }
                             default:
                                 ec = jmespath_errc::expected_rbrace;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -5058,7 +5061,7 @@ namespace detail {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_colon;
-                                return jmespath_expression();
+                                return std::vector<token<Json>>{};
                         }
                         break;
                     }
@@ -5069,7 +5072,7 @@ namespace detail {
             if (state_stack_.empty())
             {
                 ec = jmespath_errc::syntax_error;
-                return jmespath_expression();
+                return std::vector<token<Json>>{};
             }
             while (state_stack_.size() > 1)
             {
@@ -5083,17 +5086,17 @@ namespace detail {
                         else
                         {
                             ec = jmespath_errc::syntax_error;
-                            return jmespath_expression();
+                            return std::vector<token<Json>>{};
                         }
                         break;
                     case expr_state::val_expr:
                         push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         state_stack_.pop_back(); 
                         break;
                     case expr_state::identifier_or_function_expr:
                         push_token(token<Json>(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                        if (ec) {return jmespath_expression();}
+                        if (ec) {return std::vector<token<Json>>{};}
                         state_stack_.pop_back(); 
                         break;
                     case expr_state::unquoted_string: 
@@ -5101,7 +5104,7 @@ namespace detail {
                         break;
                     default:
                         ec = jmespath_errc::syntax_error;
-                        return jmespath_expression();
+                        return std::vector<token<Json>>{};
                         break;
                 }
             }
@@ -5109,20 +5112,20 @@ namespace detail {
             if (!(state_stack_.size() == 1 && state_stack_.back() == expr_state::rhs_expression))
             {
                 ec = jmespath_errc::unexpected_end_of_input;
-                return jmespath_expression();
+                return std::vector<token<Json>>{};
             }
 
             state_stack_.pop_back();
 
             push_token(end_of_expression_arg, ec);
-            if (ec) {return jmespath_expression();}
+            if (ec) {return std::vector<token<Json>>{};}
 
             //for (auto& t : output_stack_)
             //{
             //    std::cout << t.to_string() << '\n';
             //}
 
-            return jmespath_expression(std::move(resources_), std::move(output_stack_));
+            return std::move(output_stack_);
         }
 
         void advance_past_space_character()
@@ -5516,11 +5519,13 @@ namespace detail {
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator;
         std::error_code ec;
-        auto expr = evaluator.compile(path.data(), path.size(), ec);
+        typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources resources;
+        auto output_stack = evaluator.compile(path.data(), path.size(), resources, ec);
         if (ec)
         {
             JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
         }
+        jmespath_expression<Json> expr{ std::move(resources), std::move(output_stack) };
         auto result = expr.evaluate(doc, ec);
         if (ec)
         {
@@ -5533,11 +5538,13 @@ namespace detail {
     Json search(const Json& doc, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator;
-        auto expr = evaluator.compile(path.data(), path.size(), ec);
+        typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources resources;
+        auto output_stack = evaluator.compile(path.data(), path.size(), resources, ec);
         if (ec)
         {
             return Json::null();
         }
+        jmespath_expression<Json> expr{ std::move(resources), std::move(output_stack) };
         auto result = expr.evaluate(doc, ec);
         if (ec)
         {
@@ -5550,14 +5557,15 @@ namespace detail {
     jmespath_expression<Json> make_expression(const typename Json::string_view_type& expr,
         const jsoncons::jmespath::custom_functions<Json>& funcs = jsoncons::jmespath::custom_functions<Json>())
     {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{ funcs };
+        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
         std::error_code ec;
-        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
+        typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources resources{funcs};
+        auto output_stack = evaluator.compile(expr.data(), expr.size(), resources, ec);
         if (ec)
         {
             JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
         }
-        return result;
+        return jmespath_expression<Json>{ std::move(resources), std::move(output_stack) };
     }
 
     template <typename Json>
@@ -5565,8 +5573,9 @@ namespace detail {
         std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
-        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
-        return result;
+        typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources resources;
+        auto output_stack = evaluator.compile(expr.data(), expr.size(), resources, ec);
+        return jmespath_expression<Json>{ std::move(resources), std::move(output_stack) };
     }
 
     template <typename Json>
@@ -5574,9 +5583,10 @@ namespace detail {
         const jsoncons::jmespath::custom_functions<Json>& funcs,
         std::error_code& ec)
     {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{ funcs };
-        jmespath_expression<Json> result = evaluator.compile(expr.data(), expr.size(), ec);
-        return result;
+        jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator{};
+        typename jsoncons::jmespath::detail::jmespath_evaluator<Json>::static_resources resources{funcs};
+        auto output_stack = evaluator.compile(expr.data(), expr.size(), resources, ec);
+        return jmespath_expression<Json>{ std::move(resources), std::move(output_stack) };
     }
 
 } // namespace jmespath
