@@ -1231,6 +1231,14 @@ namespace detail {
         expect_assign,
         expect_in
     };
+    
+    struct expression_context
+    {
+        std::size_t end_index{0};
+        std::string variable_ref;
+
+        expression_context() = default;
+    };
 
     template <typename Json>
     class jmespath_evaluator 
@@ -3655,17 +3663,13 @@ namespace detail {
             return column_;
         }
 
-        std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources,
+        std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
             std::error_code& ec)
         {
-            return compile(path, length, resources, false, ec);
-        }
-
-        std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
-            bool is_let_expression, std::error_code& ec)
-        {
+            std::vector<expression_context> context_stack;
             std::vector<expr_state> state_stack;
             std::vector<token<Json>> output_stack;
+            std::string key_buffer;
 
             push_token(current_node_arg, output_stack, ec);
             if (ec) {return std::vector<token<Json>>{};}
@@ -3743,19 +3747,16 @@ namespace detail {
                             default:
                                 if (state_stack.size() > 1) 
                                 {
+                                    if (context_stack.size() > 0)
+                                    {
+                                        context_stack.pop_back();
+                                    }
                                     state_stack.pop_back();
                                 }
                                 else
                                 {
-                                    if (is_let_expression && (*p_ == ',' || (*p_ == 'i' && (end_input_-p_) >= 2 && *(p_+1) == 'n')))
-                                    {
-                                        done = true;
-                                    }
-                                    else
-                                    {
-                                        ec = jmespath_errc::syntax_error;
-                                        return std::vector<token<Json>>{};
-                                    }
+                                    ec = jmespath_errc::syntax_error;
+                                    return std::vector<token<Json>>{};
                                 }
                                 break;
                         }
@@ -3881,6 +3882,7 @@ namespace detail {
                                     ec = jmespath_errc::expected_identifier;
                                     return std::vector<token<Json>>{};
                                 }
+                                context_stack.push_back(expression_context{});
                                 break;
                         };
                         break;
@@ -3970,6 +3972,8 @@ namespace detail {
                         }
                         break;
                     case expr_state::expect_in:
+                        std::cout << "expect_in buffer: " << buffer << ", num tokens: " << output_stack.size() << "\n";
+                        std::cout << "CONTEXT: " << context_stack.back().end_index << ", " <<  context_stack.back().variable_ref << "\n";
                         advance_past_space_character();
                         if (!(*p_ == 'i' && (p_+1) < end_input_ && *(p_+1) == 'n'))
                         {
@@ -3992,19 +3996,13 @@ namespace detail {
                                 std::cout << "expect_assign\n";
                                 ++p_;
                                 ++column_;
-                                std::cout << "before compile\n";
-                                jmespath_evaluator evaluator{};
-                                auto output_stk = evaluator.compile(p_, (end_input_-p_), resources, true, ec);
-                                std::cout << "after compile\n";
-                                if (ec)
-                                {
-                                    std::cout << "COMPILE ERROR " << ec.message() << ", " << *p_ << "\n";
-                                    return std::vector<token<Json>>{};
-                                }
-                                p_ = evaluator.p_;
-                                std::cout << "buffer: " << buffer << ", num tokens: " << output_stk.size() << "\n";
-                                buffer.clear();
+                                
                                 state_stack.back() = expr_state::expect_in;
+                                state_stack.push_back(expr_state::rhs_expression);
+                                state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.back().end_index = output_stack.size();
+                                context_stack.back().variable_ref = buffer;
+                                buffer.clear();
                                 break;
                             }
                             default:
