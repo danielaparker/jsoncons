@@ -533,8 +533,9 @@ namespace detail {
     template <typename Json>
     class unary_operator
     {
+    public:
         using reference = typename Json::const_reference;
-
+    private:
         std::size_t precedence_level_;
         bool is_right_associative_;
 
@@ -562,8 +563,9 @@ namespace detail {
     template <typename Json>
     class binary_operator
     {
+    public:  
         using reference = typename Json::const_reference;
-
+    private:
         std::size_t precedence_level_;
         bool is_right_associative_;
     protected:
