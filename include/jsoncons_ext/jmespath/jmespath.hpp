@@ -189,7 +189,7 @@ namespace jmespath {
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
-            temp_storage_.emplace_back(std::move(temp));
+            temp_storage_.push_back(std::move(temp));
             return ptr;
         }
     };
@@ -3485,7 +3485,7 @@ namespace detail {
                 }
             };
 
-            std::vector<std::unique_ptr<Json>> temp_storage_;
+            std::vector<std::unique_ptr<expr_base<Json>>> expr_storage_;
             std::unordered_map<string_type,std::unique_ptr<function_base<Json>>,MyHash> custom_functions_;
             
         public:
@@ -3504,6 +3504,15 @@ namespace detail {
                     custom_functions_.emplace(item.name(),
                         jsoncons::make_unique<function_wrapper<Json>>(item.arity(),item.function()));
                 }
+            }
+            
+            template <typename T>
+            expr_base<Json>* create_expression(T&& val)
+            {
+                auto temp = jsoncons::make_unique<T>(std::forward<T>(val));
+                expr_base<Json>* ptr = temp.get();
+                expr_storage_.push_back(std::move(temp));
+                return ptr;
             }
 
             const function_base<Json>* get_function(const string_type& name, std::error_code& ec) const

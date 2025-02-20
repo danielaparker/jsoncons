@@ -2315,7 +2315,7 @@ namespace detail {
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
+            temp_json_values_.push_back(std::move(temp));
             return ptr;
         }
 
@@ -2329,7 +2329,7 @@ namespace detail {
         {
             auto temp = jsoncons::make_unique<path_node_type>(std::forward<Args>(args)...);
             path_node_type* ptr = temp.get();
-            temp_node_values_.emplace_back(std::move(temp));
+            temp_node_values_.push_back(std::move(temp));
             return ptr;
         }
     };
