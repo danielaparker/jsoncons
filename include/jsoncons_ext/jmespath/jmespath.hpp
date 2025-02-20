@@ -1236,56 +1236,8 @@ namespace detail {
     {
         std::size_t end_index{0};
         std::string variable_ref;
-        std::unique_ptr<context_node> prev;
 
         context_node() = default;
-    };
-    
-    struct context_node_list
-    {
-        std::unique_ptr<context_node> tail;
-        
-        context_node_list() = default;
-        
-        ~context_node_list() noexcept
-        {
-            destroy();
-        }
-        
-        context_node& back()
-        {
-            return *tail;
-        }
-        
-        bool empty() const
-        {
-            return tail ? false : true;
-        }
-
-        void push()
-        {
-            std::unique_ptr<context_node> ptr(jsoncons::make_unique<context_node>());
-            std::swap(tail, ptr);
-            tail->prev = std::move(ptr);
-        }
-    
-        void pop()
-        {
-            if (tail == nullptr)
-            {
-                return;
-            }
-            std::unique_ptr<context_node> temp = std::move(tail);
-            tail = std::move(temp->prev);
-        }
-    private:
-        void destroy() noexcept
-        {
-            while (tail)
-            {
-                tail = std::move(tail->prev);
-            }
-        }
     };
 
     template <typename Json>
@@ -3723,7 +3675,7 @@ namespace detail {
         std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
             std::error_code& ec)
         {
-            context_node_list context_stack;
+            std::vector<context_node> context_stack;
             std::vector<expr_state> state_stack;
             std::vector<token<Json>> output_stack;
             std::string key_buffer;
@@ -3806,7 +3758,7 @@ namespace detail {
                                 {
                                     if (!context_stack.empty())
                                     {
-                                        context_stack.pop();
+                                        context_stack.pop_back();
                                     }
                                     state_stack.pop_back();
                                 }
@@ -3939,7 +3891,7 @@ namespace detail {
                                     ec = jmespath_errc::expected_identifier;
                                     return std::vector<token<Json>>{};
                                 }
-                                context_stack.push();
+                                context_stack.push_back(context_node{});
                                 break;
                         };
                         break;
