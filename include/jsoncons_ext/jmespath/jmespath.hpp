@@ -5179,7 +5179,7 @@ namespace detail {
             //    std::cout << t.to_string() << '\n';
             //}
 
-            return std::move(output_stack);
+            return output_stack;
         }
 
         void advance_past_space_character()
