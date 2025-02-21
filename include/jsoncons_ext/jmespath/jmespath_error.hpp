@@ -119,6 +119,7 @@ enum class jmespath_errc
     invalid_arity,
     identifier_not_found,
     expected_index_expression,
+    undefined_variable,
     unknown_error 
 };
 
@@ -190,6 +191,8 @@ public:
                 return "Identifier not found";
             case jmespath_errc::expected_index_expression:
                 return "Expected index expression";
+            case jmespath_errc::undefined_variable:
+                return "Undefined variable";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";
