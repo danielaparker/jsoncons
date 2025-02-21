@@ -3772,6 +3772,7 @@ namespace detail {
                             case '>':
                             case '=':
                             {
+                                state_stack.push_back(expr_state::lhs_expression);
                                 state_stack.push_back(expr_state::comparator_expression);
                                 break;
                             }
@@ -3819,21 +3820,18 @@ namespace detail {
                             case '<':
                                 ++p_;
                                 ++column_;
-                                state_stack.back() = expr_state::lhs_expression;
-                                state_stack.push_back(expr_state::cmp_lt_or_lte);
+                                state_stack.back() = expr_state::cmp_lt_or_lte;
                                 break;
                             case '>':
                                 ++p_;
                                 ++column_;
-                                state_stack.back() = expr_state::lhs_expression;
-                                state_stack.push_back(expr_state::cmp_gt_or_gte);
+                                state_stack.back() = expr_state::cmp_gt_or_gte;
                                 break;
                             case '=':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack.back() = expr_state::lhs_expression;
-                                state_stack.push_back(expr_state::cmp_eq);
+                                state_stack.back() = expr_state::cmp_eq;
                                 break;
                             }
                             default:
