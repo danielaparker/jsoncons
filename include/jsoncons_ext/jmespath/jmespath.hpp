@@ -3796,8 +3796,10 @@ namespace detail {
                             default:
                                 if (state_stack.size() > 1) 
                                 {
-                                    JSONCONS_ASSERT(!context_stack.empty());
-                                    context_stack.pop_back();
+                                    if (!context_stack.empty())
+                                    {
+                                        context_stack.pop_back();
+                                    }
                                     state_stack.pop_back();
                                 }
                                 else
