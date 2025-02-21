@@ -1242,7 +1242,7 @@ namespace detail {
         variable_ref,
         expect_assign,
         expect_in_or_comma,
-        lookup
+        substitute_variable
     };
     
     template <typename Json>
@@ -1259,7 +1259,8 @@ namespace detail {
     void append_to_output_stack(const std::vector<expression_context<Json>>& context_stack, 
         const std::string& variable_ref, std::vector<token<Json>>& output_stack, std::error_code& ec)
     {
-        for (auto it = context_stack.rbegin(); it != context_stack.rend(); ++it)
+        bool found = false;
+        for (auto it = context_stack.rbegin(); it != context_stack.rend() && !found; ++it)
         {
             auto it2 = it->variables.find(variable_ref);
             if (it2 != it->variables.end())
@@ -1268,9 +1269,13 @@ namespace detail {
                 {
                     output_stack.push_back(item);
                 }
+                found = true;
             }
         }
-        ec = jmespath_errc::undefined_variable;
+        if (!found)
+        {
+            ec = jmespath_errc::undefined_variable;
+        }
     }
 
     template <typename Json>
@@ -3844,7 +3849,7 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case expr_state::lookup:
+                    case expr_state::substitute_variable:
                     {
                         append_to_output_stack(context_stack, buffer, output_stack, ec);
                         if (ec)
@@ -3924,7 +3929,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '$':
-                                state_stack.back() = expr_state::lookup;
+                                state_stack.back() = expr_state::substitute_variable;
                                 state_stack.push_back(expr_state::unquoted_string);
                                 buffer.clear();
                                 ++p_;
@@ -5158,17 +5163,12 @@ namespace detail {
                             return jmespath_expression{};
                         }
                         break;
-                    case expr_state::lookup:
+                    case expr_state::substitute_variable:
                     {
-                        auto it = context_stack.back().variables.find(buffer);
-                        if (it == context_stack.back().variables.end())
+                        append_to_output_stack(context_stack, buffer, output_stack, ec);
+                        if (ec)
                         {
-                            ec = jmespath_errc::syntax_error;
                             return jmespath_expression{};
-                        }
-                        for (auto& item : it->second)
-                        {
-                            output_stack.push_back(item);
                         }
                         state_stack.pop_back();
                         break;
