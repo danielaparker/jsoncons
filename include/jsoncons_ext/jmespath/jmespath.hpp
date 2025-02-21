@@ -5597,7 +5597,7 @@ namespace detail {
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json> evaluator;
         auto expr = evaluator.compile(path.data(), path.size(), 
-            jsoncons::jmespath::custom_functions<Json>, ec);
+            jsoncons::jmespath::custom_functions<Json>{}, ec);
         if (ec)
         {
             return Json::null();
