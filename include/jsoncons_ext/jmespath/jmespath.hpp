@@ -3796,10 +3796,8 @@ namespace detail {
                             default:
                                 if (state_stack.size() > 1) 
                                 {
-                                    if (!context_stack.empty())
-                                    {
-                                        context_stack.pop_back();
-                                    }
+                                    JSONCONS_ASSERT(!context_stack.empty());
+                                    context_stack.pop_back();
                                     state_stack.pop_back();
                                 }
                                 else
@@ -4102,7 +4100,7 @@ namespace detail {
                     {
                         switch (*p_)
                         {
-                            case ' ':case '\t':
+                            case ' ':case '\t':case '\r':case '\n':
                                 advance_past_space_character();
                                 break;
                             case '$':

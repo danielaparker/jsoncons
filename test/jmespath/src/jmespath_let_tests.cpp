@@ -37,5 +37,16 @@ TEST_CASE("jmespath let tests")
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
     }    
+    SECTION("Test 3")
+    {
+        auto doc = jsoncons::json::parse(R"({"foo": "bar"})");
+        auto expected = jsoncons::json::parse(R"(["bar", "bar"])");
+
+        std::string query = R"(let $foo = foo in [$foo, $foo])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
+    }    
 }
 
