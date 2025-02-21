@@ -4832,7 +4832,7 @@ namespace detail {
                                 ++column_;
                                 push_token(rparen_arg, resources, output_stack, ec);
                                 if (ec) {return jmespath_expression{};}
-                                state_stack.back() = expr_state::rhs_expression;
+                                state_stack.pop_back();
                                 break;
                             default:
                                 ec = jmespath_errc::expected_rparen;
