@@ -2623,7 +2623,7 @@ namespace detail {
         typename std::enable_if<std::is_const<typename std::remove_reference<typename T::reference>::type>::value,const_selector_type*>::type    
         new_selector(T&& val)
         {
-            const_selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
+            const_selectors_.push_back(jsoncons::make_unique<T>(std::forward<T>(val)));
             return const_selectors_.back().get();
         }
 
@@ -2631,7 +2631,7 @@ namespace detail {
         typename std::enable_if<!std::is_const<typename std::remove_reference<typename T::reference>::type>::value,selector_type*>::type    
         new_selector(T&& val)
         {
-            selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
+            selectors_.push_back(jsoncons::make_unique<T>(std::forward<T>(val)));
             return selectors_.back().get();
         }
 

@@ -69,7 +69,7 @@ public:
                 reference ctx = params[0].value();
                 reference countValue = get_value(ctx, context, params[1]);
                 const auto& expr = params[2].expression();
-                auto argDefault = params[3];
+                const auto& argDefault = params[3];
 
                 if (!countValue.is_number())
                 {
