@@ -1238,10 +1238,10 @@ namespace detail {
         cmp_ne,
         expect_pipe_or_or,
         expect_and,
-        let_expression,
+        variable_binding,
         variable_ref,
         expect_assign,
-        expect_in,
+        expect_in_or_comma,
         lookup
     };
     
@@ -4020,27 +4020,35 @@ namespace detail {
                                 break;
                         }
                         break;
-                    case expr_state::expect_in:
+                    case expr_state::expect_in_or_comma:
                     {
                         advance_past_space_character();
-                        if (!(*p_ == 'i' && (p_ + 1) < end_input_ && *(p_ + 1) == 'n'))
+                        if (*p_ == ',')
+                        {
+                            state_stack.back() = expr_state::variable_binding;
+                            ++p_;
+                            ++column_;
+                        }
+                        else if (*p_ == 'i' && (p_ + 1) < end_input_ && *(p_ + 1) == 'n')
+                        {
+                            p_ += 2;
+                            column_ += 2;
+
+                            std::vector<token<Json>> tokens;
+                            for (std::size_t i = context_stack.back().end_index; i < output_stack.size(); ++i)
+                            {
+                                tokens.push_back(std::move(output_stack[i]));
+                            }
+                            output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
+                            context_stack.back().variables[context_stack.back().variable_ref] = std::move(tokens);
+
+                            state_stack.pop_back(); // pop expect_in_or_comma
+                        }
+                        else
                         {
                             ec = jmespath_errc::syntax_error;
                             return jmespath_expression{};
                         }
-                        p_ += 2;
-                        column_ += 2;
-
-                        std::vector<token<Json>> tokens;
-                        for (std::size_t i = context_stack.back().end_index; i < output_stack.size(); ++i)
-                        {
-                            tokens.push_back(std::move(output_stack[i]));
-                        }
-                        output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
-                        context_stack.back().variables[context_stack.back().variable_ref] = std::move(tokens);
-
-                        state_stack.pop_back(); // pop expect_in
-                        state_stack.pop_back(); // pop let
                         break;
                     }
                     case expr_state::expect_assign:
@@ -4054,7 +4062,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 
-                                state_stack.back() = expr_state::expect_in;
+                                state_stack.back() = expr_state::expect_in_or_comma;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 context_stack.back().end_index = output_stack.size();
@@ -4072,7 +4080,7 @@ namespace detail {
                     case expr_state::variable_ref:
                         state_stack.back() = expr_state::expect_assign;
                         break;
-                    case expr_state::let_expression:
+                    case expr_state::variable_binding:
                     {
                         switch (*p_)
                         {
@@ -4080,7 +4088,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '$':
-                                state_stack.push_back(expr_state::variable_ref);
+                                state_stack.back() = expr_state::variable_ref;
                                 state_stack.push_back(expr_state::unquoted_string);
                                 ++p_;
                                 ++column_;
@@ -4139,7 +4147,7 @@ namespace detail {
                                 if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
                                     state_stack.back() = expr_state::lhs_expression;
-                                    state_stack.push_back(expr_state::let_expression);
+                                    state_stack.push_back(expr_state::variable_binding);
                                     buffer.clear();
                                 }
                                 else
