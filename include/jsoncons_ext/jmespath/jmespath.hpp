@@ -20,6 +20,7 @@
 #include <unordered_map> // std::unordered_map
 #include <utility> // std::move
 #include <vector>
+#include <map>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_type.hpp>
@@ -941,41 +942,27 @@ namespace detail {
             construct(std::move(other));
         }
 
+        token(const token& other)
+        {
+            construct(other);
+        }
+
+        token& operator=(const token& other)
+        {
+            if (&other != this)
+            {
+                destroy();
+                construct(other);
+            }
+            return *this;
+        }
+
         token& operator=(token&& other) noexcept
         {
             if (&other != this)
             {
-                if (type_ == other.type_)
-                {
-                    switch (type_)
-                    {
-                        case token_kind::expression:
-                            expression_ = std::move(other.expression_);
-                            break;
-                        case token_kind::key:
-                            key_ = std::move(other.key_);
-                            break;
-                        case token_kind::unary_operator:
-                            unary_operator_ = other.unary_operator_;
-                            break;
-                        case token_kind::binary_operator:
-                            binary_operator_ = other.binary_operator_;
-                            break;
-                        case token_kind::function:
-                            function_ = other.function_;
-                            break;
-                        case token_kind::literal:
-                            value_ = std::move(other.value_);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    destroy();
-                    construct(std::move(other));
-                }
+                destroy();
+                construct(std::move(other));
             }
             return *this;
         }
@@ -1071,11 +1058,14 @@ namespace detail {
             type_ = other.type_;
             switch (type_)
             {
-                case token_kind::expression:
-                    new (&expression_) std::unique_ptr<expr_base<Json>>(std::move(other.expression_));
-                    break;
                 case token_kind::key:
                     new (&key_) string_type(std::move(other.key_));
+                    break;
+                case token_kind::literal:
+                    new (&value_) Json(std::move(other.value_));
+                    break;
+                case token_kind::expression:
+                    expression_ = other.expression_;
                     break;
                 case token_kind::unary_operator:
                     unary_operator_ = other.unary_operator_;
@@ -1086,8 +1076,33 @@ namespace detail {
                 case token_kind::function:
                     function_ = other.function_;
                     break;
+                default:
+                    break;
+            }
+        }
+
+        void construct(const token<Json>& other)
+        {
+            type_ = other.type_;
+            switch (type_)
+            {
+                case token_kind::key:
+                    new (&key_) string_type(other.key_);
+                    break;
                 case token_kind::literal:
-                    new (&value_) Json(std::move(other.value_));
+                    new (&value_) Json(other.value_);
+                    break;
+                case token_kind::expression:
+                    expression_ = other.expression_;
+                    break;
+                case token_kind::unary_operator:
+                    unary_operator_ = other.unary_operator_;
+                    break;
+                case token_kind::binary_operator:
+                    binary_operator_ = other.binary_operator_;
+                    break;
+                case token_kind::function:
+                    function_ = other.function_;
                     break;
                 default:
                     break;
@@ -1226,15 +1241,18 @@ namespace detail {
         let_expression,
         variable_ref,
         expect_assign,
-        expect_in
+        expect_in,
+        lookup
     };
     
-    struct context_node
+    template <class Json>
+    struct expression_context
     {
         std::size_t end_index{0};
         std::string variable_ref;
-
-        context_node() = default;
+        std::map<std::string,std::vector<token<Json>>> variables;
+        
+        expression_context() = default;
     };
 
     template <typename Json>
@@ -3672,7 +3690,7 @@ namespace detail {
         std::vector<token<Json>> compile(const char_type* path, std::size_t length, static_resources& resources, 
             std::error_code& ec)
         {
-            std::vector<context_node> context_stack;
+            std::vector<expression_context<Json>> context_stack;
             std::vector<expr_state> state_stack;
             std::vector<token<Json>> output_stack;
             std::string key_buffer;
@@ -3806,6 +3824,21 @@ namespace detail {
                                 break;
                         }
                         break;
+                    case expr_state::lookup:
+                    {
+                        auto it = context_stack.back().variables.find(buffer);
+                        if (it == context_stack.back().variables.end())
+                        {
+                            ec = jmespath_errc::syntax_error;
+                            return std::vector<token<Json>>{};
+                        }
+                        for (auto& item : it->second)
+                        {
+                            output_stack.push_back(item);
+                        }
+                        state_stack.pop_back();
+                        break;
+                    }
                     case expr_state::lhs_expression: 
                     {
                         switch (*p_)
@@ -3875,6 +3908,14 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '$':
+                                std::cout << "lhs_expression $";
+                                state_stack.back() = expr_state::lookup;
+                                state_stack.push_back(expr_state::unquoted_string);
+                                buffer.clear();
+                                ++p_;
+                                ++column_;
+                                break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
@@ -3889,7 +3930,7 @@ namespace detail {
                                     ec = jmespath_errc::expected_identifier;
                                     return std::vector<token<Json>>{};
                                 }
-                                context_stack.push_back(context_node{});
+                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         };
                         break;
@@ -3979,19 +4020,31 @@ namespace detail {
                         }
                         break;
                     case expr_state::expect_in:
+                    {
                         std::cout << "expect_in buffer: " << buffer << ", num tokens: " << output_stack.size() << "\n";
-                        std::cout << "CONTEXT: " << context_stack.back().end_index << ", " <<  context_stack.back().variable_ref << "\n";
+                        std::cout << "CONTEXT: " << context_stack.back().end_index << ", " << context_stack.back().variable_ref << "\n";
                         advance_past_space_character();
-                        if (!(*p_ == 'i' && (p_+1) < end_input_ && *(p_+1) == 'n'))
+                        if (!(*p_ == 'i' && (p_ + 1) < end_input_ && *(p_ + 1) == 'n'))
                         {
                             ec = jmespath_errc::syntax_error;
                             return std::vector<token<Json>>{};
                         }
                         p_ += 2;
                         column_ += 2;
+
+                        std::vector<token<Json>> tokens;
+                        for (std::size_t i = context_stack.back().end_index; i < output_stack.size(); ++i)
+                        {
+                            tokens.push_back(std::move(output_stack[i]));
+                        }
+                        output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
+                        context_stack.back().variables[context_stack.back().variable_ref] = std::move(tokens);
+
                         std::cout << "Got in\n";
-                        state_stack.pop_back();
+                        state_stack.pop_back(); // pop expect_in
+                        state_stack.pop_back(); // pop let
                         break;
+                    }
                     case expr_state::expect_assign:
                         switch (*p_)
                         {
@@ -4093,10 +4146,9 @@ namespace detail {
                                 if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
                                     std::cout << "let\n";
-                                    state_stack.back() = expr_state::let_expression;
+                                    state_stack.back() = expr_state::lhs_expression;
+                                    state_stack.push_back(expr_state::let_expression);
                                     buffer.clear();
-                                    //++p_;
-                                    //++column_;
                                 }
                                 else
                                 {
@@ -5093,6 +5145,21 @@ namespace detail {
                             return std::vector<token<Json>>{};
                         }
                         break;
+                    case expr_state::lookup:
+                    {
+                        auto it = context_stack.back().variables.find(buffer);
+                        if (it == context_stack.back().variables.end())
+                        {
+                            ec = jmespath_errc::syntax_error;
+                            return std::vector<token<Json>>{};
+                        }
+                        for (auto& item : it->second)
+                        {
+                            output_stack.push_back(item);
+                        }
+                        state_stack.pop_back();
+                        break;
+                    }
                     case expr_state::val_expr:
                         push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
                         if (ec) {return std::vector<token<Json>>{};}

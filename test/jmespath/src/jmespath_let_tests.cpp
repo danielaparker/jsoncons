@@ -23,8 +23,8 @@ TEST_CASE("jmespath let tests")
         std::string query = R"(let $foo = foo in $foo)";
         auto expr = jmespath::make_expression<jsoncons::json>(query);
 
-        /*jsoncons::json result = expr.evaluate(doc);
-        CHECK(expected == result);*/
+        jsoncons::json result = expr.evaluate(doc);
+        CHECK(expected == result);
     }    
 }
 
