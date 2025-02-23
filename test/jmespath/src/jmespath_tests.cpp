@@ -34,6 +34,7 @@ void jmespath_tests(const std::string& fpath)
         for (const auto& test_case : test_group["cases"].array_range())
         {
             std::string expr = test_case["expression"].as<std::string>();
+            //std::cout << (fpath + "-" + expr) << "\n";
             try
             {
                 json actual = jmespath::search(root, expr);

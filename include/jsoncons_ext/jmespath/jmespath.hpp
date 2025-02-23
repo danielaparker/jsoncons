@@ -3743,6 +3743,7 @@ namespace detail {
                     {
                         state_stack.back() = expr_state::rhs_expression;
                         state_stack.push_back(expr_state::lhs_expression);
+                        context_stack.push_back(expression_context<Json>{});
                         break;
                     }
                     case expr_state::rhs_expression:
@@ -3784,24 +3785,24 @@ namespace detail {
                                 state_stack.push_back(expr_state::cmp_ne);
                                 break;
                             }
-                            case ')':
-                            {
-                                state_stack.pop_back();
-                                break;
-                            }
                             case '[':
                                 state_stack.push_back(expr_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
                                 break;
+                            case ')':
+                            {
+                                state_stack.pop_back();
+                                JSONCONS_ASSERT(!context_stack.empty());
+                                context_stack.pop_back();
+                                break;
+                            }
                             default:
                                 if (state_stack.size() > 1) 
                                 {
-                                    if (!context_stack.empty())
-                                    {
-                                        context_stack.pop_back();
-                                    }
                                     state_stack.pop_back();
+                                    JSONCONS_ASSERT(!context_stack.empty());
+                                    context_stack.pop_back();
                                 }
                                 else
                                 {
@@ -3904,6 +3905,7 @@ namespace detail {
                                 state_stack.back() = expr_state::expect_rparen;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 break;
                             }
                             case '!':
@@ -3947,7 +3949,7 @@ namespace detail {
                                     ec = jmespath_errc::expected_identifier;
                                     return jmespath_expression{};
                                 }
-                                context_stack.push_back(expression_context<Json>{});
+                                //context_stack.push_back(expression_context<Json>{});
                                 break;
                         };
                         break;
@@ -4026,6 +4028,7 @@ namespace detail {
                                 state_stack.back() = expr_state::expression_type;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4033,12 +4036,13 @@ namespace detail {
                                 state_stack.back() = expr_state::argument;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;
                     case expr_state::expect_in_or_comma:
                     {
-                        std::cout << "expr_state::expect_in_or_comma\n";
+                        //std::cout << "expr_state::expect_in_or_comma\n";
                         advance_past_space_character();
                         if (*p_ == ',')
                         {
@@ -4082,6 +4086,7 @@ namespace detail {
                                 state_stack.back() = expr_state::expect_in_or_comma;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 context_stack.back().end_index = output_stack.size();
                                 context_stack.back().variable_ref = buffer;
                                 buffer.clear();
@@ -4099,7 +4104,7 @@ namespace detail {
                         break;
                     case expr_state::variable_binding:
                     {
-                        std::cout << "expr_state::variable_binding\n";
+                        //std::cout << "expr_state::variable_binding\n";
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -4587,6 +4592,7 @@ namespace detail {
                                 state_stack.back() = expr_state::filter;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 ++p_;
                                 ++column_;
                                 break;
@@ -5153,15 +5159,9 @@ namespace detail {
                 switch (state_stack.back())
                 {
                     case expr_state::rhs_expression:
-                        if (state_stack.size() > 1)
-                        {
-                            state_stack.pop_back();
-                        }
-                        else
-                        {
-                            ec = jmespath_errc::syntax_error;
-                            return jmespath_expression{};
-                        }
+                        state_stack.pop_back();
+                        JSONCONS_ASSERT(!context_stack.empty());
+                        context_stack.pop_back();
                         break;
                     case expr_state::substitute_variable:
                     {
@@ -5193,17 +5193,21 @@ namespace detail {
                 }
             }
 
-            if (!(state_stack.size() == 1 && state_stack.back() == expr_state::rhs_expression))
+            if (!(state_stack.back() == expr_state::rhs_expression))
             {
                 ec = jmespath_errc::unexpected_end_of_input;
                 return jmespath_expression{};
             }
 
             state_stack.pop_back();
-
+            JSONCONS_ASSERT(!context_stack.empty());
+            context_stack.pop_back();
+            
             push_token(end_of_expression_arg, resources, output_stack, ec);
             if (ec) {return jmespath_expression{};}
 
+            JSONCONS_ASSERT(context_stack.empty());
+            
             return jmespath_expression{ std::move(resources), std::move(output_stack) };
         }
 
