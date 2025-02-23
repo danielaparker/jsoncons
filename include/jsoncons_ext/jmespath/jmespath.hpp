@@ -4038,6 +4038,7 @@ namespace detail {
                         break;
                     case expr_state::expect_in_or_comma:
                     {
+                        std::cout << "expr_state::expect_in_or_comma\n";
                         advance_past_space_character();
                         if (*p_ == ',')
                         {
@@ -4098,6 +4099,7 @@ namespace detail {
                         break;
                     case expr_state::variable_binding:
                     {
+                        std::cout << "expr_state::variable_binding\n";
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
