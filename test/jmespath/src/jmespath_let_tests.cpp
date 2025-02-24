@@ -51,20 +51,7 @@ TEST_CASE("jmespath let tests")
     SECTION("Nested bindings")
     {
         auto doc = jsoncons::json::parse(R"({"a": "topval", "b": [{"a": "inner1"}, {"a": "inner2"}]})");
-        auto expected = jsoncons::json::parse(R"([["inner1","inner1"],["inner2","inner2"]])");
-
-        std::string query = R"(let $a = a
-  in
-    b[*].[a, $a])";
-        auto expr = jmespath::make_expression<jsoncons::json>(query);
-
-        jsoncons::json result = expr.evaluate(doc);
-        CHECK(expected == result);
-    }    
-    /*SECTION("Nested bindings 2")
-    {
-        auto doc = jsoncons::json::parse(R"({"a": "topval", "b": [{"a": "inner1"}, {"a": "inner2"}]})");
-        auto expected = jsoncons::json::parse(R"(["bar", "bar"])");
+        auto expected = jsoncons::json::parse(R"( [["inner1", "topval", "shadow"], ["inner2", "topval", "shadow"]])");
 
         std::string query = R"(let $a = a
   in
@@ -74,6 +61,6 @@ TEST_CASE("jmespath let tests")
         jsoncons::json result = expr.evaluate(doc);
         //CHECK(expected == result);
         std::cout << result << "\n";
-    }*/
+    }
 }
 

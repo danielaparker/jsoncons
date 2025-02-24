@@ -3851,6 +3851,7 @@ namespace detail {
                     case expr_state::substitute_variable:
                     {
                         append_to_output_stack(context_stack, buffer, output_stack, ec);
+                        buffer.clear();
                         if (ec)
                         {
                             return jmespath_expression{};
