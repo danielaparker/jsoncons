@@ -15,7 +15,7 @@ namespace jmespath = jsoncons::jmespath;
 
 TEST_CASE("jmespath let tests")
 {
-    /*SECTION("Test 1")
+    SECTION("Test 1")
     {
         auto doc = jsoncons::json::parse(R"({"foo": "bar"})");
         auto expected = jsoncons::json::parse(R"("bar")");
@@ -60,9 +60,8 @@ TEST_CASE("jmespath let tests")
 
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
-        std::cout << result << "\n";
     }    
-    SECTION("Nested bindings")
+    /*SECTION("Nested bindings 2")
     {
         auto doc = jsoncons::json::parse(R"({"a": "topval", "b": [{"a": "inner1"}, {"a": "inner2"}]})");
         auto expected = jsoncons::json::parse(R"(["bar", "bar"])");

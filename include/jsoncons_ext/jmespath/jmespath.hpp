@@ -3949,7 +3949,6 @@ namespace detail {
                                     ec = jmespath_errc::expected_identifier;
                                     return jmespath_expression{};
                                 }
-                                //context_stack.push_back(expression_context<Json>{});
                                 break;
                         };
                         break;
@@ -4083,12 +4082,12 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 
+                                context_stack.back().end_index = output_stack.size();
+                                context_stack.back().variable_ref = buffer;
                                 state_stack.back() = expr_state::expect_in_or_comma;
                                 state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
                                 context_stack.push_back(expression_context<Json>{});
-                                context_stack.back().end_index = output_stack.size();
-                                context_stack.back().variable_ref = buffer;
                                 buffer.clear();
                                 break;
                             }
