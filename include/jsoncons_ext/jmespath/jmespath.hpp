@@ -2601,7 +2601,6 @@ namespace detail {
                     }
                     case token_kind::variable:
                     {
-                        std::cout << doc << "\n";
                         auto& ref = t.expression_->evaluate(doc, context, ec);
                         context.set_variable(t.key_, ref);
                         break;
@@ -3398,7 +3397,8 @@ namespace detail {
 
                 for (auto& list : token_lists_)
                 {
-                    result->emplace_back(json_const_pointer_arg, evaluate_tokens(val, list, context, ec));
+                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                    result->emplace_back(json_const_pointer_arg, evaluate_tokens(val, list, new_context, ec));
                 }
                 return *result;
             }
@@ -3440,7 +3440,8 @@ namespace detail {
 
             reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
             {
-                auto ptr = evaluate_tokens(val, tokens_, context, ec);
+                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                auto ptr = evaluate_tokens(val, tokens_, new_context, ec);
                 return *ptr;
             }
 
@@ -3483,7 +3484,8 @@ namespace detail {
                 resultp->reserve(key_toks_.size());
                 for (auto& item : key_toks_)
                 {
-                    resultp->try_emplace(item.key, json_const_pointer_arg, evaluate_tokens(val, item.tokens, context, ec));
+                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                    resultp->try_emplace(item.key, json_const_pointer_arg, evaluate_tokens(val, item.tokens, new_context, ec));
                 }
 
                 return *resultp;
@@ -3513,7 +3515,8 @@ namespace detail {
 
             reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
             {
-                return *evaluate_tokens(val, toks_, context, ec);
+                eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                return *evaluate_tokens(val, toks_, new_context, ec);
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -4021,6 +4024,7 @@ namespace detail {
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
+                                    buffer.clear();
                                     state_stack.back() = expr_state::identifier_or_function_expr;
                                     state_stack.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
@@ -4071,6 +4075,7 @@ namespace detail {
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
+                                    buffer.clear();
                                     state_stack.back() = expr_state::identifier_or_function_expr;
                                     state_stack.push_back(expr_state::unquoted_string);
                                     buffer.push_back(*p_);
@@ -4128,6 +4133,20 @@ namespace detail {
                         advance_past_space_character();
                         if (*p_ == ',')
                         {
+                            std::vector<token<Json>> toks;
+                            for (std::size_t i = context_stack.back().end_index; i < output_stack.size(); ++i)
+                            {
+                                toks.push_back(std::move(output_stack[i]));
+                            }
+                            output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
+                            push_token(token<Json>{ context_stack.back().variable_ref, 
+                                resources.create_expression(variable_expression(std::move(toks))) },
+                                resources, output_stack, ec);
+                            if (ec)
+                            {
+                                return jmespath_expression{};
+                            }
+
                             state_stack.back() = expr_state::variable_binding;
                             ++p_;
                             ++column_;
@@ -4201,6 +4220,7 @@ namespace detail {
                             case '$':
                                 state_stack.back() = expr_state::variable_ref;
                                 state_stack.push_back(expr_state::unquoted_string);
+                                buffer.clear();
                                 ++p_;
                                 ++column_;
                                 break;
