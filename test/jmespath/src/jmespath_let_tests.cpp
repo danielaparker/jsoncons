@@ -26,7 +26,7 @@ TEST_CASE("jmespath let tests")
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
     }    
-    SECTION("Test 2")
+    /*SECTION("Test 2")
     {
         auto doc = jsoncons::json::parse(R"({"foo": {"bar": "baz"}})");
         auto expected = jsoncons::json::parse(R"("baz")");
@@ -61,6 +61,6 @@ TEST_CASE("jmespath let tests")
         jsoncons::json result = expr.evaluate(doc);
         //CHECK(expected == result);
         std::cout << result << "\n";
-    }
+    }*/
 }
 

@@ -117,12 +117,38 @@ namespace jmespath {
         using string_view_type = typename Json::string_view_type;
         using reference = typename Json::const_reference;
         using pointer = typename Json::pointer;
-    private:
-        std::vector<std::unique_ptr<Json>> temp_storage_;
+    public:
+        std::vector<std::unique_ptr<Json>>& temp_storage_;
+        std::map<std::string,const Json*> variables_;
 
     public:
-        ~eval_context()
+        eval_context(std::vector<std::unique_ptr<Json>>& temp_storage)
+            : temp_storage_(temp_storage)
         {
+        }
+
+        eval_context(std::vector<std::unique_ptr<Json>>& temp_storage, 
+            const std::map<std::string,const Json*>& variables)
+            : temp_storage_(temp_storage), variables_(variables)
+        {
+        }
+        
+        ~eval_context() noexcept = default;
+        
+        void set_variable(const std::string& key, const Json& value)
+        {
+            variables_[key] = std::addressof(value);
+        }
+        
+        const Json& get_variable(const std::string& key, std::error_code& ec) const
+        {
+            auto it = variables_.find(key);
+            if (it == variables_.end())
+            {
+                ec = jmespath_errc::undefined_variable;
+                return Json::null();
+            }
+            return *it->second;
         }
 
         reference number_type_name() 
@@ -625,7 +651,9 @@ namespace detail {
         argument,
         begin_expression_type,
         end_expression_type,
-        end_of_expression
+        end_of_expression,
+        variable,
+        variable_binding
     };
 
     struct literal_arg_t
@@ -736,6 +764,12 @@ namespace detail {
     };
     constexpr argument_arg_t argument_arg{};
 
+    struct variable_binding_arg_t
+    {
+        explicit variable_binding_arg_t() = default;
+    };
+    constexpr variable_binding_arg_t variable_binding_arg{};
+
     struct slice
     {
         jsoncons::optional<int64_t> start_;
@@ -811,6 +845,7 @@ namespace detail {
 
         token_kind type_;
 
+        string_type key_;
         union
         {
             expr_base_impl<Json>* expression_;
@@ -818,7 +853,6 @@ namespace detail {
             const binary_operator<Json>* binary_operator_;
             const function_base<Json>* function_;
             Json value_;
-            string_type key_;
         };
     public:
 
@@ -894,9 +928,9 @@ namespace detail {
         }
 
         token(expr_base_impl<Json>* expression)
-            : type_(token_kind::expression)
+            : type_(token_kind::expression), 
+              expression_(expression)
         {
-            expression_ = expression;
         }
 
         token(const unary_operator<Json>* expression) noexcept
@@ -947,6 +981,23 @@ namespace detail {
             construct(other);
         }
 
+        token(const std::string& variable_ref, expr_base_impl<Json>* expression) noexcept
+            : type_(token_kind::variable), 
+              key_(variable_ref), 
+              expression_(expression)
+        {
+        }
+
+        token(variable_binding_arg_t, const string_type& variable_ref)
+            : type_(token_kind::variable_binding), key_(variable_ref)
+        {
+        }
+
+        ~token() noexcept
+        {
+            destroy();
+        }
+
         token& operator=(const token& other)
         {
             if (&other != this)
@@ -965,11 +1016,6 @@ namespace detail {
                 construct(std::move(other));
             }
             return *this;
-        }
-
-        ~token() noexcept
-        {
-            destroy();
         }
 
         token_kind type() const
@@ -1058,8 +1104,13 @@ namespace detail {
             type_ = other.type_;
             switch (type_)
             {
+                case token_kind::variable:
+                    key_ = std::move(other.key_);
+                    expression_ = other.expression_;
+                    break;
+                case token_kind::variable_binding:
                 case token_kind::key:
-                    new (&key_) string_type(std::move(other.key_));
+                    key_ = std::move(other.key_);
                     break;
                 case token_kind::literal:
                     new (&value_) Json(std::move(other.value_));
@@ -1086,8 +1137,13 @@ namespace detail {
             type_ = other.type_;
             switch (type_)
             {
+                case token_kind::variable:
+                    key_ = other.key_;
+                    expression_ = other.expression_;
+                    break;
+                case token_kind::variable_binding:
                 case token_kind::key:
-                    new (&key_) string_type(other.key_);
+                    key_ = other.key_;
                     break;
                 case token_kind::literal:
                     new (&value_) Json(other.value_);
@@ -1113,9 +1169,6 @@ namespace detail {
         {
             switch(type_)
             {
-                case token_kind::key:
-                    key_.~basic_string();
-                    break;
                 case token_kind::literal:
                     value_.~Json();
                     break;
@@ -1254,29 +1307,6 @@ namespace detail {
         
         expression_context() = default;
     };
-    
-    template <typename Json>
-    void append_to_output_stack(const std::vector<expression_context<Json>>& context_stack, 
-        const std::string& variable_ref, std::vector<token<Json>>& output_stack, std::error_code& ec)
-    {
-        bool found = false;
-        for (auto it = context_stack.rbegin(); it != context_stack.rend() && !found; ++it)
-        {
-            auto it2 = it->variables.find(variable_ref);
-            if (it2 != it->variables.end())
-            {
-                for (const auto& item : it2->second)
-                {
-                    output_stack.push_back(item);
-                }
-                found = true;
-            }
-        }
-        if (!found)
-        {
-            ec = jmespath_errc::undefined_variable;
-        }
-    }
 
     template <typename Json>
     class jmespath_evaluator 
@@ -2523,7 +2553,10 @@ namespace detail {
             }
         };
 
-        static pointer evaluate_tokens(reference doc, const std::vector<token<Json>>& output_stack, eval_context<Json>& context, std::error_code& ec)
+        static pointer evaluate_tokens(reference doc, 
+            const std::vector<token<Json>>& output_stack, 
+            eval_context<Json>& context, 
+            std::error_code& ec)
         {
             pointer root_ptr = std::addressof(doc);
             std::vector<parameter_type> stack;
@@ -2564,6 +2597,26 @@ namespace detail {
                         stack.pop_back();
                         auto& ref = t.expression_->evaluate(*ptr, context, ec);
                         stack.emplace_back(ref);
+                        break;
+                    }
+                    case token_kind::variable:
+                    {
+                        std::cout << doc << "\n";
+                        auto& ref = t.expression_->evaluate(doc, context, ec);
+                        context.set_variable(t.key_, ref);
+                        break;
+                    }
+                    case token_kind::variable_binding:
+                    {
+                        JSONCONS_ASSERT(!stack.empty());
+                        stack.pop_back();
+                        const auto& j = context.get_variable(t.key_, ec);
+                        if (ec)
+                        {
+                            ec = jmespath_errc::undefined_variable;
+                            return std::addressof(context.null_value());
+                        }
+                        stack.push_back(j);
                         break;
                     }
                     case token_kind::unary_operator:
@@ -3228,7 +3281,8 @@ namespace detail {
 
                 for (auto& item : val.array_range())
                 {
-                    Json j(json_const_pointer_arg, evaluate_tokens(item, token_list_, context, ec));
+                    eval_context<Json> new_context{ context.temp_storage_, context.variables_ };
+                    Json j(json_const_pointer_arg, evaluate_tokens(item, token_list_, new_context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(item, context, ec);
@@ -3367,6 +3421,33 @@ namespace detail {
                     }
                     s.append("---\n");
                 }
+                return s;
+            }
+        };
+
+        class variable_expression final : public basic_expression
+        {
+            std::vector<token<Json>> tokens_;
+        public:
+            variable_expression(std::vector<token<Json>>&& tokens)
+                : tokens_(std::move(tokens))
+            {
+                if (tokens_.front().type() != token_kind::literal)
+                {
+                    tokens_.emplace(tokens_.begin(), current_node_arg);
+                }
+            }
+
+            reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
+            {
+                auto ptr = evaluate_tokens(val, tokens_, context, ec);
+                return *ptr;
+            }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                std::string s;
+                s.append("variable_expression\n");
                 return s;
             }
         };
@@ -3681,8 +3762,9 @@ namespace detail {
                 {
                     return Json::null();
                 }
-                eval_context<Json> dynamic_storage;
-                return deep_copy(*evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
+                std::vector<std::unique_ptr<Json>> temp_storage;
+                eval_context<Json> context{temp_storage};
+                return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
             }
         };
     public:
@@ -3850,8 +3932,8 @@ namespace detail {
                         break;
                     case expr_state::substitute_variable:
                     {
-                        append_to_output_stack(context_stack, buffer, output_stack, ec);
-                        buffer.clear();
+                        push_token(token<Json>{variable_binding_arg, buffer},
+                            resources, output_stack, ec);
                         if (ec)
                         {
                             return jmespath_expression{};
@@ -4055,13 +4137,19 @@ namespace detail {
                             p_ += 2;
                             column_ += 2;
 
-                            std::vector<token<Json>> tokens;
+                            std::vector<token<Json>> toks;
                             for (std::size_t i = context_stack.back().end_index; i < output_stack.size(); ++i)
                             {
-                                tokens.push_back(std::move(output_stack[i]));
+                                toks.push_back(std::move(output_stack[i]));
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
-                            context_stack.back().variables[context_stack.back().variable_ref] = std::move(tokens);
+                            push_token(token<Json>{ context_stack.back().variable_ref, 
+                                resources.create_expression(variable_expression(std::move(toks))) },
+                                resources, output_stack, ec);
+                            if (ec)
+                            {
+                                return jmespath_expression{};
+                            }
 
                             state_stack.pop_back(); // pop expect_in_or_comma
                         }
@@ -5165,7 +5253,8 @@ namespace detail {
                         break;
                     case expr_state::substitute_variable:
                     {
-                        append_to_output_stack(context_stack, buffer, output_stack, ec);
+                        push_token(token<Json>{variable_binding_arg, buffer},
+                            resources, output_stack, ec);
                         if (ec)
                         {
                             return jmespath_expression{};
@@ -5410,6 +5499,12 @@ namespace detail {
                     output_stack.push_back(resources.create_expression(function_expression(std::move(toks))));
                     break;
                 }
+                case token_kind::variable:
+                    output_stack.push_back(std::move(tok));
+                    break;
+                case token_kind::variable_binding:
+                    output_stack.push_back(std::move(tok));
+                    break;
                 case token_kind::literal:
                     if (!output_stack.empty() && output_stack.back().type() == token_kind::current_node)
                     {
