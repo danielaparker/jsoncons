@@ -61,7 +61,7 @@ namespace jmespath = jsoncons::jmespath;
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
     }
-}*/
+}
 
 TEST_CASE("jmespath let as valid identifiers")
 {
@@ -75,7 +75,7 @@ TEST_CASE("jmespath let as valid identifiers")
 }
     )");
 
-    /* SECTION("test 1")
+    SECTION("test 1")
 {
         auto expected = jsoncons::json::parse(R"(
 {
@@ -96,7 +96,7 @@ TEST_CASE("jmespath let as valid identifiers")
         jsoncons::json result = expr.evaluate(doc);
         //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
-    }*/    
+    }    
 
     SECTION("test 2")
 {
@@ -114,8 +114,72 @@ TEST_CASE("jmespath let as valid identifiers")
         auto expr = jmespath::make_expression<jsoncons::json>(query);
 
         jsoncons::json result = expr.evaluate(doc);
-        std::cout << pretty_print(result) << "\n";
+        //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
     }    
+
+    SECTION("test 3")
+    {
+        auto expected = jsoncons::json::parse(R"(
+{
+    "in": "let",
+    "let": "let"
+}
+        )");
+
+        std::string query = R"(let $let = 'let' in { let: 'let', in: $let })";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        //std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }    
+}*/
+
+TEST_CASE("jmespath let projection stop")
+{
+    auto doc = jsoncons::json::parse(R"(
+{"foo" : [[0, 1], [2, 3], [4, 5]]}
+    )");
+
+    /*SECTION("test 1")
+{
+        auto expected = jsoncons::json::parse(R"(
+[0, 1]
+        )");
+
+        std::string query = R"(let $foo = foo[*] in $foo[0])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        std::cout << pretty_print(result) << "\n";
+        //CHECK(expected == result);
+    }*/    
+    SECTION("test 2")
+{
+        auto expected = jsoncons::json::parse(R"(
+[0, 1]
+        )");
+
+        std::string query = R"(foo[*])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        std::cout << pretty_print(result) << "\n";
+        //CHECK(expected == result);
+    }    
+    SECTION("test 3")
+    {
+        auto expected = jsoncons::json::parse(R"(
+[0, 1]
+        )");
+
+        std::string query = R"((foo[*])[0])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        std::cout << pretty_print(result) << "\n";
+        //CHECK(expected == result);
+    }
 }
 
