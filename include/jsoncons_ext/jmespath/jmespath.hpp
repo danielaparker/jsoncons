@@ -3805,8 +3805,6 @@ namespace detail {
             std::vector<token<Json>> output_stack;
             std::string key_buffer;
 
-            push_token(current_node_arg, resources, output_stack, ec);
-            if (ec) {return jmespath_expression{};}
             state_stack.push_back(expr_state::start);
 
             string_type buffer;
@@ -4235,6 +4233,9 @@ namespace detail {
                     case expr_state::identifier_or_function_expr:
                         switch(*p_)
                         {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
@@ -4273,7 +4274,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             }
-                            default:
+                            case '$':
                             {
                                 if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
@@ -4283,11 +4284,17 @@ namespace detail {
                                 }
                                 else
                                 {
-                                    push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
-                                    if (ec) {return jmespath_expression{};}
-                                    buffer.clear();
-                                    state_stack.pop_back(); 
+                                    ec = jmespath_errc::syntax_error;
+                                    return jmespath_expression{};
                                 }
+                                break;
+                            }
+                            default:
+                            {
+                                push_token(resources.create_expression(identifier_selector(buffer)), resources, output_stack, ec);
+                                if (ec) {return jmespath_expression{};}
+                                buffer.clear();
+                                state_stack.pop_back(); 
                                 break;
                             }
                         }
@@ -5316,6 +5323,11 @@ namespace detail {
             if (ec) {return jmespath_expression{};}
 
             JSONCONS_ASSERT(context_stack.empty());
+            
+            if (output_stack.front().type() != token_kind::literal)
+            {
+                output_stack.insert(output_stack.begin(), token<Json>{current_node_arg});
+            }
             
             return jmespath_expression{ std::move(resources), std::move(output_stack) };
         }

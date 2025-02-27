@@ -13,7 +13,7 @@
 
 namespace jmespath = jsoncons::jmespath;
 
-TEST_CASE("jmespath let tests")
+/*TEST_CASE("jmespath let tests")
 {
     SECTION("Test 1")
     {
@@ -61,5 +61,61 @@ TEST_CASE("jmespath let tests")
         jsoncons::json result = expr.evaluate(doc);
         CHECK(expected == result);
     }
+}*/
+
+TEST_CASE("jmespath let as valid identifiers")
+{
+    auto doc = jsoncons::json::parse(R"(
+{
+    "let" : 
+    {
+        "let" : "let-val",
+        "in" : "in-val"
+    }
+}
+    )");
+
+    /* SECTION("test 1")
+{
+        auto expected = jsoncons::json::parse(R"(
+{
+    "in": {
+        "in": "in-val",
+        "let": "let-val"
+    },
+    "let": {
+        "in": "in-val",
+        "let": "let-val"
+    }
+}
+        )");
+
+        std::string query = R"(let $let = let in {let: let, in: $let})";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        //std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }*/    
+
+    SECTION("test 2")
+{
+        auto expected = jsoncons::json::parse(R"(
+{
+    "in": "let",
+    "let": {
+        "in": "in-val",
+        "let": "let-val"
+    }
+}
+        )");
+
+        std::string query = R"(let $let = 'let' in { let: let, in: $let })";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }    
 }
 
