@@ -5375,6 +5375,10 @@ namespace detail {
             }
             ++it;
             operator_stack_.erase(it.base(),operator_stack_.end());
+            if (output_stack.back().is_expression())
+            {
+                output_stack.push_back(token<Json>(pipe_arg));
+            }
         }
 
         void push_token(token<Json>&& tok, static_resources& resources, 

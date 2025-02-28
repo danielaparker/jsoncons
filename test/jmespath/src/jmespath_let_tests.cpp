@@ -13,7 +13,7 @@
 
 namespace jmespath = jsoncons::jmespath;
 
-/*TEST_CASE("jmespath let tests")
+TEST_CASE("jmespath let tests")
 {
     SECTION("Test 1")
     {
@@ -134,7 +134,7 @@ TEST_CASE("jmespath let as valid identifiers")
         //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
     }    
-}*/
+}
 
 TEST_CASE("jmespath let projection stop")
 {
@@ -142,7 +142,7 @@ TEST_CASE("jmespath let projection stop")
 {"foo" : [[0, 1], [2, 3], [4, 5]]}
     )");
 
-    /*SECTION("test 1")
+    SECTION("test 1")
 {
         auto expected = jsoncons::json::parse(R"(
 [0, 1]
@@ -154,32 +154,6 @@ TEST_CASE("jmespath let projection stop")
         jsoncons::json result = expr.evaluate(doc);
         std::cout << pretty_print(result) << "\n";
         //CHECK(expected == result);
-    }*/    
-    SECTION("test 2")
-{
-        auto expected = jsoncons::json::parse(R"(
-[0, 1]
-        )");
-
-        std::string query = R"(foo[*])";
-        auto expr = jmespath::make_expression<jsoncons::json>(query);
-
-        jsoncons::json result = expr.evaluate(doc);
-        std::cout << pretty_print(result) << "\n";
-        //CHECK(expected == result);
     }    
-    SECTION("test 3")
-    {
-        auto expected = jsoncons::json::parse(R"(
-[0, 1]
-        )");
-
-        std::string query = R"((foo[*])[0])";
-        auto expr = jmespath::make_expression<jsoncons::json>(query);
-
-        jsoncons::json result = expr.evaluate(doc);
-        std::cout << pretty_print(result) << "\n";
-        //CHECK(expected == result);
-    }
 }
 
