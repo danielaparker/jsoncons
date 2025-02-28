@@ -3939,6 +3939,7 @@ namespace detail {
                         {
                             return jmespath_expression{};
                         }
+                        buffer.clear();
                         state_stack.pop_back();
                         break;
                     }
@@ -5286,6 +5287,7 @@ namespace detail {
                         {
                             return jmespath_expression{};
                         }
+                        buffer.clear();
                         state_stack.pop_back();
                         break;
                     }
