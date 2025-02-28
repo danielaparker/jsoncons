@@ -4276,7 +4276,7 @@ namespace detail {
                             }
                             case '$':
                             {
-                                if (buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
+                                if (buffer.size() == 3 && buffer[0] == 'l' && buffer[1] == 'e' && buffer[2] == 't')
                                 {
                                     state_stack.back() = expr_state::lhs_expression;
                                     state_stack.push_back(expr_state::variable_binding);
