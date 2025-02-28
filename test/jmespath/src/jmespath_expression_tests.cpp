@@ -15,7 +15,6 @@ using jsoncons::json;
 using jsoncons::ojson;
 namespace jmespath = jsoncons::jmespath;
 
-/*
 TEST_CASE("jmespath_expression tests")
 {
     SECTION("Test 1")
@@ -104,7 +103,7 @@ TEST_CASE("jmespath issue")
 
     std::cout << pretty_print(result) << "\n\n";
 }
-*/
+
 TEST_CASE("jmespath parentheses issue") 
 {
     auto doc = jsoncons::json::parse(R"(

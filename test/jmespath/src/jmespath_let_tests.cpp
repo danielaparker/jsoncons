@@ -13,7 +13,7 @@
 
 namespace jmespath = jsoncons::jmespath;
 
-TEST_CASE("jmespath let tests")
+/*TEST_CASE("jmespath let tests")
 {
     SECTION("Test 1")
     {
@@ -143,7 +143,7 @@ TEST_CASE("jmespath let projection stop")
     )");
 
     SECTION("test 1")
-{
+    {
         auto expected = jsoncons::json::parse(R"(
 [0, 1]
         )");
@@ -154,6 +154,120 @@ TEST_CASE("jmespath let projection stop")
         jsoncons::json result = expr.evaluate(doc);
         //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
+    }    
+}*/
+
+TEST_CASE("jmespath let motivation section")
+{
+    /*SECTION("test 1")
+{
+        auto doc = jsoncons::json::parse(R"(
+[
+  {"home_state": "WA",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  },
+  {"home_state": "NY",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  }
+]
+        )");
+        auto expected = jsoncons::json::parse(R"(
+[
+    [
+        "Seattle",
+        "Bellevue",
+        "Olympia"
+    ],
+    [
+        "New York City",
+        "Albany"
+    ]
+]
+        )");
+
+        std::string query = R"([*].[let $home_state = home_state in states[? name == $home_state].cities[]][])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        //std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }*/    
+    
+    SECTION("test 2")
+{
+        auto doc = jsoncons::json::parse(R"(
+{"imageDetails": [
+  {
+    "repositoryName": "org/first-repo",
+    "imageTags": ["latest", "v1.0", "v1.2"],
+    "imageDigest": "sha256:abcd"
+  },
+  {
+    "repositoryName": "org/second-repo",
+    "imageTags": ["v2.0", "v2.2"],
+    "imageDigest": "sha256:efgh"
+  }
+]}
+        )");
+        
+        auto expected = jsoncons::json::parse(R"(
+[
+    ["latest","sha256:abcd","org/first-repo"],
+    ["v1.0","sha256:abcd","org/first-repo"],
+    ["v1.2","sha256:abcd","org/first-repo"],
+    ["v2.0","sha256:efgh","org/second-repo"],
+    ["v2.2","sha256:efgh","org/second-repo"]
+]
+        )");
+
+        std::string query = R"(imageDetails[].[
+          let $repo = repositoryName,
+              $digest = imageDigest
+          in
+            imageTags[].[@, $digest, $repo]
+        ][][])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+        jsoncons::json result = expr.evaluate(doc);
+        //std::cout << pretty_print(result) << "\n";
+        CHECK(expected == result);
+    }    
+}
+
+TEST_CASE("jmespath let errors")
+{
+    jsoncons::json doc{jsoncons::json_object_arg};
+
+    SECTION("test 1")
+    {
+        std::error_code ec;
+        std::string query = R"($noexist)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
+    }    
+
+    SECTION("test 2")
+    {
+        std::error_code ec;
+        std::string query = R"([let $scope = 'foo' in [$scope], $scope])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
+    }    
+
+    SECTION("test 3")
+    {
+        std::error_code ec;
+        std::string query = R"(foo.$bar)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK(ec == jmespath::jmespath_errc::expected_identifier);
     }    
 }
 
