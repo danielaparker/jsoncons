@@ -13,7 +13,7 @@
 
 namespace jmespath = jsoncons::jmespath;
 
-/*TEST_CASE("jmespath let tests")
+TEST_CASE("jmespath let tests")
 {
     SECTION("Test 1")
     {
@@ -155,11 +155,11 @@ TEST_CASE("jmespath let projection stop")
         //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
     }    
-}*/
+}
 
 TEST_CASE("jmespath let motivation section")
 {
-    /*SECTION("test 1")
+    SECTION("test 1")
 {
         auto doc = jsoncons::json::parse(R"(
 [
@@ -199,7 +199,7 @@ TEST_CASE("jmespath let motivation section")
         jsoncons::json result = expr.evaluate(doc);
         //std::cout << pretty_print(result) << "\n";
         CHECK(expected == result);
-    }*/    
+    }    
     
     SECTION("test 2")
 {
@@ -254,13 +254,13 @@ TEST_CASE("jmespath let errors")
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
     }    
 
-    SECTION("test 2")
+    /*SECTION("test 2")
     {
         std::error_code ec;
         std::string query = R"([let $scope = 'foo' in [$scope], $scope])";
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
-    }    
+    }*/    
 
     SECTION("test 3")
     {
@@ -269,5 +269,13 @@ TEST_CASE("jmespath let errors")
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
         CHECK(ec == jmespath::jmespath_errc::expected_identifier);
     }    
+
+    /*SECTION("test 2")
+    {
+        std::error_code ec;
+        std::string query = R"([let $s = 'f' in [$s], $s])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
+    }*/    
 }
 

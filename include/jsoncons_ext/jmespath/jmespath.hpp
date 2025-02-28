@@ -5168,6 +5168,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
+                                JSONCONS_ASSERT(!context_stack.empty());
                                 push_token(token<Json>(separator_arg), resources, output_stack, ec);
                                 if (ec) {return jmespath_expression{};}
                                 state_stack.push_back(expr_state::lhs_expression);
