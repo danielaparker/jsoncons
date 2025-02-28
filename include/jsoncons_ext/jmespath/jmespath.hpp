@@ -4770,7 +4770,9 @@ namespace detail {
                                     push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
                                     if (ec) {return jmespath_expression{};}
                                     state_stack.back() = expr_state::multi_select_list;
+                                    state_stack.push_back(expr_state::rhs_expression);                                
                                     state_stack.push_back(expr_state::lhs_expression);                                
+                                    context_stack.push_back(expression_context<Json>{});
                                 }
                                 break;
                             case ']': // []
@@ -4783,7 +4785,9 @@ namespace detail {
                                 push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
                                 if (ec) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_list;
+                                state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;
@@ -4808,7 +4812,9 @@ namespace detail {
                                 push_token(token<Json>(begin_multi_select_list_arg), resources, output_stack, ec);
                                 if (ec) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::multi_select_list;
+                                state_stack.push_back(expr_state::rhs_expression);
                                 state_stack.push_back(expr_state::lhs_expression);
+                                context_stack.push_back(expression_context<Json>{});
                                 break;
                         }
                         break;

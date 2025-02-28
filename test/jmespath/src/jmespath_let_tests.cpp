@@ -254,13 +254,13 @@ TEST_CASE("jmespath let errors")
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
     }    
 
-    /*SECTION("test 2")
+    SECTION("test 2")
     {
         std::error_code ec;
         std::string query = R"([let $scope = 'foo' in [$scope], $scope])";
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
-    }*/    
+    }    
 
     SECTION("test 3")
     {
@@ -268,14 +268,6 @@ TEST_CASE("jmespath let errors")
         std::string query = R"(foo.$bar)";
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
         CHECK(ec == jmespath::jmespath_errc::expected_identifier);
-    }    
-
-    /*SECTION("test 2")
-    {
-        std::error_code ec;
-        std::string query = R"([let $s = 'f' in [$s], $s])";
-        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
-        CHECK(ec == jmespath::jmespath_errc::undefined_variable);
-    }*/    
+    }
 }
 

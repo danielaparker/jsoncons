@@ -101,7 +101,7 @@ TEST_CASE("jmespath issue")
 
     auto result = jmespath::search(doc, expr);
 
-    std::cout << pretty_print(result) << "\n\n";
+    //std::cout << pretty_print(result) << "\n\n";
 }
 
 TEST_CASE("jmespath parentheses issue") 
@@ -120,7 +120,7 @@ TEST_CASE("jmespath parentheses issue")
             auto expr = jmespath::make_expression<jsoncons::json>(query);
 
             jsoncons::json result = expr.evaluate(doc);
-            std::cout << pretty_print(result) << "\n";
-            //CHECK(expected == result);
+            //std::cout << pretty_print(result) << "\n";
+            CHECK(expected == result);
         }
 }
