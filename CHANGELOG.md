@@ -1,3 +1,16 @@
+1.3.0 preview (master) 
+-----
+
+- Fixed bugs:
+
+    - Git Issue #595: SIGABRT when serialising unmapped enum value
+
+- Implemented new features:
+
+    - JMESPath Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md)
+
+    - Fixed jmespath issue with some parenthesized expressions, e.g. `(foo[*])[0]`.
+
 1.2.0 
 -----
 

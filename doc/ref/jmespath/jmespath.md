@@ -34,6 +34,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 [search function](#eg1)  
 [jmespath_expression](#eg2)  
 [custom_functions (since 1.0.0)](#eg3)  
+[Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) (since 1.3.0)](#eg4)  
 
  <div id="eg1"/>
 
@@ -412,3 +413,57 @@ Output:
 ```
 
 Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this example
+
+
+ <div id="eg4"/>
+
+#### Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) (since 1.3.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jmespath/jmespath.hpp>
+#include <iostream>
+
+namespace jmespath = jsoncons::jmespath;
+
+int main()
+{
+    auto doc = jsoncons::json::parse(R"(
+[
+  {"home_state": "WA",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  },
+  {"home_state": "NY",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  }
+]
+    )");
+
+    std::string query = R"([*].[let $home_state = home_state in states[? name == $home_state].cities[]][])";
+    auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+    jsoncons::json result = expr.evaluate(doc);
+
+    auto options = jsoncons::json_options{}
+        .array_array_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result, options) << "\n";
+}
+```
+
+Output:
+
+```json
+[
+    ["Seattle", "Bellevue", "Olympia"],
+    ["New York City", "Albany"]
+]
+```
+
