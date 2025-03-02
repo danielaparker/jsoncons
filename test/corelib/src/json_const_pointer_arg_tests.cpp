@@ -276,7 +276,7 @@ TEST_CASE("json_const_reference identifier tests")
         flatten(v3, "bar", j3);
 
         target = j3;
-        CHECK(target == expected);
+        CHECK(expected == target);
     }
 
     SECTION("test2")
@@ -298,7 +298,7 @@ TEST_CASE("json_const_reference identifier tests")
 
             target = deep_copy(j3);
         }
-        CHECK(target == expected);
+        CHECK(expected == target);
         CHECK(target.storage_kind() == json_storage_kind::array);
         for (const auto& item : target.array_range())
         {

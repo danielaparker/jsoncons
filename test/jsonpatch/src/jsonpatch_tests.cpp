@@ -27,7 +27,7 @@ void check_patch(Json& target, const Json& patch, const std::error_code& expecte
         std::cout << "target:\n" << target << '\n';
     }
     CHECK(ec == expected_ec); //-V521
-    CHECK(target == expected); //-V521
+    CHECK(expected == target); //-V521
 }
 
 TEST_CASE("testing_a_value_success")

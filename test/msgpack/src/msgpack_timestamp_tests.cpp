@@ -29,7 +29,7 @@ TEST_CASE("msgpack timestamp tests")
         std::vector<uint8_t> input = {0xd6,0xff,0x5a,0x4a,0xf6,0xa5};
         auto r = decode_msgpack<uint64_t>(input);
 
-        CHECK(r == expected);
+        CHECK(expected == r);
 
         std::vector<uint8_t> output;
         json j = decode_msgpack<json>(input);
@@ -44,7 +44,7 @@ TEST_CASE("msgpack timestamp tests")
         auto r = decode_msgpack<json>(input);
         std::cout << pretty_print(r) << "\n\n";
 
-        //CHECK(r == expected);
+        //CHECK(expected == r);
     }
     SECTION("test 3")
     {
@@ -54,7 +54,7 @@ TEST_CASE("msgpack timestamp tests")
         auto r = decode_msgpack<json>(input);
         std::cout << pretty_print(r) << "\n\n";
 
-        //CHECK(r == expected);
+        //CHECK(expected == r);
 
         //std::vector<uint8_t> output;
         //json j = decode_msgpack<json>(input);
@@ -69,7 +69,7 @@ TEST_CASE("msgpack timestamp tests")
         auto r = decode_msgpack<json>(input);
         std::cout << r << "\n\n";
 
-        //CHECK(r == expected);
+        //CHECK(expected == r);
 
         //std::vector<uint8_t> output;
         //json j = decode_msgpack<json>(input);

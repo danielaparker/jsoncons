@@ -21,16 +21,16 @@ TEST_CASE("test_positive_bignum")
     bigint x = bigint::from_bytes_be(1, v.data(),v.size());
 
     std::string sx = x.to_string();
-    CHECK(sx == expected);
+    CHECK(expected == sx);
 
     bigint y(x);
     std::string sy = y.to_string();
-    CHECK(sy == expected);
+    CHECK(expected == sy);
 
     bigint z;
     z = x;
     std::string sz = y.to_string();
-    CHECK(sz == expected);
+    CHECK(expected == sz);
 
     SECTION("write_string_hex")
     {
@@ -60,16 +60,16 @@ TEST_CASE("test_negative_bignum")
     bigint x2 = -1 - x;
 
     std::string sx = x2.to_string();
-    CHECK(sx == expected);
+    CHECK(expected == sx);
 
     bigint y(x2);
     std::string sy = y.to_string();
-    CHECK(sy == expected);
+    CHECK(expected == sy);
 
     bigint z;
     z = x2;
     std::string sz = z.to_string();
-    CHECK(sz == expected);
+    CHECK(expected == sz);
 
     int signum;
     std::vector<uint8_t> v;
@@ -264,7 +264,7 @@ TEST_CASE("times 10")
             expected.push_back('0');
         }
         std::string s = n.to_string();
-        CHECK(s == expected);
+        CHECK(expected == s);
         //std::cout << "x31: " << s << "\n";
     }
     SECTION("32")
@@ -277,7 +277,7 @@ TEST_CASE("times 10")
             expected.push_back('0');
         }
         std::string s = n.to_string();
-        CHECK(s == expected);
+        CHECK(expected == s);
         //std::cout << "x31: " << s << "\n";
     }
 }
@@ -328,7 +328,7 @@ TEST_CASE("bigint operations")
         bigint c = a + b;
         bigint expected = bigint::from_string("114155161541772611753423779991949400219504844050475254940924090817036741759492475205227039558501334339864668016751861424100681899362117762365770656374869982874551457998960521");
 
-        CHECK((c == expected));
+        CHECK(expected == (c));
     }
 
     SECTION("minus")
@@ -338,7 +338,7 @@ TEST_CASE("bigint operations")
         bigint c = a - b;
         bigint expected = bigint::from_string("-12176758131732809277667595300071350793340231275123357245105813911281525421067983920123402400825483861704741143034417216862503145088348700309898604710287263494312265061500182");
 
-        CHECK((c == expected));
+        CHECK(expected == (c));
     }
 
     SECTION("mult")
@@ -348,7 +348,7 @@ TEST_CASE("bigint operations")
         bigint c = a * b;
         bigint expected = bigint::from_string("55409001364124857587521411422210474638575227552776047085010157327559891765943209923363557763419730972781537530948429788352886919273214132899346769031695550850320602049507618052164677667378189154076988316301237199538599598044906690917691500474146296751848053320011822980888915807952984822080201739642211593661864443811046346990267512628848918282");
 
-        CHECK((c == expected));
+        CHECK(expected == (c));
     }
 
     SECTION("div")
@@ -358,7 +358,7 @@ TEST_CASE("bigint operations")
         bigint c = a / b;
         bigint expected = bigint::from_string("33");
 
-        CHECK((c == expected));
+        CHECK(expected == (c));
     }
 
     SECTION("&=")

@@ -205,7 +205,7 @@ TEST_CASE("cbor json constructor __int64 tests")
         std::vector<uint8_t> expected = {0xc3,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
         std::vector<uint8_t> data;
         cbor::encode_cbor(val1, data);
-        CHECK(data == expected);
+        CHECK(expected == data);
 
         auto val2 = cbor::decode_cbor<__int128>(data);
 
@@ -223,7 +223,7 @@ TEST_CASE("cbor json constructor unsigned __int64 tests")
         std::vector<uint8_t> expected = {0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
         std::vector<uint8_t> data;
         cbor::encode_cbor(val1, data);
-        CHECK(data == expected);
+        CHECK(expected == data);
 
         auto val2 = cbor::decode_cbor<unsigned __int128>(data);
 

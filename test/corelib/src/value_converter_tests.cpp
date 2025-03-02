@@ -22,7 +22,7 @@ TEST_CASE("convert into string")
         std::string s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec); 
         
-        CHECK(s == expected);
+        CHECK(expected == s);
     }
     SECTION("from byte string into wstring")
     {
@@ -34,7 +34,7 @@ TEST_CASE("convert into string")
         std::wstring s = converter.convert(byte_string_view(bytes), semantic_tag::base64url, ec);
         REQUIRE(!ec);
 
-        CHECK(s == expected);
+        CHECK(expected == s);
     }
 }
 
@@ -50,7 +50,7 @@ TEST_CASE("convert into list-like")
         std::vector<uint8_t> v = converter.convert(jsoncons::string_view("Zm9vYmFy"), semantic_tag::base64url, ec);
         REQUIRE(!ec); 
         
-        CHECK(v == expected);
+        CHECK(expected == v);
     }
 }
 

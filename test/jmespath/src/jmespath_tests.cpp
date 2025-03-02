@@ -52,7 +52,7 @@ void jmespath_tests(const std::string& fpath)
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
-                    CHECK(actual == expected); //-V521
+                    CHECK(expected == actual); //-V521
                 }
                 else if (test_case.contains("error"))
                 {

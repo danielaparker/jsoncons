@@ -15,7 +15,7 @@ through the function object. If the function object returns `true`, the parser
 will make an attempt to recover from recoverable errors. If the error is non-recoverable of if the function object
 returns `false`, the parser will stop. 
 
-The jsoncons library comes with two built-in function objects for JSON parsing error handling:
+The jsoncons library comes with three built-in function objects for JSON parsing error handling:
 
 - `default_json_parsing`, which returns `true` if the error code indicates a comment, otherwise `false`
 

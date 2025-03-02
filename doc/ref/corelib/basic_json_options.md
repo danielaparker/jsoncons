@@ -25,6 +25,8 @@ inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
+allow_comments (since 1.3.0)|If 'true', allow (and ignore) comments when parsing JSON|
+allow_trailing_comma (since 1.3.0)|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored) |
 err_handler (since 0.171.0)|Defines an [error handler](err_handler.md) for parsing JSON. Defaults to `default_json_parsing`.|
 indent_size| |The indent size, the default is 4
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
@@ -99,7 +101,7 @@ to be used when reading JSON.
 Sets a string replacement for infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); (4)
+    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); 
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
@@ -114,6 +116,14 @@ Sets a number replacement for `Negative Infinity` when writing JSON
 
     basic_json_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
+Defaults to `false`.
+
+    basic_json_options& allow_comments(bool value); 
+If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
+Defaults to `true`.
+
+    basic_json_options& allow_trailing_comma(bool value); 
+If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
 Defaults to `false`.
 
     basic_json_options& indent_size(uint8_t value)
@@ -464,10 +474,16 @@ int main()
     // auto j = json::parse(s, allow_trailing_commas());
 
     // since 0.171.0
+    // auto options = json_options{}
+    //     .err_handler(allow_trailing_commas());
+    // auto j = json::parse(s, options);
+
+    // since 1.3.0
     auto options = json_options{}
-        .err_handler(allow_trailing_commas());
+        .allow_trailing_comma(true));
     auto j = json::parse(s, options);
-    std::cout << "(2) " << j << "\n\n";
+
+    std::cout << "(2)" << j << "\n\n";
 }
 ```
 Output:

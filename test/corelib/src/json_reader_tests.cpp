@@ -142,7 +142,7 @@ void test_json_reader_ec(const std::string& text, const std::error_code& expecte
     //          << " and column " << reader.column() << '\n';
 
     CHECK(ec);
-    CHECK(ec == expected);
+    CHECK(expected == ec);
 }
 
 TEST_CASE("test_missing_separator")

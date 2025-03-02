@@ -32,6 +32,11 @@ void parse_with_comment()
         auto options = json_options{}
             .err_handler(strict_json_parsing());
         auto j2 = json::parse(s, options);
+
+        // since 1.3.0
+        auto options = json_options{}
+            .allow_comments(false);
+        auto j3 = json::parse(s, options);
     }
     catch (const ser_error& e)
     {
@@ -63,9 +68,14 @@ void parse_with_trailing_commas()
     // until 0.170.0
     // auto j = json::parse(s, allow_trailing_commas());
 
-    // since 0.171.0
+    // since 0.170.0
+    // auto options = json_options{}
+    //     .err_handler(allow_trailing_commas());
+    // auto j = json::parse(s, options);
+
+    // since 1.3.0
     auto options = json_options{}
-        .err_handler(allow_trailing_commas());
+        .allow_trailing_comma(true);
     auto j = json::parse(s, options);
     std::cout << "(2) " << j << "\n\n";
 }

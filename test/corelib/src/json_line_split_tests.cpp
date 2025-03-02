@@ -73,7 +73,7 @@ std::string expected = R"({
             .array_array_line_splits(line_split_kind::new_line);
         std::ostringstream os;
         os << pretty_print(val, options);
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("array_array same_line")
@@ -96,7 +96,7 @@ std::string expected = R"({
         os << pretty_print(val,options);
 
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("array_array new_line")
@@ -121,7 +121,7 @@ std::string expected = R"({
         os << pretty_print(val,options);
 
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("array_array multi_line")
@@ -149,7 +149,7 @@ std::string expected = R"({
         std::ostringstream os;
         os << pretty_print(val,options);
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("object_array same_line")
@@ -173,7 +173,7 @@ std::string expected = R"({
         std::ostringstream os;
         os << pretty_print(val,options);
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("object_array new_line")
@@ -199,7 +199,7 @@ std::string expected = R"({
         std::ostringstream os;
         os << pretty_print(val,options);
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("")
@@ -227,7 +227,7 @@ std::string expected = R"({
         std::ostringstream os;
         os << pretty_print(val,options);
         //std::cout << os.str() << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 }
 

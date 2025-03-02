@@ -210,7 +210,7 @@ TEST_CASE("bson c test suite")
         json j = bson::decode_bson<json>(input);
 
         int64_t expected = 1234567890000; // milliseconds
-        CHECK(j.at("time_t").as<int64_t>() == expected);
+        CHECK(expected == j.at("time_t").as<int64_t>());
         CHECK(j.at("time_t").tag() == semantic_tag::epoch_milli);
 
         std::vector<char> output;
@@ -227,7 +227,7 @@ TEST_CASE("bson c test suite")
         //std::cout << j << "\n";
 
         std::string expected = "/^abcd/ilx";
-        CHECK(j.at("regex").as<std::string>() == expected);
+        CHECK(expected == j.at("regex").as<std::string>());
         CHECK(j.at("regex").tag() == semantic_tag::regex);
 
         std::vector<char> output;
@@ -243,7 +243,7 @@ TEST_CASE("bson c test suite")
         json j = bson::decode_bson<json>(input);
 
         std::string expected = "var a = {};";
-        CHECK(j.at("code").as<std::string>() == expected);
+        CHECK(expected == j.at("code").as<std::string>());
         CHECK(j.at("code").tag() == semantic_tag::code);
 
         std::vector<char> output;

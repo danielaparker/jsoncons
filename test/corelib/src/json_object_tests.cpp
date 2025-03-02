@@ -1053,7 +1053,7 @@ TEST_CASE("test_json_merge")
         CHECK(expected == j);
 
         j2.merge(j2.object_range().begin()+1,source);
-        CHECK(j2 == expected);
+        CHECK(expected == j2);
     }
 
     SECTION("test 2")
@@ -1105,7 +1105,7 @@ TEST_CASE("test_json_merge_move")
         CHECK(expected == j);
 
         j2.merge(std::move(source2));
-        CHECK(j2 == expected);
+        CHECK(expected == j2);
     }
 }
 
@@ -1142,7 +1142,7 @@ TEST_CASE("test_json_merge_or_update")
         CHECK(expected == j);
 
         j2.merge_or_update(j2.object_range().begin()+1,source);
-        CHECK(j2 == expected);
+        CHECK(expected == j2);
     }
 }
 
@@ -1179,7 +1179,7 @@ TEST_CASE("test_json_merge_or_update_move")
         CHECK(expected == j);
 
         j2.merge_or_update(std::move(source2));
-        CHECK(j2 == expected);
+        CHECK(expected == j2);
     }
 }
 

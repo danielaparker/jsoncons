@@ -459,6 +459,6 @@ TEST_CASE("jsonpath_expression remove")
 
         CHECK(n == 3);
         REQUIRE(doc.at("books").size() == 1);
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
 }

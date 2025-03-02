@@ -58,7 +58,7 @@ void jmespath_expression_example()
         }        
     )";
 
-    auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]");
+    auto expr = jmespath::make_expression<json>("people[?age > `20`].[name, age]");
 
     json doc = json::parse(jtext);
 
