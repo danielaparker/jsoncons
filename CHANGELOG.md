@@ -11,7 +11,8 @@
 
     - Fixed jmespath issue with some parenthesized expressions, e.g. `(foo[*])[0]`.
 
-    - New `json_options` `allow_comments` and `allow_trailing_comma`.
+    - New `json_options` `allow_comments` and `allow_trailing_comma`. These options should
+      be preferred over using an error handler.
 
 
 1.2.0 
