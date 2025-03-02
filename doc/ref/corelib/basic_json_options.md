@@ -469,10 +469,16 @@ int main()
     // auto j = json::parse(s, allow_trailing_commas());
 
     // since 0.171.0
+    // auto options = json_options{}
+    //     .err_handler(allow_trailing_commas());
+    // auto j = json::parse(s, options);
+
+    // since 1.3.0
     auto options = json_options{}
-        .err_handler(allow_trailing_commas());
+        .allow_trailing_comma(true));
     auto j = json::parse(s, options);
-    std::cout << "(2) " << j << "\n\n";
+
+    std::cout << "(2)" << j << "\n\n";
 }
 ```
 Output:
