@@ -1315,7 +1315,7 @@ public:
         basic_bigint<Allocator> q;
 
         b <<= 1;
-        while ( b >>= 2, b > 0 )
+        while ( (void)(b >>= 2), b > 0 )
         {
             x >>= 1;
         }
