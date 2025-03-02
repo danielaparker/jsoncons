@@ -32,6 +32,11 @@ void parse_with_comment()
         auto options = json_options{}
             .err_handler(strict_json_parsing());
         auto j2 = json::parse(s, options);
+
+        // since 1.3.0
+        auto options = json_options{}
+            .allow_comments(false);
+        auto j3 = json::parse(s, options);
     }
     catch (const ser_error& e)
     {

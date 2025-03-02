@@ -406,12 +406,17 @@ std::cout << "(1) " << j << '\n';
 try
 {
     // until 0.170.0
-    auto j = jsoncons::json::parse(s, jsoncons::strict_json_parsing());
+    auto j1 = jsoncons::json::parse(s, jsoncons::strict_json_parsing());
 
     // since 0.171.0
     auto options = json_options{}
         .err_handler(jsoncons::strict_json_parsing());
-    auto j = jsoncons::json::parse(s, options);
+    auto j2 = jsoncons::json::parse(s, options);
+
+    // since 1.3.0
+    auto options = json_options{}
+        .allow_comments(false);
+    auto j3 = jsoncons::json::parse(s, options);
 }
 catch (const ser_error& e)
 {

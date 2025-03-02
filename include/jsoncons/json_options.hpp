@@ -267,6 +267,7 @@ public:
     using typename super_type::string_type;
 private:
     bool lossless_number_{false};
+    bool allow_comments_{true};
     bool allow_trailing_comma_{false};
     std::function<bool(json_errc,const ser_context&)> err_handler_;
 public:
@@ -280,6 +281,7 @@ public:
     basic_json_decode_options(basic_json_decode_options&& other) noexcept
         : super_type(std::move(other)), 
           lossless_number_(other.lossless_number_), 
+          allow_comments_(other.allow_comments_), 
           allow_trailing_comma_(other.allow_trailing_comma_), 
           err_handler_(std::move(other.err_handler_))
     {
@@ -291,6 +293,11 @@ public:
     bool lossless_number() const 
     {
         return lossless_number_;
+    }
+
+    bool allow_comments() const 
+    {
+        return allow_comments_;
     }
 
     bool allow_trailing_comma() const 
@@ -483,6 +490,7 @@ public:
     using basic_json_decode_options<CharT>::neginf_to_num;
 
     using basic_json_decode_options<CharT>::lossless_number;
+    using basic_json_decode_options<CharT>::allow_comments;
     using basic_json_decode_options<CharT>::allow_trailing_comma;
     using basic_json_decode_options<CharT>::err_handler;
 
@@ -624,6 +632,12 @@ public:
     basic_json_options& lossless_number(bool value) 
     {
         this->lossless_number_ = value;
+        return *this;
+    }
+
+    basic_json_options& allow_comments(bool value) 
+    {
+        this->allow_comments_ = value;
         return *this;
     }
 

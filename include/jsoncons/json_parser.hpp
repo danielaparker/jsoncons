@@ -1543,32 +1543,38 @@ public:
                 {
                     switch (*input_ptr_)
                     {
-                    case '*':
-                        state_ = parse_state::slash_star;
-                        more_ = err_handler_(json_errc::illegal_comment, *this);
-                        if (!more_)
-                        {
-                            ec = json_errc::illegal_comment;
-                            return;
-                        }
-                        break;
-                    case '/':
-                        state_ = parse_state::slash_slash;
-                        more_ = err_handler_(json_errc::illegal_comment, *this);
-                        if (!more_)
-                        {
-                            ec = json_errc::illegal_comment;
-                            return;
-                        }
-                        break;
-                    default:    
-                        more_ = err_handler_(json_errc::syntax_error, *this);
-                        if (!more_)
-                        {
-                            ec = json_errc::syntax_error;
-                            return;
-                        }
-                        break;
+                        case '*':
+                            state_ = parse_state::slash_star;
+                            if (!options_.allow_comments())
+                            {
+                                more_ = err_handler_(json_errc::illegal_comment, *this);
+                                if (!more_)
+                                {
+                                    ec = json_errc::illegal_comment;
+                                    return;
+                                }
+                            }
+                            break;
+                        case '/':
+                            state_ = parse_state::slash_slash;
+                            if (!options_.allow_comments())
+                            {
+                                more_ = err_handler_(json_errc::illegal_comment, *this);
+                                if (!more_)
+                                {
+                                    ec = json_errc::illegal_comment;
+                                    return;
+                                }
+                            }
+                            break;
+                        default:    
+                            more_ = err_handler_(json_errc::syntax_error, *this);
+                            if (!more_)
+                            {
+                                ec = json_errc::syntax_error;
+                                return;
+                            }
+                            break;
                     }
                     ++input_ptr_;
                     ++position_;

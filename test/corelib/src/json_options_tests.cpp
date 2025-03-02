@@ -36,6 +36,66 @@ TEST_CASE("test json_options max_nesting_depth")
     }
 }
 
+TEST_CASE("json_options allow_trailing_comma test")
+{
+    SECTION("object with trailing comma")
+    {
+        auto options = json_options{}
+            .allow_trailing_comma(true);
+
+        json expected = json::parse("[1,2,3]");
+
+        json val = json::parse("[1,2,3,]", options);
+
+        CHECK(expected == val);
+    }
+
+    SECTION("array with trailing comma")
+    {
+        auto options = json_options{}
+            .allow_trailing_comma(true);
+
+        json expected = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2
+    }
+    )", options);
+
+        json val = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2,
+    }
+    )", options);
+
+        CHECK(expected == val);
+    }
+}
+
+TEST_CASE("json_options allow_comments test")
+{
+    SECTION("allow")
+    {
+        auto options = json_options{}
+            .allow_comments(true);
+
+        json expected = json::parse("[1,2]");
+
+        json val = json::parse("[1,2/*,3*/]", options);
+
+        CHECK(expected == val);
+    }
+
+    SECTION("don't allow")
+    {
+        auto options = json_options{}
+            .allow_comments(true);
+
+        REQUIRE_THROWS(json::parse("[1,2/*,3*/]", options));
+    }
+}
+
 TEST_CASE("test_default_nan_replacement")
 {
     json obj;
