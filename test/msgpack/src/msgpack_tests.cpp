@@ -163,15 +163,15 @@ TEST_CASE("msgpack bin tests")
 
         std::vector<uint8_t> input1 = {0xc4,0x00};
         auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
-        CHECK(v1 == expected);
+        CHECK(expected == v1);
 
         std::vector<uint8_t> input2 = {0xc5,0x00,0x00};
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
-        CHECK(v2 == expected);
+        CHECK(expected == v2);
 
         std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x00};
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
-        CHECK(v3 == expected);
+        CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
         encode_msgpack(byte_string_view(v1),output1);
@@ -183,15 +183,15 @@ TEST_CASE("msgpack bin tests")
 
         std::vector<uint8_t> input1 = {0xc4,0x01,0x01};
         auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
-        CHECK(v1 == expected);
+        CHECK(expected == v1);
 
         std::vector<uint8_t> input2 = {0xc5,0x00,0x01,0x01};
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
-        CHECK(v2 == expected);
+        CHECK(expected == v2);
 
         std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x01,0x01};
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
-        CHECK(v3 == expected);
+        CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
         encode_msgpack(byte_string_view(v1),output1);
@@ -203,15 +203,15 @@ TEST_CASE("msgpack bin tests")
 
         std::vector<uint8_t> input1 = {0xc4,0x02,0x00,0xff};
         auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
-        CHECK(v1 == expected);
+        CHECK(expected == v1);
 
         std::vector<uint8_t> input2 = {0xc5,0x00,0x02,0x00,0xff};
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
-        CHECK(v2 == expected);
+        CHECK(expected == v2);
 
         std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x02,0x00,0xff};
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
-        CHECK(v3 == expected);
+        CHECK(expected == v3);
 
         std::vector<uint8_t> output1;
         encode_msgpack(byte_string_view(v1),output1);
@@ -227,7 +227,7 @@ TEST_CASE("msgpack ext tests")
 
         std::vector<uint8_t> input = {0xd4,0x01,0x10};
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j = decode_msgpack<json>(input);
         std::vector<uint8_t> output;
@@ -240,7 +240,7 @@ TEST_CASE("msgpack ext tests")
 
         std::vector<uint8_t> input = {0xd5,0x02,0x20,0x21};
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
-        CHECK((v == expected));
+        CHECK(expected == (v));
 
         auto j = decode_msgpack<json>(input);
         std::vector<uint8_t> output;
@@ -254,7 +254,7 @@ TEST_CASE("msgpack ext tests")
 
         std::vector<uint8_t> input = {0xd6,0x03,0x30,0x31,0x32,0x33};
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j = decode_msgpack<json>(input);
         std::vector<uint8_t> output;
@@ -268,7 +268,7 @@ TEST_CASE("msgpack ext tests")
 
         std::vector<uint8_t> input = {0xd7,0x04,0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47};
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j = decode_msgpack<json>(input);
         std::vector<uint8_t> output;
@@ -282,7 +282,7 @@ TEST_CASE("msgpack ext tests")
 
         std::vector<uint8_t> input = {0xd8,0x05,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f};
         auto v = decode_msgpack<std::vector<uint8_t>>(input);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j = decode_msgpack<json>(input);
         std::vector<uint8_t> output;
@@ -297,7 +297,7 @@ TEST_CASE("msgpack ext tests")
         // ext8
         std::vector<uint8_t> input1 = {0xc7,0x00,0x06}; 
         auto v = decode_msgpack<std::vector<uint8_t>>(input1);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j1 = decode_msgpack<json>(input1);
         std::vector<uint8_t> output1;
@@ -307,7 +307,7 @@ TEST_CASE("msgpack ext tests")
         // ext16
         std::vector<uint8_t> input2 = {0xc8,0x00,0x00,0x06};
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
-        CHECK(v2 == expected);
+        CHECK(expected == v2);
 
         auto j2 = decode_msgpack<json>(input2);
         std::vector<uint8_t> output2;
@@ -317,7 +317,7 @@ TEST_CASE("msgpack ext tests")
         // ext32
         std::vector<uint8_t> input3 = {0xc9,0x00,0x00,0x00,0x00,0x06};
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
-        CHECK(v3 == expected);
+        CHECK(expected == v3);
 
         auto j3 = decode_msgpack<json>(input3);
         std::vector<uint8_t> output3;
@@ -332,7 +332,7 @@ TEST_CASE("msgpack ext tests")
         // ext8
         std::vector<uint8_t> input1 = {0xc7,0x03,0x07,0x70,0x71,0x72}; 
         auto v = decode_msgpack<std::vector<uint8_t>>(input1);
-        CHECK(v == expected);
+        CHECK(expected == v);
 
         auto j1 = decode_msgpack<json>(input1);
         std::vector<uint8_t> output1;
@@ -342,7 +342,7 @@ TEST_CASE("msgpack ext tests")
         // ext16
         std::vector<uint8_t> input2 = {0xc8,0x00,0x03,0x07,0x70,0x71,0x72};
         auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
-        CHECK(v2 == expected);
+        CHECK(expected == v2);
 
         auto j2 = decode_msgpack<json>(input2);
         std::vector<uint8_t> output2;
@@ -352,7 +352,7 @@ TEST_CASE("msgpack ext tests")
         // ext32
         std::vector<uint8_t> input3 = {0xc9,0x00,0x00,0x00,0x03,0x07,0x70,0x71,0x72};
         auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
-        CHECK(v3 == expected);
+        CHECK(expected == v3);
 
         auto j3 = decode_msgpack<json>(input3);
         std::vector<uint8_t> output3;
@@ -411,7 +411,7 @@ TEST_CASE("msgpack json constructor __int64 tests")
         std::vector<uint8_t> expected = {0xb5,0x2d,0x31,0x38,0x34,0x34,0x36,0x37,0x34,0x34,0x30,0x37,0x33,0x37,0x30,0x39,0x35,0x35,0x31,0x36,0x31,0x37};
         std::vector<uint8_t> data;
         msgpack::encode_msgpack(val1, data);
-        CHECK(data == expected);
+        CHECK(expected == data);
 
         auto val2 = msgpack::decode_msgpack<__int128>(data);
 
@@ -429,7 +429,7 @@ TEST_CASE("msgpack json constructor unsigned __int64 tests")
         std::vector<uint8_t> expected = {0xb4,0x31,0x38,0x34,0x34,0x36,0x37,0x34,0x34,0x30,0x37,0x33,0x37,0x30,0x39,0x35,0x35,0x31,0x36,0x31,0x36};
         std::vector<uint8_t> data;
         msgpack::encode_msgpack(val1, data);
-        CHECK(data == expected);
+        CHECK(expected == data);
 
         auto val2 = msgpack::decode_msgpack<unsigned __int128>(data);
 

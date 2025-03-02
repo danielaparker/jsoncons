@@ -55,7 +55,7 @@ TEST_CASE("jsonschema defaults tests")
             {"bar":"bad"}
  )");
 
-            CHECK(data == expected);
+            CHECK(expected == data);
         }
         catch (const std::exception& e)
         {

@@ -26,7 +26,7 @@ TEST_CASE("test_byte_string_serialization")
 
     //std::cout << expected << " " << os.str() << '\n';
 
-    CHECK(os.str() == expected);
+    CHECK(expected == os.str());
 }
 
 struct json_string_encoder_reset_test_fixture

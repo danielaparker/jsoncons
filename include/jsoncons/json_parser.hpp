@@ -975,15 +975,18 @@ public:
                                 if (ec) return;
                                 break;
                             case '}':
-                                more_ = err_handler_(json_errc::extra_comma, *this);
-                                if (!more_)
-                                {
-                                    ec = json_errc::extra_comma;
-                                    return;
-                                }
                                 saved_position_ = position_;
                                 ++input_ptr_;
                                 ++position_;
+                                if (!options_.allow_trailing_comma())
+                                {
+                                    more_ = err_handler_(json_errc::extra_comma, *this);
+                                    if (!more_)
+                                    {
+                                        ec = json_errc::extra_comma;
+                                        return;
+                                    }
+                                }
                                 end_object(visitor, ec);  // Recover
                                 if (ec) return;
                                 break;
@@ -1174,11 +1177,14 @@ public:
                                 ++position_;
                                 if (parent() == parse_state::array)
                                 {
-                                    more_ = err_handler_(json_errc::extra_comma, *this);
-                                    if (!more_)
+                                    if (!options_.allow_trailing_comma())
                                     {
-                                        ec = json_errc::extra_comma;
-                                        return;
+                                        more_ = err_handler_(json_errc::extra_comma, *this);
+                                        if (!more_)
+                                        {
+                                            ec = json_errc::extra_comma;
+                                            return;
+                                        }
                                     }
                                     end_array(visitor, ec);  // Recover
                                     if (ec) return;
@@ -1192,6 +1198,7 @@ public:
                                         return;
                                     }
                                 }
+                                
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);

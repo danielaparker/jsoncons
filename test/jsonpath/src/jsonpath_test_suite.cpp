@@ -70,7 +70,7 @@ void jsonpath_tests(const std::string& fpath)
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
-                    CHECK(actual == expected);
+                    CHECK(expected == actual);
                 }
                 if (test_case.contains("path"))
                 {
@@ -89,7 +89,7 @@ void jsonpath_tests(const std::string& fpath)
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
-                    CHECK(actual == expected);
+                    CHECK(expected == actual);
                 }
                 if (test_case.contains("error"))
                 {

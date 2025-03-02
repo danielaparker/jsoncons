@@ -47,7 +47,7 @@ TEST_CASE("test_default_nan_replacement")
     os << print(obj);
     std::string expected = R"({"field1":null,"field2":null,"field3":null})";
 
-    CHECK(os.str() == expected);
+    CHECK(expected == os.str());
 }
 
 TEST_CASE("test inf_to_num")
@@ -66,7 +66,7 @@ TEST_CASE("test inf_to_num")
         os << print(j, options);
         std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
 
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 }
 
@@ -90,7 +90,7 @@ TEST_CASE("object: nan_to_str, inf_to_str, neginf_to_str test")
 
         //std::cout << os.str() << "\n";
         std::string expected = R"({"field1": "NaN", "field2": "Inf", "field3": "NegInf"})";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("print nan_to_str, inf_to_str, neginf_to_str")
@@ -105,7 +105,7 @@ TEST_CASE("object: nan_to_str, inf_to_str, neginf_to_str test")
 
         //std::cout << os.str() << "\n";
         std::string expected = R"({"field1":"NaN","field2":"NegInf","field3":"-NegInf"})";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 }
 
@@ -130,7 +130,7 @@ TEST_CASE("array: nan_to_str, inf_to_str, neginf_to_str test")
         //std::cout << os.str() << "\n";
         std::string expected = R"(["NaN", "Inf", "NegInf"])";
 
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("print nan_to_str, inf_to_str, neginf_to_str")
@@ -146,7 +146,7 @@ TEST_CASE("array: nan_to_str, inf_to_str, neginf_to_str test")
         //std::cout << os.str() << "\n";
         std::string expected = R"(["NaN","NegInf","-NegInf"])";
 
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 }
 
@@ -202,7 +202,7 @@ TEST_CASE("object_array empty array")
         std::string expected = R"({
     "foo": []
 })";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("new_line")
@@ -218,7 +218,7 @@ TEST_CASE("object_array empty array")
         std::string expected = R"({
     "foo": []
 })";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("multi_line")
@@ -234,7 +234,7 @@ TEST_CASE("object_array empty array")
         std::string expected = R"({
     "foo": []
 })";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
 }
@@ -268,7 +268,7 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("new_line")
@@ -295,7 +295,7 @@ TEST_CASE("object_array with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("multi_line")
@@ -328,7 +328,7 @@ TEST_CASE("object_array with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("same_line with line length limit")
@@ -355,7 +355,7 @@ TEST_CASE("object_array with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("new_line with line length limit") // Revisit 234
@@ -383,7 +383,7 @@ TEST_CASE("object_array with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 }
 
@@ -449,7 +449,7 @@ TEST_CASE("array_object with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("new_line")
@@ -471,7 +471,7 @@ TEST_CASE("array_object with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
 
     SECTION("multi_line (default)")
@@ -500,7 +500,7 @@ TEST_CASE("array_object with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
     SECTION("same_line with line length limit")
     {
@@ -522,7 +522,7 @@ TEST_CASE("array_object with/without line_length_limit")
         os << pretty_print(j, options);
 
         //std::cout << pretty_print(j, options) << "\n";
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
     }
     SECTION("new_line with line length limit")
     {
@@ -543,7 +543,7 @@ TEST_CASE("array_object with/without line_length_limit")
 
         std::ostringstream os;
         os << pretty_print(j, options);
-        CHECK(os.str() == expected);
+        CHECK(expected == os.str());
 
         //std::cout << pretty_print(j, options) << "\n";
     }

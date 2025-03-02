@@ -25,6 +25,7 @@ inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|Maximum nesting depth allowed when serializing JSON
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
+allow_trailing_comma|If 'true', an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored) |
 err_handler (since 0.171.0)|Defines an [error handler](err_handler.md) for parsing JSON. Defaults to `default_json_parsing`.|
 indent_size| |The indent size, the default is 4
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
@@ -114,6 +115,10 @@ Sets a number replacement for `Negative Infinity` when writing JSON
 
     basic_json_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
+Defaults to `false`.
+
+    basic_json_options& allow_trailing_comma(bool value); 
+If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
 Defaults to `false`.
 
     basic_json_options& indent_size(uint8_t value)

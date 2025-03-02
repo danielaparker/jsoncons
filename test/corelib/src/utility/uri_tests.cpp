@@ -317,7 +317,7 @@ TEST_CASE("uri part decode tests")
         std::string expected = "~";
 
         std::string decoded = jsoncons::uri::decode_part(raw);
-        CHECK(decoded == expected);
+        CHECK(expected == decoded);
     }
     SECTION("test 2")
     {
@@ -325,7 +325,7 @@ TEST_CASE("uri part decode tests")
         std::string expected = "%";
 
         std::string decoded = jsoncons::uri::decode_part(raw);
-        CHECK(decoded == expected);
+        CHECK(expected == decoded);
     }
     SECTION("test 3")
     {
@@ -333,7 +333,7 @@ TEST_CASE("uri part decode tests")
         std::string expected = "foo%bar~baz";
 
         std::string decoded = jsoncons::uri::decode_part(raw);
-        CHECK(decoded == expected);
+        CHECK(expected == decoded);
     }
 }
 
@@ -346,7 +346,7 @@ TEST_CASE("uri part encode tests")
 
         std::string encoded;
         jsoncons::uri::encode_path(part, encoded);
-        CHECK(encoded == expected);
+        CHECK(expected == encoded);
     }
     
     SECTION("test 2")
@@ -356,7 +356,7 @@ TEST_CASE("uri part encode tests")
 
         std::string encoded;
         jsoncons::uri::encode_path(part, encoded);
-        CHECK(encoded == expected);
+        CHECK(expected == encoded);
     }
 }
 
@@ -369,7 +369,7 @@ TEST_CASE("uri part encode illegal characters tests")
 
         std::string encoded;
         jsoncons::uri::encode_illegal_characters(part, encoded);
-        CHECK(encoded == expected);
+        CHECK(expected == encoded);
     }
 }
 

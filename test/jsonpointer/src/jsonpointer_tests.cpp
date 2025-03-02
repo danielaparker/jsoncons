@@ -30,7 +30,7 @@ void check_contains(const basic_json<CharT,Policy,Allocator>& example, const std
         std::cout << "    given: " << example << "\n";
         std::cout << "    pointer: " << pointer << "\n";
     }
-    CHECK(result == expected);
+    CHECK(expected == result);
 }
 
 template <typename CharT,typename Policy,typename Allocator>
@@ -45,7 +45,7 @@ void check_get(const basic_json<CharT,Policy,Allocator>& example, const std::str
         std::cout << "    pointer: " << pointer << "\n";
     }
     CHECK_FALSE(ec);
-    CHECK(result == expected);
+    CHECK(expected == result);
 }
 
 void check_insert_or_assign(json& example, const std::string& path, const json& value, const json& expected)
@@ -53,7 +53,7 @@ void check_insert_or_assign(json& example, const std::string& path, const json& 
     std::error_code ec;
     jsonpointer::add(example, path, value, ec);
     CHECK_FALSE(ec);
-    CHECK(example == expected);
+    CHECK(expected == example);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
@@ -61,7 +61,7 @@ void check_replace(json& example, const std::string& path, const json& value, co
     std::error_code ec;
     jsonpointer::replace(example, path, value, ec);
     CHECK_FALSE(ec);
-    CHECK(example == expected);
+    CHECK(expected == example);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
@@ -69,7 +69,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
     std::error_code ec;
     jsonpointer::remove(example, path, ec);
     CHECK_FALSE(ec);
-    CHECK(example == expected);
+    CHECK(expected == example);
 }
 
 TEST_CASE("get_with_const_ref_test")
@@ -383,7 +383,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
         CHECK(result == json());
     }
     SECTION("get from non-empty")
@@ -401,7 +401,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
         CHECK(result == json());
     }
     SECTION("add into empty")
@@ -419,7 +419,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
     SECTION("add into non-empty")
     {
@@ -436,7 +436,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
     SECTION("add_if_absent into empty")
     {
@@ -451,7 +451,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
         json doc;
         jsonpointer::add_if_absent(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
     SECTION("add_if_absent into non-empty")
     {
@@ -466,7 +466,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
         json doc = json::parse(R"({"foo":{}})");
         jsonpointer::add_if_absent(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
     SECTION("replace into empty")
     {
@@ -483,7 +483,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
     SECTION("replace into non-empty")
     {
@@ -500,7 +500,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
-        CHECK(doc == expected);
+        CHECK(expected == doc);
     }
 }
 

@@ -59,7 +59,7 @@ TEST_CASE("jsonpath json_query json test")
     {
         auto result = jsonpath::json_query(j,"$..book[?(@.category == 'fiction')].title");
         auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
-        CHECK((result == expected));
+        CHECK(expected == (result));
     }
 
     SECTION("test 2")
@@ -67,7 +67,7 @@ TEST_CASE("jsonpath json_query json test")
         std::string expr = "$..book[?(@.category == 'fiction')].title";
         auto result = jsonpath::json_query(j,expr);
         auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
-        CHECK((result == expected));
+        CHECK(expected == (result));
     }
 
     SECTION("test 3")
@@ -76,7 +76,7 @@ TEST_CASE("jsonpath json_query json test")
 
         json expected("Sword of Honour");
         jsonpath::json_query(j, expr, 
-            [expected](const jsoncons::string_view&, const json& title) {CHECK((title == expected));});
+            [expected](const jsoncons::string_view&, const json& title) {CHECK(expected == (title));});
     }
 }
 
@@ -132,7 +132,7 @@ TEST_CASE("jsonpath json_query wjson test")
     {
         auto result = jsonpath::json_query(j,L"$..book[?(@.category == 'fiction')].title");
         auto expected = wjson::parse(LR"(["Sword of Honour","Moby Dick"])");
-        CHECK((result == expected));
+        CHECK(expected == (result));
     }
 }
 

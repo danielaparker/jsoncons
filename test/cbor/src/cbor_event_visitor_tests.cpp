@@ -122,7 +122,7 @@ TEST_CASE("item_event_visitor cbor 1")
 
         std::error_code ec;
         parser.parse(visitor, ec);
-        CHECK(destination.get_result() == expected);
+        CHECK(expected == destination.get_result());
     }
 }
 
@@ -153,7 +153,7 @@ TEST_CASE("item_event_visitor cbor 2")
         std::error_code ec;
         parser.parse(visitor, ec);
         //std::cout << destination.get_result() << "\n";
-        CHECK(destination.get_result() == expected);
+        CHECK(expected == destination.get_result());
     }
 }
 
@@ -184,7 +184,7 @@ TEST_CASE("item_event_visitor cbor 3")
         std::error_code ec;
         parser.parse(visitor, ec);
         //std::cout << destination.get_result() << "\n";
-        CHECK(destination.get_result() == expected);
+        CHECK(expected == destination.get_result());
     }
 }
 
@@ -215,7 +215,7 @@ TEST_CASE("item_event_visitor cbor 4")
         std::error_code ec;
         parser.parse(visitor, ec);
         //std::cout << destination.get_result() << "\n";
-        CHECK(destination.get_result() == expected);
+        CHECK(expected == destination.get_result());
     }
 }
 
@@ -246,7 +246,7 @@ TEST_CASE("item_event_visitor cbor 5")
         std::error_code ec;
         parser.parse(visitor, ec);
         //std::cout << destination.get_result() << "\n";
-        CHECK(destination.get_result() == expected);
+        CHECK(expected == destination.get_result());
     }
 }
 

@@ -171,7 +171,7 @@ TEST_CASE("bson encode array")
         std::vector<uint8_t> data;
         bson::encode_bson(p, data);
 
-        CHECK(data == expected);
+        CHECK(expected == data);
 
         auto p2 = bson::decode_bson<std::pair<int,int>>(data);
         CHECK(p2 == p);
