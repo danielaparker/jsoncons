@@ -1544,28 +1544,32 @@ public:
                     switch (*input_ptr_)
                     {
                         case '*':
-                            state_ = parse_state::slash_star;
                             if (!options_.allow_comments())
                             {
-                                more_ = err_handler_(json_errc::illegal_comment, *this);
-                                if (!more_)
-                                {
-                                    ec = json_errc::illegal_comment;
-                                    return;
-                                }
+                                ec = json_errc::illegal_comment;
+                                return;
                             }
+                            more_ = err_handler_(json_errc::illegal_comment, *this);
+                            if (!more_)
+                            {
+                                ec = json_errc::illegal_comment;
+                                return;
+                            }
+                            state_ = parse_state::slash_star;
                             break;
                         case '/':
-                            state_ = parse_state::slash_slash;
                             if (!options_.allow_comments())
                             {
-                                more_ = err_handler_(json_errc::illegal_comment, *this);
-                                if (!more_)
-                                {
-                                    ec = json_errc::illegal_comment;
-                                    return;
-                                }
+                                ec = json_errc::illegal_comment;
+                                return;
                             }
+                            more_ = err_handler_(json_errc::illegal_comment, *this);
+                            if (!more_)
+                            {
+                                ec = json_errc::illegal_comment;
+                                return;
+                            }
+                            state_ = parse_state::slash_slash;
                             break;
                         default:    
                             more_ = err_handler_(json_errc::syntax_error, *this);

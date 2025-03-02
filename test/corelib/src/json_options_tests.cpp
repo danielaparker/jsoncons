@@ -90,7 +90,7 @@ TEST_CASE("json_options allow_comments test")
     SECTION("don't allow")
     {
         auto options = json_options{}
-            .allow_comments(true);
+            .allow_comments(false);
 
         REQUIRE_THROWS(json::parse("[1,2/*,3*/]", options));
     }

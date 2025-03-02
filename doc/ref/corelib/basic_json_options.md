@@ -118,6 +118,10 @@ Sets a number replacement for `Negative Infinity` when writing JSON
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
 Defaults to `false`.
 
+    basic_json_options& allow_comments(bool value); 
+If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
+Defaults to `true`.
+
     basic_json_options& allow_trailing_comma(bool value); 
 If set to `true`, an extra comma at the end of a list of JSON values in an object or array is allowed (and ignored).
 Defaults to `false`.
