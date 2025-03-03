@@ -4,6 +4,10 @@ The jmespath extension implements [JMESPath](https://jmespath.org/). JMESPath is
 for transforming JSON documents into other JSON documents.
 It's supported in both the AWS and Azure CLI and has libraries available in a number of languages.
 
+Since 1.3.0, the jsoncons implementation supports JMESPath Lexical Scoping using the new 
+[let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md), 
+added to the language [on Mar 31, 2023](https://github.com/jmespath/jmespath.jep/pull/18).  
+
 ### Compliance level
 
 Fully compliant. The jsoncons implementation passes all [compliance tests](https://github.com/jmespath/jmespath.test).
@@ -466,4 +470,6 @@ Output:
     ["New York City", "Albany"]
 ]
 ```
+
+Credit to [JEP: 18 Lexical Scoping](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) for this example
 

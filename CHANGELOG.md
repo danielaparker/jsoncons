@@ -9,7 +9,7 @@
 
     - JMESPath Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md)
 
-    - Fixed jmespath issue with parenthesized expressions involving projection, e.g. `(foo[*])[0]`.
+    - Fixed jmespath issue affecting some parenthesized expressions involving projection, e.g. `(foo[*])[0]`.
 
     - New `json_options` `allow_comments` and `allow_trailing_comma`. These options should
       be preferred over using an error handler.
