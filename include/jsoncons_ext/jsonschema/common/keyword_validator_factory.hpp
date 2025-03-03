@@ -268,6 +268,10 @@ namespace jsonschema {
                     {
                         expected_types.push_back(json_schema_type::number);
                     }
+                    else
+                    {
+                        JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type"));
+                    }
                     break;
                 } 
 
@@ -303,6 +307,10 @@ namespace jsonschema {
                         else if (type == "number")
                         {
                             expected_types.push_back(json_schema_type::number);
+                        }
+                        else
+                        {
+                            JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type"));
                         }
                     }
                     break;
