@@ -270,7 +270,7 @@ namespace jsonschema {
                     }
                     else
                     {
-                        JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type"));
+                        JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type '" + type + "'"));
                     }
                     break;
                 } 
@@ -310,7 +310,7 @@ namespace jsonschema {
                         }
                         else
                         {
-                            JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type"));
+                            JSONCONS_THROW(schema_error(schema_location.string() + ": " + "Invalid type '" + type + "'"));
                         }
                     }
                     break;
