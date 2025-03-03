@@ -34,7 +34,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 [search function](#eg1)  
 [jmespath_expression](#eg2)  
 [custom_functions (since 1.0.0)](#eg3)  
-[Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) (since 1.3.0)](#eg4)  
+[JMESPath Lexical Scoping using the new let expression (since 1.3.0)](#eg4)  
 
  <div id="eg1"/>
 
@@ -417,7 +417,7 @@ Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this
 
  <div id="eg4"/>
 
-#### Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) (since 1.3.0)
+#### JMESPath Lexical Scoping using the new let expression (since 1.3.0)
 
 ```cpp
 #include <jsoncons/json.hpp>
