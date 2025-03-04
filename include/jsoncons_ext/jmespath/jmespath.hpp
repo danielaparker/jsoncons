@@ -21,7 +21,6 @@
 #include <utility> // std::move
 #include <vector>
 #include <map>
-#include <set>
 
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/json_type.hpp>
@@ -1304,26 +1303,9 @@ namespace detail {
     {
         std::size_t end_index{0};
         std::string variable_ref;
-        std::set<std::string> variables;
         
         expression_context() = default;
     };
-    
-    template <typename Json>
-    bool contains_variable(const std::vector<Json>& context_stack, const std::string& variable_ref)
-    {
-        auto found = false;
-        
-        for (auto it = context_stack.rbegin(); !found && it != context_stack.rend(); ++it)
-        {
-            if (it->variables.count(variable_ref) > 0)
-            {
-                found = true;
-            }
-        }
-        
-        return found;
-    }
 
     template <typename Json>
     class jmespath_evaluator 
@@ -3776,6 +3758,22 @@ namespace detail {
                 return result;
             }
 
+            Json evaluate(reference doc, 
+                const std::vector<std::pair<std::string,Json>>& params) const
+            {
+                if (output_stack_.empty())
+                {
+                    return Json::null();
+                }
+                std::error_code ec;
+                Json result = evaluate(doc, params, ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(jmespath_error(ec));
+                }
+                return result;
+            }
+
             Json evaluate(reference doc, std::error_code& ec) const
             {
                 if (output_stack_.empty())
@@ -3784,6 +3782,24 @@ namespace detail {
                 }
                 std::vector<std::unique_ptr<Json>> temp_storage;
                 eval_context<Json> context{temp_storage};
+                return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
+            }
+
+            Json evaluate(reference doc, 
+                const std::vector<std::pair<std::string,Json>>& params,
+                std::error_code& ec) const
+            {
+                if (output_stack_.empty())
+                {
+                    return Json::null();
+                }
+                std::vector<std::unique_ptr<Json>> temp_storage;
+                eval_context<Json> context{temp_storage};
+                for (const auto& param : params)
+                {
+                    context.set_variable(param.first, param.second);
+                }
+                
                 return deep_copy(*evaluate_tokens(doc, output_stack_, context, ec));
             }
         };
@@ -3950,11 +3966,6 @@ namespace detail {
                         break;
                     case expr_state::substitute_variable:
                     {
-                        if (!contains_variable(context_stack, buffer))
-                        {
-                            ec = jmespath_errc::undefined_variable;
-                            return jmespath_expression{};
-                        }
                         push_token(token<Json>{variable_binding_arg, buffer},
                             resources, output_stack, ec);
                         if (ec)
@@ -4160,7 +4171,6 @@ namespace detail {
                                 toks.push_back(std::move(output_stack[i]));
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
-                            context_stack.back().variables.insert(context_stack.back().variable_ref);
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
@@ -4184,7 +4194,6 @@ namespace detail {
                                 toks.push_back(std::move(output_stack[i]));
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
-                            context_stack.back().variables.insert(context_stack.back().variable_ref);
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
@@ -5312,11 +5321,6 @@ namespace detail {
                         break;
                     case expr_state::substitute_variable:
                     {
-                        if (!contains_variable(context_stack, buffer))
-                        {
-                            ec = jmespath_errc::undefined_variable;
-                            return jmespath_expression{};
-                        }
                         push_token(token<Json>{variable_binding_arg, buffer},
                             resources, output_stack, ec);
                         if (ec)

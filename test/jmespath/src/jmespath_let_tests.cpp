@@ -251,6 +251,9 @@ TEST_CASE("jmespath let errors")
         std::error_code ec;
         std::string query = R"($noexist)";
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        expr.evaluate(doc, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
     }    
 
@@ -259,8 +262,11 @@ TEST_CASE("jmespath let errors")
         std::error_code ec;
         std::string query = R"([let $scope = 'foo' in [$scope], $scope])";
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        expr.evaluate(doc, ec);
         CHECK(ec == jmespath::jmespath_errc::undefined_variable);
-    }    
+    }
 
     SECTION("test 3")
     {
@@ -269,5 +275,61 @@ TEST_CASE("jmespath let errors")
         auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
         CHECK(ec == jmespath::jmespath_errc::expected_identifier);
     }
+    SECTION("test 4")
+    {
+        std::error_code ec;
+        std::string query = R"($noexist)";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        auto expected = jsoncons::json::parse(R"("foo")");
+        auto result = expr.evaluate(doc, {{"noexist", "foo"}}, ec);
+        CHECK_FALSE(ec);
+        CHECK(expected == result);
+        //std::cout << result << "\n";
+    }    
+
+    SECTION("test 5")
+    {
+        std::error_code ec;
+        std::string query = R"([let $scope = 'foo' in [$scope], $scope])";
+        auto expr = jmespath::make_expression<jsoncons::json>(query, ec);
+        CHECK_FALSE(ec);
+
+        auto expected = jsoncons::json::parse(R"([["foo"],"foo"])");
+        auto result = expr.evaluate(doc, { {"scope", "foo"} }, ec);
+        CHECK_FALSE(ec);
+        CHECK(expected == result);
+        //std::cout << result << "\n";
+    }
 }
 
+TEST_CASE("jmespath let params")
+{
+    SECTION("test 1")
+    {
+        auto doc = jsoncons::json::parse(R"(
+{
+    "results": [
+         {
+              "name": "test1",
+              "uuid": "33bb9554-c616-42e6-a9c6-88d3bba4221c"
+          },
+          {
+              "name": "test2",
+              "uuid": "acde070d-8c4c-4f0d-9d8a-162843c10333"
+          }
+    ]
+}
+        )");
+        
+        auto expr = jmespath::make_expression<jsoncons::json>("results[*].[name, uuid, $hostname]");
+
+        auto result = expr.evaluate(doc, { {"hostname", "localhost"} });
+        
+        auto options = jsoncons::json_options{}
+            .array_array_line_splits(jsoncons::line_split_kind::same_line);
+
+        std::cout << pretty_print(result) << "\n";
+    }
+}

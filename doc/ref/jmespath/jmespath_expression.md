@@ -9,13 +9,16 @@ class jmespath_expression
 
 #### Member functions
 
-    Json evaluate(reference doc);                               (until 0.177.0)
-                                                            (1)
-    Json evaluate(reference doc) const;                         (since 0.177.0)
+    Json evaluate(reference doc) const;                                    (1)
 
-    Json evaluate(reference doc, std::error_code& ec);          (until 0.177.0)
-                                                            (2)
-    Json evaluate(reference doc, std::error_code& ec) const;    (since 0.177.0)
+    Json evaluate(reference doc, 
+        const std::vector<std::pair<std::string,Json>>& params) const;     (2)
+                                                            
+    Json evaluate(reference doc, std::error_code& ec) const;               (3)
+                                                            
+    Json evaluate(reference doc, 
+        const std::vector<std::pair<std::string,Json>>& params,            (4)
+        std::error_code& ec) const;    
 
 #### Parameters
 
@@ -25,23 +28,8 @@ class jmespath_expression
     <td>Json value</td> 
   </tr>
   <tr>
-    <td>ec</td>
-    <td>out-parameter for reporting errors in the non-throwing overload</td> 
-  </tr>
-</table>
-
-#### Exceptions
-
-(1) Throws a [jmespath_error](jmespath_error.md) if JMESPath evaluation fails.
-
-(2) Sets the out-parameter `ec` to the [jmespath_error_category](jmespath_errc.md) if JMESPath evaluation fails. 
-
-#### Parameters
-
-<table>
-  <tr>
-    <td>expr</td>
-    <td>JMESPath expression</td> 
+    <td>params</td>
+    <td>List of parameters to be passed to an initial (global) scope when the query is evaluated</td> 
   </tr>
   <tr>
     <td>ec</td>
@@ -51,7 +39,7 @@ class jmespath_expression
 
 #### Exceptions
 
-(1) Throws a [jmespath_error](jmespath_error.md) if JMESPath compilation fails.
+(1),(3) Throws a [jmespath_error](jmespath_error.md) if JMESPath evaluation fails.
 
-(2) Sets the out-parameter `ec` to the [jmespath_error_category](jmespath_errc.md) if JMESPath compilation fails. 
+(2),(4) Sets the out-parameter `ec` to the [jmespath_error_category](jmespath_errc.md) if JMESPath evaluation fails. 
 

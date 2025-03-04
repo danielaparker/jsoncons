@@ -67,6 +67,63 @@ void jmespath_expression_example()
     std::cout << pretty_print(result) << "\n\n";
 }
 
+void let_example()
+{
+    auto doc = jsoncons::json::parse(R"(
+[
+  {"home_state": "WA",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  },
+  {"home_state": "NY",
+   "states": [
+     {"name": "WA", "cities": ["Seattle", "Bellevue", "Olympia"]},
+     {"name": "CA", "cities": ["Los Angeles", "San Francisco"]},
+     {"name": "NY", "cities": ["New York City", "Albany"]}
+   ]
+  }
+]
+    )");
+
+    std::string query = R"([*].[let $home_state = home_state in states[? name == $home_state].cities[]][])";
+    auto expr = jmespath::make_expression<jsoncons::json>(query);
+
+    jsoncons::json result = expr.evaluate(doc);
+
+    auto options = jsoncons::json_options{}
+        .array_array_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result, options) << "\n";
+}
+
+void expression_with_params_example() // since 1.3.0
+{
+    auto doc = jsoncons::json::parse(R"(
+{
+"results": [
+     {
+          "name": "test1",
+          "uuid": "33bb9554-c616-42e6-a9c6-88d3bba4221c"
+      },
+      {
+          "name": "test2",
+          "uuid": "acde070d-8c4c-4f0d-9d8a-162843c10333"
+      }
+]
+}
+    )");
+
+    auto expr = jmespath::make_expression<jsoncons::json>("results[*].[name, uuid, $hostname]");
+
+    auto result = expr.evaluate(doc, { {"hostname", "localhost"} });
+
+    auto options = jsoncons::json_options{}
+        .array_array_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result) << "\n";
+}
+
 #if defined(_MSC_VER)
 
 #include <execution>
@@ -110,6 +167,8 @@ int main()
     std::cout << "\nJMESPath examples\n\n";
     search_example();
     jmespath_expression_example();
+    let_example();
+    expression_with_params_example();
 
 #if defined(_MSC_VER)
     query_json_lines_in_parallel();

@@ -39,6 +39,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 [jmespath_expression](#eg2)  
 [custom_functions (since 1.0.0)](#eg3)  
 [JMESPath Lexical Scoping using the new let expression (since 1.3.0)](#eg4)  
+[Evaluate a JMESPath expression with parameters (since 1.3.0)](#eg5)  
 
  <div id="eg1"/>
 
@@ -472,4 +473,59 @@ Output:
 ```
 
 Credit to [JEP: 18 Lexical Scoping](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) for this example
+
+ <div id="eg5"/>
+
+#### Evaluate a JMESPath expression with parameters (since 1.3.0)
+
+```cpp
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jmespath/jmespath.hpp>
+#include <iostream>
+
+namespace jmespath = jsoncons::jmespath;
+
+int main()
+{
+    auto doc = jsoncons::json::parse(R"(
+{
+"results": [
+     {
+          "name": "test1",
+          "uuid": "33bb9554-c616-42e6-a9c6-88d3bba4221c"
+      },
+      {
+          "name": "test2",
+          "uuid": "acde070d-8c4c-4f0d-9d8a-162843c10333"
+      }
+]
+}
+    )");
+
+    auto expr = jmespath::make_expression<jsoncons::json>("results[*].[name, uuid, $hostname]");
+
+    auto result = expr.evaluate(doc, { {"hostname", "localhost"} });
+
+    auto options = jsoncons::json_options{}
+        .array_array_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result) << "\n";
+}
+```
+
+Output:
+
+```json
+[
+    [
+        "test1",
+        "33bb9554-c616-42e6-a9c6-88d3bba4221c",
+        "localhost"
+    ],
+    [
+        "test2",
+        "acde070d-8c4c-4f0d-9d8a-162843c10333",
+        "localhost"
+    ]
+]
+```
 

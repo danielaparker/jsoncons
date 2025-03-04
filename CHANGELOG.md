@@ -16,6 +16,8 @@
 
     - JMESPath Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md)
 
+    - JMESPath evaluate now supports passing parameters to an initial (global) scope
+
     - New `json_options` `allow_comments` and `allow_trailing_comma`. These options should
       be preferred over using an error handler.
 
