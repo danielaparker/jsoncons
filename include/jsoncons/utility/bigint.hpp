@@ -577,6 +577,9 @@ public:
 
     basic_bigint& operator+=( const basic_bigint<Allocator>& y )
     {
+        const uint64_t* y_data = y.data();
+        JSONCONS_ASSERT(y_data != nullptr);
+        
         if ( is_negative() != y.is_negative() )
             return *this -= -y;
         uint64_t d;
@@ -592,7 +595,7 @@ public:
             carry = d < carry;
             if ( i < y.length() )
             {
-                data()[i] = d + y.data()[i];
+                data()[i] = d + y_data[i];
                 if ( data()[i] < d )
                     carry = 1;
             }
