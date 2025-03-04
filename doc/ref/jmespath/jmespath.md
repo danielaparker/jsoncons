@@ -53,7 +53,6 @@ compile and evaluate a JMESPath expression.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
-// for brevity
 using jsoncons::json; 
 namespace jmespath = jsoncons::jmespath;
 
@@ -102,7 +101,6 @@ A `jmespath_expression` is immutable and thread-safe.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
-// for brevity
 using jsoncons::json; 
 namespace jmespath = jsoncons::jmespath;
 
@@ -161,7 +159,6 @@ Credit to [JMESPath Tutorial](https://jmespath.org/tutorial.html) for this Examp
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
-// for brevity
 namespace jmespath = jsoncons::jmespath;
 
 // When adding custom functions, they are generally placed in their own project's source code and namespace.
@@ -292,7 +289,6 @@ thread_local size_t my_custom_functions<Json>::current_index = 0;
 
 } // namespace myspace
 
-// for brevity
 using json = jsoncons::json;
    
 int main()
@@ -429,11 +425,12 @@ Credit to [PR #560](https://github.com/danielaparker/jsoncons/pull/560) for this
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 #include <iostream>
 
+using jsoncons::json; 
 namespace jmespath = jsoncons::jmespath;
 
 int main()
 {
-    auto doc = jsoncons::json::parse(R"(
+    auto doc = json::parse(R"(
 [
   {"home_state": "WA",
    "states": [
@@ -453,14 +450,13 @@ int main()
     )");
 
     std::string query = R"([*].[let $home_state = home_state in states[? name == $home_state].cities[]][])";
-    auto expr = jmespath::make_expression<jsoncons::json>(query);
+    auto expr = jmespath::make_expression<json>(query);
 
-    jsoncons::json result = expr.evaluate(doc);
+    json result = expr.evaluate(doc);
 
     auto options = jsoncons::json_options{}
         .array_array_line_splits(jsoncons::line_split_kind::same_line);
     std::cout << pretty_print(result, options) << "\n";
-}
 ```
 
 Output:
@@ -483,11 +479,12 @@ Credit to [JEP: 18 Lexical Scoping](https://github.com/jmespath/jmespath.jep/blo
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 #include <iostream>
 
+using jsoncons::json;
 namespace jmespath = jsoncons::jmespath;
 
 int main()
 {
-    auto doc = jsoncons::json::parse(R"(
+    auto doc = json::parse(R"(
 {
 "results": [
      {
@@ -502,9 +499,9 @@ int main()
 }
     )");
 
-    auto expr = jmespath::make_expression<jsoncons::json>("results[*].[name, uuid, $hostname]");
+    auto expr = jmespath::make_expression<json>("results[*].[name, uuid, $hostname]");
 
-    auto result = expr.evaluate(doc, { {"hostname", "localhost"} });
+    auto result = expr.evaluate(doc, {{"hostname", json{"localhost"}}});
 
     auto options = jsoncons::json_options{}
         .array_array_line_splits(jsoncons::line_split_kind::same_line);

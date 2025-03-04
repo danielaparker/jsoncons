@@ -69,7 +69,7 @@ void jmespath_expression_example()
 
 void let_example()
 {
-    auto doc = jsoncons::json::parse(R"(
+    auto doc = json::parse(R"(
 [
   {"home_state": "WA",
    "states": [
@@ -89,9 +89,9 @@ void let_example()
     )");
 
     std::string query = R"([*].[let $home_state = home_state in states[? name == $home_state].cities[]][])";
-    auto expr = jmespath::make_expression<jsoncons::json>(query);
+    auto expr = jmespath::make_expression<json>(query);
 
-    jsoncons::json result = expr.evaluate(doc);
+    json result = expr.evaluate(doc);
 
     auto options = jsoncons::json_options{}
         .array_array_line_splits(jsoncons::line_split_kind::same_line);
@@ -100,7 +100,7 @@ void let_example()
 
 void expression_with_params_example() // since 1.3.0
 {
-    auto doc = jsoncons::json::parse(R"(
+    auto doc = json::parse(R"(
 {
 "results": [
      {
@@ -115,9 +115,9 @@ void expression_with_params_example() // since 1.3.0
 }
     )");
 
-    auto expr = jmespath::make_expression<jsoncons::json>("results[*].[name, uuid, $hostname]");
+    auto expr = jmespath::make_expression<json>("results[*].[name, uuid, $hostname]");
 
-    auto result = expr.evaluate(doc, { {"hostname", "localhost"} });
+    auto result = expr.evaluate(doc, {{"hostname", json{"localhost"}}});
 
     auto options = jsoncons::json_options{}
         .array_array_line_splits(jsoncons::line_split_kind::same_line);
