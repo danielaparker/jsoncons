@@ -582,7 +582,6 @@ public:
     basic_bigint& operator+=( const basic_bigint<Allocator>& y )
     {
         const uint64_t* y_data = y.data();
-        JSONCONS_ASSERT(y_data != nullptr);
         
         if ( is_negative() != y.is_negative() )
             return *this -= -y;
@@ -590,21 +589,22 @@ public:
         uint64_t carry = 0;
 
         resize( (std::max)(y.length(), length()) + 1 );
+        uint64_t* this_data = data();
 
         for (size_type i = 0; i < length(); i++ )
         {
             if ( i >= y.length() && carry == 0 )
                 break;
-            d = data()[i] + carry;
+            d = this_data[i] + carry;
             carry = d < carry;
             if ( i < y.length() )
             {
-                data()[i] = d + y_data[i];
-                if ( data()[i] < d )
+                this_data[i] = d + y_data[i];
+                if ( this_data[i] < d )
                     carry = 1;
             }
             else
-                data()[i] = d;
+                this_data[i] = d;
         }
         reduce();
         return *this;
@@ -612,6 +612,8 @@ public:
 
     basic_bigint& operator-=( const basic_bigint<Allocator>& y )
     {
+        const uint64_t* y_data = y.data();
+
         if ( is_negative() != y.is_negative() )
             return *this += -y;
         if ( (!is_negative() && y > *this) || (is_negative() && y < *this) )
@@ -626,7 +628,7 @@ public:
             borrow = d > data()[i];
             if ( i < y.length())
             {
-                data()[i] = d - y.data()[i];
+                data()[i] = d - y_data[i];
                 if ( data()[i] > d )
                     borrow = 1;
             }
@@ -668,14 +670,16 @@ public:
         return *this;
     }
 
-    basic_bigint& operator*=( basic_bigint<Allocator> y )
+    basic_bigint& operator*=(const basic_bigint<Allocator>& y)
     {
+        const uint64_t* y_data = y.data();
+
         if ( length() == 0 || y.length() == 0 )
                     return *this = 0;
         bool difSigns = is_negative() != y.is_negative();
         if ( length() + y.length() == max_short_storage_size ) // length() = y.length() = 1
         {
-            uint64_t a = data()[0], b = y.data()[0];
+            uint64_t a = data()[0], b = y_data[0];
             data()[0] = a * b;
             if ( data()[0] / a != b )
             {
@@ -694,7 +698,7 @@ public:
         else
         {
             if ( y.length() == 1 )
-                *this *= y.data()[0];
+                *this *= y_data[0];
             else
             {
                 size_type lenProd = length() + y.length(), jA, jB;
@@ -713,7 +717,7 @@ public:
                         jB = i - jA;
                         if ( jB >= 0 && jB < y.length() )
                         {
-                            DDproduct( x.data()[jA], y.data()[jB], hi, lo );
+                            DDproduct( x.data()[jA], y_data[jB], hi, lo );
                             sumLo_old = sumLo;
                             sumHi_old = sumHi;
                             sumLo += lo;
@@ -1346,6 +1350,8 @@ public:
 
     int compare( const basic_bigint<Allocator>& y ) const noexcept
     {
+        const uint64_t* y_data = y.data();
+
         if ( is_negative() != y.is_negative() )
             return y.is_negative() - is_negative();
         int code = 0;
@@ -1359,12 +1365,12 @@ public:
         {
             for (size_type i = length(); i-- > 0; )
             {
-                if (data()[i] > y.data()[i])
+                if (data()[i] > y_data[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (data()[i] < y.data()[i])
+                else if (data()[i] < y_data[i])
                 {
                     code = -1;
                     break;
