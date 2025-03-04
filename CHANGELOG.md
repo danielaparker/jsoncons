@@ -1,15 +1,20 @@
-1.3.0 preview (master) 
+1.3.0
 -----
 
 - Fixed bugs:
 
     - Git Issue #595: SIGABRT when serialising unmapped enum value
 
+    - Git Issue #597: Invalid json schema compiled successfully
+
 - Implemented new features:
 
     - JMESPath Lexical Scoping using the new [let expression](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md)
 
-    - Fixed jmespath issue affecting some parenthesized expressions involving projection, e.g. `(foo[*])[0]`.
+    - Fixed a jmespath issue with parenthesized expressions involving projections (wildcard expressions, 
+      the flatten operator, slices and filter expressions) where the right parenthesis did not stop the projection.
+      For example, given JSON `{"foo" : [[0, 1], [2, 3]]}`, the JMESPath query `(foo[*])[0]` 
+      returned `[0,2]` rather than the correct `[0,1]`.
 
     - New `json_options` `allow_comments` and `allow_trailing_comma`. These options should
       be preferred over using an error handler.
