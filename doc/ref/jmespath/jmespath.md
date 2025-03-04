@@ -486,16 +486,16 @@ int main()
 {
     auto doc = json::parse(R"(
 {
-"results": [
-     {
-          "name": "test1",
-          "uuid": "33bb9554-c616-42e6-a9c6-88d3bba4221c"
-      },
-      {
-          "name": "test2",
-          "uuid": "acde070d-8c4c-4f0d-9d8a-162843c10333"
-      }
-]
+    "results": [
+         {
+              "name": "test1",
+              "uuid": "33bb9554-c616-42e6-a9c6-88d3bba4221c"
+          },
+          {
+              "name": "test2",
+              "uuid": "acde070d-8c4c-4f0d-9d8a-162843c10333"
+          }
+    ]
 }
     )");
 
