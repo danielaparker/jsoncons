@@ -39,7 +39,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 [jmespath_expression](#eg2)  
 [custom_functions (since 1.0.0)](#eg3)  
 [JMESPath Lexical Scoping using the new let expression (since 1.3.0)](#eg4)  
-[Evaluate a JMESPath expression with parameters (since 1.3.0)](#eg5)  
+[Late binding of variables to an initial (global) scope via parameters (since 1.3.0)](#eg5)  
 
  <div id="eg1"/>
 
@@ -476,7 +476,7 @@ Credit to [JEP: 18 Lexical Scoping](https://github.com/jmespath/jmespath.jep/blo
 
  <div id="eg5"/>
 
-#### Evaluate a JMESPath expression with parameters (since 1.3.0)
+#### Late binding of variables to an initial (global) scope via parameters (since 1.3.0)
 
 ```cpp
 #include <jsoncons/json.hpp>
@@ -528,4 +528,6 @@ Output:
     ]
 ]
 ```
+
+Credit to [JEP: 18 Lexical Scoping](https://github.com/jmespath/jmespath.jep/blob/main/proposals/0018-lexical-scope.md) for this example
 

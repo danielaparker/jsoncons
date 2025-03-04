@@ -29,7 +29,7 @@ class jmespath_expression
   </tr>
   <tr>
     <td>params</td>
-    <td>List of parameters to be passed to an initial (global) scope when the query is evaluated</td> 
+    <td>List of parameters to be provided to an initial (global) scope when the query is evaluated</td> 
   </tr>
   <tr>
     <td>ec</td>
