@@ -182,7 +182,9 @@ void jmespath_custom_function_example()
   
     auto result = expr.evaluate(doc);
   
-    std::cout << pretty_print(result) << "\n";
+    auto options = jsoncons::json_options{}
+        .array_object_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result, options) << "\n\n";
 }
 
 int main()

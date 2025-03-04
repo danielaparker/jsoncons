@@ -480,6 +480,11 @@ namespace detail {
                                 //stack_.back().new_line_after(true);
                                 new_line();
                             }
+                            else
+                            {
+                                stack_.back().new_line_after(true);
+                                new_line();
+                            }
                             break;
                         case line_split_kind::new_line:
                             stack_.back().new_line_after(true);
