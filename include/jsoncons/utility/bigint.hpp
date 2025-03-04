@@ -357,12 +357,16 @@ public:
 
     constexpr const uint64_t* data() const
     {
-        return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+        const uint64_t* p = is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+        JSONCONS_ASSERT(p != nullptr);
+        return p;
     }
 
     uint64_t* data() 
     {
-        return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+        uint64_t* p = is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+        JSONCONS_ASSERT(p != nullptr);
+        return p;
     }
 
     template <typename CharT>
