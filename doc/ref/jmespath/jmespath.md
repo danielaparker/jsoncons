@@ -322,7 +322,9 @@ int main()
   
     auto result = expr.evaluate(doc);
   
-    std::cout << pretty_print(result) << "\n\n";
+    auto options = jsoncons::json_options{}
+        .array_object_line_splits(jsoncons::line_split_kind::same_line);
+    std::cout << pretty_print(result, options) << "\n\n";
 }
 ```
 
@@ -330,86 +332,22 @@ Output:
 
 ```json
 [
-    {
-        "id": "id-xxx",
-        "position": 1,
-        "state": 1
-    },
-    {
-        "id": "",
-        "position": 2,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 3,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 4,
-        "state": 0
-    },
-    {
-        "id": "id-yyy",
-        "position": 5,
-        "state": 1
-    },
-    {
-        "id": "",
-        "position": 6,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 7,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 8,
-        "state": 0
-    },
-    {
-        "id": "id-mmm",
-        "position": 9,
-        "state": 2
-    },
-    {
-        "id": "",
-        "position": 10,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 11,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 12,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 13,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 14,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 15,
-        "state": 0
-    },
-    {
-        "id": "",
-        "position": 16,
-        "state": 0
-    }
+    {"id": "id-xxx", "position": 1, "state": 1},
+    {"id": "", "position": 2, "state": 0},
+    {"id": "", "position": 3, "state": 0},
+    {"id": "", "position": 4, "state": 0},
+    {"id": "id-yyy", "position": 5, "state": 1},
+    {"id": "", "position": 6, "state": 0},
+    {"id": "", "position": 7, "state": 0},
+    {"id": "", "position": 8, "state": 0},
+    {"id": "id-mmm", "position": 9, "state": 2},
+    {"id": "", "position": 10, "state": 0},
+    {"id": "", "position": 11, "state": 0},
+    {"id": "", "position": 12, "state": 0},
+    {"id": "", "position": 13, "state": 0},
+    {"id": "", "position": 14, "state": 0},
+    {"id": "", "position": 15, "state": 0},
+    {"id": "", "position": 16, "state": 0}
 ]
 ```
 

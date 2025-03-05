@@ -495,8 +495,11 @@ TEST_CASE("array_object with/without line_length_limit")
     )";
     SECTION("same_line")
     {
-    std::string expected = R"([{"author": "Graham Greene","title": "The Comedians"},{"author": "Koji Suzuki","title": "ring"},{"author": "Haruki Murakami",
-                                                                                                 "title": "A Wild Sheep Chase"}])";
+    std::string expected = R"([
+    {"author": "Graham Greene","title": "The Comedians"},
+    {"author": "Koji Suzuki","title": "ring"},
+    {"author": "Haruki Murakami","title": "A Wild Sheep Chase"}
+])";
 
         json j = json::parse(s);
 
@@ -564,12 +567,14 @@ TEST_CASE("array_object with/without line_length_limit")
     }
     SECTION("same_line with line length limit")
     {
-    std::string expected = R"([{"author": "Graham Greene",
-  "title": "The Comedians"},
+    std::string expected = R"([
+    {"author": "Graham Greene",
+     "title": "The Comedians"},
     {"author": "Koji Suzuki",
      "title": "ring"},
     {"author": "Haruki Murakami",
-     "title": "A Wild Sheep Chase"}])";
+     "title": "A Wild Sheep Chase"}
+])";
 
         json j = json::parse(s);
 
@@ -629,7 +634,9 @@ TEST_CASE("json_options tests")
     }
     SECTION("pad_inside_object_braces")
     {
-        std::string s = R"([{ "foo": 1 }])";
+        std::string s = R"([
+    { "foo": 1 }
+])";
 
         json j = json::parse(s);
 
