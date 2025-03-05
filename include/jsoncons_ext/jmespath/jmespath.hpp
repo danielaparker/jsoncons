@@ -3431,6 +3431,7 @@ namespace detail {
             variable_expression(std::vector<token<Json>>&& tokens)
                 : tokens_(std::move(tokens))
             {
+                JSONCONS_ASSERT(!tokens_.empty());
                 if (tokens_.front().type() != token_kind::literal)
                 {
                     tokens_.emplace(tokens_.begin(), current_node_arg);
