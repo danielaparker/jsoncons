@@ -24,8 +24,8 @@ namespace ns {
     {
         std::vector<double> x_;
     public:
-        hiking_reputon(std::vector<double> x)
-            : x_(x)
+        hiking_reputon(std::vector<double>&& x)
+            : x_(std::move(x))
         {
         }
         const std::vector<double>& x() const {return x_;}
@@ -136,7 +136,7 @@ TEST_CASE("serialize big array to ubjson")
 {
     std::vector<double> x; x.resize(16777217);
     for (std::size_t i = 0; i < x.size(); ++i) { x[i] = (double)i; }
-    ns::hiking_reputon val(x);
+    ns::hiking_reputon val(std::move(x));
 
     // Encode a ns::hiking_reputation value to UBJSON
     std::vector<uint8_t> data;
