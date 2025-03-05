@@ -356,7 +356,7 @@ public:
         common_stor_.is_negative_ = value;
     }
 
-    constexpr const uint64_t* data() const
+    const uint64_t* data() const
     {
         const uint64_t* p = is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
         JSONCONS_ASSERT(p != nullptr);
