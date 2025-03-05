@@ -857,37 +857,37 @@ namespace detail {
     public:
 
         token(current_node_arg_t) noexcept
-            : type_(token_kind::current_node)
+            : type_(token_kind::current_node), expression_{nullptr}
         {
         }
 
         token(end_function_arg_t) noexcept
-            : type_(token_kind::end_function)
+            : type_(token_kind::end_function), expression_{nullptr}
         {
         }
 
         token(separator_arg_t) noexcept
-            : type_(token_kind::separator)
+            : type_(token_kind::separator), expression_{nullptr}
         {
         }
 
         token(lparen_arg_t) noexcept
-            : type_(token_kind::lparen)
+            : type_(token_kind::lparen), expression_{nullptr}
         {
         }
 
         token(rparen_arg_t) noexcept
-            : type_(token_kind::rparen)
+            : type_(token_kind::rparen), expression_{nullptr}
         {
         }
 
         token(end_of_expression_arg_t) noexcept
-            : type_(token_kind::end_of_expression)
+            : type_(token_kind::end_of_expression), expression_{nullptr}
         {
         }
 
         token(begin_multi_select_hash_arg_t) noexcept
-            : type_(token_kind::begin_multi_select_hash)
+            : type_(token_kind::begin_multi_select_hash), expression_{nullptr}
         {
         }
 
@@ -1050,7 +1050,12 @@ namespace detail {
 
         bool is_projection() const
         {
-            return type_ == token_kind::expression && expression_->is_projection(); 
+            if (is_expression())
+            {
+                JSONCONS_ASSERT(expression_ != nullptr);
+                return expression_->is_projection();;
+            }
+            return false; 
         }
 
         bool is_expression() const
@@ -1069,10 +1074,13 @@ namespace detail {
             switch(type_)
             {
                 case token_kind::unary_operator:
+                    JSONCONS_ASSERT(unary_operator_ != nullptr);
                     return unary_operator_->precedence_level();
                 case token_kind::binary_operator:
+                    JSONCONS_ASSERT(binary_operator_ != nullptr);
                     return binary_operator_->precedence_level();
                 case token_kind::expression:
+                    JSONCONS_ASSERT(expression_ != nullptr);
                     return expression_->precedence_level();
                 default:
                     return 0;
@@ -1089,10 +1097,13 @@ namespace detail {
             switch(type_)
             {
                 case token_kind::unary_operator:
+                    JSONCONS_ASSERT(unary_operator_ != nullptr);
                     return unary_operator_->is_right_associative();
                 case token_kind::binary_operator:
+                    JSONCONS_ASSERT(binary_operator_ != nullptr);
                     return binary_operator_->is_right_associative();
                 case token_kind::expression:
+                    JSONCONS_ASSERT(expression_ != nullptr);
                     return expression_->is_right_associative();
                 default:
                     return false;
@@ -3431,11 +3442,6 @@ namespace detail {
             variable_expression(std::vector<token<Json>>&& tokens)
                 : tokens_(std::move(tokens))
             {
-                JSONCONS_ASSERT(!tokens_.empty());
-                if (tokens_.front().type() != token_kind::literal)
-                {
-                    tokens_.emplace(tokens_.begin(), current_node_arg);
-                }
             }
 
             reference evaluate(reference val, eval_context<Json>& context, std::error_code& ec) const override
@@ -4172,6 +4178,11 @@ namespace detail {
                                 toks.push_back(std::move(output_stack[i]));
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
+                            JSONCONS_ASSERT(!toks.empty());
+                            if (toks.front().type() != token_kind::literal)
+                            {
+                                toks.emplace(toks.begin(), current_node_arg);
+                            }
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
@@ -4195,6 +4206,12 @@ namespace detail {
                                 toks.push_back(std::move(output_stack[i]));
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
+                            JSONCONS_ASSERT(!toks.empty());
+                            JSONCONS_ASSERT(toks.begin() != toks.end());
+                            if (toks.front().type() != token_kind::literal)
+                            {
+                                toks.emplace(toks.begin(), current_node_arg);
+                            }
                             push_token(token<Json>{ context_stack.back().variable_ref, 
                                 resources.create_expression(variable_expression(std::move(toks))) },
                                 resources, output_stack, ec);
