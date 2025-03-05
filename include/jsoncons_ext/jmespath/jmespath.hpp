@@ -4207,7 +4207,6 @@ namespace detail {
                             }
                             output_stack.erase(output_stack.begin() + context_stack.back().end_index, output_stack.end());
                             JSONCONS_ASSERT(!toks.empty());
-                            JSONCONS_ASSERT(toks.begin() != toks.end());
                             if (toks.front().type() != token_kind::literal)
                             {
                                 toks.emplace(toks.begin(), current_node_arg);

@@ -2895,7 +2895,12 @@ namespace detail {
 
         bool is_path() const
         {
-            return token_kind_ == jsonpath_token_kind::selector && selector_->is_path(); 
+            if (token_kind_ == jsonpath_token_kind::selector)
+            {
+                JSONCONS_ASSERT(selector_ != nullptr);
+                return selector_->is_path(); 
+            }
+            return false;
         }
 
         bool is_operator() const
@@ -2909,10 +2914,13 @@ namespace detail {
             switch(token_kind_)
             {
                 case jsonpath_token_kind::selector:
+                    JSONCONS_ASSERT(selector_ != nullptr);
                     return selector_->precedence_level();
                 case jsonpath_token_kind::unary_operator:
+                    JSONCONS_ASSERT(unary_operator_ != nullptr);
                     return unary_operator_->precedence_level();
                 case jsonpath_token_kind::binary_operator:
+                    JSONCONS_ASSERT(binary_operator_ != nullptr);
                     return binary_operator_->precedence_level();
                 default:
                     return 0;
@@ -2921,7 +2929,12 @@ namespace detail {
 
         jsoncons::optional<std::size_t> arity() const
         {
-            return token_kind_ == jsonpath_token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
+            if (token_kind_ == jsonpath_token_kind::function)
+            {
+                JSONCONS_ASSERT(function_ != nullptr);
+                return function_->arity();
+            }
+            return jsoncons::optional<std::size_t>();
         }
 
         bool is_right_associative() const
@@ -2929,10 +2942,13 @@ namespace detail {
             switch(token_kind_)
             {
                 case jsonpath_token_kind::selector:
+                    JSONCONS_ASSERT(selector_ != nullptr);
                     return selector_->is_right_associative();
                 case jsonpath_token_kind::unary_operator:
+                    JSONCONS_ASSERT(unary_operator_ != nullptr);
                     return unary_operator_->is_right_associative();
                 case jsonpath_token_kind::binary_operator:
+                    JSONCONS_ASSERT(binary_operator_ != nullptr);
                     return binary_operator_->is_right_associative();
                 default:
                     return false;
