@@ -221,6 +221,7 @@ private:
                 std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
                 JSONCONS_RETHROW;
             }
+            JSONCONS_ASSERT(stor.data_ != nullptr);
             std::memcpy(data_, stor.data_, size_type(stor.length_*sizeof(uint64_t)));
         }
 
@@ -656,16 +657,17 @@ public:
         uint64_t carry = 0;
 
         resize( length() + 1 );
+        uint64_t* this_data = data();
 
         size_type i = 0;
         for (i = 0; i < len0; i++ )
         {
             DDproduct( dig, y, hi, lo );
-            data()[i] = lo + carry;
-            dig = data()[i+1];
-            carry = hi + (data()[i] < lo);
+            this_data[i] = lo + carry;
+            dig = this_data[i+1];
+            carry = hi + (this_data[i] < lo);
         }
-        data()[i] = carry;
+        this_data[i] = carry;
         reduce();
         return *this;
     }
@@ -705,7 +707,9 @@ public:
                 uint64_t sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bigint<Allocator> x = *this;
+                const uint64_t* x_data = x.data();
                 resize( lenProd ); // Give *this length lenProd
+                uint64_t* this_data = data();
 
                 for (size_type i = 0; i < lenProd; i++ )
                 {
@@ -717,7 +721,7 @@ public:
                         jB = i - jA;
                         if ( jB >= 0 && jB < y.length() )
                         {
-                            DDproduct( x.data()[jA], y_data[jB], hi, lo );
+                            DDproduct( x_data[jA], y_data[jB], hi, lo );
                             sumLo_old = sumLo;
                             sumHi_old = sumHi;
                             sumLo += lo;
@@ -727,7 +731,7 @@ public:
                             carry += (sumHi < sumHi_old);
                         }
                     }
-                    data()[i] = sumLo;
+                    this_data[i] = sumLo;
                 }
             }
         }
@@ -756,8 +760,9 @@ public:
         if ( q ) // Increase common_stor_.length_ by q:
         {
             resize(length() + q);
+            uint64_t* this_data = data();
             for (size_type i = length(); i-- > 0; )
-                data()[i] = ( i < q ? 0 : data()[i - q]);
+                this_data[i] = ( i < q ? 0 : this_data[i - q]);
             k %= basic_type_bits;
         }
         if ( k )  // 0 < k < basic_type_bits:
@@ -765,11 +770,12 @@ public:
             uint64_t k1 = basic_type_bits - k;
             uint64_t mask = (uint64_t(1) << k) - uint64_t(1);
             resize( length() + 1 );
+            uint64_t* this_data = data();
             for (size_type i = length(); i-- > 0; )
             {
-                data()[i] <<= k;
+                this_data[i] <<= k;
                 if ( i > 0 )
-                    data()[i] |= (data()[i-1] >> k1) & mask;
+                    this_data[i] |= (this_data[i-1] >> k1) & mask;
             }
         }
         reduce();
@@ -796,14 +802,15 @@ public:
             }
         }
 
+        uint64_t* this_data = data();
         size_type n = size_type(length() - 1);
         int64_t k1 = basic_type_bits - k;
         uint64_t mask = (uint64_t(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
-            data()[i] >>= k;
+            this_data[i] >>= k;
             if ( i < n )
-                data()[i] |= ((data()[i+1] & mask) << k1);
+                this_data[i] |= ((this_data[i+1] & mask) << k1);
         }
         reduce();
         return *this;
