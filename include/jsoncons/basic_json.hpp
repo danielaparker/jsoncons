@@ -4714,25 +4714,25 @@ namespace jsoncons {
     inline namespace literals {
 
     inline 
-    jsoncons::json operator "" _json(const char* s, std::size_t n)
+    jsoncons::json operator ""_json(const char* s, std::size_t n)
     {
         return jsoncons::json::parse(jsoncons::json::string_view_type(s, n));
     }
 
     inline 
-    jsoncons::wjson operator "" _json(const wchar_t* s, std::size_t n)
+    jsoncons::wjson operator ""_json(const wchar_t* s, std::size_t n)
     {
         return jsoncons::wjson::parse(jsoncons::wjson::string_view_type(s, n));
     }
 
     inline
-    jsoncons::ojson operator "" _ojson(const char* s, std::size_t n)
+    jsoncons::ojson operator ""_ojson(const char* s, std::size_t n)
     {
         return jsoncons::ojson::parse(jsoncons::ojson::string_view_type(s, n));
     }
 
     inline
-    jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
+    jsoncons::wojson operator ""_ojson(const wchar_t* s, std::size_t n)
     {
         return jsoncons::wojson::parse(jsoncons::wojson::string_view_type(s, n));
     }
