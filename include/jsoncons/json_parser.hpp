@@ -129,21 +129,22 @@ private:
     basic_json_decode_options<char_type> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
-    int nesting_depth_;
-    uint32_t cp_;
-    uint32_t cp2_;
-    std::size_t line_;
-    std::size_t position_;
-    std::size_t mark_position_;
-    std::size_t saved_position_;
-    const char_type* begin_input_;
-    const char_type* end_input_;
-    const char_type* input_ptr_;
-    parse_state state_;
-    parse_string_state string_state_ = parse_string_state{};
-    parse_number_state number_state_ = parse_number_state{};
-    bool more_;
-    bool done_;
+    int nesting_depth_{0};
+    uint32_t cp_{0};
+    uint32_t cp2_{0};
+    std::size_t line_{1};
+    std::size_t position_{0};
+    std::size_t mark_position_{0};
+    std::size_t saved_position_{0};
+    const char_type* begin_input_{nullptr};
+    const char_type* end_input_{nullptr};
+    const char_type* input_ptr_{nullptr};
+    parse_state state_{parse_state::start};
+    parse_string_state string_state_{};
+    parse_number_state number_state_{};
+    bool more_{true};
+    bool done_{false};
+    bool cursor_mode_{false};
 
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
     jsoncons::detail::chars_to to_double_;
@@ -178,19 +179,6 @@ public:
                       const TempAllocator& temp_alloc = TempAllocator())
        : options_(options),
          err_handler_(err_handler),
-         nesting_depth_(0), 
-         cp_(0),
-         cp2_(0),
-         line_(1),
-         position_(0),
-         mark_position_(0),
-         saved_position_(0),
-         begin_input_(nullptr),
-         end_input_(nullptr),
-         input_ptr_(nullptr),
-         state_(parse_state::start),
-         more_(true),
-         done_(false),
          string_buffer_(temp_alloc),
          state_stack_(temp_alloc)
     {
