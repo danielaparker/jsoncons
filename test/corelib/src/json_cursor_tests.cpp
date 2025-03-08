@@ -15,7 +15,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("json_cursor eof test")
 {
     SECTION("string source eof test")
@@ -602,14 +601,14 @@ TEST_CASE("staj event as object")
         CHECK((j1 == document[1]));
     }
 }
-#endif
+
 TEMPLATE_TEST_CASE("json_cursor reset test", "",
                    (std::pair<json_string_cursor, std::string>),
                    (std::pair<json_stream_cursor, std::istringstream>))
 {
     using cursor_type = typename TestType::first_type;
     using input_type = typename TestType::second_type;
-#if 0
+
     SECTION("keeping same source")
     {
         input_type input(R"("Tom" -100 null)");
@@ -639,7 +638,7 @@ TEMPLATE_TEST_CASE("json_cursor reset test", "",
         REQUIRE_FALSE(ec);
         CHECK(cursor.done());
     }
-#endif
+
     SECTION("with another source")
     {
         input_type input0;
