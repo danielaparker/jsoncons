@@ -201,6 +201,11 @@ public:
             string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
     }
+    
+    void cursor_mode(bool value)
+    {
+        cursor_mode_ = value;
+    }
 
     bool source_exhausted() const
     {

@@ -43,7 +43,7 @@ private:
     json_source_adaptor<Source> source_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    bool done_;
+    bool done_{false};
 
 public:
 
@@ -57,9 +57,9 @@ public:
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all),
-         done_(false)
+         cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             std::error_code local_ec;
@@ -86,9 +86,9 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all),
-         done_(false)
+         cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source));
     }
 
@@ -139,9 +139,10 @@ public:
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all),
-         done_(false)
+         cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
+
         if (!done())
         {
             std::error_code local_ec;
@@ -169,9 +170,9 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(),
          parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all),
-         done_(false)
+         cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         initialize_with_string_view(std::forward<Sourceable>(source), ec);
     }
     
