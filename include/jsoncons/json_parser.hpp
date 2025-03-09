@@ -382,7 +382,6 @@ public:
             more_ = false;
             return;
         }
-        --level_;
         state_ = pop_state();
         if (state_ == parse_state::object)
         {
@@ -412,10 +411,11 @@ public:
             state_ = parse_state::expect_comma_or_end;
         }
         more_ = !cursor_mode_;
-        if (level_ <= mark_level_)
+        if (level_ == mark_level_)
         {
             more_ = false;
         }
+        --level_;
     }
 
     void begin_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
@@ -446,7 +446,6 @@ public:
             more_ = false;
             return;
         }
-        --level_;
         state_ = pop_state();
         if (state_ == parse_state::array)
         {
@@ -476,10 +475,11 @@ public:
         }
 
         more_ = !cursor_mode_;
-        if (level_ <= mark_level_)
+        if (level_ == mark_level_)
         {
             more_ = false;
         }
+        --level_;
     }
 
     void reinitialize()
