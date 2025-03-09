@@ -129,7 +129,7 @@ private:
     basic_json_decode_options<char_type> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
-    int nesting_depth_{0};
+    int level_{0};
     uint32_t cp_{0};
     uint32_t cp2_{0};
     std::size_t line_{1};
@@ -145,6 +145,7 @@ private:
     bool more_{true};
     bool done_{false};
     bool cursor_mode_{false};
+    int mark_level_{0};
 
     std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
     jsoncons::detail::chars_to to_double_;
@@ -205,6 +206,21 @@ public:
     void cursor_mode(bool value)
     {
         cursor_mode_ = value;
+    }
+
+    int level() const
+    {
+        return level_;
+    }
+
+    int mark_level() const 
+    {
+        return mark_level_;
+    }
+
+    void mark_level(int value)
+    {
+        mark_level_ = value;
     }
 
     bool source_exhausted() const
@@ -341,7 +357,7 @@ public:
 
     void begin_object(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(++level_ > options_.max_nesting_depth()))
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -353,23 +369,24 @@ public:
 
         push_state(parse_state::object);
         state_ = parse_state::expect_member_name_or_end;
-        more_ = visitor.begin_object(semantic_tag::none, *this, ec);
+        visitor.begin_object(semantic_tag::none, *this, ec);
+        more_ = !cursor_mode_;
     }
 
     void end_object(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(nesting_depth_ < 1))
+        if (JSONCONS_UNLIKELY(level_ < 1))
         {
             err_handler_(json_errc::unexpected_rbrace, *this);
             ec = json_errc::unexpected_rbrace;
             more_ = false;
             return;
         }
-        --nesting_depth_;
+        --level_;
         state_ = pop_state();
         if (state_ == parse_state::object)
         {
-            more_ = visitor.end_object(*this, ec);
+            visitor.end_object(*this, ec);
         }
         else if (state_ == parse_state::array)
         {
@@ -394,11 +411,16 @@ public:
         {
             state_ = parse_state::expect_comma_or_end;
         }
+        more_ = !cursor_mode_;
+        if (level_ <= mark_level_)
+        {
+            more_ = false;
+        }
     }
 
     void begin_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (++nesting_depth_ > options_.max_nesting_depth())
+        if (++level_ > options_.max_nesting_depth())
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -410,23 +432,25 @@ public:
 
         push_state(parse_state::array);
         state_ = parse_state::expect_value_or_end;
-        more_ = visitor.begin_array(semantic_tag::none, *this, ec);
+        visitor.begin_array(semantic_tag::none, *this, ec);
+
+        more_ = !cursor_mode_;
     }
 
     void end_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        if (nesting_depth_ < 1)
+        if (level_ < 1)
         {
             err_handler_(json_errc::unexpected_rbracket, *this);
             ec = json_errc::unexpected_rbracket;
             more_ = false;
             return;
         }
-        --nesting_depth_;
+        --level_;
         state_ = pop_state();
         if (state_ == parse_state::array)
         {
-            more_ = visitor.end_array(*this, ec);
+            visitor.end_array(*this, ec);
         }
         else if (state_ == parse_state::object)
         {
@@ -449,6 +473,12 @@ public:
         else
         {
             state_ = parse_state::expect_comma_or_end;
+        }
+
+        more_ = !cursor_mode_;
+        if (level_ <= mark_level_)
+        {
+            more_ = false;
         }
     }
 
@@ -474,7 +504,7 @@ public:
         line_ = 1;
         position_ = 0;
         mark_position_ = 0;
-        nesting_depth_ = 0;
+        level_ = 0;
     }
 
     void restart()
@@ -1394,7 +1424,7 @@ public:
                         case 'e':
                             ++input_ptr_;
                             ++position_;
-                            more_ = visitor.bool_value(true,  semantic_tag::none, *this, ec);
+                            visitor.bool_value(true,  semantic_tag::none, *this, ec);
                             if (parent() == parse_state::root)
                             {
                                 state_ = parse_state::accept;
@@ -1403,6 +1433,7 @@ public:
                             {
                                 state_ = parse_state::expect_comma_or_end;
                             }
+                            more_ = !cursor_mode_;
                             break;
                         default:
                             err_handler_(json_errc::invalid_value, *this);
@@ -1462,7 +1493,7 @@ public:
                         case 'e':
                             ++input_ptr_;
                             ++position_;
-                            more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                            visitor.bool_value(false, semantic_tag::none, *this, ec);
                             if (parent() == parse_state::root)
                             {
                                 state_ = parse_state::accept;
@@ -1471,6 +1502,7 @@ public:
                             {
                                 state_ = parse_state::expect_comma_or_end;
                             }
+                            more_ = !cursor_mode_;
                             break;
                         default:
                             err_handler_(json_errc::invalid_value, *this);
@@ -1514,7 +1546,7 @@ public:
                     switch (*input_ptr_)
                     {
                     case 'l':
-                        more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                        visitor.null_value(semantic_tag::none, *this, ec);
                         if (parent() == parse_state::root)
                         {
                             state_ = parse_state::accept;
@@ -1523,6 +1555,7 @@ public:
                         {
                             state_ = parse_state::expect_comma_or_end;
                         }
+                        more_ = !cursor_mode_;
                         break;
                     default:
                         err_handler_(json_errc::invalid_value, *this);
@@ -1650,7 +1683,7 @@ public:
             {
                 input_ptr_ += 4;
                 position_ += 4;
-                more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
+                visitor.bool_value(true, semantic_tag::none, *this, ec);
                 if (parent() == parse_state::root)
                 {
                     state_ = parse_state::accept;
@@ -1659,6 +1692,7 @@ public:
                 {
                     state_ = parse_state::expect_comma_or_end;
                 }
+                more_ = !cursor_mode_;
             }
             else
             {
@@ -1685,7 +1719,8 @@ public:
             {
                 input_ptr_ += 4;
                 position_ += 4;
-                more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                visitor.null_value(semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 if (parent() == parse_state::root)
                 {
                     state_ = parse_state::accept;
@@ -1720,7 +1755,8 @@ public:
             {
                 input_ptr_ += 5;
                 position_ += 5;
-                more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                visitor.bool_value(false, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 if (parent() == parse_state::root)
                 {
                     state_ = parse_state::accept;
@@ -2624,11 +2660,13 @@ private:
         auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
-            more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+            visitor.int64_value(val, semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
         else // Must be overflow
         {
-            more_ = visitor.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
+            visitor.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
+            more_ = !cursor_mode_;
         }
         after_value(ec);
     }
@@ -2639,11 +2677,13 @@ private:
         auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
-            more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+            visitor.uint64_value(val, semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
         else // Must be overflow
         {
-            more_ = visitor.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
+            visitor.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
+            more_ = !cursor_mode_;
         }
         after_value(ec);
     }
@@ -2654,12 +2694,14 @@ private:
         {
             if (options_.lossless_number())
             {
-                more_ = visitor.string_value(string_buffer_, semantic_tag::bigdec, *this, ec);
+                visitor.string_value(string_buffer_, semantic_tag::bigdec, *this, ec);
+                more_ = !cursor_mode_;
             }
             else
             {
                 double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
-                more_ = visitor.double_value(d, semantic_tag::none, *this, ec);
+                visitor.double_value(d, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
         }
         JSONCONS_CATCH(...)
@@ -2670,7 +2712,8 @@ private:
                 ec = json_errc::invalid_number;
                 return;
             }
-            more_ = visitor.null_value(semantic_tag::none, *this, ec); // recovery
+            visitor.null_value(semantic_tag::none, *this, ec); // recovery
+            more_ = !cursor_mode_;
         }
 
         after_value(ec);
@@ -2689,7 +2732,8 @@ private:
         switch (parent())
         {
         case parse_state::member_name:
-            more_ = visitor.key(sv, *this, ec);
+            visitor.key(sv, *this, ec);
+            more_ = !cursor_mode_;
             pop_state();
             state_ = parse_state::expect_colon;
             break;
@@ -2699,11 +2743,13 @@ private:
             auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
             if (it != string_double_map_.end())
             {
-                more_ = visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
             else
             {
-                more_ = visitor.string_value(sv, semantic_tag::none, *this, ec);
+                visitor.string_value(sv, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
             state_ = parse_state::expect_comma_or_end;
             break;
@@ -2713,11 +2759,13 @@ private:
             auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
             if (it != string_double_map_.end())
             {
-                more_ = visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                visitor.double_value((*it).second, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
             else
             {
-                more_ = visitor.string_value(sv, semantic_tag::none, *this, ec);
+                visitor.string_value(sv, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
             state_ = parse_state::accept;
             break;
@@ -2781,7 +2829,7 @@ private:
     void push_state(parse_state state)
     {
         state_stack_.push_back(state);
-        //std::cout << "max_nesting_depth: " << options_.max_nesting_depth() << ", capacity: " << state_stack_.capacity() << ", nesting_depth: " << nesting_depth_ << ", stack size: " << state_stack_.size() << "\n";
+        //std::cout << "max_nesting_depth: " << options_.max_nesting_depth() << ", capacity: " << state_stack_.capacity() << ", nesting_depth: " << level_ << ", stack size: " << state_stack_.size() << "\n";
     }
 
     parse_state pop_state()

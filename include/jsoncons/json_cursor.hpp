@@ -280,10 +280,14 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                  std::error_code& ec) override
     {
+        parser_.cursor_mode(false);
+        parser_.mark_level(parser_.level());
         if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
         {
             read_next(visitor, ec);
         }
+        parser_.cursor_mode(true);
+        parser_.mark_level(0);
     }
 
     void next() override
