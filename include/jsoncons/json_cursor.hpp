@@ -291,6 +291,13 @@ public:
             parser_.cursor_mode(true);
             parser_.mark_level(0);
         }
+        else
+        {
+            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            {
+                read_next(visitor, ec);
+            }
+        }
     }
 
     void next() override
