@@ -578,7 +578,7 @@ TEST_CASE("staj event as object")
         cursor.next();
         CHECK(cursor.done());
     }
-    SECTION("test 2")
+    SECTION("test read_to")
     {
         json document = json::parse(buffer);
 
