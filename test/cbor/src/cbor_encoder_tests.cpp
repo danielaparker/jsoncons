@@ -550,28 +550,28 @@ TEST_CASE("test cbor encode with raw tags")
         encoder.flush();
         
         cbor::cbor_bytes_cursor cursor(data);
-        CHECK(cursor.raw_tag() == 0xB1);
-        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::begin_array);
+        CHECK(0xB1 == cursor.raw_tag());
+        CHECK(jsoncons::staj_event_type::begin_array == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC1);
-        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::null_value);
+        CHECK(0xC1 == cursor.raw_tag());
+        CHECK(jsoncons::staj_event_type::null_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC2);
-        CHECK(cursor.current().get<bool>() == false);
+        CHECK(0xC2 == cursor.raw_tag());
+        CHECK(false == cursor.current().get<bool>());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC3);
-        CHECK(cursor.current().get<uint64_t>() == 1);
+        CHECK(0xC3 == cursor.raw_tag());
+        CHECK(1 == cursor.current().get<uint64_t>());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC4);
-        CHECK(cursor.current().get<int64_t>() == -10);
+        CHECK(0xC4 == cursor.raw_tag());
+        CHECK(-10 == cursor.current().get<int64_t>());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC5);
-        CHECK(cursor.current().get<double>() == Approx(10.5).epsilon(0.00001));
+        CHECK(0xC5 == cursor.raw_tag());
+        CHECK(Approx(10.5).epsilon(0.00001) == cursor.current().get<double>());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xC6);
-        CHECK(cursor.current().get<std::vector<uint8_t>>() == std::vector<uint8_t>{0x01,0x02,0x03});
+        CHECK(0xC6 == cursor.raw_tag());
+        CHECK(std::vector<uint8_t>{0x01,0x02,0x03} == cursor.current().get<std::vector<uint8_t>>());
         cursor.next();
-        CHECK(cursor.raw_tag() == 0xD1);
-        CHECK(cursor.current().event_type() == jsoncons::staj_event_type::begin_object);
+        CHECK(0xD1 == cursor.raw_tag());
+        CHECK(jsoncons::staj_event_type::begin_object == cursor.current().event_type());
     }
 }

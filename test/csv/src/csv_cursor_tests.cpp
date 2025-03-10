@@ -142,11 +142,9 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         cursor.next();
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
-        cursor.read_to(decoder);
-        
-        std::cout << decoder.get_result() << "\n";
+        //cursor.read_to(decoder);
 
-        /*cursor.next();
+        cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::key);
         CHECK(cursor.current().get<std::string>() == std::string("index_id"));
         cursor.next();
@@ -164,7 +162,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::double_value);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::end_object);
-        cursor.next();*/
+        cursor.next();
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
