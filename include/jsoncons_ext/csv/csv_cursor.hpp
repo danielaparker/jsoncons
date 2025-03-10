@@ -229,7 +229,7 @@ public:
         {
             read_next(visitor, ec);
         }
-        read_next(ec);
+        //read_next(ec);
     }
 
     void next() override
