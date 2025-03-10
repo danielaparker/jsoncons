@@ -280,7 +280,7 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                  std::error_code& ec) override
     {
-        if (current().event_type() == staj_event_type::begin_object || current().event_type() == staj_event_type::begin_array)
+        if (is_begin_container(current().event_type()))
         {
             parser_.cursor_mode(false);
             parser_.mark_level(parser_.level());
