@@ -228,8 +228,8 @@ public:
         if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
         {
             read_next(visitor, ec);
+            read_next(ec);
         }
-        //read_next(ec);
     }
 
     void next() override
