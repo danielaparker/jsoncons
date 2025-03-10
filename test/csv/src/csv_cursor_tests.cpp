@@ -144,8 +144,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.read_to(decoder);
 
-        //REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
-        //cursor.next();
+        REQUIRE(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
 
         REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
