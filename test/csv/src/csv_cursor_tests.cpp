@@ -46,7 +46,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     {
         auto options = csv::csv_options{}
             .assume_header(true)
-               .mapping_kind(csv::csv_mapping_kind::n_rows);
+            .mapping_kind(csv::csv_mapping_kind::n_rows);
         csv::csv_string_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -101,6 +101,90 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::double_value);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.done());
+    }
+    SECTION("n_objects test")
+    {
+        auto options = csv::csv_options{}
+            .assume_header(true)
+            .mapping_kind(csv::csv_mapping_kind::n_objects);
+        csv::csv_string_cursor cursor(data, options);
+
+        jsoncons::json_decoder<jsoncons::json> decoder;
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("index_id"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("rate"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::double_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.read_to(decoder);
+        
+        std::cout << decoder.get_result() << "\n";
+
+        /*cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("index_id"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("rate"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::double_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();*/
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("index_id"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("observation_date"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(cursor.current().get<std::string>() == std::string("rate"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::double_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
         cursor.next();
 
         CHECK(cursor.current().event_type() == staj_event_type::end_array);
