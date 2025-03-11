@@ -225,11 +225,9 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
-        basic_json_tee<char_type> tee(cursor_visitor_, visitor);
         if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
         {
-            read_next(tee, ec);
-            //read_next(ec);
+            read_next(visitor, ec);
         }
     }
 
