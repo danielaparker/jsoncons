@@ -275,6 +275,10 @@ private:
 
         visitor.end_object(*this,ec);
         more_ = !cursor_mode_;
+        if (level() == mark_level_)
+        {
+            more_ = false;
+        }
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))
         {
             ec = bson_errc::size_mismatch;
@@ -319,6 +323,10 @@ private:
 
         visitor.end_array(*this, ec);
         more_ = !cursor_mode_;
+        if (level() == mark_level_)
+        {
+            more_ = false;
+        }
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))
         {
             ec = bson_errc::size_mismatch;
