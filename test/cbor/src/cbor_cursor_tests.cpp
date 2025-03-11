@@ -42,41 +42,41 @@ TEST_CASE("cbor_cursor reputon test")
     {
         cbor::cbor_bytes_cursor cursor(data);
 
-        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
-        CHECK(cursor.current().size() == 2);
+        CHECK(staj_event_type::begin_object == cursor.current().event_type());
+        CHECK(2 == cursor.current().size());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        CHECK(cursor.current().size() == 1);
+        CHECK(staj_event_type::begin_array == cursor.current().event_type());
+        CHECK(1 == cursor.current().size());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        CHECK(staj_event_type::begin_object == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
+        CHECK(staj_event_type::key == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::double_value);
+        CHECK(staj_event_type::double_value == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        CHECK(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        CHECK(staj_event_type::end_array == cursor.current().event_type());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        CHECK(staj_event_type::end_object == cursor.current().event_type());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -89,41 +89,41 @@ TEST_CASE("cbor_cursor indefinite array of array test")
     SECTION("test 1")
     {
         cbor::cbor_bytes_cursor cursor(data);
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::begin_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::begin_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::byte_string_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::byte_string_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::bigint);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::bigint == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::end_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::begin_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::byte_string_value);
-        CHECK(cursor.current().tag() == semantic_tag::base64);
+        CHECK(staj_event_type::byte_string_value == cursor.current().event_type());
+        CHECK(semantic_tag::base64 == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::bigdec);
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::bigdec == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::end_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_array);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::end_array == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next();
         CHECK(cursor.done());
     }
@@ -311,9 +311,9 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         cursor_type cursor(std::move(source));
 
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
-        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(std::string("Tom") == cursor.current().template get<std::string>());
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
         cursor.next();
@@ -321,17 +321,17 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
 
         cursor.reset();
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
-        CHECK(cursor.current().template get<int>() == -100);
+        CHECK(staj_event_type::int64_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(-100 == cursor.current().template get<int>());
         cursor.next();
         CHECK(cursor.done());
 
         cursor.reset(ec);
         REQUIRE_FALSE(ec);
         REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == staj_event_type::null_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
+        CHECK(staj_event_type::null_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
         cursor.next(ec);
         REQUIRE_FALSE(ec);
         CHECK(cursor.done());
@@ -357,9 +357,9 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
 
         // Reset to valid input1
         cursor.reset(input1);
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
-        CHECK(cursor.current().template get<std::string>() == std::string("Tom"));
+        CHECK(staj_event_type::string_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(std::string("Tom") == cursor.current().template get<std::string>());
         CHECK(cursor.current().template get<jsoncons::string_view>() ==
               jsoncons::string_view("Tom"));
         ec = cbor::cbor_errc::success;
@@ -378,9 +378,9 @@ TEMPLATE_TEST_CASE("cbor_cursor reset test", "",
         ec = cbor::cbor_errc::success;
         cursor.reset(input3, ec);
         REQUIRE_FALSE(ec);
-        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
-        CHECK(cursor.current().tag() == semantic_tag::none);
-        CHECK(cursor.current().template get<int>() == -100);
+        CHECK(staj_event_type::int64_value == cursor.current().event_type());
+        CHECK(semantic_tag::none == cursor.current().tag());
+        CHECK(-100 == cursor.current().template get<int>());
         REQUIRE_FALSE(cursor.done());
         cursor.next(ec);
         CHECK_FALSE(ec);

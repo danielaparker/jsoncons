@@ -190,6 +190,7 @@ namespace jsoncons {
             {
                 v.push_back(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return T{};}
+                //std::cout << "read next 10\n";
                 cursor.next(ec);
             }
             return v;
@@ -479,6 +480,7 @@ namespace jsoncons {
             {
                 v.insert(decode_traits<value_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return T{};}
+                //std::cout << "cursor.next 20\n";
                 cursor.next(ec);
                 if (ec) {return T{};}
             }
@@ -525,6 +527,7 @@ namespace jsoncons {
             {
                 v[i] = decode_traits<value_type,CharT>::decode(cursor, decoder, ec);
                 if (ec) {return v;}
+                //std::cout << "cursor.next 100\n";
                 cursor.next(ec);
                 if (ec) {return v;}
             }
@@ -571,10 +574,12 @@ namespace jsoncons {
                 }
                 auto key = cursor.current().template get<key_type>(ec);
                 if (ec) {return val;}
+                //std::cout << "cursor.next 200\n";
                 cursor.next(ec);
                 if (ec) {return val;}
                 val.emplace(std::move(key),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
+                //std::cout << "cursor.next 300\n";
                 cursor.next(ec);
                 if (ec) {return val;}
             }
@@ -635,10 +640,12 @@ namespace jsoncons {
                     ec = json_errc::invalid_number;
                     return val;
                 }
+                //std::cout << "cursor.next 500\n";
                 cursor.next(ec);
                 if (ec) {return val;}
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 if (ec) {return val;}
+                //std::cout << "cursor.next 600\n";
                 cursor.next(ec);
                 if (ec) {return val;}
             }

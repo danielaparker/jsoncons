@@ -35,22 +35,34 @@
 
 namespace jsoncons {
 
-enum class staj_event_type
+enum class staj_event_type : uint8_t
 {
-    begin_array,
-    end_array,
-    begin_object,
-    end_object,
-    key,
-    string_value,
-    byte_string_value,
-    null_value,
-    bool_value,
-    int64_value,
-    uint64_value,
-    half_value,
-    double_value
+    key = 0,                // 0000
+    string_value = 1,       // 0001
+    byte_string_value = 2,  // 0010
+    null_value = 3,         // 0011
+    bool_value = 4,         // 0100
+    int64_value = 5,        // 0101
+    uint64_value = 6,       // 0110
+    half_value = 8,         // 1000
+    double_value = 9,       // 1001
+    begin_object = 13,      // 1101
+    end_object = 7,         // 0111    
+    begin_array = 14,       // 1110
+    end_array = 15          // 1111
 };
+
+inline bool is_begin_container(staj_event_type event_type) noexcept
+{
+    static const uint8_t mask{ uint8_t(staj_event_type::begin_object) & uint8_t(staj_event_type::begin_array) };
+    return (uint8_t(event_type) & mask) == mask;
+}
+
+inline bool is_end_container(staj_event_type event_type) noexcept
+{
+    static const uint8_t mask{ uint8_t(staj_event_type::end_object) & uint8_t(staj_event_type::end_array) };
+    return (uint8_t(event_type) & mask) == mask;
+}
 
 template <typename CharT>
 std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
