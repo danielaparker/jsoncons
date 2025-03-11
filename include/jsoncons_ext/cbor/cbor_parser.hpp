@@ -124,22 +124,23 @@ class basic_cbor_parser : public ser_context
           item_tag,
           num_of_tags};
 
-    std::bitset<num_of_tags> other_tags_;
+    bool more_{true};
+    bool done_{false};
+    bool cursor_mode_{false};
+    int mark_level_{0};
+    uint64_t raw_tag_{0};
+    int nesting_depth_{0};
 
+    std::bitset<num_of_tags> other_tags_;
     allocator_type alloc_;
     Source source_;
     cbor_decode_options options_;
-
-    bool more_{true};
-    bool done_{false};
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
-    uint64_t raw_tag_{0};
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     byte_string_type typed_array_;
     std::vector<std::size_t> shape_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
-    int nesting_depth_{0};
 
     struct read_byte_string_from_buffer
     {
@@ -224,6 +225,26 @@ public:
     {
         source_ = std::forward<Sourceable>(source);
         reset();
+    }
+
+    void cursor_mode(bool value)
+    {
+        cursor_mode_ = value;
+    }
+
+    int level() const
+    {
+        return static_cast<int>(state_stack_.size());
+    }
+
+    int mark_level() const 
+    {
+        return mark_level_;
+    }
+
+    void mark_level(int value)
+    {
+        mark_level_ = value;
     }
 
     bool done() const
@@ -449,7 +470,8 @@ private:
                         }
                         other_tags_[item_tag] = false;
                     }
-                    more_ = visitor.uint64_value(val, tag, *this, ec);
+                    visitor.uint64_value(val, tag, *this, ec);
+                    more_ = !cursor_mode_;
                 }
                 break;
             }
@@ -469,7 +491,8 @@ private:
                     }
                     other_tags_[item_tag] = false;
                 }
-                more_ = visitor.int64_value(val, tag, *this, ec);
+                visitor.int64_value(val, tag, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
@@ -515,19 +538,23 @@ private:
                 switch (info)
                 {
                     case 0x14:
-                        more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                        visitor.bool_value(false, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x15:
-                        more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
+                        visitor.bool_value(true, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x16:
-                        more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                        visitor.null_value(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x17:
-                        more_ = visitor.null_value(semantic_tag::undefined, *this, ec);
+                        visitor.null_value(semantic_tag::undefined, *this, ec);
+                        more_ = !cursor_mode_;
                         source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
@@ -537,7 +564,8 @@ private:
                         {
                             return;
                         }
-                        more_ = visitor.half_value(static_cast<uint16_t>(val), semantic_tag::none, *this, ec);
+                        visitor.half_value(static_cast<uint16_t>(val), semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         break;
                     }
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
@@ -557,7 +585,8 @@ private:
                             }
                             other_tags_[item_tag] = false;
                         }
-                        more_ = visitor.double_value(val, tag, *this, ec);
+                        visitor.double_value(val, tag, *this, ec);
+                        more_ = !cursor_mode_;
                         break;
                     }
                     default:
@@ -582,7 +611,8 @@ private:
                             {
                                 return;
                             }
-                            more_ = visitor.string_value(text_buffer_, semantic_tag::bigdec, *this, ec);
+                            visitor.string_value(text_buffer_, semantic_tag::bigdec, *this, ec);
+                            more_ = !cursor_mode_;
                             break;
                         case 0x05:
                             text_buffer_.clear();
@@ -591,7 +621,8 @@ private:
                             {
                                 return;
                             }
-                            more_ = visitor.string_value(text_buffer_, semantic_tag::bigfloat, *this, ec);
+                            visitor.string_value(text_buffer_, semantic_tag::bigfloat, *this, ec);
+                            more_ = !cursor_mode_;
                             break;
                         case 40: // row major storage
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_row_major, ec);
@@ -643,7 +674,8 @@ private:
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
                 state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
-                more_ = visitor.begin_array(tag, *this, ec);
+                visitor.begin_array(tag, *this, ec);
+                more_ = !cursor_mode_;
                 source_.ignore(1);
                 break;
             }
@@ -655,7 +687,8 @@ private:
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::array,len,pop_stringref_map_stack);
-                more_ = visitor.begin_array(len, tag, *this, ec);
+                visitor.begin_array(len, tag, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
         }
@@ -665,7 +698,12 @@ private:
     {
         --nesting_depth_;
 
-        more_ = visitor.end_array(*this, ec);
+        visitor.end_array(*this, ec);
+        more_ = !cursor_mode_;
+        if (level() == mark_level_)
+        {
+            more_ = false;
+        }
         if (state_stack_.back().pop_stringref_map_stack)
         {
             stringref_map_stack_.pop_back();
@@ -693,7 +731,8 @@ private:
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
                 state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
-                more_ = visitor.begin_object(semantic_tag::none, *this, ec);
+                visitor.begin_object(semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 source_.ignore(1);
                 break;
             }
@@ -705,7 +744,8 @@ private:
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::map_key,len,pop_stringref_map_stack);
-                more_ = visitor.begin_object(len, semantic_tag::none, *this, ec);
+                visitor.begin_object(len, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
         }
@@ -714,7 +754,12 @@ private:
     void end_object(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
-        more_ = visitor.end_object(*this, ec);
+        visitor.end_object(*this, ec);
+        if (level() == mark_level_)
+        {
+            more_ = false;
+        }
+        more_ = !cursor_mode_;
         if (state_stack_.back().pop_stringref_map_stack)
         {
             stringref_map_stack_.pop_back();
@@ -1500,7 +1545,8 @@ private:
             }
             other_tags_[item_tag] = false;
         }
-        more_ = visitor.string_value(v, tag, *this, ec);
+        visitor.string_value(v, tag, *this, ec);
+        more_ = !cursor_mode_;
     }
 
     static jsoncons::endian get_typed_array_endianness(const uint8_t tag)
@@ -1535,7 +1581,8 @@ private:
                     bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     text_buffer_.clear();
                     n.write_string(text_buffer_);
-                    more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
+                    visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x3:
@@ -1551,7 +1598,8 @@ private:
                     n = -1 - n;
                     text_buffer_.clear();
                     n.write_string(text_buffer_);
-                    more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
+                    visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x15:
@@ -1562,7 +1610,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base64url, *this, ec);
+                    visitor.byte_string_value(bytes_buffer_, semantic_tag::base64url, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x16:
@@ -1573,7 +1622,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base64, *this, ec);
+                    visitor.byte_string_value(bytes_buffer_, semantic_tag::base64, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x17:
@@ -1584,7 +1634,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base16, *this, ec);
+                    visitor.byte_string_value(bytes_buffer_, semantic_tag::base16, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x40:
@@ -1598,7 +1649,8 @@ private:
                     }
                     uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x44:
@@ -1612,7 +1664,8 @@ private:
                     }
                     uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::clamped, *this, ec);
+                    visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::clamped, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x41:
@@ -1639,7 +1692,8 @@ private:
                             data[i] = binary::byte_swap<uint16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x42:
@@ -1665,7 +1719,8 @@ private:
                             data[i] = binary::byte_swap<uint32_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x43:
@@ -1691,7 +1746,8 @@ private:
                             data[i] = binary::byte_swap<uint64_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x48:
@@ -1705,7 +1761,8 @@ private:
                     }
                     int8_t* data = reinterpret_cast<int8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(jsoncons::span<const int8_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const int8_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x49:
@@ -1731,7 +1788,8 @@ private:
                             data[i] = binary::byte_swap<int16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const int16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const int16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x4a:
@@ -1757,7 +1815,8 @@ private:
                             data[i] = binary::byte_swap<int32_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const int32_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const int32_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x4b:
@@ -1783,7 +1842,8 @@ private:
                             data[i] = binary::byte_swap<int64_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const int64_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const int64_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x50:
@@ -1809,7 +1869,8 @@ private:
                             data[i] = binary::byte_swap<uint16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(half_arg, jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(half_arg, jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x51:
@@ -1835,7 +1896,8 @@ private:
                             data[i] = binary::byte_swap<float>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const float>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const float>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case 0x52:
@@ -1862,7 +1924,8 @@ private:
                             data[i] = binary::byte_swap<double>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(jsoncons::span<const double>(data,size), semantic_tag::none, *this, ec);
+                    visitor.typed_array(jsoncons::span<const double>(data,size), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 default:
@@ -1873,7 +1936,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(bytes_buffer_, raw_tag_, *this, ec);
+                    visitor.byte_string_value(bytes_buffer_, raw_tag_, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
             }
@@ -1886,7 +1950,8 @@ private:
             {
                 return;
             }
-            more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::none, *this, ec);
+            visitor.byte_string_value(bytes_buffer_, semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
     }
 
@@ -1912,12 +1977,14 @@ private:
         }
 
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
-        more_ = visitor.begin_multi_dim(shape_, tag, *this, ec);
+        visitor.begin_multi_dim(shape_, tag, *this, ec);
+        more_ = !cursor_mode_;
     }
 
     void produce_end_multi_dim(item_event_visitor& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_multi_dim(*this, ec);
+        visitor.end_multi_dim(*this, ec);
+        more_ = !cursor_mode_;
         state_stack_.pop_back();
     }
 
