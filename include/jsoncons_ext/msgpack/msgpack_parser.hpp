@@ -64,14 +64,17 @@ class basic_msgpack_parser : public ser_context
 
     static constexpr int64_t nanos_in_second = 1000000000;
 
-    Source source_;
-    msgpack_decode_options options_;
     bool more_{true};
     bool done_{false};
+    int nesting_depth_{0};
+    bool cursor_mode_{false};
+    int mark_level_{0};
+
+    Source source_;
+    msgpack_decode_options options_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    int nesting_depth_{0};
 
 public:
     template <typename Sourceable>
@@ -108,6 +111,26 @@ public:
     {
         source_ = std::forward<Sourceable>(source);
         reset();
+    }
+
+    void cursor_mode(bool value)
+    {
+        cursor_mode_ = value;
+    }
+
+    int level() const
+    {
+        return static_cast<int>(state_stack_.size());
+    }
+
+    int mark_level() const 
+    {
+        return mark_level_;
+    }
+
+    void mark_level(int value)
+    {
+        mark_level_ = value;
     }
 
     bool done() const
@@ -227,7 +250,8 @@ private:
             if (type <= 0x7f) 
             {
                 // positive fixint
-                more_ = visitor.uint64_value(type, semantic_tag::none, *this, ec);
+                visitor.uint64_value(type, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
             else if (type <= 0x8f) 
             {
@@ -258,13 +282,15 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
         }
         else if (type >= 0xe0) 
         {
             // negative fixint
-            more_ = visitor.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this, ec);
+            visitor.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
         else
         {
@@ -272,17 +298,20 @@ private:
             {
                 case jsoncons::msgpack::msgpack_type::nil_type: 
                 {
-                    more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                    visitor.null_value(semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case jsoncons::msgpack::msgpack_type::true_type:
                 {
-                    more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
+                    visitor.bool_value(true, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case jsoncons::msgpack::msgpack_type::false_type:
                 {
-                    more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
+                    visitor.bool_value(false, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case jsoncons::msgpack::msgpack_type::float32_type: 
@@ -295,7 +324,8 @@ private:
                         return;
                     }
                     float val = binary::big_to_native<float>(buf, sizeof(buf));
-                    more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
+                    visitor.double_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -309,7 +339,8 @@ private:
                         return;
                     }
                     double val = binary::big_to_native<double>(buf, sizeof(buf));
-                    more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
+                    visitor.double_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -322,7 +353,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.uint64_value(b, semantic_tag::none, *this, ec);
+                    visitor.uint64_value(b, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -336,7 +368,8 @@ private:
                         return;
                     }
                     uint16_t val = binary::big_to_native<uint16_t>(buf, sizeof(buf));
-                    more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -350,7 +383,8 @@ private:
                         return;
                     }
                     uint32_t val = binary::big_to_native<uint32_t>(buf, sizeof(buf));
-                    more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -364,7 +398,8 @@ private:
                         return;
                     }
                     uint64_t val = binary::big_to_native<uint64_t>(buf, sizeof(buf));
-                    more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -378,7 +413,8 @@ private:
                         return;
                     }
                     int8_t val = binary::big_to_native<int8_t>(buf, sizeof(buf));
-                    more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -392,7 +428,8 @@ private:
                         return;
                     }
                     int16_t val = binary::big_to_native<int16_t>(buf, sizeof(buf));
-                    more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -406,7 +443,8 @@ private:
                         return;
                     }
                     int32_t val = binary::big_to_native<int32_t>(buf, sizeof(buf));
-                    more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -420,7 +458,8 @@ private:
                         return;
                     }
                     int64_t val = binary::big_to_native<int64_t>(buf, sizeof(buf));
-                    more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    visitor.int64_value(val, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -449,7 +488,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                    visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
 
@@ -470,10 +510,11 @@ private:
                         return;
                     }
 
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
+                    visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
                                                       semantic_tag::none, 
                                                       *this,
                                                       ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
                 case jsoncons::msgpack::msgpack_type::fixext1_type: 
@@ -519,7 +560,8 @@ private:
                             return;
                         }
                         uint32_t val = binary::big_to_native<uint32_t>(buf32, sizeof(buf32));
-                        more_ = visitor.uint64_value(val, semantic_tag::epoch_second, *this, ec);
+                        visitor.uint64_value(val, semantic_tag::epoch_second, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else if (is_timestamp && len == 8)
                     {
@@ -539,7 +581,8 @@ private:
                         nano += nsec;
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
-                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        more_ = !cursor_mode_;
                         if (!more_) return;
                     }
                     else if (is_timestamp && len == 12)
@@ -577,7 +620,8 @@ private:
 
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
-                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        more_ = !cursor_mode_;
                         if (!more_) return;
                     }
                     else
@@ -590,10 +634,11 @@ private:
                             return;
                         }
 
-                        more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
+                        visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
                                                           static_cast<uint8_t>(ext_type), 
                                                           *this,
                                                           ec);
+                        more_ = !cursor_mode_;
                     }
                     break;
                 }
@@ -636,14 +681,16 @@ private:
             return;
         }
         state_stack_.emplace_back(parse_mode::array,length);
-        more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
+        visitor.begin_array(length, semantic_tag::none, *this, ec);
+        more_ = !cursor_mode_;
     }
 
     void end_array(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
-        more_ = visitor.end_array(*this, ec);
+        visitor.end_array(*this, ec);
+        more_ = !cursor_mode_;
         state_stack_.pop_back();
     }
 
@@ -661,13 +708,15 @@ private:
             return;
         }
         state_stack_.emplace_back(parse_mode::map_key,length);
-        more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
+        visitor.begin_object(length, semantic_tag::none, *this, ec);
+        more_ = !cursor_mode_;
     }
 
     void end_object(item_event_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
-        more_ = visitor.end_object(*this, ec);
+        visitor.end_object(*this, ec);
+        more_ = !cursor_mode_;
         state_stack_.pop_back();
     }
 

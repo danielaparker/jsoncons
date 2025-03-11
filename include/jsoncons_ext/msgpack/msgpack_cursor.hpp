@@ -55,6 +55,7 @@ public:
           cursor_visitor_(accept_all),
           cursor_handler_adaptor_(cursor_visitor_, alloc)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next();
@@ -94,6 +95,7 @@ public:
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next(ec);
@@ -178,9 +180,23 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (cursor_visitor_.dump(visitor, *this, ec))
+        if (is_begin_container(current().event_type()))
         {
-            read_next(visitor, ec);
+            parser_.cursor_mode(false);
+            parser_.mark_level(parser_.level());
+            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            {
+                read_next(visitor, ec);
+            }
+            parser_.cursor_mode(true);
+            parser_.mark_level(0);
+        }
+        else
+        {
+            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            {
+                read_next(visitor, ec);
+            }
         }
     }
 

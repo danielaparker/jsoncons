@@ -60,6 +60,7 @@ class basic_ubjson_parser : public ser_context
 
     bool more_{true};
     bool done_{false};
+    int nesting_depth_{0};
     bool cursor_mode_{false};
     int mark_level_{0};
 
@@ -67,7 +68,6 @@ class basic_ubjson_parser : public ser_context
     ubjson_decode_options options_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    int nesting_depth_{0};
 public:
     template <typename Sourceable>
         basic_ubjson_parser(Sourceable&& source,
