@@ -134,13 +134,12 @@ class basic_cbor_parser : public ser_context
     bool done_{false};
     string_type text_buffer_;
     byte_string_type bytes_buffer_;
-    uint64_t raw_tag_;
+    uint64_t raw_tag_{0};
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     byte_string_type typed_array_;
     std::vector<std::size_t> shape_;
-    std::size_t index_; // TODO: Never used!
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
-    int nesting_depth_;
+    int nesting_depth_{0};
 
     struct read_byte_string_from_buffer
     {
@@ -187,12 +186,9 @@ public:
          options_(options),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
-         raw_tag_(0),
          state_stack_(alloc),
          typed_array_(alloc),
-         index_(0),
-         stringref_map_stack_(alloc),
-         nesting_depth_(0)
+         stringref_map_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

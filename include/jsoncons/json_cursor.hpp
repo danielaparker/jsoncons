@@ -278,7 +278,7 @@ public:
     }
 
     void read_to(basic_json_visitor<CharT>& visitor,
-                 std::error_code& ec) override
+        std::error_code& ec) override
     {
         if (is_begin_container(current().event_type()))
         {

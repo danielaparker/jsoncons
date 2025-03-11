@@ -37,8 +37,8 @@ enum class parse_mode {root,accept,document,array,value};
 struct parse_state 
 {
     parse_mode mode; 
-    std::size_t length{0};
-    std::size_t pos{0};
+    std::size_t length;
+    std::size_t pos;
     uint8_t type;
     std::size_t index{0};
 
@@ -64,10 +64,13 @@ class basic_bson_parser : public ser_context
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;
     using string_type = std::basic_string<char,std::char_traits<char>,char_allocator_type>;
 
+    bool more_{true};
+    bool done_{false};
+    bool cursor_mode_{false};
+    int mark_level_{0};
+    
     Source source_;
     bson_decode_options options_;
-    bool more_;
-    bool done_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     string_type name_buffer_;
     string_type text_buffer_;
@@ -79,8 +82,6 @@ public:
                       const TempAllocator& temp_alloc = TempAllocator())
        : source_(std::forward<Sourceable>(source)), 
          options_(options),
-         more_(true), 
-         done_(false),
          bytes_buffer_(temp_alloc),
          name_buffer_(temp_alloc),
          text_buffer_(temp_alloc),
@@ -112,6 +113,26 @@ public:
         reset();
     }
 
+    void cursor_mode(bool value)
+    {
+        cursor_mode_ = value;
+    }
+
+    int level() const
+    {
+        return static_cast<int>(state_stack_.size());
+    }
+
+    int mark_level() const 
+    {
+        return mark_level_;
+    }
+
+    void mark_level(int value)
+    {
+        mark_level_ = value;
+    }
+
     bool done() const
     {
         return done_;
@@ -137,7 +158,8 @@ public:
         if (state_stack_.size() == 2 && state_stack_.back().mode == parse_mode::document)
         {
             state_stack_.back().mode = parse_mode::array;
-            more_ = visitor.begin_array(semantic_tag::none, *this, ec);
+            visitor.begin_array(semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
     }
 
@@ -242,7 +264,8 @@ private:
 
         auto length = binary::little_to_native<int32_t>(buf, sizeof(buf));
 
-        more_ = visitor.begin_object(semantic_tag::none, *this, ec);
+        visitor.begin_object(semantic_tag::none, *this, ec);
+        more_ = !cursor_mode_;
         state_stack_.emplace_back(parse_mode::document,length,n);
     }
 
@@ -250,7 +273,8 @@ private:
     {
         JSONCONS_ASSERT(state_stack_.size() >= 2);
 
-        more_ = visitor.end_object(*this,ec);
+        visitor.end_object(*this,ec);
+        more_ = !cursor_mode_;
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))
         {
             ec = bson_errc::size_mismatch;
@@ -280,7 +304,8 @@ private:
         }
         auto length = binary::little_to_native<int32_t>(buf, sizeof(buf));
 
-        more_ = visitor.begin_array(semantic_tag::none, *this, ec);
+        visitor.begin_array(semantic_tag::none, *this, ec);
+        more_ = !cursor_mode_;
         if (ec)
         {
             return;
@@ -292,7 +317,8 @@ private:
     {
         JSONCONS_ASSERT(state_stack_.size() >= 2);
 
-        more_ = visitor.end_array(*this, ec);
+        visitor.end_array(*this, ec);
+        more_ = !cursor_mode_;
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))
         {
             ec = bson_errc::size_mismatch;
@@ -321,7 +347,8 @@ private:
                 more_ = false;
                 return;
             }
-            more_ = visitor.key(jsoncons::basic_string_view<char>(name_buffer_.data(),name_buffer_.length()), *this, ec);
+            visitor.key(jsoncons::basic_string_view<char>(name_buffer_.data(),name_buffer_.length()), *this, ec);
+            more_ = !cursor_mode_;
         }
     }
 
@@ -341,7 +368,8 @@ private:
                     return;
                 }
                 double res = binary::little_to_native<double>(buf, sizeof(buf));
-                more_ = visitor.double_value(res, semantic_tag::none, *this, ec);
+                visitor.double_value(res, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::symbol_type:
@@ -362,7 +390,8 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::javascript_type:
@@ -380,7 +409,8 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(text_buffer_, semantic_tag::code, *this, ec);
+                visitor.string_value(text_buffer_, semantic_tag::code, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::regex_type:
@@ -398,7 +428,8 @@ private:
                 {
                     return;
                 }
-                more_ = visitor.string_value(text_buffer_, semantic_tag::regex, *this, ec);
+                visitor.string_value(text_buffer_, semantic_tag::regex, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::document_type: 
@@ -414,12 +445,14 @@ private:
             }
             case jsoncons::bson::bson_type::undefined_type: 
                 {
-                    more_ = visitor.null_value(semantic_tag::undefined, *this, ec);
+                    visitor.null_value(semantic_tag::undefined, *this, ec);
+                    more_ = !cursor_mode_;
                     break;
                 }
             case jsoncons::bson::bson_type::null_type: 
             {
-                more_ = visitor.null_value(semantic_tag::none, *this, ec);
+                visitor.null_value(semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::bool_type:
@@ -433,7 +466,8 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.bool_value(c != 0, semantic_tag::none, *this, ec);
+                visitor.bool_value(c != 0, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::int32_type: 
@@ -448,7 +482,8 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<int32_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                visitor.int64_value(val, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
 
@@ -464,7 +499,8 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<uint64_t>(buf, sizeof(buf));
-                more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
 
@@ -480,7 +516,8 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<int64_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
+                visitor.int64_value(val, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
 
@@ -496,7 +533,8 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<int64_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::epoch_milli, *this, ec);
+                visitor.int64_value(val, semantic_tag::epoch_milli, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::binary_type: 
@@ -537,10 +575,11 @@ private:
                     return;
                 }
 
-                more_ = visitor.byte_string_value(bytes_buffer_, 
+                visitor.byte_string_value(bytes_buffer_, 
                                                   subtype, 
                                                   *this,
                                                   ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::decimal128_type: 
@@ -562,7 +601,8 @@ private:
                 text_buffer_.clear();
                 text_buffer_.resize(bson::decimal128_limits::buf_size);
                 auto r = bson::decimal128_to_chars(&text_buffer_[0], &text_buffer_[0]+text_buffer_.size(), dec);
-                more_ = visitor.string_value(string_view(text_buffer_.data(),static_cast<std::size_t>(r.ptr-text_buffer_.data())), semantic_tag::float128, *this, ec);
+                visitor.string_value(string_view(text_buffer_.data(),static_cast<std::size_t>(r.ptr-text_buffer_.data())), semantic_tag::float128, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             case jsoncons::bson::bson_type::object_id_type: 
@@ -580,7 +620,8 @@ private:
                 oid_t oid(buf);
                 to_string(oid, text_buffer_);
 
-                more_ = visitor.string_value(text_buffer_, semantic_tag::id, *this, ec);
+                visitor.string_value(text_buffer_, semantic_tag::id, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
             default:

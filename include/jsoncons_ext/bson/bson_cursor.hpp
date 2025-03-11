@@ -38,7 +38,7 @@ public:
 private:
     basic_bson_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
-    bool eof_;
+    bool eof_{false};
 
 public:
     using string_view_type = string_view;
@@ -52,9 +52,9 @@ public:
                       const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc), 
-          cursor_visitor_(accept_all),
-          eof_(false)
+          cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next();
@@ -90,9 +90,9 @@ public:
                       const bson_decode_options& options,
                       std::error_code& ec)
        : parser_(std::forward<Sourceable>(source), options, alloc),
-         cursor_visitor_(accept_all),
-         eof_(false)
+         cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next(ec);
@@ -183,11 +183,25 @@ public:
     }
 
     void read_to(basic_json_visitor<char_type>& visitor,
-                std::error_code& ec) override
+        std::error_code& ec) override
     {
-        if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+        if (is_begin_container(current().event_type()))
         {
-            read_next(visitor, ec);
+            parser_.cursor_mode(false);
+            parser_.mark_level(parser_.level());
+            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            {
+                read_next(visitor, ec);
+            }
+            parser_.cursor_mode(true);
+            parser_.mark_level(0);
+        }
+        else
+        {
+            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            {
+                read_next(visitor, ec);
+            }
         }
     }
 

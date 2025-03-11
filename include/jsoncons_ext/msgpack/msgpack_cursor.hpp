@@ -38,7 +38,7 @@ private:
     basic_msgpack_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
     basic_item_event_visitor_to_json_visitor<char_type,Allocator> cursor_handler_adaptor_;
-    bool eof_;
+    bool eof_{false};
 
 public:
     using string_view_type = string_view;
@@ -53,8 +53,7 @@ public:
                          const Allocator& alloc = Allocator())
         : parser_(std::forward<Sourceable>(source), options, alloc), 
           cursor_visitor_(accept_all),
-          cursor_handler_adaptor_(cursor_visitor_, alloc),
-          eof_(false)
+          cursor_handler_adaptor_(cursor_visitor_, alloc)
     {
         if (!done())
         {

@@ -66,12 +66,12 @@ class basic_msgpack_parser : public ser_context
 
     Source source_;
     msgpack_decode_options options_;
-    bool more_;
-    bool done_;
+    bool more_{true};
+    bool done_{false};
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    int nesting_depth_;
+    int nesting_depth_{0};
 
 public:
     template <typename Sourceable>
@@ -80,12 +80,9 @@ public:
                          const Allocator& alloc = Allocator())
        : source_(std::forward<Sourceable>(source)),
          options_(options),
-         more_(true), 
-         done_(false),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
-         state_stack_(alloc),
-         nesting_depth_(0)
+         state_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

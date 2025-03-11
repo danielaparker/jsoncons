@@ -36,7 +36,7 @@ public:
 private:
     basic_ubjson_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
-    bool eof_;
+    bool eof_{false};
 
 public:
     using string_view_type = string_view;
@@ -50,8 +50,7 @@ public:
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Sourceable>(source), options, alloc), 
-         cursor_visitor_(accept_all), 
-         eof_(false)
+         cursor_visitor_(accept_all)
     {
         if (!done())
         {
