@@ -36,8 +36,8 @@ namespace msgpack {
         using allocator_type = Allocator;
     private:
         basic_msgpack_parser<Source,Allocator> parser_;
-        basic_item_event_receiver<char_type> event_receiver_;
-        bool eof_;
+        basic_item_event_receiver<char_type> cursor_visitor_;
+        bool eof_{false};
 
     public:
         using string_view_type = string_view;
@@ -47,9 +47,9 @@ namespace msgpack {
                              const msgpack_decode_options& options = msgpack_decode_options(),
                              const Allocator& alloc = Allocator())
             : parser_(std::forward<Sourceable>(source), options, alloc), 
-              event_receiver_(accept_all),
-              eof_(false)
+              cursor_visitor_(accept_all)
         {
+            parser_.cursor_mode(true);
             if (!done())
             {
                 next();
@@ -89,9 +89,10 @@ namespace msgpack {
                              const msgpack_decode_options& options,
                              std::error_code& ec)
            : parser_(std::forward<Sourceable>(source), options, alloc), 
-             event_receiver_(accept_all),
+             cursor_visitor_(accept_all),
              eof_(false)
         {
+            parser_.cursor_mode(true);
             if (!done())
             {
                 next(ec);
@@ -106,7 +107,7 @@ namespace msgpack {
         void reset()
         {
             parser_.reset();
-            event_receiver_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -118,7 +119,7 @@ namespace msgpack {
         void reset(Sourceable&& source)
         {
             parser_.reset(std::forward<Sourceable>(source));
-            event_receiver_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -129,7 +130,7 @@ namespace msgpack {
         void reset(std::error_code& ec)
         {
             parser_.reset();
-            event_receiver_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -141,7 +142,7 @@ namespace msgpack {
         void reset(Sourceable&& source, std::error_code& ec)
         {
             parser_.reset(std::forward<Sourceable>(source));
-            event_receiver_.reset();
+            cursor_visitor_.reset();
             eof_ = false;
             if (!done())
             {
@@ -156,7 +157,7 @@ namespace msgpack {
 
         const basic_staj_event<char_type>& current() const override
         {
-            return event_receiver_.event();
+            return cursor_visitor_.event();
         }
 
         void read_to(basic_item_event_visitor<char_type>& visitor) override
@@ -172,9 +173,23 @@ namespace msgpack {
         void read_to(basic_item_event_visitor<char_type>& visitor,
                     std::error_code& ec) override
         {
-            if (event_receiver_.dump(visitor, *this, ec))
+            if (is_begin_container(current().event_type()))
             {
-                read_next(visitor, ec);
+                parser_.cursor_mode(false);
+                parser_.mark_level(parser_.level());
+                if (cursor_visitor_.dump(visitor, *this, ec))
+                {
+                    read_next(visitor, ec);
+                }
+                parser_.cursor_mode(true);
+                parser_.mark_level(0);
+            }
+            else
+            {
+                if (cursor_visitor_.dump(visitor, *this, ec))
+                {
+                    read_next(visitor, ec);
+                }
             }
         }
 
@@ -228,16 +243,16 @@ namespace msgpack {
 
         void read_next(std::error_code& ec)
         {
-            if (event_receiver_.in_available())
+            if (cursor_visitor_.in_available())
             {
-                event_receiver_.send_available(ec);
+                cursor_visitor_.send_available(ec);
             }
             else
             {
                 parser_.restart();
                 while (!parser_.stopped())
                 {
-                    parser_.parse(event_receiver_, ec);
+                    parser_.parse(cursor_visitor_, ec);
                     if (ec) {return;}
                 }
             }
