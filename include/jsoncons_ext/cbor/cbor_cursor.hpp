@@ -188,11 +188,15 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                  std::error_code& ec) override
     {
-        if (is_begin_container(current().event_type()))
+        if (is_typed_array())
+        {
+            cursor_visitor_.dump(visitor, *this, ec);
+        }
+        else if (is_begin_container(current().event_type()))
         {
             parser_.cursor_mode(false);
             parser_.mark_level(parser_.level());
-            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            if (cursor_visitor_.dump(visitor, *this, ec))
             {
                 read_next(visitor, ec);
             }
