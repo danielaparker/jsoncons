@@ -227,10 +227,12 @@ public:
     {
         if (is_begin_container(current().event_type()))
         {
-            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
+            cursor_visitor_.event().send_json_event(visitor, *this, ec);
+            if (JSONCONS_UNLIKELY(ec))
             {
-                read_next(visitor, ec);
+                return;
             }
+            read_next(visitor, ec);
         }
         else
         {
