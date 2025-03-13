@@ -198,10 +198,7 @@ public:
         }
         else
         {
-            if (cursor_visitor_.event().send_json_event(visitor, *this, ec))
-            {
-                read_next(visitor, ec);
-            }
+            cursor_visitor_.event().send_json_event(visitor, *this, ec);
         }
     }
 
