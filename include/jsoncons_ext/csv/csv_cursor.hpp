@@ -62,6 +62,7 @@ public:
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next();
@@ -78,6 +79,7 @@ public:
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         initialize_with_string_view(sv);
     }
@@ -131,6 +133,7 @@ public:
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         if (!done())
         {
             next(ec);
@@ -148,6 +151,7 @@ public:
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
+        parser_.cursor_mode(true);
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         initialize_with_string_view(sv, ec);
     }
@@ -227,12 +231,16 @@ public:
     {
         if (is_begin_container(current().event_type()))
         {
+            parser_.cursor_mode(false);
+            parser_.mark_level(parser_.level());
             cursor_visitor_.event().send_json_event(visitor, *this, ec);
             if (JSONCONS_UNLIKELY(ec))
             {
                 return;
             }
             read_next(visitor, ec);
+            parser_.cursor_mode(true);
+            parser_.mark_level(0);
         }
         else
         {

@@ -234,6 +234,7 @@ namespace detail {
         TempAllocator alloc_;
         std::size_t name_index_{0};
         int level_{0};
+        int level2_{0};
         cached_state state_{cached_state::begin_object};
         std::size_t column_index_{0};
         std::size_t row_index_{0};
@@ -253,6 +254,7 @@ namespace detail {
         {
             name_index_ = 0;
             level_ = 0;
+            level2_ = 0;
             state_ = cached_state::begin_object;
             column_index_ = 0;
             row_index_ = 0;
@@ -274,6 +276,7 @@ namespace detail {
             }
             name_index_ = 0;
             level_ = 0;
+            level2_ = 0;
             column_index_ = 0;
             row_index_ = 0;
             state_ = cached_state::begin_object;
@@ -283,8 +286,13 @@ namespace detail {
         {
             ++name_index_;
         }
+        
+        int level() const
+        {
+            return static_cast<int>(level_);
+        }
 
-        bool replay_parse_events(basic_json_visitor<CharT>& visitor)
+        bool replay_parse_events(basic_json_visitor<CharT>& visitor, bool cursor_mode, int mark_level)
         {
             bool more = true;
             while (more)
@@ -292,18 +300,25 @@ namespace detail {
                 switch (state_)
                 {
                     case cached_state::begin_object:
-                        more = visitor.begin_object(semantic_tag::none, ser_context());
+                        visitor.begin_object(semantic_tag::none, ser_context());
+                        more = !cursor_mode;
                         column_index_ = 0;
                         state_ = cached_state::name;
                         break;
                     case cached_state::end_object:
-                        more = visitor.end_object(ser_context());
+                        visitor.end_object(ser_context());
+                        more = !cursor_mode;
+                        if (level() == mark_level)
+                        {
+                            more = false;
+                        }
                         state_ = cached_state::done;
                         break;
                     case cached_state::name:
                         if (column_index_ < column_names_.size())
                         {
-                            more = visitor.key(column_names_[column_index_], ser_context());
+                            visitor.key(column_names_[column_index_], ser_context());
+                            more = !cursor_mode;
                             state_ = cached_state::begin_array;
                         }
                         else
@@ -312,19 +327,26 @@ namespace detail {
                         }
                         break;
                     case cached_state::begin_array:
-                        more = visitor.begin_array(semantic_tag::none, ser_context());
+                        visitor.begin_array(semantic_tag::none, ser_context());
+                        more = !cursor_mode;
                         row_index_ = 0;
                         state_ = cached_state::item;
                         break;
                     case cached_state::end_array:
-                        more = visitor.end_array(ser_context());
+                        visitor.end_array(ser_context());
+                        more = !cursor_mode;
+                        if (level() == mark_level)
+                        {
+                            more = false;
+                        }
                         ++column_index_;
                         state_ = cached_state::name;
                         break;
                     case cached_state::item:
                         if (row_index_ < cached_events_[column_index_].size())
                         {
-                            more = cached_events_[column_index_][row_index_].replay(visitor);
+                            cached_events_[column_index_][row_index_].replay(visitor);
+                            more = !cursor_mode;
                             ++row_index_;
                         }
                         else
@@ -362,18 +384,18 @@ namespace detail {
             {
                 cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag, alloc_);
                 
-                ++level_;
+                ++level2_;
             }
             return true;
         }
 
         bool visit_end_array(const ser_context&, std::error_code&) override
         {
-            if (level_ > 0)
+            if (level2_ > 0)
             {
                 cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none, alloc_);
                 ++name_index_;
-                --level_;
+                --level2_;
             }
             else
             {
@@ -393,7 +415,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -407,7 +429,7 @@ namespace detail {
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
 
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -423,7 +445,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -439,7 +461,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -455,7 +477,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -471,7 +493,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -484,7 +506,7 @@ namespace detail {
             if (name_index_ < column_names_.size())
             {
                 cached_events_[name_index_].emplace_back(value, tag, alloc_);
-                if (level_ == 0)
+                if (level2_ == 0)
                 {
                     ++name_index_;
                 }
@@ -540,6 +562,9 @@ private:
     const CharT* input_ptr_{nullptr};
     bool more_{true};
     std::size_t header_line_{1};
+    bool cursor_mode_{false};
+    bool save_cursor_mode_{false};
+    int mark_level_{0};
 
     detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
@@ -608,6 +633,26 @@ public:
 
     ~basic_csv_parser() noexcept
     {
+    }
+
+    void cursor_mode(bool value)
+    {
+        save_cursor_mode_ = cursor_mode_ = value;
+    }
+
+    int level() const
+    {
+        return static_cast<int>(level_);
+    }
+
+    int mark_level() const 
+    {
+        return mark_level_;
+    }
+
+    void mark_level(int value)
+    {
+        mark_level_ = value;
     }
 
     bool done() const
@@ -682,6 +727,8 @@ public:
         {
             case csv_mapping_kind::m_columns:
                 visitor_ = &m_columns_filter_;
+                save_cursor_mode_ = cursor_mode_;
+                cursor_mode_ = false;
                 break;
             default:
                 visitor_ = std::addressof(visitor);
@@ -707,7 +754,13 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -775,12 +828,19 @@ public:
                         default:
                             break;
                     }
-                    more_ = visitor_->end_array(*this, ec);
+                    visitor_->end_array(*this, ec);
+                    more_ = !cursor_mode_;
+                    if (level() == mark_level_)
+                    {
+                        more_ = false;
+                    }
+                    --level_;
+                    
                     if (options_.mapping_kind() == csv_mapping_kind::m_columns)
                     {
                         if (!m_columns_filter_.done())
                         {
-                            more_ = m_columns_filter_.replay_parse_events(visitor);
+                            more_ = m_columns_filter_.replay_parse_events(visitor, save_cursor_mode_, mark_level_);
                         }
                         else
                         {
@@ -834,14 +894,18 @@ public:
                 case csv_parse_state::start:
                     if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                     {
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                     }
                     if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         state_ = csv_parse_state::expect_comment_or_record;
+                        ++level_;
                     }
                     else
                     {
@@ -851,12 +915,20 @@ public:
                 case csv_parse_state::column_labels:
                     if (column_index_ < column_names_.size())
                     {
-                        more_ = visitor_->string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
+                        visitor_->string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                         ++column_index_;
                     }
                     else
                     {
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
+                        
                         state_ = csv_parse_state::expect_comment_or_record; 
                         //stack_.back() = csv_mode::data;
                         column_index_ = 0;
@@ -1015,7 +1087,13 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     ++column_index_;
                     state_ = csv_parse_state::before_unquoted_string;
@@ -1028,7 +1106,13 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     state_ = csv_parse_state::end_record;
                     ++column_;
@@ -1045,7 +1129,13 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -1055,7 +1145,9 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                     }
                     state_ = csv_parse_state::before_unquoted_subfield_tail;
                     break; 
@@ -1073,7 +1165,9 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                     }
                     state_ = csv_parse_state::before_quoted_subfield_tail;
                     break; 
@@ -1091,7 +1185,13 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -1340,7 +1440,8 @@ private:
                     column_names_.push_back(buffer_);
                     if (options_.assume_header() && options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
-                        more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                 }
                 break;
@@ -1351,7 +1452,8 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            more_ = visitor_->key(column_names_[column_index_ - offset_], *this, ec);
+                            visitor_->key(column_names_[column_index_ - offset_], *this, ec);
+                            more_ = !cursor_mode_;
                         }
                     }
                 }
@@ -1373,7 +1475,9 @@ private:
                 {
                     if (options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                     }
                 }
                 break;
@@ -1381,10 +1485,14 @@ private:
                 switch (options_.mapping_kind())
                 {
                     case csv_mapping_kind::n_rows:
-                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                         break;
                     case csv_mapping_kind::n_objects:
-                        more_ = visitor_->begin_object(semantic_tag::none, *this, ec);
+                        visitor_->begin_object(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
+                        ++level_;
                         break;
                     case csv_mapping_kind::m_columns:
                         break;
@@ -1404,7 +1512,13 @@ private:
         {
             if (level_ > 0)
             {
-                more_ = visitor_->end_array(*this, ec);
+                visitor_->end_array(*this, ec);
+                more_ = !cursor_mode_;
+                if (level() == mark_level_)
+                {
+                    more_ = false;
+                }
+                --level_;
                 level_ = 0;
             }
         }
@@ -1420,7 +1534,13 @@ private:
                     case csv_mapping_kind::n_rows:
                         if (options_.assume_header())
                         {
-                            more_ = visitor_->end_array(*this, ec);
+                            visitor_->end_array(*this, ec);
+                            more_ = !cursor_mode_;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
+                            --level_;
                         }
                         break;
                     case csv_mapping_kind::m_columns:
@@ -1436,13 +1556,31 @@ private:
                 switch (options_.mapping_kind())
                 {
                     case csv_mapping_kind::n_rows:
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                         break;
                     case csv_mapping_kind::n_objects:
-                        more_ = visitor_->end_object(*this, ec);
+                        visitor_->end_object(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                         break;
                     case csv_mapping_kind::m_columns:
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                         break;
                 }
                 break;
@@ -1509,7 +1647,8 @@ private:
                 case csv_mapping_kind::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
-                        more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                        visitor_->null_value(semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else
                     {
@@ -1523,7 +1662,8 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                             else
                             {
@@ -1534,7 +1674,8 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                             else
                             {
@@ -1582,7 +1723,8 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                             else 
                             {
@@ -1593,7 +1735,8 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                             else
                             {
@@ -1624,7 +1767,8 @@ private:
         auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ buffer_ });
         if (it != string_double_map_.end())
         {
-            more_ = visitor_->double_value((*it).second, semantic_tag::none, *this, ec);
+            visitor_->double_value((*it).second, semantic_tag::none, *this, ec);
+            more_ = !cursor_mode_;
         }
         else if (column_index_ < column_types_.size() + offset_)
         {
@@ -1635,19 +1779,33 @@ private:
                 {
                     if (column_index_ == offset_ || level_ > column_types_[column_index_-offset_].level)
                     {
-                        more_ = visitor_->end_array(*this, ec);
+                        visitor_->end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
                     }
                     level_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index_ - offset_].level)
             {
-                more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                visitor_->begin_array(semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 level_ = column_types_[column_index_ - offset_].level;
+                ++level_;
             }
             else if (level_ > column_types_[column_index_ - offset_].level)
             {
-                more_ = visitor_->end_array(*this, ec);
+                visitor_->end_array(*this, ec);
+                more_ = !cursor_mode_;
+                if (level() == mark_level_)
+                {
+                    more_ = false;
+                }
+                --level_;
                 level_ = column_types_[column_index_ - offset_].level;
             }
             switch (column_types_[column_index_ - offset_].col_type)
@@ -1659,7 +1817,8 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            more_ = visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                            visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else
                         {
@@ -1672,7 +1831,8 @@ private:
                             }
                             else
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                         }
                     }
@@ -1681,7 +1841,8 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            more_ = visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                            visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else
                         {
@@ -1690,7 +1851,8 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                more_ = visitor_->double_value(val, semantic_tag::none, *this, ec);
+                                visitor_->double_value(val, semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                             else
                             {
@@ -1703,7 +1865,8 @@ private:
                                 }
                                 else
                                 {
-                                    more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                    visitor_->null_value(semantic_tag::none, *this, ec);
+                                    more_ = !cursor_mode_;
                                 }
                             }
                         }
@@ -1713,19 +1876,23 @@ private:
                     {
                         if (buffer_.length() == 1 && buffer_[0] == '0')
                         {
-                            more_ = visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 1 && buffer_[0] == '1')
                         {
-                            more_ = visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 5 && ((buffer_[0] == 'f' || buffer_[0] == 'F') && (buffer_[1] == 'a' || buffer_[1] == 'A') && (buffer_[2] == 'l' || buffer_[2] == 'L') && (buffer_[3] == 's' || buffer_[3] == 'S') && (buffer_[4] == 'e' || buffer_[4] == 'E')))
                         {
-                            more_ = visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else if (buffer_.length() == 4 && ((buffer_[0] == 't' || buffer_[0] == 'T') && (buffer_[1] == 'r' || buffer_[1] == 'R') && (buffer_[2] == 'u' || buffer_[2] == 'U') && (buffer_[3] == 'e' || buffer_[3] == 'E')))
                         {
-                            more_ = visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                         else
                         {
@@ -1738,7 +1905,8 @@ private:
                             }
                             else
                             {
-                                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                                visitor_->null_value(semantic_tag::none, *this, ec);
+                                more_ = !cursor_mode_;
                             }
                         }
                     }
@@ -1746,7 +1914,8 @@ private:
                 default:
                     if (buffer_.length() > 0)
                     {
-                        more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else
                     {
@@ -1759,7 +1928,8 @@ private:
                         }
                         else
                         {
-                            more_ = visitor_->string_value(string_view_type(), semantic_tag::none, *this, ec);
+                            visitor_->string_value(string_view_type(), semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
                         }
                     }
                     break;  
@@ -1773,7 +1943,8 @@ private:
             }
             else
             {
-                more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
             }
         }
     }
@@ -2001,13 +2172,16 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                more_ = visitor_->null_value(semantic_tag::none, *this, ec);
+                visitor_->null_value(semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             case numeric_check_state::boolean_true:
-                more_ = visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                visitor_->bool_value(true, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             case numeric_check_state::boolean_false:
-                more_ = visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                visitor_->bool_value(false, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             case numeric_check_state::zero:
             case numeric_check_state::integer:
@@ -2018,11 +2192,13 @@ private:
                     auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
-                        more_ = visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                        visitor_->int64_value(val, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else // Must be overflow
                     {
-                        more_ = visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                 }
                 else
@@ -2031,11 +2207,13 @@ private:
                     auto result = jsoncons::detail::decimal_to_integer(buffer_.data(), buffer_.length(), val);
                     if (result)
                     {
-                        more_ = visitor_->uint64_value(val, semantic_tag::none, *this, ec);
+                        visitor_->uint64_value(val, semantic_tag::none, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        more_ = visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
+                        more_ = !cursor_mode_;
                     }
                     else
                     {
@@ -2051,18 +2229,21 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    more_ = visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                    visitor_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
+                    more_ = !cursor_mode_;
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    more_ = visitor_->double_value(d, semantic_tag::none, *this, ec);
+                    visitor_->double_value(d, semantic_tag::none, *this, ec);
+                    more_ = !cursor_mode_;
                 }
                 break;
             }
             default:
             {
-                more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
+                more_ = !cursor_mode_;
                 break;
             }
         }
