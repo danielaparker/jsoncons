@@ -190,7 +190,7 @@ void csv_decode_without_type_inference()
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .infer_types(false);
+        .infer_types(false);
     auto j = csv::decode_csv<jsoncons::ojson>(s,options);
 
     std::cout << pretty_print(j) << '\n';
@@ -203,9 +203,9 @@ void read_write_csv_tasks()
     jsoncons::json_decoder<jsoncons::ojson> decoder;
     auto options = csv::csv_options{}
         .assume_header(true)
-           .trim(true)
-           .ignore_empty_values(true) 
-           .column_types("integer,string,string,string");
+        .trim(true)
+        .ignore_empty_values(true) 
+        .column_types("integer,string,string,string");
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     auto tasks = decoder.get_result();
@@ -384,7 +384,7 @@ void decode_csv_stream()
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .column_types("string,float,float,float,float");
+        .column_types("string,float,float,float,float");
 
     std::istringstream is(bond_yields);
 
@@ -423,9 +423,9 @@ void decode_encode_csv_tasks()
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .trim(true)
-           .ignore_empty_values(true) 
-           .column_types("integer,string,string,string");
+        .trim(true)
+        .ignore_empty_values(true) 
+        .column_types("integer,string,string,string");
     auto tasks = csv::decode_csv<jsoncons::ojson>(is, options);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";

@@ -567,7 +567,7 @@ private:
     bool more_{true};
     std::size_t header_line_{1};
     bool cursor_mode_{false};
-    bool save_cursor_mode_{false};
+    bool actual_cursor_mode_{false};
     int mark_level_{0};
 
     detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
@@ -641,7 +641,7 @@ public:
 
     void cursor_mode(bool value)
     {
-        save_cursor_mode_ = value;
+        actual_cursor_mode_ = value;
         cursor_mode_ = (options_.mapping_kind() == csv_mapping_kind::m_columns) ? false : value;
     }
 
@@ -844,7 +844,7 @@ public:
                     {
                         if (!m_columns_filter_.done())
                         {
-                            more_ = m_columns_filter_.replay_parse_events(visitor, save_cursor_mode_, mark_level_);
+                            more_ = m_columns_filter_.replay_parse_events(visitor, actual_cursor_mode_, mark_level_);
                         }
                         else
                         {

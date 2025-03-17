@@ -236,7 +236,7 @@ TEST_CASE("csv_test_empty_values")
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .column_types("boolean,integer,float,string");
+        .column_types("boolean,integer,float,string");
 
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
@@ -283,8 +283,8 @@ TEST_CASE("csv_test_empty_values_with_defaults")
 
     auto options = csv::csv_options{}
         .assume_header(true) 
-           .column_types("boolean,integer,float,string")
-           .column_defaults("false,0,0.0,\"\"");
+        .column_types("boolean,integer,float,string")
+        .column_defaults("false,0,0.0,\"\"");
 
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
@@ -333,8 +333,8 @@ TEST_CASE("csv_test_empty_values_with_empty_defaults")
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .column_types("boolean,integer,float,string")
-           .column_defaults(",,,");
+        .column_types("boolean,integer,float,string")
+        .column_defaults(",,,");
 
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
@@ -1164,7 +1164,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .ignore_empty_lines(false);
+        .ignore_empty_lines(false);
 
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
@@ -1234,7 +1234,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .trim(true);
+        .trim(true);
 
     csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
@@ -1284,7 +1284,7 @@ TEST_CASE("Test decode_csv, terminating newline")
     {
         auto options = csv::csv_options{}
             .assume_header(true)
-               .mapping_kind(csv::csv_mapping_kind::m_columns);
+            .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1325,7 +1325,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
     {
         auto options = csv::csv_options{}
             .assume_header(true)
-               .mapping_kind(csv::csv_mapping_kind::m_columns);
+            .mapping_kind(csv::csv_mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object()); //-V521
         REQUIRE(j.size() == 1); //-V521
@@ -1424,7 +1424,7 @@ TEST_CASE("test_type_inference")
 
         auto options = csv::csv_options{}
             .assume_header(true)
-               .mapping_kind(csv::csv_mapping_kind::n_objects);
+            .mapping_kind(csv::csv_mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(expected == j); //-V521
@@ -1445,7 +1445,7 @@ TEST_CASE("test_type_inference")
 
         auto options = csv::csv_options{}
             .assume_header(true)
-               .mapping_kind(csv::csv_mapping_kind::m_columns);
+            .mapping_kind(csv::csv_mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(expected == j); //-V521
@@ -1462,9 +1462,9 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     auto options = csv::csv_options{}
         .assume_header(true)
-           .mapping_kind(csv::csv_mapping_kind::n_objects)
-           .trim(true)
-           .lossless_number(true);
+        .mapping_kind(csv::csv_mapping_kind::n_objects)
+        .trim(true)
+        .lossless_number(true);
 
     ojson j = csv::decode_csv<ojson>(input,options);
     REQUIRE(j.size() == 3); //-V521
@@ -1585,7 +1585,7 @@ TEST_CASE("csv_parser number detection")
 5001173100E95978)";
         auto options = jsoncons::csv::csv_options{}
             .assume_header(true)
-               .field_delimiter(',');
+            .field_delimiter(',');
 
         const auto csv = jsoncons::csv::decode_csv<jsoncons::json>(data, options);
 

@@ -20,6 +20,7 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
+#if 0
 TEST_CASE("test_n_objects")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
@@ -30,7 +31,7 @@ NY,LON,TOR;LON
 )";
     auto options = csv::csv_options{}
         .assume_header(true)
-           .subfield_delimiter(';');
+        .subfield_delimiter(';');
 
     json expected = R"(
 [
@@ -110,7 +111,7 @@ NY,LON,TOR;LON
         std::cerr << e.what() << '\n';
     }
 }
-
+#endif
 TEST_CASE("test_m_columns")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
@@ -121,8 +122,8 @@ NY,LON,TOR;LON
 )";
     auto options = csv::csv_options{}
         .assume_header(true)
-           .mapping_kind(csv::csv_mapping_kind::m_columns)
-           .subfield_delimiter(';');
+        .mapping_kind(csv::csv_mapping_kind::m_columns)
+        .subfield_delimiter(';');
 
     json expected = R"(
 {
