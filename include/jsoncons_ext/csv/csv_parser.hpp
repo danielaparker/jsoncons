@@ -641,7 +641,8 @@ public:
 
     void cursor_mode(bool value)
     {
-        save_cursor_mode_ = cursor_mode_ = value;
+        save_cursor_mode_ = value;
+        cursor_mode_ = (options_.mapping_kind() == csv_mapping_kind::m_columns) ? false : value;
     }
 
     int level() const
@@ -731,7 +732,6 @@ public:
         {
             case csv_mapping_kind::m_columns:
                 visitor_ = &m_columns_filter_;
-                save_cursor_mode_ = cursor_mode_;
                 cursor_mode_ = false;
                 break;
             default:

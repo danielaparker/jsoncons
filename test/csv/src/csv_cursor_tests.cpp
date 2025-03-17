@@ -19,7 +19,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("csv_cursor eof test")
 {
     const std::string data = "";
@@ -34,7 +33,6 @@ TEST_CASE("csv_cursor eof test")
         CHECK(ec == csv::csv_errc::source_error);
     }
 }
-#endif
 
 TEST_CASE("csv_cursor n_rows test")
 {
@@ -43,7 +41,7 @@ EUR_LIBOR_06M,2015-10-23,0.0000214
 EUR_LIBOR_06M,2015-10-26,0.0000143
 EUR_LIBOR_06M,2015-10-27,0.0000001
 )";
-#if 0
+
     SECTION("n_rows test")
     {
         auto options = csv::csv_options{}
@@ -174,7 +172,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         cursor.next();
         CHECK(cursor.done());
     }
-#endif    
+    
     SECTION("m_columns test")
     {
         auto options = csv::csv_options{}
@@ -183,11 +181,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
             
         json_decoder<json> decoder;
 
-        csv::csv_string_reader reader(data,decoder);
-        reader.read();
-        json j = decoder.get_result();
-        std::cout << pretty_print(j) << '\n';    
-            
         csv::csv_string_cursor cursor(data, options);
 
         REQUIRE(cursor.current().event_type() == staj_event_type::begin_object);
@@ -239,7 +232,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.done());
     }
 }
-#if 0
+
 TEST_CASE("csv_cursor n_rows with quotes test")
 {
     const std::string data = R"("index_id","observation_date","rate"
@@ -1056,4 +1049,4 @@ TEMPLATE_TEST_CASE("csv_cursor reset test", "",
         check_csv_cursor_table("with input3", cursor, "h3", 3);
     }
 }
-#endif
+
