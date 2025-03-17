@@ -301,6 +301,7 @@ namespace detail {
                 {
                     case cached_state::begin_object:
                         visitor.begin_object(semantic_tag::none, ser_context());
+                        ++level_;
                         more = !cursor_mode;
                         column_index_ = 0;
                         state_ = cached_state::name;
@@ -308,10 +309,11 @@ namespace detail {
                     case cached_state::end_object:
                         visitor.end_object(ser_context());
                         more = !cursor_mode;
-                        if (level() == mark_level)
+                        if (level_ == mark_level)
                         {
                             more = false;
                         }
+                        --level_;
                         state_ = cached_state::done;
                         break;
                     case cached_state::name:
@@ -328,6 +330,7 @@ namespace detail {
                         break;
                     case cached_state::begin_array:
                         visitor.begin_array(semantic_tag::none, ser_context());
+                        ++level_;
                         more = !cursor_mode;
                         row_index_ = 0;
                         state_ = cached_state::item;
@@ -335,10 +338,11 @@ namespace detail {
                     case cached_state::end_array:
                         visitor.end_array(ser_context());
                         more = !cursor_mode;
-                        if (level() == mark_level)
+                        if (level_ == mark_level)
                         {
                             more = false;
                         }
+                        --level_;
                         ++column_index_;
                         state_ = cached_state::name;
                         break;
@@ -1576,10 +1580,6 @@ private:
                     case csv_mapping_kind::m_columns:
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
-                        {
-                            more_ = false;
-                        }
                         --level_;
                         break;
                 }
