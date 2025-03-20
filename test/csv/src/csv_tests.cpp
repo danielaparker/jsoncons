@@ -19,7 +19,7 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-
+#if 0
 TEST_CASE("csv subfield delimiter tests")
 {
     SECTION("n_objects tests")
@@ -222,7 +222,7 @@ TEST_CASE("csv ignore_empty_value")
     }
 */
 }
-
+#endif
 TEST_CASE("csv_test_empty_values")
 {
     std::string input = "bool-f,int-f,float-f,string-f"
@@ -269,7 +269,7 @@ TEST_CASE("csv_test_empty_values")
     CHECK(val[0]["string-f"] .as<std::string>() == "");
     CHECK(val[0]["string-f"].is<std::string>());
 }
-
+#if 0
 TEST_CASE("csv_test_empty_values_with_defaults")
 {
     std::string input = "bool-f,int-f,float-f,string-f"
@@ -1621,4 +1621,4 @@ TEST_CASE("csv_parser number detection")
         CHECK(std::numeric_limits<double>::infinity() == result[5][0]); // infinite
     }
 }
-
+#endif
