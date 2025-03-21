@@ -555,10 +555,11 @@ private:
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     std::size_t column_{1};
     std::size_t line_{1};
-    int depth_{default_depth};
+    int nesting_depth_{default_depth};
     const basic_csv_decode_options<CharT> options_;
     std::size_t column_index_{0};
     std::size_t level_{0};
+    std::size_t depth_{0};
     std::size_t offset_{0};
     jsoncons::detail::chars_to to_double_; 
     const CharT* begin_input_{nullptr};
@@ -691,9 +692,10 @@ public:
         visitor_ = nullptr;
         column_ = 1;
         line_ = 1;
-        depth_ = default_depth;
+        nesting_depth_ = default_depth;
         column_index_ = 0;
         level_ = 0;
+        depth_ = 0;
         offset_ = 0;
         begin_input_ = nullptr;
         input_end_ = nullptr;
@@ -1514,7 +1516,7 @@ private:
     {
         if (column_types_.size() > 0)
         {
-            if (level_ > 0)
+            if (depth_ > 0)
             {
                 visitor_->end_array(*this, ec);
                 more_ = !cursor_mode_;
@@ -1523,7 +1525,7 @@ private:
                     more_ = false;
                 }
                 --level_;
-                level_ = 0;
+                depth_ = 0;
             }
         }
         switch (stack_.back())
@@ -1670,7 +1672,7 @@ private:
                                 end_value(options_.infer_types(), ec);
                             }
                         }
-                        else if (level_ > 0)
+                        else if (depth_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
@@ -1731,7 +1733,7 @@ private:
                                 end_value(false, ec);
                             }
                         }
-                        else if (level_ > 0)
+                        else if (depth_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
@@ -1777,7 +1779,7 @@ private:
                 offset_ = offset_ + column_types_[column_index_ - offset_].rep_count;
                 if (column_index_ - offset_ + 1 < column_types_.size())
                 {
-                    if (column_index_ == offset_ || level_ > column_types_[column_index_-offset_].level)
+                    if (column_index_ == offset_ || depth_ > column_types_[column_index_-offset_].level)
                     {
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
@@ -1787,17 +1789,17 @@ private:
                         }
                         --level_;
                     }
-                    level_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
+                    depth_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
                 }
             }
-            if (level_ < column_types_[column_index_ - offset_].level)
+            if (depth_ < column_types_[column_index_ - offset_].level)
             {
                 visitor_->begin_array(semantic_tag::none, *this, ec);
                 more_ = !cursor_mode_;
-                level_ = column_types_[column_index_ - offset_].level;
+                depth_ = column_types_[column_index_ - offset_].level;
                 ++level_;
             }
-            else if (level_ > column_types_[column_index_ - offset_].level)
+            else if (depth_ > column_types_[column_index_ - offset_].level)
             {
                 visitor_->end_array(*this, ec);
                 more_ = !cursor_mode_;
@@ -1806,7 +1808,7 @@ private:
                     more_ = false;
                 }
                 --level_;
-                //level_ = column_types_[column_index_ - offset_].level; REVISIT
+                depth_ = column_types_[column_index_ - offset_].level;
             }
             switch (column_types_[column_index_ - offset_].col_type)
             {
