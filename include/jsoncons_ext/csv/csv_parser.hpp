@@ -1806,7 +1806,7 @@ private:
                     more_ = false;
                 }
                 --level_;
-                level_ = column_types_[column_index_ - offset_].level;
+                //level_ = column_types_[column_index_ - offset_].level; REVISIT
             }
             switch (column_types_[column_index_ - offset_].col_type)
             {
