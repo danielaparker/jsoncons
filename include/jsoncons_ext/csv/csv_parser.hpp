@@ -558,7 +558,7 @@ private:
     int nesting_depth_{default_depth};
     const basic_csv_decode_options<CharT> options_;
     std::size_t column_index_{0};
-    std::size_t level_{0};
+    int level_{0};
     std::size_t depth_{0};
     std::size_t offset_{0};
     jsoncons::detail::chars_to to_double_; 
@@ -648,7 +648,7 @@ public:
 
     int level() const
     {
-        return static_cast<int>(level_);
+        return level_;
     }
 
     int mark_level() const 
