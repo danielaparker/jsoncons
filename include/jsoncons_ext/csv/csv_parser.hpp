@@ -824,7 +824,7 @@ public:
                 case csv_parse_state::end_record:
                     if (column_index_ > 0)
                     {
-                        after_record(visitor, ec);
+                        end_record(local_visitor, ec);
                     }
                     state_ = csv_parse_state::no_more_records;
                     break;
@@ -1292,7 +1292,7 @@ public:
                         {
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record(visitor, ec);
+                                begin_record(local_visitor, ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1307,7 +1307,7 @@ public:
                         case '\r':
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record(visitor, ec);
+                                begin_record(local_visitor, ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1325,14 +1325,14 @@ public:
                             if (!options_.trim_leading())
                             {
                                 buffer_.push_back(static_cast<CharT>(curr_char));
-                                before_record(visitor, ec);
+                                begin_record(local_visitor, ec);
                                 state_ = csv_parse_state::unquoted_string;
                             }
                             ++column_;
                             ++input_ptr_;
                             break;
                         default:
-                            before_record(visitor, ec);
+                            begin_record(local_visitor, ec);
                             if (curr_char == options_.quote_char())
                             {
                                 buffer_.clear();
@@ -1357,7 +1357,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record(visitor, ec);
+                            end_record(local_visitor, ec);
                             ++input_ptr_;
                             break;
                         }
@@ -1365,7 +1365,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record(visitor, ec);
+                            end_record(local_visitor, ec);
                             push_state(state_);
                             state_ = csv_parse_state::cr;
                             ++input_ptr_;
@@ -1494,7 +1494,7 @@ private:
     }
 
     // begin_array or begin_record
-    void before_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+    void begin_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
         offset_ = 0;
 
@@ -1540,7 +1540,7 @@ private:
     }
 
     // end_array, begin_array, string_value (headers)
-    void after_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+    void end_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
         if (!column_types_.empty())
         {
@@ -1563,7 +1563,7 @@ private:
                 case csv_mapping_kind::m_columns:
                     if (depth_ > 0)
                     {
-                        m_columns_filter_.end_array(*this, ec);
+                        visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         --level_;
                         depth_ = 0;
@@ -1625,7 +1625,7 @@ private:
                         --level_;
                         break;
                     case csv_mapping_kind::m_columns:
-                        m_columns_filter_.end_array(*this, ec);
+                        visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         --level_;
                         break;
