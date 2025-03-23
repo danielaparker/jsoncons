@@ -730,6 +730,9 @@ public:
 
     void parse_some(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        basic_json_visitor<CharT>& local_visitor = (options_.mapping_kind() == csv_mapping_kind::m_columns) 
+            ? m_columns_filter_ : visitor;
+
         switch (options_.mapping_kind())
         {
             case csv_mapping_kind::m_columns:
@@ -760,7 +763,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -837,7 +840,7 @@ public:
                         default:
                             break;
                     }
-                    visitor_->end_array(*this, ec);
+                    local_visitor.end_array(*this, ec);
                     more_ = !cursor_mode_;
                     if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                     {
@@ -873,7 +876,7 @@ public:
                         return;
                     }
                     stack_.pop_back();
-                    visitor_->flush();
+                    local_visitor.flush();
                     state_ = csv_parse_state::done;
                     more_ = false;
                     return;
@@ -906,7 +909,7 @@ public:
                 case csv_parse_state::start:
                     if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                     {
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        local_visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                     }
@@ -914,7 +917,7 @@ public:
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        local_visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         state_ = csv_parse_state::expect_comment_or_record;
                         ++level_;
@@ -927,13 +930,13 @@ public:
                 case csv_parse_state::column_labels:
                     if (column_index_ < column_names_.size())
                     {
-                        visitor_->string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
+                        local_visitor.string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++column_index_;
                     }
                     else
                     {
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -1102,7 +1105,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -1124,7 +1127,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -1150,7 +1153,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
@@ -1169,7 +1172,7 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        local_visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                     }
@@ -1189,7 +1192,7 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        local_visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                     }
@@ -1209,7 +1212,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        visitor_->end_array(*this, ec);
+                        local_visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
