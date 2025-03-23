@@ -1477,14 +1477,18 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
-                if (options_.assume_header() && line_ == header_line_)
+                switch (options_.mapping_kind())
                 {
-                    if (options_.mapping_kind() == csv_mapping_kind::n_rows)
-                    {
-                        visitor.begin_array(semantic_tag::none, *this, ec);
-                        more_ = !cursor_mode_;
-                        ++level_;
-                    }
+                    case csv_mapping_kind::n_rows:
+                        if (options_.assume_header() && line_ == header_line_)
+                        {
+                            visitor.begin_array(semantic_tag::none, *this, ec);
+                            more_ = !cursor_mode_;
+                            ++level_;
+                        }
+                        break;
+                    default:
+                        break;
                 }
                 break;
             case csv_mode::data:
@@ -1514,18 +1518,35 @@ private:
     // end_array, begin_array, string_value (headers)
     void after_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (column_types_.size() > 0)
+        if (!column_types_.empty())
         {
-            if (depth_ > 0)
+            switch (options_.mapping_kind())
             {
-                visitor_->end_array(*this, ec);
-                more_ = !cursor_mode_;
-                if (level() == mark_level_)
-                {
-                    more_ = false;
-                }
-                --level_;
-                depth_ = 0;
+                case csv_mapping_kind::n_rows:
+                case csv_mapping_kind::n_objects:
+                    if (depth_ > 0)
+                    {
+                        visitor.end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        if (level_ == mark_level_)
+                        {
+                            more_ = false;
+                        }
+                        --level_;
+                        depth_ = 0;
+                    }
+                    break;
+                case csv_mapping_kind::m_columns:
+                    if (depth_ > 0)
+                    {
+                        m_columns_filter_.end_array(*this, ec);
+                        more_ = !cursor_mode_;
+                        --level_;
+                        depth_ = 0;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
         switch (stack_.back())
@@ -1564,7 +1585,7 @@ private:
                     case csv_mapping_kind::n_rows:
                         visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (level_ == mark_level_)
                         {
                             more_ = false;
                         }
@@ -1573,7 +1594,7 @@ private:
                     case csv_mapping_kind::n_objects:
                         visitor.end_object(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (level_ == mark_level_)
                         {
                             more_ = false;
                         }
