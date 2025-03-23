@@ -721,7 +721,7 @@ public:
     void parse_some(basic_json_visitor<CharT>& visitor)
     {
         std::error_code ec;
-        parse_some(visitor,ec);
+        parse_some(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,line_,column_));
@@ -818,7 +818,7 @@ public:
                 case csv_parse_state::end_record:
                     if (column_index_ > 0)
                     {
-                        after_record(ec);
+                        after_record(visitor, ec);
                     }
                     state_ = csv_parse_state::no_more_records;
                     break;
@@ -1268,7 +1268,7 @@ public:
                         {
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record(ec);
+                                before_record(visitor, ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1283,7 +1283,7 @@ public:
                         case '\r':
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record(ec);
+                                before_record(visitor, ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1301,14 +1301,14 @@ public:
                             if (!options_.trim_leading())
                             {
                                 buffer_.push_back(static_cast<CharT>(curr_char));
-                                before_record(ec);
+                                before_record(visitor, ec);
                                 state_ = csv_parse_state::unquoted_string;
                             }
                             ++column_;
                             ++input_ptr_;
                             break;
                         default:
-                            before_record(ec);
+                            before_record(visitor, ec);
                             if (curr_char == options_.quote_char())
                             {
                                 buffer_.clear();
@@ -1333,7 +1333,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record(ec);
+                            after_record(visitor, ec);
                             ++input_ptr_;
                             break;
                         }
@@ -1341,7 +1341,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record(ec);
+                            after_record(visitor, ec);
                             push_state(state_);
                             state_ = csv_parse_state::cr;
                             ++input_ptr_;
@@ -1470,7 +1470,7 @@ private:
     }
 
     // begin_array or begin_record
-    void before_record(std::error_code& ec)
+    void before_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
         offset_ = 0;
 
@@ -1481,7 +1481,7 @@ private:
                 {
                     if (options_.mapping_kind() == csv_mapping_kind::n_rows)
                     {
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                     }
@@ -1491,12 +1491,12 @@ private:
                 switch (options_.mapping_kind())
                 {
                     case csv_mapping_kind::n_rows:
-                        visitor_->begin_array(semantic_tag::none, *this, ec);
+                        visitor.begin_array(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                         break;
                     case csv_mapping_kind::n_objects:
-                        visitor_->begin_object(semantic_tag::none, *this, ec);
+                        visitor.begin_object(semantic_tag::none, *this, ec);
                         more_ = !cursor_mode_;
                         ++level_;
                         break;
@@ -1512,7 +1512,7 @@ private:
     }
 
     // end_array, begin_array, string_value (headers)
-    void after_record(std::error_code& ec)
+    void after_record(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
         if (column_types_.size() > 0)
         {
@@ -1540,7 +1540,7 @@ private:
                     case csv_mapping_kind::n_rows:
                         if (options_.assume_header())
                         {
-                            visitor_->end_array(*this, ec);
+                            visitor.end_array(*this, ec);
                             more_ = !cursor_mode_;
                             if (level() == mark_level_)
                             {
@@ -1562,7 +1562,7 @@ private:
                 switch (options_.mapping_kind())
                 {
                     case csv_mapping_kind::n_rows:
-                        visitor_->end_array(*this, ec);
+                        visitor.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         if (level() == mark_level_)
                         {
@@ -1571,7 +1571,7 @@ private:
                         --level_;
                         break;
                     case csv_mapping_kind::n_objects:
-                        visitor_->end_object(*this, ec);
+                        visitor.end_object(*this, ec);
                         more_ = !cursor_mode_;
                         if (level() == mark_level_)
                         {
@@ -1580,7 +1580,7 @@ private:
                         --level_;
                         break;
                     case csv_mapping_kind::m_columns:
-                        visitor_->end_array(*this, ec);
+                        m_columns_filter_.end_array(*this, ec);
                         more_ = !cursor_mode_;
                         --level_;
                         break;
