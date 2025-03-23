@@ -20,7 +20,6 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-#if 0
 TEST_CASE("test_n_objects")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
@@ -111,7 +110,7 @@ NY,LON,TOR;LON
         std::cerr << e.what() << '\n';
     }
 }
-#endif
+
 TEST_CASE("test_m_columns")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters

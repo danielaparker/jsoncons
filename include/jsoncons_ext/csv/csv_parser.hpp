@@ -762,9 +762,12 @@ public:
                         stack_.pop_back();
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -836,9 +839,12 @@ public:
                     }
                     visitor_->end_array(*this, ec);
                     more_ = !cursor_mode_;
-                    if (level() == mark_level_)
+                    if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                     {
-                        more_ = false;
+                        if (level() == mark_level_)
+                        {
+                            more_ = false;
+                        }
                     }
                     --level_;
                     
@@ -929,9 +935,12 @@ public:
                     {
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                         
@@ -1095,9 +1104,12 @@ public:
                         stack_.pop_back();
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -1114,9 +1126,12 @@ public:
                         stack_.pop_back();
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -1137,9 +1152,12 @@ public:
                         stack_.pop_back();
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -1193,9 +1211,12 @@ public:
                         stack_.pop_back();
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -1804,9 +1825,12 @@ private:
                     {
                         visitor_->end_array(*this, ec);
                         more_ = !cursor_mode_;
-                        if (level() == mark_level_)
+                        if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                         {
-                            more_ = false;
+                            if (level() == mark_level_)
+                            {
+                                more_ = false;
+                            }
                         }
                         --level_;
                     }
@@ -1824,9 +1848,12 @@ private:
             {
                 visitor_->end_array(*this, ec);
                 more_ = !cursor_mode_;
-                if (level() == mark_level_)
+                if (options_.mapping_kind() != csv_mapping_kind::m_columns)
                 {
-                    more_ = false;
+                    if (level() == mark_level_)
+                    {
+                        more_ = false;
+                    }
                 }
                 --level_;
                 depth_ = column_types_[column_index_ - offset_].level;
